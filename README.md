@@ -1,6 +1,6 @@
 # Introduction
 
-Piper is a (non-BPM) workflow engine designed to be dead simple. 
+Piper is a distributed workflow engine designed to be dead simple. 
 
 In Piper, work to be done is defined as a set of tasks called a Pipeline. Pipelines can be sourced from many locations but typically they live on a Git repository where they can be versioned and tracked.
 
