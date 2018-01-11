@@ -34,7 +34,10 @@ public class Bash implements TaskHandler<String> {
     File logFile = File.createTempFile("log", null);
     FileUtils.writeStringToFile(scriptFile, aTask.getRequiredString("script"));
     try (PrintStream stream = new PrintStream(logFile);) {
-      Runtime.getRuntime().exec(String.format("chmod u+x %s",scriptFile.getAbsolutePath()));
+      Process chmod = Runtime.getRuntime().exec(String.format("chmod u+x %s",scriptFile.getAbsolutePath()));
+      int chmodRetCode = chmod.waitFor();
+      if(chmodRetCode != 0)
+        throw new ExecuteException("Failed to chmod", chmodRetCode);
       CommandLine cmd = new CommandLine (scriptFile.getAbsolutePath());
       logger.debug("{}",cmd);
       DefaultExecutor exec = new DefaultExecutor();
