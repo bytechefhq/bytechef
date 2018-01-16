@@ -42,6 +42,7 @@ public class JobStatusWebhookEventListener implements EventListener {
       if(Events.JOB_STATUS.equals(webhook.getRequiredString(DSL.TYPE))) {
         MapObject webhookEvent = new MapObject(webhook.asMap());
         webhookEvent.put(DSL.EVENT,aEvent.asMap());
+        logger.debug("Calling webhook {} -> {}",webhook.getRequiredString(DSL.URL),webhookEvent);
         rest.postForObject(webhook.getRequiredString(DSL.URL), webhookEvent, String.class);
       }
     }

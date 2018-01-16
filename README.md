@@ -196,7 +196,31 @@ Produces a new collection of values by mapping each value in `list` through the 
   iteratee:
     type: filesize         
     file: ${item}
-``` 
+```
+
+
+## Webhooks
+
+Piper provide the ability to register HTTP webhooks to receieve notifications for certain events. 
+
+Registering webhooks is done when creating the job. E.g.:
+
+```
+{
+	"pipelineId": "demo/hello",
+	"inputs": {
+		...
+	},
+	"webhooks": [{
+		"type": "job.status", 
+		"url": "http://example.com"
+	}]
+}
+```
+
+`type` is the type of event you would like to be notified on and `url` is the URL that Piper would be calling when the event occurs. 
+
+Supported types are `job.status` and `task.started`.
 
 # Tutorials
 
