@@ -207,14 +207,14 @@ Registering webhooks is done when creating the job. E.g.:
 
 ```
 {
-	"pipelineId": "demo/hello",
-	"inputs": {
-		...
-	},
-	"webhooks": [{
-		"type": "job.status", 
-		"url": "http://example.com"
-	}]
+  "pipelineId": "demo/hello",
+  "inputs": {
+    ...
+  },
+  "webhooks": [{
+    "type": "job.status", 
+    "url": "http://example.com"
+  }]
 }
 ```
 
