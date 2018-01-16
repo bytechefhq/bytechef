@@ -5,7 +5,9 @@ import java.util.Date;
 
 import javax.sql.DataSource;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ import org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.creactiviti.piper.core.Page;
 import com.creactiviti.piper.core.task.JdbcTaskExecutionRepository;
@@ -37,6 +42,8 @@ public class JdbcJobRepositoryTests {
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
     
+    int pageTotal = jobRepository.findAll(1).getNumber();
+    
     SimpleJob job = new SimpleJob();
     job.setPipelineId("demo:1234");
     job.setId("1");
@@ -45,8 +52,7 @@ public class JdbcJobRepositoryTests {
     jobRepository.create(job);
     
     Page<Job> all = jobRepository.findAll(1);
-    Assert.assertEquals(1,all.getSize());
-    Assert.assertEquals("1",all.getItems().get(0).getId());
+    Assert.assertEquals(pageTotal+1,all.getSize());
     
     Job one = jobRepository.findOne("1");
     Assert.assertNotNull(one);
