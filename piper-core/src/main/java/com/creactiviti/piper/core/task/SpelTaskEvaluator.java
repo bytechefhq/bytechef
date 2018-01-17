@@ -90,13 +90,28 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   
   private MethodResolver methodResolver () {
     return (ctx,target,name,args) -> {
-      if("range".equals(name)) {
-        return range();
+      switch(name) {
+        case "range":
+          return range();
+        case "boolean":
+          return cast(Boolean.class);
+        case "byte":
+          return cast(Byte.class);
+        case "char":
+          return cast(Character.class);
+        case "short":
+          return cast(Short.class);
+        case "int":
+          return cast(Integer.class);
+        case "long":
+          return cast(Long.class);
+        case "float":
+          return cast(Float.class);
+        case "double":
+          return cast(Double.class);
+        default:
+          return null;
       }
-      else if("int".equals(name)) {
-        return toInt();
-      }
-      return null;
     };
   }
   
@@ -109,9 +124,9 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     };
   }
   
-  private MethodExecutor toInt () {
+  private <T> MethodExecutor cast(Class<T> type) {
     return (ctx,target,args) -> {
-      Integer value = (Integer) ConvertUtils.convert(args[0], Integer.class);
+      T value = type.cast(ConvertUtils.convert(args[0], type));
       return new TypedValue(value);
     };
   }
