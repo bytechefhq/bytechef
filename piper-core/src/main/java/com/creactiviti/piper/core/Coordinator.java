@@ -101,19 +101,21 @@ public class Coordinator {
     MapContext context = new MapContext(jobParams.getMap(INPUTS,Collections.EMPTY_MAP));
     contextRepository.push(job.getId(),context);
     
+    eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS,"jobId",job.getId(),"status",job.getStatus()));
+    
     messenger.send(Queues.JOBS, job);
 
     return job;
   }
 
   public void start (Job aJob) {
-    eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS,"jobId",aJob.getId(),"status",aJob.getStatus()));
     SimpleJob job = new SimpleJob(aJob);
     job.setStartTime(new Date());
     job.setStatus(JobStatus.STARTED);
     job.setCurrentTask(0);
     jobRepository.merge(job);
     jobExecutor.execute (job);
+    eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS,"jobId",aJob.getId(),"status",job.getStatus()));
   }
   
   private void validate (MapObject aCreateJobParams, Pipeline aPipeline) {
