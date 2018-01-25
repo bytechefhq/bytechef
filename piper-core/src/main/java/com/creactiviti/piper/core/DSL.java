@@ -59,7 +59,7 @@ public class DSL {
   
   public static final String TAGS = "tags";
   
-  public static final String PRIORTIY = "priority";
+  public static final String PRIORITY = "priority";
   
   public static final String SWITCH = "switch";
   
@@ -98,7 +98,7 @@ public class DSL {
                                                               STATUS,
                                                               ERROR,
                                                               EXECUTION,
-                                                              PRIORTIY,
+                                                              PRIORITY,
                                                               CURRENT_TASK
                                                             }; 
   
