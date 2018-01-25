@@ -163,11 +163,11 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
   
   @Override
   public int getPriority() {
-    return getInteger(DSL.PRIORTIY, Prioritizable.DEFAULT_PRIORITY);
+    return getInteger(DSL.PRIORITY, Prioritizable.DEFAULT_PRIORITY);
   }
   
   public void setPriority (int aPriority) {
-    set(DSL.PRIORTIY, aPriority);
+    set(DSL.PRIORITY, aPriority);
   }
     
   /**
