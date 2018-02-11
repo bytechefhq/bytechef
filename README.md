@@ -1,6 +1,6 @@
 # Introduction
 
-Piper is a distributed workflow engine designed to be dead simple. 
+Piper is an open-source, distributed workflow engine designed to be dead simple. 
 
 Piper can run on one or a thousand machines depending on your scaling needs. 
 
