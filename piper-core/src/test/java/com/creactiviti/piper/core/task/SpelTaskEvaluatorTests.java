@@ -202,6 +202,8 @@ public class SpelTaskEvaluatorTests {
     Assert.assertEquals(Long.valueOf(1L),evaluated.get("someLong"));
   }
 
+
+  
   @Test
   public void test23 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
@@ -217,4 +219,14 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
     Assert.assertEquals(Double.valueOf(1.337d),evaluated.get("someDouble"));
   }
+  
+  @Test
+  public void test25 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("tempDir", "${systemProperty('java.io.tmpdir')}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals("/tmp",evaluated.get("tempDir"));
+  }
+  
+  
 }

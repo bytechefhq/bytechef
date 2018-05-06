@@ -12,6 +12,8 @@ import java.util.stream.IntStream;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.expression.AccessException;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.MethodExecutor;
@@ -91,6 +93,8 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   private MethodResolver methodResolver () {
     return (ctx,target,name,args) -> {
       switch(name) {
+        case "systemProperty":
+          return this::systemProperty;
         case "range":
           return range();
         case "boolean":
@@ -113,6 +117,10 @@ public class SpelTaskEvaluator implements TaskEvaluator {
           return null;
       }
     };
+  }
+  
+  private TypedValue systemProperty (EvaluationContext aContext, Object aTarget, Object... aArgs) throws AccessException {
+    return new TypedValue(System.getProperty((String)aArgs[0]));
   }
   
   private MethodExecutor range () {
