@@ -37,10 +37,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(name="piper.messenger.provider",havingValue="jms")
 public class JmsMessengerConfiguration implements JmsListenerConfigurer {
 
-  @Autowired
+  @Autowired(required=false)
   private Worker worker;
   
-  @Autowired
+  @Autowired(required=false)
   private Coordinator coordinator;
 
   @Autowired
