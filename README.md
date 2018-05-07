@@ -131,7 +131,7 @@ Run the `tasks` collection of functions in parallel, without waiting until the p
 - type: parallel
   tasks: 
     - type: print
-      millis: hello
+      text: hello
         
     - type: print
       text: goodbye
