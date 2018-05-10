@@ -367,6 +367,10 @@ curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"video/transc
 
 See [Transcoding video at scale with Piper](https://medium.com/@arik.c.mail/transcoding-video-at-scale-with-piper-dca23eb26fd2)
 
+## Adaptive Streaming
+
+See [Adaptive Streaming with Piper](https://medium.com/@arik.c.mail/adaptive-streaming-with-piper-b37e55d95466)
+
 # Using Git as a Pipeline Repository backend
 
 Rather than storing the pipelines in your local file system you can use Git to store them for you. This has great advantages, not the least of which is pipeline versioning, Pull Requests and everything else Git has to offer.
