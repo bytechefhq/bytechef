@@ -12,11 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *//* 
- * Copyright (C) Creactiviti LLC - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Arik Cohen <arik@creactiviti.com>, June 2017
  */
 package com.creactiviti.piper.plugin.ffmpeg;
 
