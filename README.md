@@ -451,6 +451,13 @@ docker run --name=piper --rm -it -e piper.worker.enabled=true -e piper.coordinat
 ```
 curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"hello","inputs":{"name":"Joe Jones"}}' http://localhost:8080/jobs
 ```
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+| [<img src="https://avatars0.githubusercontent.com/u/3052806?s=460&v=4" width="100px;"/><br /><sub>Arik Cohen</sub>](http://creactiviti.com)<br /> | [<img src="https://avatars2.githubusercontent.com/u/634441?s=460&v=4" width="100px;"/><br /><sub>Vasco Gonçalves</sub>](https://github.com/vascofg)<br /> | [<img src="https://avatars0.githubusercontent.com/u/1426551?s=460&v=4" width="100px;"/><br /><sub>Daisuke MURAOKA</sub>](https://github.com/muranoya)<br /> | [<img src="https://avatars1.githubusercontent.com/u/83333?s=460&v=4" width="100px;"/><br /><sub>Julien Rottenberg</sub>](https://github.com/jrottenberg)<br /> | [<img src="https://avatars3.githubusercontent.com/u/9574336?s=460&v=4" width="100px;"/><br /><sub>Chris Camel</sub>](https://github.com/ccamel)<br /> |  
+| :---: | :---: | :---: | :---: | :---: | 
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 
 # License
