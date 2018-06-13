@@ -15,10 +15,15 @@
  */
 package com.creactiviti.piper.web;
 
+import java.io.IOException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,6 +60,11 @@ public class JobsController {
     Job job = jobRepository.findOne (aJobId);
     Assert.notNull(job,"Unknown job: " + aJobId);
     return job;
+  }
+  
+  @ExceptionHandler(IllegalArgumentException.class)
+  public void handleIllegalArgumentException (HttpServletResponse aResponse) throws IOException {
+    aResponse.sendError(HttpStatus.BAD_REQUEST.value());
   }
   
   @PutMapping(value="/jobs/{id}/restart")
