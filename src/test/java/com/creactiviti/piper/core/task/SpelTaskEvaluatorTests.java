@@ -218,15 +218,6 @@ public class SpelTaskEvaluatorTests {
     TaskExecution jt = SimpleTaskExecution.createFrom("someDouble", "${double('1.337')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
     Assert.assertEquals(Double.valueOf(1.337d),evaluated.get("someDouble"));
-  }
-  
-  @Test
-  public void test25 () {
-    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
-    TaskExecution jt = SimpleTaskExecution.createFrom("tempDir", "${systemProperty('java.io.tmpdir')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals("/tmp",evaluated.get("tempDir"));
-  }
-  
+  }  
   
 }
