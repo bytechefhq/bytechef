@@ -127,6 +127,12 @@ public class SpelTaskEvaluator implements TaskEvaluator {
           return cast(Float.class);
         case "double":
           return cast(Double.class);
+        case "join":
+          return join();
+        case "concat":
+          return concat();
+        case "flatten":
+          return flatten();
         default:
           return null;
       }
@@ -152,5 +158,36 @@ public class SpelTaskEvaluator implements TaskEvaluator {
       return new TypedValue(value);
     };
   }
-  
+
+  private <T> MethodExecutor join () {
+    return (ctx,target,args) -> {
+      String separator = (String) args[0];
+      List<T> values = (List<T>) args[1];
+      String str = values.stream()
+                         .map(String::valueOf)
+                         .collect(Collectors.joining(separator));
+      return new TypedValue(str);
+    };
+  }
+
+  private <T> MethodExecutor concat () {
+    return (ctx,target,args) -> {
+      List<T> l1 = (List<T>) args[0];
+      List<T> l2 = (List<T>) args[1];
+      List<T> joined = new ArrayList<T>(l1.size()+l2.size());
+      joined.addAll(l1);
+      joined.addAll(l2);
+      return new TypedValue(joined);
+    };
+  }
+
+  private <T> MethodExecutor flatten () {
+    return (ctx,target,args) -> {
+      List<List<T>> list = (List<List<T>>) args[0];
+      List<T> flat = list.stream()
+                         .flatMap(List::stream)
+                         .collect(Collectors.toList());
+      return new TypedValue(flat);
+    };
+  }
 }

@@ -202,8 +202,6 @@ public class SpelTaskEvaluatorTests {
     Assert.assertEquals(Long.valueOf(1L),evaluated.get("someLong"));
   }
 
-
-  
   @Test
   public void test23 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
@@ -218,6 +216,61 @@ public class SpelTaskEvaluatorTests {
     TaskExecution jt = SimpleTaskExecution.createFrom("someDouble", "${double('1.337')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
     Assert.assertEquals(Double.valueOf(1.337d),evaluated.get("someDouble"));
-  }  
-  
+  }
+
+  @Test
+  public void test25 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(',',range(1,3))}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals("1,2,3",evaluated.get("joined"));
+  }
+
+  @Test
+  public void test26 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(',',range(1,1))}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals("1",evaluated.get("joined"));
+  }
+
+  @Test
+  public void test27 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(' and ',{'a','b','c'})}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals("a and b and c",evaluated.get("joined"));
+  }
+
+  @Test
+  public void test28 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("concatenated"));
+  }
+
+  @Test
+  public void test29 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("concatenated", "${concat({'a','b','c'}, range(1,3))}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("concatenated"));
+  }
+
+  @Test
+  public void test30 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("flattened"));
+  }
+
+  @Test
+  public void test31 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},range(1,3)})}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("flattened"));
+  }
 }
