@@ -161,11 +161,9 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     return (ctx,target,args) -> {
       String separator = (String) args[0];
       List<T> values = (List<T>) args[1];
-      List<String> strings = new ArrayList<>(values.size());
-      for (T obj : values) {
-        strings.add(String.valueOf(obj));
-      }
-      String str = String.join(separator, strings);
+      String str = values.stream()
+                         .map(String::valueOf)
+                         .collect(Collectors.joining(separator));
       return new TypedValue(str);
     };
   }
