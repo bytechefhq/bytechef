@@ -127,6 +127,10 @@ public class SpelTaskEvaluator implements TaskEvaluator {
           return cast(Float.class);
         case "double":
           return cast(Double.class);
+        case "join":
+          return join();
+        case "concat":
+          return concat();
         default:
           return null;
       }
@@ -152,5 +156,28 @@ public class SpelTaskEvaluator implements TaskEvaluator {
       return new TypedValue(value);
     };
   }
-  
+
+  private <T> MethodExecutor join () {
+    return (ctx,target,args) -> {
+      String separator = (String) args[0];
+      List<T> values = (List<T>) args[1];
+      List<String> strings = new ArrayList<>(values.size());
+      for (T obj : values) {
+        strings.add(String.valueOf(obj));
+      }
+      String str = String.join(separator, strings);
+      return new TypedValue(str);
+    };
+  }
+
+  private <T> MethodExecutor concat () {
+    return (ctx,target,args) -> {
+      List<T> l1 = (List<T>) args[0];
+      List<T> l2 = (List<T>) args[1];
+      List<T> joined = new ArrayList<T>(l1.size()+l2.size());
+      joined.addAll(l1);
+      joined.addAll(l2);
+      return new TypedValue(joined);
+    };
+  }
 }
