@@ -131,6 +131,8 @@ public class SpelTaskEvaluator implements TaskEvaluator {
           return join();
         case "concat":
           return concat();
+        case "flatten":
+          return flatten();
         default:
           return null;
       }
@@ -176,6 +178,16 @@ public class SpelTaskEvaluator implements TaskEvaluator {
       joined.addAll(l1);
       joined.addAll(l2);
       return new TypedValue(joined);
+    };
+  }
+
+  private <T> MethodExecutor flatten () {
+    return (ctx,target,args) -> {
+      List<List<T>> list = (List<List<T>>) args[0];
+      List<T> flat = list.stream()
+                         .flatMap(List::stream)
+                         .collect(Collectors.toList());
+      return new TypedValue(flat);
     };
   }
 }

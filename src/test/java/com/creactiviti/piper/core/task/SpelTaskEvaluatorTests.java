@@ -257,4 +257,20 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
     Assert.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("concatenated"));
   }
+
+  @Test
+  public void test30 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("flattened"));
+  }
+
+  @Test
+  public void test31 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},range(1,3)})}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    Assert.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("flattened"));
+  }
 }
