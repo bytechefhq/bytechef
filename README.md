@@ -381,8 +381,8 @@ You can change it by using the `piper.pipeline-repository.git.url` and `piper.pi
 
 # Configuration
 
-```
-# messaging provider between Coordinator and Workers (jms | amqp) default: jms
+```ini
+# messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
 piper.messenger.provider=jms
 # turn on the Coordinator process
 piper.coordinator.enabled=true
