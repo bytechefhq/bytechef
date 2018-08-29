@@ -11,4 +11,4 @@ java -jar \
      -Dpiper.pipeline-repository.git.search-paths=demo/,video/ \
      -Dpiper.pipeline-repository.filesystem.enabled=true \
      -Dpiper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
-     piper-server/target/piper-server-0.0.1-SNAPSHOT.jar
+     target/piper-0.0.1-SNAPSHOT.jar

@@ -8,5 +8,5 @@ java -jar \
      -Dpiper.worker.enabled=false \
      -Dpiper.pipeline-repository.git.enabled=false \
      -Dpiper.pipeline-repository.filesystem.enabled=true \
-     -Dpiper.pipeline-repository.filesystem.base-path=$HOME/piper/**/*.yaml \
-     piper-server/target/piper-server-0.0.1-SNAPSHOT.jar 
+     -Dpiper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
+     target/piper-0.0.1-SNAPSHOT.jar
