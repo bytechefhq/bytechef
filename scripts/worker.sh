@@ -7,4 +7,4 @@ java -jar \
      -Dserver.port=8181 \
      -Dpiper.worker.enabled=true \
      -Dpiper.worker.subscriptions.tasks=10 \
-     piper-server/target/piper-server-0.0.1-SNAPSHOT.jar 
+     target/piper-0.0.1-SNAPSHOT.jar
