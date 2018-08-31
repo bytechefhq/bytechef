@@ -9,3 +9,4 @@ target
 /.apt_generated/
 *.iml
 .sts4-cache/
+application.pid
