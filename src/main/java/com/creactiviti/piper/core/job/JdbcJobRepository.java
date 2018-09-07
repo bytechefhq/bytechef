@@ -26,6 +26,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
+import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.Page;
 import com.creactiviti.piper.core.ResultPage;
 import com.creactiviti.piper.core.json.JsonHelper;
@@ -83,7 +84,7 @@ public class JdbcJobRepository implements JobRepository {
   @Override
   public void create (Job aJob) {
     MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
-    jdbc.update("insert into job (id,create_time,start_time,status,current_task,pipeline_id,label,tags,priority,inputs,webhooks,outputs) values (:id,:createTime,:startTime,:status,:currentTask,:pipelineId,:label,:tags,:priority,:inputs,:webhooks,:outputs)", sqlParameterSource);
+    jdbc.update("insert into job (id,create_time,start_time,status,current_task,pipeline_id,label,tags,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:pipelineId,:label,:tags,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)", sqlParameterSource);
   }
 
   private MapSqlParameterSource createSqlParameterSource(Job aJob) {
@@ -106,6 +107,7 @@ public class JdbcJobRepository implements JobRepository {
     sqlParameterSource.addValue("inputs", JsonHelper.writeValueAsString(json,job.getInputs()));
     sqlParameterSource.addValue("outputs", JsonHelper.writeValueAsString(json,job.getOutputs()));
     sqlParameterSource.addValue("webhooks", JsonHelper.writeValueAsString(json,job.getWebhooks()));
+    sqlParameterSource.addValue("parentTaskExecutionId", job.getParentTaskExecutionId());
     return sqlParameterSource;
   }
   
@@ -133,6 +135,7 @@ public class JdbcJobRepository implements JobRepository {
     map.put("inputs", JsonHelper.readValue(json,aRs.getString("inputs"),Map.class));
     map.put("outputs", JsonHelper.readValue(json,aRs.getString("outputs"),Map.class));
     map.put("webhooks", JsonHelper.readValue(json,aRs.getString("webhooks"),List.class));
+    map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
     return new SimpleJob(map);
   }
   
