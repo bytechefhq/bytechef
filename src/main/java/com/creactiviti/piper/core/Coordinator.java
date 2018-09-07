@@ -188,6 +188,7 @@ public class Coordinator {
     log.debug("Resuming job {}", aJobId);
     Job job = jobRepository.findOne (aJobId);
     Assert.notNull(job,String.format("Unknown job %s",aJobId));
+    Assert.isTrue(job.getParentTaskExecutionId() == null,"Can't resume a subflow");
     Assert.isTrue(isRestartable(job), "can't stop job " + aJobId + " as it is " + job.getStatus());
     SimpleJob mjob = new SimpleJob (job);
     mjob.setStatus(JobStatus.STARTED);
