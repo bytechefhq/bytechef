@@ -24,6 +24,10 @@ import com.creactiviti.piper.core.messenger.Messenger;
 import com.creactiviti.piper.core.messenger.Queues;
 
 /**
+ * a {@link TaskDispatcher} implementation which handles the 'subflow' 
+ * task type. Subflows are essentially isolated job instances started 
+ * by the parent 'subflow' task which is the owner of the sub-flow. 
+ * 
  * @author Arik Cohen
  * @since Sep 06, 2018
  */
