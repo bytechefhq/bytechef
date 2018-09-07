@@ -51,15 +51,17 @@ public class SubflowJobStatusEventListener implements EventListener {
         case CREATED:
         case STARTED:
           break;
-        case STOPPED:
+        case STOPPED: {
           TaskExecution subflowTask = taskExecutionRepository.findOne(job.getParentTaskExecutionId());
           coordinator.stop(subflowTask.getJobId());
           break;
-        case FAILED:
+        }
+        case FAILED: {
           SimpleTaskExecution errorable = SimpleTaskExecution.createForUpdate(taskExecutionRepository.findOne(job.getParentTaskExecutionId()));
           errorable.setError(new ErrorObject("An error occured with subflow",new String[0]));
           coordinator.handleError(errorable);
           break;
+        }
         case COMPLETED:{
           SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(taskExecutionRepository.findOne(job.getParentTaskExecutionId()));
           Object output = job.getOutputs();
