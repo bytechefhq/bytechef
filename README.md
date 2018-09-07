@@ -204,7 +204,7 @@ Produces a new collection of values by mapping each value in `list` through the 
 
 ## Subflow
 
-Starts a new job as a sub-flow of the current job. Output of the sub-flow job will then become the output of the task. 
+Starts a new job as a sub-flow of the current job. Output of the sub-flow job will be the output of the task. 
 
 ```    
 - type: subflow
