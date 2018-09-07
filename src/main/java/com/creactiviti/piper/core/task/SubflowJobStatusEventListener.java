@@ -13,8 +13,14 @@ import com.creactiviti.piper.core.job.JobRepository;
 import com.creactiviti.piper.core.job.JobStatus;
 
 /**
+ * an {@link EventListener} which is used for listening to subflow
+ * job status events. When a sub-flow completes/fails or stops its
+ * parent job and its parent task needs to be informed so as to
+ * resume its execution.
+ * 
  * @author Arik Cohen
  * @since Sep 06, 2018
+ * @see SubflowTaskDispatcher
  */
 public class SubflowJobStatusEventListener implements EventListener {
 
