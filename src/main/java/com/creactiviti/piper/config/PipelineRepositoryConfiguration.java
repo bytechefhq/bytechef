@@ -60,6 +60,7 @@ public class PipelineRepositoryConfiguration {
     GitPipelineRepository gitPipelineRepository = new GitPipelineRepository();
     gitPipelineRepository.setUrl(piperProperties.getPipelineRepository().getGit().getUrl());
     gitPipelineRepository.setSearchPaths(piperProperties.getPipelineRepository().getGit().getSearchPaths());
+    gitPipelineRepository.setBranch(piperProperties.getPipelineRepository().getGit().getBranch());
     return gitPipelineRepository;
   }  
   

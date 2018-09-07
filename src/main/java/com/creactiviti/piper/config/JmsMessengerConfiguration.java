@@ -18,6 +18,8 @@ package com.creactiviti.piper.config;
 import java.util.Map;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.Message;
+import javax.jms.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +105,7 @@ public class JmsMessengerConfiguration implements JmsListenerConfigurer {
       registerListenerEndpoint(aRegistrar, Queues.ERRORS, coordinatorProperties.getSubscriptions().getErrors(), coordinator, "handleError");
       registerListenerEndpoint(aRegistrar, Queues.EVENTS, coordinatorProperties.getSubscriptions().getEvents(), eventListener, "onApplicationEvent");
       registerListenerEndpoint(aRegistrar, Queues.JOBS, coordinatorProperties.getSubscriptions().getJobs(), coordinator, "start");
+      registerListenerEndpoint(aRegistrar, Queues.SUBFLOWS, coordinatorProperties.getSubscriptions().getJobs(), coordinator, "create");
     }
     if(workerProperties.isEnabled()) {
       Map<String, Object> subscriptions = workerProperties.getSubscriptions();
@@ -114,7 +117,7 @@ public class JmsMessengerConfiguration implements JmsListenerConfigurer {
   private void registerListenerEndpoint(JmsListenerEndpointRegistrar aRegistrar, String aQueueName, int aConcurrency, Object aDelegate, String aMethodName) {
     logger.info("Registring JMS Listener: {} -> {}:{}", aQueueName, aDelegate.getClass().getName(), aMethodName);
     
-    MessageListenerAdapter messageListener = new MessageListenerAdapter(aDelegate);
+    MessageListenerAdapter messageListener = new NoReplyMessageListenerAdapter(aDelegate);
     messageListener.setMessageConverter(jacksonJmsMessageConverter(objectMapper));
     messageListener.setDefaultListenerMethod(aMethodName);
 
@@ -133,4 +136,16 @@ public class JmsMessengerConfiguration implements JmsListenerConfigurer {
     return factory;
   }
   
+  private static class NoReplyMessageListenerAdapter extends MessageListenerAdapter {
+    
+    public NoReplyMessageListenerAdapter (Object aDelegate) {
+      super(aDelegate);
+    }
+    
+    @Override
+    protected void handleResult(Object aResult, Message aRequest, Session aSession) {
+      // ignore
+    }
+    
+  }
 }

@@ -107,6 +107,7 @@ public class Coordinator {
     job.setPipelineId(pipeline.getId());
     job.setStatus(JobStatus.CREATED);
     job.setCreateTime(new Date());
+    job.setParentTaskExecutionId((String)aJobParams.get(DSL.PARENT_TASK_EXECUTION_ID));
     job.setTags(tags!=null?tags.toArray(new String[tags.size()]):new String[0]);
     job.setWebhooks(webhooks!=null?webhooks:Collections.EMPTY_LIST);
     job.setInputs(inputs);

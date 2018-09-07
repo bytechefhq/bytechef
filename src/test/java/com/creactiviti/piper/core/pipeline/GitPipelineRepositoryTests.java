@@ -26,11 +26,11 @@ public class GitPipelineRepositoryTests {
     ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     
     @Override
-    public List<IdentifiableResource> getHeadFiles(String aUrl, String... aSearchPath) {
+    public List<IdentifiableResource> getHeadFiles(String aUrl, String aBranch, String... aSearchPath) {
       return Arrays.asList(new IdentifiableResource("demo/hello/123", resolver.getResource("file:pipelines/demo/hello.yaml")));
     }
     @Override
-    public IdentifiableResource getFile(String aUrl, String aFileId) {
+    public IdentifiableResource getFile(String aUrl, String aBranch, String aFileId) {
       return new IdentifiableResource("demo/hello/123", resolver.getResource("file:pipelines/demo/hello.yaml"));
     }
     

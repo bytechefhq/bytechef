@@ -15,14 +15,19 @@
  */
 package com.creactiviti.piper.core.task;
 
-import com.creactiviti.piper.core.messenger.Exchanges;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.Queues;
 
 /**
  * @author Arik Cohen
  * @since Sep 06, 2018
  */
-public class SubflowTaskDispatcher implements TaskDispatcher<ControlTask>, TaskDispatcherResolver {
+public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
   private final Messenger messenger;
   
@@ -31,8 +36,12 @@ public class SubflowTaskDispatcher implements TaskDispatcher<ControlTask>, TaskD
   }
   
   @Override
-  public void dispatch(ControlTask aTask) {
-    messenger.send(Exchanges.CONTROL+"/"+Exchanges.CONTROL, aTask);
+  public void dispatch(TaskExecution aTask) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(DSL.INPUTS, aTask.getMap(DSL.INPUTS, Collections.emptyMap()));
+    params.put(DSL.PARENT_TASK_EXECUTION_ID, aTask.getId());
+    params.put(DSL.PIPELINE_ID, aTask.getRequiredString(DSL.PIPELINE_ID));
+    messenger.send(Queues.SUBFLOWS, params);
   }
 
   @Override
