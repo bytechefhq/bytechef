@@ -143,6 +143,7 @@ public class AmqpMessengerConfiguration implements RabbitListenerConfigurer {
       registerListenerEndpoint(aRegistrar, Queues.ERRORS, coordinatorProperties.getSubscriptions().getErrors(), coordinator, "handleError");
       registerListenerEndpoint(aRegistrar, Queues.EVENTS, coordinatorProperties.getSubscriptions().getEvents(), eventListener, "onApplicationEvent");
       registerListenerEndpoint(aRegistrar, Queues.JOBS, coordinatorProperties.getSubscriptions().getJobs(), coordinator, "start");
+      registerListenerEndpoint(aRegistrar, Queues.SUBFLOWS, coordinatorProperties.getSubscriptions().getSubflows(), coordinator, "create");
     }
     if(workerProperties.isEnabled()) {
       Map<String, Object> subscriptions = workerProperties.getSubscriptions();

@@ -21,6 +21,7 @@ public class CoordinatorSubscriptions {
   private int errors = 1;
   private int events = 1;
   private int jobs = 1;
+  private int subflows = 1;
 
   public int getCompletions() {
     return completions;
@@ -53,5 +54,12 @@ public class CoordinatorSubscriptions {
   public void setJobs(int aJobs) {
     jobs = aJobs;
   }
+
+  public int getSubflows() {
+    return subflows;
+  }
   
+  public void setSubflows(int aSubflows) {
+    subflows = aSubflows;
+  }
 }
