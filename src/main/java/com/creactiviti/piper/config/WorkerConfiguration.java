@@ -16,6 +16,7 @@
 package com.creactiviti.piper.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -42,6 +43,7 @@ public class WorkerConfiguration {
   }
 
   @Bean
+  @Qualifier("Worker")
   DistributedEventPublisher workerEventPublisher () {
     return new DistributedEventPublisher (messenger);
   }

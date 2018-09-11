@@ -23,8 +23,8 @@ package com.creactiviti.piper.core.event;
 public interface Events {
 
   public static final String TASK_STARTED = "task.started";
-  
+
+  public static final String TASK_PROGRESSED = "task.progressed";
+
   public static final String JOB_STATUS = "job.status";
-  
-  
 }

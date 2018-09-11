@@ -15,11 +15,12 @@
  */
 package com.creactiviti.piper.core.task;
 
-import java.util.Date;
-
 import com.creactiviti.piper.core.error.Errorable;
 import com.creactiviti.piper.core.error.Prioritizable;
+import com.creactiviti.piper.core.error.Progressable;
 import com.creactiviti.piper.core.error.Retryable;
+
+import java.util.Date;
 
 /**
  * <p>Extends the {@link PipelineTask} interface to add execution semantics to 
@@ -38,7 +39,7 @@ import com.creactiviti.piper.core.error.Retryable;
  * @author Arik Cohen
  * @since May 8, 2017
  */
-public interface TaskExecution extends PipelineTask, Errorable, Retryable, Prioritizable {
+public interface TaskExecution extends PipelineTask, Errorable, Retryable, Prioritizable, Progressable {
 
   /**
    * Get the unique id of the task instance.

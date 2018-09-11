@@ -15,22 +15,14 @@
  */
 package com.creactiviti.piper.core;
 
-import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Throwables;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.util.Assert;
 
-import com.google.common.base.Throwables;
+import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * @author Arik Cohen
@@ -217,7 +209,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
   public int getInteger(Object aKey, int aDefaultValue) {
     return get(aKey, Integer.class, aDefaultValue);
   }
-  
+
   @Override
   public Date getDate(Object aKey) {
     Object value = get(aKey);

@@ -59,11 +59,13 @@ public class DSL {
   public static final String END_TIME = "endTime";
   
   public static final String STATUS = "status";
-  
+
+  public static final String PROGRESS = "progress";
+
   public static final String OUTPUT = "output";
   
   public static final String ERROR = "error";
-  
+
   public static final String TASKS = "tasks";
   
   public static final String INPUTS = "inputs";
