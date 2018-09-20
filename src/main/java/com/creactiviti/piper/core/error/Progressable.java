@@ -8,7 +8,7 @@ package com.creactiviti.piper.core.error;
  */
 public interface Progressable {
     /**
-     *  @return the current progress value, a number between 0. and 1., or <code>null</code> otherwise.
+     *  @return the current progress value, a number between 0 and 100.
      */
-    Float getProgress ();
+    int getProgress ();
 }

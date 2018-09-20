@@ -37,7 +37,7 @@ public class TaskProgressedEventListener implements EventListener {
   public void onApplicationEvent (PiperEvent aEvent) {
     if(Events.TASK_PROGRESSED.equals(aEvent.getType())) {
       String taskId = aEvent.getString("taskId");
-      Float progress = aEvent.getFloat("progress");
+      int progress = aEvent.getInteger("progress", 0);
 
       TaskExecution task = taskExecutionRepository.findOne(taskId);
 
@@ -46,7 +46,7 @@ public class TaskProgressedEventListener implements EventListener {
       } else {
         SimpleTaskExecution mtask = SimpleTaskExecution.createForUpdate(task);
 
-        mtask.setProgess(progress);
+        mtask.setProgress(progress);
 
         taskExecutionRepository.merge(mtask);
       }

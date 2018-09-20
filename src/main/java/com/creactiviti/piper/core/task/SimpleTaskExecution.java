@@ -80,11 +80,11 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
   }
 
   @Override
-  public Float getProgress() {
-    return get(DSL.PROGRESS, Float.class);
+  public int getProgress() {
+    return get(DSL.PROGRESS, Integer.class, 0);
   }
 
-  public void setProgess(Float progress) {
+  public void setProgress(int progress) {
     set(DSL.PROGRESS, progress);
   }
 

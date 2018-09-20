@@ -55,7 +55,7 @@ public class Download implements TaskHandler<Object> {
             if (connection.getResponseCode() / 100 == 2) {
                 File downloadedFile = File.createTempFile("download-", "", null);
                 int contentLength = connection.getContentLength();
-                Consumer<Float> progressConsumer =
+                Consumer<Integer> progressConsumer =
                         (p) -> eventPublisher.publishEvent(PiperEvent.of(Events.TASK_PROGRESSED,"taskId", ((TaskExecution)aTask).getId(), "progress", p));
 
                 try (BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
@@ -76,12 +76,12 @@ public class Download implements TaskHandler<Object> {
     private static final class ProgressingOutputStream extends FilterOutputStream {
         private final int totalSize;
         private final OutputStream out;
-        private final Consumer<Float> progressConsumer;
+        private final Consumer<Integer> progressConsumer;
         private long count;
         private long lastTime;
-        private long delta = 1000;
+        private long delta = 500;
 
-        ProgressingOutputStream(OutputStream out, int totalSize, Consumer<Float> progressConsumer) {
+        ProgressingOutputStream(OutputStream out, int totalSize, Consumer<Integer> progressConsumer) {
             super(out);
 
             this.totalSize = totalSize;
@@ -108,11 +108,11 @@ public class Download implements TaskHandler<Object> {
                 long time = System.currentTimeMillis();
 
                 if( count == totalSize ) {
-                    progressConsumer.accept(1f);
+                    progressConsumer.accept(100);
                 }
 
                 if( time > lastTime + delta ) {
-                    Float p = count / (float)totalSize;
+                    int p = (int)(count * 100 / totalSize);
                     progressConsumer.accept(p);
                     lastTime = time;
                 }

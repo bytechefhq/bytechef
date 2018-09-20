@@ -86,7 +86,7 @@ public class Worker {
           }
         }
         completion.setStatus(TaskStatus.COMPLETED);
-        completion.setProgess(100.f);
+        completion.setProgress(100);
         completion.setEndTime(new Date());
         completion.setExecutionTime(System.currentTimeMillis()-startTime);
         messenger.send(Queues.COMPLETIONS, completion);
