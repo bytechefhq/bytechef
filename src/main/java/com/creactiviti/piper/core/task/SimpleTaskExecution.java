@@ -15,16 +15,16 @@
  */
 package com.creactiviti.piper.core.task;
 
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-
 import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.error.Error;
 import com.creactiviti.piper.core.error.ErrorObject;
 import com.creactiviti.piper.core.error.Prioritizable;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
 
 
 public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecution {
@@ -78,7 +78,16 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
     if(status == null) return null;
     return TaskStatus.valueOf(status);
   }
-  
+
+  @Override
+  public int getProgress() {
+    return get(DSL.PROGRESS, Integer.class, 0);
+  }
+
+  public void setProgress(int progress) {
+    set(DSL.PROGRESS, progress);
+  }
+
   @Override
   public Object getOutput() {
     return get(DSL.OUTPUT);

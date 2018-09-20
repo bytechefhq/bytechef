@@ -15,23 +15,6 @@
  */
 package com.creactiviti.piper.core;
 
-import java.time.Duration;
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-
 import com.creactiviti.piper.core.context.MapContext;
 import com.creactiviti.piper.core.error.ErrorObject;
 import com.creactiviti.piper.core.event.EventPublisher;
@@ -39,14 +22,16 @@ import com.creactiviti.piper.core.event.Events;
 import com.creactiviti.piper.core.event.PiperEvent;
 import com.creactiviti.piper.core.messenger.Messenger;
 import com.creactiviti.piper.core.messenger.Queues;
-import com.creactiviti.piper.core.task.ControlTask;
-import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
-import com.creactiviti.piper.core.task.TaskEvaluator;
-import com.creactiviti.piper.core.task.TaskExecution;
-import com.creactiviti.piper.core.task.TaskHandler;
-import com.creactiviti.piper.core.task.TaskHandlerResolver;
-import com.creactiviti.piper.core.task.TaskStatus;
+import com.creactiviti.piper.core.task.*;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+
+import java.time.Duration;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * <p>The class responsible for executing tasks spawned by the {@link Coordinator}.</p>
@@ -101,6 +86,7 @@ public class Worker {
           }
         }
         completion.setStatus(TaskStatus.COMPLETED);
+        completion.setProgress(100);
         completion.setEndTime(new Date());
         completion.setExecutionTime(System.currentTimeMillis()-startTime);
         messenger.send(Queues.COMPLETIONS, completion);

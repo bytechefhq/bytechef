@@ -50,7 +50,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
   @Override
   public void create (TaskExecution aTaskExecution) {
     SqlParameterSource sqlParameterSource = createSqlParameterSource(aTaskExecution);
-    jdbc.update("insert into task_execution (id,parent_id,job_id,serialized_execution,status,create_time,priority,task_number) values (:id,:parentId,:jobId,:serializedExecution,:status,:createTime,:priority,:taskNumber)", sqlParameterSource);
+    jdbc.update("insert into task_execution (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) values (:id,:parentId,:jobId,:serializedExecution,:status,:progress,:createTime,:priority,:taskNumber)", sqlParameterSource);
   }
   
   @Override
@@ -66,7 +66,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
       merged.setStartTime(current.getStartTime());      
     }
     SqlParameterSource sqlParameterSource = createSqlParameterSource(merged);
-    jdbc.update("update task_execution set serialized_execution=:serializedExecution,status=:status,start_time=:startTime,end_time=:endTime where id = :id ", sqlParameterSource);
+    jdbc.update("update task_execution set serialized_execution=:serializedExecution,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ", sqlParameterSource);
     return merged;
   }
   
@@ -85,6 +85,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
     sqlParameterSource.addValue("parentId", aTaskExecution.getParentId());
     sqlParameterSource.addValue("jobId", aTaskExecution.getJobId());
     sqlParameterSource.addValue("status", aTaskExecution.getStatus().toString());
+    sqlParameterSource.addValue("progress", aTaskExecution.getProgress());
     sqlParameterSource.addValue("createTime", aTaskExecution.getCreateTime());
     sqlParameterSource.addValue("startTime", aTaskExecution.getStartTime());
     sqlParameterSource.addValue("endTime", aTaskExecution.getEndTime());

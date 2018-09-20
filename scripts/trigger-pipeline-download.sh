@@ -1,0 +1,1 @@
+ curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"demo/download"}' http://localhost:8080/jobs

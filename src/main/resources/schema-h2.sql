@@ -18,6 +18,7 @@ create table task_execution (
   id varchar(256) not null primary key,
   parent_id varchar(256),
   status varchar(256) not null,
+  progress int not null,
   job_id varchar(256) not null,
   create_time timestamp not null,
   start_time timestamp,

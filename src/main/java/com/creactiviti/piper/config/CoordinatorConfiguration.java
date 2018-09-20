@@ -15,49 +15,25 @@
  */
 package com.creactiviti.piper.config;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-
-import com.creactiviti.piper.core.Coordinator;
-import com.creactiviti.piper.core.DefaultJobExecutor;
-import com.creactiviti.piper.core.DefaultTaskCompletionHandler;
-import com.creactiviti.piper.core.EachTaskCompletionHandler;
-import com.creactiviti.piper.core.ForkTaskCompletionHandler;
-import com.creactiviti.piper.core.MapTaskCompletionHandler;
-import com.creactiviti.piper.core.SwitchTaskCompletionHandler;
-import com.creactiviti.piper.core.TaskCompletionHandler;
-import com.creactiviti.piper.core.TaskCompletionHandlerChain;
+import com.creactiviti.piper.core.*;
 import com.creactiviti.piper.core.annotations.ConditionalOnCoordinator;
 import com.creactiviti.piper.core.context.Context;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.error.ErrorHandler;
 import com.creactiviti.piper.core.error.ErrorHandlerChain;
 import com.creactiviti.piper.core.error.TaskExecutionErrorHandler;
-import com.creactiviti.piper.core.event.DistributedEventPublisher;
-import com.creactiviti.piper.core.event.JobStatusWebhookEventListener;
-import com.creactiviti.piper.core.event.TaskStartedEventListener;
-import com.creactiviti.piper.core.event.TaskStartedWebhookEventListener;
+import com.creactiviti.piper.core.event.*;
 import com.creactiviti.piper.core.job.JobRepository;
 import com.creactiviti.piper.core.messenger.Messenger;
 import com.creactiviti.piper.core.pipeline.PipelineRepository;
-import com.creactiviti.piper.core.task.ControlTaskDispatcher;
-import com.creactiviti.piper.core.task.CounterRepository;
-import com.creactiviti.piper.core.task.EachTaskDispatcher;
-import com.creactiviti.piper.core.task.ForkTaskDispatcher;
-import com.creactiviti.piper.core.task.MapTaskDispatcher;
-import com.creactiviti.piper.core.task.ParallelTaskCompletionHandler;
-import com.creactiviti.piper.core.task.ParallelTaskDispatcher;
-import com.creactiviti.piper.core.task.SwitchTaskDispatcher;
-import com.creactiviti.piper.core.task.TaskDispatcher;
-import com.creactiviti.piper.core.task.TaskDispatcherChain;
-import com.creactiviti.piper.core.task.TaskDispatcherResolver;
-import com.creactiviti.piper.core.task.TaskExecutionRepository;
-import com.creactiviti.piper.core.task.WorkTaskDispatcher;
+import com.creactiviti.piper.core.task.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @ConditionalOnCoordinator
@@ -239,7 +215,12 @@ public class CoordinatorConfiguration {
   TaskStartedEventListener taskStartedEventListener () {
     return new TaskStartedEventListener(taskExecutionRepo, taskDispatcher());
   }
-  
+
+  @Bean
+  TaskProgressedEventListener taskProgressedEventListener () {
+    return new TaskProgressedEventListener(taskExecutionRepo);
+  }
+
   @Bean
   JobStatusWebhookEventListener webhookEventHandler () {
     return new JobStatusWebhookEventListener(jobRepository);
