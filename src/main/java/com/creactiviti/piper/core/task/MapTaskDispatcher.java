@@ -40,18 +40,19 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
 public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
   private final TaskDispatcher taskDispatcher;
-  private final TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private final TaskEvaluator taskEvaluator;
   private final TaskExecutionRepository taskExecutionRepo;
   private final Messenger messenger;
   private final ContextRepository contextRepository;
   private final CounterRepository counterRepository;
 
-  public MapTaskDispatcher (TaskDispatcher aTaskDispatcher, TaskExecutionRepository aTaskExecutionRepo, Messenger aMessenger, ContextRepository aContextRepository, CounterRepository aCounterRepository) {
-    taskDispatcher = aTaskDispatcher;
-    taskExecutionRepo = aTaskExecutionRepo;
-    messenger = aMessenger;
-    contextRepository = aContextRepository;
-    counterRepository = aCounterRepository;
+  private MapTaskDispatcher (Builder aBuilder) {
+    taskDispatcher = aBuilder.taskDispatcher;
+    taskExecutionRepo = aBuilder.taskExecutionRepo;
+    messenger = aBuilder.messenger;
+    contextRepository = aBuilder.contextRepository;
+    counterRepository = aBuilder.counterRepository;
+    taskEvaluator = aBuilder.taskEvaluator;
   }
 
   @Override
@@ -100,6 +101,55 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
       return this;
     }
     return null;
+  }
+  
+  public static Builder builder () {
+    return new Builder();
+  }
+  
+  public static class Builder { 
+    
+    private TaskDispatcher taskDispatcher;
+    private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+    private TaskExecutionRepository taskExecutionRepo;
+    private Messenger messenger;
+    private ContextRepository contextRepository;
+    private CounterRepository counterRepository;
+    
+    public Builder taskDispatcher(TaskDispatcher aTaskDispatcher) {
+      taskDispatcher = aTaskDispatcher;
+      return this;
+    }
+    
+    public Builder taskEvaluator(TaskEvaluator aTaskEvaluator) {
+      taskEvaluator = aTaskEvaluator;
+      return this;
+    }
+    
+    public Builder taskExecutionRepository(TaskExecutionRepository aTaskExecutionRepository) {
+      taskExecutionRepo = aTaskExecutionRepository;
+      return this;
+    }
+    
+    public Builder messenger(Messenger aMessenger) {
+      messenger = aMessenger;
+      return this;
+    }
+    
+    public Builder contextRepository(ContextRepository aContextRepository) {
+      contextRepository = aContextRepository;
+      return this;
+    }
+    
+    public Builder counterRepository(CounterRepository aCounterRepository) {
+      counterRepository = aCounterRepository;
+      return this;
+    }
+    
+    public MapTaskDispatcher build () {
+      return new MapTaskDispatcher(this);
+    }
+    
   }
 
 }
