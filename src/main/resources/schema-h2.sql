@@ -11,7 +11,8 @@ create table job (
   priority int not null,
   inputs text not null,
   webhooks text not null,
-  outputs text not null
+  outputs text not null,
+  parent_task_execution_id varchar(256)
 );
 
 create table task_execution (

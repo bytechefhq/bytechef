@@ -88,6 +88,8 @@ public class DSL {
   
   public static final String CURRENT_TASK = "currentTask";
   
+  public static final String PARENT_TASK_EXECUTION_ID = "parentTaskExecutionId";
+  
   public static final String MAP = "map";
   
   public static final String WEBHOOKS = "webhooks";
@@ -116,7 +118,8 @@ public class DSL {
                                                               ERROR,
                                                               EXECUTION,
                                                               PRIORITY,
-                                                              CURRENT_TASK
+                                                              CURRENT_TASK,
+                                                              PARENT_TASK_EXECUTION_ID
                                                             }; 
   
 }

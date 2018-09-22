@@ -47,7 +47,11 @@ inputs:                --+
     label: Your Name     | - This defines the inputs
     type: string         |   expected by the pipeline
     required: true     --+
-
+    
+outputs:                 --+
+  - name: myMagicNumber    | - You can output any of the job's
+    value: ${randomNumber} |   variable as the job's output.
+                         --+   
 tasks: 
   - name: randomNumber               --+
     label: Generate a random number    |
@@ -196,6 +200,18 @@ Produces a new collection of values by mapping each value in `list` through the 
   iteratee:
     type: filesize         
     file: ${item}
+```
+
+## Subflow
+
+Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task. 
+
+```    
+- type: subflow
+  pipelineId: copy_files
+  inputs: 
+    - source: /path/to/source/dir
+    - destination: /path/to/destination/dir
 ```
 
 

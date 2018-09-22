@@ -53,6 +53,8 @@ import com.creactiviti.piper.core.task.ForkTaskDispatcher;
 import com.creactiviti.piper.core.task.MapTaskDispatcher;
 import com.creactiviti.piper.core.task.ParallelTaskCompletionHandler;
 import com.creactiviti.piper.core.task.ParallelTaskDispatcher;
+import com.creactiviti.piper.core.task.SubflowJobStatusEventListener;
+import com.creactiviti.piper.core.task.SubflowTaskDispatcher;
 import com.creactiviti.piper.core.task.SwitchTaskDispatcher;
 import com.creactiviti.piper.core.task.TaskDispatcher;
 import com.creactiviti.piper.core.task.TaskDispatcherChain;
@@ -163,6 +165,16 @@ public class CoordinatorConfiguration {
   }
   
   @Bean
+  SubflowTaskDispatcher subflowTaskDispatcher () {
+    return new SubflowTaskDispatcher(messenger);
+  }
+  
+  @Bean
+  SubflowJobStatusEventListener subflowJobStatusEventListener () {
+    return new SubflowJobStatusEventListener(jobRepository, taskExecutionRepo, coordinator());
+  }
+  
+  @Bean
   DefaultJobExecutor jobExecutor () {
     DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
     jobExecutor.setContextRepository(contextRepository);
@@ -182,6 +194,7 @@ public class CoordinatorConfiguration {
       forkTaskDispatcher(taskDispatcher),
       switchTaskDispatcher(taskDispatcher),
       controlTaskDispatcher(),
+      subflowTaskDispatcher(),
       workTaskDispatcher()
     );
     taskDispatcher.setResolvers(resolvers);

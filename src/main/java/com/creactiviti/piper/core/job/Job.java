@@ -38,6 +38,17 @@ public interface Job extends Errorable, Prioritizable {
   String getId ();
   
   /**
+   * For sub-flows. Return the ID 
+   * of the parent task that created 
+   * this job.   
+   * 
+   * @return The ID of the parent task 
+   * if this is a subflow job or 
+   * <code>null</code> otherwise.
+   */
+  String getParentTaskExecutionId ();
+  
+  /**
    * Return the {@link JobStatus}
    * 
    * @return The job's status.

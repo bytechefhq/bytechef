@@ -56,6 +56,15 @@ public class SimpleJob extends MapObject implements Job {
     return getString(DSL.ID);
   }
   
+  @Override
+  public String getParentTaskExecutionId() {
+    return getString(DSL.PARENT_TASK_EXECUTION_ID);
+  }
+  
+  public void setParentTaskExecutionId (String aTaskExecutionId) {
+    set(DSL.PARENT_TASK_EXECUTION_ID, aTaskExecutionId);
+  }
+  
   public void setId(String aId) {
     set(DSL.ID, aId);
   }

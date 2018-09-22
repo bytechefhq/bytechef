@@ -25,13 +25,14 @@ public class GitPipelineRepository extends YamlPipelineRepository  {
 
   private String url;
   private String[] searchPaths;
+  private String branch = "master";
   private GitOperations git = new JGitTemplate();
 
   
   @Override
   public List<Pipeline> findAll () {
     synchronized(this) {
-      List<IdentifiableResource> resources = git.getHeadFiles(url, searchPaths);
+      List<IdentifiableResource> resources = git.getHeadFiles(url, branch, searchPaths);
       List<Pipeline> pipelines = resources.stream()
                                           .map(r -> parsePipeline(r))
                                           .collect(Collectors.toList());
@@ -42,7 +43,7 @@ public class GitPipelineRepository extends YamlPipelineRepository  {
   @Override
   public Pipeline findOne (String aId) {
     synchronized(this) {
-      IdentifiableResource resource = git.getFile(url, aId);
+      IdentifiableResource resource = git.getFile(url, branch, aId);
       return parsePipeline(resource);
     }
   }
@@ -57,6 +58,10 @@ public class GitPipelineRepository extends YamlPipelineRepository  {
   
   public void setGitOperations(GitOperations aGit) {
     git = aGit;
+  }
+  
+  public void setBranch(String aBranch) {
+    branch = aBranch;
   }
   
 

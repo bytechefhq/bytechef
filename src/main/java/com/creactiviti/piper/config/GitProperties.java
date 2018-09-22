@@ -20,6 +20,7 @@ public class GitProperties {
   private boolean enabled = false;
   private String url;
   private String[] searchPaths;
+  private String branch = "master";
   
   public String getUrl() {
     return url;
@@ -43,6 +44,14 @@ public class GitProperties {
   
   public void setEnabled(boolean aEnabled) {
     enabled = aEnabled;
+  }
+  
+  public String getBranch() {
+    return branch;
+  }
+  
+  public void setBranch(String aBranch) {
+    branch = aBranch;
   }
   
 }

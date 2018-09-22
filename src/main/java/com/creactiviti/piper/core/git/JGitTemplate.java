@@ -49,8 +49,8 @@ public class JGitTemplate implements GitOperations {
   private File repositoryDir = null;
 
   @Override
-  public List<IdentifiableResource> getHeadFiles (String aUrl, String... aSearchPaths) {
-    Repository repo = getRepository(aUrl);
+  public List<IdentifiableResource> getHeadFiles (String aUrl, String aBranch, String... aSearchPaths) {
+    Repository repo = getRepository(aUrl,aBranch);
     return getHeadFiles(repo, aSearchPaths);
   }
 
@@ -78,12 +78,13 @@ public class JGitTemplate implements GitOperations {
     } 
   }
 
-  private synchronized Repository getRepository(String aUrl) {
+  private synchronized Repository getRepository(String aUrl, String aBranch) {
     try {
       clear();
-      logger.info("Cloning {}", aUrl);
+      logger.info("Cloning {} {}", aUrl,aBranch);
       Git git = Git.cloneRepository()
                    .setURI(aUrl)
+                   .setBranch(aBranch)
                    .setDirectory(repositoryDir)
                    .call();
       return (git.getRepository());
@@ -94,9 +95,9 @@ public class JGitTemplate implements GitOperations {
   }
 
   @Override
-  public IdentifiableResource getFile(String aUrl, String aFileId) {
+  public IdentifiableResource getFile(String aUrl, String aBranch, String aFileId) {
     try {
-      Repository repository = getRepository(aUrl);
+      Repository repository = getRepository(aUrl,aBranch);
       int blobIdDelim = aFileId.lastIndexOf(':');
       if(blobIdDelim > -1) {
         String path = aFileId.substring(0,blobIdDelim);

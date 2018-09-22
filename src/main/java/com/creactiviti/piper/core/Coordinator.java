@@ -107,6 +107,7 @@ public class Coordinator {
     job.setPipelineId(pipeline.getId());
     job.setStatus(JobStatus.CREATED);
     job.setCreateTime(new Date());
+    job.setParentTaskExecutionId((String)aJobParams.get(DSL.PARENT_TASK_EXECUTION_ID));
     job.setTags(tags!=null?tags.toArray(new String[tags.size()]):new String[0]);
     job.setWebhooks(webhooks!=null?webhooks:Collections.EMPTY_LIST);
     job.setInputs(inputs);
@@ -187,6 +188,7 @@ public class Coordinator {
     log.debug("Resuming job {}", aJobId);
     Job job = jobRepository.findOne (aJobId);
     Assert.notNull(job,String.format("Unknown job %s",aJobId));
+    Assert.isTrue(job.getParentTaskExecutionId() == null,"Can't resume a subflow");
     Assert.isTrue(isRestartable(job), "can't stop job " + aJobId + " as it is " + job.getStatus());
     SimpleJob mjob = new SimpleJob (job);
     mjob.setStatus(JobStatus.STARTED);
