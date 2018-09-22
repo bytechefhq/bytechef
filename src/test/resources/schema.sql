@@ -3,6 +3,7 @@ create table job (
   status varchar(256) not null,
   current_task int not null,
   pipeline_id varchar(256) not null,
+  parent_task_execution_id varchar(256),
   label varchar(256),
   create_time timestamp not null,
   start_time timestamp,
