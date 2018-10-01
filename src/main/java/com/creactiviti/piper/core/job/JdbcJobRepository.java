@@ -155,7 +155,7 @@ public class JdbcJobRepository implements JobRepository {
 
   @Override
   public int countCompletedJobsYesterday() {
-    return (int)jdbc.queryForObject("select count(*) from job where status='COMPLETED' and end_time >= current_date-1 and end_time < current_date-1 ", Collections.EMPTY_MAP, Integer.class);
+    return (int)jdbc.queryForObject("select count(*) from job where status='COMPLETED' and end_time >= current_date-1 and end_time < current_date", Collections.EMPTY_MAP, Integer.class);
   }
 
 }
