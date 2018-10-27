@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Arik Cohe
  * @since Apt 7, 2017
  */
-@Component
 public class JdbcContextRepository implements ContextRepository<Context> {
 
   private JdbcTemplate jdbc;
