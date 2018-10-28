@@ -15,6 +15,7 @@
  */
 package com.creactiviti.piper.core.context;
 
+import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.client.MongoCollection;
@@ -24,13 +25,16 @@ import org.bson.BsonDocumentWriter;
 import org.bson.Document;
 import org.bson.codecs.EncoderContext;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Sorts.descending;
+import static java.util.stream.Stream.of;
 
 public class MongoContextRepository implements ContextRepository<Context> {
 
@@ -94,5 +98,11 @@ public class MongoContextRepository implements ContextRepository<Context> {
         .encode(new BsonDocumentWriter(doc), aContext, EncoderContext.builder().isEncodingCollectibleDocument(true).build());
 
     return doc;
+  }
+
+  @PostConstruct
+  void ensureIndexes() {
+    of(DSL.CREATE_TIME, "stackId")
+        .forEach(it -> collection.createIndex(ascending(it)));
   }
 }

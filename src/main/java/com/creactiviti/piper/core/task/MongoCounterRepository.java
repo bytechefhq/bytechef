@@ -22,12 +22,15 @@ import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.ReturnDocument.AFTER;
 import static com.mongodb.client.model.Updates.*;
+import static java.util.stream.Stream.of;
 
 public class MongoCounterRepository implements CounterRepository {
   private final MongoCollection<Document> collection;
@@ -70,11 +73,15 @@ public class MongoCounterRepository implements CounterRepository {
     return doc.getLong(DSL.VALUE);
   }
 
-
   @Override
   public void delete(String aCounterName) {
     collection
         .deleteOne(eq("_id", aCounterName));
   }
 
+  @PostConstruct
+  void ensureIndexes() {
+    of(DSL.CREATE_TIME)
+        .forEach(it -> collection.createIndex(ascending(it)));
+  }
 }

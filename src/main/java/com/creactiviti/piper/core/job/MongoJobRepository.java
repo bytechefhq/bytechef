@@ -26,17 +26,20 @@ import org.bson.BsonDocumentWriter;
 import org.bson.codecs.EncoderContext;
 import org.bson.conversions.Bson;
 
+import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Updates.set;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 
 public class MongoJobRepository implements JobRepository {
   private final MongoCollection<Job> collection;
@@ -150,5 +153,12 @@ public class MongoJobRepository implements JobRepository {
 
     return doc;
   }
+
+  @PostConstruct
+  void ensureIndexes() {
+    of(DSL.CREATE_TIME, DSL.START_TIME, DSL.END_TIME, DSL.PARENT_TASK_EXECUTION_ID, DSL.STATUS)
+        .forEach(it -> collection.createIndex(ascending(it)));
+  }
+
 
 }

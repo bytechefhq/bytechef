@@ -20,15 +20,18 @@ import com.google.common.collect.ImmutableList;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Updates.push;
 import static com.mongodb.client.model.Updates.set;
 import static java.text.MessageFormat.format;
+import static java.util.stream.Stream.of;
 
 public class MongoTaskExecutionRepository implements TaskExecutionRepository {
   private final MongoCollection<TaskExecution> collection;
@@ -91,5 +94,11 @@ public class MongoTaskExecutionRepository implements TaskExecutionRepository {
             replaceRoot('$' + DSL.EXECUTION)
         ))
         .into(new ArrayList<>());
+  }
+
+  @PostConstruct
+  void ensureIndexes() {
+    of(DSL.CREATE_TIME, DSL.START_TIME, DSL.END_TIME, DSL.JOB_ID, DSL.STATUS)
+        .forEach(it -> collection.createIndex(ascending(format("{0}.{1}", DSL.EXECUTION, it))));
   }
 }
