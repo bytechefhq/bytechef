@@ -421,13 +421,15 @@ piper.pipeline-repository.git.search-paths=demo/,video/
 piper.pipeline-repository.filesystem.enabled=true
 # location of pipelines on the file system.
 piper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml
+# persistence
+piper.persistence.provider= # Persistence provider to use. Supports jdbc (for h2 and postgresql database) and mongo.
 # data source
 spring.datasource.initialize=true # Create the database using 'schema-{platform}.sql'.
 spring.datasource.name= # Name of the datasource.
-spring.datasource.password= # Login password of the database.
 spring.datasource.platform=h2 # Platform to use in the DDL or DML scripts. Supports h2 and postgres.
-spring.datasource.url= # JDBC url of the database.
-spring.datasource.username= # Login user of the database.
+spring.datasource.url= # Url of the database. Supports jdbc:// and mongdb://
+spring.datasource.username= # Login user of the database (for jdbc)
+spring.datasource.password= # Login password of the database (for jdbc)
 ```
 
 # Docker
