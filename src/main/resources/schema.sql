@@ -1,4 +1,4 @@
-drop table if exists job;
+drop table if exists job cascade;
 
 create table job (
   id varchar(256) not null primary key,
@@ -20,7 +20,7 @@ create table job (
 CREATE INDEX ON job (create_time);
 CREATE INDEX ON job (status);
 
-drop table if exists task_execution;
+drop table if exists task_execution cascade;
 
 create table task_execution (
   id varchar(256) not null primary key,
@@ -38,7 +38,7 @@ create table task_execution (
 
 CREATE INDEX ON task_execution (job_id);
 
-drop table if exists context;
+drop table if exists context cascade;
 
 create table context (
   id varchar(256) not null primary key,
@@ -49,7 +49,7 @@ create table context (
 
 CREATE INDEX ON context (stack_id);
 
-drop table if exists counter;
+drop table if exists counter cascade;
 
 create table counter (
   id varchar(256) not null primary key,

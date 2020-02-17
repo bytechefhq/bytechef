@@ -4,8 +4,8 @@ package com.creactiviti.piper.core.task;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.creactiviti.piper.core.MapObject;
 import com.creactiviti.piper.core.context.MapContext;
@@ -18,7 +18,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.create();
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(evaluated.asMap(),jt.asMap());
+    Assertions.assertEquals(evaluated.asMap(),jt.asMap());
   }
 
   @Test
@@ -26,7 +26,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("hello", "world");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(evaluated.asMap(),jt.asMap());
+    Assertions.assertEquals(evaluated.asMap(),jt.asMap());
   }
 
   @Test
@@ -34,7 +34,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("hello", "${name}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.singletonMap("name", "arik")));
-    Assert.assertEquals("arik",evaluated.getString("hello"));
+    Assertions.assertEquals("arik",evaluated.getString("hello"));
   }
 
   @Test
@@ -45,7 +45,7 @@ public class SpelTaskEvaluatorTests {
     ctx.put("firstName", "Arik");
     ctx.put("lastName", "Cohen");
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-    Assert.assertEquals("Arik Cohen",evaluated.getString("hello"));
+    Assertions.assertEquals("Arik Cohen",evaluated.getString("hello"));
   }
 
   @Test
@@ -55,7 +55,7 @@ public class SpelTaskEvaluatorTests {
     MapContext ctx = new MapContext();
     ctx.put("number", "5");
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-    Assert.assertEquals(Integer.valueOf(5),((Integer)evaluated.get("hello")));
+    Assertions.assertEquals(Integer.valueOf(5),((Integer)evaluated.get("hello")));
   }
 
   @Test
@@ -66,7 +66,7 @@ public class SpelTaskEvaluatorTests {
     ctx.put("firstName", "Arik");
     ctx.put("lastName", "Cohen");
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-    Assert.assertEquals(Arrays.asList("Arik","Cohen"),evaluated.getList("list", String.class));
+    Assertions.assertEquals(Arrays.asList("Arik","Cohen"),evaluated.getList("list", String.class));
   }
 
   @Test
@@ -76,7 +76,7 @@ public class SpelTaskEvaluatorTests {
     MapContext ctx = new MapContext();
     ctx.put("firstName", "Arik");
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-    Assert.assertEquals(MapObject.of(Collections.singletonMap("hello", "Arik")),evaluated.getMap("map"));
+    Assertions.assertEquals(MapObject.of(Collections.singletonMap("hello", "Arik")),evaluated.getMap("map"));
   }
 
   @Test
@@ -87,7 +87,7 @@ public class SpelTaskEvaluatorTests {
     ctx.put("n1", 5);
     ctx.put("n2", 3);
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-    Assert.assertEquals(Integer.valueOf(15),evaluated.getInteger("mult"));
+    Assertions.assertEquals(Integer.valueOf(15),evaluated.getInteger("mult"));
   }
 
   @Test
@@ -95,7 +95,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("message", "${name}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals("${name}",evaluated.getString("message"));
+    Assertions.assertEquals("${name}",evaluated.getString("message"));
   }
 
   @Test
@@ -103,7 +103,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("message", "yo ${name}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals("yo ${name}",evaluated.getString("message"));
+    Assertions.assertEquals("yo ${name}",evaluated.getString("message"));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("thing", "${number}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.singletonMap("number", 1)));
-    Assert.assertEquals(Integer.valueOf(1),evaluated.get("thing"));
+    Assertions.assertEquals(Integer.valueOf(1),evaluated.get("thing"));
   }
 
   @Test
@@ -119,7 +119,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("thing", "${number*3}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.singletonMap("number", 1)));
-    Assert.assertEquals(Integer.valueOf(3),evaluated.get("thing"));
+    Assertions.assertEquals(Integer.valueOf(3),evaluated.get("thing"));
   }
 
   @Test
@@ -127,7 +127,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("thing", "${number*3}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals("${number*3}",evaluated.get("thing"));
+    Assertions.assertEquals("${number*3}",evaluated.get("thing"));
   }
 
   @Test
@@ -135,7 +135,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("list", "${range(1,3)}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Arrays.asList(1,2,3),evaluated.get("list"));
+    Assertions.assertEquals(Arrays.asList(1,2,3),evaluated.get("list"));
   }
 
   @Test
@@ -143,7 +143,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("sub",Collections.singletonMap("list", "${range(1,3)}"));
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Arrays.asList(1,2,3),evaluated.getMap("sub").get("list"));
+    Assertions.assertEquals(Arrays.asList(1,2,3),evaluated.getMap("sub").get("list"));
   }
 
   @Test
@@ -151,7 +151,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("message", "${item1}-${item2}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(ImmutableMap.of("item1", "hello","item2","world")));
-    Assert.assertEquals("hello-world",evaluated.get("message"));
+    Assertions.assertEquals("hello-world",evaluated.get("message"));
   }
 
   @Test
@@ -159,7 +159,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someBoolean", "${boolean('1')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Boolean.valueOf(true),evaluated.get("someBoolean"));
+    Assertions.assertEquals(Boolean.valueOf(true),evaluated.get("someBoolean"));
   }
 
   @Test
@@ -167,7 +167,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someByte", "${byte('127')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Byte.valueOf(Byte.MAX_VALUE),evaluated.get("someByte"));
+    Assertions.assertEquals(Byte.valueOf(Byte.MAX_VALUE),evaluated.get("someByte"));
   }
 
   @Test
@@ -175,7 +175,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someChar", "${char('c')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Character.valueOf('c'),evaluated.get("someChar"));
+    Assertions.assertEquals(Character.valueOf('c'),evaluated.get("someChar"));
   }
 
   @Test
@@ -183,7 +183,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someShort", "${short('32767')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Short.valueOf(Short.MAX_VALUE),evaluated.get("someShort"));
+    Assertions.assertEquals(Short.valueOf(Short.MAX_VALUE),evaluated.get("someShort"));
   }
 
   @Test
@@ -191,7 +191,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someInt", "${int('1')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Integer.valueOf(1),evaluated.get("someInt"));
+    Assertions.assertEquals(Integer.valueOf(1),evaluated.get("someInt"));
   }
 
   @Test
@@ -199,7 +199,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someLong", "${long('1')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Long.valueOf(1L),evaluated.get("someLong"));
+    Assertions.assertEquals(Long.valueOf(1L),evaluated.get("someLong"));
   }
 
   @Test
@@ -207,7 +207,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someFloat", "${float('1.337')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Float.valueOf(1.337f),evaluated.get("someFloat"));
+    Assertions.assertEquals(Float.valueOf(1.337f),evaluated.get("someFloat"));
   }
 
   @Test
@@ -215,7 +215,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someDouble", "${double('1.337')}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Double.valueOf(1.337d),evaluated.get("someDouble"));
+    Assertions.assertEquals(Double.valueOf(1.337d),evaluated.get("someDouble"));
   }
 
   @Test
@@ -223,7 +223,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(',',range(1,3))}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals("1,2,3",evaluated.get("joined"));
+    Assertions.assertEquals("1,2,3",evaluated.get("joined"));
   }
 
   @Test
@@ -231,7 +231,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(',',range(1,1))}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals("1",evaluated.get("joined"));
+    Assertions.assertEquals("1",evaluated.get("joined"));
   }
 
   @Test
@@ -239,7 +239,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(' and ',{'a','b','c'})}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals("a and b and c",evaluated.get("joined"));
+    Assertions.assertEquals("a and b and c",evaluated.get("joined"));
   }
 
   @Test
@@ -247,7 +247,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("concatenated"));
+    Assertions.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("concatenated"));
   }
 
   @Test
@@ -255,7 +255,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("concatenated", "${concat({'a','b','c'}, range(1,3))}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("concatenated"));
+    Assertions.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("concatenated"));
   }
 
   @Test
@@ -263,7 +263,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("flattened"));
+    Assertions.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("flattened"));
   }
 
   @Test
@@ -271,6 +271,6 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},range(1,3)})}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
-    Assert.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("flattened"));
+    Assertions.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("flattened"));
   }
 }

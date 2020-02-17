@@ -1,30 +1,27 @@
 package com.creactiviti.piper.core.job;
 
-import com.creactiviti.piper.core.Page;
-import com.creactiviti.piper.core.task.JdbcTaskExecutionRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import static java.time.temporal.ChronoUnit.DAYS;
 
-import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 
-import static java.time.temporal.ChronoUnit.DAYS;
+import javax.sql.DataSource;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import com.creactiviti.piper.core.Page;
+import com.creactiviti.piper.core.task.JdbcTaskExecutionRepository;
+import com.creactiviti.piper.core.uuid.UUIDGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 
-@RunWith(SpringRunner.class)
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest
 public class JdbcJobRepositoryTests {
 
   @Autowired
@@ -40,20 +37,22 @@ public class JdbcJobRepositoryTests {
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
     
-    int pageTotal = jobRepository.findAll(1).getNumber();
+    int pageTotal = jobRepository.findAll(1).getSize();
+    
+    String id = UUIDGenerator.generate();
     
     SimpleJob job = new SimpleJob();
     job.setPipelineId("demo:1234");
-    job.setId("1");
+    job.setId(id);
     job.setCreateTime(new Date());
     job.setStatus(JobStatus.CREATED);
     jobRepository.create(job);
     
     Page<Job> all = jobRepository.findAll(1);
-    Assert.assertEquals(pageTotal+1,all.getSize());
+    Assertions.assertEquals(pageTotal+1,all.getSize());
     
-    Job one = jobRepository.findOne("1");
-    Assert.assertNotNull(one);
+    Job one = jobRepository.findOne(id);
+    Assertions.assertNotNull(one);
   }
   
   @Test
@@ -66,24 +65,26 @@ public class JdbcJobRepositoryTests {
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
     
+    String id = UUIDGenerator.generate();
+    
     SimpleJob job = new SimpleJob();
-    job.setId("1");
+    job.setId(id);
     job.setPipelineId("demo:1234");
     job.setCreateTime(new Date());
     job.setStatus(JobStatus.CREATED);
     jobRepository.create(job);
     
-    Job one = jobRepository.findOne("1");
+    Job one = jobRepository.findOne(id);
     
     SimpleJob mjob = new SimpleJob(one);
     mjob.setStatus(JobStatus.FAILED);
     
     // test immutability
-    Assert.assertNotEquals(mjob.getStatus().toString(),one.getStatus().toString());  
+    Assertions.assertNotEquals(mjob.getStatus().toString(),one.getStatus().toString());  
     
     jobRepository.merge(mjob);
-    one = jobRepository.findOne("1");
-    Assert.assertEquals("FAILED",one.getStatus().toString());  
+    one = jobRepository.findOne(id);
+    Assertions.assertEquals("FAILED",one.getStatus().toString());  
   }
 
   @Test
@@ -96,19 +97,23 @@ public class JdbcJobRepositoryTests {
     JdbcJobRepository jobRepository = new JdbcJobRepository();
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
+    
+    String id = UUIDGenerator.generate();
+    
+    int countCompletedJobsToday = jobRepository.countCompletedJobsToday();
 
     SimpleJob completedJobYesterday = new SimpleJob();
-    completedJobYesterday.setId("1");
+    completedJobYesterday.setId(id);
     completedJobYesterday.setPipelineId("demo:1234");
     completedJobYesterday.setCreateTime(Date.from(Instant.now().minus(2, DAYS)));
     completedJobYesterday.setStatus(JobStatus.COMPLETED);
     jobRepository.create(completedJobYesterday);
     completedJobYesterday.setEndTime(Date.from(Instant.now().minus(1, DAYS)));
     jobRepository.merge(completedJobYesterday);
-
+    
     for(int i = 0; i < 5; i++) {
         SimpleJob completedJobToday = new SimpleJob();
-        completedJobToday.setId("2."+i);
+        completedJobToday.setId(UUIDGenerator.generate()+"."+i);
         completedJobToday.setPipelineId("demo:1234");
         completedJobToday.setCreateTime(Date.from(Instant.now().minus(1, DAYS)));
         completedJobToday.setStatus(JobStatus.COMPLETED);
@@ -118,7 +123,7 @@ public class JdbcJobRepositoryTests {
     }
 
     SimpleJob runningJobToday = new SimpleJob();
-    runningJobToday.setId("3");
+    runningJobToday.setId(UUIDGenerator.generate());
     runningJobToday.setPipelineId("demo:1234");
     runningJobToday.setCreateTime(new Date());
     runningJobToday.setStatus(JobStatus.STARTED);
@@ -128,7 +133,7 @@ public class JdbcJobRepositoryTests {
     int todayJobs = jobRepository.countCompletedJobsToday();
 
     // assert
-    Assert.assertEquals(5, todayJobs);
+    Assertions.assertEquals(countCompletedJobsToday+5, todayJobs);
   }
 
   @Test
@@ -141,10 +146,12 @@ public class JdbcJobRepositoryTests {
     JdbcJobRepository jobRepository = new JdbcJobRepository();
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
+    
+    int countCompletedJobsYesterday = jobRepository.countCompletedJobsYesterday();
 
     for(int i = 0; i < 5; i++) {
         SimpleJob completedJobYesterday = new SimpleJob();
-        completedJobYesterday.setId("1."+i);
+        completedJobYesterday.setId(UUIDGenerator.generate()+"."+i);
         completedJobYesterday.setPipelineId("demo:1234");
         completedJobYesterday.setCreateTime(Date.from(Instant.now().minus(2, DAYS)));
         completedJobYesterday.setStatus(JobStatus.COMPLETED);
@@ -154,14 +161,14 @@ public class JdbcJobRepositoryTests {
     }
 
     SimpleJob runningJobYesterday = new SimpleJob();
-    runningJobYesterday.setId("2");
+    runningJobYesterday.setId(UUIDGenerator.generate());
     runningJobYesterday.setPipelineId("demo:1234");
     runningJobYesterday.setCreateTime(Date.from(Instant.now().minus(1, DAYS)));
     runningJobYesterday.setStatus(JobStatus.STARTED);
     jobRepository.create(runningJobYesterday);
 
     SimpleJob completedJobToday = new SimpleJob();
-    completedJobToday.setId("3");
+    completedJobToday.setId(UUIDGenerator.generate());
     completedJobToday.setPipelineId("demo:1234");
     completedJobToday.setCreateTime(Date.from(Instant.now().minus(1, DAYS)));
     completedJobToday.setStatus(JobStatus.COMPLETED);
@@ -173,7 +180,7 @@ public class JdbcJobRepositoryTests {
     int yesterdayJobs = jobRepository.countCompletedJobsYesterday();
 
     // assert
-    Assert.assertEquals(5, yesterdayJobs);
+    Assertions.assertEquals(countCompletedJobsYesterday+5, yesterdayJobs);
   }
 
   private ObjectMapper createObjectMapper() {

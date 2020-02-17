@@ -23,9 +23,10 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.commons.beanutils.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -54,7 +55,9 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   private static final String PREFIX = "${";
   private static final String SUFFIX = "}";
   
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  
+  private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
   
   @Override
   public TaskExecution evaluate(TaskExecution aJobTask, Context aContext) {
@@ -154,7 +157,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   
   private <T> MethodExecutor cast(Class<T> type) {
     return (ctx,target,args) -> {
-      T value = type.cast(ConvertUtils.convert(args[0], type));
+      T value = type.cast(conversionService.convert(args[0], type));
       return new TypedValue(value);
     };
   }

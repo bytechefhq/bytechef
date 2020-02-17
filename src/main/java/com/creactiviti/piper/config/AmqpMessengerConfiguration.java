@@ -49,7 +49,6 @@ import com.creactiviti.piper.core.messenger.AmqpMessenger;
 import com.creactiviti.piper.core.messenger.Exchanges;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rabbitmq.http.client.Client;
 
 @Configuration
 @EnableConfigurationProperties(PiperProperties.class)
@@ -86,15 +85,6 @@ public class AmqpMessengerConfiguration implements RabbitListenerConfigurer {
   @Bean
   RabbitAdmin admin (ConnectionFactory aConnectionFactory) {
     return new RabbitAdmin(aConnectionFactory);
-  }
-  
-  @Bean
-  Client rabbitManagementTemplate () throws Exception {
-    String username = rabbitProperties.determineUsername();
-    String password = rabbitProperties.determinePassword();
-    String host = rabbitProperties.determineHost();
-    String url = String.format("http://%s:%s@%s:15672/api/",username!=null?username:DEFAULT_USER,username!=null?password:DEFAULT_PASS,host!=null?host:DEFAULT_HOST);
-    return new Client(url);
   }
   
   @Bean

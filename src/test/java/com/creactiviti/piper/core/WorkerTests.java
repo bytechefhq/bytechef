@@ -1,8 +1,9 @@
 
 package com.creactiviti.piper.core;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.creactiviti.piper.core.messenger.Queues;
 import com.creactiviti.piper.core.messenger.SynchMessenger;
@@ -15,7 +16,7 @@ public class WorkerTests {
   public void test1 () {
     Worker worker = new Worker();
     SynchMessenger messenger = new SynchMessenger();
-    messenger.receive(Queues.COMPLETIONS, (t)-> Assert.assertTrue(((TaskExecution)t).getOutput().equals("done")) );
+    messenger.receive(Queues.COMPLETIONS, (t)-> Assertions.assertTrue(((TaskExecution)t).getOutput().equals("done")) );
     messenger.receive(Queues.EVENTS, (t)-> {} );
     worker.setMessenger(messenger);
     worker.setEventPublisher((e)->{});
@@ -31,7 +32,7 @@ public class WorkerTests {
   public void test2 () {
     Worker worker = new Worker();
     SynchMessenger messenger = new SynchMessenger();
-    messenger.receive(Queues.ERRORS, (t)-> Assert.assertTrue( ((TaskExecution)t).getError().getMessage().equals("bad input") ) );
+    messenger.receive(Queues.ERRORS, (t)-> Assertions.assertTrue( ((TaskExecution)t).getError().getMessage().equals("bad input") ) );
     messenger.receive(Queues.EVENTS, (t)-> {} );
     worker.setMessenger(messenger);
     worker.setEventPublisher((e)->{});

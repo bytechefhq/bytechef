@@ -15,14 +15,23 @@
  */
 package com.creactiviti.piper.core;
 
-import com.google.common.base.Throwables;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.util.Assert;
-
 import java.lang.reflect.Array;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.util.Assert;
+
+import com.google.common.base.Throwables;
 
 /**
  * @author Arik Cohen
@@ -33,6 +42,8 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
   private final HashMap<String, Object> map;
   
   private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ";
+  
+  private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
   
   public MapObject () {
     map = new HashMap<>();
@@ -79,7 +90,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
         typedList.add((T)new MapObject((Map<String, Object>) item));
       }
       else {
-        typedList.add((T)ConvertUtils.convert(item,aElementType));
+        typedList.add(conversionService.convert(item,aElementType));
       }
     }
     return Collections.unmodifiableList(typedList);
@@ -94,7 +105,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
   @Override
   public String getString (Object aKey) {
     Object value = get(aKey);
-    return ConvertUtils.convert(value);
+    return conversionService.convert(value,String.class);
   }
   
   @Override
@@ -158,7 +169,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     if(value == null) {
       return null;
     }
-    return (T) ConvertUtils.convert(value, aReturnType);
+    return conversionService.convert(value, aReturnType);
   }
   
   @Override
@@ -167,7 +178,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     if(value == null) {
       return aDefaultValue;
     }
-    return (T) ConvertUtils.convert(value, aReturnType);
+    return conversionService.convert(value, aReturnType);
   }
 
   @Override
@@ -291,6 +302,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     return counter;
   }
   
+  @Override
   public String toString() {
     return map.toString();
   }

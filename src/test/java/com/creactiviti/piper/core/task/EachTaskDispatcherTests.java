@@ -1,7 +1,7 @@
 
 package com.creactiviti.piper.core.task;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,7 +10,8 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
@@ -24,10 +25,12 @@ public class EachTaskDispatcherTests {
   private ContextRepository contextRepository = mock(ContextRepository.class);
   private CounterRepository counterRepository = mock(CounterRepository.class);
   
-  @Test(expected=IllegalArgumentException.class)
+  @Test
   public void test1 ()  {
-    EachTaskDispatcher dispatcher = new EachTaskDispatcher(null,null,null,null,null);
-    dispatcher.dispatch(SimpleTaskExecution.create());
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      EachTaskDispatcher dispatcher = new EachTaskDispatcher(null,null,null,null,null);
+      dispatcher.dispatch(SimpleTaskExecution.create());
+    });
   }
   
   @Test

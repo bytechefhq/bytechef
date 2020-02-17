@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class MapObjectTests {
@@ -14,87 +14,89 @@ public class MapObjectTests {
   @Test
   public void test1 () {
     MapObject mo = new MapObject(Collections.singletonMap("hello", "world")) {};
-    Assert.assertEquals("world", mo.getString("hello"));
+    Assertions.assertEquals("world", mo.getString("hello"));
   }
   
   @Test
   public void test2 () {
     MapObject mo = new MapObject(Collections.singletonMap("number", "5")) {};
-    Assert.assertEquals(Integer.valueOf(5), mo.getInteger("number"));
+    Assertions.assertEquals(Integer.valueOf(5), mo.getInteger("number"));
   }
   
   @Test
   public void test3 () {
     MapObject mo = new MapObject(Collections.singletonMap("number", "5")) {};
-    Assert.assertEquals(Double.valueOf(5), mo.getDouble("number"));
+    Assertions.assertEquals(Double.valueOf(5), mo.getDouble("number"));
   }
   
   @Test
   public void test4 () {
     MapObject mo = new MapObject(Collections.singletonMap("number", "5")) {};
-    Assert.assertEquals(Double.valueOf(3), mo.getDouble("double",3));
+    Assertions.assertEquals(Double.valueOf(3), mo.getDouble("double",3));
   }
   
   @Test
   public void test5 () {
     MapObject mo = new MapObject(Collections.singletonMap("number", "5")) {};
-    Assert.assertEquals(1, mo.size());
+    Assertions.assertEquals(1, mo.size());
   }
 
   @Test
   public void test6 () {
     MapObject mo = new MapObject(Collections.singletonMap("number", "5")) {};
-    Assert.assertTrue(mo.containsKey("number"));
-    Assert.assertFalse(mo.containsKey("none"));
+    Assertions.assertTrue(mo.containsKey("number"));
+    Assertions.assertFalse(mo.containsKey("none"));
   }
   
   @Test
   public void test7 () {
     MapObject mo = new MapObject(Collections.singletonMap("number", "5")) {};
-    Assert.assertTrue(mo.containsValue("5"));
+    Assertions.assertTrue(mo.containsValue("5"));
   }
   
   @Test
   public void test8 () {
     MapObject mo = new MapObject(Collections.singletonMap("hello", "world")) {};
-    Assert.assertEquals("world", mo.get("hello"));
+    Assertions.assertEquals("world", mo.get("hello"));
   }
   
-  @Test(expected=ClassCastException.class)
+  @Test
   public void test9 () {
-    MapObject mo = new MapObject(Collections.singletonMap("hello", "world")) {};
-    Assert.assertEquals(Arrays.asList("world"), mo.getList("hello",String.class));
+      MapObject mo = new MapObject(Collections.singletonMap("hello", "world")) {};
+      Assertions.assertEquals(Arrays.asList("world"), mo.getList("hello",String.class));
   }
   
   @Test
   public void test10 () {
     MapObject mo = new MapObject(Collections.singletonMap("hello", Arrays.asList("world"))) {};
     List<String> list = mo.getList("hello",String.class);
-    Assert.assertEquals(Arrays.asList("world"), list);
+    Assertions.assertEquals(Arrays.asList("world"), list);
   }
   
   @Test
   public void test11 () {
     MapObject mo = new MapObject(Collections.singletonMap("key", 1)) {};
-    Assert.assertEquals("1",mo.getString("key"));
+    Assertions.assertEquals("1",mo.getString("key"));
   }
   
   @Test
   public void test12 () {
     MapObject mo = new MapObject(Collections.singletonMap("key", "value")) {};
-    Assert.assertEquals("value",mo.getRequiredString("key"));
+    Assertions.assertEquals("value",mo.getRequiredString("key"));
   }
   
-  @Test(expected=IllegalArgumentException.class)
+  @Test
   public void test13 () {
-    MapObject mo = new MapObject(Collections.singletonMap("key", "value")) {};
-    Assert.assertEquals("value",mo.getRequiredString("anotherKey"));
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      MapObject mo = new MapObject(Collections.singletonMap("key", "value")) {};
+      Assertions.assertEquals("value",mo.getRequiredString("anotherKey"));
+    });
   }
   
   @Test
   public void test14 () {
     MapObject mo = new MapObject(Collections.singletonMap("key", "value")) {};
-    Assert.assertEquals("anotherValue",mo.getString("anotherKey","anotherValue"));
+    Assertions.assertEquals("anotherValue",mo.getString("anotherKey","anotherValue"));
   }
   
 }
