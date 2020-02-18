@@ -37,8 +37,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since Apr 14, 2017
  */
-@Component
-public class Bash implements TaskHandler<String> {
+@Component("shell/bash")
+class Bash implements TaskHandler<String> {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 

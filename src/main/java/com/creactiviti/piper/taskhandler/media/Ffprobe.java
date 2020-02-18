@@ -40,8 +40,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Arik Cohen
  * @since May 23, 2017
  */
-@Component
-public class Ffprobe implements TaskHandler<Map<String,Object>> {
+@Component("media/ffprobe")
+class Ffprobe implements TaskHandler<Map<String,Object>> {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ObjectMapper json = new ObjectMapper();

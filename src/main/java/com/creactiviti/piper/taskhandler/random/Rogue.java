@@ -30,8 +30,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since Mar 30, 2017
  */
-@Component
-public class Rogue implements TaskHandler<Object> {
+@Component("random/rogue")
+class Rogue implements TaskHandler<Object> {
 
   @Override
   public Object handle(Task aTask) throws Exception {

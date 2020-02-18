@@ -27,8 +27,8 @@ import org.springframework.stereotype.Component;
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
-@Component
-public class Dar implements TaskHandler<String> {
+@Component("media/dar")
+class Dar implements TaskHandler<String> {
 
   private final Mediainfo mediainfo = new Mediainfo();
   

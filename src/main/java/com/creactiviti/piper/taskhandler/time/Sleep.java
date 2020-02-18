@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
-@Component
+@Component("time/sleep")
 public class Sleep implements TaskHandler<Object> {
 
   @Override

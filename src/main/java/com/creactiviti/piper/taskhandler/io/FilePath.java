@@ -30,8 +30,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since May 6, 2018
  */
-@Component
-public class FilePath implements TaskHandler<Object> {
+@Component("io/filepath")
+class FilePath implements TaskHandler<Object> {
 
   @Override
   public Object handle (Task aTask) {

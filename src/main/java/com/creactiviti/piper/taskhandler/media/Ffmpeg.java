@@ -38,8 +38,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since Jan 30, 2017
  */
-@Component
-public class Ffmpeg implements TaskHandler<Object> {
+@Component("media/ffmpeg")
+class Ffmpeg implements TaskHandler<Object> {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 

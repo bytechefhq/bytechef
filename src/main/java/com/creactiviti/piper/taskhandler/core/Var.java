@@ -25,8 +25,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since May 11, 2017
  */
-@Component("var,core/var")
-public class Var implements TaskHandler<Object> {
+@Component("core/var")
+class Var implements TaskHandler<Object> {
 
   @Override
   public Object handle (Task aTask) {

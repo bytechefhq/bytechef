@@ -38,8 +38,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since Jun 4, 2017
  */
-@Component
-public class Vstitch implements TaskHandler<Object> {
+@Component("media/vstitch")
+class Vstitch implements TaskHandler<Object> {
 
   private final Ffmpeg ffmpeg = new Ffmpeg();
   

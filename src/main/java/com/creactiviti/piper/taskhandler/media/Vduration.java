@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
-@Component
-public class Vduration implements TaskHandler<Double> {
+@Component("media/vduration")
+class Vduration implements TaskHandler<Double> {
 
   private Ffprobe ffprobe = new Ffprobe();
   

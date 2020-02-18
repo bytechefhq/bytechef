@@ -42,7 +42,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
  *
  * @since Sep 06, 2018
  */
-@Component
+@Component("io/download")
 class Download implements TaskHandler<Object> {
 
   private final EventPublisher eventPublisher;

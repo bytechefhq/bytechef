@@ -29,7 +29,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since Mar 30, 2017
  */
-@Component
+@Component("random/int")
 public class RandomInt implements TaskHandler<Object> {
 
   @Override

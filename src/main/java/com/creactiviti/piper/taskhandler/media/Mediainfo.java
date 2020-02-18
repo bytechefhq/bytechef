@@ -37,8 +37,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since June 2, 2017
  */
-@Component
-public class Mediainfo implements TaskHandler<Map<String,Object>> {
+@Component("media/mediainfo")
+class Mediainfo implements TaskHandler<Map<String,Object>> {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   

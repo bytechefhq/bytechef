@@ -32,8 +32,8 @@ import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.google.common.collect.ImmutableMap;
 
-@Component
-public class Vsplit implements TaskHandler<List<Map<String,Object>>> {
+@Component("media/vsplit")
+class Vsplit implements TaskHandler<List<Map<String,Object>>> {
 
   private static final int ONE_SECOND = 1000;
   private final Vduration vduration = new Vduration();

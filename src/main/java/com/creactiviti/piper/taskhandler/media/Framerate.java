@@ -28,8 +28,8 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since Jun 2, 2017
  */
-@Component
-public class Framerate implements TaskHandler<Double> {
+@Component("media/framerate")
+class Framerate implements TaskHandler<Double> {
 
   private final Mediainfo mediainfo = new Mediainfo();
   
