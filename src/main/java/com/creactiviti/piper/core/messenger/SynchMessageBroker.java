@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Jul 10, 2016
  */
-public class SynchMessenger implements Messenger {
+public class SynchMessageBroker implements MessageBroker {
 
   private Map<String, List<Receiver>> listeners = new HashMap<> ();
 

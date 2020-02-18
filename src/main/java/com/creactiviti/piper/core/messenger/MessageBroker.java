@@ -23,7 +23,7 @@ package com.creactiviti.piper.core.messenger;
  * @author Arik Cohen
  * @since Jun 18, 2016
  */
-public interface Messenger {
+public interface MessageBroker {
 
   /**
    * 

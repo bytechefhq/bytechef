@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.creactiviti.piper.core.DSL;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 
 /**
@@ -33,10 +33,10 @@ import com.creactiviti.piper.core.messenger.Queues;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-  private final Messenger messenger;
+  private final MessageBroker messageBroker;
   
-  public SubflowTaskDispatcher (Messenger aMessenger) {
-    messenger = aMessenger;
+  public SubflowTaskDispatcher (MessageBroker aMessageBroker) {
+    messageBroker = aMessageBroker;
   }
   
   @Override
@@ -45,7 +45,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     params.put(DSL.INPUTS, aTask.getMap(DSL.INPUTS, Collections.emptyMap()));
     params.put(DSL.PARENT_TASK_EXECUTION_ID, aTask.getId());
     params.put(DSL.PIPELINE_ID, aTask.getRequiredString(DSL.PIPELINE_ID));
-    messenger.send(Queues.SUBFLOWS, params);
+    messageBroker.send(Queues.SUBFLOWS, params);
   }
 
   @Override

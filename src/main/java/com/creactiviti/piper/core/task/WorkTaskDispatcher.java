@@ -17,23 +17,23 @@ package com.creactiviti.piper.core.task;
 
 import org.springframework.util.Assert;
 
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 
 public class WorkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-  private final Messenger messenger;
+  private final MessageBroker messageBroker;
   
   private static final String DEFAULT_QUEUE = Queues.TASKS;
   
-  public WorkTaskDispatcher (Messenger aMessenger) {
-    messenger = aMessenger;
+  public WorkTaskDispatcher (MessageBroker aMessageBroker) {
+    messageBroker = aMessageBroker;
   }
   
   @Override
   public void dispatch (TaskExecution aTask) {
-    Assert.notNull(messenger,"messenger not configured");
-    messenger.send(calculateRoutingKey(aTask), aTask);
+    Assert.notNull(messageBroker,"message broker not configured");
+    messageBroker.send(calculateRoutingKey(aTask), aTask);
   }
   
   private String calculateRoutingKey (Task aTask) {

@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
 
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 
 public class EachTaskDispatcherTests {
   
   private TaskExecutionRepository taskRepo = mock(TaskExecutionRepository.class);
   private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
-  private Messenger messenger = mock(Messenger.class);
+  private MessageBroker messageBroker = mock(MessageBroker.class);
   private ContextRepository contextRepository = mock(ContextRepository.class);
   private CounterRepository counterRepository = mock(CounterRepository.class);
   
@@ -36,24 +36,24 @@ public class EachTaskDispatcherTests {
   @Test
   public void test2 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
-    EachTaskDispatcher dispatcher = new EachTaskDispatcher(taskDispatcher, taskRepo,messenger,contextRepository,counterRepository);
+    EachTaskDispatcher dispatcher = new EachTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,counterRepository);
     SimpleTaskExecution task = SimpleTaskExecution.create();
     task.set("list", Arrays.asList(1,2,3));
     task.set("iteratee", Collections.singletonMap("type", "print"));
     dispatcher.dispatch(task);
     verify(taskDispatcher,times(3)).dispatch(any());
-    verify(messenger,times(0)).send(any(),any());
+    verify(messageBroker,times(0)).send(any(),any());
   }
   
   @Test
   public void test3 ()  {
-    EachTaskDispatcher dispatcher = new EachTaskDispatcher(taskDispatcher, taskRepo,messenger,contextRepository,counterRepository);
+    EachTaskDispatcher dispatcher = new EachTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,counterRepository);
     SimpleTaskExecution task = SimpleTaskExecution.create();
     task.set("list", Arrays.asList());
     task.set("iteratee", Collections.singletonMap("type", "print"));
     dispatcher.dispatch(task);
     verify(taskDispatcher,times(0)).dispatch(any());
-    verify(messenger,times(1)).send(any(),any());
+    verify(messageBroker,times(1)).send(any(),any());
   }
 
 }

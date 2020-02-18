@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
 import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
@@ -42,14 +42,14 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
   private final TaskDispatcher taskDispatcher;
   private final TaskEvaluator taskEvaluator;
   private final TaskExecutionRepository taskExecutionRepo;
-  private final Messenger messenger;
+  private final MessageBroker messageBroker;
   private final ContextRepository contextRepository;
   private final CounterRepository counterRepository;
 
   private MapTaskDispatcher (Builder aBuilder) {
     taskDispatcher = aBuilder.taskDispatcher;
     taskExecutionRepo = aBuilder.taskExecutionRepo;
-    messenger = aBuilder.messenger;
+    messageBroker = aBuilder.messageBroker;
     contextRepository = aBuilder.contextRepository;
     counterRepository = aBuilder.counterRepository;
     taskEvaluator = aBuilder.taskEvaluator;
@@ -91,7 +91,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     else {
       SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
       completion.setEndTime(new Date());
-      messenger.send(Queues.COMPLETIONS, completion);
+      messageBroker.send(Queues.COMPLETIONS, completion);
     }
   }
 
@@ -112,7 +112,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     private TaskDispatcher taskDispatcher;
     private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
     private TaskExecutionRepository taskExecutionRepo;
-    private Messenger messenger;
+    private MessageBroker messageBroker;
     private ContextRepository contextRepository;
     private CounterRepository counterRepository;
     
@@ -131,8 +131,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
       return this;
     }
     
-    public Builder messenger(Messenger aMessenger) {
-      messenger = aMessenger;
+    public Builder messageBroker (MessageBroker aMessageBroker) {
+      messageBroker = aMessageBroker;
       return this;
     }
     

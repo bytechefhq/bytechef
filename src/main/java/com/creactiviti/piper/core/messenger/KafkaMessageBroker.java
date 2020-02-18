@@ -15,15 +15,16 @@
  */
 package com.creactiviti.piper.core.messenger;
 
-import com.creactiviti.piper.core.error.Retryable;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.Assert;
 
-import java.util.concurrent.TimeUnit;
+import com.creactiviti.piper.core.error.Retryable;
 
-public class KafkaMessenger implements Messenger {
+public class KafkaMessageBroker implements MessageBroker {
 
   private KafkaTemplate<Integer, Object> kafkaTemplate;
 

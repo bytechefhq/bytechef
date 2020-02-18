@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
@@ -41,7 +41,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
   private TaskDispatcher taskDispatcher;
   private TaskExecutionRepository taskExecutionRepo;
-  private Messenger messenger;
+  private MessageBroker messageBroker;
   private ContextRepository contextRepository;
   private CounterRepository counterRepository;
 
@@ -68,7 +68,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     else {
       SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
       completion.setEndTime(new Date());
-      messenger.send(Queues.COMPLETIONS, completion);
+      messageBroker.send(Queues.COMPLETIONS, completion);
     }
   }
 
@@ -88,8 +88,8 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     counterRepository = aCounterRepository;
   }
   
-  public void setMessenger(Messenger aMessenger) {
-    messenger = aMessenger;
+  public void setMessageBroker(MessageBroker aMessageBroker) {
+    messageBroker = aMessageBroker;
   }
   
   public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {

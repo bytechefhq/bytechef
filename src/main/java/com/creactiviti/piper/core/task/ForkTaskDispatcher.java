@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 import com.creactiviti.piper.core.ForkTaskCompletionHandler;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
@@ -69,7 +69,7 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
   private TaskDispatcher taskDispatcher;
   private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
   private TaskExecutionRepository taskExecutionRepo;
-  private Messenger messenger;
+  private MessageBroker messageBroker;
   private ContextRepository contextRepository;
   private CounterRepository counterRepository;
 
@@ -107,7 +107,7 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     else {
       SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
       completion.setEndTime(new Date());
-      messenger.send(Queues.COMPLETIONS, completion);
+      messageBroker.send(Queues.COMPLETIONS, completion);
     }
   }
 
@@ -127,8 +127,8 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     counterRepository = aCounterRepository;
   }
   
-  public void setMessenger(Messenger aMessenger) {
-    messenger = aMessenger;
+  public void setMessageBroker(MessageBroker aMessageBroker) {
+    messageBroker = aMessageBroker;
   }
   
   public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {

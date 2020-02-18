@@ -21,7 +21,7 @@ import org.springframework.util.Assert;
 import com.creactiviti.piper.core.error.Prioritizable;
 import com.creactiviti.piper.core.error.Retryable;
 
-public class AmqpMessenger implements Messenger {
+public class AmqpMessageBroker implements MessageBroker {
 
   private AmqpTemplate amqpTemplate;
 

@@ -44,7 +44,7 @@ import com.creactiviti.piper.core.Coordinator;
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.event.EventListener;
 import com.creactiviti.piper.core.messenger.Exchanges;
-import com.creactiviti.piper.core.messenger.JmsMessenger;
+import com.creactiviti.piper.core.messenger.JmsMessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -74,8 +74,8 @@ public class JmsMessengerConfiguration implements JmsListenerConfigurer {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
   @Bean
-  JmsMessenger jmsMessenger (JmsTemplate aJmsTemplate) {
-    JmsMessenger jmsMessenger = new JmsMessenger();
+  JmsMessageBroker jmsMessenger (JmsTemplate aJmsTemplate) {
+    JmsMessageBroker jmsMessenger = new JmsMessageBroker();
     jmsMessenger.setJmsTemplate(aJmsTemplate);
     return jmsMessenger;
   }

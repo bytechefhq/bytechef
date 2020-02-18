@@ -26,7 +26,7 @@ import com.creactiviti.piper.core.MapObject;
 import com.creactiviti.piper.core.SwitchTaskCompletionHandler;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
@@ -41,12 +41,12 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
   private final TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
   private final TaskExecutionRepository taskExecutionRepo;
   private final ContextRepository contextRepository;
-  private final Messenger messenger;
+  private final MessageBroker messageBroker;
   
-  public SwitchTaskDispatcher (TaskDispatcher aTaskDispatcher, TaskExecutionRepository aTaskRepo, Messenger aMessenger, ContextRepository aContextRepository) {
+  public SwitchTaskDispatcher (TaskDispatcher aTaskDispatcher, TaskExecutionRepository aTaskRepo, MessageBroker aMessageBroker, ContextRepository aContextRepository) {
     taskDispatcher = aTaskDispatcher;
     taskExecutionRepo = aTaskRepo;
-    messenger = aMessenger;
+    messageBroker = aMessageBroker;
     contextRepository = aContextRepository;
   }
 
@@ -80,7 +80,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         completion.setStartTime(new Date());
         completion.setEndTime(new Date());
         completion.setExecutionTime(0);
-        messenger.send(Queues.COMPLETIONS, completion);
+        messageBroker.send(Queues.COMPLETIONS, completion);
       }
     }
     else {
@@ -89,7 +89,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
       completion.setEndTime(new Date());
       completion.setExecutionTime(0);
       completion.setOutput(selectedCase.get("value"));
-      messenger.send(Queues.COMPLETIONS, completion);
+      messageBroker.send(Queues.COMPLETIONS, completion);
     }
   }
 

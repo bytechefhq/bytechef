@@ -45,7 +45,7 @@ import org.springframework.context.annotation.Configuration;
 import com.creactiviti.piper.core.Coordinator;
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.event.EventListener;
-import com.creactiviti.piper.core.messenger.AmqpMessenger;
+import com.creactiviti.piper.core.messenger.AmqpMessageBroker;
 import com.creactiviti.piper.core.messenger.Exchanges;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,8 +88,8 @@ public class AmqpMessengerConfiguration implements RabbitListenerConfigurer {
   }
   
   @Bean
-  AmqpMessenger amqpMessenger (AmqpTemplate aAmqpTemplate) {
-    AmqpMessenger amqpMessenger = new AmqpMessenger();
+  AmqpMessageBroker amqpMessenger (AmqpTemplate aAmqpTemplate) {
+    AmqpMessageBroker amqpMessenger = new AmqpMessageBroker();
     amqpMessenger.setAmqpTemplate(aAmqpTemplate);
     return amqpMessenger;
   }

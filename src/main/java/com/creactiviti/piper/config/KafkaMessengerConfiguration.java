@@ -19,7 +19,7 @@ import com.creactiviti.piper.core.Coordinator;
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.event.EventListener;
 import com.creactiviti.piper.core.messenger.Exchanges;
-import com.creactiviti.piper.core.messenger.KafkaMessenger;
+import com.creactiviti.piper.core.messenger.KafkaMessageBroker;
 import com.creactiviti.piper.core.messenger.Queues;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,8 +84,8 @@ public class KafkaMessengerConfiguration implements KafkaListenerConfigurer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Bean
-    KafkaMessenger kafkaMessenger(KafkaTemplate akafkaTemplate) {
-        KafkaMessenger kafkaMessenger = new KafkaMessenger();
+    KafkaMessageBroker kafkaMessenger(KafkaTemplate akafkaTemplate) {
+        KafkaMessageBroker kafkaMessenger = new KafkaMessageBroker();
         kafkaMessenger.setKafkaTemplate(akafkaTemplate);
         return kafkaMessenger;
     }

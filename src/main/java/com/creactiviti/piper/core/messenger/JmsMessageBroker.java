@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.error.Retryable;
 
-public class JmsMessenger implements Messenger {
+public class JmsMessageBroker implements MessageBroker {
 
   private JmsTemplate jmsTemplate;
 

@@ -44,7 +44,7 @@ import com.creactiviti.piper.core.event.TaskProgressedEventListener;
 import com.creactiviti.piper.core.event.TaskStartedEventListener;
 import com.creactiviti.piper.core.event.TaskStartedWebhookEventListener;
 import com.creactiviti.piper.core.job.JobRepository;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.pipeline.PipelineRepository;
 import com.creactiviti.piper.core.task.ControlTaskDispatcher;
 import com.creactiviti.piper.core.task.CounterRepository;
@@ -71,7 +71,7 @@ public class CoordinatorConfiguration {
   @Autowired private ContextRepository<Context> contextRepository;
   @Autowired private PipelineRepository pipelineRepository;
   @Autowired private CounterRepository counterRepository;
-  @Autowired @Lazy private Messenger messenger;
+  @Autowired @Lazy private MessageBroker messageBroker;
   
   @Bean
   Coordinator coordinator () {
@@ -85,7 +85,7 @@ public class CoordinatorConfiguration {
     coordinator.setTaskDispatcher(taskDispatcher());
     coordinator.setErrorHandler(errorHandler());
     coordinator.setTaskCompletionHandler(taskCompletionHandler());
-    coordinator.setMessenger(messenger);
+    coordinator.setMessageBroker(messageBroker);
     return coordinator;
   }
   
@@ -137,7 +137,7 @@ public class CoordinatorConfiguration {
   
   @Bean
   SwitchTaskDispatcher switchTaskDispatcher (TaskDispatcher aTaskDispatcher) {
-    return new SwitchTaskDispatcher(aTaskDispatcher,taskExecutionRepo,messenger,contextRepository);
+    return new SwitchTaskDispatcher(aTaskDispatcher,taskExecutionRepo,messageBroker,contextRepository);
   }
   
   @Bean
@@ -166,7 +166,7 @@ public class CoordinatorConfiguration {
   
   @Bean
   SubflowTaskDispatcher subflowTaskDispatcher () {
-    return new SubflowTaskDispatcher(messenger);
+    return new SubflowTaskDispatcher(messageBroker);
   }
   
   @Bean
@@ -203,12 +203,12 @@ public class CoordinatorConfiguration {
   
   @Bean
   ControlTaskDispatcher controlTaskDispatcher () {
-    return new ControlTaskDispatcher(messenger);
+    return new ControlTaskDispatcher(messageBroker);
   }
   
   @Bean
   EachTaskDispatcher eachTaskDispatcher (TaskDispatcher aTaskDispatcher) {
-    return new EachTaskDispatcher(aTaskDispatcher,taskExecutionRepo,messenger,contextRepository,counterRepository);
+    return new EachTaskDispatcher(aTaskDispatcher,taskExecutionRepo,messageBroker,contextRepository,counterRepository);
   }
   
   @Bean
@@ -216,7 +216,7 @@ public class CoordinatorConfiguration {
     return MapTaskDispatcher.builder()
                             .taskDispatcher(aTaskDispatcher)
                             .taskExecutionRepository(taskExecutionRepo)
-                            .messenger(messenger)
+                            .messageBroker(messageBroker)
                             .contextRepository(contextRepository)
                             .counterRepository(counterRepository)
                             .build();
@@ -227,7 +227,7 @@ public class CoordinatorConfiguration {
     ParallelTaskDispatcher dispatcher = new ParallelTaskDispatcher();
     dispatcher.setContextRepository(contextRepository);
     dispatcher.setCounterRepository(counterRepository);
-    dispatcher.setMessenger(messenger);
+    dispatcher.setMessageBroker(messageBroker);
     dispatcher.setTaskDispatcher(aTaskDispatcher);
     dispatcher.setTaskExecutionRepository(taskExecutionRepo);
     return dispatcher;
@@ -238,7 +238,7 @@ public class CoordinatorConfiguration {
     ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
     forkTaskDispatcher.setTaskDispatcher(aTaskDispatcher);
     forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepo);
-    forkTaskDispatcher.setMessenger(messenger);
+    forkTaskDispatcher.setMessageBroker(messageBroker);
     forkTaskDispatcher.setContextRepository(contextRepository);
     forkTaskDispatcher.setCounterRepository(counterRepository);
     return forkTaskDispatcher;
@@ -246,12 +246,12 @@ public class CoordinatorConfiguration {
   
   @Bean
   WorkTaskDispatcher workTaskDispatcher () {
-    return new WorkTaskDispatcher(messenger);
+    return new WorkTaskDispatcher(messageBroker);
   }
     
   @Bean
   DistributedEventPublisher coordinatorEventPublisher () {
-    return new DistributedEventPublisher (messenger);
+    return new DistributedEventPublisher (messageBroker);
   }
   
    

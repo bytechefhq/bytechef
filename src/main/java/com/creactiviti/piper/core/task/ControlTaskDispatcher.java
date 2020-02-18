@@ -15,8 +15,10 @@
  */
 package com.creactiviti.piper.core.task;
 
+import java.util.Objects;
+
 import com.creactiviti.piper.core.messenger.Exchanges;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 
 /**
  * 
@@ -25,15 +27,15 @@ import com.creactiviti.piper.core.messenger.Messenger;
  */
 public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskDispatcherResolver {
 
-  private final Messenger messenger;
+  private final MessageBroker messageBroker;
   
-  public ControlTaskDispatcher (Messenger aMessenger) {
-    messenger = aMessenger;
+  public ControlTaskDispatcher (MessageBroker aMessageBroker) {
+    messageBroker = Objects.requireNonNull(aMessageBroker);
   }
   
   @Override
   public void dispatch(ControlTask aTask) {
-    messenger.send(Exchanges.CONTROL+"/"+Exchanges.CONTROL, aTask);
+    messageBroker.send(Exchanges.CONTROL+"/"+Exchanges.CONTROL, aTask);
   }
 
   @Override

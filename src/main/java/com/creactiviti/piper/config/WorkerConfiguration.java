@@ -24,19 +24,19 @@ import org.springframework.context.annotation.Lazy;
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.annotations.ConditionalOnWorker;
 import com.creactiviti.piper.core.event.DistributedEventPublisher;
-import com.creactiviti.piper.core.messenger.Messenger;
+import com.creactiviti.piper.core.messenger.MessageBroker;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
 
 @Configuration
 @ConditionalOnWorker
 public class WorkerConfiguration {
   
-  @Autowired @Lazy private Messenger messenger;
+  @Autowired @Lazy private MessageBroker messageBroker;
   
   @Bean
-  Worker worker (TaskHandlerResolver aTaskHandlerResolver, Messenger aMessenger) {
+  Worker worker (TaskHandlerResolver aTaskHandlerResolver, MessageBroker aMessageBroker) {
     Worker worker = new Worker();
-    worker.setMessenger(aMessenger);
+    worker.setMessageBroker(aMessageBroker);
     worker.setTaskHandlerResolver(aTaskHandlerResolver);
     worker.setEventPublisher(workerEventPublisher());
     return worker;
@@ -45,7 +45,7 @@ public class WorkerConfiguration {
   @Bean
   @Qualifier("Worker")
   DistributedEventPublisher workerEventPublisher () {
-    return new DistributedEventPublisher (messenger);
+    return new DistributedEventPublisher (messageBroker);
   }
   
   
