@@ -29,8 +29,8 @@ import org.springframework.util.Assert;
 import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.MessageBroker;
-import com.creactiviti.piper.core.messenger.Queues;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
 /**

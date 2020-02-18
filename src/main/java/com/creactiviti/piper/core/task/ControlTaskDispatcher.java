@@ -17,8 +17,8 @@ package com.creactiviti.piper.core.task;
 
 import java.util.Objects;
 
-import com.creactiviti.piper.core.messenger.Exchanges;
-import com.creactiviti.piper.core.messenger.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.Exchanges;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
 
 /**
  * 

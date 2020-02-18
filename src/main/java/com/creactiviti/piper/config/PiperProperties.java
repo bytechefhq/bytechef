@@ -23,7 +23,7 @@ public class PiperProperties {
   private SerializationProperties serialization;
   private PersistenceProperties persistence;
   private PipelineRepositoryProperties pipelineRepository;
-  private MessengerProperties messenger;
+  private MessageBrokerProperties messageBroker;
   private CoordinatorProperties coordinator = new CoordinatorProperties();
   private WorkerProperties worker = new WorkerProperties();
 
@@ -50,13 +50,13 @@ public class PiperProperties {
   public void setPipelineRepository(PipelineRepositoryProperties aPipelineRepository) {
     pipelineRepository = aPipelineRepository;
   }
-  
-  public MessengerProperties getMessenger() {
-    return messenger;
+
+  public MessageBrokerProperties getMessageBroker() {
+    return messageBroker;
   }
   
-  public void setMessenger(MessengerProperties aMessenger) {
-    messenger = aMessenger;
+  public void setMessageBroker(MessageBrokerProperties aMessageBroker) {
+    messageBroker = aMessageBroker;
   }
 
   public CoordinatorProperties getCoordinator() {

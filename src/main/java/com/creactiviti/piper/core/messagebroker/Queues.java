@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.core.messenger;
+package com.creactiviti.piper.core.messagebroker;
 
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 

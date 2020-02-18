@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Lazy;
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.annotations.ConditionalOnWorker;
 import com.creactiviti.piper.core.event.DistributedEventPublisher;
-import com.creactiviti.piper.core.messenger.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
 
 @Configuration

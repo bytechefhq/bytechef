@@ -17,8 +17,8 @@ package com.creactiviti.piper.core.task;
 
 import org.springframework.util.Assert;
 
-import com.creactiviti.piper.core.messenger.MessageBroker;
-import com.creactiviti.piper.core.messenger.Queues;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.Queues;
 
 public class WorkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.core.messenger;
+package com.creactiviti.piper.core.messagebroker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 
 /**
  * a simple, non-thread-safe implementation of the 
- * {@link Messenger} interface. Useful for testing.
+ * {@link MessageBroker} interface. Useful for testing.
  * 
  * @author Arik Cohen
  * @since Jul 10, 2016

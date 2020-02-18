@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.creactiviti.piper.core.DSL;
-import com.creactiviti.piper.core.messenger.MessageBroker;
-import com.creactiviti.piper.core.messenger.Queues;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.Queues;
 
 /**
  * a {@link TaskDispatcher} implementation which handles the 'subflow' 

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
 
 public class EachTaskDispatcherTests {
   

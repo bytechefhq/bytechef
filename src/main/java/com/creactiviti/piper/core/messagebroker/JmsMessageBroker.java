@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.core.messenger;
+package com.creactiviti.piper.core.messagebroker;
 
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.error.Retryable;
 
-public class KafkaMessageBroker implements MessageBroker {
+public class JmsMessageBroker implements MessageBroker {
 
-  private KafkaTemplate<Integer, Object> kafkaTemplate;
+  private JmsTemplate jmsTemplate;
 
   @Override
   public void send (String aRoutingKey, Object aMessage) {
@@ -35,14 +33,9 @@ public class KafkaMessageBroker implements MessageBroker {
       Retryable r = (Retryable) aMessage;
       delay(r.getRetryDelayMillis());
     }
-
-    kafkaTemplate.send(MessageBuilder
-            .withPayload(aMessage)
-            .setHeader(KafkaHeaders.TOPIC, aRoutingKey)
-            .setHeader("_type", aMessage.getClass().getName())
-            .build());
+    jmsTemplate.convertAndSend(aRoutingKey, aMessage);
   }
-
+  
   private void delay (long aValue) {
     try {
       TimeUnit.MILLISECONDS.sleep(aValue);
@@ -50,7 +43,8 @@ public class KafkaMessageBroker implements MessageBroker {
     }
   }
 
-  public void setKafkaTemplate(KafkaTemplate<Integer, Object> akafkaTemplate) {
-    kafkaTemplate = akafkaTemplate;
+  public void setJmsTemplate(JmsTemplate aJmsTemplate) {
+    jmsTemplate = aJmsTemplate;
   }
+
 }

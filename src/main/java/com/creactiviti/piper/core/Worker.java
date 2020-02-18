@@ -37,8 +37,8 @@ import com.creactiviti.piper.core.error.ErrorObject;
 import com.creactiviti.piper.core.event.EventPublisher;
 import com.creactiviti.piper.core.event.Events;
 import com.creactiviti.piper.core.event.PiperEvent;
-import com.creactiviti.piper.core.messenger.MessageBroker;
-import com.creactiviti.piper.core.messenger.Queues;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.task.ControlTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.SpelTaskEvaluator;
@@ -56,7 +56,7 @@ import com.creactiviti.piper.core.task.TaskStatus;
  * on a seperate node altogether.</p>
  * 
  * <p>Communication between the two is decoupled through the 
- * {@link Messenger} interface.</p>
+ * {@link MessageBroker} interface.</p>
  * 
  * @author Arik Cohen
  * @since Jun 12, 2016

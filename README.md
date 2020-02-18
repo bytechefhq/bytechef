@@ -399,7 +399,7 @@ You can change it by using the `piper.pipeline-repository.git.url` and `piper.pi
 
 ```ini
 # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
-piper.messenger.provider=jms
+piper.message-broker.provider=jms
 # turn on the Coordinator process
 piper.coordinator.enabled=true
 # turn on the Worker process and listen to tasks.

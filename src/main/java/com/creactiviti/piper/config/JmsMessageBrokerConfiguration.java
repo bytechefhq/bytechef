@@ -43,15 +43,15 @@ import org.springframework.jms.support.converter.MessageType;
 import com.creactiviti.piper.core.Coordinator;
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.event.EventListener;
-import com.creactiviti.piper.core.messenger.Exchanges;
-import com.creactiviti.piper.core.messenger.JmsMessageBroker;
-import com.creactiviti.piper.core.messenger.Queues;
+import com.creactiviti.piper.core.messagebroker.Exchanges;
+import com.creactiviti.piper.core.messagebroker.JmsMessageBroker;
+import com.creactiviti.piper.core.messagebroker.Queues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableConfigurationProperties(PiperProperties.class)
-@ConditionalOnProperty(name="piper.messenger.provider",havingValue="jms")
-public class JmsMessengerConfiguration implements JmsListenerConfigurer {
+@ConditionalOnProperty(name="piper.message-broker.provider",havingValue="jms")
+public class JmsMessageBrokerConfiguration implements JmsListenerConfigurer {
 
   @Autowired(required=false)
   private Worker worker;
@@ -74,10 +74,10 @@ public class JmsMessengerConfiguration implements JmsListenerConfigurer {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
   @Bean
-  JmsMessageBroker jmsMessenger (JmsTemplate aJmsTemplate) {
-    JmsMessageBroker jmsMessenger = new JmsMessageBroker();
-    jmsMessenger.setJmsTemplate(aJmsTemplate);
-    return jmsMessenger;
+  JmsMessageBroker jmsMessageBroker (JmsTemplate aJmsTemplate) {
+    JmsMessageBroker jmsMessageBroker = new JmsMessageBroker();
+    jmsMessageBroker.setJmsTemplate(aJmsTemplate);
+    return jmsMessageBroker;
   }
   
   @Bean 

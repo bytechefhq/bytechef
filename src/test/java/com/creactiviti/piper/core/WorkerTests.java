@@ -5,8 +5,8 @@ package com.creactiviti.piper.core;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.creactiviti.piper.core.messenger.Queues;
-import com.creactiviti.piper.core.messenger.SynchMessageBroker;
+import com.creactiviti.piper.core.messagebroker.Queues;
+import com.creactiviti.piper.core.messagebroker.SynchMessageBroker;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.TaskExecution;
 

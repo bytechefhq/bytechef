@@ -2,7 +2,7 @@
 
 java -jar \
      -Djava.security.egd=file:/dev/./urandom \
-     -Dpiper.messenger.provider=amqp \
+     -Dpiper.message-broker.provider=amqp \
      -Dpiper.coordinator.enabled=true \
      -Dserver.port=8080 \
      -Dpiper.worker.enabled=false \

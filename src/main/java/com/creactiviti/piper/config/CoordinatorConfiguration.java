@@ -44,7 +44,7 @@ import com.creactiviti.piper.core.event.TaskProgressedEventListener;
 import com.creactiviti.piper.core.event.TaskStartedEventListener;
 import com.creactiviti.piper.core.event.TaskStartedWebhookEventListener;
 import com.creactiviti.piper.core.job.JobRepository;
-import com.creactiviti.piper.core.messenger.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
 import com.creactiviti.piper.core.pipeline.PipelineRepository;
 import com.creactiviti.piper.core.task.ControlTaskDispatcher;
 import com.creactiviti.piper.core.task.CounterRepository;

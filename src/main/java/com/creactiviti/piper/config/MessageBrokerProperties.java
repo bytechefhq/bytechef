@@ -12,27 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package com.creactiviti.piper.core.messenger;
+ */package com.creactiviti.piper.config;
 
+public class MessageBrokerProperties {
 
-/**
- * <p>Abstraction for sending messages between the various componentes of the application. 
- * Implementations are responsible for the guranteed delivery of the message.</p>
- * 
- * @author Arik Cohen
- * @since Jun 18, 2016
- */
-public interface MessageBroker {
-
-  /**
-   * 
-   * @param aRoutingKey
-   *          a string representaiton used for routing the message 
-   *          to the appropriate destination.
-   * @param aMessage
-   *          The message to send.
-   */
-  void send (String aRoutingKey, Object aMessage);
+  private String provider;
+  
+  public String getProvider() {
+    return provider;
+  }
+  
+  public void setProvider(String aProvider) {
+    provider = aProvider;
+  }
   
 }

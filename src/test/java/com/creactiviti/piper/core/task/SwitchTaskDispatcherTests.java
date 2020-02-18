@@ -16,7 +16,7 @@ import org.mockito.ArgumentCaptor;
 
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messenger.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
 import com.google.common.collect.ImmutableMap;
 
 public class SwitchTaskDispatcherTests {

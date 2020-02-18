@@ -17,8 +17,8 @@ package com.creactiviti.piper.core.event;
 
 import java.util.Objects;
 
-import com.creactiviti.piper.core.messenger.MessageBroker;
-import com.creactiviti.piper.core.messenger.Queues;
+import com.creactiviti.piper.core.messagebroker.MessageBroker;
+import com.creactiviti.piper.core.messagebroker.Queues;
 
 /**
  * @author Arik Cohen
