@@ -42,6 +42,7 @@ public class PipelineRepositoryConfiguration {
      
   @Bean
   @Order(1)
+  @ConditionalOnProperty(name="piper.pipeline-repository.classpath.enabled",havingValue="true")
   ResourceBasedPipelineRepository resourceBasedPipelineRepository () {
     return new ResourceBasedPipelineRepository();
   }

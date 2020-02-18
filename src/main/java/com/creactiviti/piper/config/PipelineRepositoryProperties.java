@@ -18,6 +18,7 @@ package com.creactiviti.piper.config;
 public class PipelineRepositoryProperties {
 
   private GitProperties git;
+  private ClasspathProperties classpath;
   
   public GitProperties getGit() {
     return git;
@@ -25,6 +26,69 @@ public class PipelineRepositoryProperties {
   
   public void setGit(GitProperties aGit) {
     git = aGit;
+  }
+  
+  public ClasspathProperties getClasspath() {
+    return classpath;
+  }
+  
+  public void setClasspath(ClasspathProperties aClasspath) {
+    classpath = aClasspath;
+  }
+  
+  public static class ClasspathProperties {
+    
+    private boolean enabled = false;
+    
+    public boolean isEnabled() {
+      return enabled;
+    }
+    
+    public void setEnabled(boolean aEnabled) {
+      enabled = aEnabled;
+    }
+    
+  }
+  
+  public static class GitProperties {
+
+    private boolean enabled = false;
+    private String url;
+    private String[] searchPaths;
+    private String branch = "master";
+    
+    public String getUrl() {
+      return url;
+    }
+    
+    public void setUrl(String aUrl) {
+      url = aUrl;
+    }
+
+    public String[] getSearchPaths() {
+      return searchPaths;
+    }
+    
+    public void setSearchPaths(String[] aSearchPaths) {
+      searchPaths = aSearchPaths;
+    }
+    
+    public boolean isEnabled() {
+      return enabled;
+    }
+    
+    public void setEnabled(boolean aEnabled) {
+      enabled = aEnabled;
+    }
+    
+    public String getBranch() {
+      return branch;
+    }
+    
+    public void setBranch(String aBranch) {
+      branch = aBranch;
+    }
+    
   }
   
 }
