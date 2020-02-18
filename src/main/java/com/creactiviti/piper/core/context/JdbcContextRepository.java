@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import com.creactiviti.piper.core.json.JsonHelper;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
@@ -34,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Arik Cohe
  * @since Apt 7, 2017
  */
-public class JdbcContextRepository implements ContextRepository<Context> {
+public class JdbcContextRepository implements ContextRepository {
 
   private JdbcTemplate jdbc;
   private ObjectMapper objectMapper = new ObjectMapper();

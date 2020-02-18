@@ -37,7 +37,7 @@ public class JdbcJobRepositoryTests {
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
     
-    int pageTotal = jobRepository.findAll(1).getSize();
+    int pageTotal = jobRepository.getPage(1).getSize();
     
     String id = UUIDGenerator.generate();
     
@@ -48,10 +48,10 @@ public class JdbcJobRepositoryTests {
     job.setStatus(JobStatus.CREATED);
     jobRepository.create(job);
     
-    Page<Job> all = jobRepository.findAll(1);
+    Page<Job> all = jobRepository.getPage(1);
     Assertions.assertEquals(pageTotal+1,all.getSize());
     
-    Job one = jobRepository.findOne(id);
+    Job one = jobRepository.getById(id);
     Assertions.assertNotNull(one);
   }
   
@@ -74,7 +74,7 @@ public class JdbcJobRepositoryTests {
     job.setStatus(JobStatus.CREATED);
     jobRepository.create(job);
     
-    Job one = jobRepository.findOne(id);
+    Job one = jobRepository.getById(id);
     
     SimpleJob mjob = new SimpleJob(one);
     mjob.setStatus(JobStatus.FAILED);
@@ -83,7 +83,7 @@ public class JdbcJobRepositoryTests {
     Assertions.assertNotEquals(mjob.getStatus().toString(),one.getStatus().toString());  
     
     jobRepository.merge(mjob);
-    one = jobRepository.findOne(id);
+    one = jobRepository.getById(id);
     Assertions.assertEquals("FAILED",one.getStatus().toString());  
   }
 

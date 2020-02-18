@@ -28,7 +28,7 @@ public class TaskExecutionErrorHandlerTests {
   
   @Test
   public void test1 () {
-    when(jobRepo.findJobByTaskId("1234")).thenReturn(new SimpleJob(Collections.singletonMap("id","4567")));
+    when(jobRepo.getByTaskId("1234")).thenReturn(new SimpleJob(Collections.singletonMap("id","4567")));
     TaskExecutionErrorHandler handler = new TaskExecutionErrorHandler();
     handler.setEventPublisher(eventPublisher);
     handler.setJobRepository(jobRepo);
@@ -43,7 +43,7 @@ public class TaskExecutionErrorHandlerTests {
   
   @Test
   public void test2 () {
-    when(jobRepo.findJobByTaskId("1234")).thenReturn(new SimpleJob());
+    when(jobRepo.getByTaskId("1234")).thenReturn(new SimpleJob());
     TaskExecutionErrorHandler handler = new TaskExecutionErrorHandler();
     handler.setJobRepository(jobRepo);
     handler.setJobTaskRepository(taskRepo);

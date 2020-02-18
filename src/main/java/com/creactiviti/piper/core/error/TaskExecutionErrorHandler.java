@@ -75,7 +75,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         mtask.setEndTime(new Date());
         jobTaskRepository.merge(mtask);
       }
-      Job job = jobRepository.findJobByTaskId(mtask.getId());
+      Job job = jobRepository.getByTaskId(mtask.getId());
       Assert.notNull(job,"job not found for task: " + mtask.getId());
       SimpleJob mjob = new SimpleJob (job);
       Assert.notNull(mjob,String.format("No job found for task %s ",mtask.getId()));

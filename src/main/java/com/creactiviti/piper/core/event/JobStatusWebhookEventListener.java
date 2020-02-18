@@ -46,7 +46,7 @@ public class JobStatusWebhookEventListener implements EventListener {
   
   private void handleEvent (PiperEvent aEvent) {
     String jobId = aEvent.getRequiredString(DSL.JOB_ID);
-    Job job = jobRepository.findOne(jobId);
+    Job job = jobRepository.getById(jobId);
     if(job == null) {
       logger.warn("Unknown job: {}", jobId);
       return;

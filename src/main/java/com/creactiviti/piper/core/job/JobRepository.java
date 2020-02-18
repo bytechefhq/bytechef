@@ -15,19 +15,23 @@
  */
 package com.creactiviti.piper.core.job;
 
+import java.util.Optional;
+
 import com.creactiviti.piper.core.Page;
 
 public interface JobRepository {
   
-  Page<Job> findAll (int aPageNumber);
+  Page<Job> getPage (int aPageNumber);
   
-  Job findOne (String aId);
+  Job getById (String aId);
+  
+  Optional<Job> getLatest ();
   
   void create (Job aJob);
   
   Job merge (Job aJob);
   
-  Job findJobByTaskId (String aTaskId);
+  Job getByTaskId (String aTaskId);
   
   int countRunningJobs ();
   

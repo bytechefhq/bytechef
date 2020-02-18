@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -44,16 +45,23 @@ public class JdbcJobRepository implements JobRepository {
   public static final int DEFAULT_PAGE_SIZE = 20;
   
   @Override
-  public Job findOne(String aId) {
+  public Job getById(String aId) {
     List<Job> query = jdbc.query("select * from job where id = :id", Collections.singletonMap("id", aId),this::jobRowMappper);
-    if(query.size() == 1) {
-      return query.get(0);
-    }
-    return null;
+    Assert.isTrue(query.size() == 1, "expected 1 result. got " + query.size());
+    return query.get(0);
   }
   
   @Override
-  public Job findJobByTaskId(String aTaskId) {
+  public Optional<Job> getLatest() {
+    List<Job> query = jdbc.query("select * from job order by create_time desc limit 1", this::jobRowMappper);
+    if(query.size() == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(query.get(0));
+  }
+  
+  @Override
+  public Job getByTaskId(String aTaskId) {
     Map<String, String> params = Collections.singletonMap("id", aTaskId);
     List<Job> list = jdbc.query("select * from job j where j.id = (select job_id from task_execution jt where jt.id=:id)", params, this::jobRowMappper);
     Assert.isTrue(list.size() < 2, "expecting 1 result, got: " + list.size());
@@ -61,7 +69,7 @@ public class JdbcJobRepository implements JobRepository {
   }
 
   @Override
-  public Page<Job> findAll(int aPageNumber) {
+  public Page<Job> getPage(int aPageNumber) {
     Integer totalItems = jdbc.getJdbcOperations().queryForObject("select count(*) from job",Integer.class);
     int offset = (aPageNumber-1) * DEFAULT_PAGE_SIZE;
     int limit = DEFAULT_PAGE_SIZE;
@@ -157,5 +165,7 @@ public class JdbcJobRepository implements JobRepository {
   public int countCompletedJobsYesterday() {
     return (int)jdbc.queryForObject("select count(*) from job where status='COMPLETED' and end_time >= current_date-1 and end_time < current_date", Collections.EMPTY_MAP, Integer.class);
   }
+
+
 
 }

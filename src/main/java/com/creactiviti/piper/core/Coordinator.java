@@ -160,7 +160,7 @@ public class Coordinator {
    * @return The stopped {@link Job}
    */
   public Job stop (String aJobId) {
-    Job job = jobRepository.findOne(aJobId);
+    Job job = jobRepository.getById(aJobId);
     Assert.notNull(job,"Unknown job: " + aJobId);
     Assert.isTrue(job.getStatus()==JobStatus.STARTED,"Job " + aJobId + " can not be stopped as it is " + job.getStatus());
     SimpleJob mjob = new SimpleJob(job);
@@ -186,7 +186,7 @@ public class Coordinator {
    */
   public Job resume (String aJobId) {
     log.debug("Resuming job {}", aJobId);
-    Job job = jobRepository.findOne (aJobId);
+    Job job = jobRepository.getById (aJobId);
     Assert.notNull(job,String.format("Unknown job %s",aJobId));
     Assert.isTrue(job.getParentTaskExecutionId() == null,"Can't resume a subflow");
     Assert.isTrue(isRestartable(job), "can't stop job " + aJobId + " as it is " + job.getStatus());

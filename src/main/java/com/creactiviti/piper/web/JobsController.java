@@ -17,6 +17,7 @@ package com.creactiviti.piper.web;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,7 +48,7 @@ public class JobsController {
   
   @GetMapping(value="/jobs")
   public Page<Job> list (@RequestParam(value="p",defaultValue="1") Integer aPageNumber) {
-    return jobRepository.findAll(aPageNumber);
+    return jobRepository.getPage(aPageNumber);
   }
   
   @PostMapping("/jobs")
@@ -57,9 +58,15 @@ public class JobsController {
   
   @GetMapping(value="/jobs/{id}")
   public Job get (@PathVariable("id")String aJobId) {
-    Job job = jobRepository.findOne (aJobId);
-    Assert.notNull(job,"Unknown job: " + aJobId);
+    Job job = jobRepository.getById (aJobId);
     return job;
+  }
+  
+  @GetMapping(value="/jobs/latest")
+  public Job latest () {
+    Optional<Job> job = jobRepository.getLatest();
+    Assert.isTrue(job.isPresent(),"no jobs");
+    return job.get();
   }
   
   @ExceptionHandler(IllegalArgumentException.class)

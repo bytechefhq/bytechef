@@ -110,7 +110,7 @@ public class CoordinatorTests {
         
     Job job = coordinator.create(MapObject.of(ImmutableMap.of("pipelineId","demo/hello","inputs",Collections.singletonMap("yourName","me"))));
     
-    Job completedJob = jobRepository.findOne(job.getId());
+    Job completedJob = jobRepository.getById(job.getId());
     
     Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
   }

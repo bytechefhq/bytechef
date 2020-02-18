@@ -28,12 +28,12 @@ import java.util.List;
  * @author Arik Cohen
  * @since Mar 2017
  */
-public interface ContextRepository<T extends Context> {
+public interface ContextRepository {
 
-  T push (String aStackId, T aContext);
+  Context push (String aStackId, Context aContext);
   
-  T peek (String aStackId);
+  Context peek (String aStackId);
   
-  List<T> getStack (String aStackId);
+  List<Context> getStack (String aStackId);
   
 }

@@ -41,7 +41,7 @@ public class SubflowJobStatusEventListener implements EventListener {
       
       String jobId = aEvent.getRequiredString("jobId");
       JobStatus status = JobStatus.valueOf(aEvent.getRequiredString("status"));
-      Job job = jobRepository.findOne(jobId);
+      Job job = jobRepository.getById(jobId);
       
       if(job.getParentTaskExecutionId() == null) {
         return; // not a subflow -- nothing to do

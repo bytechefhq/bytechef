@@ -61,7 +61,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
   @Override
   public void handle (TaskExecution aTask) {
     log.debug("Completing task {}", aTask.getId());
-    Job job = jobRepository.findJobByTaskId (aTask.getId());
+    Job job = jobRepository.getByTaskId (aTask.getId());
     if(job!=null) {
       SimpleTaskExecution task = SimpleTaskExecution.createForUpdate(aTask);
       task.setStatus(TaskStatus.COMPLETED);

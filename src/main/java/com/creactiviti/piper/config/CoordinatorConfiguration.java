@@ -33,7 +33,6 @@ import com.creactiviti.piper.core.SwitchTaskCompletionHandler;
 import com.creactiviti.piper.core.TaskCompletionHandler;
 import com.creactiviti.piper.core.TaskCompletionHandlerChain;
 import com.creactiviti.piper.core.annotations.ConditionalOnCoordinator;
-import com.creactiviti.piper.core.context.Context;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.error.ErrorHandler;
 import com.creactiviti.piper.core.error.ErrorHandlerChain;
@@ -68,7 +67,7 @@ public class CoordinatorConfiguration {
 
   @Autowired private JobRepository jobRepository;
   @Autowired private TaskExecutionRepository taskExecutionRepo;
-  @Autowired private ContextRepository<Context> contextRepository;
+  @Autowired private ContextRepository contextRepository;
   @Autowired private PipelineRepository pipelineRepository;
   @Autowired private CounterRepository counterRepository;
   @Autowired @Lazy private MessageBroker messageBroker;
