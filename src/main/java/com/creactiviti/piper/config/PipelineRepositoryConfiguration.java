@@ -57,10 +57,11 @@ public class PipelineRepositoryConfiguration {
   @Order(3)
   @ConditionalOnProperty(name="piper.pipeline-repository.git.enabled",havingValue="true")
   GitPipelineRepository gitPipelineRepository (PiperProperties piperProperties) {
-    GitPipelineRepository gitPipelineRepository = new GitPipelineRepository();
-    gitPipelineRepository.setUrl(piperProperties.getPipelineRepository().getGit().getUrl());
-    gitPipelineRepository.setSearchPaths(piperProperties.getPipelineRepository().getGit().getSearchPaths());
-    gitPipelineRepository.setBranch(piperProperties.getPipelineRepository().getGit().getBranch());
+    GitPipelineRepository gitPipelineRepository = new GitPipelineRepository(
+        piperProperties.getPipelineRepository().getGit().getUrl(),
+        piperProperties.getPipelineRepository().getGit().getBranch(),
+        piperProperties.getPipelineRepository().getGit().getSearchPaths()
+    );
     return gitPipelineRepository;
   }  
   
