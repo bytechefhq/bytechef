@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.taskhandler.io;
+package com.creactiviti.piper.taskhandler.core;
 
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @author Arik Cohen
  * @since May 11, 2017
  */
-@Component
+@Component("var")
 public class Var implements TaskHandler<Object> {
 
   @Override
