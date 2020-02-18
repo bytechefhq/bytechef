@@ -40,15 +40,15 @@ import com.google.common.base.Throwables;
 public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
   private final HashMap<String, Object> map;
-  
+
   private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-  
+
   private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
-  
+
   public MapObject () {
     map = new HashMap<>();
   }
-  
+
   public MapObject (Map<String, Object> aSource) {
     map = new HashMap<String, Object>(aSource);
   }
@@ -77,7 +77,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
   public Object get(Object aKey) {
     return map.get(aKey);
   }
-  
+
   @Override
   public <T> List<T> getList(Object aKey, Class<T> aElementType) {
     List list = get(aKey, List.class);
@@ -95,39 +95,39 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     }
     return Collections.unmodifiableList(typedList);
   }
-  
+
   @Override
   public <T> List<T> getList(Object aKey, Class<T> aElementType, List<T> aDefaultValue) {
     List<T> list = getList(aKey, aElementType);
     return list!=null?list:aDefaultValue;
   }
-  
+
   @Override
   public String getString (Object aKey) {
     Object value = get(aKey);
     return conversionService.convert(value,String.class);
   }
-  
+
   @Override
   public String getRequiredString(Object aKey) {
     String value = getString(aKey);
     Assert.notNull(value,"Unknown key: " + aKey);
     return value;
   }
-  
+
   @Override
   public <T> T getRequired(Object aKey, Class<T> aValueType) {
     T value = get(aKey,aValueType);
     Assert.notNull(value,"Unknown key: " + aKey);
     return value;
   }
-  
+
   @Override
   public String getString (Object aKey, String aDefault) {
     String value = getString(aKey);
     return value != null ? value : aDefault;
   }
-  
+
   @Override
   public Object put(String aKey, Object aValue) {
     return map.put(aKey, aValue);
@@ -171,7 +171,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     }
     return conversionService.convert(value, aReturnType);
   }
-  
+
   @Override
   public <T> T get(Object aKey, Class<T> aReturnType, T aDefaultValue) {
     Object value = get(aKey);
@@ -200,12 +200,12 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
   public Double getDouble(Object aKey, double aDefaultValue) {
     return get(aKey,Double.class,aDefaultValue);
   }
-  
+
   @Override
   public Float getFloat(Object aKey) {
     return get(aKey,Float.class);
   }
-  
+
   @Override
   public float getFloat(Object aKey, float aDefaultValue) {
     return get(aKey,Float.class, aDefaultValue);
@@ -233,18 +233,18 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     }
     return (Date)value;
   }
-  
+
   @Override
   public Boolean getBoolean(Object aKey) {
     return get(aKey, Boolean.class);
   }
-  
+
   @Override
   public boolean getBoolean(Object aKey, boolean aDefaultValue) {
     Boolean value = getBoolean(aKey);
     return value!=null?value:aDefaultValue;
   }
-  
+
   @Override
   public Map<String,Object> getMap (Object aKey) {
     Map<String,Object> value = (Map<String, Object>) get(aKey);
@@ -253,18 +253,18 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     }
     return Collections.unmodifiableMap(value);
   }
-  
+
   @Override
   public Map<String, Object> getMap(Object aKey, Map<String, Object> aDefault) {
     Map<String, Object> value = getMap(aKey);
     return value!=null?value:aDefault;
   }
-  
+
   @Override
   public Map<String, Object> asMap() {
     return Collections.unmodifiableMap(new HashMap<>(map));
   }
-  
+
   @Override
   public <T> T[] getArray(Object aKey, Class<T> aElementType) {
     Object value = get(aKey);
@@ -278,7 +278,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     }
     return toR;
   }
-  
+
   @Override
   public void set(String aKey, Object aValue) {
     put(aKey, aValue);
@@ -290,7 +290,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
       set(aKey, aValue);
     }
   }
-  
+
   @Override
   public long increment(String aKey) {
     Long counter = getLong(aKey);
@@ -301,21 +301,21 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     set(aKey, counter);
     return counter;
   }
-  
+
   @Override
   public String toString() {
     return map.toString();
   }
-    
+
   @Override
   public boolean equals(Object aObj) {
     return map.equals(aObj);
   }
 
   public static MapObject empty () {
-    return new MapObject(Collections.EMPTY_MAP);
+    return new MapObject(Collections.emptyMap());
   }
-  
+
   public static MapObject of (Map<String,Object> aMap) {
     return new MapObject(aMap);
   }
