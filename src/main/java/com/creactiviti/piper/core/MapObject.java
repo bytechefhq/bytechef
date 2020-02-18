@@ -41,7 +41,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
   private final HashMap<String, Object> map;
   
-  private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ";
+  private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   
   private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
   
