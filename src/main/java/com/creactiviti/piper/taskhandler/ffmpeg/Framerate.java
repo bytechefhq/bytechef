@@ -13,24 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.core.taskhandler.io;
+package com.creactiviti.piper.taskhandler.ffmpeg;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
+/**
+ * 
+ * @author Arik Cohen
+ * @since Jun 2, 2017
+ */
 @Component
-public class Print implements TaskHandler<Object> {
+public class Framerate implements TaskHandler<Double> {
 
-  private Logger log = LoggerFactory.getLogger(getClass());
-
+  private final Mediainfo mediainfo = new Mediainfo();
+  
   @Override
-  public Object handle (Task aTask) {
-    log.info(aTask.getRequiredString("text"));
-    return null;
+  public Double handle (Task aTask) throws Exception {
+    Map<String, Object> mediainfoResult = mediainfo.handle(aTask);
+    String frameRateStr = (String) mediainfoResult.get("video_frame_rate");
+    Assert.notNull(frameRateStr, "can not determine framerate");
+    return Double.valueOf(frameRateStr.replaceAll("[^0-9\\.]", ""));
   }
 
 }
+

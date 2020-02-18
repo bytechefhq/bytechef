@@ -18,7 +18,7 @@
  * Proprietary and confidential
  * Written by Arik Cohen <arik@creactiviti.com>, June 2017
  */
-package com.creactiviti.piper.plugin.ffmpeg;
+package com.creactiviti.piper.taskhandler.ffmpeg;
 
 import java.time.Duration;
 import java.util.ArrayList;

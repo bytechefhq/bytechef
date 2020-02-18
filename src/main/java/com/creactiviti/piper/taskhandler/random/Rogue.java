@@ -13,24 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.core.taskhandler.io;
+package com.creactiviti.piper.taskhandler.random;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
+ * a {@link TaskHandler} implementaion which can
+ * throw an exception based on a probabilty
+ * value.
  * 
  * @author Arik Cohen
- * @since May 11, 2017
+ * @since Mar 30, 2017
  */
 @Component
-public class Var implements TaskHandler<Object> {
+public class Rogue implements TaskHandler<Object> {
 
   @Override
-  public Object handle (Task aTask) {
-    return aTask.getRequired("value");
+  public Object handle(Task aTask) throws Exception {
+    float nextFloat = RandomUtils.nextFloat(0, 1);
+    float probabilty = aTask.getFloat("probabilty",0.5f);
+    Assert.isTrue(probabilty>=0 && probabilty<=1,"probability must be a value between 0 and 1");
+    if(nextFloat <= probabilty) {
+      throw new IllegalStateException("I'm a rogue exception");
+    }
+    return null;
   }
 
 }

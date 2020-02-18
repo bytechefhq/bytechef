@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.core.taskhandler.random;
+package com.creactiviti.piper.taskhandler.random;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Component;

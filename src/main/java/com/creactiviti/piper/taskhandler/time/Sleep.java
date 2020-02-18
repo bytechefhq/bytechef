@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.plugin.ffmpeg;
-
-import java.util.Map;
+package com.creactiviti.piper.taskhandler.time;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
-/**
- * 
- * @author Arik Cohen
- * @since Jun 2, 2017
- */
 @Component
-public class Framerate implements TaskHandler<Double> {
+public class Sleep implements TaskHandler<Object> {
 
-  private final Mediainfo mediainfo = new Mediainfo();
-  
   @Override
-  public Double handle (Task aTask) throws Exception {
-    Map<String, Object> mediainfoResult = mediainfo.handle(aTask);
-    String frameRateStr = (String) mediainfoResult.get("video_frame_rate");
-    Assert.notNull(frameRateStr, "can not determine framerate");
-    return Double.valueOf(frameRateStr.replaceAll("[^0-9\\.]", ""));
+  public Object handle (Task aTask) throws InterruptedException {
+    Thread.sleep(aTask.getLong("millis", 1000));
+    return null;
   }
 
 }
-

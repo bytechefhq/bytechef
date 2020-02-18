@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.core.taskhandler.script;
+package com.creactiviti.piper.taskhandler.ffmpeg;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.List;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -31,42 +32,36 @@ import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
- * a {@link TaskHandler} implementaion which lets one 
- * run arbitrary Bash scripts.
+ * a {@link TaskHandler} implementation which is used
+ * for executing ffmpeg-based commands.
  * 
  * @author Arik Cohen
- * @since Apr 14, 2017
+ * @since Jan 30, 2017
  */
 @Component
-public class Bash implements TaskHandler<String> {
+public class Ffmpeg implements TaskHandler<Object> {
 
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger log = LoggerFactory.getLogger(getClass());
 
   @Override
-  public String handle(Task aTask) throws Exception {
-    File scriptFile = File.createTempFile("_script", ".sh");
-    File logFile = File.createTempFile("log", null);
-    FileUtils.writeStringToFile(scriptFile, aTask.getRequiredString("script"));
-    try (PrintStream stream = new PrintStream(logFile);) {
-      Process chmod = Runtime.getRuntime().exec(String.format("chmod u+x %s",scriptFile.getAbsolutePath()));
-      int chmodRetCode = chmod.waitFor();
-      if(chmodRetCode != 0) {
-        throw new ExecuteException("Failed to chmod", chmodRetCode);
-      }
-      CommandLine cmd = new CommandLine (scriptFile.getAbsolutePath());
-      logger.debug("{}",cmd);
-      DefaultExecutor exec = new DefaultExecutor();
+  public Object handle(Task aTask) throws Exception {
+    List<String> options = aTask.getList("options", String.class);
+    CommandLine cmd = new CommandLine ("ffmpeg");
+    options.forEach(o->cmd.addArgument(o));
+    log.debug("{}",cmd);
+    DefaultExecutor exec = new DefaultExecutor();
+    File tempFile = File.createTempFile("log", null);
+    try (PrintStream stream = new PrintStream(tempFile);) {
       exec.setStreamHandler(new PumpStreamHandler(stream));
-      exec.execute(cmd);
-      return FileUtils.readFileToString(logFile);
+      int exitValue = exec.execute(cmd);
+      return exitValue!=0?FileUtils.readFileToString(tempFile):cmd.toString();
     }
     catch (ExecuteException e) {
-      throw new ExecuteException(e.getMessage(),e.getExitValue(), new RuntimeException(FileUtils.readFileToString(logFile)));
+      throw new ExecuteException(e.getMessage(),e.getExitValue(), new RuntimeException(FileUtils.readFileToString(tempFile)));
     }
     finally {
-      FileUtils.deleteQuietly(logFile);
-      FileUtils.deleteQuietly(scriptFile);
+      FileUtils.deleteQuietly(tempFile);
     }
   }
-  
+
 }

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.plugin.ffmpeg;
+package com.creactiviti.piper.taskhandler.ffmpeg;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.exec.CommandLine;
@@ -31,21 +32,31 @@ import org.springframework.stereotype.Component;
 
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
+ * Executes an ffprobe command on a given input. 
  * 
  * @author Arik Cohen
- * @since June 2, 2017
+ * @since May 23, 2017
  */
 @Component
-public class Mediainfo implements TaskHandler<Map<String,Object>> {
+public class Ffprobe implements TaskHandler<Map<String,Object>> {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
+  private final ObjectMapper json = new ObjectMapper();
   
   @Override
-  public Map<String,Object> handle (Task aTask) throws Exception {
-    CommandLine cmd = new CommandLine ("mediainfo");
-    cmd.addArgument(aTask.getRequiredString("input"));
+  public Map<String,Object> handle(Task aTask) throws Exception {
+    CommandLine cmd = new CommandLine ("ffprobe");
+    cmd.addArgument("-v")
+       .addArgument("quiet")
+       .addArgument("-print_format")
+       .addArgument("json")
+       .addArgument("-show_error")
+       .addArgument("-show_format")
+       .addArgument("-show_streams")
+       .addArgument(aTask.getRequiredString("input"));
     log.debug("{}",cmd);
     DefaultExecutor exec = new DefaultExecutor();
     File tempFile = File.createTempFile("log", null);
@@ -62,20 +73,23 @@ public class Mediainfo implements TaskHandler<Map<String,Object>> {
     }
   }
   
-  private Map<String,Object> parse (String aRaw) throws Exception {
-    String[] lines = aRaw.split("\n");
-    Map<String,Object> parsed = new HashMap<> ();
-    String prefix = "";
-    for(String line : lines) {
-      String[] parts = line.split(":",2);
-      if(parts.length == 1) {
-        prefix = parts[0].trim().toLowerCase().replaceAll(" ", "_")+"_";
-      }
-      else {
-        parsed.put(prefix+parts[0].trim().toLowerCase().replaceAll(" ", "_"), parts[1].trim());
-      }
+  private Map<String,Object> parse (String aJson) throws Exception {
+    Map<String,Object> result = json.readValue(aJson,Map.class);
+    ArrayList<Object> video = new ArrayList<>();
+    ArrayList<Object> audio = new ArrayList<>();
+    result.put("video", video);
+    result.put("audio", audio);
+    List<Map<String,Object>> streams = (List<Map<String, Object>>) result.get("streams");
+    for(int i=0; streams!=null&&i<streams.size(); i++) {
+     Map<String, Object> stream = streams.get(i);
+     if("video".equals(stream.get("codec_type"))) {
+       video.add(stream);
+     }
+     else if("audio".equals(stream.get("codec_type"))) {
+       audio.add(stream);
+     }
     }
-    return parsed;
+    return result;
   }
 
 }
