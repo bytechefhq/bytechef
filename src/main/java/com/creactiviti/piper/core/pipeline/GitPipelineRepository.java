@@ -18,6 +18,7 @@ package com.creactiviti.piper.core.pipeline;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.creactiviti.piper.config.PipelineRepositoryProperties.GitProperties;
 import com.creactiviti.piper.core.git.GitOperations;
 import com.creactiviti.piper.core.git.JGitTemplate;
 
@@ -29,8 +30,14 @@ public class GitPipelineRepository extends YamlPipelineRepository  {
     git = aGitOperations;
   }
   
-  public GitPipelineRepository (String aUrl, String aBranch, String[] aSearchPaths) {
-    git = new JGitTemplate(aUrl,aBranch,aSearchPaths);
+  public GitPipelineRepository (GitProperties aGitProperties) {
+    git = new JGitTemplate(
+      aGitProperties.getUrl(), 
+      aGitProperties.getBranch(), 
+      aGitProperties.getSearchPaths(), 
+      aGitProperties.getUsername(), 
+      aGitProperties.getPassword()
+    );
   }
   
   @Override

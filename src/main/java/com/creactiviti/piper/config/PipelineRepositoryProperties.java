@@ -56,6 +56,8 @@ public class PipelineRepositoryProperties {
     private String url;
     private String[] searchPaths;
     private String branch = "master";
+    private String username;
+    private String password;
     
     public String getUrl() {
       return url;
@@ -87,6 +89,22 @@ public class PipelineRepositoryProperties {
     
     public void setBranch(String aBranch) {
       branch = aBranch;
+    }
+    
+    public String getUsername() {
+      return username;
+    }
+    
+    public void setUsername(String aUsername) {
+      username = aUsername;
+    }
+    
+    public String getPassword() {
+      return password;
+    }
+    
+    public void setPassword(String aPassword) {
+      password = aPassword;
     }
     
   }

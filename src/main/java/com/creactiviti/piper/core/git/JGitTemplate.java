@@ -30,6 +30,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +52,15 @@ public class JGitTemplate implements GitOperations {
   private final String url;
   private final String branch;
   private final String[] searchPaths;
+  private final String username;
+  private final String password;
   
-  public JGitTemplate (String aUrl, String aBranch, String[] aSearchPaths) {
+  public JGitTemplate (String aUrl, String aBranch, String[] aSearchPaths, String aUsername, String aPassword) {
     url = aUrl;
     branch = aBranch;
     searchPaths = aSearchPaths;
+    username = aUsername;
+    password = aPassword;
   }
 
   @Override
@@ -69,13 +74,16 @@ public class JGitTemplate implements GitOperations {
     List<IdentifiableResource> resources = new ArrayList<>();
     try (ObjectReader reader = aRepository.newObjectReader(); RevWalk walk = new RevWalk(reader); TreeWalk treeWalk = new TreeWalk(aRepository,reader);) {
       final ObjectId id = aRepository.resolve(Constants.HEAD);
+      if(id == null) {
+        return List.of();
+      }
       RevCommit commit = walk.parseCommit(id);
       RevTree tree = commit.getTree();
       treeWalk.addTree(tree);
       treeWalk.setRecursive(true);
       while (treeWalk.next()) {
         String path = treeWalk.getPathString();        
-        if(searchPaths.stream().anyMatch((sp)->path.startsWith(sp))) {
+        if(!path.startsWith(".") && (searchPaths == null || searchPaths.size() == 0 || searchPaths.stream().anyMatch((sp)->path.startsWith(sp)))) {
           ObjectId objectId = treeWalk.getObjectId(0);
           logger.debug("Loading {} [{}]",path,objectId.name());
           resources.add(readBlob(aRepository, path.substring(0, path.indexOf('.')), objectId.name()));
@@ -96,6 +104,7 @@ public class JGitTemplate implements GitOperations {
                    .setURI(url)
                    .setBranch(branch)
                    .setDirectory(repositoryDir)
+                   .setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
                    .call();
       return (git.getRepository());
     }
