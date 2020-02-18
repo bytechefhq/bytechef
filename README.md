@@ -414,7 +414,10 @@ piper.worker.subscriptions.tasks=5
 # enable a git-based pipeline repository
 piper.pipeline-repository.git.enabled=true
 # The URL to the Git Repo
-piper.pipeline-repository.git.url=git@github.com:creactiviti/piper-pipelines.git
+piper.pipeline-repository.git.url=https://github.com/myusername/my-pipelines.git
+piper.pipeline-repository.git.branch=master
+piper.pipeline-repository.git.username=me
+piper.pipeline-repository.git.password=secret
 # folders within the git repo that are scanned for pipelines.
 piper.pipeline-repository.git.search-paths=demo/,video/
 # enable file system based pipeline repository
