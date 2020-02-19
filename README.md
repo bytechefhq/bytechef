@@ -238,6 +238,20 @@ Registering webhooks is done when creating the job. E.g.:
 
 Supported types are `job.status` and `task.started`.
 
+# Task Handlers
+
+
+[core/var](src/main/java/com/creactiviti/piper/taskhandler/core/Var.java)
+
+Assign a value to a variable
+
+```
+  name: pi
+  type: core/var
+  value: 3.14159
+```
+
+
 # Tutorials
 
 ## Hello World
