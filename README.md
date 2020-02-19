@@ -373,6 +373,13 @@ Supported types are `job.status` and `task.started`.
         done
 ```
 
+[time/sleep](src/main/java/com/creactiviti/piper/taskhandler/time/Sleep.java)
+
+```
+  type: time/sleep
+  millis: 60000
+```
+
 
 # Tutorials
 
