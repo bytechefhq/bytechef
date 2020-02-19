@@ -16,24 +16,18 @@
 package com.creactiviti.piper.core.task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.expression.AccessException;
-import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
-import org.springframework.expression.TypedValue;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -57,7 +51,25 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
-  private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
+  private static final Map<String, MethodExecutor> methodExecutors;
+  
+  static {
+    Map<String,MethodExecutor> map = new HashMap<> ();
+    map.put("boolean", new Cast<>(Boolean.class));
+    map.put("byte", new Cast<>(Byte.class));
+    map.put("char", new Cast<>(Character.class));
+    map.put("short", new Cast<>(Short.class));
+    map.put("int", new Cast<>(Integer.class));
+    map.put("long", new Cast<>(Long.class));
+    map.put("float", new Cast<>(Float.class));
+    map.put("double", new Cast<>(Double.class));
+    map.put("systemProperty", new SystemProperty());
+    map.put("range", new Range());
+    map.put("join", new Join());
+    map.put("concat", new Concat());
+    map.put("flatten", new Flatten());
+    methodExecutors = Collections.unmodifiableMap(map);
+  }
   
   @Override
   public TaskExecution evaluate(TaskExecution aJobTask, Context aContext) {
@@ -109,88 +121,9 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   
   private MethodResolver methodResolver () {
     return (ctx,target,name,args) -> {
-      switch(name) {
-        case "systemProperty":
-          return this::systemProperty;
-        case "range":
-          return range();
-        case "boolean":
-          return cast(Boolean.class);
-        case "byte":
-          return cast(Byte.class);
-        case "char":
-          return cast(Character.class);
-        case "short":
-          return cast(Short.class);
-        case "int":
-          return cast(Integer.class);
-        case "long":
-          return cast(Long.class);
-        case "float":
-          return cast(Float.class);
-        case "double":
-          return cast(Double.class);
-        case "join":
-          return join();
-        case "concat":
-          return concat();
-        case "flatten":
-          return flatten();
-        default:
-          return null;
-      }
+      return methodExecutors.get(name);
     };
   }
   
-  private TypedValue systemProperty (EvaluationContext aContext, Object aTarget, Object... aArgs) throws AccessException {
-    return new TypedValue(System.getProperty((String)aArgs[0]));
-  }
   
-  private MethodExecutor range () {
-    return (ctx,target,args) -> {
-      List<Integer> value = IntStream.rangeClosed((int)args[0], (int)args[1])
-                                     .boxed()
-                                     .collect(Collectors.toList());
-      return new TypedValue(value);
-    };
-  }
-  
-  private <T> MethodExecutor cast(Class<T> type) {
-    return (ctx,target,args) -> {
-      T value = type.cast(conversionService.convert(args[0], type));
-      return new TypedValue(value);
-    };
-  }
-
-  private <T> MethodExecutor join () {
-    return (ctx,target,args) -> {
-      String separator = (String) args[0];
-      List<T> values = (List<T>) args[1];
-      String str = values.stream()
-                         .map(String::valueOf)
-                         .collect(Collectors.joining(separator));
-      return new TypedValue(str);
-    };
-  }
-
-  private <T> MethodExecutor concat () {
-    return (ctx,target,args) -> {
-      List<T> l1 = (List<T>) args[0];
-      List<T> l2 = (List<T>) args[1];
-      List<T> joined = new ArrayList<T>(l1.size()+l2.size());
-      joined.addAll(l1);
-      joined.addAll(l2);
-      return new TypedValue(joined);
-    };
-  }
-
-  private <T> MethodExecutor flatten () {
-    return (ctx,target,args) -> {
-      List<List<T>> list = (List<List<T>>) args[0];
-      List<T> flat = list.stream()
-                         .flatMap(List::stream)
-                         .collect(Collectors.toList());
-      return new TypedValue(flat);
-    };
-  }
 }
