@@ -291,7 +291,7 @@ Supported types are `job.status` and `task.started`.
   ]
 ```
 
-[media/ffmpeg](src/main/java/com/creactiviti/piper/taskhandler/media/Ffprobe.java)
+[media/ffprobe](src/main/java/com/creactiviti/piper/taskhandler/media/Ffprobe.java)
 
 ```
   name: ffprobeResults
