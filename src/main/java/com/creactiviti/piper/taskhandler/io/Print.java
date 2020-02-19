@@ -15,21 +15,23 @@
  */
 package com.creactiviti.piper.taskhandler.io;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
+/**
+ * Print some text to the console
+ * 
+ * @author Arik Cohen
+ * @since Feb, 19 2020
+ */
 @Component("io/print")
 public class Print implements TaskHandler<Object> {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
-
   @Override
   public Object handle (Task aTask) {
-    log.info(aTask.getRequiredString("text"));
+    System.out.println(aTask.getRequiredString("text"));
     return null;
   }
 

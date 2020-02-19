@@ -257,6 +257,12 @@ Supported types are `job.status` and `task.started`.
   filename: /path/to/my/file.txt
 ```
 
+[io/print](src/main/java/com/creactiviti/piper/taskhandler/io/Print.java)
+
+```
+  type: io/print
+  text: hello world
+```
 
 # Tutorials
 
