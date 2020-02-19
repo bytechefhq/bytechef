@@ -378,6 +378,14 @@ Supported types are `job.status` and `task.started`.
   signatureDuration: 60s
 ```
 
+[s3/put](src/main/java/com/creactiviti/piper/taskhandler/s3/S3Put.java)
+
+```
+  type: s3/put
+  uri: s3://my-bucket/path/to/file.mp4
+  filepath: /path/to/my/file.mp4
+```
+
 [shell/bash](src/main/java/com/creactiviti/piper/taskhandler/shell/Bash.java)
 
 ```
