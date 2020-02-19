@@ -266,6 +266,13 @@ Supported types are `job.status` and `task.started`.
   path: /path/to/directory
 ```
 
+[io/mkdir](src/main/java/com/creactiviti/piper/taskhandler/io/Mkdir.java)
+
+```
+  type: io/mkdir
+  path: /path/to/directory
+```
+
 [io/print](src/main/java/com/creactiviti/piper/taskhandler/io/Print.java)
 
 ```
