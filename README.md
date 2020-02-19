@@ -243,8 +243,6 @@ Supported types are `job.status` and `task.started`.
 
 [core/var](src/main/java/com/creactiviti/piper/taskhandler/core/Var.java)
 
-Example: 
-
 ```
   name: pi
   type: core/var
@@ -252,8 +250,6 @@ Example:
 ```
 
 [io/filepath](src/main/java/com/creactiviti/piper/taskhandler/io/FilePath.java)
-
-Example: 
 
 ```
   name: myFilePath
