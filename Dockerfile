@@ -1,8 +1,17 @@
-FROM       jrottenberg/ffmpeg:3.3
+FROM       jrottenberg/ffmpeg:4.2-ubuntu
 
-RUN        apt-get update && apt-get -y install openjdk-8-jre python mediainfo
+RUN        apt-get update
+
+RUN        apt-get install -y software-properties-common
+
+RUN        add-apt-repository ppa:linuxuprising/java
+
+RUN        echo oracle-java13-installer shared/accepted-oracle-license-v1-2 select true | /usr/bin/debconf-set-selections
+
+RUN        apt-get -y install mediainfo wget oracle-java13-installer
 
 ENTRYPOINT []
-CMD        ["java", "-Xmx1g", "-jar", "-Djava.security.egd=file:/dev/./urandom", "/app/piper.jar"]
 
-COPY       piper-server/target/piper-server-0.0.1-SNAPSHOT.jar /app/piper.jar
+CMD        ["java", "-jar", "-Djava.security.egd=file:/dev/./urandom", "/app/piper.jar"]
+
+COPY       target/piper-0.0.1-SNAPSHOT.jar /app/piper.jar
