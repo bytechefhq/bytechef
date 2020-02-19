@@ -71,7 +71,7 @@ public class CoordinatorConfiguration {
   @Autowired private PipelineRepository pipelineRepository;
   @Autowired private CounterRepository counterRepository;
   @Autowired @Lazy private MessageBroker messageBroker;
-  @Autowired @Lazy private EventPublisher eventPublisher;
+  @Autowired private EventPublisher eventPublisher;
   
   @Bean
   Coordinator coordinator () {

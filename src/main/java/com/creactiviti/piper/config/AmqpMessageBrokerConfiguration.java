@@ -41,6 +41,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import com.creactiviti.piper.core.Coordinator;
 import com.creactiviti.piper.core.Worker;
@@ -55,9 +56,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(name="piper.message-broker.provider",havingValue="amqp")
 public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer {
   
+  @Lazy
   @Autowired(required=false)
   private Worker worker;
   
+  @Lazy
   @Autowired(required=false)
   private Coordinator coordinator;
   

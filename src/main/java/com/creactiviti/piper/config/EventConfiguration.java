@@ -17,7 +17,6 @@ package com.creactiviti.piper.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 import com.creactiviti.piper.core.event.DistributedEventPublisher;
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
@@ -29,7 +28,7 @@ import com.creactiviti.piper.core.messagebroker.MessageBroker;
 @Configuration
 class EventConfiguration {
 
-  @Lazy @Bean
+  @Bean
   DistributedEventPublisher defaultEventPublisher (MessageBroker aMessageBroker) {
     return new DistributedEventPublisher (aMessageBroker);
   }
