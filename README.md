@@ -361,6 +361,14 @@ Supported types are `job.status` and `task.started`.
   probabilty: 0.25 # default 0.5
 ```
 
+[s3/get](src/main/java/com/creactiviti/piper/taskhandler/s3/S3Get.java)
+
+```
+  type: s3/get
+  uri: s3://my-bucket/path/to/file.mp4
+  filepath: /path/to/my/file.mp4
+```
+
 [shell/bash](src/main/java/com/creactiviti/piper/taskhandler/shell/Bash.java)
 
 ```
