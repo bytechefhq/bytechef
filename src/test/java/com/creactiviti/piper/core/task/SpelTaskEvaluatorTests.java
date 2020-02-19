@@ -17,7 +17,7 @@ public class SpelTaskEvaluatorTests {
   public void test1 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.create();
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(evaluated.asMap(),jt.asMap());
   }
 
@@ -25,7 +25,7 @@ public class SpelTaskEvaluatorTests {
   public void test2 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("hello", "world");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(evaluated.asMap(),jt.asMap());
   }
 
@@ -94,7 +94,7 @@ public class SpelTaskEvaluatorTests {
   public void test9 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("message", "${name}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals("${name}",evaluated.getString("message"));
   }
 
@@ -102,7 +102,7 @@ public class SpelTaskEvaluatorTests {
   public void test10 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("message", "yo ${name}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals("yo ${name}",evaluated.getString("message"));
   }
 
@@ -126,7 +126,7 @@ public class SpelTaskEvaluatorTests {
   public void test13 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("thing", "${number*3}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals("${number*3}",evaluated.get("thing"));
   }
 
@@ -134,7 +134,7 @@ public class SpelTaskEvaluatorTests {
   public void test14 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("list", "${range(1,3)}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Arrays.asList(1,2,3),evaluated.get("list"));
   }
 
@@ -142,7 +142,7 @@ public class SpelTaskEvaluatorTests {
   public void test15 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("sub",Collections.singletonMap("list", "${range(1,3)}"));
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Arrays.asList(1,2,3),evaluated.getMap("sub").get("list"));
   }
 
@@ -158,7 +158,7 @@ public class SpelTaskEvaluatorTests {
   public void test17 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someBoolean", "${boolean('1')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Boolean.valueOf(true),evaluated.get("someBoolean"));
   }
 
@@ -166,7 +166,7 @@ public class SpelTaskEvaluatorTests {
   public void test18 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someByte", "${byte('127')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Byte.valueOf(Byte.MAX_VALUE),evaluated.get("someByte"));
   }
 
@@ -174,7 +174,7 @@ public class SpelTaskEvaluatorTests {
   public void test19 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someChar", "${char('c')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Character.valueOf('c'),evaluated.get("someChar"));
   }
 
@@ -182,7 +182,7 @@ public class SpelTaskEvaluatorTests {
   public void test20 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someShort", "${short('32767')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Short.valueOf(Short.MAX_VALUE),evaluated.get("someShort"));
   }
 
@@ -190,7 +190,7 @@ public class SpelTaskEvaluatorTests {
   public void test21 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someInt", "${int('1')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Integer.valueOf(1),evaluated.get("someInt"));
   }
 
@@ -198,7 +198,7 @@ public class SpelTaskEvaluatorTests {
   public void test22 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someLong", "${long('1')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Long.valueOf(1L),evaluated.get("someLong"));
   }
 
@@ -206,7 +206,7 @@ public class SpelTaskEvaluatorTests {
   public void test23 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someFloat", "${float('1.337')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Float.valueOf(1.337f),evaluated.get("someFloat"));
   }
 
@@ -214,7 +214,7 @@ public class SpelTaskEvaluatorTests {
   public void test24 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("someDouble", "${double('1.337')}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Double.valueOf(1.337d),evaluated.get("someDouble"));
   }
 
@@ -222,7 +222,7 @@ public class SpelTaskEvaluatorTests {
   public void test25 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(',',range(1,3))}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals("1,2,3",evaluated.get("joined"));
   }
 
@@ -230,7 +230,7 @@ public class SpelTaskEvaluatorTests {
   public void test26 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(',',range(1,1))}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals("1",evaluated.get("joined"));
   }
 
@@ -238,7 +238,7 @@ public class SpelTaskEvaluatorTests {
   public void test27 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("joined", "${join(' and ',{'a','b','c'})}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals("a and b and c",evaluated.get("joined"));
   }
 
@@ -246,7 +246,7 @@ public class SpelTaskEvaluatorTests {
   public void test28 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("concatenated"));
   }
 
@@ -254,7 +254,7 @@ public class SpelTaskEvaluatorTests {
   public void test29 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("concatenated", "${concat({'a','b','c'}, range(1,3))}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("concatenated"));
   }
 
@@ -262,7 +262,7 @@ public class SpelTaskEvaluatorTests {
   public void test30 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Arrays.asList("a","b","c","d","e","f"),evaluated.get("flattened"));
   }
 
@@ -270,7 +270,15 @@ public class SpelTaskEvaluatorTests {
   public void test31 () {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.createFrom("flattened", "${flatten({{'a','b','c'},range(1,3)})}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.EMPTY_MAP));
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("flattened"));
+  }
+  
+  @Test
+  public void test32 () {
+    SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
+    TaskExecution jt = SimpleTaskExecution.createFrom("tempDir", "${tempDir()}");
+    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
+    Assertions.assertEquals(System.getProperty("java.io.tmpdir"),evaluated.get("tempDir"));
   }
 }
