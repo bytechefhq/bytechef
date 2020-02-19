@@ -32,7 +32,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @since Feb, 19 2020
  */
 @Component("io/ls")
-public class Ls implements TaskHandler<List<Ls.FileInfo>> {
+class Ls implements TaskHandler<List<Ls.FileInfo>> {
 
   @Override
   public List<Ls.FileInfo> handle (Task aTask) throws IOException {
