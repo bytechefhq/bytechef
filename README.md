@@ -55,20 +55,20 @@ outputs:                 --+
 tasks: 
   - name: randomNumber               --+
     label: Generate a random number    |
-    type: randomInt                    | - This is a task
+    type: random/int                   | - This is a task
     startInclusive: 0                  |
     endInclusive: 10000              --+
                             
   - label: Print a greeting 
-    type: print             
+    type: io/print             
     text: Hello ${yourName} 
                            
   - label: Sleep a little
-    type: sleep             --+
+    type: time/sleep        --+
     millis: ${randomNumber}   | - tasks may refer to the result of a previous task
                             --+
   - label: Print a farewell
-    type: print
+    type: io/print
     text: Goodbye ${yourName}
 ```
 
@@ -121,7 +121,7 @@ Applies the function `iteratee` to each item in `list`, in parallel. Note, that 
 - type: each
   list: [1000,2000,3000]
   iteratee:
-    type: sleep         
+    type: time/sleep         
     millis: ${item} 
 ```
 
@@ -134,10 +134,10 @@ Run the `tasks` collection of functions in parallel, without waiting until the p
 ```
 - type: parallel
   tasks: 
-    - type: print
+    - type: io/print
       text: hello
         
-    - type: print
+    - type: io/print
       text: goodbye
 ```
 
@@ -150,20 +150,20 @@ Executes each branch in the `branches` as a seperate and isolated sub-flow. Bran
   branches: 
      - - name: randomNumber                 <-- branch 1 start here
          label: Generate a random number
-         type: randomInt
+         type: random/int
          startInclusive: 0
          endInclusive: 5000
            
-       - type: sleep
+       - type: time/sleep
          millis: ${randomNumber}
            
      - - name: randomNumber                 <-- branch 2 start here
          label: Generate a random number
-         type: randomInt
+         type: random/int
          startInclusive: 0
          endInclusive: 5000
            
-       - type: sleep
+       - type: time/sleep
          millis: ${randomNumber}      
 ```
 
@@ -177,15 +177,15 @@ Executes one and only one branch of execution based on the `expression` value.
   cases: 
      - key: hello                 <-- case 1 start here
        tasks: 
-         - type: print
+         - type: io/print
            text: hello world
      - key: bye                   <-- case 2 start here
        tasks: 
-         - type: print
+         - type: io/print
            text: goodbye world
   default:
     - tasks:
-        -type: print
+        -type: io/print
          text: something else
 ```
 
@@ -198,7 +198,7 @@ Produces a new collection of values by mapping each value in `list` through the 
   type: map
   list: ["/path/to/file1.txt","/path/to/file2.txt","/path/to/file3.txt"]
   iteratee:
-    type: filesize         
+    type: io/filesize         
     file: ${item}
 ```
 
@@ -440,11 +440,11 @@ inputs:
 
 tasks:      
   - label: Print a greeting
-    type: print
+    type: io/print
     text: Hello ${name}
        
   - label: Print a farewell
-    type: print
+    type: io/print
     text: Goodbye ${name}
     
 ```  
@@ -585,7 +585,7 @@ inputs:
     
 tasks:      
   - label: Print Hello Message
-    type: print
+    type: io/print
     text: "Hello ${name}!"
 ```
 
