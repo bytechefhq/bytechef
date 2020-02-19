@@ -37,14 +37,14 @@ import com.creactiviti.piper.core.task.TaskHandler;
 @Component("media/ffmpeg")
 class Ffmpeg implements TaskHandler<Object> {
 
-  private Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public Object handle (Task aTask) throws Exception {
     List<String> options = aTask.getList("options", String.class);
     CommandLine cmd = new CommandLine ("ffmpeg");
     options.forEach(o->cmd.addArgument(o));
-    log.debug("{}",cmd);
+    logger.debug("{}",cmd);
     DefaultExecutor exec = new DefaultExecutor();
     int exitValue = exec.execute(cmd);
     Assert.isTrue(exitValue == 0, "exit value: " + exitValue);
