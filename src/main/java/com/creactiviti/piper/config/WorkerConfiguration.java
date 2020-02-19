@@ -17,6 +17,7 @@ package com.creactiviti.piper.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.annotations.ConditionalOnWorker;
@@ -29,7 +30,7 @@ import com.creactiviti.piper.core.task.TaskHandlerResolver;
 public class WorkerConfiguration {
   
   @Bean
-  Worker worker (TaskHandlerResolver aTaskHandlerResolver, MessageBroker aMessageBroker, EventPublisher aEventPublisher) {
+  Worker worker (TaskHandlerResolver aTaskHandlerResolver, MessageBroker aMessageBroker, @Lazy EventPublisher aEventPublisher) {
     Worker worker = new Worker();
     worker.setMessageBroker(aMessageBroker);
     worker.setTaskHandlerResolver(aTaskHandlerResolver);
