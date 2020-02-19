@@ -361,10 +361,10 @@ Supported types are `job.status` and `task.started`.
   probabilty: 0.25 # default 0.5
 ```
 
-[s3/get](src/main/java/com/creactiviti/piper/taskhandler/s3/S3Get.java)
+[s3/get-object](src/main/java/com/creactiviti/piper/taskhandler/s3/S3GetObject.java)
 
 ```
-  type: s3/get
+  type: s3/get-object
   uri: s3://my-bucket/path/to/file.mp4
   filepath: /path/to/my/file.mp4
 ```
@@ -378,10 +378,10 @@ Supported types are `job.status` and `task.started`.
   signatureDuration: 60s
 ```
 
-[s3/put](src/main/java/com/creactiviti/piper/taskhandler/s3/S3Put.java)
+[s3/put-object](src/main/java/com/creactiviti/piper/taskhandler/s3/S3PutObject.java)
 
 ```
-  type: s3/put
+  type: s3/put-object
   uri: s3://my-bucket/path/to/file.mp4
   filepath: /path/to/my/file.mp4
 ```

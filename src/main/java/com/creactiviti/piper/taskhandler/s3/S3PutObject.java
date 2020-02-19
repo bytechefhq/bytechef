@@ -7,18 +7,17 @@ import org.springframework.stereotype.Component;
 import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
-import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
- * Retrieves objects from Amazon S3. To use GET, Piper must have READ access to the object. 
+ * Adds an object to a bucket. Piper must have WRITE permissions on a bucket to add an object to it.
  * 
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-@Component("s3/get")
-class S3Get implements TaskHandler<Object> {
+@Component("s3/put-object")
+class S3PutObject implements TaskHandler<Object> {
 
   @Override
   public Object handle (Task aTask) throws Exception {
@@ -30,9 +29,10 @@ class S3Get implements TaskHandler<Object> {
     
     S3Client s3 = S3Client.builder().build();
     
-    s3.getObject(GetObjectRequest.builder().bucket(bucketName).key(key).build(),
-        ResponseTransformer.toFile(Paths.get(aTask.getRequiredString("filepath"))));
-    
+    s3.putObject(PutObjectRequest.builder()
+                                 .bucket(bucketName)
+                                 .key(key)
+                                 .build(), Paths.get(aTask.getRequiredString("filepath")));
     
     return null;
   }
