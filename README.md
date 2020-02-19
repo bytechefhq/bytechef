@@ -243,12 +243,22 @@ Supported types are `job.status` and `task.started`.
 
 [core/var](src/main/java/com/creactiviti/piper/taskhandler/core/Var.java)
 
-Assign a value to a variable
+Example: 
 
 ```
   name: pi
   type: core/var
   value: 3.14159
+```
+
+[io/filepath](src/main/java/com/creactiviti/piper/taskhandler/io/FilePath.java)
+
+Example: 
+
+```
+  name: myFilePath
+  type: io/filepath
+  filename: /path/to/my/file.txt
 ```
 
 
