@@ -257,6 +257,15 @@ Supported types are `job.status` and `task.started`.
   filename: /path/to/my/file.txt
 ```
 
+[io/ls](src/main/java/com/creactiviti/piper/taskhandler/io/Ls.java)
+
+```
+  name: listOfFiles
+  type: io/ls
+  recursive: true # default: false
+  path: /path/to/directory
+```
+
 [io/print](src/main/java/com/creactiviti/piper/taskhandler/io/Print.java)
 
 ```
