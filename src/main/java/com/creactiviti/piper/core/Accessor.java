@@ -178,7 +178,7 @@ public interface Accessor {
    * @return The list of items
    */
   <T> List<T> getList (Object aKey, Class<T> aElementType);
-
+  
   /**
    * Return the {@link List} of items associated with the given
    * key.

@@ -22,6 +22,7 @@ import java.util.Map;
 import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.DSL;
+import com.creactiviti.piper.core.MapObject;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
@@ -47,12 +48,12 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
   @Override
   public void dispatch (TaskExecution aTask) {
-    List<Map> tasks = aTask.getList("tasks", Map.class);
+    List<MapObject> tasks = aTask.getList("tasks", MapObject.class);
     Assert.notNull(tasks,"'tasks' property can't be null");
     if(tasks.size() > 0) {
       counterRepository.set(aTask.getId(), tasks.size());
-      for(Map task : tasks) {
-        SimpleTaskExecution parallelTask = SimpleTaskExecution.createFromMap(task);
+      for(Map<String,Object> task : tasks) {
+        SimpleTaskExecution parallelTask = SimpleTaskExecution.of(task);
         parallelTask.setId(UUIDGenerator.generate());
         parallelTask.setParentId(aTask.getId());
         parallelTask.setStatus(TaskStatus.CREATED);
@@ -66,7 +67,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
       }
     }
     else {
-      SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
+      SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
       completion.setEndTime(new Date());
       messageBroker.send(Queues.COMPLETIONS, completion);
     }

@@ -55,11 +55,11 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
   @Override
   public void handle (TaskExecution aTaskExecution) {
-    SimpleTaskExecution mtask = SimpleTaskExecution.createForUpdate(aTaskExecution);
+    SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
     mtask.setStatus(TaskStatus.COMPLETED);
     taskExecutionRepo.merge(mtask);
 
-    SimpleTaskExecution switchTask = SimpleTaskExecution.createForUpdate(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
+    SimpleTaskExecution switchTask = SimpleTaskExecution.of(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
     if(aTaskExecution.getOutput() != null && aTaskExecution.getName() != null) {
       Context context = contextRepository.peek(switchTask.getId());
       MapContext newContext = new MapContext(context.asMap());
@@ -70,7 +70,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     List<MapObject> tasks = resolveCase(switchTask);
     if(aTaskExecution.getTaskNumber()<tasks.size()) {
       MapObject task = tasks.get(aTaskExecution.getTaskNumber());
-      SimpleTaskExecution execution = SimpleTaskExecution.createFromMap(task);
+      SimpleTaskExecution execution = SimpleTaskExecution.of(task);
       execution.setId(UUIDGenerator.generate());
       execution.setStatus(TaskStatus.CREATED);
       execution.setCreateTime(new Date());

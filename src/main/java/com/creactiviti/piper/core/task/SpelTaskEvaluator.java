@@ -69,6 +69,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     map.put("concat", new Concat());
     map.put("flatten", new Flatten());
     map.put("tempDir", new TempDir());
+    map.put("uuid", new Uuid());
     methodExecutors = Collections.unmodifiableMap(map);
   }
   
@@ -76,7 +77,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   public TaskExecution evaluate(TaskExecution aJobTask, Context aContext) {
     Map<String, Object> map = aJobTask.asMap();
     Map<String, Object> newMap = evaluateInternal(map,aContext);
-    return SimpleTaskExecution.createFromMap(newMap);
+    return SimpleTaskExecution.of(newMap);
   }
 
   private Map<String, Object> evaluateInternal(Map<String, Object> aMap, Context aContext) {

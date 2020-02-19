@@ -42,12 +42,12 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
   
   @Override
   public void handle (TaskExecution aTaskExecution) {
-    SimpleTaskExecution mtask = SimpleTaskExecution.createForUpdate(aTaskExecution);
+    SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
     mtask.setStatus(TaskStatus.COMPLETED);
     taskExecutionRepo.merge(mtask);
     long subtasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
     if(subtasksLeft == 0) {
-      SimpleTaskExecution parentExecution = SimpleTaskExecution.createForUpdate(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
+      SimpleTaskExecution parentExecution = SimpleTaskExecution.of(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
       parentExecution.setEndTime(new Date ());
       parentExecution.setExecutionTime(parentExecution.getEndTime().getTime()-parentExecution.getStartTime().getTime());
       taskCompletionHandler.handle(parentExecution);

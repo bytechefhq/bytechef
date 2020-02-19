@@ -43,13 +43,13 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
   
   @Override
   public void handle (TaskExecution aTaskExecution) {
-    SimpleTaskExecution mtask = SimpleTaskExecution.createForUpdate(aTaskExecution);
+    SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
     mtask.setStatus(TaskStatus.COMPLETED);
     taskExecutionRepo.merge(mtask);
     long subtasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
     if(subtasksLeft == 0) {
       List<TaskExecution> children = taskExecutionRepo.findByParentId(aTaskExecution.getParentId());
-      SimpleTaskExecution parentExecution = SimpleTaskExecution.createForUpdate(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
+      SimpleTaskExecution parentExecution = SimpleTaskExecution.of(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
       parentExecution.setEndTime(new Date ());
       parentExecution.setExecutionTime(parentExecution.getEndTime().getTime()-parentExecution.getStartTime().getTime());
       parentExecution.setOutput(children.stream().map(c->c.getOutput()).collect(Collectors.toList()));

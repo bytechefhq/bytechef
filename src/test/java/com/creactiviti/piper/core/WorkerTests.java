@@ -21,7 +21,7 @@ public class WorkerTests {
     worker.setMessageBroker(messageBroker);
     worker.setEventPublisher((e)->{});
     worker.setTaskHandlerResolver((jt) -> (t) -> "done");
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.setId("1234");
     task.setJobId("4567");
     worker.handle(task);
@@ -39,7 +39,7 @@ public class WorkerTests {
     worker.setTaskHandlerResolver((jt) -> (t) -> {
       throw new IllegalArgumentException("bad input");
     });
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.setId("1234");
     task.setJobId("4567");
     worker.handle(task);

@@ -33,7 +33,7 @@ public class TaskExecutionErrorHandlerTests {
     handler.setEventPublisher(eventPublisher);
     handler.setJobRepository(jobRepo);
     handler.setJobTaskRepository(taskRepo);
-    SimpleTaskExecution errorable = SimpleTaskExecution.create();
+    SimpleTaskExecution errorable = new SimpleTaskExecution();
     errorable.setId("1234");
     errorable.setError(new ErrorObject("something bad happened", new String[0]));
     handler.handle(errorable);
@@ -48,7 +48,7 @@ public class TaskExecutionErrorHandlerTests {
     handler.setJobRepository(jobRepo);
     handler.setJobTaskRepository(taskRepo);
     handler.setTaskDispatcher(taskDispatcher);
-    SimpleTaskExecution errorable = SimpleTaskExecution.createFrom("retry", 1);
+    SimpleTaskExecution errorable = SimpleTaskExecution.of("retry", 1);
     errorable.setId("1234");
     errorable.setError(new ErrorObject("something bad happened", new String[0]));
     handler.handle(errorable);

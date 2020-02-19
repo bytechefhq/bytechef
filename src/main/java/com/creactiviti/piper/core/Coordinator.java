@@ -168,7 +168,7 @@ public class Coordinator {
     jobRepository.merge(mjob);
     eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS,"jobId",job.getId(),"status",job.getStatus()));
     if(mjob.getExecution().size() > 0) {
-      SimpleTaskExecution currentTask = SimpleTaskExecution.createForUpdate(job.getExecution().get(job.getExecution().size()-1));
+      SimpleTaskExecution currentTask = SimpleTaskExecution.of(job.getExecution().get(job.getExecution().size()-1));
       currentTask.setStatus(TaskStatus.CANCELLED);
       currentTask.setEndTime(new Date());
       jobTaskRepository.merge(currentTask);
@@ -212,7 +212,7 @@ public class Coordinator {
       taskCompletionHandler.handle(aTask);
     }
     catch (Exception e) {
-      SimpleTaskExecution exec = SimpleTaskExecution.createForUpdate(aTask);
+      SimpleTaskExecution exec = SimpleTaskExecution.of(aTask);
       exec.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
       handleError(exec);
     }

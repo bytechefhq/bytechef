@@ -54,7 +54,7 @@ class Vstitch implements TaskHandler<Object> {
                 .append("\n");
         }
       }
-      SimpleTaskExecution ffmpegTask = SimpleTaskExecution.create();
+      SimpleTaskExecution ffmpegTask = new SimpleTaskExecution();
       List<String> options = Arrays.asList(
         "-y",
         "-f","concat",

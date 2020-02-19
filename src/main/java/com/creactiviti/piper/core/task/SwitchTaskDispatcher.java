@@ -52,7 +52,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
   @Override
   public void dispatch (TaskExecution aTask) {
-    SimpleTaskExecution switchTask = SimpleTaskExecution.createForUpdate(aTask);
+    SimpleTaskExecution switchTask = SimpleTaskExecution.of(aTask);
     switchTask.setStartTime(new Date ());
     switchTask.setStatus(TaskStatus.STARTED);
     taskExecutionRepo.merge(switchTask);
@@ -61,7 +61,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
       List<MapObject> tasks = selectedCase.getList("tasks", MapObject.class,Collections.emptyList());
       if(tasks.size() > 0) {
         MapObject task = tasks.get(0);
-        SimpleTaskExecution execution = SimpleTaskExecution.createFromMap(task);
+        SimpleTaskExecution execution = SimpleTaskExecution.of(task);
         execution.setId(UUIDGenerator.generate());
         execution.setStatus(TaskStatus.CREATED);
         execution.setCreateTime(new Date());
@@ -76,7 +76,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         taskDispatcher.dispatch(evaluatedExecution);
       }
       else  {
-        SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
+        SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
         completion.setStartTime(new Date());
         completion.setEndTime(new Date());
         completion.setExecutionTime(0);
@@ -84,7 +84,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
       }
     }
     else {
-      SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
+      SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
       completion.setStartTime(new Date());
       completion.setEndTime(new Date());
       completion.setExecutionTime(0);

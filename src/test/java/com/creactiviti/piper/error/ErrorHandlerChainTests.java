@@ -41,6 +41,6 @@ public class ErrorHandlerChainTests {
       }
     };
     ErrorHandlerChain chain = new ErrorHandlerChain(Arrays.asList(errorHandler1,errorHandler2));
-    chain.handle(SimpleTaskExecution.create());
+    chain.handle(new SimpleTaskExecution());
   }
 }

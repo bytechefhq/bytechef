@@ -90,11 +90,11 @@ public class Worker {
         TaskHandler<?> taskHandler = taskHandlerResolver.resolve(aTask);
         eventPublisher.publishEvent(PiperEvent.of(Events.TASK_STARTED,"taskId",aTask.getId(),"jobId",aTask.getJobId()));
         Object output = taskHandler.handle(aTask);
-        SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
+        SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
         if(output!=null) {
           if(completion.getOutput() != null) {
             TaskExecution evaluated = taskEvaluator.evaluate(completion, new MapContext ("execution", new MapContext("output", output)));
-            completion = SimpleTaskExecution.createForUpdate(evaluated);
+            completion = SimpleTaskExecution.of(evaluated);
           }
           else {
             completion.setOutput(output);
@@ -135,7 +135,7 @@ public class Worker {
   
   private void handleException (TaskExecution aTask, Exception aException) {
     logger.error(aException.getMessage(),aException);
-    SimpleTaskExecution task = SimpleTaskExecution.createForUpdate(aTask);
+    SimpleTaskExecution task = SimpleTaskExecution.of(aTask);
     task.setError(new ErrorObject(aException.getMessage(),ExceptionUtils.getStackFrames(aException)));
     task.setStatus(TaskStatus.FAILED);
     messageBroker.send(Queues.ERRORS, task);

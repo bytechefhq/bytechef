@@ -30,7 +30,7 @@ public class SwitchTaskDispatcherTests {
   public void test1 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
     SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print")))));
     task.set("expression", "k1");
     dispatcher.dispatch(task);
@@ -43,7 +43,7 @@ public class SwitchTaskDispatcherTests {
   public void test2 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
     SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print")))));
     task.set("expression", "k2");
     dispatcher.dispatch(task);
@@ -54,7 +54,7 @@ public class SwitchTaskDispatcherTests {
   public void test3 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
     SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(
       ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print"))),
       ImmutableMap.of("key", "k2","tasks",Arrays.asList(ImmutableMap.of("type","sleep"))))
@@ -70,7 +70,7 @@ public class SwitchTaskDispatcherTests {
   public void test4 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
     SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(
       ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print"))),
       ImmutableMap.of("key", "k2","tasks",Arrays.asList(ImmutableMap.of("type","sleep")))

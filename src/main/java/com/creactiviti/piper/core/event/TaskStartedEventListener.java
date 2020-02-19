@@ -54,7 +54,7 @@ public class TaskStartedEventListener implements EventListener {
         taskDispatcher.dispatch(new CancelTask(task.getId()));
       }
       else {
-        SimpleTaskExecution mtask = SimpleTaskExecution.createForUpdate(task);
+        SimpleTaskExecution mtask = SimpleTaskExecution.of(task);
         if(mtask.getStartTime()==null && mtask.getStatus() != TaskStatus.STARTED) {
           mtask.setStartTime(aEvent.getCreateTime());
           mtask.setStatus(TaskStatus.STARTED);

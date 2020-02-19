@@ -18,7 +18,7 @@ public class LsTests {
   public void test1 () throws IOException {
     Ls ls = new Ls();
     ClassPathResource cpr = new ClassPathResource("ls");
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("path", cpr.getFile().getAbsolutePath());
     task.set("recursive", true);
     List<FileInfo> files = ls.handle(task);
@@ -31,7 +31,7 @@ public class LsTests {
   public void test2 () throws IOException {
     Ls ls = new Ls();
     ClassPathResource cpr = new ClassPathResource("ls");
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("path", cpr.getFile().getAbsolutePath());
     task.set("recursive", true);
     List<FileInfo> files = ls.handle(task);
@@ -44,7 +44,7 @@ public class LsTests {
   public void test3 () throws IOException {
     Ls ls = new Ls();
     ClassPathResource cpr = new ClassPathResource("ls");
-    SimpleTaskExecution task = SimpleTaskExecution.create();
+    SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("path", cpr.getFile().getAbsolutePath());
     List<FileInfo> files = ls.handle(task);
     Assertions.assertEquals(Set.of("B.txt","A.txt"), files.stream()

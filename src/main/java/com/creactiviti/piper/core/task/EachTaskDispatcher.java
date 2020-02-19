@@ -60,7 +60,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     Map<String, Object> iteratee = aTask.getMap("iteratee");
     Assert.notNull(list,"'iteratee' property can't be null");
     
-    SimpleTaskExecution parentEachTask = SimpleTaskExecution.createForUpdate(aTask);
+    SimpleTaskExecution parentEachTask = SimpleTaskExecution.of(aTask);
     parentEachTask.setStartTime(new Date ());
     parentEachTask.setStatus(TaskStatus.STARTED);
     taskExecutionRepo.merge(parentEachTask);
@@ -69,7 +69,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
       counterRepository.set(aTask.getId(), list.size());
       for(int i=0; i<list.size(); i++) {
         Object item = list.get(i);
-        SimpleTaskExecution eachTask = SimpleTaskExecution.createFromMap(iteratee);
+        SimpleTaskExecution eachTask = SimpleTaskExecution.of(iteratee);
         eachTask.setId(UUIDGenerator.generate());
         eachTask.setParentId(aTask.getId());
         eachTask.setStatus(TaskStatus.CREATED);
@@ -87,7 +87,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
       }
     }
     else {
-      SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
+      SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
       completion.setEndTime(new Date());
       messageBroker.send(Queues.COMPLETIONS, completion);
     }

@@ -61,9 +61,9 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
   @Transactional
   public TaskExecution merge (TaskExecution aTaskExecution) {
     TaskExecution current = jdbc.queryForObject("select * from task_execution where id = :id for update", Collections.singletonMap("id", aTaskExecution.getId()),this::jobTaskRowMappper);
-    SimpleTaskExecution merged = SimpleTaskExecution.createForUpdate(aTaskExecution);  
+    SimpleTaskExecution merged = SimpleTaskExecution.of(aTaskExecution);  
     if(current.getStatus().isTerminated() && aTaskExecution.getStatus() == TaskStatus.STARTED) {
-      merged = SimpleTaskExecution.createForUpdate(current);
+      merged = SimpleTaskExecution.of(current);
       merged.setStartTime(aTaskExecution.getStartTime());
     }
     else if (aTaskExecution.getStatus().isTerminated() && current.getStatus() == TaskStatus.STARTED) {
@@ -82,7 +82,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
   }
   
   private TaskExecution jobTaskRowMappper (ResultSet aRs, int aIndex) throws SQLException {
-    return SimpleTaskExecution.createFromMap(readValueFromString(aRs.getString("serialized_execution")));
+    return SimpleTaskExecution.of(readValueFromString(aRs.getString("serialized_execution")));
   }
 
   private SqlParameterSource createSqlParameterSource (TaskExecution aTaskExecution) {

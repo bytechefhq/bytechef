@@ -15,9 +15,12 @@
  */
 package com.creactiviti.piper.core.event;
 
-import com.creactiviti.piper.core.task.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.creactiviti.piper.core.task.SimpleTaskExecution;
+import com.creactiviti.piper.core.task.TaskExecution;
+import com.creactiviti.piper.core.task.TaskExecutionRepository;
 
 /**
  *
@@ -44,7 +47,7 @@ public class TaskProgressedEventListener implements EventListener {
       if(task == null) {
         logger.error("Unknown task: {}",taskId);
       } else {
-        SimpleTaskExecution mtask = SimpleTaskExecution.createForUpdate(task);
+        SimpleTaskExecution mtask = SimpleTaskExecution.of(task);
 
         mtask.setProgress(progress);
 

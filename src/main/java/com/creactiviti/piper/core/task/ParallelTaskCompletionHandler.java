@@ -38,7 +38,7 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
   
   @Override
   public void handle (TaskExecution aTaskExecution) {
-    SimpleTaskExecution mtask = SimpleTaskExecution.createForUpdate(aTaskExecution);
+    SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
     mtask.setStatus(TaskStatus.COMPLETED);
     taskExecutionRepo.merge(mtask);
     long tasksLeft = counterRepository.decrement(aTaskExecution.getParentId());

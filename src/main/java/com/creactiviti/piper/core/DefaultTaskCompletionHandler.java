@@ -63,7 +63,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     log.debug("Completing task {}", aTask.getId());
     Job job = jobRepository.getByTaskId (aTask.getId());
     if(job!=null) {
-      SimpleTaskExecution task = SimpleTaskExecution.createForUpdate(aTask);
+      SimpleTaskExecution task = SimpleTaskExecution.of(aTask);
       task.setStatus(TaskStatus.COMPLETED);
       jobTaskRepository.merge(task);
       SimpleJob mjob = new SimpleJob (job);
@@ -96,7 +96,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     Pipeline pipeline = pipelineRepository.findOne(aJob.getPipelineId());
     List<Accessor> outputs = pipeline.getOutputs();
     Context context = contextRepository.peek(aJob.getId());
-    SimpleTaskExecution jobOutput = SimpleTaskExecution.create(); 
+    SimpleTaskExecution jobOutput = new SimpleTaskExecution(); 
     for(Accessor output : outputs) {
       jobOutput.set(output.getRequiredString(DSL.NAME), output.getRequiredString(DSL.VALUE));
     }

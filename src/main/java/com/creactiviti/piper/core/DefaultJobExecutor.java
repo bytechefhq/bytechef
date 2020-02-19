@@ -15,6 +15,8 @@
  */
 package com.creactiviti.piper.core;
 
+import java.util.Date;
+
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
 import com.creactiviti.piper.core.job.Job;
@@ -28,6 +30,8 @@ import com.creactiviti.piper.core.task.TaskDispatcher;
 import com.creactiviti.piper.core.task.TaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskExecutionRepository;
+import com.creactiviti.piper.core.task.TaskStatus;
+import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
 /**
  * 
@@ -62,7 +66,10 @@ public class DefaultJobExecutor implements JobExecutor {
 
   private TaskExecution nextTask(Job aJob, Pipeline aPipeline) {
     PipelineTask task = aPipeline.getTasks().get(aJob.getCurrentTask());
-    SimpleTaskExecution mt = SimpleTaskExecution.createFrom (task);
+    SimpleTaskExecution mt = new SimpleTaskExecution (task.asMap());
+    mt.setCreateTime(new Date());
+    mt.setId(UUIDGenerator.generate());
+    mt.setStatus(TaskStatus.CREATED);
     mt.setJobId(aJob.getId());
     mt.setPriority(aJob.getPriority());
     return mt;

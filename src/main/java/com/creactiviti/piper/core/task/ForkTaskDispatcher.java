@@ -77,7 +77,7 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
   public void dispatch (TaskExecution aTask) {
     List<List> branches = aTask.getList("branches", List.class);
     Assert.notNull(branches,"'branches' property can't be null");
-    SimpleTaskExecution forkTask = SimpleTaskExecution.createForUpdate(aTask);
+    SimpleTaskExecution forkTask = SimpleTaskExecution.of(aTask);
     forkTask.setStartTime(new Date ());
     forkTask.setStatus(TaskStatus.STARTED);
     taskExecutionRepo.merge(forkTask);
@@ -87,7 +87,7 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         List branch = branches.get(i);
         Assert.isTrue(branch.size()>0, "branch " + i + " does not contain any tasks");
         Map<String,Object> task = (Map<String, Object>) branch.get(0);
-        SimpleTaskExecution execution = SimpleTaskExecution.createFromMap(task);
+        SimpleTaskExecution execution = SimpleTaskExecution.of(task);
         execution.setId(UUIDGenerator.generate());
         execution.setStatus(TaskStatus.CREATED);
         execution.setCreateTime(new Date());
@@ -105,7 +105,7 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
       }
     }
     else {
-      SimpleTaskExecution completion = SimpleTaskExecution.createForUpdate(aTask);
+      SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
       completion.setEndTime(new Date());
       messageBroker.send(Queues.COMPLETIONS, completion);
     }

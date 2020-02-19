@@ -528,6 +528,13 @@ Supported types are `job.status` and `task.started`.
   value: "${tempDir()}"  # e.g. /tmp
 ```
 
+[uuid](src/main/java/com/creactiviti/piper/core/task/Uuid.java)
+
+```
+  type: core/var
+  value: "${uuid()}"
+```
+
 # Tutorials
 
 ## Hello World

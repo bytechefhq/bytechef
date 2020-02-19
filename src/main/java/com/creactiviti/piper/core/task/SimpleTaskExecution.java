@@ -15,29 +15,28 @@
  */
 package com.creactiviti.piper.core.task;
 
-import com.creactiviti.piper.core.DSL;
-import com.creactiviti.piper.core.error.Error;
-import com.creactiviti.piper.core.error.ErrorObject;
-import com.creactiviti.piper.core.error.Prioritizable;
-import com.creactiviti.piper.core.uuid.UUIDGenerator;
-
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import com.creactiviti.piper.core.DSL;
+import com.creactiviti.piper.core.error.Error;
+import com.creactiviti.piper.core.error.ErrorObject;
+import com.creactiviti.piper.core.error.Prioritizable;
+
 
 public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecution {
 
-  private SimpleTaskExecution () {
-    this(Collections.EMPTY_MAP);
+  public SimpleTaskExecution () {
+    this(Collections.emptyMap());
   }
   
   private SimpleTaskExecution (TaskExecution aSource) {
     this(aSource.asMap());
   }
   
-  private SimpleTaskExecution (Map<String,Object> aSource) {
+  public SimpleTaskExecution (Map<String,Object> aSource) {
     super(aSource);
   }  
   
@@ -194,58 +193,15 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
   }
     
   /**
-   * Creates a new {@link SimpleTaskExecution} instance 
-   * from a {@link PipelineTask}.
-   * 
-   * @param aTask
-   *         The {@link PipelineTask} to create this instance from.
-   * @return {@link SimpleTaskExecution}
-   */
-  public static SimpleTaskExecution createFrom (PipelineTask aTask) {
-    SimpleTaskExecution jobTask = new SimpleTaskExecution (aTask);
-    jobTask.setCreateTime(new Date());
-    jobTask.setId(UUIDGenerator.generate());
-    jobTask.setStatus(TaskStatus.CREATED);
-    return jobTask;
-  }
-    
-  /**
-   * Creates a new {@link SimpleTaskExecution} instance, using the 
-   * given {@link TaskExecution} instance as a starting point. 
-   * 
-   * @param aJobTask
-   *          The {@link TaskExecution} instance to use as a starting 
-   *          point.
-   * @return the new {@link SimpleTaskExecution}
-   */
-  public static SimpleTaskExecution createNewFrom (TaskExecution aJobTask) {
-    SimpleTaskExecution mutableJobTask = new SimpleTaskExecution(aJobTask);
-    mutableJobTask.setId(UUIDGenerator.generate());
-    mutableJobTask.setCreateTime(new Date());
-    mutableJobTask.setStatus(TaskStatus.CREATED);
-    mutableJobTask.setError(null);
-    return mutableJobTask;
-  }
-
-  /**
-   * Creates a {@link SimpleTaskExecution} instance which 
+   * Creates a mutation {@link SimpleTaskExecution} instance which 
    * is a copy of a {@link TaskExecution}.
    * 
-   * @param aJobTask
+   * @param aSource
    *          The {@link TaskExecution} instance to copy.
    * @return the new {@link SimpleTaskExecution}
    */
-  public static SimpleTaskExecution createForUpdate (TaskExecution aJobTask) {
-    return new SimpleTaskExecution(aJobTask);
-  }
-  
-  /**
-   * Creates an empty {@link SimpleTaskExecution} instance.
-   * 
-   * @return The new {@link SimpleTaskExecution}.
-   */
-  public static SimpleTaskExecution create () {
-    return new SimpleTaskExecution();
+  public static SimpleTaskExecution of (TaskExecution aSource) {
+    return new SimpleTaskExecution(aSource);
   }
   
   /**
@@ -254,7 +210,7 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
    * 
    * @return The new {@link SimpleTaskExecution}.
    */
-  public static SimpleTaskExecution createFrom (String aKey, Object aValue) {
+  public static SimpleTaskExecution of (String aKey, Object aValue) {
     return new SimpleTaskExecution(Collections.singletonMap(aKey, aValue));
   }
   
@@ -264,7 +220,7 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
    * 
    * @return The new {@link SimpleTaskExecution}.
    */
-  public static SimpleTaskExecution createFromMap (Map<String,Object> aSource) {
+  public static SimpleTaskExecution of (Map<String,Object> aSource) {
     return new SimpleTaskExecution(aSource);
   }
   
