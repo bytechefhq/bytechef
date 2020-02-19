@@ -8,6 +8,7 @@ import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
@@ -32,6 +33,7 @@ class S3PutObject implements TaskHandler<Object> {
     s3.putObject(PutObjectRequest.builder()
                                  .bucket(bucketName)
                                  .key(key)
+                                 .acl(aTask.getString("acl")!=null?ObjectCannedACL.fromValue(aTask.getString("acl")):null)
                                  .build(), Paths.get(aTask.getRequiredString("filepath")));
     
     return null;
