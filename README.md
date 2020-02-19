@@ -264,6 +264,33 @@ Supported types are `job.status` and `task.started`.
   text: hello world
 ```
 
+[media/dar](src/main/java/com/creactiviti/piper/taskhandler/media/Dar.java)
+
+```
+  name: myDar
+  type: media/dar
+  input: /path/to/my/video/mp4
+```
+
+[media/ffmpeg](src/main/java/com/creactiviti/piper/taskhandler/media/Ffmpeg.java)
+
+```
+  type: media/ffmpeg
+  options: [
+    -y,
+    -i, "${input}",
+    "-pix_fmt","yuv420p",
+    "-codec:v","libx264",
+    "-preset","fast",
+    "-b:v","500k",
+    "-maxrate","500k",
+    "-bufsize","1000k",
+    "-vf","scale=-2:${targetHeight}",
+    "-b:a","128k",
+    "${output}"
+  ]
+```
+
 # Tutorials
 
 ## Hello World
