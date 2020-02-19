@@ -280,6 +280,13 @@ Supported types are `job.status` and `task.started`.
   text: hello world
 ```
 
+[io/rm](src/main/java/com/creactiviti/piper/taskhandler/io/Rm.java)
+
+```
+  type: io/rm
+  path: /some/directory
+```
+
 [media/dar](src/main/java/com/creactiviti/piper/taskhandler/media/Dar.java)
 
 ```
