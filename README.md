@@ -299,6 +299,51 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/media/file.mov
 ```
 
+[media/framerate](src/main/java/com/creactiviti/piper/taskhandler/media/Framerate.java)
+
+```
+  name: framerate
+  type: media/framerate
+  input: /path/to/my/video/file.mov
+```
+
+[media/mediainfo](src/main/java/com/creactiviti/piper/taskhandler/media/Mediainfo.java)
+
+```
+  name: mediainfoResult
+  type: media/mediainfo
+  input: /path/to/my/media/file.mov
+```
+
+[media/vduration](src/main/java/com/creactiviti/piper/taskhandler/media/Vduration.java)
+
+```
+  name: duration
+  type: media/vduration
+  input: /path/to/my/video/file.mov
+```
+
+[media/vsplit](src/main/java/com/creactiviti/piper/taskhandler/media/Vsplit.java)
+
+```
+  name: chunks
+  type: media/vsplit
+  input: /path/to/my/video.mp4
+  chunkSize: 30s
+```
+
+[media/vstitch](src/main/java/com/creactiviti/piper/taskhandler/media/Vstitch.java)
+
+```
+  type: media/vstitch
+  chunks:
+    - /path/to/chunk_001.mp4
+    - /path/to/chunk_002.mp4
+    - /path/to/chunk_003.mp4
+    - /path/to/chunk_004.mp4
+  output: /path/to/stitched/file.mp4
+```
+
 # Tutorials
 
 ## Hello World
