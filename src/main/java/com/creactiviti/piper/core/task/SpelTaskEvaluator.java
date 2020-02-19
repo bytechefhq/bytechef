@@ -68,7 +68,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     map.put("join", new Join());
     map.put("concat", new Concat());
     map.put("flatten", new Flatten());
-    map.put("tmpDir()", new TmpDir());
+    map.put("tmpDir", new TmpDir());
     methodExecutors = Collections.unmodifiableMap(map);
   }
   

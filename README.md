@@ -421,6 +421,112 @@ Supported types are `job.status` and `task.started`.
   millis: 60000
 ```
 
+# Functions
+
+[boolean](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: boolean('false')
+```
+
+[byte](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: byte('42')
+```
+
+[char](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: char('1')
+```
+
+[short](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: short('42')
+```
+
+[int](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: int('42')
+```
+
+[long](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: long('42')
+```
+
+[float](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: float('4.2')
+```
+
+[double](src/main/java/com/creactiviti/piper/core/task/Cast.java)
+
+```
+  type: var
+  value: float('4.2')
+```
+
+[systemProperty](src/main/java/com/creactiviti/piper/core/task/SystemProperty.java)
+
+```
+  type: var
+  value: systemProperty('java.home')
+```
+
+[range](src/main/java/com/creactiviti/piper/core/task/Range.java)
+
+```
+  type: var
+  value: range(0,100) # [0,1,...,100]
+```
+
+[join](src/main/java/com/creactiviti/piper/core/task/Join.java)
+
+```
+  type: var
+  value: join('A','B','C') # ABC
+```
+
+[concat](src/main/java/com/creactiviti/piper/core/task/Concat.java)
+
+```
+  type: var
+  value: join('A','B','C')
+```
+
+[concat](src/main/java/com/creactiviti/piper/core/task/Concat.java)
+
+```
+  type: var
+  value: concat(['A','B'],['C']) # ['A','B','C']
+```
+
+[flatten](src/main/java/com/creactiviti/piper/core/task/Flatten.java)
+
+```
+  type: var
+  value: flatten([['A'],['B']]) # ['A','B']
+```
+
+[tmpDir](src/main/java/com/creactiviti/piper/core/task/TmpDir.java)
+
+```
+  type: var
+  value: tmpDir()  # e.g. /tmp
+```
 
 # Tutorials
 
