@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.creactiviti.piper.taskhandler.script;
+package com.creactiviti.piper.taskhandler.shell;
 
 import java.io.File;
 import java.io.PrintStream;

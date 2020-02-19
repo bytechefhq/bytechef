@@ -361,6 +361,18 @@ Supported types are `job.status` and `task.started`.
   probabilty: 0.25 # default 0.5
 ```
 
+[shell/bash](src/main/java/com/creactiviti/piper/taskhandler/shell/bash.java)
+
+```
+  name: listOfFiles
+  type: shell/bash
+  script: |
+        for f in /tmp
+        do
+          echo "$f"
+        done
+```
+
 
 # Tutorials
 

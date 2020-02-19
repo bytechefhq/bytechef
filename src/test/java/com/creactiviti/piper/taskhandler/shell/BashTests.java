@@ -1,11 +1,11 @@
-package com.creactiviti.piper.taskhandler.script;
+package com.creactiviti.piper.taskhandler.shell;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.taskhandler.script.Bash;
+import com.creactiviti.piper.taskhandler.shell.Bash;
 
 public class BashTests {
 
