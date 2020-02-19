@@ -31,7 +31,7 @@ create table task_execution (
   create_time timestamp not null,
   start_time timestamp,
   end_time timestamp,
-  serialized_execution text not null,
+  serialized_execution jsonb not null,
   priority int not null,
   task_number int not null
 );
@@ -44,7 +44,7 @@ create table context (
   id varchar(256) not null primary key,
   stack_id varchar(256) not null,
   create_time timestamp not null,
-  serialized_context text not null
+  serialized_context jsonb not null
 );
 
 CREATE INDEX ON context (stack_id);

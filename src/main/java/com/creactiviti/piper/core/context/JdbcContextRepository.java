@@ -40,7 +40,8 @@ public class JdbcContextRepository implements ContextRepository {
   
   @Override
   public Context push(String aStackId, Context aContext) {
-    jdbc.update("insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",UUIDGenerator.generate(),aStackId,JsonHelper.writeValueAsString(objectMapper, aContext), new Date());
+    String sql = "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?::jsonb,?)";
+    jdbc.update(sql,UUIDGenerator.generate(),aStackId,JsonHelper.writeValueAsString(objectMapper, aContext), new Date());
     return aContext;
   }
 

@@ -50,7 +50,11 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
   @Override
   public void create (TaskExecution aTaskExecution) {
     SqlParameterSource sqlParameterSource = createSqlParameterSource(aTaskExecution);
-    jdbc.update("insert into task_execution (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) values (:id,:parentId,:jobId,:serializedExecution,:status,:progress,:createTime,:priority,:taskNumber)", sqlParameterSource);
+    String sql = "insert into task_execution " + 
+                 "  (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) " + 
+                 "values " + 
+                 "  (:id,:parentId,:jobId,(:serializedExecution)::jsonb,:status,:progress,:createTime,:priority,:taskNumber)";
+    jdbc.update(sql, sqlParameterSource);
   }
   
   @Override
@@ -66,7 +70,9 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
       merged.setStartTime(current.getStartTime());      
     }
     SqlParameterSource sqlParameterSource = createSqlParameterSource(merged);
-    jdbc.update("update task_execution set serialized_execution=:serializedExecution,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ", sqlParameterSource);
+    String sql = "update task_execution set " + 
+                 "  serialized_execution=(:serializedExecution)::jsonb,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ";
+    jdbc.update(sql, sqlParameterSource);
     return merged;
   }
   

@@ -118,7 +118,7 @@ public class CoordinatorTests {
   private ObjectMapper createObjectMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
+    objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
     return objectMapper;
   }
   
