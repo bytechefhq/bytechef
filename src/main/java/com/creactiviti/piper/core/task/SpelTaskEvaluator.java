@@ -100,14 +100,16 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     }
     else if (aValue instanceof List) {
       List<Object> evaluatedlist = new ArrayList<>();
-      List<Object> list = (List<Object>) aValue;
+      List<?> list = (List<?>) aValue;
       for(Object item : list) {
         evaluatedlist.add(evaluate(item, aContext));
       }
       return evaluatedlist;
     }
     else if (aValue instanceof Map) {
-      return evaluateInternal((Map<String, Object>) aValue, aContext);
+      @SuppressWarnings("unchecked")
+      Map<String, Object> value = (Map<String, Object>) aValue;
+      return evaluateInternal(value, aContext);
     }
     return aValue;
   }
