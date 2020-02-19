@@ -37,7 +37,7 @@ import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.error.ErrorHandler;
 import com.creactiviti.piper.core.error.ErrorHandlerChain;
 import com.creactiviti.piper.core.error.TaskExecutionErrorHandler;
-import com.creactiviti.piper.core.event.DistributedEventPublisher;
+import com.creactiviti.piper.core.event.EventPublisher;
 import com.creactiviti.piper.core.event.JobStatusWebhookEventListener;
 import com.creactiviti.piper.core.event.TaskProgressedEventListener;
 import com.creactiviti.piper.core.event.TaskStartedEventListener;
@@ -71,12 +71,13 @@ public class CoordinatorConfiguration {
   @Autowired private PipelineRepository pipelineRepository;
   @Autowired private CounterRepository counterRepository;
   @Autowired @Lazy private MessageBroker messageBroker;
+  @Autowired @Lazy private EventPublisher eventPublisher;
   
   @Bean
   Coordinator coordinator () {
     Coordinator coordinator = new Coordinator();
     coordinator.setContextRepository(contextRepository);
-    coordinator.setEventPublisher(coordinatorEventPublisher());
+    coordinator.setEventPublisher(eventPublisher);
     coordinator.setJobRepository(jobRepository);
     coordinator.setJobTaskRepository(taskExecutionRepo);
     coordinator.setPipelineRepository(pipelineRepository);
@@ -99,7 +100,7 @@ public class CoordinatorConfiguration {
     jobTaskErrorHandler.setJobRepository(jobRepository);
     jobTaskErrorHandler.setJobTaskRepository(taskExecutionRepo);
     jobTaskErrorHandler.setTaskDispatcher(taskDispatcher());
-    jobTaskErrorHandler.setEventPublisher(coordinatorEventPublisher());
+    jobTaskErrorHandler.setEventPublisher(eventPublisher);
     return jobTaskErrorHandler;
   }
   
@@ -125,7 +126,7 @@ public class CoordinatorConfiguration {
     taskCompletionHandler.setJobRepository(jobRepository);
     taskCompletionHandler.setJobTaskRepository(taskExecutionRepo);
     taskCompletionHandler.setPipelineRepository(pipelineRepository);
-    taskCompletionHandler.setEventPublisher(coordinatorEventPublisher());
+    taskCompletionHandler.setEventPublisher(eventPublisher);
     return taskCompletionHandler;
   }
   
@@ -248,12 +249,6 @@ public class CoordinatorConfiguration {
     return new WorkTaskDispatcher(messageBroker);
   }
     
-  @Bean
-  DistributedEventPublisher coordinatorEventPublisher () {
-    return new DistributedEventPublisher (messageBroker);
-  }
-  
-   
   @Bean
   TaskStartedEventListener taskStartedEventListener () {
     return new TaskStartedEventListener(taskExecutionRepo, taskDispatcher());

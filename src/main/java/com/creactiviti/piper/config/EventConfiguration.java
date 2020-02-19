@@ -15,32 +15,22 @@
  */
 package com.creactiviti.piper.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
-import com.creactiviti.piper.core.Worker;
-import com.creactiviti.piper.core.annotations.ConditionalOnWorker;
-import com.creactiviti.piper.core.event.EventPublisher;
+import com.creactiviti.piper.core.event.DistributedEventPublisher;
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
-import com.creactiviti.piper.core.task.TaskHandlerResolver;
 
+/**
+ * @author Arik Cohen
+ * @since Feb, 19 2020
+ */
 @Configuration
-@ConditionalOnWorker
-public class WorkerConfiguration {
-  
-  @Autowired @Lazy private MessageBroker messageBroker;
-  @Autowired @Lazy private EventPublisher eventPublisher;
-  
-  @Bean
-  Worker worker (TaskHandlerResolver aTaskHandlerResolver, MessageBroker aMessageBroker) {
-    Worker worker = new Worker();
-    worker.setMessageBroker(aMessageBroker);
-    worker.setTaskHandlerResolver(aTaskHandlerResolver);
-    worker.setEventPublisher(eventPublisher);
-    return worker;
-  }
+class EventConfiguration {
 
+  @Bean
+  DistributedEventPublisher defaultEventPublisher (MessageBroker aMessageBroker) {
+    return new DistributedEventPublisher (aMessageBroker);
+  }
   
 }
