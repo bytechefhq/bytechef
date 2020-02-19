@@ -344,6 +344,24 @@ Supported types are `job.status` and `task.started`.
   output: /path/to/stitched/file.mp4
 ```
 
+
+[random/int](src/main/java/com/creactiviti/piper/taskhandler/random/RandomInt.java)
+
+```
+  name: someRandomNumber
+  type: random/int
+  startInclusive: 1000 # default 0
+  endInclusive: 9999 # default 100
+```
+
+[random/rogue](src/main/java/com/creactiviti/piper/taskhandler/random/Rogue.java)
+
+```
+  type: random/rogue
+  probabilty: 0.25 # default 0.5
+```
+
+
 # Tutorials
 
 ## Hello World
