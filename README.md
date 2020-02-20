@@ -392,6 +392,13 @@ Supported types are `job.status` and `task.started`.
   filepath: /path/to/my/file.mp4
 ```
 
+[s3/get-url](src/main/java/com/creactiviti/piper/taskhandler/s3/S3GetUrl.java)
+
+```
+  type: s3/get-url
+  uri: s3://my-bucket/path/to/file.mp4
+```
+
 [s3/presign-get-object](src/main/java/com/creactiviti/piper/taskhandler/s3/S3PresignedGetObject.java)
 
 ```
