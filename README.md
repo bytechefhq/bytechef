@@ -786,4 +786,4 @@ curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"hello","inpu
 ```
 
 # License
-Piper is released under version 2.0 of the [Apache License][]. 
+Piper is released under version 2.0 of the [Apache License](LICENSE). 
