@@ -787,8 +787,3 @@ curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"hello","inpu
 
 # License
 Piper is released under version 2.0 of the [Apache License][]. 
-
-## Support
-If you need professional support feel free to contact [me](mailto:arik@creactiviti.com) for details.
-
-[Apache License]: http://www.apache.org/licenses/LICENSE-2.0
