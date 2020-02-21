@@ -15,6 +15,8 @@
  */
 package com.creactiviti.piper.core.task;
 
+import java.util.List;
+
 public interface PipelineTask extends Task {
 
   /**
@@ -66,5 +68,37 @@ public interface PipelineTask extends Task {
    * @return String
    */
   String getTimeout ();
+  
+  /**
+   * The (optional) list of tasks that are to be
+   * executed prior to this task.
+   * 
+   * @return the list of {@link PipelineTask}s 
+   *         to execute prior to the execution of
+   *         this task. Never return a <code>null</code>
+   */
+  List<PipelineTask> getPre ();
+  
+  /**
+   * The (optional) list of tasks that are to be
+   * executed after the succesful execution of this
+   * task.
+   * 
+   * @return the list of {@link PipelineTask}s 
+   *         to execute after the succesful execution of
+   *         this task. Never return a <code>null</code>
+   */
+  List<PipelineTask> getPost ();
+  
+  /**
+   * The (optional) list of tasks that are to be
+   * executed after execution of this task -- regardless
+   * of whether it had failed or not.
+   * 
+   * @return the list of {@link PipelineTask}s 
+   *         to execute after execution of this task -- regardless
+   *         of whether it had failed or not. Never return a <code>null</code>
+   */
+  List<PipelineTask> getFinalize ();
   
 }

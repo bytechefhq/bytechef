@@ -15,6 +15,8 @@
  */
 package com.creactiviti.piper.core.task;
 
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
@@ -27,7 +29,7 @@ public class WorkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
   private static final String DEFAULT_QUEUE = Queues.TASKS;
   
   public WorkTaskDispatcher (MessageBroker aMessageBroker) {
-    messageBroker = aMessageBroker;
+    messageBroker = Objects.requireNonNull(aMessageBroker);
   }
   
   @Override
@@ -42,7 +44,7 @@ public class WorkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
   }
   
   @Override
-  public TaskDispatcher resolve (Task aTask) {
+  public TaskDispatcher<TaskExecution> resolve (Task aTask) {
     if(aTask instanceof TaskExecution) {
       return this; 
     }

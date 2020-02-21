@@ -17,6 +17,7 @@ package com.creactiviti.piper.core;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +41,7 @@ import com.creactiviti.piper.core.event.PiperEvent;
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
 import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.task.ControlTask;
+import com.creactiviti.piper.core.task.PipelineTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskEvaluator;
@@ -47,6 +49,7 @@ import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
 import com.creactiviti.piper.core.task.TaskStatus;
+import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
 /**
  * <p>The class responsible for executing tasks spawned by the {@link Coordinator}.</p>
@@ -85,25 +88,8 @@ public class Worker {
   public void handle (TaskExecution aTask) {
     Future<?> future = executors.submit(() -> {
       try {
-        long startTime = System.currentTimeMillis();
-        logger.debug("Recived task: {}",aTask);
-        TaskHandler<?> taskHandler = taskHandlerResolver.resolve(aTask);
         eventPublisher.publishEvent(PiperEvent.of(Events.TASK_STARTED,"taskId",aTask.getId(),"jobId",aTask.getJobId()));
-        Object output = taskHandler.handle(aTask);
-        SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
-        if(output!=null) {
-          if(completion.getOutput() != null) {
-            TaskExecution evaluated = taskEvaluator.evaluate(completion, new MapContext ("execution", new MapContext("output", output)));
-            completion = SimpleTaskExecution.of(evaluated);
-          }
-          else {
-            completion.setOutput(output);
-          }
-        }
-        completion.setStatus(TaskStatus.COMPLETED);
-        completion.setProgress(100);
-        completion.setEndTime(new Date());
-        completion.setExecutionTime(System.currentTimeMillis()-startTime);
+        SimpleTaskExecution completion = doExecuteTask(aTask);
         messageBroker.send(Queues.COMPLETIONS, completion);
       }
       catch (InterruptedException e) {
@@ -130,6 +116,67 @@ public class Worker {
     catch (CancellationException e) {
       logger.debug("Cancelled task: {}", aTask.getId());
     }
+    
+  }
+  
+  private SimpleTaskExecution doExecuteTask (TaskExecution aTask) throws Exception {
+    try {
+      long startTime = System.currentTimeMillis();
+      logger.debug("Recived task: {}",aTask);
+      
+      MapContext context = new MapContext();
+      
+      // pre tasks
+      executePreTasks(aTask,context);
+      
+      TaskExecution evaluatedTask = taskEvaluator.evaluate(aTask, context);
+      
+      TaskHandler<?> taskHandler = taskHandlerResolver.resolve(evaluatedTask);
+      Object output = taskHandler.handle(evaluatedTask);
+      SimpleTaskExecution completion = SimpleTaskExecution.of(evaluatedTask);
+      if(output!=null) {
+        if(completion.getOutput() != null) {
+          TaskExecution evaluated = taskEvaluator.evaluate(completion, new MapContext ("execution", new MapContext("output", output)));
+          completion = SimpleTaskExecution.of(evaluated);
+        }
+        else {
+          completion.setOutput(output);
+        }
+      }
+      completion.setStatus(TaskStatus.COMPLETED);
+      completion.setProgress(100);
+      completion.setEndTime(new Date());
+      completion.setExecutionTime(System.currentTimeMillis()-startTime);
+      
+      // post tasks
+      executePostTasks(completion);
+      
+      return completion;
+    }
+    finally {
+      // finalize tasks
+      executeFinalizeTasks(aTask);
+    }
+  }
+  
+  private void executePreTasks (TaskExecution aTask, MapContext aContext) throws Exception {
+    List<PipelineTask> preTasks = aTask.getPre();
+    for(PipelineTask preTask : preTasks) {
+      SimpleTaskExecution preTaskExecution = new SimpleTaskExecution(preTask.asMap());
+      preTaskExecution.setId(UUIDGenerator.generate());
+      preTaskExecution.setJobId(aTask.getJobId());
+      SimpleTaskExecution completion = doExecuteTask(preTaskExecution);
+      if(completion.getName() != null) {
+        aContext.set(completion.getName(), completion.getOutput());
+      }
+    }
+  }
+  
+  private void executePostTasks (TaskExecution aTask) {
+    
+  }
+  
+  private void executeFinalizeTasks (TaskExecution aTask) {
     
   }
   
