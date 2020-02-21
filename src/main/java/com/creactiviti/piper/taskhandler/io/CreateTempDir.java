@@ -27,7 +27,7 @@ import com.google.common.io.Files;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-@Component("io/create-temp-dir")
+@Component("io/createTempDir")
 class CreateTempDir implements TaskHandler<String> {
 
   @Override

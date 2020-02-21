@@ -237,7 +237,7 @@ execution (`finalize`).
       - type: io/mkdir
         path: "${workDir}"
     post: 
-      - type: s3/put-object
+      - type: s3/putObject
         uri: s3://my-bucket/240p.mp4
     finalize:
       - type: io/rm
@@ -279,7 +279,7 @@ Supported types are `job.status` and `task.started`.
   value: 3.14159
 ```
 
-[io/create-temp-dir](src/main/java/com/creactiviti/piper/taskhandler/io/CreateTempDir.java)
+[io/createTempDir](src/main/java/com/creactiviti/piper/taskhandler/io/CreateTempDir.java)
 
 ```
   name: tempDir
@@ -421,34 +421,34 @@ Supported types are `job.status` and `task.started`.
   probabilty: 0.25 # default 0.5
 ```
 
-[s3/get-object](src/main/java/com/creactiviti/piper/taskhandler/s3/S3GetObject.java)
+[s3/getObject](src/main/java/com/creactiviti/piper/taskhandler/s3/S3GetObject.java)
 
 ```
-  type: s3/get-object
+  type: s3/getObject
   uri: s3://my-bucket/path/to/file.mp4
   filepath: /path/to/my/file.mp4
 ```
 
-[s3/get-url](src/main/java/com/creactiviti/piper/taskhandler/s3/S3GetUrl.java)
+[s3/getUrl](src/main/java/com/creactiviti/piper/taskhandler/s3/S3GetUrl.java)
 
 ```
-  type: s3/get-url
+  type: s3/getUrl
   uri: s3://my-bucket/path/to/file.mp4
 ```
 
-[s3/presign-get-object](src/main/java/com/creactiviti/piper/taskhandler/s3/S3PresignedGetObject.java)
+[s3/presignGetObject](src/main/java/com/creactiviti/piper/taskhandler/s3/S3PresignedGetObject.java)
 
 ```
   name: url
-  type: s3/presign-get-object
+  type: s3/presignGetObject
   uri: s3://my-bucket/path/to/file.mp4
   signatureDuration: 60s
 ```
 
-[s3/put-object](src/main/java/com/creactiviti/piper/taskhandler/s3/S3PutObject.java)
+[s3/putObject](src/main/java/com/creactiviti/piper/taskhandler/s3/S3PutObject.java)
 
 ```
-  type: s3/put-object
+  type: s3/putObject
   uri: s3://my-bucket/path/to/file.mp4
   filepath: /path/to/my/file.mp4
 ```

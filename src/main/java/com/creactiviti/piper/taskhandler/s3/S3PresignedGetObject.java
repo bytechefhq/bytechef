@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-@Component("s3/presign-get-object")
+@Component("s3/presignGetObject")
 class S3PresignedGetObject implements TaskHandler<Object> {
 
   @Override

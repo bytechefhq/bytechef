@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-@Component("s3/put-object")
+@Component("s3/putObject")
 class S3PutObject implements TaskHandler<Object> {
 
   @Override

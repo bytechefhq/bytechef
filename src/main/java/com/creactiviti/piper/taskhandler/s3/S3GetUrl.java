@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
  * @author Arik Cohen
  * @since Feb, 20 2020
  */
-@Component("s3/get-url")
+@Component("s3/getUrl")
 class S3GetUrl implements TaskHandler<String> {
 
   @Override

@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-@Component("s3/get-object")
+@Component("s3/getObject")
 class S3GetObject implements TaskHandler<Object> {
 
   @Override
