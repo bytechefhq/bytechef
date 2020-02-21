@@ -240,7 +240,7 @@ execution (`finalize`).
       - type: s3/put-object
         uri: s3://my-bucket/240p.mp4
     finalize:
-      - type: rm
+      - type: io/rm
         path: ${workDir}
 ```   
 
