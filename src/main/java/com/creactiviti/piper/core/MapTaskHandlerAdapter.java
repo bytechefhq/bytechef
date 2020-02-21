@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import com.creactiviti.piper.core.context.MapContext;
 import com.creactiviti.piper.core.messagebroker.Queues;
@@ -19,7 +18,6 @@ import com.creactiviti.piper.core.task.TaskHandlerResolver;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-@Component("map")
 class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
   
   private final TaskHandlerResolver taskHandlerResolver;
