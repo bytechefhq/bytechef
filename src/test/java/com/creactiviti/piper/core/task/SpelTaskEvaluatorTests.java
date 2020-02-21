@@ -4,6 +4,7 @@ package com.creactiviti.piper.core.task;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -279,7 +280,7 @@ public class SpelTaskEvaluatorTests {
     SpelTaskEvaluator evaluator = new SpelTaskEvaluator();
     TaskExecution jt = SimpleTaskExecution.of("tempDir", "${tempDir()}");
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
-    Assertions.assertEquals(System.getProperty("java.io.tmpdir"),evaluated.get("tempDir"));
+    Assertions.assertEquals(FilenameUtils.getFullPathNoEndSeparator(System.getProperty("java.io.tmpdir")),evaluated.get("tempDir"));
   }
   
   @Test
