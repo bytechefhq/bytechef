@@ -1,7 +1,6 @@
 
 package com.creactiviti.piper.core.task;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -292,11 +291,4 @@ public class SpelTaskEvaluatorTests {
     Assertions.assertNotNull(evaluated.get("uuid"));
   }
   
-  @Test
-  public void test34 () {
-    SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().methodExecutor("createTempDir", new CreateTempDir()).build();
-    TaskExecution jt = SimpleTaskExecution.of("tempDir", "${createTempDir()}");
-    TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
-    Assertions.assertTrue(new File((String)evaluated.get("tempDir")).exists());
-  }
 }

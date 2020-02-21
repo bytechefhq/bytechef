@@ -279,6 +279,13 @@ Supported types are `job.status` and `task.started`.
   value: 3.14159
 ```
 
+[io/create-temp-dir](src/main/java/com/creactiviti/piper/taskhandler/io/CreateTempDir.java)
+
+```
+  name: tempDir
+  type: io/create-temp-dir
+```
+
 [io/filepath](src/main/java/com/creactiviti/piper/taskhandler/io/FilePath.java)
 
 ```
