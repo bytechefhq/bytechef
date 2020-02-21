@@ -21,8 +21,6 @@ RUN        wget "http://zebulon.bok.net/Bento4/binaries/Bento4-SDK-1-5-1-629.x86
              
 ENV        PATH $PATH:/app/bento4/bin
 
-ENTRYPOINT []
-
-CMD        ["java", "-jar", "-Djava.io.tmpdir=/tmp","-Djava.security.egd=file:/dev/./urandom", "/app/piper.jar"]
+ENTRYPOINT ["java","-jar","/app/piper.jar"]
 
 COPY       target/piper-0.0.1-SNAPSHOT.jar /app/piper.jar
