@@ -18,7 +18,7 @@ package com.creactiviti.piper.taskhandler.random;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 
@@ -33,7 +33,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
 public class RandomInt implements TaskHandler<Object> {
 
   @Override
-  public Object handle(Task aTask) throws Exception {
+  public Object handle(TaskExecution aTask) throws Exception {
     int startInclusive = aTask.getInteger("startInclusive", 0);
     int endInclusive = aTask.getInteger("endInclusive", 100);
     return RandomUtils.nextInt(startInclusive, endInclusive);

@@ -67,14 +67,14 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
  */
 public class Worker {
 
-  private TaskHandlerResolver taskHandlerResolver;
-  private MessageBroker messageBroker;  
   private final ExecutorService executors = Executors.newCachedThreadPool();
   private final Map<String, Future<?>> taskExecutions = new ConcurrentHashMap<>();
-  private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private final TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  
+  private TaskHandlerResolver taskHandlerResolver;
+  private MessageBroker messageBroker;  
   private EventPublisher eventPublisher;
-
-  private Logger logger = LoggerFactory.getLogger(getClass());
   
   private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; 
   

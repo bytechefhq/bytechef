@@ -2,7 +2,7 @@ package com.creactiviti.piper.taskhandler.s3;
 
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 import software.amazon.awssdk.services.s3.S3Client;
@@ -20,7 +20,7 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 class S3GetUrl implements TaskHandler<String> {
 
   @Override
-  public String handle (Task aTask) throws Exception {
+  public String handle (TaskExecution aTask) throws Exception {
     
     AmazonS3URI s3Uri = new AmazonS3URI(aTask.getRequiredString("uri"));
     

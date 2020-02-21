@@ -27,7 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -44,7 +44,7 @@ class Vstitch implements TaskHandler<Object> {
   private final Ffmpeg ffmpeg = new Ffmpeg();
   
   @Override
-  public Object handle (Task aTask) throws Exception {
+  public Object handle (TaskExecution aTask) throws Exception {
     List<String> chunks = aTask.getList("chunks",String.class);
     File tempFile = File.createTempFile("_chunks", ".txt");
     try {

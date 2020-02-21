@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 @Component("media/vduration")
@@ -34,7 +34,7 @@ class Vduration implements TaskHandler<Double> {
   private Ffprobe ffprobe = new Ffprobe();
   
   @Override
-  public Double handle (Task aTask) throws Exception {
+  public Double handle (TaskExecution aTask) throws Exception {
     Map<String, Object> ffprobeResult = ffprobe.handle(aTask);
     List<Map<String,Object>> videos = (List<Map<String, Object>>) ffprobeResult.get("video");
     if(videos!=null && videos.size() > 0) {

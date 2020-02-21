@@ -28,7 +28,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.google.common.collect.ImmutableMap;
 
@@ -42,7 +42,7 @@ class Vsplit implements TaskHandler<List<Map<String,Object>>> {
   private static final int MIN_CHUNK_SIZE = 5;
   
   @Override
-  public List<Map<String, Object>> handle (Task aTask) throws Exception {
+  public List<Map<String, Object>> handle (TaskExecution aTask) throws Exception {
     List<Map<String,Object>> chunks = new ArrayList<> ();
     Double duration = vduration.handle(aTask);
     Double frate = framerate.handle(aTask);

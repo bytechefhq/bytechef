@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 @Component("media/dar")
@@ -33,7 +33,7 @@ class Dar implements TaskHandler<String> {
   private final Mediainfo mediainfo = new Mediainfo();
   
   @Override
-  public String handle (Task aTask) throws Exception {
+  public String handle (TaskExecution aTask) throws Exception {
     Map<String, Object> mediainfoResult = mediainfo.handle(aTask);
     return (String) mediainfoResult.get("video_display_aspect_ratio");
   }

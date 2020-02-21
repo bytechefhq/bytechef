@@ -21,7 +21,7 @@ import com.creactiviti.piper.core.job.JdbcJobRepository;
 import com.creactiviti.piper.core.job.Job;
 import com.creactiviti.piper.core.job.JobStatus;
 import com.creactiviti.piper.core.messagebroker.Queues;
-import com.creactiviti.piper.core.messagebroker.SynchMessageBroker;
+import com.creactiviti.piper.core.messagebroker.SyncMessageBroker;
 import com.creactiviti.piper.core.pipeline.ResourceBasedPipelineRepository;
 import com.creactiviti.piper.core.task.DefaultTaskHandlerResolver;
 import com.creactiviti.piper.core.task.JdbcTaskExecutionRepository;
@@ -47,21 +47,21 @@ public class CoordinatorTests {
     Worker worker = new Worker();
     Coordinator coordinator = new Coordinator ();
    
-    SynchMessageBroker messageBroker = new SynchMessageBroker();
+    SyncMessageBroker messageBroker = new SyncMessageBroker();
     messageBroker.receive(Queues.COMPLETIONS, (o)->coordinator.complete((TaskExecution)o));
     messageBroker.receive(Queues.JOBS, (o)->coordinator.start((Job)o));
     
     
     worker.setMessageBroker(messageBroker);
     worker.setEventPublisher((e)->{});
-    DefaultTaskHandlerResolver taskHandlerResolver = new DefaultTaskHandlerResolver();
+    
     
     Map<String,TaskHandler<?>> handlers = new HashMap<>();
     handlers.put("print", new Print());
     handlers.put("randomInt", new RandomInt());
     handlers.put("sleep", new Sleep());
     
-    taskHandlerResolver.setTaskHandlers(handlers);
+    DefaultTaskHandlerResolver taskHandlerResolver = new DefaultTaskHandlerResolver(handlers);
     
     worker.setTaskHandlerResolver(taskHandlerResolver);
     
@@ -85,7 +85,7 @@ public class CoordinatorTests {
     coordinator.setPipelineRepository(new ResourceBasedPipelineRepository());
     coordinator.setJobTaskRepository(taskRepository);
     
-    SynchMessageBroker coordinatorMessageBroker = new SynchMessageBroker();
+    SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
     coordinatorMessageBroker.receive(Queues.TASKS, (o)->worker.handle((TaskExecution)o));
     WorkTaskDispatcher taskDispatcher = new WorkTaskDispatcher(coordinatorMessageBroker);
     coordinator.setTaskDispatcher(taskDispatcher);

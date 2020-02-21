@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component;
 import com.creactiviti.piper.core.event.EventPublisher;
 import com.creactiviti.piper.core.event.Events;
 import com.creactiviti.piper.core.event.PiperEvent;
-import com.creactiviti.piper.core.task.Task;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
@@ -52,7 +51,7 @@ class Download implements TaskHandler<Object> {
   }
 
   @Override
-  public Object handle(Task aTask) {
+  public Object handle(TaskExecution aTask) {
     try {
       URL url = new URL(aTask.getRequiredString("url"));
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -62,7 +61,7 @@ class Download implements TaskHandler<Object> {
         File downloadedFile = File.createTempFile("download-", "", null);
         int contentLength = connection.getContentLength();
         Consumer<Integer> progressConsumer =
-            (p) -> eventPublisher.publishEvent(PiperEvent.of(Events.TASK_PROGRESSED,"taskId", ((TaskExecution)aTask).getId(), "progress", p));
+            (p) -> eventPublisher.publishEvent(PiperEvent.of(Events.TASK_PROGRESSED,"taskId", aTask.getId(), "progress", p));
 
             try (BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
                 OutputStream os = new ProgressingOutputStream(new FileOutputStream(downloadedFile), contentLength, progressConsumer)) {
