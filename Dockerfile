@@ -23,6 +23,6 @@ ENV        PATH $PATH:/app/bento4/bin
 
 ENTRYPOINT []
 
-CMD        ["java", "-jar", "-Djava.security.egd=file:/dev/./urandom", "/app/piper.jar"]
+CMD        ["java", "-jar", "-Djava.io.tmpdir=/tmp","-Djava.security.egd=file:/dev/./urandom", "/app/piper.jar"]
 
 COPY       target/piper-0.0.1-SNAPSHOT.jar /app/piper.jar
