@@ -56,12 +56,12 @@ public class SimplePipeline extends MapObject implements Pipeline {
 
   @Override
   public List<Accessor> getInputs() {
-    return getList(DSL.INPUTS,Accessor.class,Collections.EMPTY_LIST);
+    return getList(DSL.INPUTS,Accessor.class,Collections.emptyList());
   }
   
   @Override
   public List<Accessor> getOutputs() {
-    return getList(DSL.OUTPUTS,Accessor.class,Collections.EMPTY_LIST);
+    return getList(DSL.OUTPUTS,Accessor.class,Collections.emptyList());
   }
   
   @Override

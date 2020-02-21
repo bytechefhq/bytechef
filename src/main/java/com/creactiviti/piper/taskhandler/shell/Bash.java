@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -43,7 +43,7 @@ class Bash implements TaskHandler<String> {
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  public String handle(Task aTask) throws Exception {
+  public String handle(TaskExecution aTask) throws Exception {
     File scriptFile = File.createTempFile("_script", ".sh");
     File logFile = File.createTempFile("log", null);
     FileUtils.writeStringToFile(scriptFile, aTask.getRequiredString("script"));

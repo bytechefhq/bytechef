@@ -31,6 +31,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 
+import com.creactiviti.piper.core.task.PipelineTask;
+import com.creactiviti.piper.core.task.SimplePipelineTask;
 import com.google.common.base.Throwables;
 
 /**
@@ -80,7 +82,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
   @Override
   public <T> List<T> getList(Object aKey, Class<T> aElementType) {
-    List list = get(aKey, List.class);
+    List<?> list = get(aKey, List.class);
     if(list == null) {
       return null;
     }
@@ -88,6 +90,9 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     for(Object item : list) {
       if(aElementType.equals(Accessor.class) || aElementType.equals(MapObject.class)) {
         typedList.add((T)new MapObject((Map<String, Object>) item));
+      }
+      else if (aElementType.equals(PipelineTask.class)) {
+        typedList.add((T)new SimplePipelineTask((Map<String, Object>) item));
       }
       else {
         typedList.add(conversionService.convert(item,aElementType));

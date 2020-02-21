@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -43,7 +43,7 @@ class Mediainfo implements TaskHandler<Map<String,Object>> {
   private final Logger log = LoggerFactory.getLogger(getClass());
   
   @Override
-  public Map<String,Object> handle (Task aTask) throws Exception {
+  public Map<String,Object> handle (TaskExecution aTask) throws Exception {
     CommandLine cmd = new CommandLine ("mediainfo");
     cmd.addArgument(aTask.getRequiredString("input"));
     log.debug("{}",cmd);

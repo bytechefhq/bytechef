@@ -15,9 +15,6 @@
  */
 package com.creactiviti.piper.core.context;
 
-import java.util.List;
-
-
 /**
  * <p>Stores context information for a job or task
  * objects.</p>
@@ -30,10 +27,8 @@ import java.util.List;
  */
 public interface ContextRepository {
 
-  Context push (String aStackId, Context aContext);
+  void push (String aStackId, Context aContext);
   
   Context peek (String aStackId);
-  
-  List<Context> getStack (String aStackId);
   
 }

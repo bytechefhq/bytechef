@@ -22,7 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -37,7 +37,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
 class Rm implements TaskHandler<Object> {
 
   @Override
-  public Object handle (Task aTask) throws IOException {
+  public Object handle (TaskExecution aTask) throws IOException {
     File file = new File (aTask.getRequiredString("path"));
     if(!file.exists()) {
       return null;

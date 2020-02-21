@@ -4,7 +4,7 @@ import java.nio.file.Paths;
 
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 import software.amazon.awssdk.core.sync.ResponseTransformer;
@@ -21,7 +21,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 class S3GetObject implements TaskHandler<Object> {
 
   @Override
-  public Object handle (Task aTask) throws Exception {
+  public Object handle (TaskExecution aTask) throws Exception {
     
     AmazonS3URI s3Uri = new AmazonS3URI(aTask.getRequiredString("uri"));
     

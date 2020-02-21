@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -35,7 +35,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
 class Ls implements TaskHandler<List<Ls.FileInfo>> {
 
   @Override
-  public List<Ls.FileInfo> handle (Task aTask) throws IOException {
+  public List<Ls.FileInfo> handle (TaskExecution aTask) throws IOException {
     
     Path root = Paths.get(aTask.getRequiredString("path"));
     

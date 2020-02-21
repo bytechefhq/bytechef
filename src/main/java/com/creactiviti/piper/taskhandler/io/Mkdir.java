@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -36,7 +36,7 @@ import com.creactiviti.piper.core.task.TaskHandler;
 class Mkdir implements TaskHandler<Object> {
 
   @Override
-  public Object handle (Task aTask) throws IOException {
+  public Object handle (TaskExecution aTask) throws IOException {
     Files.createDirectories(Paths.get(aTask.getRequiredString("path")));
     return null;
   }

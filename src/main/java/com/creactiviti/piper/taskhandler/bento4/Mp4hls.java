@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -22,7 +22,7 @@ class Mp4hls implements TaskHandler<Object> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  public Object handle (Task aTask) throws Exception {
+  public Object handle (TaskExecution aTask) throws Exception {
     List<String> options = aTask.getList("options", String.class);
     CommandLine cmd = new CommandLine ("mp4hls");
     options.forEach(o->cmd.addArgument(o));

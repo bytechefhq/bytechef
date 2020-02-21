@@ -214,6 +214,36 @@ Starts a new job as a sub-flow of the current job. Output of the sub-flow job is
     - destination: /path/to/destination/dir
 ```
 
+## Pre/Post/Finalize
+
+Each task can define a set of tasks that will be executed prior to its execution (`pre`), 
+after its succesful execution (`post`) and at the end of the task's lifecycle regardless of the outcome of the task's 
+execution (`finalize`).
+
+```
+  - label: 240p
+    type: media/ffmpeg
+    options: [
+      "-y",
+      "-i",
+      "/some/input/video.mov",
+      "-vf","scale=w=-2:h=240",
+      "${workDir}/240p.mp4"
+    ]
+    pre:
+      - name: workDir
+        type: core/var
+        value: "${temptDir()}/${uuid()}"
+      - type: io/mkdir
+        path: "${workDir}"
+    post: 
+      - type: s3/put-object
+        uri: s3://my-bucket/240p.mp4
+    finalize:
+      - type: rm
+        path: ${workDir}
+```   
+
 
 ## Webhooks
 

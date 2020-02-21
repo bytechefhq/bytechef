@@ -18,7 +18,6 @@ package com.creactiviti.piper.core.context;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -39,10 +38,9 @@ public class JdbcContextRepository implements ContextRepository {
   private ObjectMapper objectMapper = new ObjectMapper();
   
   @Override
-  public Context push(String aStackId, Context aContext) {
+  public void push(String aStackId, Context aContext) {
     String sql = "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?::jsonb,?)";
     jdbc.update(sql,UUIDGenerator.generate(),aStackId,JsonHelper.writeValueAsString(objectMapper, aContext), new Date());
-    return aContext;
   }
 
   @Override
@@ -54,12 +52,6 @@ public class JdbcContextRepository implements ContextRepository {
     catch (EmptyResultDataAccessException e) {
       return null;
     }
-  }
-  
-  @Override
-  public List<Context> getStack (String aStackId) {
-    String sql = "select id,serialized_context from context where stack_id = ? order by create_time desc";
-    return jdbc.query(sql, this::contextRowMapper,aStackId);
   }
   
   private Context contextRowMapper (ResultSet aResultSet, int aIndex) throws SQLException {

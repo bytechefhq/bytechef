@@ -20,7 +20,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 /**
@@ -34,7 +34,7 @@ class Framerate implements TaskHandler<Double> {
   private final Mediainfo mediainfo = new Mediainfo();
   
   @Override
-  public Double handle (Task aTask) throws Exception {
+  public Double handle (TaskExecution aTask) throws Exception {
     Map<String, Object> mediainfoResult = mediainfo.handle(aTask);
     String frameRateStr = (String) mediainfoResult.get("video_frame_rate");
     Assert.notNull(frameRateStr, "can not determine framerate");

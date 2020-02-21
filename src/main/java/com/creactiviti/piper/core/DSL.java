@@ -104,6 +104,12 @@ public class DSL {
   
   public static final String VALUE = "value";
   
+  public static final String PRE = "pre";
+  
+  public static final String POST = "post";
+  
+  public static final String FINALIZE = "finalize";
+  
   public static final String[] RESERVED_WORDS = new String[]{
                                                               ID,
                                                               PARENT_ID,

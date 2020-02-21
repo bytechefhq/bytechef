@@ -15,6 +15,7 @@
  */
 package com.creactiviti.piper.core.task;
 
+import java.util.List;
 import java.util.Map;
 
 import com.creactiviti.piper.core.DSL;
@@ -67,6 +68,21 @@ public class SimplePipelineTask extends MapObject implements PipelineTask {
   @Override
   public String getTimeout() {
     return getString(DSL.TIMEOUT);
+  }
+  
+  @Override
+  public List<PipelineTask> getPre() {
+    return getList(DSL.PRE, PipelineTask.class, List.of());
+  }
+  
+  @Override
+  public List<PipelineTask> getPost() {
+    return getList(DSL.POST, PipelineTask.class, List.of());
+  }
+  
+  @Override
+  public List<PipelineTask> getFinalize() {
+    return getList(DSL.FINALIZE, PipelineTask.class, List.of());
   }
   
 }

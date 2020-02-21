@@ -4,7 +4,7 @@ import java.time.Duration;
 
 import org.springframework.stereotype.Component;
 
-import com.creactiviti.piper.core.task.Task;
+import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -21,7 +21,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 class S3PresignedGetObject implements TaskHandler<Object> {
 
   @Override
-  public Object handle (Task aTask) throws Exception {
+  public Object handle (TaskExecution aTask) throws Exception {
     AmazonS3URI s3Uri = new AmazonS3URI(aTask.getRequiredString("uri"));
     
     S3Presigner presigner = S3Presigner.create();
