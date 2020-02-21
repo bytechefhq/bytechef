@@ -51,9 +51,9 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
-  private static final Map<String, MethodExecutor> methodExecutors;
+  private final Map<String, MethodExecutor> methodExecutors;
   
-  static {
+  private SpelTaskEvaluator(Builder aBuilder) {
     Map<String,MethodExecutor> map = new HashMap<> ();
     map.put("boolean", new Cast<>(Boolean.class));
     map.put("byte", new Cast<>(Byte.class));
@@ -68,8 +68,8 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     map.put("join", new Join());
     map.put("concat", new Concat());
     map.put("flatten", new Flatten());
-    map.put("tempDir", new TempDir());
     map.put("uuid", new Uuid());
+    map.putAll(aBuilder.methodExecutors);
     methodExecutors = Collections.unmodifiableMap(map);
   }
   
@@ -129,6 +129,29 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     return (ctx,target,name,args) -> {
       return methodExecutors.get(name);
     };
+  }
+  
+  public static SpelTaskEvaluator create () {
+    return builder().build();
+  }
+  
+  public static Builder builder () {
+    return new Builder ();
+  }
+  
+  public static class Builder {
+    
+    private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
+    
+    public Builder methodExecutor (String aMethodName, MethodExecutor aMethodExecutor) {
+      methodExecutors.put(aMethodName, aMethodExecutor);
+      return this;
+    }
+    
+    public SpelTaskEvaluator build () {
+      return new SpelTaskEvaluator(this);
+    }
+    
   }
   
   

@@ -110,7 +110,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
   public static class Builder { 
     
     private TaskDispatcher<TaskExecution> taskDispatcher;
-    private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+    private TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
     private TaskExecutionRepository taskExecutionRepo;
     private MessageBroker messageBroker;
     private ContextRepository contextRepository;

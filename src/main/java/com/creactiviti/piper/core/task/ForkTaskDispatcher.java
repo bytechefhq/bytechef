@@ -67,7 +67,7 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
 public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
   private TaskDispatcher taskDispatcher;
-  private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
   private TaskExecutionRepository taskExecutionRepo;
   private MessageBroker messageBroker;
   private ContextRepository contextRepository;

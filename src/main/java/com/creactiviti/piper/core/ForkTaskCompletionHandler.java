@@ -52,7 +52,7 @@ public class ForkTaskCompletionHandler implements TaskCompletionHandler {
   private final CounterRepository counterRepository;
   private final TaskDispatcher taskDispatcher;
   private final ContextRepository contextRepository;
-  private final TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
   
   public ForkTaskCompletionHandler(TaskExecutionRepository aTaskExecutionRepo, TaskCompletionHandler aTaskCompletionHandler, CounterRepository aCounterRepository, TaskDispatcher aTaskDispatcher, ContextRepository aContextRepository) {
     taskExecutionRepo = aTaskExecutionRepo;

@@ -41,6 +41,7 @@ import com.creactiviti.piper.core.event.PiperEvent;
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
 import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.task.ControlTask;
+import com.creactiviti.piper.core.task.CreateTempDir;
 import com.creactiviti.piper.core.task.PipelineTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.SpelTaskEvaluator;
@@ -49,6 +50,7 @@ import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
 import com.creactiviti.piper.core.task.TaskStatus;
+import com.creactiviti.piper.core.task.TempDir;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
 /**
@@ -69,7 +71,10 @@ public class Worker {
 
   private final ExecutorService executors = Executors.newCachedThreadPool();
   private final Map<String, Future<?>> taskExecutions = new ConcurrentHashMap<>();
-  private final TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.builder()
+                                                               .methodExecutor("tempDir", new TempDir())
+                                                               .methodExecutor("createTempDir", new CreateTempDir())
+                                                               .build();
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
   private TaskHandlerResolver taskHandlerResolver;

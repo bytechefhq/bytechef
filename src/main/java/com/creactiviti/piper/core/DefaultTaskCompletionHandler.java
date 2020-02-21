@@ -56,7 +56,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
   private ContextRepository contextRepository;
   private JobExecutor jobExecutor;
   private EventPublisher eventPublisher;
-  private TaskEvaluator taskEvaluator = new SpelTaskEvaluator(); 
+  private TaskEvaluator taskEvaluator = SpelTaskEvaluator.create(); 
   
   @Override
   public void handle (TaskExecution aTask) {

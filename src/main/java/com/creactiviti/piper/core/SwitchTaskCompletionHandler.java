@@ -44,7 +44,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
   private final TaskCompletionHandler taskCompletionHandler;
   private final TaskDispatcher taskDispatcher;
   private final ContextRepository contextRepository;
-  private final TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
 
   public SwitchTaskCompletionHandler(TaskExecutionRepository aTaskExecutionRepo, TaskCompletionHandler aTaskCompletionHandler, TaskDispatcher aTaskDispatcher, ContextRepository aContextRepository) {
     taskExecutionRepo = aTaskExecutionRepo;

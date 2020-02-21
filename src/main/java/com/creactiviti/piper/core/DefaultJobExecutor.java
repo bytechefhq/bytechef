@@ -44,7 +44,7 @@ public class DefaultJobExecutor implements JobExecutor {
   private TaskExecutionRepository jobTaskRepository;
   private ContextRepository contextRepository;
   private TaskDispatcher taskDispatcher;
-  private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
+  private TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
   
   @Override
   public void execute (Job aJob) {
