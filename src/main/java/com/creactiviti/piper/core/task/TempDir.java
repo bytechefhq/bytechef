@@ -14,7 +14,8 @@ class TempDir implements MethodExecutor {
 
   @Override
   public TypedValue execute (EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-    return new TypedValue(FilenameUtils.getFullPathNoEndSeparator(System.getProperty("java.io.tmpdir")));
+    String tmpDir = System.getProperty("java.io.tmpdir");
+    return new TypedValue(FilenameUtils.getFullPathNoEndSeparator(tmpDir));
   }
 
 }

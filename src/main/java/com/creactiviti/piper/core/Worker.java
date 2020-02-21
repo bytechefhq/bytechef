@@ -160,10 +160,11 @@ public class Worker {
   
   private void executeSubTasks (TaskExecution aTask, List<PipelineTask> aSubTasks, MapContext aContext) throws Exception {
     for(PipelineTask subTask : aSubTasks) {
-      SimpleTaskExecution preTaskExecution = new SimpleTaskExecution(subTask.asMap());
-      preTaskExecution.setId(UUIDGenerator.generate());
-      preTaskExecution.setJobId(aTask.getJobId());
-      SimpleTaskExecution completion = doExecuteTask(preTaskExecution);
+      SimpleTaskExecution subTaskExecution = new SimpleTaskExecution(subTask.asMap());
+      subTaskExecution.setId(UUIDGenerator.generate());
+      subTaskExecution.setJobId(aTask.getJobId());
+      TaskExecution evaluatedTask = taskEvaluator.evaluate(subTaskExecution, aContext);
+      SimpleTaskExecution completion = doExecuteTask(evaluatedTask);
       if(completion.getName() != null) {
         aContext.set(completion.getName(), completion.getOutput());
       }
