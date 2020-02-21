@@ -120,14 +120,13 @@ public class Worker {
   }
   
   private SimpleTaskExecution doExecuteTask (TaskExecution aTask) throws Exception {
+    MapContext context = new MapContext();
     try {
       long startTime = System.currentTimeMillis();
       logger.debug("Recived task: {}",aTask);
       
-      MapContext context = new MapContext();
-      
       // pre tasks
-      executePreTasks(aTask,context);
+      executeSubTasks(aTask, aTask.getPre(), context);
       
       TaskExecution evaluatedTask = taskEvaluator.evaluate(aTask, context);
       
@@ -149,20 +148,19 @@ public class Worker {
       completion.setExecutionTime(System.currentTimeMillis()-startTime);
       
       // post tasks
-      executePostTasks(completion);
+      executeSubTasks(aTask, aTask.getPost(), context);
       
       return completion;
     }
     finally {
       // finalize tasks
-      executeFinalizeTasks(aTask);
+      executeSubTasks(aTask, aTask.getFinalize(), context);
     }
   }
   
-  private void executePreTasks (TaskExecution aTask, MapContext aContext) throws Exception {
-    List<PipelineTask> preTasks = aTask.getPre();
-    for(PipelineTask preTask : preTasks) {
-      SimpleTaskExecution preTaskExecution = new SimpleTaskExecution(preTask.asMap());
+  private void executeSubTasks (TaskExecution aTask, List<PipelineTask> aSubTasks, MapContext aContext) throws Exception {
+    for(PipelineTask subTask : aSubTasks) {
+      SimpleTaskExecution preTaskExecution = new SimpleTaskExecution(subTask.asMap());
       preTaskExecution.setId(UUIDGenerator.generate());
       preTaskExecution.setJobId(aTask.getJobId());
       SimpleTaskExecution completion = doExecuteTask(preTaskExecution);
@@ -170,14 +168,6 @@ public class Worker {
         aContext.set(completion.getName(), completion.getOutput());
       }
     }
-  }
-  
-  private void executePostTasks (TaskExecution aTask) {
-    
-  }
-  
-  private void executeFinalizeTasks (TaskExecution aTask) {
-    
   }
   
   private void handleException (TaskExecution aTask, Exception aException) {

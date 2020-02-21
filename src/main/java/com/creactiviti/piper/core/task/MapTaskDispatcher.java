@@ -39,7 +39,7 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
  */
 public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-  private final TaskDispatcher taskDispatcher;
+  private final TaskDispatcher<TaskExecution> taskDispatcher;
   private final TaskEvaluator taskEvaluator;
   private final TaskExecutionRepository taskExecutionRepo;
   private final MessageBroker messageBroker;
@@ -96,7 +96,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
   }
 
   @Override
-  public TaskDispatcher resolve (Task aTask) {
+  public TaskDispatcher<?> resolve (Task aTask) {
     if(aTask.getType().equals(DSL.MAP)) {
       return this;
     }
@@ -109,14 +109,14 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
   
   public static class Builder { 
     
-    private TaskDispatcher taskDispatcher;
+    private TaskDispatcher<TaskExecution> taskDispatcher;
     private TaskEvaluator taskEvaluator = new SpelTaskEvaluator();
     private TaskExecutionRepository taskExecutionRepo;
     private MessageBroker messageBroker;
     private ContextRepository contextRepository;
     private CounterRepository counterRepository;
     
-    public Builder taskDispatcher(TaskDispatcher aTaskDispatcher) {
+    public Builder taskDispatcher(TaskDispatcher<TaskExecution> aTaskDispatcher) {
       taskDispatcher = aTaskDispatcher;
       return this;
     }
