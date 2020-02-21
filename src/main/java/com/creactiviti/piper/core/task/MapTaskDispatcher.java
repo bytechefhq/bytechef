@@ -60,7 +60,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     List<Object> list = aTask.getList("list", Object.class);
     Assert.notNull(list,"'list' property can't be null");
     Map<String, Object> iteratee = aTask.getMap("iteratee");
-    Assert.notNull(list,"'iteratee' property can't be null");
+    Assert.notNull(iteratee,"'iteratee' property can't be null");
     
     SimpleTaskExecution parentMapTask = SimpleTaskExecution.of(aTask);
     parentMapTask.setStartTime(new Date ());

@@ -51,7 +51,7 @@ class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
                                                     .contextRepository(contextRepository)
                                                     .counterRepository(new InMemoryCounterRepository())
                                                     .messageBroker(messageBroker)
-                                                    .taskDispatcher((task)->worker.handle(task))
+                                                    .taskDispatcher(worker::handle)
                                                     .taskExecutionRepository(new InMemoryTaskExecutionRepository())
                                                     .build();
     

@@ -58,7 +58,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     List<Object> list = aTask.getList("list", Object.class);
     Assert.notNull(list,"'list' property can't be null");
     Map<String, Object> iteratee = aTask.getMap("iteratee");
-    Assert.notNull(list,"'iteratee' property can't be null");
+    Assert.notNull(iteratee,"'iteratee' property can't be null");
     
     SimpleTaskExecution parentEachTask = SimpleTaskExecution.of(aTask);
     parentEachTask.setStartTime(new Date ());
