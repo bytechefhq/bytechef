@@ -96,7 +96,9 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         return(expression.getValue(context));
       }
       catch (SpelEvaluationException e) {
-        logger.debug(e.getMessage());
+        if(logger.isTraceEnabled()) {
+          logger.trace(e.getMessage());
+        }
         return aValue;
       }
     }
