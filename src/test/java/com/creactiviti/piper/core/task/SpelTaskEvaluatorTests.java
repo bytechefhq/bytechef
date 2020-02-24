@@ -312,4 +312,22 @@ public class SpelTaskEvaluatorTests {
     Assertions.assertEquals(0.5d,evaluated.getDouble("result"));
   }
   
+  @Test
+  public void test36 () {
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+    TaskExecution jt = SimpleTaskExecution.of("number", "${stringf('%03d',5)}");
+    MapContext ctx = new MapContext();
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals("005",evaluated.getString("number"));
+  }
+  
+  @Test
+  public void test37 () {
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+    TaskExecution jt = SimpleTaskExecution.of("number", "${stringf('%s %s','hello','world')}");
+    MapContext ctx = new MapContext();
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals("hello world",evaluated.getString("number"));
+  }
+  
 }

@@ -72,6 +72,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     map.put("concat", new Concat());
     map.put("flatten", new Flatten());
     map.put("uuid", new Uuid());
+    map.put("stringf", new StringFormat());
     map.putAll(aBuilder.methodExecutors);
     methodExecutors = Collections.unmodifiableMap(map);
   }

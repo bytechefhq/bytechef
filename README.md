@@ -587,6 +587,13 @@ Supported types are `job.status` and `task.started`.
   value: "${tempDir()}/${uuid()}"
 ```
 
+[stringf](src/main/java/com/creactiviti/piper/core/task/StringFormat.java)
+
+```
+  type: core/var
+  value: "${stringf('%03d',5)}"  # 005
+```
+
 # Tutorials
 
 ## Hello World
