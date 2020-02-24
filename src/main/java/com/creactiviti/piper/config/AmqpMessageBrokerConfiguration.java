@@ -36,6 +36,7 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -74,6 +75,9 @@ public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer 
   
   @Autowired
   private ConnectionFactory connectionFactory;
+  
+  @Autowired
+  private RabbitProperties rabbit;
   
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
@@ -173,6 +177,7 @@ public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer 
     factory.setConnectionFactory(connectionFactory);
     factory.setDefaultRequeueRejected(false);
     factory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
+    factory.setPrefetchCount(rabbit.getListener().getDirect().getPrefetch());
     return factory;
   }
   
