@@ -5,6 +5,9 @@ package com.creactiviti.piper.core;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.messagebroker.SyncMessageBroker;
+import com.creactiviti.piper.core.task.CancelTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
@@ -173,5 +177,105 @@ public class WorkerTests {
     worker.handle(task);
   }
   
+  @Test
+  public void test6 () throws InterruptedException {
+    ExecutorService executors = Executors.newSingleThreadExecutor();
+    Worker worker = new Worker();
+    SyncMessageBroker messageBroker = new SyncMessageBroker();
+    worker.setMessageBroker(messageBroker);
+    worker.setEventPublisher((e)->{});
+    worker.setTaskHandlerResolver((jt) -> (t) -> {
+      System.out.println("sleeping...");
+      TimeUnit.SECONDS.sleep(5);
+      System.out.println("woke up!");
+      return null;
+    });
+    SimpleTaskExecution task = new SimpleTaskExecution();
+    task.setId("1234");
+    task.setJobId("4567");
+    // execute the task
+    executors.submit(() -> worker.handle(task));
+    // give it a second to start executing
+    TimeUnit.SECONDS.sleep(1);
+    Assertions.assertEquals(1, worker.getTaskExecutions().size());
+    // cancel the execution of the task
+    worker.handle(new CancelTask(task.getJobId(),task.getId()));
+    // give it a second to cancel
+    TimeUnit.SECONDS.sleep(1);
+    Assertions.assertEquals(0, worker.getTaskExecutions().size());
+  }
+
+  @Test
+  public void test7 () throws InterruptedException {
+    ExecutorService executors = Executors.newFixedThreadPool(2);
+    Worker worker = new Worker();
+    SyncMessageBroker messageBroker = new SyncMessageBroker();
+    worker.setMessageBroker(messageBroker);
+    worker.setEventPublisher((e)->{});
+    worker.setTaskHandlerResolver((jt) -> (t) -> {
+      System.out.println("sleeping...");
+      TimeUnit.SECONDS.sleep(5);
+      System.out.println("woke up!");
+      return null;
+    });
+    SimpleTaskExecution task1 = new SimpleTaskExecution();
+    task1.setId("1111");
+    task1.setJobId("2222");
+    // execute the task
+    executors.submit(() -> worker.handle(task1));
+    
+    SimpleTaskExecution task2 = new SimpleTaskExecution();
+    task2.setId("3333");
+    task2.setJobId("4444");
+    // execute the task
+    executors.submit(() -> worker.handle(task2));
+    
+    // give it a second to start executing
+    TimeUnit.SECONDS.sleep(1);
+    
+    Assertions.assertEquals(2, worker.getTaskExecutions().size());
+    // cancel the execution of the task
+    worker.handle(new CancelTask(task1.getJobId(),task1.getId()));
+    // give it a second to cancel
+    TimeUnit.SECONDS.sleep(1);
+    Assertions.assertEquals(1, worker.getTaskExecutions().size());
+  }
+  
+  @Test
+  public void test8 () throws InterruptedException {
+    ExecutorService executors = Executors.newFixedThreadPool(2);
+    Worker worker = new Worker();
+    SyncMessageBroker messageBroker = new SyncMessageBroker();
+    worker.setMessageBroker(messageBroker);
+    worker.setEventPublisher((e)->{});
+    worker.setTaskHandlerResolver((jt) -> (t) -> {
+      System.out.println("sleeping...");
+      TimeUnit.SECONDS.sleep(5);
+      System.out.println("woke up!");
+      return null;
+    });
+    SimpleTaskExecution task1 = new SimpleTaskExecution();
+    task1.setId("1111");
+    task1.setJobId("2222");
+    // execute the task
+    executors.submit(() -> worker.handle(task1));
+    
+    SimpleTaskExecution task2 = new SimpleTaskExecution();
+    task2.setId("3333");
+    task2.setJobId("2222");
+    task2.setParentId(task1.getId());
+    // execute the task
+    executors.submit(() -> worker.handle(task2));
+    
+    // give it a second to start executing
+    TimeUnit.SECONDS.sleep(1);
+    
+    Assertions.assertEquals(2, worker.getTaskExecutions().size());
+    // cancel the execution of the task
+    worker.handle(new CancelTask(task1.getJobId(),task1.getId()));
+    // give it a second to cancel
+    TimeUnit.SECONDS.sleep(1);
+    Assertions.assertEquals(0, worker.getTaskExecutions().size());
+  }
   
 }

@@ -16,9 +16,11 @@
 package com.creactiviti.piper.core;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -69,17 +71,18 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
 public class Worker {
 
   private final ExecutorService executors = Executors.newCachedThreadPool();
-  private final Map<String, Future<?>> taskExecutions = new ConcurrentHashMap<>();
+  private final Map<String, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
   private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.builder()
                                                                .methodExecutor("tempDir", new TempDir())
                                                                .build();
+  
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
   private TaskHandlerResolver taskHandlerResolver;
   private MessageBroker messageBroker;  
   private EventPublisher eventPublisher;
   
-  private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; 
+  private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
   
   /**
    * Handle the execution of a {@link TaskExecution}. Implementors
@@ -99,7 +102,7 @@ public class Worker {
         // ignore
       }
       catch (Exception e) {
-        Future<?> myFuture = taskExecutions.get(aTask.getId());
+        TaskExecutionFuture<?> myFuture = taskExecutions.get(aTask.getId());
         if(!myFuture.isCancelled()) {
           handleException(aTask, e);
         }
@@ -109,7 +112,7 @@ public class Worker {
       }
     });
     
-    taskExecutions.put(aTask.getId(), future);
+    taskExecutions.put(aTask.getId(), new TaskExecutionFuture<>(aTask,future));
     
     try {
       future.get(calculateTimeout(aTask), TimeUnit.MILLISECONDS);
@@ -120,6 +123,28 @@ public class Worker {
       logger.debug("Cancelled task: {}", aTask.getId());
     }
     
+  }
+  
+  /**
+   * Handle control tasks. Control tasks are used by the Coordinator
+   * to control Worker instances. For example to stop an ongoing task
+   * or to adjust something on a worker outside the context of a job.
+   */
+  public void handle (ControlTask aControlTask) {
+    Assert.notNull(aControlTask,"task must not be null");
+    if(ControlTask.TYPE_CANCEL.equals(aControlTask.getType())) {
+      String jobId = aControlTask.getRequiredString("jobId");
+      for(TaskExecutionFuture<?> tef : taskExecutions.values()) {
+        if(tef.taskExecution.getJobId().equals(jobId)) {
+          logger.info("Cancelling task {}->{}",jobId,tef.taskExecution.getId());
+          tef.cancel(true);
+        }
+      }
+    }
+  }
+  
+  Map<String, TaskExecutionFuture<?>> getTaskExecutions() {
+    return Collections.unmodifiableMap(taskExecutions);
   }
   
   private SimpleTaskExecution doExecuteTask (TaskExecution aTask) throws Exception {
@@ -188,23 +213,6 @@ public class Worker {
     }
     return DEFAULT_TIME_OUT;
   }
-  
-  /**
-   * Handle control tasks. Control tasks are used by the Coordinator
-   * to control Worker instances. For example to stop an ongoing task
-   * or to adjust something on a worker outside the context of a job.
-   */
-  public void handle (ControlTask aControlTask) {
-    Assert.notNull(aControlTask,"task must not be null");
-    if(ControlTask.TYPE_CANCEL.equals(aControlTask.getType())) {
-      String taskId = aControlTask.getRequiredString("taskId");
-      Future<?> future = taskExecutions.get(taskId);
-      if(future != null) {
-        logger.info("Cancelling task {}",taskId);
-        future.cancel(true);
-      }
-    }
-  }
 
   public void setTaskHandlerResolver(TaskHandlerResolver aTaskHandlerResolver) {
     taskHandlerResolver = aTaskHandlerResolver;
@@ -216,6 +224,43 @@ public class Worker {
   
   public void setEventPublisher(EventPublisher aEventPublisher) {
     eventPublisher = aEventPublisher;
+  }
+  
+  private static class TaskExecutionFuture<T> implements Future<T> {
+
+    private final Future<T> future;
+    private final TaskExecution taskExecution;
+    
+    TaskExecutionFuture (TaskExecution aTaskExecution, Future<T> aFuture) {
+      taskExecution = Objects.requireNonNull(aTaskExecution);
+      future = Objects.requireNonNull(aFuture);
+    }
+
+    @Override
+    public boolean cancel(boolean aMayInterruptIfRunning) {
+      return future.cancel(aMayInterruptIfRunning);
+    }
+
+    @Override
+    public boolean isCancelled() {
+      return future.isCancelled();
+    }
+
+    @Override
+    public boolean isDone() {
+      return future.isDone();
+    }
+
+    @Override
+    public T get() throws InterruptedException, ExecutionException {
+      return future.get();
+    }
+
+    @Override
+    public T get(long aTimeout, TimeUnit aUnit) throws InterruptedException, ExecutionException, TimeoutException {
+      return future.get(aTimeout, aUnit);
+    }
+    
   }
   
 }

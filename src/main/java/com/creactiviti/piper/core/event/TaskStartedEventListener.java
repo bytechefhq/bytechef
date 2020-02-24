@@ -51,7 +51,7 @@ public class TaskStartedEventListener implements EventListener {
         logger.error("Unkown task: {}",taskId);
       }
       else if (task.getStatus() == TaskStatus.CANCELLED) {
-        taskDispatcher.dispatch(new CancelTask(task.getId()));
+        taskDispatcher.dispatch(new CancelTask(task.getJobId(),task.getId()));
       }
       else {
         SimpleTaskExecution mtask = SimpleTaskExecution.of(task);

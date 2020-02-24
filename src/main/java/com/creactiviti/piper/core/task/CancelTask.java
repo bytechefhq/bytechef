@@ -24,9 +24,10 @@ public class CancelTask extends SimpleControlTask {
 
   public CancelTask () { }
   
-  public CancelTask (String aTaskId) {
+  public CancelTask (String aJobId, String aTaskId) {
     super(ControlTask.TYPE_CANCEL);
     set("taskId", aTaskId);
+    set("jobId", aJobId);
   }
   
 }

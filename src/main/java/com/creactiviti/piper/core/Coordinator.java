@@ -172,7 +172,7 @@ public class Coordinator {
       currentTask.setStatus(TaskStatus.CANCELLED);
       currentTask.setEndTime(new Date());
       jobTaskRepository.merge(currentTask);
-      taskDispatcher.dispatch(new CancelTask(currentTask.getId()));
+      taskDispatcher.dispatch(new CancelTask(currentTask.getJobId(),currentTask.getId()));
     }
     return mjob;
   }
