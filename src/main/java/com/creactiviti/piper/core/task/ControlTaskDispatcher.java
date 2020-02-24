@@ -25,7 +25,7 @@ import com.creactiviti.piper.core.messagebroker.MessageBroker;
  * @author Arik Cohen
  * @since Apr 11, 2017
  */
-public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskDispatcherResolver {
+public class ControlTaskDispatcher implements TaskDispatcher, TaskDispatcherResolver {
 
   private final MessageBroker messageBroker;
   
@@ -34,7 +34,7 @@ public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskD
   }
   
   @Override
-  public void dispatch(ControlTask aTask) {
+  public void dispatch(Task aTask) {
     messageBroker.send(Exchanges.CONTROL+"/"+Exchanges.CONTROL, aTask);
   }
 

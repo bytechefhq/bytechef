@@ -15,6 +15,7 @@
  */
 package com.creactiviti.piper.core;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -328,6 +329,17 @@ public interface Accessor {
    *         converting as needed.
    */
   Date getDate (Object aKey);
+  
+  /**
+   * Return the {@link Duration} value associated with the given
+   * key -- converting as necessary.
+   * 
+   * @param aKey
+   *          The key associated with the desired value.
+   * @return The {@link Duration} value associated with the given key --
+   *         converting as needed.
+   */
+  Duration getDuration (Object aKey);
   
   /**
    * Return a map of all key-value pairs.

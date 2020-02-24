@@ -17,6 +17,7 @@ package com.creactiviti.piper.core.job;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.creactiviti.piper.core.Accessor;
 import com.creactiviti.piper.core.error.Errorable;
@@ -140,5 +141,7 @@ public interface Job extends Errorable, Prioritizable {
    * @return {@link List}
    */
   List<Accessor> getWebhooks ();
+  
+  Map<String,Object> asMap();
   
 }

@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.BeanUtils;
-
 import com.creactiviti.piper.core.Accessor;
 import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.MapObject;
@@ -39,7 +37,7 @@ import com.creactiviti.piper.core.task.TaskExecution;
 public class SimpleJob extends MapObject implements Job {
 
   public SimpleJob () {
-    super(Collections.EMPTY_MAP);
+    super(Collections.emptyMap());
   }
   
   public SimpleJob (Map<String,Object> aSource) {
@@ -47,8 +45,7 @@ public class SimpleJob extends MapObject implements Job {
   }
   
   public SimpleJob (Job aSource) {
-    super();
-    BeanUtils.copyProperties(aSource, this);
+    super(aSource.asMap());
   }
     
   @Override
@@ -102,7 +99,7 @@ public class SimpleJob extends MapObject implements Job {
   @Override
   public List<TaskExecution> getExecution() {
     List<TaskExecution> list = getList(DSL.EXECUTION, TaskExecution.class);
-    return list!=null?list:Collections.EMPTY_LIST;
+    return list!=null?list:Collections.emptyList();
   }
   
   @Override
@@ -196,7 +193,7 @@ public class SimpleJob extends MapObject implements Job {
   
   @Override
   public List<Accessor> getWebhooks() {
-    return getList(DSL.WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
+    return getList(DSL.WEBHOOKS, Accessor.class, Collections.emptyList());
   }
   
   public void setWebhooks (List<Accessor> aWebhooks) {

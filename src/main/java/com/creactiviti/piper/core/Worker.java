@@ -33,7 +33,6 @@ import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import com.creactiviti.piper.core.context.MapContext;
 import com.creactiviti.piper.core.error.ErrorObject;
@@ -131,7 +130,7 @@ public class Worker {
    * or to adjust something on a worker outside the context of a job.
    */
   public void handle (ControlTask aControlTask) {
-    Assert.notNull(aControlTask,"task must not be null");
+    logger.debug("received control task: {}", aControlTask);
     if(ControlTask.TYPE_CANCEL.equals(aControlTask.getType())) {
       String jobId = aControlTask.getRequiredString("jobId");
       for(TaskExecutionFuture<?> tef : taskExecutions.values()) {

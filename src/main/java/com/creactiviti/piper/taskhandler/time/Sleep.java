@@ -15,6 +15,8 @@
  */
 package com.creactiviti.piper.taskhandler.time;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.stereotype.Component;
 
 import com.creactiviti.piper.core.task.TaskExecution;
@@ -25,7 +27,15 @@ public class Sleep implements TaskHandler<Object> {
 
   @Override
   public Object handle (TaskExecution aTask) throws InterruptedException {
-    Thread.sleep(aTask.getLong("millis", 1000));
+    if(aTask.containsKey("millis")) {
+      Thread.sleep(aTask.getLong("millis"));
+    }
+    else if (aTask.containsKey("duration")) {
+      Thread.sleep(aTask.getDuration("duration").toMillis());
+    }
+    else {
+      TimeUnit.SECONDS.sleep(1);
+    }
     return null;
   }
 

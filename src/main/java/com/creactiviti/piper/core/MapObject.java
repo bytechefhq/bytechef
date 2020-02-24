@@ -17,6 +17,7 @@ package com.creactiviti.piper.core;
 
 import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -331,4 +332,12 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     Assert.notNull(value,"Unknown key: " + aKey);
     return value;
   }
+  
+  @Override
+  public Duration getDuration(Object aKey) {
+    String value = getString(aKey);
+    if(value == null) return null;
+    return Duration.parse("PT"+value);
+  }
+  
 }
