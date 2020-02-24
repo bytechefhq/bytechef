@@ -291,4 +291,25 @@ public class SpelTaskEvaluatorTests {
     Assertions.assertNotNull(evaluated.get("uuid"));
   }
   
+  @Test
+  public void test34 () {
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+    TaskExecution jt = SimpleTaskExecution.of("fullName", "${firstName} ${lastName}");
+    MapContext ctx = new MapContext();
+    ctx.put("firstName", "Arik");
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals("Arik ${lastName}",evaluated.getString("fullName"));
+  }
+  
+  @Test
+  public void test35 () {
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+    TaskExecution jt = SimpleTaskExecution.of("result", "${num/den}");
+    MapContext ctx = new MapContext();
+    ctx.put("num", 5.0);
+    ctx.put("den", 10.0);
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals(0.5d,evaluated.getDouble("result"));
+  }
+  
 }

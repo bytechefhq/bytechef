@@ -28,8 +28,11 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
+import org.springframework.expression.common.CompositeStringExpression;
+import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -91,15 +94,33 @@ public class SpelTaskEvaluator implements TaskEvaluator {
   private Object evaluate (Object aValue, Context aContext) {
     StandardEvaluationContext context = createEvaluationContext(aContext);
     if(aValue instanceof String) {
-      Expression expression = parser.parseExpression((String)aValue,new TemplateParserContext(PREFIX,SUFFIX));
-      try {
-        return(expression.getValue(context));
-      }
-      catch (SpelEvaluationException e) {
-        if(logger.isTraceEnabled()) {
-          logger.trace(e.getMessage());
+      Expression expr = parser.parseExpression((String)aValue,new TemplateParserContext(PREFIX,SUFFIX));
+      if(expr instanceof CompositeStringExpression) { // attempt partial evaluation
+        StringBuilder value = new StringBuilder();
+        Expression[] subExpressions = ((CompositeStringExpression) expr).getExpressions();
+        for(Expression subExpression : subExpressions) {
+          if(subExpression instanceof LiteralExpression) {
+            value.append(subExpression.getValue());
+          }
+          else if (subExpression instanceof SpelExpression) {
+             value.append(evaluate(PREFIX + subExpression.getExpressionString() + SUFFIX, aContext));
+          }
+          else {
+            throw new IllegalArgumentException("unknown expression type: " + subExpression.getClass().getName());
+          }
         }
-        return aValue;
+        return value.toString();
+      }
+      else {
+        try {
+          return(expr.getValue(context));
+        }
+        catch (SpelEvaluationException e) {
+          if(logger.isTraceEnabled()) {
+            logger.trace(e.getMessage());
+          }
+          return aValue;
+        }
       }
     }
     else if (aValue instanceof List) {
@@ -117,7 +138,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     }
     return aValue;
   }
-
+  
   private StandardEvaluationContext createEvaluationContext(Context aContext) {
     StandardEvaluationContext context = new StandardEvaluationContext(aContext);
     context.addPropertyAccessor(new MapPropertyAccessor());
