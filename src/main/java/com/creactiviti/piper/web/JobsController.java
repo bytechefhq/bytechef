@@ -38,6 +38,7 @@ import com.creactiviti.piper.core.Page;
 import com.creactiviti.piper.core.annotations.ConditionalOnCoordinator;
 import com.creactiviti.piper.core.job.Job;
 import com.creactiviti.piper.core.job.JobRepository;
+import com.creactiviti.piper.core.job.JobSummary;
 
 @RestController
 @ConditionalOnCoordinator
@@ -47,7 +48,7 @@ public class JobsController {
   @Autowired private Coordinator coordinator;
   
   @GetMapping(value="/jobs")
-  public Page<Job> list (@RequestParam(value="p",defaultValue="1") Integer aPageNumber) {
+  public Page<JobSummary> list (@RequestParam(value="p",defaultValue="1") Integer aPageNumber) {
     return jobRepository.getPage(aPageNumber);
   }
   

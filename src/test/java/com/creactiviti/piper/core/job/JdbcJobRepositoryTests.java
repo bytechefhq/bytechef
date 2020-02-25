@@ -48,7 +48,7 @@ public class JdbcJobRepositoryTests {
     job.setStatus(JobStatus.CREATED);
     jobRepository.create(job);
     
-    Page<Job> all = jobRepository.getPage(1);
+    Page<JobSummary> all = jobRepository.getPage(1);
     Assertions.assertEquals(pageTotal+1,all.getSize());
     
     Job one = jobRepository.getById(id);

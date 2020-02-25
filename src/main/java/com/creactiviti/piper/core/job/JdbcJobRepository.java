@@ -69,12 +69,12 @@ public class JdbcJobRepository implements JobRepository {
   }
 
   @Override
-  public Page<Job> getPage(int aPageNumber) {
+  public Page<JobSummary> getPage(int aPageNumber) {
     Integer totalItems = jdbc.getJdbcOperations().queryForObject("select count(*) from job",Integer.class);
     int offset = (aPageNumber-1) * DEFAULT_PAGE_SIZE;
     int limit = DEFAULT_PAGE_SIZE;
-    List<Job> items = jdbc.query(String.format("select * from job order by create_time desc offset %s limit %s",offset,limit),this::jobRowMappper);
-    ResultPage<Job> resultPage = new ResultPage<>(Job.class);
+    List<JobSummary> items = jdbc.query(String.format("select * from job order by create_time desc offset %s limit %s",offset,limit),this::jobSummaryRowMappper);
+    ResultPage<JobSummary> resultPage = new ResultPage<>(JobSummary.class);
     resultPage.setItems(items);
     resultPage.setNumber(items.size()>0?aPageNumber:0);
     resultPage.setTotalItems(totalItems);
@@ -145,6 +145,25 @@ public class JdbcJobRepository implements JobRepository {
     map.put("webhooks", JsonHelper.readValue(json,aRs.getString("webhooks"),List.class));
     map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
     return new SimpleJob(map);
+  }
+  
+  private JobSummary jobSummaryRowMappper (ResultSet aRs, int aIndex) throws SQLException {
+    Map<String, Object> map = new HashMap<>();
+    map.put("id", aRs.getString("id"));
+    map.put("status", aRs.getString("status"));
+    map.put("currentTask", aRs.getInt("current_task"));
+    map.put("pipelineId", aRs.getString("pipeline_id"));
+    map.put("label", aRs.getString("label"));
+    map.put("createTime", aRs.getTimestamp("create_time"));
+    map.put("startTime", aRs.getTimestamp("start_time"));
+    map.put("endTime", aRs.getTimestamp("end_time"));
+    map.put("tags", aRs.getString("tags").length()>0?aRs.getString("tags").split(","):new String[0]);
+    map.put("priority", aRs.getInt("priority"));
+    map.put("inputs", JsonHelper.readValue(json,aRs.getString("inputs"),Map.class));
+    map.put("outputs", JsonHelper.readValue(json,aRs.getString("outputs"),Map.class));
+    map.put("webhooks", JsonHelper.readValue(json,aRs.getString("webhooks"),List.class));
+    map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
+    return new JobSummary (new SimpleJob(map));
   }
   
   private List<TaskExecution> getExecution(String aJobId) {

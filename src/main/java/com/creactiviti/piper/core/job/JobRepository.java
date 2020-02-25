@@ -21,7 +21,7 @@ import com.creactiviti.piper.core.Page;
 
 public interface JobRepository {
   
-  Page<Job> getPage (int aPageNumber);
+  Page<JobSummary> getPage (int aPageNumber);
   
   Job getById (String aId);
   
