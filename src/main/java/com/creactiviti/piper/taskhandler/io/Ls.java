@@ -52,10 +52,12 @@ class Ls implements TaskHandler<List<Ls.FileInfo>> {
     
     private final Path path;
     private final Path root;
+    private final long size;
     
     public FileInfo(Path aRoot, Path aPath) {
       root = aRoot;
       path = aPath;
+      size = aPath.toFile().length();
     }
     
     public String getName () {
@@ -71,7 +73,7 @@ class Ls implements TaskHandler<List<Ls.FileInfo>> {
     }
     
     public long getSize () throws IOException {
-      return Files.size(path);
+      return size;
     }
     
   }
