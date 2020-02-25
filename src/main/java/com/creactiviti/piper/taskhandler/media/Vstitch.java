@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
@@ -43,9 +45,12 @@ class Vstitch implements TaskHandler<Object> {
 
   private final Ffmpeg ffmpeg = new Ffmpeg();
   
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  
   @Override
   public Object handle (TaskExecution aTask) throws Exception {
     List<String> chunks = aTask.getList("chunks",String.class);
+    logger.debug("{}",chunks);
     File tempFile = File.createTempFile("_chunks", ".txt");
     try {
       try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile, true), "UTF-8"))) {
