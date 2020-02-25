@@ -44,17 +44,11 @@ public class CoordinatorTests {
   
   @Test
   public void testStartJob () throws SQLException {
-    Worker worker = new Worker();
     Coordinator coordinator = new Coordinator ();
    
     SyncMessageBroker messageBroker = new SyncMessageBroker();
     messageBroker.receive(Queues.COMPLETIONS, (o)->coordinator.complete((TaskExecution)o));
     messageBroker.receive(Queues.JOBS, (o)->coordinator.start((Job)o));
-    
-    
-    worker.setMessageBroker(messageBroker);
-    worker.setEventPublisher((e)->{});
-    
     
     Map<String,TaskHandler<?>> handlers = new HashMap<>();
     handlers.put("print", new Print());
@@ -63,7 +57,11 @@ public class CoordinatorTests {
     
     DefaultTaskHandlerResolver taskHandlerResolver = new DefaultTaskHandlerResolver(handlers);
     
-    worker.setTaskHandlerResolver(taskHandlerResolver);
+    Worker worker = Worker.builder()
+                          .withTaskHandlerResolver(taskHandlerResolver)
+                          .withMessageBroker(messageBroker)
+                          .withEventPublisher((e)->{})
+                          .build();
     
     ObjectMapper objectMapper = createObjectMapper();
     

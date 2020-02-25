@@ -56,7 +56,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(name="piper.message-broker.provider",havingValue="amqp")
 public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer {
   
-  @Lazy
   @Autowired(required=false)
   private Worker worker;
   

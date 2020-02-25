@@ -125,7 +125,8 @@ public class DSL {
                                                               EXECUTION,
                                                               PRIORITY,
                                                               CURRENT_TASK,
-                                                              PARENT_TASK_EXECUTION_ID
+                                                              PARENT_TASK_EXECUTION_ID,
+                                                              OUTPUT
                                                             }; 
   
 }

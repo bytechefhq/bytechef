@@ -61,7 +61,7 @@ class Vstitch implements TaskHandler<Object> {
         "-safe","0",
         "-i",tempFile.getAbsolutePath(),
         "-c","copy",
-        aTask.getRequiredString("output")
+        aTask.getRequiredString("outputFile")
       );
       ffmpegTask.set("options", options);
       ffmpeg.handle(ffmpegTask);

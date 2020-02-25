@@ -24,4 +24,20 @@ public class MapTaskHandlerAdapterTests {
     Assertions.assertEquals(List.of(1,2,3),results);
   }
   
+  @Test
+  public void test2 () throws Exception {
+    Assertions.assertThrows(RuntimeException.class, () -> {
+      TaskHandlerResolver resolver = (task)->(t)->{
+        throw new IllegalArgumentException("i'm rogue");
+      };
+      MapTaskHandlerAdapter adapter = new MapTaskHandlerAdapter(resolver);
+      SimpleTaskExecution task = new SimpleTaskExecution();
+      task.setId("1234");
+      task.setJobId("4567");
+      task.set("list", List.of(1,2,3));
+      task.set("iteratee", Map.of("type","rogue"));
+      adapter.handle(task);
+    });
+  }
+  
 }

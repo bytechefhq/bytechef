@@ -251,7 +251,7 @@ public class CoordinatorConfiguration {
     
   @Bean
   TaskStartedEventListener taskStartedEventListener () {
-    return new TaskStartedEventListener(taskExecutionRepo, taskDispatcher());
+    return new TaskStartedEventListener(taskExecutionRepo, taskDispatcher(), jobRepository);
   }
 
   @Bean

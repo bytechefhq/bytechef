@@ -18,6 +18,9 @@ package com.creactiviti.piper.core.event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.creactiviti.piper.core.job.Job;
+import com.creactiviti.piper.core.job.JobRepository;
+import com.creactiviti.piper.core.job.JobStatus;
 import com.creactiviti.piper.core.task.CancelTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.TaskDispatcher;
@@ -34,12 +37,14 @@ public class TaskStartedEventListener implements EventListener {
 
   private final TaskExecutionRepository taskExecutionRepository;
   private final TaskDispatcher taskDispatcher;
+  private final JobRepository jobRepository;
   
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
-  public TaskStartedEventListener (TaskExecutionRepository aTaskExecutionRepository, TaskDispatcher aTaskDispatcher) {
+  public TaskStartedEventListener (TaskExecutionRepository aTaskExecutionRepository, TaskDispatcher aTaskDispatcher, JobRepository aJobRepository) {
     taskExecutionRepository = aTaskExecutionRepository;
     taskDispatcher = aTaskDispatcher;
+    jobRepository = aJobRepository;
   }
 
   @Override
@@ -49,8 +54,12 @@ public class TaskStartedEventListener implements EventListener {
       TaskExecution task = taskExecutionRepository.findOne(taskId);
       if(task == null) {
         logger.error("Unkown task: {}",taskId);
+        return;
       }
-      else if (task.getStatus() == TaskStatus.CANCELLED) {
+      
+      Job job = jobRepository.getByTaskId(taskId);
+      
+      if (task.getStatus() == TaskStatus.CANCELLED || job.getStatus() != JobStatus.STARTED) {
         taskDispatcher.dispatch(new CancelTask(task.getJobId(),task.getId()));
       }
       else {

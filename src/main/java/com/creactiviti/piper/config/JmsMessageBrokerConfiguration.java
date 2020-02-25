@@ -54,7 +54,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(name="piper.message-broker.provider",havingValue="jms")
 public class JmsMessageBrokerConfiguration implements JmsListenerConfigurer {
 
-  @Lazy
   @Autowired(required=false)
   private Worker worker;
   

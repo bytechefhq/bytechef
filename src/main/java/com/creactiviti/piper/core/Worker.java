@@ -69,7 +69,6 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
  */
 public class Worker {
 
-  private final ExecutorService executors = Executors.newCachedThreadPool();
   private final Map<String, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
   private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.builder()
                                                                .methodExecutor("tempDir", new TempDir())
@@ -77,11 +76,19 @@ public class Worker {
   
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
-  private TaskHandlerResolver taskHandlerResolver;
-  private MessageBroker messageBroker;  
-  private EventPublisher eventPublisher;
+  private final TaskHandlerResolver taskHandlerResolver;
+  private final MessageBroker messageBroker;  
+  private final EventPublisher eventPublisher;
+  private final ExecutorService executors;
   
   private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
+  
+  private Worker (Builder aBuilder) {
+    taskHandlerResolver = Objects.requireNonNull(aBuilder.taskHandlerResolver);
+    messageBroker = Objects.requireNonNull(aBuilder.messageBroker);
+    eventPublisher = Objects.requireNonNull(aBuilder.eventPublisher);
+    executors = Objects.requireNonNull(aBuilder.executors);
+  }
   
   /**
    * Handle the execution of a {@link TaskExecution}. Implementors
@@ -161,13 +168,7 @@ public class Worker {
       Object output = taskHandler.handle(evaluatedTask);
       SimpleTaskExecution completion = SimpleTaskExecution.of(evaluatedTask);
       if(output!=null) {
-        if(completion.getOutput() != null) {
-          TaskExecution evaluated = taskEvaluator.evaluate(completion, new MapContext ("execution", new MapContext("output", output)));
-          completion = SimpleTaskExecution.of(evaluated);
-        }
-        else {
-          completion.setOutput(output);
-        }
+        completion.setOutput(output);
       }
       completion.setStatus(TaskStatus.COMPLETED);
       completion.setProgress(100);
@@ -212,17 +213,42 @@ public class Worker {
     }
     return DEFAULT_TIME_OUT;
   }
-
-  public void setTaskHandlerResolver(TaskHandlerResolver aTaskHandlerResolver) {
-    taskHandlerResolver = aTaskHandlerResolver;
-  }
-
-  public void setMessageBroker(MessageBroker aMessageBroker) {
-    messageBroker = aMessageBroker;
+  
+  public static Builder builder () {
+    return new Builder();
   }
   
-  public void setEventPublisher(EventPublisher aEventPublisher) {
-    eventPublisher = aEventPublisher;
+  public static class Builder {
+    
+    private TaskHandlerResolver taskHandlerResolver;
+    private MessageBroker messageBroker;  
+    private EventPublisher eventPublisher;
+    private ExecutorService executors = Executors.newCachedThreadPool();
+    
+    public Builder withTaskHandlerResolver(TaskHandlerResolver aTaskHandlerResolver) {
+      taskHandlerResolver = aTaskHandlerResolver;
+      return this;
+    }
+
+    public Builder withMessageBroker(MessageBroker aMessageBroker) {
+      messageBroker = aMessageBroker;
+      return this;
+    }
+    
+    public Builder withEventPublisher(EventPublisher aEventPublisher) {
+      eventPublisher = aEventPublisher;
+      return this;
+    }
+    
+    public Builder withExecutors(ExecutorService aExecutors) {
+      executors = aExecutors;
+      return this;
+    }
+    
+    public Worker build () {
+      return new Worker(this);
+    }
+    
   }
   
   private static class TaskExecutionFuture<T> implements Future<T> {

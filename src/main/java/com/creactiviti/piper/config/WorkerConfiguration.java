@@ -31,11 +31,11 @@ public class WorkerConfiguration {
   
   @Bean
   Worker worker (TaskHandlerResolver aTaskHandlerResolver, MessageBroker aMessageBroker, @Lazy EventPublisher aEventPublisher) {
-    Worker worker = new Worker();
-    worker.setMessageBroker(aMessageBroker);
-    worker.setTaskHandlerResolver(aTaskHandlerResolver);
-    worker.setEventPublisher(aEventPublisher);
-    return worker;
+    return Worker.builder()
+                 .withTaskHandlerResolver(aTaskHandlerResolver)
+                 .withMessageBroker(aMessageBroker)
+                 .withEventPublisher(aEventPublisher)
+                 .build();
   }
 
   
