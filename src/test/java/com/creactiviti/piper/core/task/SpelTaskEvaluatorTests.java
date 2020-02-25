@@ -330,4 +330,22 @@ public class SpelTaskEvaluatorTests {
     Assertions.assertEquals("hello world",evaluated.getString("number"));
   }
   
+  @Test
+  public void test38 () {
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+    TaskExecution jt = SimpleTaskExecution.of("sorted", "${sort({3,1,2})}");
+    MapContext ctx = new MapContext();
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals(Arrays.asList(1,2,3),evaluated.getList("sorted",Integer.class));
+  }
+  
+  @Test
+  public void test39 () {
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+    TaskExecution jt = SimpleTaskExecution.of("sorted", "${sort({'C','A','B'})}");
+    MapContext ctx = new MapContext();
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals(Arrays.asList("A","B","C"),evaluated.getList("sorted",String.class));
+  }
+  
 }

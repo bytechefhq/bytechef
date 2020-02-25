@@ -570,14 +570,21 @@ Supported types are `job.status` and `task.started`.
 
 ```
   type: core/var
-  value: concat(['A','B'],['C']) # ['A','B','C']
+  value: ${concat(['A','B'],['C'])} # ['A','B','C']
 ```
 
 [flatten](src/main/java/com/creactiviti/piper/core/task/Flatten.java)
 
 ```
   type: core/var
-  value: flatten([['A'],['B']]) # ['A','B']
+  value: ${flatten([['A'],['B']])} # ['A','B']
+```
+
+[sort](src/main/java/com/creactiviti/piper/core/task/Sort.java)
+
+```
+  type: core/var
+  value: ${sort([3,1,2])} # [1,2,3]
 ```
 
 [tempDir](src/main/java/com/creactiviti/piper/core/task/TempDir.java)
