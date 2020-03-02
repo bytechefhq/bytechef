@@ -15,11 +15,12 @@
  */
 package com.creactiviti.piper.taskhandler.media;
 
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.arakelian.jq.ImmutableJqLibrary;
+import com.arakelian.jq.ImmutableJqRequest;
+import com.arakelian.jq.JqResponse;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
@@ -35,11 +36,19 @@ class Framerate implements TaskHandler<Double> {
   
   @Override
   public Double handle (TaskExecution aTask) throws Exception {
-    Map<String, Object> mediainfoResult = mediainfo.handle(aTask);
-    String frameRateStr = (String) mediainfoResult.get("video_frame_rate");
+    Mediainfo.Output mediainfoResult = mediainfo.handle(aTask);
+    
+    JqResponse response = ImmutableJqRequest.builder() //
+        .lib(ImmutableJqLibrary.of())
+        .input(mediainfoResult.toJson())
+        .filter(".media[]  | select(.type == \"Video\") | .FrameRate") 
+        .build()
+        .execute();
+    
+    String frameRateStr = response.getOutput();
     Assert.notNull(frameRateStr, "can not determine framerate");
     return Double.valueOf(frameRateStr.replaceAll("[^0-9\\.]", ""));
   }
-
+  
 }
 

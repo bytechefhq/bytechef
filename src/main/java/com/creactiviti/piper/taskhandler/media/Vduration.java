@@ -20,32 +20,29 @@
  */
 package com.creactiviti.piper.taskhandler.media;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 
+import com.arakelian.jq.ImmutableJqLibrary;
+import com.arakelian.jq.ImmutableJqRequest;
+import com.arakelian.jq.JqResponse;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
 @Component("media/vduration")
 class Vduration implements TaskHandler<Double> {
 
-  private Ffprobe ffprobe = new Ffprobe();
+  private final Mediainfo mediainfo = new Mediainfo();
   
   @Override
   public Double handle (TaskExecution aTask) throws Exception {
-    Map<String, Object> ffprobeResult = ffprobe.handle(aTask);
-    List<Map<String,Object>> videos = (List<Map<String, Object>>) ffprobeResult.get("video");
-    if(videos!=null && videos.size() > 0) {
-      Map<String, Object> video = videos.get(0);
-      Object duration = video.get("duration");
-      if(duration instanceof String) {
-        return Double.valueOf((String)duration);
-      }
-      return (Double) duration;
-    }
-    return null;
+    Mediainfo.Output mediainfoResult = mediainfo.handle(aTask);
+    JqResponse response = ImmutableJqRequest.builder() //
+        .lib(ImmutableJqLibrary.of())
+        .input(mediainfoResult.toJson())
+        .filter(".media[]  | select(.type == \"Video\") | .Duration") 
+        .build()
+        .execute();
+    return Double.valueOf(response.getOutput());
   }
 
 }

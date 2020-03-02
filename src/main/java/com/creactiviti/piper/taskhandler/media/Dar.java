@@ -20,10 +20,11 @@
  */
 package com.creactiviti.piper.taskhandler.media;
 
-import java.util.Map;
-
 import org.springframework.stereotype.Component;
 
+import com.arakelian.jq.ImmutableJqLibrary;
+import com.arakelian.jq.ImmutableJqRequest;
+import com.arakelian.jq.JqResponse;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 
@@ -34,9 +35,17 @@ class Dar implements TaskHandler<String> {
   
   @Override
   public String handle (TaskExecution aTask) throws Exception {
-    Map<String, Object> mediainfoResult = mediainfo.handle(aTask);
-    return (String) mediainfoResult.get("video_display_aspect_ratio");
+    Mediainfo.Output mediainfoResult = mediainfo.handle(aTask);
+    
+    JqResponse response = ImmutableJqRequest.builder() //
+        .lib(ImmutableJqLibrary.of())
+        .input(mediainfoResult.toJson())
+        .filter(".media[]  | select(.type == \"Video\") | .DisplayAspectRatio") 
+        .build()
+        .execute();
+    
+    return response.getOutput();
   }
-
+  
 }
 

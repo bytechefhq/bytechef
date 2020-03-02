@@ -15,22 +15,21 @@
  */
 package com.creactiviti.piper.taskhandler.media;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.zeroturnaround.exec.ProcessExecutor;
 
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
 
 /**
  * 
@@ -38,44 +37,46 @@ import com.creactiviti.piper.core.task.TaskHandler;
  * @since June 2, 2017
  */
 @Component("media/mediainfo")
-class Mediainfo implements TaskHandler<Map<String,Object>> {
+class Mediainfo implements TaskHandler<Mediainfo.Output> {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   
+  private static final XmlMapper xmlMapper = new XmlMapper();
+  
   @Override
-  public Map<String,Object> handle (TaskExecution aTask) throws Exception {
-    CommandLine cmd = new CommandLine ("mediainfo");
-    cmd.addArgument(aTask.getRequiredString("input"));
-    log.debug("{}",cmd);
-    DefaultExecutor exec = new DefaultExecutor();
-    File tempFile = File.createTempFile("log", null);
-    try (PrintStream stream = new PrintStream(tempFile);) {
-      exec.setStreamHandler(new PumpStreamHandler(stream));
-      exec.execute(cmd);
-      return parse(FileUtils.readFileToString(tempFile));
-    }
-    catch (ExecuteException e) {
-      throw new ExecuteException(e.getMessage(),e.getExitValue(), new RuntimeException(FileUtils.readFileToString(tempFile)));
-    }
-    finally {
-      FileUtils.deleteQuietly(tempFile);
-    }
+  public Mediainfo.Output handle (TaskExecution aTask) throws Exception {
+    
+    xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    
+    String output = new ProcessExecutor()
+                    .command(List.of("mediainfo","--Output=XML",aTask.getRequiredString("input")))
+                    .readOutput(true)
+                    .execute()
+                    .outputUTF8();
+    
+    log.debug("{}",output);
+    
+    return xmlMapper.readValue(output,Output.class);
   }
   
-  private Map<String,Object> parse (String aRaw) throws Exception {
-    String[] lines = aRaw.split("\n");
-    Map<String,Object> parsed = new HashMap<> ();
-    String prefix = "";
-    for(String line : lines) {
-      String[] parts = line.split(":",2);
-      if(parts.length == 1) {
-        prefix = parts[0].trim().toLowerCase().replaceAll(" ", "_")+"_";
-      }
-      else {
-        parsed.put(prefix+parts[0].trim().toLowerCase().replaceAll(" ", "_"), parts[1].trim());
-      }
+  static class Output {
+    
+    private List<Map<?,?>> media;
+    
+    private static final ObjectMapper jsonMapper = new ObjectMapper();
+    
+    public List<Map<?, ?>> getMedia() {
+      return media;
     }
-    return parsed;
+    
+    public void setMedia(List<Map<?, ?>> aMedia) {
+      media = aMedia;
+    }
+    
+    public String toJson () throws JsonProcessingException {
+      return jsonMapper.writeValueAsString(this);
+    }
+    
   }
 
 }
