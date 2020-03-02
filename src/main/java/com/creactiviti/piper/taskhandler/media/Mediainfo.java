@@ -25,10 +25,7 @@ import org.zeroturnaround.exec.ProcessExecutor;
 
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 
 /**
@@ -37,46 +34,25 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
  * @since June 2, 2017
  */
 @Component("media/mediainfo")
-class Mediainfo implements TaskHandler<Mediainfo.Output> {
+class Mediainfo implements TaskHandler<Map<?,?>> {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
   
-  private static final XmlMapper xmlMapper = new XmlMapper();
-  
+  private final ObjectMapper mapper = new ObjectMapper();
+
   @Override
-  public Mediainfo.Output handle (TaskExecution aTask) throws Exception {
-    
-    xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    
+  public Map<?,?> handle (TaskExecution aTask) throws Exception {
+
     String output = new ProcessExecutor()
-                    .command(List.of("mediainfo","--Output=XML",aTask.getRequiredString("input")))
-                    .readOutput(true)
-                    .execute()
-                    .outputUTF8();
-    
+        .command(List.of("mediainfo","--Output=JSON",aTask.getRequiredString("input")," | ", "xq"))
+        .readOutput(true)
+        .execute()
+        .outputUTF8();
+
     log.debug("{}",output);
     
-    return xmlMapper.readValue(output,Output.class);
+    return mapper.readValue(output, Map.class);
   }
-  
-  static class Output {
-    
-    private List<Map<?,?>> media;
-    
-    private static final ObjectMapper jsonMapper = new ObjectMapper();
-    
-    public List<Map<?, ?>> getMedia() {
-      return media;
-    }
-    
-    public void setMedia(List<Map<?, ?>> aMedia) {
-      media = aMedia;
-    }
-    
-    public String toJson () throws JsonProcessingException {
-      return jsonMapper.writeValueAsString(this);
-    }
-    
-  }
+
 
 }

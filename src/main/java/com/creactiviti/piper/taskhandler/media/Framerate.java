@@ -15,6 +15,8 @@
  */
 package com.creactiviti.piper.taskhandler.media;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -23,6 +25,7 @@ import com.arakelian.jq.ImmutableJqRequest;
 import com.arakelian.jq.JqResponse;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -33,15 +36,16 @@ import com.creactiviti.piper.core.task.TaskHandler;
 class Framerate implements TaskHandler<Double> {
 
   private final Mediainfo mediainfo = new Mediainfo();
+  private final ObjectMapper jsonMapper = new ObjectMapper ();
   
   @Override
   public Double handle (TaskExecution aTask) throws Exception {
-    Mediainfo.Output mediainfoResult = mediainfo.handle(aTask);
+    Map<?,?> mediainfoResult = mediainfo.handle(aTask);
     
     JqResponse response = ImmutableJqRequest.builder() //
         .lib(ImmutableJqLibrary.of())
-        .input(mediainfoResult.toJson())
-        .filter(".media[]  | select(.type == \"Video\") | .FrameRate") 
+        .input(jsonMapper.writeValueAsString(mediainfoResult))
+        .filter(".media.track[]  | select(.\"@type\" == \"Video\") | .FrameRate") 
         .build()
         .execute();
     
