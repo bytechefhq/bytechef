@@ -42,7 +42,7 @@ class Vduration implements TaskHandler<Double> {
         .filter(".media[]  | select(.type == \"Video\") | .Duration") 
         .build()
         .execute();
-    return Double.valueOf(response.getOutput());
+    return Double.valueOf(response.getOutput().replaceAll("[^0-9\\.]", ""));
   }
 
 }
