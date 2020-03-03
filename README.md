@@ -609,6 +609,27 @@ Supported types are `job.status` and `task.started`.
   value: "${stringf('%03d',5)}"  # 005
 ```
 
+[now](src/main/java/com/creactiviti/piper/core/task/Now.java)
+
+```
+  type: core/var
+  value: "${dateFormat(now(),'yyyy')}"  # e.g. 2020
+```
+
+[timestamp](src/main/java/com/creactiviti/piper/core/task/Timestamp.java)
+
+```
+  type: core/var
+  value: "${timestamp()}"  # e.g. 1583268621423
+```
+
+[dateFormat](src/main/java/com/creactiviti/piper/core/task/DateFormat.java)
+
+```
+  type: core/var
+  value: "${dateFormat(now(),'yyyy')}"  # e.g. 2020
+```
+
 # Tutorials
 
 ## Hello World

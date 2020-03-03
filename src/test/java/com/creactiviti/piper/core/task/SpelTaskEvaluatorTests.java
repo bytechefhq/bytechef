@@ -1,8 +1,10 @@
 
 package com.creactiviti.piper.core.task;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
@@ -346,6 +348,16 @@ public class SpelTaskEvaluatorTests {
     MapContext ctx = new MapContext();
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals(Arrays.asList("A","B","C"),evaluated.getList("sorted",String.class));
+  }
+  
+  @Test
+  public void test40 () {
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+    TaskExecution jt = SimpleTaskExecution.of("date", "${dateFormat(now(),'yyyyMMdd')}");
+    MapContext ctx = new MapContext();
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    Assertions.assertEquals(sdf.format(new Date()),evaluated.getString("date"));
   }
   
 }
