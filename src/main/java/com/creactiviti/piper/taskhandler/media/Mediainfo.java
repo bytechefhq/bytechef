@@ -44,7 +44,7 @@ class Mediainfo implements TaskHandler<Map<?,?>> {
   public Map<?,?> handle (TaskExecution aTask) throws Exception {
 
     String output = new ProcessExecutor()
-        .command(List.of("mediainfo","--Output=JSON",aTask.getRequiredString("input")," | ", "xq"))
+        .command(List.of("mediainfo","--Output=JSON",aTask.getRequiredString("input")))
         .readOutput(true)
         .execute()
         .outputUTF8();
