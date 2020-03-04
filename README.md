@@ -218,7 +218,10 @@ Starts a new job as a sub-flow of the current job. Output of the sub-flow job is
 
 Each task can define a set of tasks that will be executed prior to its execution (`pre`), 
 after its succesful execution (`post`) and at the end of the task's lifecycle regardless of the outcome of the task's 
-execution (`finalize`).
+execution (`finalize`). 
+
+`pre/post/finalize` tasks always execute on the same node which will execute the task itself and are considered to be an atomic part of the task. That is, failure in any of the `pre/post/finalize` tasks is considered a failure of the entire task.
+
 
 ```
   - label: 240p
