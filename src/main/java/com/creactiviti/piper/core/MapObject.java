@@ -340,4 +340,10 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     return Duration.parse("PT"+value);
   }
   
+  @Override
+  public Duration getDuration(Object aKey, String aDefaultDuration) {
+    Duration value = getDuration(aKey);
+    return value!=null?value:Duration.parse("PT"+aDefaultDuration);
+  }
+  
 }

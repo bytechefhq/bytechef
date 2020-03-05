@@ -262,7 +262,12 @@ Registering webhooks is done when creating the job. E.g.:
   },
   "webhooks": [{
     "type": "job.status", 
-    "url": "http://example.com"
+    "url": "http://example.com",
+    "retry": {   # optional configuration for retry attempts in case of webhook failure 
+      "initialInterval":"3s" # default 2s
+      "maxInterval":"10s" # default 30s
+      "maxAttempts": 4 # default 5
+    }
   }]
 }
 ```

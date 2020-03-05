@@ -342,6 +342,19 @@ public interface Accessor {
   Duration getDuration (Object aKey);
   
   /**
+   * Return the {@link Duration} value associated with the given
+   * key -- converting as necessary.
+   * 
+   * @param aKey
+   *          The key associated with the desired value.
+   * @param aDefaultDuration
+   *          The default duration
+   * @return The {@link Duration} value associated with the given key --
+   *         converting as needed.
+   */
+  Duration getDuration (Object aKey, String aDefaultDuration);
+  
+  /**
    * Return a map of all key-value pairs.
    * 
    * @return {@link Map}

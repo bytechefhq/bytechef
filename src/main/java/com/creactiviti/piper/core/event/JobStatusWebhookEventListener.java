@@ -19,6 +19,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import com.creactiviti.piper.core.Accessor;
@@ -40,7 +43,7 @@ public class JobStatusWebhookEventListener implements EventListener {
   
   private final RestTemplate rest = new RestTemplate();
   
-  public JobStatusWebhookEventListener(JobRepository aJobRepository) {
+  public JobStatusWebhookEventListener (JobRepository aJobRepository) {
     jobRepository = aJobRepository;
   }
   
@@ -56,10 +59,30 @@ public class JobStatusWebhookEventListener implements EventListener {
       if(Events.JOB_STATUS.equals(webhook.getRequiredString(DSL.TYPE))) {
         MapObject webhookEvent = new MapObject(webhook.asMap());
         webhookEvent.put(DSL.EVENT,aEvent.asMap());
-        logger.debug("Calling webhook {} -> {}",webhook.getRequiredString(DSL.URL),webhookEvent);
-        rest.postForObject(webhook.getRequiredString(DSL.URL), webhookEvent, String.class);
+        createRetryTemplate(webhook).execute((context) -> {
+          if(context.getRetryCount() == 0) {
+            logger.debug("Calling webhook {} -> {}",webhook.getRequiredString(DSL.URL),webhookEvent);
+          }
+          else {
+            logger.debug("[Retry: {}] Calling webhook {} -> {}",context.getRetryCount(),webhook.getRequiredString(DSL.URL),webhookEvent);
+          }
+          return rest.postForObject(webhook.getRequiredString(DSL.URL), webhookEvent, String.class);
+        });
       }
     }
+  }
+  
+  private RetryTemplate createRetryTemplate (Accessor aWebhook) {
+    MapObject retryParams = aWebhook.get("retry",MapObject.class,new MapObject());
+    RetryTemplate retryTemplate = new RetryTemplate();
+    ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+    backOffPolicy.setInitialInterval(retryParams.getDuration("initialInterval", "2s").toMillis());
+    backOffPolicy.setMaxInterval(retryParams.getDuration("maxInterval", "30s").toMillis());
+    retryTemplate.setBackOffPolicy(backOffPolicy);
+    SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+    retryPolicy.setMaxAttempts(retryParams.getInteger("maxAttempts", 5));
+    retryTemplate.setRetryPolicy(retryPolicy);
+    return retryTemplate;
   }
   
   @Override
