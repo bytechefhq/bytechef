@@ -13,19 +13,19 @@ outputs:
 tasks:
   - name: randomNumber
     label: Generate a random number
-    type: randomInt
+    type: random/int
     startInclusive: 0
     endInclusive: 5000
       
   - label: Print a greeting
-    type: print
+    type: io/print
     text: Hello ${yourName}
        
   - label: Sleep a little
-    type: sleep
+    type: time/sleep
     millis: ${randomNumber}
     
   - label: Print a farewell
-    type: print
+    type: io/print
     text: Goodbye ${yourName}
     
