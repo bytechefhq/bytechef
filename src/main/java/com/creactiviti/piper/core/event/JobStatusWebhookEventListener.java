@@ -78,6 +78,7 @@ public class JobStatusWebhookEventListener implements EventListener {
     ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
     backOffPolicy.setInitialInterval(retryParams.getDuration("initialInterval", "2s").toMillis());
     backOffPolicy.setMaxInterval(retryParams.getDuration("maxInterval", "30s").toMillis());
+    backOffPolicy.setMultiplier(retryParams.getDouble("multiplier",2.0));
     retryTemplate.setBackOffPolicy(backOffPolicy);
     SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
     retryPolicy.setMaxAttempts(retryParams.getInteger("maxAttempts", 5));

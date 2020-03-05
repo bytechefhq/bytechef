@@ -267,6 +267,7 @@ Registering webhooks is done when creating the job. E.g.:
       "initialInterval":"3s" # default 2s
       "maxInterval":"10s" # default 30s
       "maxAttempts": 4 # default 5
+      "multiplier": 2.5 # default 2.0
     }
   }]
 }
