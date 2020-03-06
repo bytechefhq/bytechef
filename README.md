@@ -639,6 +639,13 @@ Supported types are `job.status` and `task.started`.
   value: "${dateFormat(now(),'yyyy')}"  # e.g. 2020
 ```
 
+[config](src/main/java/com/creactiviti/piper/core/task/Config.java)
+
+```
+  type: core/var
+  value: "${config('some.config.property')}"
+```
+
 # Tutorials
 
 ## Hello World

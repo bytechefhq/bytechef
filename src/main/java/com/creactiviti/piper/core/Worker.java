@@ -44,13 +44,11 @@ import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.task.ControlTask;
 import com.creactiviti.piper.core.task.PipelineTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
 import com.creactiviti.piper.core.task.TaskStatus;
-import com.creactiviti.piper.core.task.TempDir;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 
 /**
@@ -70,9 +68,7 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
 public class Worker {
 
   private final Map<String, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
-  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.builder()
-                                                               .methodExecutor("tempDir", new TempDir())
-                                                               .build();
+  private final TaskEvaluator taskEvaluator;
   
   private final Logger logger = LoggerFactory.getLogger(getClass());
   
@@ -88,6 +84,7 @@ public class Worker {
     messageBroker = Objects.requireNonNull(aBuilder.messageBroker);
     eventPublisher = Objects.requireNonNull(aBuilder.eventPublisher);
     executors = Objects.requireNonNull(aBuilder.executors);
+    taskEvaluator = Objects.requireNonNull(aBuilder.taskEvaluator);
   }
   
   /**
@@ -224,9 +221,15 @@ public class Worker {
     private MessageBroker messageBroker;  
     private EventPublisher eventPublisher;
     private ExecutorService executors = Executors.newCachedThreadPool();
+    private TaskEvaluator taskEvaluator;
     
     public Builder withTaskHandlerResolver(TaskHandlerResolver aTaskHandlerResolver) {
       taskHandlerResolver = aTaskHandlerResolver;
+      return this;
+    }
+    
+    public Builder withTaskEvaluator(TaskEvaluator aTaskEvaluator) {
+      taskEvaluator = aTaskEvaluator;
       return this;
     }
 

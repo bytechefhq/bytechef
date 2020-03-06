@@ -1,6 +1,9 @@
 
 package com.creactiviti.piper.core.task;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +12,7 @@ import java.util.Date;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.env.Environment;
 
 import com.creactiviti.piper.core.MapObject;
 import com.creactiviti.piper.core.context.MapContext;
@@ -358,6 +362,17 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     Assertions.assertEquals(sdf.format(new Date()),evaluated.getString("date"));
+  }
+  
+  @Test
+  public void test41 () {
+    Environment env = mock(Environment.class);
+    when(env.getProperty("my.property")).thenReturn("something");
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().environment(env).build();
+    TaskExecution jt = SimpleTaskExecution.of("myValue", "${config('my.property')}");
+    MapContext ctx = new MapContext();
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals("something",evaluated.getString("myValue"));
   }
   
 }

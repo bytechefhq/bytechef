@@ -25,6 +25,7 @@ import com.creactiviti.piper.core.messagebroker.SyncMessageBroker;
 import com.creactiviti.piper.core.pipeline.ResourceBasedPipelineRepository;
 import com.creactiviti.piper.core.task.DefaultTaskHandlerResolver;
 import com.creactiviti.piper.core.task.JdbcTaskExecutionRepository;
+import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.creactiviti.piper.core.task.WorkTaskDispatcher;
@@ -51,9 +52,9 @@ public class CoordinatorTests {
     messageBroker.receive(Queues.JOBS, (o)->coordinator.start((Job)o));
     
     Map<String,TaskHandler<?>> handlers = new HashMap<>();
-    handlers.put("print", new Print());
-    handlers.put("randomInt", new RandomInt());
-    handlers.put("sleep", new Sleep());
+    handlers.put("io/print", new Print());
+    handlers.put("random/int", new RandomInt());
+    handlers.put("time/sleep", new Sleep());
     
     DefaultTaskHandlerResolver taskHandlerResolver = new DefaultTaskHandlerResolver(handlers);
     
@@ -61,6 +62,7 @@ public class CoordinatorTests {
                           .withTaskHandlerResolver(taskHandlerResolver)
                           .withMessageBroker(messageBroker)
                           .withEventPublisher((e)->{})
+                          .withTaskEvaluator(SpelTaskEvaluator.create())
                           .build();
     
     ObjectMapper objectMapper = createObjectMapper();
@@ -94,6 +96,7 @@ public class CoordinatorTests {
     jobExecutor.setJobTaskRepository(taskRepository);
     jobExecutor.setPipelineRepository(new ResourceBasedPipelineRepository());
     jobExecutor.setTaskDispatcher(taskDispatcher);
+    jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
     coordinator.setJobExecutor(jobExecutor);
     
     DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler();
@@ -103,6 +106,7 @@ public class CoordinatorTests {
     taskCompletionHandler.setJobTaskRepository(taskRepository);
     taskCompletionHandler.setPipelineRepository(new ResourceBasedPipelineRepository());
     taskCompletionHandler.setEventPublisher((e)->{});
+    taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
     coordinator.setTaskCompletionHandler(taskCompletionHandler);
     coordinator.setMessageBroker(messageBroker);
         

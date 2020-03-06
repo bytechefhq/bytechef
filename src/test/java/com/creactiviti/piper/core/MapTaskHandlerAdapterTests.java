@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
+import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
 
 public class MapTaskHandlerAdapterTests {
@@ -14,7 +15,7 @@ public class MapTaskHandlerAdapterTests {
   @Test
   public void test1 () throws Exception {
     TaskHandlerResolver resolver = (task)->(t)->t.get("value");
-    MapTaskHandlerAdapter adapter = new MapTaskHandlerAdapter(resolver);
+    MapTaskHandlerAdapter adapter = new MapTaskHandlerAdapter(resolver,SpelTaskEvaluator.create());
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.setId("1234");
     task.setJobId("4567");
@@ -30,7 +31,7 @@ public class MapTaskHandlerAdapterTests {
       TaskHandlerResolver resolver = (task)->(t)->{
         throw new IllegalArgumentException("i'm rogue");
       };
-      MapTaskHandlerAdapter adapter = new MapTaskHandlerAdapter(resolver);
+      MapTaskHandlerAdapter adapter = new MapTaskHandlerAdapter(resolver,SpelTaskEvaluator.create());
       SimpleTaskExecution task = new SimpleTaskExecution();
       task.setId("1234");
       task.setJobId("4567");

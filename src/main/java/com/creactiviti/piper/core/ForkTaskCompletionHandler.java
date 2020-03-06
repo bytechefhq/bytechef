@@ -25,7 +25,6 @@ import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
 import com.creactiviti.piper.core.task.CounterRepository;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskDispatcher;
 import com.creactiviti.piper.core.task.TaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
@@ -52,14 +51,15 @@ public class ForkTaskCompletionHandler implements TaskCompletionHandler {
   private final CounterRepository counterRepository;
   private final TaskDispatcher taskDispatcher;
   private final ContextRepository contextRepository;
-  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
+  private final TaskEvaluator taskEvaluator;
   
-  public ForkTaskCompletionHandler(TaskExecutionRepository aTaskExecutionRepo, TaskCompletionHandler aTaskCompletionHandler, CounterRepository aCounterRepository, TaskDispatcher aTaskDispatcher, ContextRepository aContextRepository) {
+  public ForkTaskCompletionHandler(TaskExecutionRepository aTaskExecutionRepo, TaskCompletionHandler aTaskCompletionHandler, CounterRepository aCounterRepository, TaskDispatcher aTaskDispatcher, ContextRepository aContextRepository, TaskEvaluator aTaskEvaluator) {
     taskExecutionRepo = aTaskExecutionRepo;
     taskCompletionHandler = aTaskCompletionHandler;
     counterRepository = aCounterRepository;
     taskDispatcher = aTaskDispatcher;
     contextRepository = aContextRepository;
+    taskEvaluator = aTaskEvaluator;
   }
   
   @Override

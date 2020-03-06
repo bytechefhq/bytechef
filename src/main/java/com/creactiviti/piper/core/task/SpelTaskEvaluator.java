@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.MethodExecutor;
@@ -77,6 +78,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     map.put("timestamp", new Timestamp());
     map.put("now", new Now());
     map.put("dateFormat", new DateFormat());
+    map.put("config", new Config(aBuilder.environment));
     map.putAll(aBuilder.methodExecutors);
     methodExecutors = Collections.unmodifiableMap(map);
   }
@@ -157,20 +159,26 @@ public class SpelTaskEvaluator implements TaskEvaluator {
     };
   }
   
-  public static SpelTaskEvaluator create () {
-    return builder().build();
-  }
-  
   public static Builder builder () {
     return new Builder ();
+  }
+  
+  public static SpelTaskEvaluator create () {
+    return builder().build();
   }
   
   public static class Builder {
     
     private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
+    private Environment environment = new EmptyEnvironment();
     
     public Builder methodExecutor (String aMethodName, MethodExecutor aMethodExecutor) {
       methodExecutors.put(aMethodName, aMethodExecutor);
+      return this;
+    }
+    
+    public Builder environment (Environment aEnvironment) {
+      environment = aEnvironment;
       return this;
     }
     

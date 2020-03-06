@@ -18,6 +18,7 @@ import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.messagebroker.SyncMessageBroker;
 import com.creactiviti.piper.core.task.CancelTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
+import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
@@ -34,6 +35,7 @@ public class WorkerTests {
         .withTaskHandlerResolver((jt) -> (t) -> "done")
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
 
     SimpleTaskExecution task = new SimpleTaskExecution();
@@ -54,6 +56,7 @@ public class WorkerTests {
         })
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.setId("1234");
@@ -77,6 +80,7 @@ public class WorkerTests {
           }
         })
         .withMessageBroker(messageBroker)
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .withEventPublisher((e)->{})
         .build();
     SimpleTaskExecution task = new SimpleTaskExecution();
@@ -121,6 +125,7 @@ public class WorkerTests {
         })
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
 
     SimpleTaskExecution task = new SimpleTaskExecution();
@@ -171,6 +176,7 @@ public class WorkerTests {
         })
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
 
 
@@ -221,9 +227,10 @@ public class WorkerTests {
         .withTaskHandlerResolver(thr)
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
 
-    taskHandlerAdapterRef[0] = new MapTaskHandlerAdapter(thr);
+    taskHandlerAdapterRef[0] = new MapTaskHandlerAdapter(thr,SpelTaskEvaluator.create());
 
     SimpleTaskExecution task = new SimpleTaskExecution();
 
@@ -258,6 +265,7 @@ public class WorkerTests {
         })
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
 
     SimpleTaskExecution task = new SimpleTaskExecution();
@@ -289,6 +297,7 @@ public class WorkerTests {
         })
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
 
     SimpleTaskExecution task1 = new SimpleTaskExecution();
@@ -327,6 +336,7 @@ public class WorkerTests {
         })
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
+        .withTaskEvaluator(SpelTaskEvaluator.create())
         .build();
 
     SimpleTaskExecution task1 = new SimpleTaskExecution();

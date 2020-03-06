@@ -13,6 +13,7 @@ import com.creactiviti.piper.core.error.Error;
 import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.messagebroker.SyncMessageBroker;
 import com.creactiviti.piper.core.task.MapTaskDispatcher;
+import com.creactiviti.piper.core.task.TaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
@@ -25,9 +26,11 @@ import com.google.common.util.concurrent.MoreExecutors;
 class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
   
   private final TaskHandlerResolver taskHandlerResolver;
+  private final TaskEvaluator taskEvaluator;
   
-  public MapTaskHandlerAdapter(@Lazy TaskHandlerResolver aResolver) {
+  public MapTaskHandlerAdapter(@Lazy TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
     taskHandlerResolver = Objects.requireNonNull(aResolver);
+    taskEvaluator = Objects.requireNonNull(aTaskEvaluator);
   }
   
   @Override
@@ -54,6 +57,7 @@ class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
         .withMessageBroker(messageBroker)
         .withEventPublisher((e)->{})
         .withExecutors(MoreExecutors.sameThreadExecutor())
+        .withTaskEvaluator(taskEvaluator)
         .build();
     
     InMemoryContextRepository contextRepository = new InMemoryContextRepository();
@@ -66,6 +70,7 @@ class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
                                                     .messageBroker(messageBroker)
                                                     .taskDispatcher(worker::handle)
                                                     .taskExecutionRepository(new InMemoryTaskExecutionRepository())
+                                                    .taskEvaluator(taskEvaluator)
                                                     .build();
     
     dispatcher.dispatch(aTask);

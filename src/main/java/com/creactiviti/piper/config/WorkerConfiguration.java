@@ -18,24 +18,43 @@ package com.creactiviti.piper.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 
+import com.creactiviti.piper.core.TaskDispatcherHandlerAdapterResolver;
 import com.creactiviti.piper.core.Worker;
 import com.creactiviti.piper.core.annotations.ConditionalOnWorker;
 import com.creactiviti.piper.core.event.EventPublisher;
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
+import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskHandlerResolver;
+import com.creactiviti.piper.core.task.TempDir;
 
 @Configuration
 @ConditionalOnWorker
 public class WorkerConfiguration {
   
   @Bean
-  Worker worker (TaskHandlerResolver aTaskHandlerResolver, MessageBroker aMessageBroker, @Lazy EventPublisher aEventPublisher) {
+  Worker worker (TaskHandlerResolver aTaskHandlerResolver, MessageBroker aMessageBroker, @Lazy EventPublisher aEventPublisher, Environment aEnvironment) {
     return Worker.builder()
                  .withTaskHandlerResolver(aTaskHandlerResolver)
                  .withMessageBroker(aMessageBroker)
                  .withEventPublisher(aEventPublisher)
+                 .withTaskEvaluator( SpelTaskEvaluator.builder()
+                                                      .methodExecutor("tempDir", new TempDir())
+                                                      .environment(aEnvironment)
+                                                      .build())
                  .build();
+  }
+  
+  @Bean
+  @Order(Ordered.HIGHEST_PRECEDENCE)
+  TaskHandlerResolver taskDispatcherHandlerAdapterResolver (@Lazy TaskHandlerResolver aResolver, Environment aEnvironment) {
+    return new TaskDispatcherHandlerAdapterResolver(aResolver,SpelTaskEvaluator.builder()
+                                                                                .methodExecutor("tempDir", new TempDir())
+                                                                                .environment(aEnvironment)
+                                                                                .build());
   }
 
   

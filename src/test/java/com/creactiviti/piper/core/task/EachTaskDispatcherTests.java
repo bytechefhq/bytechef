@@ -28,7 +28,7 @@ public class EachTaskDispatcherTests {
   @Test
   public void test1 ()  {
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      EachTaskDispatcher dispatcher = new EachTaskDispatcher(null,null,null,null,null);
+      EachTaskDispatcher dispatcher = new EachTaskDispatcher(null,null,null,null,null,SpelTaskEvaluator.create());
       dispatcher.dispatch(new SimpleTaskExecution());
     });
   }
@@ -36,7 +36,14 @@ public class EachTaskDispatcherTests {
   @Test
   public void test2 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
-    EachTaskDispatcher dispatcher = new EachTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,counterRepository);
+    EachTaskDispatcher dispatcher = new EachTaskDispatcher(
+      taskDispatcher, 
+      taskRepo,
+      messageBroker,
+      contextRepository,
+      counterRepository,
+      SpelTaskEvaluator.create()
+    );
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("list", Arrays.asList(1,2,3));
     task.set("iteratee", Collections.singletonMap("type", "print"));
@@ -47,7 +54,7 @@ public class EachTaskDispatcherTests {
   
   @Test
   public void test3 ()  {
-    EachTaskDispatcher dispatcher = new EachTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,counterRepository);
+    EachTaskDispatcher dispatcher = new EachTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,counterRepository,SpelTaskEvaluator.create());
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("list", Arrays.asList());
     task.set("iteratee", Collections.singletonMap("type", "print"));

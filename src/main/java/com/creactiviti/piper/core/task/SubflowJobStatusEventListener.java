@@ -27,12 +27,13 @@ public class SubflowJobStatusEventListener implements EventListener {
   private final JobRepository jobRepository;
   private final TaskExecutionRepository taskExecutionRepository;
   private final Coordinator coordinator;
-  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
+  private final TaskEvaluator taskEvaluator;
   
-  public SubflowJobStatusEventListener (JobRepository aJobRepository, TaskExecutionRepository aTaskExecutionRepository, Coordinator aCoordinator) {
+  public SubflowJobStatusEventListener (JobRepository aJobRepository, TaskExecutionRepository aTaskExecutionRepository, Coordinator aCoordinator, TaskEvaluator aTaskEvaluator) {
     jobRepository = Objects.requireNonNull(aJobRepository);
     taskExecutionRepository = Objects.requireNonNull(aTaskExecutionRepository);
     coordinator = Objects.requireNonNull(aCoordinator);
+    taskEvaluator = Objects.requireNonNull(aTaskEvaluator);
   }
   
   @Override

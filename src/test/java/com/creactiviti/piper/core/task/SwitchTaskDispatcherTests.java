@@ -29,7 +29,7 @@ public class SwitchTaskDispatcherTests {
   @Test
   public void test1 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
-    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
+    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,SpelTaskEvaluator.create());
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print")))));
     task.set("expression", "k1");
@@ -42,7 +42,7 @@ public class SwitchTaskDispatcherTests {
   @Test
   public void test2 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
-    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
+    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,SpelTaskEvaluator.create());
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print")))));
     task.set("expression", "k2");
@@ -53,7 +53,7 @@ public class SwitchTaskDispatcherTests {
   @Test
   public void test3 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
-    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
+    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,SpelTaskEvaluator.create());
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(
       ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print"))),
@@ -69,7 +69,7 @@ public class SwitchTaskDispatcherTests {
   @Test
   public void test4 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
-    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository);
+    SwitchTaskDispatcher dispatcher = new SwitchTaskDispatcher(taskDispatcher, taskRepo,messageBroker,contextRepository,SpelTaskEvaluator.create());
     SimpleTaskExecution task = new SimpleTaskExecution();
     task.set("cases", Arrays.asList(
       ImmutableMap.of("key", "k1","tasks",Arrays.asList(ImmutableMap.of("type","print"))),

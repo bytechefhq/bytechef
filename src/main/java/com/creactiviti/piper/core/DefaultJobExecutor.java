@@ -25,7 +25,6 @@ import com.creactiviti.piper.core.pipeline.Pipeline;
 import com.creactiviti.piper.core.pipeline.PipelineRepository;
 import com.creactiviti.piper.core.task.PipelineTask;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskDispatcher;
 import com.creactiviti.piper.core.task.TaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
@@ -44,7 +43,7 @@ public class DefaultJobExecutor implements JobExecutor {
   private TaskExecutionRepository jobTaskRepository;
   private ContextRepository contextRepository;
   private TaskDispatcher taskDispatcher;
-  private TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
+  private TaskEvaluator taskEvaluator;
   
   @Override
   public void execute (Job aJob) {
@@ -98,6 +97,10 @@ public class DefaultJobExecutor implements JobExecutor {
   
   public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {
     taskDispatcher = aTaskDispatcher;
+  }
+  
+  public void setTaskEvaluator(TaskEvaluator aTaskEvaluator) {
+    taskEvaluator = aTaskEvaluator;
   }
 
 }

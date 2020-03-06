@@ -26,7 +26,6 @@ import com.creactiviti.piper.core.context.Context;
 import com.creactiviti.piper.core.context.ContextRepository;
 import com.creactiviti.piper.core.context.MapContext;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskDispatcher;
 import com.creactiviti.piper.core.task.TaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
@@ -44,13 +43,14 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
   private final TaskCompletionHandler taskCompletionHandler;
   private final TaskDispatcher taskDispatcher;
   private final ContextRepository contextRepository;
-  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
+  private final TaskEvaluator taskEvaluator;
 
-  public SwitchTaskCompletionHandler(TaskExecutionRepository aTaskExecutionRepo, TaskCompletionHandler aTaskCompletionHandler, TaskDispatcher aTaskDispatcher, ContextRepository aContextRepository) {
+  public SwitchTaskCompletionHandler(TaskExecutionRepository aTaskExecutionRepo, TaskCompletionHandler aTaskCompletionHandler, TaskDispatcher aTaskDispatcher, ContextRepository aContextRepository, TaskEvaluator aTaskEvaluator) {
     taskExecutionRepo = aTaskExecutionRepo;
     taskCompletionHandler = aTaskCompletionHandler;
     taskDispatcher = aTaskDispatcher;
     contextRepository = aContextRepository;
+    taskEvaluator = aTaskEvaluator;
   }
 
   @Override

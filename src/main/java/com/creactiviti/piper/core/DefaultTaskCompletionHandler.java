@@ -34,7 +34,6 @@ import com.creactiviti.piper.core.job.SimpleJob;
 import com.creactiviti.piper.core.pipeline.Pipeline;
 import com.creactiviti.piper.core.pipeline.PipelineRepository;
 import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
 import com.creactiviti.piper.core.task.TaskEvaluator;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskExecutionRepository;
@@ -56,7 +55,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
   private ContextRepository contextRepository;
   private JobExecutor jobExecutor;
   private EventPublisher eventPublisher;
-  private TaskEvaluator taskEvaluator = SpelTaskEvaluator.create(); 
+  private TaskEvaluator taskEvaluator; 
   
   @Override
   public void handle (TaskExecution aTask) {
@@ -85,6 +84,11 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     else {
       log.error("Unknown job: {}",aTask.getJobId());
     }
+  }
+  
+  @Override
+  public boolean canHandle(TaskExecution aJobTask) {
+    return aJobTask.getParentId()==null;
   }
 
   private boolean hasMoreTasks (Job aJob) {
@@ -134,10 +138,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
   public void setEventPublisher(EventPublisher aEventPublisher) {
     eventPublisher = aEventPublisher;
   }
-
-  @Override
-  public boolean canHandle(TaskExecution aJobTask) {
-    return aJobTask.getParentId()==null;
+  
+  public void setTaskEvaluator(TaskEvaluator aTaskEvaluator) {
+    taskEvaluator = aTaskEvaluator;
   }
 
 }

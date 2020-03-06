@@ -38,16 +38,17 @@ import com.creactiviti.piper.core.uuid.UUIDGenerator;
 public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
   private final TaskDispatcher taskDispatcher;
-  private final TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
+  private final TaskEvaluator taskEvaluator;
   private final TaskExecutionRepository taskExecutionRepo;
   private final ContextRepository contextRepository;
   private final MessageBroker messageBroker;
   
-  public SwitchTaskDispatcher (TaskDispatcher aTaskDispatcher, TaskExecutionRepository aTaskRepo, MessageBroker aMessageBroker, ContextRepository aContextRepository) {
+  public SwitchTaskDispatcher (TaskDispatcher aTaskDispatcher, TaskExecutionRepository aTaskRepo, MessageBroker aMessageBroker, ContextRepository aContextRepository, TaskEvaluator aTaskEvaluator) {
     taskDispatcher = aTaskDispatcher;
     taskExecutionRepo = aTaskRepo;
     messageBroker = aMessageBroker;
     contextRepository = aContextRepository;
+    taskEvaluator = aTaskEvaluator;
   }
 
   @Override
