@@ -34,16 +34,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component("media/vduration")
 class Vduration implements TaskHandler<Double> {
 
-  private final Mediainfo mediainfo = new Mediainfo();
+  private final Ffprobe ffprobe = new Ffprobe();
   private final ObjectMapper jsonMapper = new ObjectMapper ();
   
   @Override
   public Double handle (TaskExecution aTask) throws Exception {
-    Map<?,?> mediainfoResult = mediainfo.handle(aTask);
+    Map<?,?> ffprobeResult = ffprobe.handle(aTask);
     JqResponse response = ImmutableJqRequest.builder() //
         .lib(ImmutableJqLibrary.of())
-        .input(jsonMapper.writeValueAsString(mediainfoResult))
-        .filter(".media.track[]  | select(.\"@type\" == \"Video\") | .Duration")
+        .input(jsonMapper.writeValueAsString(ffprobeResult))
+        .filter(".streams[] | select (.codec_type==\"video\") | .duration")
         .build()
         .execute();
     return Double.valueOf(response.getOutput().replaceAll("[^0-9\\.]", ""));
