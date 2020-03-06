@@ -5,6 +5,8 @@ import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.SpelMessage;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,7 +25,11 @@ class Config implements MethodExecutor {
   @Override
   public TypedValue execute (EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
     String propertyName = (String) aArguments[0];
-    return new TypedValue(environment.getProperty(propertyName));
+    String value = environment.getProperty(propertyName);
+    if(value == null) {
+      throw new SpelEvaluationException(SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
+    }
+    return new TypedValue(value);
   }
 
 }

@@ -375,4 +375,14 @@ public class SpelTaskEvaluatorTests {
     Assertions.assertEquals("something",evaluated.getString("myValue"));
   }
   
+  @Test
+  public void test42 () {
+    Environment env = mock(Environment.class);
+    SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().environment(env).build();
+    TaskExecution jt = SimpleTaskExecution.of("myValue", "${config('no.such.property')}");
+    MapContext ctx = new MapContext();
+    TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+    Assertions.assertEquals("${config('no.such.property')}",evaluated.getString("myValue"));
+  }
+  
 }
