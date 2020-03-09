@@ -34,7 +34,7 @@ public interface Pipeline extends Errorable {
    * Returns the unique identifier of the pipeline. 
    */
   String getId ();
-
+  
   /**
    * Returns a descriptive name for the pipeline. 
    */
@@ -54,4 +54,13 @@ public interface Pipeline extends Errorable {
    * Returns the pipeline's expected outputs
    */
   List<Accessor> getOutputs ();
+  
+  /**
+   * Defines the maximum number of times that 
+   * this message may be retries. 
+   * 
+   * @return int the maximum number of retries. 
+   */
+  int getRetry ();
+  
 }

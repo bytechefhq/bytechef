@@ -156,6 +156,10 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
     return getInteger(DSL.RETRY, 0);
   }
   
+  public void setRetry (int aRetry) {
+    set(DSL.RETRY, aRetry);
+  }
+  
   @Override
   public int getRetryAttempts() {
     return getInteger(DSL.RETRY_ATTEMPTS, 0);
@@ -177,7 +181,7 @@ public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecu
   public void setRetryAttempts (int aRetryAttempts) {
     set(DSL.RETRY_ATTEMPTS, aRetryAttempts);
   }
-  
+
   @Override
   public int getRetryDelayFactor() {
     return getInteger(DSL.RETRY_DELAY_FACTOR,2);

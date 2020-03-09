@@ -63,7 +63,7 @@ public class DefaultJobExecutor implements JobExecutor {
     return aJob.getCurrentTask() < aPipeline.getTasks().size();
   }
 
-  private TaskExecution nextTask(Job aJob, Pipeline aPipeline) {
+  private SimpleTaskExecution nextTask(Job aJob, Pipeline aPipeline) {
     PipelineTask task = aPipeline.getTasks().get(aJob.getCurrentTask());
     SimpleTaskExecution mt = new SimpleTaskExecution (task.asMap());
     mt.setCreateTime(new Date());
@@ -71,6 +71,9 @@ public class DefaultJobExecutor implements JobExecutor {
     mt.setStatus(TaskStatus.CREATED);
     mt.setJobId(aJob.getId());
     mt.setPriority(aJob.getPriority());
+    if(aPipeline.getRetry() > 0 && mt.getRetry() < 1) {
+      mt.setRetry(aPipeline.getRetry());
+    }
     return mt;
   }
 

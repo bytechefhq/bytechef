@@ -75,4 +75,10 @@ public class SimplePipeline extends MapObject implements Pipeline {
   public void setError (Error aError) {
     set(DSL.ERROR, aError);
   }
+  
+  @Override
+  public int getRetry() {
+    return getInteger(DSL.RETRY, 0);
+  }
+  
 }

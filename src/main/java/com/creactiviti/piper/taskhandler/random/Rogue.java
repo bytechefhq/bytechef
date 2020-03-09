@@ -36,9 +36,9 @@ class Rogue implements TaskHandler<Object> {
   @Override
   public Object handle(TaskExecution aTask) throws Exception {
     float nextFloat = RandomUtils.nextFloat(0, 1);
-    float probabilty = aTask.getFloat("probabilty",0.5f);
-    Assert.isTrue(probabilty>=0 && probabilty<=1,"probability must be a value between 0 and 1");
-    if(nextFloat <= probabilty) {
+    float probability = aTask.getFloat("probability",0.5f);
+    Assert.isTrue(probability>=0 && probability<=1,"probability must be a value between 0 and 1");
+    if(nextFloat <= probability) {
       throw new IllegalStateException("I'm a rogue exception");
     }
     return null;
