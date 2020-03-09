@@ -22,11 +22,12 @@ package com.creactiviti.piper.taskhandler.media;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.arakelian.jq.ImmutableJqLibrary;
 import com.arakelian.jq.ImmutableJqRequest;
-import com.arakelian.jq.JqResponse;
+import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,13 +41,34 @@ class Vduration implements TaskHandler<Double> {
   @Override
   public Double handle (TaskExecution aTask) throws Exception {
     Map<?,?> ffprobeResult = ffprobe.handle(aTask);
-    JqResponse response = ImmutableJqRequest.builder() //
+    
+    // attempt to get the duration from the codec_type = video stream
+    String output = ImmutableJqRequest.builder()
         .lib(ImmutableJqLibrary.of())
         .input(jsonMapper.writeValueAsString(ffprobeResult))
         .filter(".streams[] | select (.codec_type==\"video\") | .duration")
         .build()
-        .execute();
-    return Double.valueOf(response.getOutput().replaceAll("[^0-9\\.]", ""));
+        .execute()
+        .getOutput();
+    
+    // fallback to the container's format.duration
+    if(StringUtils.isBlank(output) || output.equals("null")) {
+      output = ImmutableJqRequest.builder() 
+          .lib(ImmutableJqLibrary.of())
+          .input(jsonMapper.writeValueAsString(ffprobeResult))
+          .filter(".format.duration")
+          .build()
+          .execute()
+          .getOutput();
+    }
+    
+    return Double.valueOf(output.replaceAll("[^0-9\\.]", ""));
+  }
+  
+  public static void main (String[] args) throws Exception {
+    Vduration vd = new Vduration();
+    
+    vd.handle(SimpleTaskExecution.of("input","/tmp/Sintel_Trailer1.480p.DivX_Plus_HD.mkv"));
   }
 
 }
