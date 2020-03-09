@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 
 import com.arakelian.jq.ImmutableJqLibrary;
 import com.arakelian.jq.ImmutableJqRequest;
-import com.creactiviti.piper.core.task.SimpleTaskExecution;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,11 +64,5 @@ class Vduration implements TaskHandler<Double> {
     return Double.valueOf(output.replaceAll("[^0-9\\.]", ""));
   }
   
-  public static void main (String[] args) throws Exception {
-    Vduration vd = new Vduration();
-    
-    vd.handle(SimpleTaskExecution.of("input","/tmp/Sintel_Trailer1.480p.DivX_Plus_HD.mkv"));
-  }
-
 }
 
