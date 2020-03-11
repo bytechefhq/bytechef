@@ -35,23 +35,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component("media/framerate")
 class Framerate implements TaskHandler<Double> {
 
-  private final Mediainfo mediainfo = new Mediainfo();
+  private final Ffprobe ffprobe = new Ffprobe();
   private final ObjectMapper jsonMapper = new ObjectMapper ();
   
   @Override
   public Double handle (TaskExecution aTask) throws Exception {
-    Map<?,?> mediainfoResult = mediainfo.handle(aTask);
+    Map<?,?> ffprobeResult = ffprobe.handle(aTask);
     
     JqResponse response = ImmutableJqRequest.builder() //
         .lib(ImmutableJqLibrary.of())
-        .input(jsonMapper.writeValueAsString(mediainfoResult))
-        .filter(".media.track[]  | select(.\"@type\" == \"Video\") | .FrameRate") 
+        .input(jsonMapper.writeValueAsString(ffprobeResult))
+        .filter(".streams[] | select (.codec_type==\"video\") | .r_frame_rate") 
         .build()
         .execute();
     
     String frameRateStr = response.getOutput();
     Assert.notNull(frameRateStr, "can not determine framerate");
-    return Double.valueOf(frameRateStr.replaceAll("[^0-9\\.]", ""));
+    String[] frate = frameRateStr.replaceAll("[^0-9/\\.]", "").split("/");
+    return Double.valueOf(frate[0])/Double.valueOf(frate[1]);
   }
   
 }
