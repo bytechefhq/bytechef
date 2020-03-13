@@ -24,6 +24,7 @@ public interface Queues {
   static final String JOBS        = "jobs";
   static final String SUBFLOWS    = "subflows";
   static final String EXECUTE     = "execute";
+  static final String DLQ         = "dlq";
   static final String CONTROL     = "x.control." + UUIDGenerator.generate();
   static final String TASKS       = "tasks";
   static final String EVENTS      = "events";

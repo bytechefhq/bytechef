@@ -59,7 +59,8 @@ public class JobStatusWebhookEventListener implements EventListener {
       if(Events.JOB_STATUS.equals(webhook.getRequiredString(DSL.TYPE))) {
         MapObject webhookEvent = new MapObject(webhook.asMap());
         webhookEvent.put(DSL.EVENT,aEvent.asMap());
-        createRetryTemplate(webhook).execute((context) -> {
+        RetryTemplate retryTemplate = createRetryTemplate(webhook);
+        retryTemplate.execute((context) -> {
           if(context.getRetryCount() == 0) {
             logger.debug("Calling webhook {} -> {}",webhook.getRequiredString(DSL.URL),webhookEvent);
           }
