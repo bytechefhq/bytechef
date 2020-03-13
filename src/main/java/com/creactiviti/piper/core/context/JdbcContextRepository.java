@@ -23,7 +23,7 @@ import java.util.Map;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.creactiviti.piper.core.json.JsonHelper;
+import com.creactiviti.piper.core.json.Json;
 import com.creactiviti.piper.core.uuid.UUIDGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,7 +40,7 @@ public class JdbcContextRepository implements ContextRepository {
   @Override
   public void push(String aStackId, Context aContext) {
     String sql = "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?::jsonb,?)";
-    jdbc.update(sql,UUIDGenerator.generate(),aStackId,JsonHelper.writeValueAsString(objectMapper, aContext), new Date());
+    jdbc.update(sql,UUIDGenerator.generate(),aStackId,Json.serialize(objectMapper, aContext), new Date());
   }
 
   @Override
@@ -56,7 +56,7 @@ public class JdbcContextRepository implements ContextRepository {
   
   private Context contextRowMapper (ResultSet aResultSet, int aIndex) throws SQLException {
     String serialized = aResultSet.getString(2);
-    return new MapContext(JsonHelper.readValue(objectMapper, serialized, Map.class));    
+    return new MapContext(Json.deserialize(objectMapper, serialized, Map.class));    
   }
 
   public void setJdbcTemplate (JdbcTemplate aJdbcTemplate) {

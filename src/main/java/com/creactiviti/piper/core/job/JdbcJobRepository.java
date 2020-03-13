@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
 import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.Page;
 import com.creactiviti.piper.core.ResultPage;
-import com.creactiviti.piper.core.json.JsonHelper;
+import com.creactiviti.piper.core.json.Json;
 import com.creactiviti.piper.core.task.TaskExecution;
 import com.creactiviti.piper.core.task.TaskExecutionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,14 +85,14 @@ public class JdbcJobRepository implements JobRepository {
   @Override
   public Job merge (Job aJob) {
     MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
-    jdbc.update("update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,pipeline_id=:pipelineId,label=:label,outputs=:outputs where id = :id ", sqlParameterSource);
+    jdbc.update("update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,pipeline_id=:pipelineId,label=:label,outputs=(:outputs)::jsonb where id = :id ", sqlParameterSource);
     return aJob;
   }
 
   @Override
   public void create (Job aJob) {
     MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
-    jdbc.update("insert into job (id,create_time,start_time,status,current_task,pipeline_id,label,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:pipelineId,:label,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)", sqlParameterSource);
+    jdbc.update("insert into job (id,create_time,start_time,status,current_task,pipeline_id,label,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:pipelineId,:label,:priority,(:inputs)::jsonb,(:webhooks)::jsonb,(:outputs)::jsonb,:parentTaskExecutionId)", sqlParameterSource);
   }
 
   private MapSqlParameterSource createSqlParameterSource(Job aJob) {
@@ -111,9 +111,9 @@ public class JdbcJobRepository implements JobRepository {
     sqlParameterSource.addValue("startTime", job.getStartTime());
     sqlParameterSource.addValue("endTime", job.getEndTime());
     sqlParameterSource.addValue("priority", job.getPriority());
-    sqlParameterSource.addValue("inputs", JsonHelper.writeValueAsString(json,job.getInputs()));
-    sqlParameterSource.addValue("outputs", JsonHelper.writeValueAsString(json,job.getOutputs()));
-    sqlParameterSource.addValue("webhooks", JsonHelper.writeValueAsString(json,job.getWebhooks()));
+    sqlParameterSource.addValue("inputs", Json.serialize(json,job.getInputs()));
+    sqlParameterSource.addValue("outputs", Json.serialize(json,job.getOutputs()));
+    sqlParameterSource.addValue("webhooks", Json.serialize(json,job.getWebhooks()));
     sqlParameterSource.addValue("parentTaskExecutionId", job.getParentTaskExecutionId());
     return sqlParameterSource;
   }
@@ -138,9 +138,9 @@ public class JdbcJobRepository implements JobRepository {
     map.put("endTime", aRs.getTimestamp("end_time"));
     map.put("execution", getExecution(aRs.getString("id")));
     map.put("priority", aRs.getInt("priority"));
-    map.put("inputs", JsonHelper.readValue(json,aRs.getString("inputs"),Map.class));
-    map.put("outputs", JsonHelper.readValue(json,aRs.getString("outputs"),Map.class));
-    map.put("webhooks", JsonHelper.readValue(json,aRs.getString("webhooks"),List.class));
+    map.put("inputs", Json.deserialize(json,aRs.getString("inputs"),Map.class));
+    map.put("outputs", Json.deserialize(json,aRs.getString("outputs"),Map.class));
+    map.put("webhooks", Json.deserialize(json,aRs.getString("webhooks"),List.class));
     map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
     return new SimpleJob(map);
   }
@@ -156,9 +156,9 @@ public class JdbcJobRepository implements JobRepository {
     map.put("startTime", aRs.getTimestamp("start_time"));
     map.put("endTime", aRs.getTimestamp("end_time"));
     map.put("priority", aRs.getInt("priority"));
-    map.put("inputs", JsonHelper.readValue(json,aRs.getString("inputs"),Map.class));
-    map.put("outputs", JsonHelper.readValue(json,aRs.getString("outputs"),Map.class));
-    map.put("webhooks", JsonHelper.readValue(json,aRs.getString("webhooks"),List.class));
+    map.put("inputs", Json.deserialize(json,aRs.getString("inputs"),Map.class));
+    map.put("outputs", Json.deserialize(json,aRs.getString("outputs"),Map.class));
+    map.put("webhooks", Json.deserialize(json,aRs.getString("webhooks"),List.class));
     map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
     return new JobSummary (new SimpleJob(map));
   }

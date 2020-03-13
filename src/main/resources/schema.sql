@@ -10,9 +10,9 @@ create table job (
   start_time               timestamp        null,
   end_time                 timestamp        null,
   priority                 int          not null,
-  inputs                   text         not null,
-  webhooks                 text         not null,
-  outputs                  text         not null,
+  inputs                   jsonb        not null,
+  webhooks                 jsonb        not null,
+  outputs                  jsonb        not null,
   parent_task_execution_id varchar(256)
 );
 

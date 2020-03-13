@@ -25,7 +25,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.creactiviti.piper.core.json.JsonHelper;
+import com.creactiviti.piper.core.json.Json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
@@ -110,11 +110,11 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
   }
   
   private Map<String,Object> readValueFromString (String aValue) {
-    return JsonHelper.readValue(json, aValue, Map.class);
+    return Json.deserialize(json, aValue, Map.class);
   }
 
   private String writeValueAsJsonString (Object aValue) {
-    return JsonHelper.writeValueAsString(json, aValue);
+    return Json.serialize(json, aValue);
   }
 
 }
