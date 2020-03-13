@@ -9,7 +9,6 @@ create table job (
   create_time              timestamp    not null,
   start_time               timestamp        null,
   end_time                 timestamp        null,
-  tags                     text         not null,
   priority                 int          not null,
   inputs                   text         not null,
   webhooks                 text         not null,

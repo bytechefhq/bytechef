@@ -112,13 +112,6 @@ public interface Job extends Errorable, Prioritizable {
   Date getEndTime ();
   
   /**
-   * Get the list of tags assigned to the job.
-   * 
-   * @return String[]
-   */
-  String[] getTags ();
-
-  /**
    * Get the key-value map of inputs passed 
    * to the job when it was created.
    * 

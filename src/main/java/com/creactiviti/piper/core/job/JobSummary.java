@@ -63,10 +63,6 @@ public class JobSummary {
     return job.getEndTime();
   }
 
-  public String[] getTags() {
-    return job.getTags();
-  }
-
   public Accessor getInputs() {
     return job.getInputs();
   }

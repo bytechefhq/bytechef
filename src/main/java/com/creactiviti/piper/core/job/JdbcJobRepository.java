@@ -85,14 +85,14 @@ public class JdbcJobRepository implements JobRepository {
   @Override
   public Job merge (Job aJob) {
     MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
-    jdbc.update("update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,pipeline_id=:pipelineId,label=:label,tags=:tags,outputs=:outputs where id = :id ", sqlParameterSource);
+    jdbc.update("update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,pipeline_id=:pipelineId,label=:label,outputs=:outputs where id = :id ", sqlParameterSource);
     return aJob;
   }
 
   @Override
   public void create (Job aJob) {
     MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
-    jdbc.update("insert into job (id,create_time,start_time,status,current_task,pipeline_id,label,tags,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:pipelineId,:label,:tags,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)", sqlParameterSource);
+    jdbc.update("insert into job (id,create_time,start_time,status,current_task,pipeline_id,label,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:pipelineId,:label,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)", sqlParameterSource);
   }
 
   private MapSqlParameterSource createSqlParameterSource(Job aJob) {
@@ -110,7 +110,6 @@ public class JdbcJobRepository implements JobRepository {
     sqlParameterSource.addValue("createTime", job.getCreateTime());
     sqlParameterSource.addValue("startTime", job.getStartTime());
     sqlParameterSource.addValue("endTime", job.getEndTime());
-    sqlParameterSource.addValue("tags", String.join(",",job.getTags()));
     sqlParameterSource.addValue("priority", job.getPriority());
     sqlParameterSource.addValue("inputs", JsonHelper.writeValueAsString(json,job.getInputs()));
     sqlParameterSource.addValue("outputs", JsonHelper.writeValueAsString(json,job.getOutputs()));
@@ -138,7 +137,6 @@ public class JdbcJobRepository implements JobRepository {
     map.put("startTime", aRs.getTimestamp("start_time"));
     map.put("endTime", aRs.getTimestamp("end_time"));
     map.put("execution", getExecution(aRs.getString("id")));
-    map.put("tags", aRs.getString("tags").length()>0?aRs.getString("tags").split(","):new String[0]);
     map.put("priority", aRs.getInt("priority"));
     map.put("inputs", JsonHelper.readValue(json,aRs.getString("inputs"),Map.class));
     map.put("outputs", JsonHelper.readValue(json,aRs.getString("outputs"),Map.class));
@@ -157,7 +155,6 @@ public class JdbcJobRepository implements JobRepository {
     map.put("createTime", aRs.getTimestamp("create_time"));
     map.put("startTime", aRs.getTimestamp("start_time"));
     map.put("endTime", aRs.getTimestamp("end_time"));
-    map.put("tags", aRs.getString("tags").length()>0?aRs.getString("tags").split(","):new String[0]);
     map.put("priority", aRs.getInt("priority"));
     map.put("inputs", JsonHelper.readValue(json,aRs.getString("inputs"),Map.class));
     map.put("outputs", JsonHelper.readValue(json,aRs.getString("outputs"),Map.class));
@@ -172,17 +169,17 @@ public class JdbcJobRepository implements JobRepository {
 
   @Override
   public int countRunningJobs() {
-    return (int) jdbc.queryForObject("select count(*) from job where status='STARTED'", Collections.EMPTY_MAP, Integer.class);
+    return jdbc.queryForObject("select count(*) from job where status='STARTED'", Map.of(), Integer.class);
   }
 
   @Override
   public int countCompletedJobsToday() {
-    return (int)jdbc.queryForObject("select count(*) from job where status='COMPLETED' and end_time >= current_date", Collections.EMPTY_MAP, Integer.class);
+    return jdbc.queryForObject("select count(*) from job where status='COMPLETED' and end_time >= current_date", Map.of(), Integer.class);
   }
 
   @Override
   public int countCompletedJobsYesterday() {
-    return (int)jdbc.queryForObject("select count(*) from job where status='COMPLETED' and end_time >= current_date-1 and end_time < current_date", Collections.EMPTY_MAP, Integer.class);
+    return jdbc.queryForObject("select count(*) from job where status='COMPLETED' and end_time >= current_date-1 and end_time < current_date", Map.of(), Integer.class);
   }
 
 

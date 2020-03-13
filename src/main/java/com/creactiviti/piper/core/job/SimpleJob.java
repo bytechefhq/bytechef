@@ -149,20 +149,6 @@ public class SimpleJob extends MapObject implements Job {
   }
   
   @Override
-  public String[] getTags() {
-    if(containsKey(DSL.TAGS)) {
-      return getArray(DSL.TAGS, String.class);
-    }
-    else {
-      return new String[0];
-    }
-  }
-  
-  public void setTags (String[] aTags) {
-    set(DSL.TAGS, aTags);
-  }
-  
-  @Override
   public int getPriority() {
     return getInteger(DSL.PRIORITY, Prioritizable.DEFAULT_PRIORITY);
   }

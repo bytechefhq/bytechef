@@ -74,8 +74,6 @@ public class DSL {
   
   public static final String EXECUTION = "execution";
   
-  public static final String TAGS = "tags";
-  
   public static final String PRIORITY = "priority";
   
   public static final String SWITCH = "switch";
