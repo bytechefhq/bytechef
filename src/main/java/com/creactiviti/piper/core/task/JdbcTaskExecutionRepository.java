@@ -81,8 +81,9 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
     return jdbc.query("select * From task_execution where job_id = :jobId order by create_time asc", Collections.singletonMap("jobId", aJobId),this::jobTaskRowMappper);
   }
   
+  @SuppressWarnings("unchecked")
   private TaskExecution jobTaskRowMappper (ResultSet aRs, int aIndex) throws SQLException {
-    return SimpleTaskExecution.of(readValueFromString(aRs.getString("serialized_execution")));
+    return SimpleTaskExecution.of(Json.deserialize(json, aRs.getString("serialized_execution"), Map.class));
   }
 
   private SqlParameterSource createSqlParameterSource (TaskExecution aTaskExecution) {
@@ -95,7 +96,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
     sqlParameterSource.addValue("createTime", aTaskExecution.getCreateTime());
     sqlParameterSource.addValue("startTime", aTaskExecution.getStartTime());
     sqlParameterSource.addValue("endTime", aTaskExecution.getEndTime());
-    sqlParameterSource.addValue("serializedExecution", writeValueAsJsonString(aTaskExecution));
+    sqlParameterSource.addValue("serializedExecution", Json.serialize(json, aTaskExecution));
     sqlParameterSource.addValue("priority", aTaskExecution.getPriority());
     sqlParameterSource.addValue("taskNumber", aTaskExecution.getTaskNumber());
     return sqlParameterSource;
@@ -109,12 +110,4 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
     json = aJson;
   }
   
-  private Map<String,Object> readValueFromString (String aValue) {
-    return Json.deserialize(json, aValue, Map.class);
-  }
-
-  private String writeValueAsJsonString (Object aValue) {
-    return Json.serialize(json, aValue);
-  }
-
 }
