@@ -864,7 +864,7 @@ label: Hello World
 inputs:
   - name: name
     label: Your Name
-    type: string
+    type: core/var
     required: true
     
 tasks:      
