@@ -6,13 +6,9 @@ RUN        apt-get update
 
 RUN        apt-get install -y software-properties-common wget
 
-RUN        add-apt-repository ppa:linuxuprising/java
-
-RUN        echo oracle-java13-installer shared/accepted-oracle-license-v1-2 select true | /usr/bin/debconf-set-selections
-
 RUN        wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-12_all.deb && dpkg -i repo-mediaarea_1.0-12_all.deb && apt-get update
 
-RUN        apt-get -y install mediainfo wget oracle-java13-installer
+RUN        apt-get -y install mediainfo wget openjdk-11-jdk
 
 RUN        apt-get install -y unzip python
 

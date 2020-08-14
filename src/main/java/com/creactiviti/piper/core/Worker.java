@@ -106,12 +106,9 @@ public class Worker {
       }
       catch (Exception e) {
         TaskExecutionFuture<?> myFuture = taskExecutions.get(aTask.getId());
-        if(!myFuture.isCancelled()) {
+        if(myFuture == null || !myFuture.isCancelled()) {
           handleException(aTask, e);
         }
-      }
-      finally {
-        taskExecutions.remove(aTask.getId());
       }
     });
     
@@ -124,6 +121,9 @@ public class Worker {
     }
     catch (CancellationException e) {
       logger.debug("Cancelled task: {}", aTask.getId());
+    }
+    finally {
+      taskExecutions.remove(aTask.getId());
     }
     
   }
