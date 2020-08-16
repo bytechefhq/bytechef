@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -93,8 +94,10 @@ public class Worker {
    * 
    * @param aTask
    *          The task to execute.
+   * @throws InterruptedException 
    */
   public void handle (TaskExecution aTask) {
+    CountDownLatch latch = new CountDownLatch(1);
     Future<?> future = executors.submit(() -> {
       try {
         eventPublisher.publishEvent(PiperEvent.of(Events.TASK_STARTED,"taskId",aTask.getId(),"jobId",aTask.getJobId()));
@@ -110,6 +113,9 @@ public class Worker {
           handleException(aTask, e);
         }
       }
+      finally {
+        latch.countDown();
+      }
     });
     
     taskExecutions.put(aTask.getId(), new TaskExecutionFuture<>(aTask,future));
@@ -123,6 +129,11 @@ public class Worker {
       logger.debug("Cancelled task: {}", aTask.getId());
     }
     finally {
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        handleException(aTask, e);
+      }
       taskExecutions.remove(aTask.getId());
     }
     
