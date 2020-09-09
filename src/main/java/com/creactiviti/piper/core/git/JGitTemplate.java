@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.Constants;
@@ -100,12 +101,16 @@ public class JGitTemplate implements GitOperations {
     try {
       clear();
       logger.info("Cloning {} {}", url,branch);
-      Git git = Git.cloneRepository()
-                   .setURI(url)
-                   .setBranch(branch)
-                   .setDirectory(repositoryDir)
-                   .setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-                   .call();
+      CloneCommand cmd = Git.cloneRepository()
+                            .setURI(url)
+                            .setBranch(branch)
+                            .setDirectory(repositoryDir);
+      
+      if(username != null && password != null) {
+        cmd.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+      }
+      
+      Git git = cmd.call();
       return (git.getRepository());
     }
     catch (Exception e) {

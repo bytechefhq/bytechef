@@ -650,13 +650,25 @@ Supported types are `job.status` and `task.started`.
 
 ## Hello World
 
+Start a local Postgres database:
+
+```
+./scripts/database.sh
+```
+
+Start a local RabbitMQ instance:
+
+```
+./scripts/rabbit.sh
+``` 
+
 Build Piper:
 
 ```
 ./scripts/build.sh
 ```
 
-Start Piper in memory without any external dependencies. Great for hassle-free development:
+Start Piper:
 
 ```
 ./scripts/development.sh
