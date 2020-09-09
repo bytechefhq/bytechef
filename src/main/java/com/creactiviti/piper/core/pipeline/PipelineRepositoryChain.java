@@ -81,10 +81,16 @@ public class PipelineRepositoryChain implements PipelineRepository, Clearable {
     if(cache.get(CACHE_ALL) != null) {
       return (List<Pipeline>) cache.get(CACHE_ALL).get();
     }
+    
     List<Pipeline> pipelines = repositories.stream()
                                            .map(r->r.findAll())
                                            .flatMap(List::stream)
-                                           .sorted((a,b)->a.getLabel().compareTo(b.getLabel()))
+                                           .sorted((a,b)->{
+                                             if(a.getLabel() == null || b.getLabel() == null) {
+                                               return -1;
+                                             }
+                                             return a.getLabel().compareTo(b.getLabel());
+                                            })
                                            .collect(Collectors.toList());
     cache.put(CACHE_ALL, pipelines);
     return pipelines;
