@@ -778,7 +778,11 @@ From another terminal window, start a Worker:
 Execute the demo pipeline: 
 
 ```
-curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' http://localhost:8080/jobs
+curl -s \
+     -X POST \
+     -H Content-Type:application/json \
+     -d '{"pipelineId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
+     http://localhost:8080/jobs
 ```
 
 
@@ -790,13 +794,21 @@ Note: You must have [ffmpeg](https://ffmpeg.org) installed on your worker machin
 Transcode a source video to an SD (480p) output:
 
 ```
-curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"sd"}}' http://localhost:8080/jobs
+curl -s \
+     -X POST \
+     -H Content-Type:application/json \
+     -d '{"pipelineId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"sd"}}' \
+     http://localhost:8080/jobs
 ```
 
 Transcode a source video to an HD (1080p) output:
 
 ```
-curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"hd"}}' http://localhost:8080/jobs
+curl -s \
+     -X POST \
+     -H Content-Type:application/json \
+     -d '{"pipelineId":"video/transcode","inputs":{"input":"/path/to/video/input.mov","output":"/path/to/video/output.mp4","profile":"hd"}}' \
+     http://localhost:8080/jobs
 ```
 
 ## Transcoding a Video (Split & Stitch)
