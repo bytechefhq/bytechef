@@ -844,10 +844,8 @@ piper.pipeline-repository.git.search-paths=demo/,video/
 piper.pipeline-repository.filesystem.enabled=true
 # location of pipelines on the file system.
 piper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml
-# persistence
-piper.persistence.provider= # Persistence provider to use. Supports jdbc (for h2 and postgresql database) and mongo.
 # data source
-spring.datasource.platform=postgres
+spring.datasource.platform=postgres # only postgres is supported at the moment
 spring.datasource.url=jdbc:postgresql://localhost:5432/piper
 spring.datasource.username=piper
 spring.datasource.password=piper
