@@ -693,7 +693,11 @@ The `/jobs` endpoint lists all jobs that are either running or were previously r
 Start a demo job:
 
 ```
-curl -s -X POST -H Content-Type:application/json -d '{"pipelineId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' http://localhost:8080/jobs
+curl -s \
+     -X POST \
+     -H Content-Type:application/json \
+     -d '{"pipelineId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
+     http://localhost:8080/jobs
 ```
 
 Which should give you something like this as a response: 
