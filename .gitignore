@@ -1,9 +1,7 @@
 ######################
 # Project Specific
 ######################
-/src/main/webapp/content/css/main.css
-/build/resources/main/static/**
-/src/test/javascript/coverage/
+
 
 ######################
 # Node
@@ -64,7 +62,8 @@ local.properties
 *.ids
 *.orig
 classes/
-out/
+**/out/
+**/dist/
 
 ######################
 # Visual Studio Code
@@ -86,7 +85,7 @@ out/
 # Gradle
 ######################
 .gradle/
-/build/
+**/build/
 
 ######################
 # Package Files
