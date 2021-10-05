@@ -1,4 +1,4 @@
-package com.creactiviti.piper.taskhandler.io;
+package com.integri.atlas.workflow.taskhandler.io;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.taskhandler.io.Ls.FileInfo;
+import com.integri.atlas.workflow.core.task.SimpleTaskExecution;
+import com.integri.atlas.workflow.taskhandler.io.Ls.FileInfo;
 
 public class LsTests {
-  
+
   @Test
   public void test1 () throws IOException {
     Ls ls = new Ls();
@@ -26,7 +26,7 @@ public class LsTests {
                                                                   .map(FileInfo::getName)
                                                                   .collect(Collectors.toSet()));
   }
-  
+
   @Test
   public void test2 () throws IOException {
     Ls ls = new Ls();
@@ -39,7 +39,7 @@ public class LsTests {
                                                                   .map(FileInfo::getRelativePath)
                                                                   .collect(Collectors.toSet()));
   }
-  
+
   @Test
   public void test3 () throws IOException {
     Ls ls = new Ls();
@@ -51,5 +51,5 @@ public class LsTests {
                                                                   .map(FileInfo::getName)
                                                                   .collect(Collectors.toSet()));
   }
-  
+
 }

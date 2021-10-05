@@ -1,5 +1,5 @@
 
-package com.creactiviti.piper.core;
+package com.integri.atlas.workflow.core;
 
 
 import java.io.File;
@@ -14,14 +14,14 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.creactiviti.piper.core.messagebroker.Queues;
-import com.creactiviti.piper.core.messagebroker.SyncMessageBroker;
-import com.creactiviti.piper.core.task.CancelTask;
-import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
-import com.creactiviti.piper.core.task.TaskExecution;
-import com.creactiviti.piper.core.task.TaskHandlerResolver;
-import com.creactiviti.piper.core.uuid.UUIDGenerator;
+import com.integri.atlas.workflow.core.messagebroker.Queues;
+import com.integri.atlas.workflow.core.messagebroker.SyncMessageBroker;
+import com.integri.atlas.workflow.core.task.CancelTask;
+import com.integri.atlas.workflow.core.task.SimpleTaskExecution;
+import com.integri.atlas.workflow.core.task.SpelTaskEvaluator;
+import com.integri.atlas.workflow.core.task.TaskExecution;
+import com.integri.atlas.workflow.core.task.TaskHandlerResolver;
+import com.integri.atlas.workflow.core.uuid.UUIDGenerator;
 
 public class WorkerTests {
 
@@ -95,7 +95,7 @@ public class WorkerTests {
   @Test
   public void test4 () {
 
-    String tempDir = new File (new File(System.getProperty("java.io.tmpdir")),UUIDGenerator.generate()).getAbsolutePath(); 
+    String tempDir = new File (new File(System.getProperty("java.io.tmpdir")),UUIDGenerator.generate()).getAbsolutePath();
 
     SyncMessageBroker messageBroker = new SyncMessageBroker();
     messageBroker.receive(Queues.COMPLETIONS, (t)-> {
@@ -146,7 +146,7 @@ public class WorkerTests {
   @Test
   public void test5 () {
 
-    String tempDir = new File (new File(System.getProperty("java.io.tmpdir")),UUIDGenerator.generate()).getAbsolutePath(); 
+    String tempDir = new File (new File(System.getProperty("java.io.tmpdir")),UUIDGenerator.generate()).getAbsolutePath();
 
     SyncMessageBroker messageBroker = new SyncMessageBroker();
     messageBroker.receive(Queues.ERRORS, (t)-> {

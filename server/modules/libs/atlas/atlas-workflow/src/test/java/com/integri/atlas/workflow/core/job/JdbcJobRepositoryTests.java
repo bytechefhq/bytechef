@@ -1,4 +1,4 @@
-package com.creactiviti.piper.core.job;
+package com.integri.atlas.workflow.core.job;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import com.creactiviti.piper.core.Page;
-import com.creactiviti.piper.core.task.JdbcTaskExecutionRepository;
-import com.creactiviti.piper.core.uuid.UUIDGenerator;
+import com.integri.atlas.workflow.core.Page;
+import com.integri.atlas.workflow.core.task.JdbcTaskExecutionRepository;
+import com.integri.atlas.workflow.core.uuid.UUIDGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -25,66 +25,66 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class JdbcJobRepositoryTests {
 
   @Autowired
-  private DataSource dataSource; 
-  
+  private DataSource dataSource;
+
   @Test
   public void test1 () {
     JdbcTaskExecutionRepository taskRepository = new JdbcTaskExecutionRepository();
     taskRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     taskRepository.setObjectMapper(createObjectMapper());
-    
+
     JdbcJobRepository jobRepository = new JdbcJobRepository();
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
-    
+
     int pageTotal = jobRepository.getPage(1).getSize();
-    
+
     String id = UUIDGenerator.generate();
-    
+
     SimpleJob job = new SimpleJob();
     job.setPipelineId("demo:1234");
     job.setId(id);
     job.setCreateTime(new Date());
     job.setStatus(JobStatus.CREATED);
     jobRepository.create(job);
-    
+
     Page<JobSummary> all = jobRepository.getPage(1);
     Assertions.assertEquals(pageTotal+1,all.getSize());
-    
+
     Job one = jobRepository.getById(id);
     Assertions.assertNotNull(one);
   }
-  
+
   @Test
   public void test2 () {
     JdbcTaskExecutionRepository taskRepository = new JdbcTaskExecutionRepository();
     taskRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     taskRepository.setObjectMapper(createObjectMapper());
-    
+
     JdbcJobRepository jobRepository = new JdbcJobRepository();
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
-    
+
     String id = UUIDGenerator.generate();
-    
+
     SimpleJob job = new SimpleJob();
     job.setId(id);
     job.setPipelineId("demo:1234");
     job.setCreateTime(new Date());
     job.setStatus(JobStatus.CREATED);
     jobRepository.create(job);
-    
+
     Job one = jobRepository.getById(id);
-    
+
     SimpleJob mjob = new SimpleJob(one);
     mjob.setStatus(JobStatus.FAILED);
-    
+
     // test immutability
-    Assertions.assertNotEquals(mjob.getStatus().toString(),one.getStatus().toString());  
-    
+    Assertions.assertNotEquals(mjob.getStatus().toString(),one.getStatus().toString());
+
     jobRepository.merge(mjob);
     one = jobRepository.getById(id);
-    Assertions.assertEquals("FAILED",one.getStatus().toString());  
+    Assertions.assertEquals("FAILED",one.getStatus().toString());
   }
 
   @Test
@@ -97,9 +97,9 @@ public class JdbcJobRepositoryTests {
     JdbcJobRepository jobRepository = new JdbcJobRepository();
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
-    
+
     String id = UUIDGenerator.generate();
-    
+
     int countCompletedJobsToday = jobRepository.countCompletedJobsToday();
 
     SimpleJob completedJobYesterday = new SimpleJob();
@@ -110,7 +110,7 @@ public class JdbcJobRepositoryTests {
     jobRepository.create(completedJobYesterday);
     completedJobYesterday.setEndTime(Date.from(Instant.now().minus(1, DAYS)));
     jobRepository.merge(completedJobYesterday);
-    
+
     for(int i = 0; i < 5; i++) {
         SimpleJob completedJobToday = new SimpleJob();
         completedJobToday.setId(UUIDGenerator.generate()+"."+i);
@@ -146,7 +146,7 @@ public class JdbcJobRepositoryTests {
     JdbcJobRepository jobRepository = new JdbcJobRepository();
     jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
     jobRepository.setJobTaskRepository(taskRepository);
-    
+
     int countCompletedJobsYesterday = jobRepository.countCompletedJobsYesterday();
 
     for(int i = 0; i < 5; i++) {
@@ -189,5 +189,5 @@ public class JdbcJobRepositoryTests {
     objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
     return objectMapper;
   }
-  
+
 }

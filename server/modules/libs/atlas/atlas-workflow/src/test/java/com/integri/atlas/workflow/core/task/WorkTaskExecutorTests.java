@@ -1,11 +1,11 @@
 
-package com.creactiviti.piper.core.task;
+package com.integri.atlas.workflow.core.task;
 
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.creactiviti.piper.core.messagebroker.Queues;
+import com.integri.atlas.workflow.core.messagebroker.Queues;
 
 public class WorkTaskExecutorTests {
 
@@ -14,7 +14,7 @@ public class WorkTaskExecutorTests {
     WorkTaskDispatcher executor = new WorkTaskDispatcher((k,m)->Assertions.assertEquals(Queues.TASKS, k));
     executor.dispatch(new SimpleTaskExecution());
   }
-  
+
   @Test
   public void test2 () {
     SimpleTaskExecution task = new SimpleTaskExecution();
@@ -22,7 +22,7 @@ public class WorkTaskExecutorTests {
     WorkTaskDispatcher executor = new WorkTaskDispatcher((k,m)->Assertions.assertEquals("encoder", k));
     executor.dispatch(task);
   }
-  
+
   @Test
   public void test3 () {
     SimpleTaskExecution task = new SimpleTaskExecution();
@@ -30,5 +30,5 @@ public class WorkTaskExecutorTests {
     WorkTaskDispatcher executor = new WorkTaskDispatcher((k,m)->Assertions.assertEquals("encoder.xlarge", k));
     executor.dispatch(task);
   }
-  
+
 }

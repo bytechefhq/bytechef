@@ -1,4 +1,4 @@
-package com.creactiviti.piper.core;
+package com.integri.atlas.workflow.core;
 
 import java.util.List;
 import java.util.Map;
@@ -6,9 +6,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.creactiviti.piper.core.task.SimpleTaskExecution;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
-import com.creactiviti.piper.core.task.TaskHandlerResolver;
+import com.integri.atlas.workflow.core.task.SimpleTaskExecution;
+import com.integri.atlas.workflow.core.task.SpelTaskEvaluator;
+import com.integri.atlas.workflow.core.task.TaskHandlerResolver;
 
 public class MapTaskHandlerAdapterTests {
 
@@ -24,7 +24,7 @@ public class MapTaskHandlerAdapterTests {
     List<?> results = adapter.handle(task);
     Assertions.assertEquals(List.of(1,2,3),results);
   }
-  
+
   @Test
   public void test2 () throws Exception {
     Assertions.assertThrows(RuntimeException.class, () -> {
@@ -40,5 +40,5 @@ public class MapTaskHandlerAdapterTests {
       adapter.handle(task);
     });
   }
-  
+
 }

@@ -1,9 +1,9 @@
-package com.creactiviti.piper.taskhandler.time;
+package com.integri.atlas.workflow.taskhandler.time;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.creactiviti.piper.core.task.SimpleTaskExecution;
+import com.integri.atlas.workflow.core.task.SimpleTaskExecution;
 
 public class SleepTests {
 
@@ -15,7 +15,7 @@ public class SleepTests {
     long delta = System.currentTimeMillis()-now;
     Assertions.assertTrue(delta >= 1000 && delta <= 1100);
   }
-  
+
   @Test
   public void test2 () throws InterruptedException {
     Sleep sleep = new Sleep();
@@ -24,7 +24,7 @@ public class SleepTests {
     long delta = System.currentTimeMillis()-now;
     Assertions.assertTrue(delta >= 500 && delta <= 600);
   }
-  
+
   @Test
   public void test3 () throws InterruptedException {
     Sleep sleep = new Sleep();
@@ -33,5 +33,5 @@ public class SleepTests {
     long delta = System.currentTimeMillis()-now;
     Assertions.assertTrue(delta >= 1000 && delta <= 1100);
   }
-  
+
 }

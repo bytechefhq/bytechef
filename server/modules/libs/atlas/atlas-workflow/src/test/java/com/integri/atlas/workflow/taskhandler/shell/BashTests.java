@@ -1,10 +1,10 @@
-package com.creactiviti.piper.taskhandler.shell;
+package com.integri.atlas.workflow.taskhandler.shell;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-import com.creactiviti.piper.core.task.SimpleTaskExecution;
+import com.integri.atlas.workflow.core.task.SimpleTaskExecution;
 
 public class BashTests {
 
@@ -15,5 +15,5 @@ public class BashTests {
     String output = bash.handle(SimpleTaskExecution.of ("script", "ls -l " + cpr.getFile().getAbsolutePath()));
     Assertions.assertTrue(output.contains("target/classes/schema.sql"));
   }
-  
+
 }
