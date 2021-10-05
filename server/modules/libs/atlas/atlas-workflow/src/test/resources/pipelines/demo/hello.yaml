@@ -1,0 +1,31 @@
+label: Hello Demo
+
+inputs:
+  - name: yourName
+    label: Your Name
+    type: string
+    required: true
+    
+outputs:
+  - name: myMagicNumber
+    value: ${randomNumber}
+    
+tasks:
+  - name: randomNumber
+    label: Generate a random number
+    type: random/int
+    startInclusive: 0
+    endInclusive: 5000
+      
+  - label: Print a greeting
+    type: io/print
+    text: Hello ${yourName}
+       
+  - label: Sleep a little
+    type: time/sleep
+    millis: ${randomNumber}
+    
+  - label: Print a farewell
+    type: io/print
+    text: Goodbye ${yourName}
+    
