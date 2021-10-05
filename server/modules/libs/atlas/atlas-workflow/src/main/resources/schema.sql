@@ -10,14 +10,14 @@ create table job (
   start_time               timestamp        null,
   end_time                 timestamp        null,
   priority                 int          not null,
-  inputs                   jsonb        not null,
-  webhooks                 jsonb        not null,
-  outputs                  jsonb        not null,
+  inputs                   json        not null,
+  webhooks                 json        not null,
+  outputs                  json        not null,
   parent_task_execution_id varchar(256)
 );
 
-create index on job (create_time);
-create index on job (status);
+create index idx_job_create_time on job (create_time);
+create index idx_job_status on job (status);
 
 drop table if exists task_execution cascade;
 
@@ -30,12 +30,12 @@ create table task_execution (
   create_time          timestamp    not null,
   start_time           timestamp        null,
   end_time             timestamp        null,
-  serialized_execution jsonb        not null,
+  serialized_execution json        not null,
   priority             int          not null,
   task_number          int          not null
 );
 
-create index on task_execution (job_id);
+create index idx_task_execution_job_id on task_execution (job_id);
 
 drop table if exists context cascade;
 
@@ -43,10 +43,10 @@ create table context (
   id                 varchar(256) not null primary key,
   stack_id           varchar(256) not null,
   create_time        timestamp    not null,
-  serialized_context jsonb        not null
+  serialized_context json        not null
 );
 
-create index on context (stack_id);
+create index idx_context_stack_id on context (stack_id);
 
 drop table if exists counter cascade;
 
