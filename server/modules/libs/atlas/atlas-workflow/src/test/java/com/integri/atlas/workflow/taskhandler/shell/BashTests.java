@@ -13,7 +13,7 @@ public class BashTests {
     Bash bash = new Bash();
     ClassPathResource cpr = new ClassPathResource("schema.sql");
     String output = bash.handle(SimpleTaskExecution.of ("script", "ls -l " + cpr.getFile().getAbsolutePath()));
-    Assertions.assertTrue(output.contains("target/classes/schema.sql"));
+    Assertions.assertTrue(output.contains("build/resources/main/schema.sql"));
   }
 
 }
