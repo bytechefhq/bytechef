@@ -1,0 +1,19 @@
+group = "com.bp.integri.atlas"
+description = ""
+
+springBoot {
+    mainClassName = "com.integri.atlas.AtlasApp"
+}
+
+dependencies {
+    implementation "mysql:mysql-connector-java"
+    implementation 'org.apache.commons:commons-lang3'
+    implementation 'org.springframework.boot:spring-boot-starter-activemq'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    implementation project(":modules:libs:atlas:atlas-workflow")
+}
