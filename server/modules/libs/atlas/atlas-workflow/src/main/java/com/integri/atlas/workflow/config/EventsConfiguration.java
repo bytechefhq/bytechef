@@ -12,30 +12,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.config;
-
-import java.util.List;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import com.integri.atlas.workflow.core.event.EventListener;
 import com.integri.atlas.workflow.core.event.EventListenerChain;
 import com.integri.atlas.workflow.core.event.LogEventListener;
+import java.util.List;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class EventsConfiguration {
 
-  @Bean
-  @Primary
-  EventListenerChain eventListener (List<EventListener> aEventListeners) {
-    return new EventListenerChain(aEventListeners);
-  }
+    @Bean
+    @Primary
+    EventListenerChain eventListener(List<EventListener> aEventListeners) {
+        return new EventListenerChain(aEventListeners);
+    }
 
-  @Bean
-  LogEventListener logEventListener () {
-    return new LogEventListener();
-  }
+    @Bean
+    LogEventListener logEventListener() {
+        return new LogEventListener();
+    }
 }

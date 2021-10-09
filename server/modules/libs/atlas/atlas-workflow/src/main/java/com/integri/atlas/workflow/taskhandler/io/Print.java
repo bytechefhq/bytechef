@@ -12,13 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.taskhandler.io;
 
-import org.springframework.stereotype.Component;
+package com.integri.atlas.workflow.taskhandler.io;
 
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskHandler;
+import org.springframework.stereotype.Component;
 
 /**
  * Print some text to the console
@@ -29,10 +31,9 @@ import com.integri.atlas.workflow.core.task.TaskHandler;
 @Component("io/print")
 public class Print implements TaskHandler<Object> {
 
-  @Override
-  public Object handle (TaskExecution aTask) {
-    System.out.println(aTask.getRequiredString("text"));
-    return null;
-  }
-
+    @Override
+    public Object handle(TaskExecution aTask) {
+        System.out.println(aTask.getRequiredString("text"));
+        return null;
+    }
 }

@@ -12,11 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core;
 
 import com.integri.atlas.workflow.core.job.Job;
-
 
 /**
  *
@@ -24,7 +26,5 @@ import com.integri.atlas.workflow.core.job.Job;
  * @since Apr 24, 2017
  */
 public interface JobExecutor {
-
-  void execute (Job aJob);
-
+    void execute(Job aJob);
 }

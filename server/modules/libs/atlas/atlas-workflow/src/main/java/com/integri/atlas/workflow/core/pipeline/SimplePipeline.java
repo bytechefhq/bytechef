@@ -12,14 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.pipeline;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.integri.atlas.workflow.core.Accessor;
 import com.integri.atlas.workflow.core.DSL;
@@ -27,58 +24,61 @@ import com.integri.atlas.workflow.core.MapObject;
 import com.integri.atlas.workflow.core.error.Error;
 import com.integri.atlas.workflow.core.error.ErrorObject;
 import com.integri.atlas.workflow.core.task.PipelineTask;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class SimplePipeline extends MapObject implements Pipeline {
 
-  public SimplePipeline(Map<String, Object> aSource) {
-    super(aSource);
-  }
-
-  @Override
-  public String getId() {
-    return getString(DSL.ID);
-  }
-
-  @Override
-  public String getLabel() {
-    return getString(DSL.LABEL);
-  }
-
-  @Override
-  public List<PipelineTask> getTasks() {
-    return getList(DSL.TASKS, PipelineTask.class);
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this);
-  }
-
-  @Override
-  public List<Accessor> getInputs() {
-    return getList(DSL.INPUTS,Accessor.class,Collections.emptyList());
-  }
-
-  @Override
-  public List<Accessor> getOutputs() {
-    return getList(DSL.OUTPUTS,Accessor.class,Collections.emptyList());
-  }
-
-  @Override
-  public Error getError() {
-    if(containsKey(DSL.ERROR)) {
-      return new ErrorObject(getMap(DSL.ERROR));
+    public SimplePipeline(Map<String, Object> aSource) {
+        super(aSource);
     }
-    return null;
-  }
 
-  public void setError (Error aError) {
-    set(DSL.ERROR, aError);
-  }
+    @Override
+    public String getId() {
+        return getString(DSL.ID);
+    }
 
-  @Override
-  public int getRetry() {
-    return getInteger(DSL.RETRY, 0);
-  }
+    @Override
+    public String getLabel() {
+        return getString(DSL.LABEL);
+    }
 
+    @Override
+    public List<PipelineTask> getTasks() {
+        return getList(DSL.TASKS, PipelineTask.class);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
+
+    @Override
+    public List<Accessor> getInputs() {
+        return getList(DSL.INPUTS, Accessor.class, Collections.emptyList());
+    }
+
+    @Override
+    public List<Accessor> getOutputs() {
+        return getList(DSL.OUTPUTS, Accessor.class, Collections.emptyList());
+    }
+
+    @Override
+    public Error getError() {
+        if (containsKey(DSL.ERROR)) {
+            return new ErrorObject(getMap(DSL.ERROR));
+        }
+        return null;
+    }
+
+    public void setError(Error aError) {
+        set(DSL.ERROR, aError);
+    }
+
+    @Override
+    public int getRetry() {
+        return getInteger(DSL.RETRY, 0);
+    }
 }

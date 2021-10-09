@@ -12,14 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.messagebroker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.util.Assert;
 
 /**
@@ -31,30 +33,27 @@ import org.springframework.util.Assert;
  */
 public class SyncMessageBroker implements MessageBroker {
 
-  private Map<String, List<Receiver>> listeners = new HashMap<> ();
+    private Map<String, List<Receiver>> listeners = new HashMap<>();
 
-  @Override
-  public void send (String aRoutingKey, Object aMessage) {
-    List<Receiver> list = listeners.get(aRoutingKey);
-    Assert.isTrue(list!=null&&list.size()>0,"no listeners subscribed for: " + aRoutingKey);
-    for(Receiver receiver : list) {
-      receiver.receive(aMessage);
+    @Override
+    public void send(String aRoutingKey, Object aMessage) {
+        List<Receiver> list = listeners.get(aRoutingKey);
+        Assert.isTrue(list != null && list.size() > 0, "no listeners subscribed for: " + aRoutingKey);
+        for (Receiver receiver : list) {
+            receiver.receive(aMessage);
+        }
     }
-  }
 
-  public void receive (String aRoutingKey, Receiver aReceiver) {
-    List<Receiver> list = listeners.get(aRoutingKey);
-    if(list == null) {
-      list = new ArrayList<>();
-      listeners.put(aRoutingKey, list);
+    public void receive(String aRoutingKey, Receiver aReceiver) {
+        List<Receiver> list = listeners.get(aRoutingKey);
+        if (list == null) {
+            list = new ArrayList<>();
+            listeners.put(aRoutingKey, list);
+        }
+        list.add(aReceiver);
     }
-    list.add(aReceiver);
-  }
 
-  public static interface Receiver {
-
-    void receive (Object aMessage);
-
-  }
-
+    public static interface Receiver {
+        void receive(Object aMessage);
+    }
 }

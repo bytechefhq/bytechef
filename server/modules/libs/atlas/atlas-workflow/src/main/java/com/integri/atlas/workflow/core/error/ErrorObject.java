@@ -12,12 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.error;
 
-import java.util.Map;
-
 import com.integri.atlas.workflow.core.MapObject;
+import java.util.Map;
 
 /**
  *
@@ -26,26 +28,24 @@ import com.integri.atlas.workflow.core.MapObject;
  */
 public class ErrorObject extends MapObject implements Error {
 
-  public ErrorObject () {
-  }
+    public ErrorObject() {}
 
-  public ErrorObject (Map<String,Object> aSource) {
-    super(aSource);
-  }
+    public ErrorObject(Map<String, Object> aSource) {
+        super(aSource);
+    }
 
-  public ErrorObject (String aMessage, String[] aStackTrace) {
-    set("message", aMessage);
-    set("stackTrace", aStackTrace);
-  }
+    public ErrorObject(String aMessage, String[] aStackTrace) {
+        set("message", aMessage);
+        set("stackTrace", aStackTrace);
+    }
 
-  @Override
-  public String getMessage() {
-    return getString("message");
-  }
+    @Override
+    public String getMessage() {
+        return getString("message");
+    }
 
-  @Override
-  public String[] getStackTrace() {
-    return getArray("stackTrace", String.class);
-  }
-
+    @Override
+    public String[] getStackTrace() {
+        return getArray("stackTrace", String.class);
+    }
 }

@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.event;
 
 /**
@@ -21,12 +24,10 @@ package com.integri.atlas.workflow.core.event;
  * @since Jun 4, 2017
  */
 public interface EventPublisher {
-
-  /**
-   * Notify all <strong>matching</strong> listeners registered with this
-   * application of an application event.
-   * @param event the event to publish
-   */
-  void publishEvent (PiperEvent event);
-
+    /**
+     * Notify all <strong>matching</strong> listeners registered with this
+     * application of an application event.
+     * @param event the event to publish
+     */
+    void publishEvent(PiperEvent event);
 }

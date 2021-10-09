@@ -12,21 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core;
 
 import java.util.List;
 
 public interface Page<T> {
+    List<T> getItems();
 
-  List<T> getItems ();
+    int getSize();
 
-  int getSize ();
+    int getNumber();
 
-  int getNumber ();
+    int getTotalItems();
 
-  int getTotalItems ();
-
-  int getTotalPages ();
-
+    int getTotalPages();
 }

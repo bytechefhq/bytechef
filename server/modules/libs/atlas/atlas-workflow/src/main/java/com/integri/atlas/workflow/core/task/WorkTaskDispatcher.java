@@ -12,43 +12,43 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
-
-import java.util.Objects;
-
-import org.springframework.util.Assert;
 
 import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
 import com.integri.atlas.workflow.core.messagebroker.Queues;
+import java.util.Objects;
+import org.springframework.util.Assert;
 
 public class WorkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-  private final MessageBroker messageBroker;
+    private final MessageBroker messageBroker;
 
-  private static final String DEFAULT_QUEUE = Queues.TASKS;
+    private static final String DEFAULT_QUEUE = Queues.TASKS;
 
-  public WorkTaskDispatcher (MessageBroker aMessageBroker) {
-    messageBroker = Objects.requireNonNull(aMessageBroker);
-  }
-
-  @Override
-  public void dispatch (TaskExecution aTask) {
-    Assert.notNull(messageBroker,"message broker not configured");
-    messageBroker.send(calculateRoutingKey(aTask), aTask);
-  }
-
-  private String calculateRoutingKey (Task aTask) {
-    TaskExecution jtask = (TaskExecution) aTask;
-    return jtask.getNode()!=null?jtask.getNode():DEFAULT_QUEUE;
-  }
-
-  @Override
-  public TaskDispatcher<TaskExecution> resolve (Task aTask) {
-    if(aTask instanceof TaskExecution) {
-      return this;
+    public WorkTaskDispatcher(MessageBroker aMessageBroker) {
+        messageBroker = Objects.requireNonNull(aMessageBroker);
     }
-    return null;
-  }
 
+    @Override
+    public void dispatch(TaskExecution aTask) {
+        Assert.notNull(messageBroker, "message broker not configured");
+        messageBroker.send(calculateRoutingKey(aTask), aTask);
+    }
+
+    private String calculateRoutingKey(Task aTask) {
+        TaskExecution jtask = (TaskExecution) aTask;
+        return jtask.getNode() != null ? jtask.getNode() : DEFAULT_QUEUE;
+    }
+
+    @Override
+    public TaskDispatcher<TaskExecution> resolve(Task aTask) {
+        if (aTask instanceof TaskExecution) {
+            return this;
+        }
+        return null;
+    }
 }

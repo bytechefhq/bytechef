@@ -12,32 +12,33 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 import java.util.List;
 
 public class TaskDispatcherChain implements TaskDispatcher<Task> {
 
-  private List<TaskDispatcherResolver> resolvers;
+    private List<TaskDispatcherResolver> resolvers;
 
-  public TaskDispatcherChain() {
-  }
+    public TaskDispatcherChain() {}
 
-  @Override
-  public void dispatch (Task aTask) {
-    for(TaskDispatcherResolver resolver : resolvers) {
-      TaskDispatcher executor = resolver.resolve(aTask);
-      if(executor != null) {
-        executor.dispatch(aTask);
-        return;
-      }
+    @Override
+    public void dispatch(Task aTask) {
+        for (TaskDispatcherResolver resolver : resolvers) {
+            TaskDispatcher executor = resolver.resolve(aTask);
+            if (executor != null) {
+                executor.dispatch(aTask);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Unable to execute task: " + aTask);
     }
-    throw new IllegalArgumentException("Unable to execute task: " + aTask);
-  }
 
-  public void setResolvers(List<TaskDispatcherResolver> aResolvers) {
-    resolvers = aResolvers;
-  }
-
+    public void setResolvers(List<TaskDispatcherResolver> aResolvers) {
+        resolvers = aResolvers;
+    }
 }

@@ -12,77 +12,77 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.task;
 
-import java.util.List;
-import java.util.Map;
+package com.integri.atlas.workflow.core.task;
 
 import com.integri.atlas.workflow.core.DSL;
 import com.integri.atlas.workflow.core.MapObject;
-
+import java.util.List;
+import java.util.Map;
 
 public class SimplePipelineTask extends MapObject implements PipelineTask {
 
-  public SimplePipelineTask (Task aSource) {
-    super(aSource.asMap());
-  }
+    public SimplePipelineTask(Task aSource) {
+        super(aSource.asMap());
+    }
 
-  public SimplePipelineTask (Map<String, Object> aSource) {
-    super(aSource);
-  }
+    public SimplePipelineTask(Map<String, Object> aSource) {
+        super(aSource);
+    }
 
-  @Override
-  public String getType() {
-    return getString(DSL.TYPE);
-  }
+    @Override
+    public String getType() {
+        return getString(DSL.TYPE);
+    }
 
-  @Override
-  public String getName() {
-    return getString(DSL.NAME);
-  }
+    @Override
+    public String getName() {
+        return getString(DSL.NAME);
+    }
 
-  @Override
-  public String getLabel() {
-    return getString(DSL.LABEL);
-  }
+    @Override
+    public String getLabel() {
+        return getString(DSL.LABEL);
+    }
 
-  @Override
-  public String getNode() {
-    return getString(DSL.NODE);
-  }
+    @Override
+    public String getNode() {
+        return getString(DSL.NODE);
+    }
 
-  public void setNode (String aNode) {
-    set(DSL.NODE, aNode);
-  }
+    public void setNode(String aNode) {
+        set(DSL.NODE, aNode);
+    }
 
-  @Override
-  public int getTaskNumber() {
-    return getInteger(DSL.TASK_NUMBER,-1);
-  }
+    @Override
+    public int getTaskNumber() {
+        return getInteger(DSL.TASK_NUMBER, -1);
+    }
 
-  public void setTaskNumber (int aTaskNumber) {
-    set(DSL.TASK_NUMBER, aTaskNumber);
-  }
+    public void setTaskNumber(int aTaskNumber) {
+        set(DSL.TASK_NUMBER, aTaskNumber);
+    }
 
-  @Override
-  public String getTimeout() {
-    return getString(DSL.TIMEOUT);
-  }
+    @Override
+    public String getTimeout() {
+        return getString(DSL.TIMEOUT);
+    }
 
-  @Override
-  public List<PipelineTask> getPre() {
-    return getList(DSL.PRE, PipelineTask.class, List.of());
-  }
+    @Override
+    public List<PipelineTask> getPre() {
+        return getList(DSL.PRE, PipelineTask.class, List.of());
+    }
 
-  @Override
-  public List<PipelineTask> getPost() {
-    return getList(DSL.POST, PipelineTask.class, List.of());
-  }
+    @Override
+    public List<PipelineTask> getPost() {
+        return getList(DSL.POST, PipelineTask.class, List.of());
+    }
 
-  @Override
-  public List<PipelineTask> getFinalize() {
-    return getList(DSL.FINALIZE, PipelineTask.class, List.of());
-  }
-
+    @Override
+    public List<PipelineTask> getFinalize() {
+        return getList(DSL.FINALIZE, PipelineTask.class, List.of());
+    }
 }

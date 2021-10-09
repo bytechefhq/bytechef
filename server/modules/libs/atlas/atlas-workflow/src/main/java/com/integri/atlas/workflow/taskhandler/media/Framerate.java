@@ -12,20 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.taskhandler.media;
-
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.arakelian.jq.ImmutableJqLibrary;
 import com.arakelian.jq.ImmutableJqRequest;
 import com.arakelian.jq.JqResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -35,25 +36,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component("media/framerate")
 class Framerate implements TaskHandler<Double> {
 
-  private final Ffprobe ffprobe = new Ffprobe();
-  private final ObjectMapper jsonMapper = new ObjectMapper ();
+    private final Ffprobe ffprobe = new Ffprobe();
+    private final ObjectMapper jsonMapper = new ObjectMapper();
 
-  @Override
-  public Double handle (TaskExecution aTask) throws Exception {
-    Map<?,?> ffprobeResult = ffprobe.handle(aTask);
+    @Override
+    public Double handle(TaskExecution aTask) throws Exception {
+        Map<?, ?> ffprobeResult = ffprobe.handle(aTask);
 
-    JqResponse response = ImmutableJqRequest.builder() //
-        .lib(ImmutableJqLibrary.of())
-        .input(jsonMapper.writeValueAsString(ffprobeResult))
-        .filter(".streams[] | select (.codec_type==\"video\") | .r_frame_rate")
-        .build()
-        .execute();
+        JqResponse response = ImmutableJqRequest
+            .builder() //
+            .lib(ImmutableJqLibrary.of())
+            .input(jsonMapper.writeValueAsString(ffprobeResult))
+            .filter(".streams[] | select (.codec_type==\"video\") | .r_frame_rate")
+            .build()
+            .execute();
 
-    String frameRateStr = response.getOutput();
-    Assert.notNull(frameRateStr, "can not determine framerate");
-    String[] frate = frameRateStr.replaceAll("[^0-9/\\.]", "").split("/");
-    return Double.valueOf(frate[0])/Double.valueOf(frate[1]);
-  }
-
+        String frameRateStr = response.getOutput();
+        Assert.notNull(frameRateStr, "can not determine framerate");
+        String[] frate = frameRateStr.replaceAll("[^0-9/\\.]", "").split("/");
+        return Double.valueOf(frate[0]) / Double.valueOf(frate[1]);
+    }
 }
-

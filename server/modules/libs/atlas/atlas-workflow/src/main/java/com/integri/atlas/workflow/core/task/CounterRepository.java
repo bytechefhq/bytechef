@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 /**
@@ -22,25 +25,23 @@ package com.integri.atlas.workflow.core.task;
  * @author Arik Cohen
  */
 public interface CounterRepository {
+    /**
+     * Set the counter to the give value.
+     * @param aCounterName the name of the counter
+     * @param aValue the value to set the counter to.
+     */
+    void set(String aCounterName, long aValue);
 
-  /**
-   * Set the counter to the give value.
-   * @param aCounterName the name of the counter
-   * @param aValue the value to set the counter to.
-   */
-  void set (String aCounterName, long aValue);
+    /**
+     * Decrement the specified counter by 1.
+     * @param aCounterName the name of the counter
+     * @return the new value
+     */
+    long decrement(String aCounterName);
 
-  /**
-   * Decrement the specified counter by 1.
-   * @param aCounterName the name of the counter
-   * @return the new value
-   */
-  long decrement (String aCounterName);
-
-  /**
-   * Delete the specified counter.
-   * @param aCounterName the name of the counter
-   */
-  void delete (String aCounterName);
-
+    /**
+     * Delete the specified counter.
+     * @param aCounterName the name of the counter
+     */
+    void delete(String aCounterName);
 }

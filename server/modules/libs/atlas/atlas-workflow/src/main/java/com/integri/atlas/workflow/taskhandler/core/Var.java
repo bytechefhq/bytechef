@@ -12,13 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.taskhandler.core;
 
-import org.springframework.stereotype.Component;
+package com.integri.atlas.workflow.taskhandler.core;
 
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskHandler;
+import org.springframework.stereotype.Component;
 
 /**
  *
@@ -28,9 +30,8 @@ import com.integri.atlas.workflow.core.task.TaskHandler;
 @Component("core/var")
 class Var implements TaskHandler<Object> {
 
-  @Override
-  public Object handle (TaskExecution aTask) {
-    return aTask.getRequired("value");
-  }
-
+    @Override
+    public Object handle(TaskExecution aTask) {
+        return aTask.getRequired("value");
+    }
 }

@@ -12,18 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.taskhandler.io;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskHandler;
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * Deletes a file, never throwing an exception. If file is a directory, delete it and all sub-directories.
@@ -36,15 +37,14 @@ import com.integri.atlas.workflow.core.task.TaskHandler;
 @Component("io/rm")
 class Rm implements TaskHandler<Object> {
 
-  @Override
-  public Object handle (TaskExecution aTask) throws IOException {
-    File file = new File (aTask.getRequiredString("path"));
-    if(!file.exists()) {
-      return null;
+    @Override
+    public Object handle(TaskExecution aTask) throws IOException {
+        File file = new File(aTask.getRequiredString("path"));
+        if (!file.exists()) {
+            return null;
+        }
+        boolean result = FileUtils.deleteQuietly(file);
+        Assert.isTrue(result, "Failed to delete: " + aTask.getString("path"));
+        return null;
     }
-    boolean result = FileUtils.deleteQuietly(file);
-    Assert.isTrue(result, "Failed to delete: " + aTask.getString("path"));
-    return null;
-  }
-
 }

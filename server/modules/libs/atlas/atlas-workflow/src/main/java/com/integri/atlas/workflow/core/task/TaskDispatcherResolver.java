@@ -12,9 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.task;
 
+package com.integri.atlas.workflow.core.task;
 
 /**
  * The strategey interface used for resolving the
@@ -25,17 +27,15 @@ package com.integri.atlas.workflow.core.task;
  * @since Mar 26, 2017
  */
 public interface TaskDispatcherResolver {
-
-  /**
-   * Resolves a {@link TaskDispatcher} for the given
-   * {@link TaskExecution} instance or <code>null</code>
-   * if one can not be resolved.
-   *
-   * @param aTask
-   *           The {@link TaskExecution} instance
-   * @return a {@link TaskDispatcher} instance to execute the given task or <code>null</code> if
-   *         unable to resolve one.
-   */
-  TaskDispatcher resolve (Task aTask);
-
+    /**
+     * Resolves a {@link TaskDispatcher} for the given
+     * {@link TaskExecution} instance or <code>null</code>
+     * if one can not be resolved.
+     *
+     * @param aTask
+     *           The {@link TaskExecution} instance
+     * @return a {@link TaskDispatcher} instance to execute the given task or <code>null</code> if
+     *         unable to resolve one.
+     */
+    TaskDispatcher resolve(Task aTask);
 }

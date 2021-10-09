@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 import com.integri.atlas.workflow.core.MapObject;
@@ -24,19 +27,18 @@ import com.integri.atlas.workflow.core.MapObject;
  */
 public class SimpleControlTask extends MapObject implements ControlTask {
 
-  public SimpleControlTask() {}
+    public SimpleControlTask() {}
 
-  public SimpleControlTask(String aType) {
-    set("type", aType);
-  }
+    public SimpleControlTask(String aType) {
+        set("type", aType);
+    }
 
-  @Override
-  public String getType() {
-    return getString("type");
-  }
+    @Override
+    public String getType() {
+        return getString("type");
+    }
 
-  public void setType (String aType) {
-    set("type", aType);
-  }
-
+    public void setType(String aType) {
+        set("type", aType);
+    }
 }

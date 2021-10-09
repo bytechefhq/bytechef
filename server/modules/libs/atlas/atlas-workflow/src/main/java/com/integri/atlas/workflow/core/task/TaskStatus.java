@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 /**
@@ -22,20 +25,19 @@ package com.integri.atlas.workflow.core.task;
  * @author Arik Cohen
  */
 public enum TaskStatus {
+    CREATED(false),
+    STARTED(false),
+    FAILED(true),
+    CANCELLED(true),
+    COMPLETED(true);
 
-  CREATED(false),
-  STARTED(false),
-  FAILED(true),
-  CANCELLED(true),
-  COMPLETED(true);
+    private final boolean terminated;
 
-  private final boolean terminated;
+    TaskStatus(boolean aTerminated) {
+        terminated = aTerminated;
+    }
 
-  TaskStatus (boolean aTerminated) {
-    terminated = aTerminated;
-  }
-
-  public boolean isTerminated() {
-    return terminated;
-  }
+    public boolean isTerminated() {
+        return terminated;
+    }
 }

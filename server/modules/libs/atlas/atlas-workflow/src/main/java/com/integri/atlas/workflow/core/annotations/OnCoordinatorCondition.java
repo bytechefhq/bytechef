@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.annotations;
 
 import org.springframework.boot.autoconfigure.condition.ConditionMessage;
@@ -30,11 +33,15 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  */
 public class OnCoordinatorCondition extends SpringBootCondition {
 
-  @Override
-  public ConditionOutcome getMatchOutcome(ConditionContext aContext, AnnotatedTypeMetadata aMetadata) {
-    String property = aContext.getEnvironment().getProperty("piper.coordinator.enabled");
-    boolean result = Boolean.valueOf(property);
-    return new ConditionOutcome(result,ConditionMessage.forCondition(ConditionalOnCoordinator.class, "(" + getClass().getName() + ")").resultedIn(result));
-  }
-
+    @Override
+    public ConditionOutcome getMatchOutcome(ConditionContext aContext, AnnotatedTypeMetadata aMetadata) {
+        String property = aContext.getEnvironment().getProperty("piper.coordinator.enabled");
+        boolean result = Boolean.valueOf(property);
+        return new ConditionOutcome(
+            result,
+            ConditionMessage
+                .forCondition(ConditionalOnCoordinator.class, "(" + getClass().getName() + ")")
+                .resultedIn(result)
+        );
+    }
 }

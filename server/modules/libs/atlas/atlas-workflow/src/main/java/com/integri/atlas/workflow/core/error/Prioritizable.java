@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.error;
 
 /**
@@ -21,15 +24,12 @@ package com.integri.atlas.workflow.core.error;
  * @since Jun 2, 2017
  */
 public interface Prioritizable {
+    public static final int DEFAULT_PRIORITY = 0;
 
-  public static final int DEFAULT_PRIORITY = 0;
-
-
-  /**
-   * Retrives the priority value
-   *
-   * @return int
-   */
-  int getPriority ();
-
+    /**
+     * Retrives the priority value
+     *
+     * @return int
+     */
+    int getPriority();
 }

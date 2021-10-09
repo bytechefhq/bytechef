@@ -12,34 +12,35 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core;
 
+import com.integri.atlas.workflow.core.task.TaskExecution;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.integri.atlas.workflow.core.task.TaskExecution;
-
 public class TaskCompletionHandlerChain implements TaskCompletionHandler {
 
-  private List<TaskCompletionHandler> taskCompletionHandlers = new ArrayList<>();
+    private List<TaskCompletionHandler> taskCompletionHandlers = new ArrayList<>();
 
-  @Override
-  public void handle (TaskExecution aJobTask) {
-    for(TaskCompletionHandler handler : taskCompletionHandlers) {
-      if(handler.canHandle(aJobTask)) {
-        handler.handle(aJobTask);
-      }
+    @Override
+    public void handle(TaskExecution aJobTask) {
+        for (TaskCompletionHandler handler : taskCompletionHandlers) {
+            if (handler.canHandle(aJobTask)) {
+                handler.handle(aJobTask);
+            }
+        }
     }
-  }
 
-  @Override
-  public boolean canHandle(TaskExecution aJobTask) {
-    return true;
-  }
+    @Override
+    public boolean canHandle(TaskExecution aJobTask) {
+        return true;
+    }
 
-  public void setTaskCompletionHandlers(List<TaskCompletionHandler> aTaskCompletionHandlers) {
-    taskCompletionHandlers = aTaskCompletionHandlers;
-  }
-
+    public void setTaskCompletionHandlers(List<TaskCompletionHandler> aTaskCompletionHandlers) {
+        taskCompletionHandlers = aTaskCompletionHandlers;
+    }
 }

@@ -12,15 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.event;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package com.integri.atlas.workflow.core.event;
 
 import com.integri.atlas.workflow.core.task.SimpleTaskExecution;
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskExecutionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,32 +30,31 @@ import com.integri.atlas.workflow.core.task.TaskExecutionRepository;
  */
 public class TaskProgressedEventListener implements EventListener {
 
-  private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionRepository taskExecutionRepository;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public TaskProgressedEventListener(TaskExecutionRepository aTaskExecutionRepository) {
-    taskExecutionRepository = aTaskExecutionRepository;
-  }
-
-  @Override
-  public void onApplicationEvent (PiperEvent aEvent) {
-    if(Events.TASK_PROGRESSED.equals(aEvent.getType())) {
-      String taskId = aEvent.getString("taskId");
-      int progress = aEvent.getInteger("progress", 0);
-
-      TaskExecution task = taskExecutionRepository.findOne(taskId);
-
-      if(task == null) {
-        logger.error("Unknown task: {}",taskId);
-      } else {
-        SimpleTaskExecution mtask = SimpleTaskExecution.of(task);
-
-        mtask.setProgress(progress);
-
-        taskExecutionRepository.merge(mtask);
-      }
+    public TaskProgressedEventListener(TaskExecutionRepository aTaskExecutionRepository) {
+        taskExecutionRepository = aTaskExecutionRepository;
     }
-  }
 
+    @Override
+    public void onApplicationEvent(PiperEvent aEvent) {
+        if (Events.TASK_PROGRESSED.equals(aEvent.getType())) {
+            String taskId = aEvent.getString("taskId");
+            int progress = aEvent.getInteger("progress", 0);
+
+            TaskExecution task = taskExecutionRepository.findOne(taskId);
+
+            if (task == null) {
+                logger.error("Unknown task: {}", taskId);
+            } else {
+                SimpleTaskExecution mtask = SimpleTaskExecution.of(task);
+
+                mtask.setProgress(progress);
+
+                taskExecutionRepository.merge(mtask);
+            }
+        }
+    }
 }

@@ -12,20 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.taskhandler.io;
 
+import com.integri.atlas.workflow.core.task.TaskExecution;
+import com.integri.atlas.workflow.core.task.TaskHandler;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
-
-import com.integri.atlas.workflow.core.task.TaskExecution;
-import com.integri.atlas.workflow.core.task.TaskHandler;
 
 /**
  * @author Arik Cohen
@@ -34,48 +35,46 @@ import com.integri.atlas.workflow.core.task.TaskHandler;
 @Component("io/ls")
 class Ls implements TaskHandler<List<Ls.FileInfo>> {
 
-  @Override
-  public List<Ls.FileInfo> handle (TaskExecution aTask) throws IOException {
+    @Override
+    public List<Ls.FileInfo> handle(TaskExecution aTask) throws IOException {
+        Path root = Paths.get(aTask.getRequiredString("path"));
 
-    Path root = Paths.get(aTask.getRequiredString("path"));
+        boolean recursive = aTask.getBoolean("recursive", false);
 
-    boolean recursive = aTask.getBoolean("recursive", false);
-
-    return Files.walk(root)
-                .filter(p->recursive || p.getParent().equals(root))
-                .filter(Files::isRegularFile)
-                .map(p->new FileInfo(root, p))
-                .collect(Collectors.toList());
-  }
-
-  public static class FileInfo {
-
-    private final Path path;
-    private final Path root;
-    private final long size;
-
-    public FileInfo(Path aRoot, Path aPath) {
-      root = aRoot;
-      path = aPath;
-      size = aPath.toFile().length();
+        return Files
+            .walk(root)
+            .filter(p -> recursive || p.getParent().equals(root))
+            .filter(Files::isRegularFile)
+            .map(p -> new FileInfo(root, p))
+            .collect(Collectors.toList());
     }
 
-    public String getName () {
-      return path.getFileName().toString();
+    public static class FileInfo {
+
+        private final Path path;
+        private final Path root;
+        private final long size;
+
+        public FileInfo(Path aRoot, Path aPath) {
+            root = aRoot;
+            path = aPath;
+            size = aPath.toFile().length();
+        }
+
+        public String getName() {
+            return path.getFileName().toString();
+        }
+
+        public String getFullPath() {
+            return path.toString();
+        }
+
+        public String getRelativePath() {
+            return root.relativize(path).toString();
+        }
+
+        public long getSize() throws IOException {
+            return size;
+        }
     }
-
-    public String getFullPath () {
-      return path.toString();
-    }
-
-    public String getRelativePath () {
-      return root.relativize(path).toString();
-    }
-
-    public long getSize () throws IOException {
-      return size;
-    }
-
-  }
-
 }

@@ -12,21 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.taskhandler.media;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.workflow.core.task.TaskExecution;
+import com.integri.atlas.workflow.core.task.TaskHandler;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.zeroturnaround.exec.ProcessExecutor;
-
-import com.integri.atlas.workflow.core.task.TaskExecution;
-import com.integri.atlas.workflow.core.task.TaskHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 /**
  *
@@ -34,25 +34,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @since June 2, 2017
  */
 @Component("media/mediainfo")
-class Mediainfo implements TaskHandler<Map<?,?>> {
+class Mediainfo implements TaskHandler<Map<?, ?>> {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
-  private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
-  @Override
-  public Map<?,?> handle (TaskExecution aTask) throws Exception {
+    @Override
+    public Map<?, ?> handle(TaskExecution aTask) throws Exception {
+        String output = new ProcessExecutor()
+            .command(List.of("mediainfo", "--Output=JSON", aTask.getRequiredString("input")))
+            .readOutput(true)
+            .execute()
+            .outputUTF8();
 
-    String output = new ProcessExecutor()
-        .command(List.of("mediainfo","--Output=JSON",aTask.getRequiredString("input")))
-        .readOutput(true)
-        .execute()
-        .outputUTF8();
+        log.debug("{}", output);
 
-    log.debug("{}",output);
-
-    return mapper.readValue(output, Map.class);
-  }
-
-
+        return mapper.readValue(output, Map.class);
+    }
 }

@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.event;
 
 import java.util.List;
@@ -24,17 +27,16 @@ import java.util.List;
  */
 public class EventListenerChain implements EventListener {
 
-  private final List<EventListener> listeners;
+    private final List<EventListener> listeners;
 
-  public EventListenerChain(List<EventListener> aEventListeners) {
-    listeners = aEventListeners;
-  }
-
-  @Override
-  public void onApplicationEvent(PiperEvent aEvent) {
-    for(EventListener listener : listeners) {
-      listener.onApplicationEvent(aEvent);
+    public EventListenerChain(List<EventListener> aEventListeners) {
+        listeners = aEventListeners;
     }
-  }
 
+    @Override
+    public void onApplicationEvent(PiperEvent aEvent) {
+        for (EventListener listener : listeners) {
+            listener.onApplicationEvent(aEvent);
+        }
+    }
 }

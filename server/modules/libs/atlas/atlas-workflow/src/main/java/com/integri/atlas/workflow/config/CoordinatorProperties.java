@@ -12,28 +12,30 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.config;
 
 public class CoordinatorProperties {
 
-  private boolean enabled = false;
-  private CoordinatorSubscriptions subscriptions = new CoordinatorSubscriptions();
+    private boolean enabled = false;
+    private CoordinatorSubscriptions subscriptions = new CoordinatorSubscriptions();
 
-  public boolean isEnabled() {
-    return enabled;
-  }
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-  public void setEnabled(boolean aEnabled) {
-    enabled = aEnabled;
-  }
+    public void setEnabled(boolean aEnabled) {
+        enabled = aEnabled;
+    }
 
-  public CoordinatorSubscriptions getSubscriptions() {
-    return subscriptions;
-  }
+    public CoordinatorSubscriptions getSubscriptions() {
+        return subscriptions;
+    }
 
-  public void setSubscriptions(CoordinatorSubscriptions aSubscriptions) {
-    subscriptions = aSubscriptions;
-  }
-
+    public void setSubscriptions(CoordinatorSubscriptions aSubscriptions) {
+        subscriptions = aSubscriptions;
+    }
 }

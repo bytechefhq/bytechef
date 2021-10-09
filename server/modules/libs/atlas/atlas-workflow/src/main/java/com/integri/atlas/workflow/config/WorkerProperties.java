@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.config;
 
 import java.util.HashMap;
@@ -20,23 +23,22 @@ import java.util.Map;
 
 public class WorkerProperties {
 
-  private boolean enabled = false;
-  private Map<String,Object> subscriptions = new HashMap<>();
+    private boolean enabled = false;
+    private Map<String, Object> subscriptions = new HashMap<>();
 
-  public boolean isEnabled() {
-    return enabled;
-  }
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-  public void setEnabled(boolean aEnabled) {
-    enabled = aEnabled;
-  }
+    public void setEnabled(boolean aEnabled) {
+        enabled = aEnabled;
+    }
 
-  public Map<String, Object> getSubscriptions() {
-    return subscriptions;
-  }
+    public Map<String, Object> getSubscriptions() {
+        return subscriptions;
+    }
 
-  public void setSubscriptions(Map<String, Object> aSubscriptions) {
-    subscriptions = aSubscriptions;
-  }
-
+    public void setSubscriptions(Map<String, Object> aSubscriptions) {
+        subscriptions = aSubscriptions;
+    }
 }

@@ -12,16 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.taskhandler.io;
 
-import java.io.IOException;
-
-import org.springframework.stereotype.Component;
-
+import com.google.common.io.Files;
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskHandler;
-import com.google.common.io.Files;
+import java.io.IOException;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Arik Cohen
@@ -30,9 +31,8 @@ import com.google.common.io.Files;
 @Component("io/createTempDir")
 class CreateTempDir implements TaskHandler<String> {
 
-  @Override
-  public String handle (TaskExecution aTask) throws IOException {
-    return Files.createTempDir().getAbsolutePath();
-  }
-
+    @Override
+    public String handle(TaskExecution aTask) throws IOException {
+        return Files.createTempDir().getAbsolutePath();
+    }
 }

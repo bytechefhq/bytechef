@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 /**
@@ -22,12 +25,11 @@ package com.integri.atlas.workflow.core.task;
  */
 public class CancelTask extends SimpleControlTask {
 
-  public CancelTask () { }
+    public CancelTask() {}
 
-  public CancelTask (String aJobId, String aTaskId) {
-    super(ControlTask.TYPE_CANCEL);
-    set("taskId", aTaskId);
-    set("jobId", aJobId);
-  }
-
+    public CancelTask(String aJobId, String aTaskId) {
+        super(ControlTask.TYPE_CANCEL);
+        set("taskId", aTaskId);
+        set("jobId", aJobId);
+    }
 }
