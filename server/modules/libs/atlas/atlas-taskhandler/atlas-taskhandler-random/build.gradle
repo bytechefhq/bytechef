@@ -1,0 +1,8 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
+
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+}
+

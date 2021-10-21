@@ -1,21 +1,26 @@
-group = "com.bp.integri.atlas"
-description = ""
-
-springBoot {
-    mainClassName = "com.integri.atlas.AtlasApp"
-}
-
 dependencies {
-    implementation "mysql:mysql-connector-java"
-    implementation "org.apache.commons:commons-lang3"
-    implementation "org.springframework.boot:spring-boot-starter-activemq"
-    implementation "org.springframework.boot:spring-boot-starter-cache"
-    implementation "org.springframework.boot:spring-boot-starter-amqp"
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-jdbc"
-    implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation "org.springframework.kafka:spring-kafka"
-    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    compileOnly "jakarta.servlet:jakarta.servlet-api"
+
+    implementation 'com.arakelian:java-jq'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    implementation 'com.google.guava:guava'
+    implementation 'commons-io:commons-io'
+    implementation 'javax.jms:javax.jms-api'
+    implementation 'org.apache.commons:commons-exec'
+    implementation 'org.apache.commons:commons-lang3'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit'
+    implementation "org.springframework:spring-jdbc"
+    implementation 'org.springframework:spring-jms'
+    implementation "org.springframework:spring-web"
+    implementation "org.springframework:spring-webmvc"
+    implementation 'org.springframework.amqp:spring-amqp'
+    implementation 'org.springframework.amqp:spring-rabbit'
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.zeroturnaround:zt-exec'
+    implementation 'software.amazon.awssdk:s3'
+
+    // temp
     implementation project(":modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-amqp")
     implementation project(":modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-jms")
     implementation project(":modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-kafka")
@@ -37,4 +42,13 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
     implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-impl")
 
+
+    testImplementation "mysql:mysql-connector-java"
+    testImplementation "org.apache.commons:commons-lang3"
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "org.springframework:spring-jdbc"
+    testImplementation "org.springframework.security:spring-security-core"
+    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.boot:spring-boot-test"
 }

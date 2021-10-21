@@ -1,0 +1,10 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+    implementation "com.google.guava:guava"
+    implementation "commons-io:commons-io"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.springframework:spring-core"
+}

@@ -1,0 +1,9 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
+
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+
+    testImplementation "org.junit.jupiter:junit-jupiter"
+}
+

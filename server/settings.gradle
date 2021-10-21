@@ -31,5 +31,25 @@ pluginManagement {
 }
 
 rootProject.name = "server"
+
 include("modules:apps:atlas-app")
-include("modules:libs:atlas:atlas-workflow")
+include("modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-amqp")
+include("modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-jms")
+include("modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-kafka")
+include("modules:libs:atlas:atlas-repository:atlas-repository-git")
+include("modules:libs:atlas:atlas-repository:atlas-repository-yaml")
+include("modules:libs:atlas:atlas-rest")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-bento4")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-core")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-io")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-media")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-random")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-s3")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-shell")
+include("modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-time")
+include("modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+include("modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
+include("modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
+include("modules:libs:atlas:atlas-engine:atlas-engine-coordinator-impl")
+include("modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
+include("modules:libs:atlas:atlas-engine:atlas-engine-worker-impl")
