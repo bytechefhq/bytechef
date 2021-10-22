@@ -2,14 +2,14 @@
 
 java -jar \
      -Djava.security.egd=file:/dev/./urandom \
-     -Dpiper.message-broker.provider=amqp \
-     -Dpiper.coordinator.enabled=true \
-     -Dpiper.worker.enabled=true \
-     -Dpiper.worker.subscriptions.tasks=5 \
-     -Dpiper.workflow-repository.git.enabled=true \
-     -Dpiper.workflow-repository.git.url=https://github.com/creactiviti/piper-workflows.git \
-     -Dpiper.workflow-repository.git.search-paths=demo/,video/ \
-     -Dpiper.workflow-repository.filesystem.enabled=true \
-     -Dpiper.workflow-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
+     -Datlas.message-broker.provider=amqp \
+     -Datlas.coordinator.enabled=true \
+     -Datlas.worker.enabled=true \
+     -Datlas.worker.subscriptions.tasks=5 \
+     -Datlas.workflow-repository.git.enabled=true \
+     -Datlas.workflow-repository.git.url=https://github.com/creactiviti/atlas-workflows.git \
+     -Datlas.workflow-repository.git.search-paths=demo/,video/ \
+     -Datlas.workflow-repository.filesystem.enabled=true \
+     -Datlas.workflow-repository.filesystem.location-pattern=$HOME/atlas/**/*.yaml \
      -Dspring.datasource.initialization-mode=always \
      lib/atlas-app.jar

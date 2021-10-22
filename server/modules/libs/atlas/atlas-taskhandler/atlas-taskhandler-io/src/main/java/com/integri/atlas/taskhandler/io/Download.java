@@ -22,7 +22,7 @@ import static org.apache.commons.io.IOUtils.copy;
 
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.TaskHandler;
 import java.io.BufferedInputStream;
@@ -63,7 +63,7 @@ class Download implements TaskHandler<Object> {
                 int contentLength = connection.getContentLength();
                 Consumer<Integer> progressConsumer = p ->
                     eventPublisher.publishEvent(
-                        PiperEvent.of(Events.TASK_PROGRESSED, "taskId", aTask.getId(), "progress", p)
+                        WorkflowEvent.of(Events.TASK_PROGRESSED, "taskId", aTask.getId(), "progress", p)
                     );
 
                 try (

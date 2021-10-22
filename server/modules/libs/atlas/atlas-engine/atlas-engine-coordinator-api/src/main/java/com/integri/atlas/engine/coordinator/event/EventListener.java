@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 
 /**
  *
@@ -26,5 +26,5 @@ import com.integri.atlas.engine.core.event.PiperEvent;
  * @since Jun 9, 2017
  */
 public interface EventListener {
-    void onApplicationEvent(PiperEvent aEvent);
+    void onApplicationEvent(WorkflowEvent aEvent);
 }

@@ -2,9 +2,9 @@
 
 java -jar \
      -Djava.security.egd=file:/dev/./urandom \
-     -Dpiper.message-broker.provider=amqp \
-     -Dpiper.coordinator.enabled=false \
+     -Datlas.message-broker.provider=amqp \
+     -Datlas.coordinator.enabled=false \
      -Dserver.port=8181 \
-     -Dpiper.worker.enabled=true \
-     -Dpiper.worker.subscriptions.tasks=10 \
+     -Datlas.worker.enabled=true \
+     -Datlas.worker.subscriptions.tasks=10 \
      lib/atlas-app.jar

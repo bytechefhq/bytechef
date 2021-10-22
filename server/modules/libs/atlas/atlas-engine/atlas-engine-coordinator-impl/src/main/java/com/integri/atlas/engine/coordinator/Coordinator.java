@@ -30,7 +30,7 @@ import com.integri.atlas.engine.core.error.Errorable;
 import com.integri.atlas.engine.core.error.Prioritizable;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
@@ -123,7 +123,7 @@ public class Coordinator {
         MapContext context = new MapContext(jobParams.getMap(INPUTS, Collections.EMPTY_MAP));
         contextRepository.push(job.getId(), context);
 
-        eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus()));
+        eventPublisher.publishEvent(WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus()));
 
         messageBroker.send(Queues.JOBS, job);
 
@@ -137,7 +137,7 @@ public class Coordinator {
         job.setCurrentTask(0);
         jobRepository.merge(job);
         jobExecutor.execute(job);
-        eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus()));
+        eventPublisher.publishEvent(WorkflowEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus()));
     }
 
     private void validate(MapObject aCreateJobParams, Workflow aWorkflow) {
@@ -175,7 +175,7 @@ public class Coordinator {
         SimpleJob mjob = new SimpleJob(job);
         mjob.setStatus(JobStatus.STOPPED);
         jobRepository.merge(mjob);
-        eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus()));
+        eventPublisher.publishEvent(WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus()));
         if (mjob.getExecution().size() > 0) {
             SimpleTaskExecution currentTask = SimpleTaskExecution.of(
                 job.getExecution().get(job.getExecution().size() - 1)

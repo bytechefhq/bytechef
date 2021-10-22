@@ -35,7 +35,7 @@ public class DistributedEventPublisher implements EventPublisher {
     }
 
     @Override
-    public void publishEvent(PiperEvent aEvent) {
+    public void publishEvent(WorkflowEvent aEvent) {
         messageBroker.send(Queues.EVENTS, aEvent);
     }
 }

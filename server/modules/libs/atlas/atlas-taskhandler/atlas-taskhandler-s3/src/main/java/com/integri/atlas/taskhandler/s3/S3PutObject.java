@@ -27,7 +27,7 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
- * Adds an object to a bucket. Piper must have WRITE permissions on a bucket to add an object to it.
+ * Adds an object to a bucket. Atlas must have WRITE permissions on a bucket to add an object to it.
  *
  * @author Arik Cohen
  * @since Feb, 19 2020

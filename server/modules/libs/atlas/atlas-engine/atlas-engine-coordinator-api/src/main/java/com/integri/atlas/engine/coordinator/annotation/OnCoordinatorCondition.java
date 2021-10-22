@@ -25,7 +25,7 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
- * A Condition that evaluates if piper.roles property
+ * A Condition that evaluates if atlas.roles property
  * contains the value <code>coordinator</code>.
  *
  * @author Arik Cohen
@@ -35,7 +35,7 @@ public class OnCoordinatorCondition extends SpringBootCondition {
 
     @Override
     public ConditionOutcome getMatchOutcome(ConditionContext aContext, AnnotatedTypeMetadata aMetadata) {
-        String property = aContext.getEnvironment().getProperty("piper.coordinator.enabled");
+        String property = aContext.getEnvironment().getProperty("atlas.coordinator.enabled");
         boolean result = Boolean.valueOf(property);
         return new ConditionOutcome(
             result,

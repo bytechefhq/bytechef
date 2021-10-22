@@ -23,7 +23,7 @@ import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.error.ErrorObject;
 import com.integri.atlas.engine.coordinator.event.EventListener;
 import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.PiperEvent;
+import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
@@ -64,7 +64,7 @@ public class SubflowJobStatusEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(PiperEvent aEvent) {
+    public void onApplicationEvent(WorkflowEvent aEvent) {
         if (aEvent.getType().equals(Events.JOB_STATUS)) {
             String jobId = aEvent.getRequiredString("jobId");
             JobStatus status = JobStatus.valueOf(aEvent.getRequiredString("status"));

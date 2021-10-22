@@ -20,7 +20,7 @@ package com.integri.atlas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.config.CoordinatorProperties;
-import com.integri.atlas.engine.config.PiperProperties;
+import com.integri.atlas.engine.config.AtlasProperties;
 import com.integri.atlas.engine.config.WorkerProperties;
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.worker.Worker;
@@ -55,8 +55,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 @Configuration
-@EnableConfigurationProperties(PiperProperties.class)
-@ConditionalOnProperty(name = "piper.message-broker.provider", havingValue = "amqp")
+@EnableConfigurationProperties(AtlasProperties.class)
+@ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "amqp")
 public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer {
 
     @Autowired(required = false)
@@ -73,7 +73,7 @@ public class AmqpMessageBrokerConfiguration implements RabbitListenerConfigurer 
     private ObjectMapper objectMapper;
 
     @Autowired
-    private PiperProperties properties;
+    private AtlasProperties properties;
 
     @Autowired
     private ConnectionFactory connectionFactory;

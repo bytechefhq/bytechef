@@ -27,7 +27,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 /**
- * Retrieves objects from Amazon S3. To use GET, Piper must have READ access to the object.
+ * Retrieves objects from Amazon S3. To use GET, Atlas must have READ access to the object.
  *
  * @author Arik Cohen
  * @since Feb, 19 2020

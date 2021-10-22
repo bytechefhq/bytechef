@@ -31,7 +31,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
-@ConditionalOnProperty(name = "piper.persistence.provider", havingValue = "jdbc")
+@ConditionalOnProperty(name = "atlas.persistence.provider", havingValue = "jdbc")
 public class JdbcPersistenceConfiguration {
 
     @Bean

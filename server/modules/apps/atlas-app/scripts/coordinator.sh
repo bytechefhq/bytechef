@@ -2,11 +2,11 @@
 
 java -jar \
      -Djava.security.egd=file:/dev/./urandom \
-     -Dpiper.message-broker.provider=amqp \
-     -Dpiper.coordinator.enabled=true \
+     -Datlas.message-broker.provider=amqp \
+     -Datlas.coordinator.enabled=true \
      -Dserver.port=8080 \
-     -Dpiper.worker.enabled=false \
-     -Dpiper.workflow-repository.git.enabled=false \
-     -Dpiper.workflow-repository.filesystem.enabled=true \
-     -Dpiper.workflow-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
+     -Datlas.worker.enabled=false \
+     -Datlas.workflow-repository.git.enabled=false \
+     -Datlas.workflow-repository.filesystem.enabled=true \
+     -Datlas.workflow-repository.filesystem.location-pattern=$HOME/atlas/**/*.yaml \
      lib/atlas-app.jar

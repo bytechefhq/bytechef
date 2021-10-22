@@ -21,7 +21,7 @@ package com.integri.atlas.config;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.config.CoordinatorProperties;
-import com.integri.atlas.engine.config.PiperProperties;
+import com.integri.atlas.engine.config.AtlasProperties;
 import com.integri.atlas.engine.config.WorkerProperties;
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.worker.Worker;
@@ -61,8 +61,8 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
 
 @Configuration
-@EnableConfigurationProperties(PiperProperties.class)
-@ConditionalOnProperty(name = "piper.message-broker.provider", havingValue = "kafka")
+@EnableConfigurationProperties(AtlasProperties.class)
+@ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "kafka")
 public class KafkaMessageBrokerConfiguration implements KafkaListenerConfigurer {
 
     @Autowired(required = false)
@@ -75,7 +75,7 @@ public class KafkaMessageBrokerConfiguration implements KafkaListenerConfigurer 
     private EventListener eventListener;
 
     @Autowired
-    private PiperProperties properties;
+    private AtlasProperties properties;
 
     @Autowired
     private BeanFactory beanFactory;
