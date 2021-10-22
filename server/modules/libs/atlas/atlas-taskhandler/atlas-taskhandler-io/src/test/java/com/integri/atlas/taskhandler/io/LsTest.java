@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-public class LsTests {
+public class LsTest {
 
     @Test
     public void test1() throws IOException {

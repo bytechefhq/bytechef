@@ -34,7 +34,7 @@ import com.integri.atlas.engine.core.task.TaskExecutionRepository;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
-public class TaskExecutionErrorHandlerTests {
+public class TaskExecutionErrorHandlerTest {
 
     private JobRepository jobRepo = mock(JobRepository.class);
     private TaskExecutionRepository taskRepo = mock(TaskExecutionRepository.class);

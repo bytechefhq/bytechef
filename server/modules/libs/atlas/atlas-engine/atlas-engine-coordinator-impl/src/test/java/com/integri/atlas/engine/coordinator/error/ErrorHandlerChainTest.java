@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ErrorHandlerChainTests {
+public class ErrorHandlerChainTest {
 
     @Test
     public void test1() {

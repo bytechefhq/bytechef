@@ -16,20 +16,25 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.taskhandler.shell;
+package com.integri.atlas.taskhandler.io;
 
+import com.google.common.io.Files;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import java.io.File;
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
 
-public class BashTests {
+public class RmTest {
 
     @Test
-    public void test1() throws Exception {
-        Bash bash = new Bash();
-        ClassPathResource cpr = new ClassPathResource("test.txt");
-        String output = bash.handle(SimpleTaskExecution.of("script", "ls -l " + cpr.getFile().getAbsolutePath()));
-        Assertions.assertTrue(output.contains("build/resources/test/test.txt"));
+    public void test1() throws IOException {
+        Rm rm = new Rm();
+        SimpleTaskExecution task = new SimpleTaskExecution();
+        File tempDir = Files.createTempDir();
+        Assertions.assertTrue(tempDir.exists());
+        task.set("path", tempDir);
+        rm.handle(task);
+        Assertions.assertFalse(tempDir.exists());
     }
 }

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-public class GitWorkflowRepositoryTests {
+public class GitWorkflowRepositoryTest {
 
     @Test
     public void test1() {

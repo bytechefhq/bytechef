@@ -54,7 +54,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @SpringBootTest
-public class CoordinatorTests {
+public class CoordinatorIntTest {
 
     @Autowired
     private DataSource dataSource;
