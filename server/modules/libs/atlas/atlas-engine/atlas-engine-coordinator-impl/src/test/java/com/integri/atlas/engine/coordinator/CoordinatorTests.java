@@ -28,7 +28,7 @@ import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
-import com.integri.atlas.repository.yaml.pipeline.ResourceBasedPipelineRepository;
+import com.integri.atlas.repository.yaml.workflow.ResourceBasedWorkflowRepository;
 import com.integri.atlas.engine.worker.task.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.coordinator.task.JdbcTaskExecutionRepository;
 import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
@@ -99,7 +99,7 @@ public class CoordinatorTests {
         jobRepository.setJobTaskRepository(taskRepository);
 
         coordinator.setJobRepository(jobRepository);
-        coordinator.setPipelineRepository(new ResourceBasedPipelineRepository());
+        coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository());
         coordinator.setJobTaskRepository(taskRepository);
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
@@ -111,7 +111,7 @@ public class CoordinatorTests {
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
         jobExecutor.setContextRepository(contextRepository);
         jobExecutor.setJobTaskRepository(taskRepository);
-        jobExecutor.setPipelineRepository(new ResourceBasedPipelineRepository());
+        jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository());
         jobExecutor.setTaskDispatcher(taskDispatcher);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
         coordinator.setJobExecutor(jobExecutor);
@@ -121,7 +121,7 @@ public class CoordinatorTests {
         taskCompletionHandler.setJobExecutor(jobExecutor);
         taskCompletionHandler.setJobRepository(jobRepository);
         taskCompletionHandler.setJobTaskRepository(taskRepository);
-        taskCompletionHandler.setPipelineRepository(new ResourceBasedPipelineRepository());
+        taskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository());
         taskCompletionHandler.setEventPublisher(e -> {});
         taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
         coordinator.setTaskCompletionHandler(taskCompletionHandler);
@@ -129,7 +129,7 @@ public class CoordinatorTests {
 
         Job job = coordinator.create(
             MapObject.of(
-                ImmutableMap.of("pipelineId", "demo/hello", "inputs", Collections.singletonMap("yourName", "me"))
+                ImmutableMap.of("workflowId", "demo/hello", "inputs", Collections.singletonMap("yourName", "me"))
             )
         );
 
@@ -151,8 +151,8 @@ public class CoordinatorTests {
             IllegalArgumentException.class,
             () -> {
                 Coordinator coordinator = new Coordinator();
-                coordinator.setPipelineRepository(new ResourceBasedPipelineRepository());
-                coordinator.create(MapObject.of(Collections.singletonMap("pipelineId", "demo/hello")));
+                coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository());
+                coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "demo/hello")));
             }
         );
     }

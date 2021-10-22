@@ -25,7 +25,7 @@ import com.integri.atlas.engine.core.error.Retryable;
 import java.util.Date;
 
 /**
- * <p>Extends the {@link PipelineTask} interface to add execution semantics to
+ * <p>Extends the {@link WorkflowTask} interface to add execution semantics to
  * the task.</p>
  *
  * <p>{@link TaskExecution} instances capture the life cycle of a single
@@ -41,7 +41,7 @@ import java.util.Date;
  * @author Arik Cohen
  * @since May 8, 2017
  */
-public interface TaskExecution extends PipelineTask, Errorable, Retryable, Prioritizable, Progressable {
+public interface TaskExecution extends WorkflowTask, Errorable, Retryable, Prioritizable, Progressable {
     /**
      * Get the unique id of the task instance.
      *

@@ -16,17 +16,17 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.yaml.pipeline;
+package com.integri.atlas.repository.yaml.workflow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Throwables;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.coordinator.pipeline.IdentifiableResource;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
-import com.integri.atlas.engine.coordinator.pipeline.PipelineRepository;
+import com.integri.atlas.engine.coordinator.workflow.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
 import com.integri.atlas.engine.core.error.ErrorObject;
-import com.integri.atlas.engine.core.task.SimplePipelineTask;
+import com.integri.atlas.engine.core.task.SimpleWorkflowTask;
 import com.integri.atlas.engine.core.task.Task;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,19 +41,19 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
-public abstract class YamlPipelineRepository implements PipelineRepository {
+public abstract class YamlWorkflowRepository implements WorkflowRepository {
 
     protected ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-    protected Pipeline parsePipeline(IdentifiableResource aResource) {
+    protected Workflow parseWorkflow(IdentifiableResource aResource) {
         try {
             Map<String, Object> yamlMap = parse(aResource);
             yamlMap.put(DSL.ID, aResource.getId());
-            return new SimplePipeline(yamlMap);
+            return new SimpleWorkflow(yamlMap);
         } catch (Exception e) {
-            SimplePipeline pipeline = new SimplePipeline(Collections.singletonMap(DSL.ID, aResource.getId()));
-            pipeline.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
-            return pipeline;
+            SimpleWorkflow workflow = new SimpleWorkflow(Collections.singletonMap(DSL.ID, aResource.getId()));
+            workflow.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
+            return workflow;
         }
     }
 
@@ -68,7 +68,7 @@ public abstract class YamlPipelineRepository implements PipelineRepository {
             List<Task> tasks = new ArrayList<>();
             for (int i = 0; i < rawTasks.size(); i++) {
                 Map<String, Object> rt = rawTasks.get(i);
-                SimplePipelineTask mutableTask = new SimplePipelineTask(rt);
+                SimpleWorkflowTask mutableTask = new SimpleWorkflowTask(rt);
                 mutableTask.setTaskNumber(i + 1);
                 tasks.add(mutableTask);
             }
@@ -84,8 +84,8 @@ public abstract class YamlPipelineRepository implements PipelineRepository {
         validateOutputs(aMap);
     }
 
-    private void validateOutputs(Map<String, Object> aPipeline) {
-        List<Map<String, Object>> outputs = (List<Map<String, Object>>) aPipeline.get(DSL.OUTPUTS);
+    private void validateOutputs(Map<String, Object> aWorkflow) {
+        List<Map<String, Object>> outputs = (List<Map<String, Object>>) aWorkflow.get(DSL.OUTPUTS);
         for (int i = 0; outputs != null && i < outputs.size(); i++) {
             Map<String, Object> output = outputs.get(i);
             Assert.notNull(output.get(DSL.NAME), "output definition must specify a 'name'");
@@ -93,9 +93,9 @@ public abstract class YamlPipelineRepository implements PipelineRepository {
         }
     }
 
-    private void validateReservedWords(Map<String, Object> aPipeline) {
+    private void validateReservedWords(Map<String, Object> aWorkflow) {
         List<String> reservedWords = Arrays.asList(DSL.RESERVED_WORDS);
-        for (Entry<String, Object> entry : aPipeline.entrySet()) {
+        for (Entry<String, Object> entry : aWorkflow.entrySet()) {
             String k = entry.getKey();
             Object v = entry.getValue();
             Assert.isTrue(!reservedWords.contains(k), "reserved word: " + k);

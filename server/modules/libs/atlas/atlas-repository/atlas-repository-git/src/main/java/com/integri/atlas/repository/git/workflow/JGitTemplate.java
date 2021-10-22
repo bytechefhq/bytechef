@@ -16,11 +16,11 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.git.pipeline;
+package com.integri.atlas.repository.git.workflow;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
-import com.integri.atlas.engine.coordinator.pipeline.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.IdentifiableResource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;

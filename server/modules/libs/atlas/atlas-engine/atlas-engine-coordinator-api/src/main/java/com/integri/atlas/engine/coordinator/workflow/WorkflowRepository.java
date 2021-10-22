@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.pipeline;
+package com.integri.atlas.engine.coordinator.workflow;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ import java.util.List;
  * @author Arik Cohen
  * @since Jun 18, 2016
  */
-public interface PipelineRepository {
-    Pipeline findOne(String aId);
+public interface WorkflowRepository {
+    Workflow findOne(String aId);
 
-    List<Pipeline> findAll();
+    List<Workflow> findAll();
 }

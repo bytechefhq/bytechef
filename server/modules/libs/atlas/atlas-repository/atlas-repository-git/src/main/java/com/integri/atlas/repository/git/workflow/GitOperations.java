@@ -16,9 +16,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.git.pipeline;
+package com.integri.atlas.repository.git.workflow;
 
-import com.integri.atlas.engine.coordinator.pipeline.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.IdentifiableResource;
 import java.util.List;
 
 public interface GitOperations {

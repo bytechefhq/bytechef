@@ -23,7 +23,7 @@ package com.integri.atlas.engine.core.context;
  * objects.</p>
  *
  * <p>{@link Context} instances are used to evaluate
- * pipeline tasks before they are executed.</p>
+ * workflow tasks before they are executed.</p>
  *
  * @author Arik Cohen
  * @since Mar 2017

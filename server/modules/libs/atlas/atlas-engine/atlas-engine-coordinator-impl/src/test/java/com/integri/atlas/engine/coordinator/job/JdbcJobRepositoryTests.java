@@ -23,11 +23,8 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.integri.atlas.engine.coordinator.job.JdbcJobRepository;
-import com.integri.atlas.engine.coordinator.job.JobSummary;
 import com.integri.atlas.engine.coordinator.Page;
-import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
-import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.coordinator.task.JdbcTaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.text.SimpleDateFormat;
@@ -61,7 +58,7 @@ public class JdbcJobRepositoryTests {
         String id = UUIDGenerator.generate();
 
         SimpleJob job = new SimpleJob();
-        job.setPipelineId("demo:1234");
+        job.setWorkflowId("demo:1234");
         job.setId(id);
         job.setCreateTime(new Date());
         job.setStatus(JobStatus.CREATED);
@@ -88,7 +85,7 @@ public class JdbcJobRepositoryTests {
 
         SimpleJob job = new SimpleJob();
         job.setId(id);
-        job.setPipelineId("demo:1234");
+        job.setWorkflowId("demo:1234");
         job.setCreateTime(new Date());
         job.setStatus(JobStatus.CREATED);
         jobRepository.create(job);
@@ -123,7 +120,7 @@ public class JdbcJobRepositoryTests {
 
         SimpleJob completedJobYesterday = new SimpleJob();
         completedJobYesterday.setId(id);
-        completedJobYesterday.setPipelineId("demo:1234");
+        completedJobYesterday.setWorkflowId("demo:1234");
         completedJobYesterday.setCreateTime(Date.from(Instant.now().minus(2, DAYS)));
         completedJobYesterday.setStatus(JobStatus.COMPLETED);
         jobRepository.create(completedJobYesterday);
@@ -133,7 +130,7 @@ public class JdbcJobRepositoryTests {
         for (int i = 0; i < 5; i++) {
             SimpleJob completedJobToday = new SimpleJob();
             completedJobToday.setId(UUIDGenerator.generate() + "." + i);
-            completedJobToday.setPipelineId("demo:1234");
+            completedJobToday.setWorkflowId("demo:1234");
             completedJobToday.setCreateTime(Date.from(Instant.now().minus(1, DAYS)));
             completedJobToday.setStatus(JobStatus.COMPLETED);
             jobRepository.create(completedJobToday);
@@ -143,7 +140,7 @@ public class JdbcJobRepositoryTests {
 
         SimpleJob runningJobToday = new SimpleJob();
         runningJobToday.setId(UUIDGenerator.generate());
-        runningJobToday.setPipelineId("demo:1234");
+        runningJobToday.setWorkflowId("demo:1234");
         runningJobToday.setCreateTime(new Date());
         runningJobToday.setStatus(JobStatus.STARTED);
         jobRepository.create(runningJobToday);
@@ -171,7 +168,7 @@ public class JdbcJobRepositoryTests {
         for (int i = 0; i < 5; i++) {
             SimpleJob completedJobYesterday = new SimpleJob();
             completedJobYesterday.setId(UUIDGenerator.generate() + "." + i);
-            completedJobYesterday.setPipelineId("demo:1234");
+            completedJobYesterday.setWorkflowId("demo:1234");
             completedJobYesterday.setCreateTime(Date.from(Instant.now().minus(2, DAYS)));
             completedJobYesterday.setStatus(JobStatus.COMPLETED);
             jobRepository.create(completedJobYesterday);
@@ -181,14 +178,14 @@ public class JdbcJobRepositoryTests {
 
         SimpleJob runningJobYesterday = new SimpleJob();
         runningJobYesterday.setId(UUIDGenerator.generate());
-        runningJobYesterday.setPipelineId("demo:1234");
+        runningJobYesterday.setWorkflowId("demo:1234");
         runningJobYesterday.setCreateTime(Date.from(Instant.now().minus(1, DAYS)));
         runningJobYesterday.setStatus(JobStatus.STARTED);
         jobRepository.create(runningJobYesterday);
 
         SimpleJob completedJobToday = new SimpleJob();
         completedJobToday.setId(UUIDGenerator.generate());
-        completedJobToday.setPipelineId("demo:1234");
+        completedJobToday.setWorkflowId("demo:1234");
         completedJobToday.setCreateTime(Date.from(Instant.now().minus(1, DAYS)));
         completedJobToday.setStatus(JobStatus.COMPLETED);
         jobRepository.create(completedJobToday);

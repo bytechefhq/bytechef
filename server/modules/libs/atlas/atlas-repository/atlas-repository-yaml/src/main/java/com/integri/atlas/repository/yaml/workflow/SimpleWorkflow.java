@@ -16,23 +16,23 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.yaml.pipeline;
+package com.integri.atlas.repository.yaml.workflow;
 
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.error.Error;
 import com.integri.atlas.engine.core.error.ErrorObject;
-import com.integri.atlas.engine.core.task.PipelineTask;
+import com.integri.atlas.engine.core.task.WorkflowTask;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class SimplePipeline extends MapObject implements Pipeline {
+public class SimpleWorkflow extends MapObject implements Workflow {
 
-    public SimplePipeline(Map<String, Object> aSource) {
+    public SimpleWorkflow(Map<String, Object> aSource) {
         super(aSource);
     }
 
@@ -47,8 +47,8 @@ public class SimplePipeline extends MapObject implements Pipeline {
     }
 
     @Override
-    public List<PipelineTask> getTasks() {
-        return getList(DSL.TASKS, PipelineTask.class);
+    public List<WorkflowTask> getTasks() {
+        return getList(DSL.TASKS, WorkflowTask.class);
     }
 
     @Override

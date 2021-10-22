@@ -19,10 +19,11 @@
 package com.integri.atlas.workflow.web;
 
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
-import com.integri.atlas.engine.coordinator.pipeline.PipelineRepository;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
+import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,20 +31,20 @@ import org.springframework.web.servlet.HandlerMapping;
 
 @RestController
 @ConditionalOnCoordinator
-public class PipelinesController {
+public class WorkflowsController {
 
     @Autowired
-    private PipelineRepository pipelineRepository;
+    private WorkflowRepository workflowRepository;
 
-    @GetMapping("/pipelines")
-    public List<Pipeline> list() {
-        return pipelineRepository.findAll();
+    @GetMapping("/workflows")
+    public List<Workflow> list() {
+        return workflowRepository.findAll();
     }
 
-    @GetMapping("/pipelines/**")
-    public Pipeline get(HttpServletRequest aRequest) {
+    @GetMapping("/workflows/**")
+    public Workflow get(HttpServletRequest aRequest) {
         String path = (String) aRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String pipelineId = path.replaceFirst("/pipelines/", "");
-        return pipelineRepository.findOne(pipelineId);
+        String workflowId = path.replaceFirst("/workflows/", "");
+        return workflowRepository.findOne(workflowId);
     }
 }

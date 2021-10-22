@@ -39,7 +39,7 @@ import com.integri.atlas.engine.coordinator.event.TaskStartedEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskStartedWebhookEventListener;
 import com.integri.atlas.engine.coordinator.job.JobRepository;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
-import com.integri.atlas.engine.coordinator.pipeline.PipelineRepository;
+import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
 import com.integri.atlas.engine.coordinator.task.ControlTaskDispatcher;
 import com.integri.atlas.engine.core.task.CounterRepository;
 import com.integri.atlas.engine.coordinator.task.EachTaskDispatcher;
@@ -78,7 +78,7 @@ public class CoordinatorConfiguration {
     private ContextRepository contextRepository;
 
     @Autowired
-    private PipelineRepository pipelineRepository;
+    private WorkflowRepository workflowRepository;
 
     @Autowired
     private CounterRepository counterRepository;
@@ -101,7 +101,7 @@ public class CoordinatorConfiguration {
         coordinator.setEventPublisher(eventPublisher);
         coordinator.setJobRepository(jobRepository);
         coordinator.setJobTaskRepository(taskExecutionRepo);
-        coordinator.setPipelineRepository(pipelineRepository);
+        coordinator.setWorkflowRepository(workflowRepository);
         coordinator.setJobExecutor(jobExecutor());
         coordinator.setTaskDispatcher(taskDispatcher());
         coordinator.setErrorHandler(errorHandler());
@@ -148,7 +148,7 @@ public class CoordinatorConfiguration {
         taskCompletionHandler.setJobExecutor(jobExecutor());
         taskCompletionHandler.setJobRepository(jobRepository);
         taskCompletionHandler.setJobTaskRepository(taskExecutionRepo);
-        taskCompletionHandler.setPipelineRepository(pipelineRepository);
+        taskCompletionHandler.setWorkflowRepository(workflowRepository);
         taskCompletionHandler.setEventPublisher(eventPublisher);
         taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
         return taskCompletionHandler;
@@ -227,7 +227,7 @@ public class CoordinatorConfiguration {
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
         jobExecutor.setContextRepository(contextRepository);
         jobExecutor.setJobTaskRepository(taskExecutionRepo);
-        jobExecutor.setPipelineRepository(pipelineRepository);
+        jobExecutor.setWorkflowRepository(workflowRepository);
         jobExecutor.setTaskDispatcher(taskDispatcher());
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
         return jobExecutor;

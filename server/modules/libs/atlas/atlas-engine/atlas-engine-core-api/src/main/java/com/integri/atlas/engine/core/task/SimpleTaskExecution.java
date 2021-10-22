@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-public class SimpleTaskExecution extends SimplePipelineTask implements TaskExecution {
+public class SimpleTaskExecution extends SimpleWorkflowTask implements TaskExecution {
 
     public SimpleTaskExecution() {
         this(Collections.emptyMap());

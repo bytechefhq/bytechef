@@ -51,7 +51,7 @@ public class DSL {
 
     public static final String CREATE_TIME = "createTime";
 
-    public static final String PIPELINE_ID = "pipelineId";
+    public static final String WORKFLOW_ID = "workflowId";
 
     public static final String START_TIME = "startTime";
 

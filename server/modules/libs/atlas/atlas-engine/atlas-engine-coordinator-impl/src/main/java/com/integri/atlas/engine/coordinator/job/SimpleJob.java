@@ -132,12 +132,12 @@ public class SimpleJob extends MapObject implements Job {
     }
 
     @Override
-    public String getPipelineId() {
-        return getString(DSL.PIPELINE_ID);
+    public String getWorkflowId() {
+        return getString(DSL.WORKFLOW_ID);
     }
 
-    public void setPipelineId(String aPipelineId) {
-        set(DSL.PIPELINE_ID, aPipelineId);
+    public void setWorkflowId(String aWorkflowId) {
+        set(DSL.WORKFLOW_ID, aWorkflowId);
     }
 
     @Override

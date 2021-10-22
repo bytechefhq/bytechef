@@ -23,13 +23,13 @@ import com.integri.atlas.engine.core.MapObject;
 import java.util.List;
 import java.util.Map;
 
-public class SimplePipelineTask extends MapObject implements PipelineTask {
+public class SimpleWorkflowTask extends MapObject implements WorkflowTask {
 
-    public SimplePipelineTask(Task aSource) {
+    public SimpleWorkflowTask(Task aSource) {
         super(aSource.asMap());
     }
 
-    public SimplePipelineTask(Map<String, Object> aSource) {
+    public SimpleWorkflowTask(Map<String, Object> aSource) {
         super(aSource);
     }
 
@@ -72,17 +72,17 @@ public class SimplePipelineTask extends MapObject implements PipelineTask {
     }
 
     @Override
-    public List<PipelineTask> getPre() {
-        return getList(DSL.PRE, PipelineTask.class, List.of());
+    public List<WorkflowTask> getPre() {
+        return getList(DSL.PRE, WorkflowTask.class, List.of());
     }
 
     @Override
-    public List<PipelineTask> getPost() {
-        return getList(DSL.POST, PipelineTask.class, List.of());
+    public List<WorkflowTask> getPost() {
+        return getList(DSL.POST, WorkflowTask.class, List.of());
     }
 
     @Override
-    public List<PipelineTask> getFinalize() {
-        return getList(DSL.FINALIZE, PipelineTask.class, List.of());
+    public List<WorkflowTask> getFinalize() {
+        return getList(DSL.FINALIZE, WorkflowTask.class, List.of());
     }
 }

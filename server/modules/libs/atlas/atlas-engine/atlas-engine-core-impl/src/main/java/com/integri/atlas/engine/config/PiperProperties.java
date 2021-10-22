@@ -25,7 +25,7 @@ public class PiperProperties {
 
     private SerializationProperties serialization;
     private PersistenceProperties persistence;
-    private PipelineRepositoryProperties pipelineRepository;
+    private WorkflowRepositoryProperties workflowRepository;
     private MessageBrokerProperties messageBroker;
     private CoordinatorProperties coordinator = new CoordinatorProperties();
     private WorkerProperties worker = new WorkerProperties();
@@ -46,12 +46,12 @@ public class PiperProperties {
         persistence = aPersistence;
     }
 
-    public PipelineRepositoryProperties getPipelineRepository() {
-        return pipelineRepository;
+    public WorkflowRepositoryProperties getWorkflowRepository() {
+        return workflowRepository;
     }
 
-    public void setPipelineRepository(PipelineRepositoryProperties aPipelineRepository) {
-        pipelineRepository = aPipelineRepository;
+    public void setWorkflowRepository(WorkflowRepositoryProperties aWorkflowRepository) {
+        workflowRepository = aWorkflowRepository;
     }
 
     public MessageBrokerProperties getMessageBroker() {

@@ -6,7 +6,7 @@ java -jar \
      -Dpiper.coordinator.enabled=true \
      -Dserver.port=8080 \
      -Dpiper.worker.enabled=false \
-     -Dpiper.pipeline-repository.git.enabled=false \
-     -Dpiper.pipeline-repository.filesystem.enabled=true \
-     -Dpiper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
+     -Dpiper.workflow-repository.git.enabled=false \
+     -Dpiper.workflow-repository.filesystem.enabled=true \
+     -Dpiper.workflow-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
      lib/atlas-app.jar

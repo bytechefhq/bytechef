@@ -19,8 +19,8 @@
 package com.integri.atlas.engine.core;
 
 import com.google.common.base.Throwables;
-import com.integri.atlas.engine.core.task.PipelineTask;
-import com.integri.atlas.engine.core.task.SimplePipelineTask;
+import com.integri.atlas.engine.core.task.WorkflowTask;
+import com.integri.atlas.engine.core.task.SimpleWorkflowTask;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.time.Duration;
@@ -92,8 +92,8 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
         for (Object item : list) {
             if (aElementType.equals(Accessor.class) || aElementType.equals(MapObject.class)) {
                 typedList.add((T) new MapObject((Map<String, Object>) item));
-            } else if (aElementType.equals(PipelineTask.class)) {
-                typedList.add((T) new SimplePipelineTask((Map<String, Object>) item));
+            } else if (aElementType.equals(WorkflowTask.class)) {
+                typedList.add((T) new SimpleWorkflowTask((Map<String, Object>) item));
             } else {
                 typedList.add(conversionService.convert(item, aElementType));
             }

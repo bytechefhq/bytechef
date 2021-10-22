@@ -18,6 +18,7 @@
 
 package com.integri.atlas.engine.coordinator;
 
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
@@ -36,8 +37,7 @@ import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
-import com.integri.atlas.engine.coordinator.pipeline.Pipeline;
-import com.integri.atlas.engine.coordinator.pipeline.PipelineRepository;
+import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
@@ -63,7 +63,7 @@ import org.springframework.util.Assert;
  */
 public class Coordinator {
 
-    private PipelineRepository pipelineRepository;
+    private WorkflowRepository workflowRepository;
     private JobRepository jobRepository;
     private TaskExecutionRepository jobTaskRepository;
     private EventPublisher eventPublisher;
@@ -74,7 +74,7 @@ public class Coordinator {
     private JobExecutor jobExecutor;
     private MessageBroker messageBroker;
 
-    private static final String PIPELINE_ID = "pipelineId";
+    private static final String WORKFLOW_ID = "workflowId";
     private static final String TAGS = "tags";
     private static final String INPUTS = "inputs";
     private static final String WEBHOOKS = "webhooks";
@@ -93,15 +93,15 @@ public class Coordinator {
     public Job create(Map<String, Object> aJobParams) {
         Assert.notNull(aJobParams, "request can't be null");
         MapObject jobParams = MapObject.of(aJobParams);
-        String pipelineId = jobParams.getRequiredString(PIPELINE_ID);
-        Pipeline pipeline = pipelineRepository.findOne(pipelineId);
-        Assert.notNull(pipeline, String.format("Unkown pipeline: %s", pipelineId));
+        String workflowId = jobParams.getRequiredString(WORKFLOW_ID);
+        Workflow workflow = workflowRepository.findOne(workflowId);
+        Assert.notNull(workflow, String.format("Unkown workflow: %s", workflowId));
         Assert.isNull(
-            pipeline.getError(),
-            pipeline.getError() != null ? String.format("%s: %s", pipelineId, pipeline.getError().getMessage()) : null
+            workflow.getError(),
+            workflow.getError() != null ? String.format("%s: %s", workflowId, workflow.getError().getMessage()) : null
         );
 
-        validate(jobParams, pipeline);
+        validate(jobParams, workflow);
 
         MapObject inputs = MapObject.of(jobParams.getMap(INPUTS, Collections.EMPTY_MAP));
         List<Accessor> webhooks = jobParams.getList(WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
@@ -109,9 +109,9 @@ public class Coordinator {
 
         SimpleJob job = new SimpleJob();
         job.setId(UUIDGenerator.generate());
-        job.setLabel(jobParams.getString(DSL.LABEL, pipeline.getLabel()));
+        job.setLabel(jobParams.getString(DSL.LABEL, workflow.getLabel()));
         job.setPriority(jobParams.getInteger(DSL.PRIORITY, Prioritizable.DEFAULT_PRIORITY));
-        job.setPipelineId(pipeline.getId());
+        job.setWorkflowId(workflow.getId());
         job.setStatus(JobStatus.CREATED);
         job.setCreateTime(new Date());
         job.setParentTaskExecutionId((String) aJobParams.get(DSL.PARENT_TASK_EXECUTION_ID));
@@ -140,10 +140,10 @@ public class Coordinator {
         eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus()));
     }
 
-    private void validate(MapObject aCreateJobParams, Pipeline aPipeline) {
+    private void validate(MapObject aCreateJobParams, Workflow aWorkflow) {
         // validate inputs
         Map<String, Object> inputs = aCreateJobParams.getMap(DSL.INPUTS, Collections.EMPTY_MAP);
-        List<Accessor> input = aPipeline.getInputs();
+        List<Accessor> input = aWorkflow.getInputs();
         for (Accessor in : input) {
             if (in.getBoolean(DSL.REQUIRED, false)) {
                 Assert.isTrue(inputs.containsKey(in.get(DSL.NAME)), "Missing required param: " + in.get("name"));
@@ -254,8 +254,8 @@ public class Coordinator {
         taskDispatcher = aTaskDispatcher;
     }
 
-    public void setPipelineRepository(PipelineRepository aPipelineRepository) {
-        pipelineRepository = aPipelineRepository;
+    public void setWorkflowRepository(WorkflowRepository aWorkflowRepository) {
+        workflowRepository = aWorkflowRepository;
     }
 
     public void setJobTaskRepository(TaskExecutionRepository aJobTaskRepository) {
