@@ -16,20 +16,32 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.context;
+package com.integri.atlas.engine.core.task.repository;
 
 /**
- * <p>Stores context information for a job or task
- * objects.</p>
- *
- * <p>{@link Context} instances are used to evaluate
- * workflow tasks before they are executed.</p>
+ * A repository that can be used to atomically set
+ * a counter value.
  *
  * @author Arik Cohen
- * @since Mar 2017
  */
-public interface ContextRepository {
-    void push(String aStackId, Context aContext);
+public interface CounterRepository {
+    /**
+     * Set the counter to the give value.
+     * @param aCounterName the name of the counter
+     * @param aValue the value to set the counter to.
+     */
+    void set(String aCounterName, long aValue);
 
-    Context peek(String aStackId);
+    /**
+     * Decrement the specified counter by 1.
+     * @param aCounterName the name of the counter
+     * @return the new value
+     */
+    long decrement(String aCounterName);
+
+    /**
+     * Delete the specified counter.
+     * @param aCounterName the name of the counter
+     */
+    void delete(String aCounterName);
 }

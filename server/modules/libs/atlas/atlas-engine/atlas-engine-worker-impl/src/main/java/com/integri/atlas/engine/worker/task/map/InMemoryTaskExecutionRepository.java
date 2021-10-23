@@ -19,7 +19,7 @@
 package com.integri.atlas.engine.worker.task.map;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.TaskExecutionRepository;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

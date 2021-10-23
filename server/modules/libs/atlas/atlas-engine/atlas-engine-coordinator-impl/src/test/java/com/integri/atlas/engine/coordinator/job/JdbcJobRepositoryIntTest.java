@@ -20,39 +20,24 @@ package com.integri.atlas.engine.coordinator.job;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.integri.atlas.engine.coordinator.job.JdbcJobRepository;
 import com.integri.atlas.engine.coordinator.Page;
-import com.integri.atlas.engine.coordinator.job.JobStatus;
-import com.integri.atlas.engine.coordinator.task.JdbcTaskExecutionRepository;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @SpringBootTest
 public class JdbcJobRepositoryIntTest {
 
     @Autowired
-    private DataSource dataSource;
+    private JobRepository jobRepository;
 
     @Test
     public void test1() {
-        JdbcTaskExecutionRepository taskRepository = new JdbcTaskExecutionRepository();
-        taskRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        taskRepository.setObjectMapper(createObjectMapper());
-
-        JdbcJobRepository jobRepository = new JdbcJobRepository();
-        jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        jobRepository.setJobTaskRepository(taskRepository);
-
         int pageTotal = jobRepository.getPage(1).getSize();
 
         String id = UUIDGenerator.generate();
@@ -73,14 +58,6 @@ public class JdbcJobRepositoryIntTest {
 
     @Test
     public void test2() {
-        JdbcTaskExecutionRepository taskRepository = new JdbcTaskExecutionRepository();
-        taskRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        taskRepository.setObjectMapper(createObjectMapper());
-
-        JdbcJobRepository jobRepository = new JdbcJobRepository();
-        jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        jobRepository.setJobTaskRepository(taskRepository);
-
         String id = UUIDGenerator.generate();
 
         SimpleJob job = new SimpleJob();
@@ -105,15 +82,6 @@ public class JdbcJobRepositoryIntTest {
 
     @Test
     public void test3() {
-        // arrange
-        JdbcTaskExecutionRepository taskRepository = new JdbcTaskExecutionRepository();
-        taskRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        taskRepository.setObjectMapper(createObjectMapper());
-
-        JdbcJobRepository jobRepository = new JdbcJobRepository();
-        jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        jobRepository.setJobTaskRepository(taskRepository);
-
         String id = UUIDGenerator.generate();
 
         int countCompletedJobsToday = jobRepository.countCompletedJobsToday();
@@ -154,15 +122,6 @@ public class JdbcJobRepositoryIntTest {
 
     @Test
     public void test4() {
-        // arrange
-        JdbcTaskExecutionRepository taskRepository = new JdbcTaskExecutionRepository();
-        taskRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        taskRepository.setObjectMapper(createObjectMapper());
-
-        JdbcJobRepository jobRepository = new JdbcJobRepository();
-        jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        jobRepository.setJobTaskRepository(taskRepository);
-
         int countCompletedJobsYesterday = jobRepository.countCompletedJobsYesterday();
 
         for (int i = 0; i < 5; i++) {
@@ -197,12 +156,5 @@ public class JdbcJobRepositoryIntTest {
 
         // assert
         Assertions.assertEquals(countCompletedJobsYesterday + 5, yesterdayJobs);
-    }
-
-    private ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
-        return objectMapper;
     }
 }

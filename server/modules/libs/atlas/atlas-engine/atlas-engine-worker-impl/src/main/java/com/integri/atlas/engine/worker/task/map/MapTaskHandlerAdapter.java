@@ -25,7 +25,6 @@ import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.MapTaskDispatcher;
 import com.integri.atlas.engine.worker.Worker;
-import com.integri.atlas.engine.worker.context.InMemoryContextRepository;
 import com.integri.atlas.engine.core.task.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.ArrayList;

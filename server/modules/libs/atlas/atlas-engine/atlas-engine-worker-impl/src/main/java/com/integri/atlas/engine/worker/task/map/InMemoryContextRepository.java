@@ -16,10 +16,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.context;
+package com.integri.atlas.engine.worker.task.map;
 
 import com.integri.atlas.engine.core.context.Context;
-import com.integri.atlas.engine.core.context.ContextRepository;
+import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-public class InMemoryContextRepository implements ContextRepository {
+class InMemoryContextRepository implements ContextRepository {
 
     private final Map<String, Deque<Context>> contexts = new HashMap<>();
 

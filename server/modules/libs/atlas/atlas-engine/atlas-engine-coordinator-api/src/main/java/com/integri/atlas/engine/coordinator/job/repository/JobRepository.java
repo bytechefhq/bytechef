@@ -16,9 +16,11 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.job;
+package com.integri.atlas.engine.coordinator.job.repository;
 
 import com.integri.atlas.engine.coordinator.Page;
+import com.integri.atlas.engine.coordinator.job.Job;
+import com.integri.atlas.engine.coordinator.job.JobSummary;
 
 import java.util.Optional;
 

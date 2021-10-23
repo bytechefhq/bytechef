@@ -22,7 +22,7 @@ import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.Page;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.job.JobRepository;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobSummary;
 import java.io.IOException;
 import java.util.Map;

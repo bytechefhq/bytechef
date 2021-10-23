@@ -22,7 +22,7 @@ import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.job.JobRepository;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import java.util.List;
 
 import com.integri.atlas.engine.core.event.Events;
