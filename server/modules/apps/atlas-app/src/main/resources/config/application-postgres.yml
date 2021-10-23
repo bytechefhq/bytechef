@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/atlas
+    username: atlas
+    password: atlas
+  sql:
+    init:
+      platform: postgres

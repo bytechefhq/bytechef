@@ -1,0 +1,32 @@
+logging:
+  level:
+    ROOT: INFO
+    com.integri.atlas: DEBUG
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+  jackson:
+    serialization:
+      indent-output: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/atlas?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: root
+    password: root
+    hikari:
+      poolName: Hikari
+#      auto-commit: false
+  h2:
+    console:
+      enabled: false
+  messages:
+    cache-duration: PT1S
+  sql:
+    init:
+      mode: always
+      platform: mysql
+
+server:
+  port: 8080
