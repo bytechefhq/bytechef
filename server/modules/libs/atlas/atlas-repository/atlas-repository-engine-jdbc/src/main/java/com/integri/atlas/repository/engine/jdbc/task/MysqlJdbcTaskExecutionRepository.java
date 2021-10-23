@@ -12,14 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.task.repository;
+package com.integri.atlas.repository.engine.jdbc.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.json.Json;
+import com.integri.atlas.engine.core.json.Json;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
@@ -29,20 +33,21 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-public class PostgresJdbcTaskExecutionRepository implements TaskExecutionRepository {
+/**
+ * @author Ivica Cardic
+ */
+public class MysqlJdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     private NamedParameterJdbcOperations jdbc;
     private ObjectMapper json = new ObjectMapper();
 
     @Override
     public TaskExecution findOne(String aTaskExecutionId) {
-        List<TaskExecution> query = jdbc.query("select * from task_execution where id = :id", Collections.singletonMap("id", aTaskExecutionId), this::jobTaskRowMappper);
+        List<TaskExecution> query = jdbc.query(
+            "select * from task_execution where id = :id",
+            Collections.singletonMap("id", aTaskExecutionId),
+            this::jobTaskRowMappper
+        );
         if (query.size() == 1) {
             return query.get(0);
         }
@@ -51,23 +56,32 @@ public class PostgresJdbcTaskExecutionRepository implements TaskExecutionReposit
 
     @Override
     public List<TaskExecution> findByParentId(String aParentId) {
-        return jdbc.query("select * from task_execution where parent_id = :parentId order by task_number", Collections.singletonMap("parentId", aParentId), this::jobTaskRowMappper);
+        return jdbc.query(
+            "select * from task_execution where parent_id = :parentId order by task_number",
+            Collections.singletonMap("parentId", aParentId),
+            this::jobTaskRowMappper
+        );
     }
 
     @Override
     public void create(TaskExecution aTaskExecution) {
         SqlParameterSource sqlParameterSource = createSqlParameterSource(aTaskExecution);
-        String sql = "insert into task_execution " +
+        String sql =
+            "insert into task_execution " +
             "  (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) " +
             "values " +
-            "  (:id,:parentId,:jobId,(:serializedExecution)::jsonb,:status,:progress,:createTime,:priority,:taskNumber)";
+            "  (:id,:parentId,:jobId,:serializedExecution,:status,:progress,:createTime,:priority,:taskNumber)";
         jdbc.update(sql, sqlParameterSource);
     }
 
     @Override
     @Transactional
     public TaskExecution merge(TaskExecution aTaskExecution) {
-        TaskExecution current = jdbc.queryForObject("select * from task_execution where id = :id for update", Collections.singletonMap("id", aTaskExecution.getId()), this::jobTaskRowMappper);
+        TaskExecution current = jdbc.queryForObject(
+            "select * from task_execution where id = :id for update",
+            Collections.singletonMap("id", aTaskExecution.getId()),
+            this::jobTaskRowMappper
+        );
         SimpleTaskExecution merged = SimpleTaskExecution.of(aTaskExecution);
         if (current.getStatus().isTerminated() && aTaskExecution.getStatus() == TaskStatus.STARTED) {
             merged = SimpleTaskExecution.of(current);
@@ -76,15 +90,20 @@ public class PostgresJdbcTaskExecutionRepository implements TaskExecutionReposit
             merged.setStartTime(current.getStartTime());
         }
         SqlParameterSource sqlParameterSource = createSqlParameterSource(merged);
-        String sql = "update task_execution set " +
-            "  serialized_execution=(:serializedExecution)::jsonb,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ";
+        String sql =
+            "update task_execution set " +
+            "  serialized_execution=:serializedExecution,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ";
         jdbc.update(sql, sqlParameterSource);
         return merged;
     }
 
     @Override
     public List<TaskExecution> getExecution(String aJobId) {
-        return jdbc.query("select * From task_execution where job_id = :jobId order by create_time asc", Collections.singletonMap("jobId", aJobId), this::jobTaskRowMappper);
+        return jdbc.query(
+            "select * From task_execution where job_id = :jobId order by create_time asc",
+            Collections.singletonMap("jobId", aJobId),
+            this::jobTaskRowMappper
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -115,5 +134,4 @@ public class PostgresJdbcTaskExecutionRepository implements TaskExecutionReposit
     public void setObjectMapper(ObjectMapper aJson) {
         json = aJson;
     }
-
 }

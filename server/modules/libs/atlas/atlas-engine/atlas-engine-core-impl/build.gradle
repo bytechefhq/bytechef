@@ -1,6 +1,8 @@
 dependencies {
+    api "com.fasterxml.jackson.core:jackson-databind"
     api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
 
+    implementation "com.google.guava:guava"
     implementation "commons-io:commons-io"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"

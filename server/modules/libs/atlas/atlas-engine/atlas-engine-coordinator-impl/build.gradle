@@ -2,7 +2,6 @@ dependencies {
     api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
     api project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
 
-    implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.google.guava:guava"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
@@ -23,6 +22,7 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.testcontainers:mysql:1.16.2"
+    testImplementation project(":modules:libs:atlas:atlas-repository:atlas-repository-engine-jdbc")
     testImplementation project(":modules:libs:atlas:atlas-repository:atlas-workflow-repository-yaml")
     testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-io")
     testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-random")

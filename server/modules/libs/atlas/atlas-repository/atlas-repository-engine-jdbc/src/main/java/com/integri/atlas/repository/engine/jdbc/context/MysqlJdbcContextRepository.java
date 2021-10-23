@@ -12,47 +12,43 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.context.repository;
+package com.integri.atlas.repository.engine.jdbc.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.json.Json;
+import com.integri.atlas.engine.core.json.Json;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- *
- * @author Arik Cohe
- * @since Apt 7, 2017
+ * @author Ivica Cardic
  */
-public class PostgresJdbcContextRepository implements ContextRepository {
+public class MysqlJdbcContextRepository implements ContextRepository {
 
     private JdbcTemplate jdbc;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void push(String aStackId, Context aContext) {
-        String sql = "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?::jsonb,?)";
+        String sql = "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)";
         jdbc.update(sql, UUIDGenerator.generate(), aStackId, Json.serialize(objectMapper, aContext), new Date());
     }
 
     @Override
     public Context peek(String aStackId) {
         try {
-            String sql = "select id,serialized_context from context where stack_id = ? order by create_time desc limit 1";
-            return jdbc.queryForObject(sql, new Object[]{aStackId}, this::contextRowMapper);
+            String sql =
+                "select id,serialized_context from context where stack_id = ? order by create_time desc limit 1";
+            return jdbc.queryForObject(sql, new Object[] { aStackId }, this::contextRowMapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -70,5 +66,4 @@ public class PostgresJdbcContextRepository implements ContextRepository {
     public void setObjectMapper(ObjectMapper aObjectMapper) {
         objectMapper = aObjectMapper;
     }
-
 }

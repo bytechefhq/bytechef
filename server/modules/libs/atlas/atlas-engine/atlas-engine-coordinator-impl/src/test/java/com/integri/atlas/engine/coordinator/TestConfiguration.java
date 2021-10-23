@@ -17,15 +17,15 @@
 package com.integri.atlas.engine.coordinator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.context.repository.MysqlJdbcContextRepository;
-import com.integri.atlas.engine.coordinator.context.repository.PostgresJdbcContextRepository;
+import com.integri.atlas.repository.engine.jdbc.context.MysqlJdbcContextRepository;
+import com.integri.atlas.repository.engine.jdbc.context.PostgresJdbcContextRepository;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
-import com.integri.atlas.engine.coordinator.job.repository.MysqlJdbcJobRepository;
-import com.integri.atlas.engine.coordinator.job.repository.PostgresJdbcJobRepository;
-import com.integri.atlas.engine.coordinator.task.repository.MysqlJdbcCounterRepository;
-import com.integri.atlas.engine.coordinator.task.repository.MysqlJdbcTaskExecutionRepository;
-import com.integri.atlas.engine.coordinator.task.repository.PostgresJdbcCounterRepository;
-import com.integri.atlas.engine.coordinator.task.repository.PostgresJdbcTaskExecutionRepository;
+import com.integri.atlas.repository.engine.jdbc.job.MysqlJdbcJobRepository;
+import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
+import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcCounterRepository;
+import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
+import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcCounterRepository;
+import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
