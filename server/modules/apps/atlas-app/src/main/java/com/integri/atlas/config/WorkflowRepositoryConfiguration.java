@@ -18,12 +18,15 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.workflow.repository.git.GitWorkflowRepository;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
+import com.integri.atlas.repository.workflow.git.GitWorkflowRepository;
 import com.integri.atlas.engine.config.AtlasProperties;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.WorkflowRepositoryChain;
-import com.integri.atlas.workflow.repository.yaml.ResourceBasedWorkflowRepository;
+import com.integri.atlas.engine.coordinator.workflow.repository.ResourceBasedWorkflowRepository;
 import java.util.List;
+
+import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -46,7 +49,7 @@ public class WorkflowRepositoryConfiguration {
     @Order(1)
     @ConditionalOnProperty(name = "atlas.workflow-repository.classpath.enabled", havingValue = "true")
     ResourceBasedWorkflowRepository resourceBasedWorkflowRepository() {
-        return new ResourceBasedWorkflowRepository();
+        return new ResourceBasedWorkflowRepository(workflowMapper());
     }
 
     @Bean
@@ -55,13 +58,18 @@ public class WorkflowRepositoryConfiguration {
     ResourceBasedWorkflowRepository fileSystemBasedWorkflowRepository(
         @Value("${atlas.workflow-repository.filesystem.location-pattern}") String aBasePath
     ) {
-        return new ResourceBasedWorkflowRepository(String.format("file:%s", aBasePath));
+        return new ResourceBasedWorkflowRepository(String.format("file:%s", aBasePath), workflowMapper());
     }
 
     @Bean
     @Order(3)
     @ConditionalOnProperty(name = "atlas.workflow-repository.git.enabled", havingValue = "true")
     GitWorkflowRepository gitWorkflowRepository(AtlasProperties aProperties) {
-        return new GitWorkflowRepository(aProperties.getWorkflowRepository().getGit());
+        return new GitWorkflowRepository(aProperties.getWorkflowRepository().getGit(), workflowMapper());
+    }
+
+    @Bean
+    WorkflowMapper workflowMapper() {
+        return new YAMLWorkflowMapper();
     }
 }
