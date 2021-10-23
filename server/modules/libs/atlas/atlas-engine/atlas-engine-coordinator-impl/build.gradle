@@ -23,7 +23,7 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.testcontainers:mysql:1.16.2"
-    testImplementation project(":modules:libs:atlas:atlas-repository:atlas-repository-yaml")
+    testImplementation project(":modules:libs:atlas:atlas-repository:atlas-workflow-repository-yaml")
     testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-io")
     testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-random")
     testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-time")
