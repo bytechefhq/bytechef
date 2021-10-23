@@ -28,11 +28,11 @@ import java.util.Map;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-public class TaskDispatcherTaskHandlerResolverAdapter implements TaskHandlerResolver {
+public class TaskDispatcherAdapterTaskHandlerResolver implements TaskHandlerResolver {
 
     private final Map<String, TaskHandler<?>> taskHandlers;
 
-    public TaskDispatcherTaskHandlerResolverAdapter(TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
+    public TaskDispatcherAdapterTaskHandlerResolver(TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
         taskHandlers = Map.of("map", new MapTaskHandlerAdapter(aResolver, aTaskEvaluator));
     }
 

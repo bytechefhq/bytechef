@@ -18,7 +18,7 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.engine.worker.task.TaskDispatcherTaskHandlerResolverAdapter;
+import com.integri.atlas.engine.worker.task.TaskDispatcherAdapterTaskHandlerResolver;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
 import com.integri.atlas.engine.core.event.EventPublisher;
@@ -61,7 +61,7 @@ public class WorkerConfiguration {
         @Lazy TaskHandlerResolver aResolver,
         Environment aEnvironment
     ) {
-        return new TaskDispatcherTaskHandlerResolverAdapter(
+        return new TaskDispatcherAdapterTaskHandlerResolver(
             aResolver,
             SpelTaskEvaluator.builder().methodExecutor("tempDir", new TempDir()).environment(aEnvironment).build()
         );
