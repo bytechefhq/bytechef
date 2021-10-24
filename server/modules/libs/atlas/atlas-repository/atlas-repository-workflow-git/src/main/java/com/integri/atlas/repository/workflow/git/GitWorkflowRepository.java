@@ -19,7 +19,7 @@
 package com.integri.atlas.repository.workflow.git;
 
 import com.integri.atlas.engine.config.WorkflowRepositoryProperties.GitProperties;
-import com.integri.atlas.engine.coordinator.workflow.repository.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
@@ -52,7 +52,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
     @Override
     public List<Workflow> findAll() {
         synchronized (this) {
-            List<IdentifiableResource> resources = git.getHeadFiles();
+            List<WorkflowResource> resources = git.getHeadFiles();
             List<Workflow> workflows = resources.stream().map(r -> workflowMapper.readValue(r)).collect(Collectors.toList());
             return workflows;
         }
@@ -61,7 +61,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
     @Override
     public Workflow findOne(String aId) {
         synchronized (this) {
-            IdentifiableResource resource = git.getFile(aId);
+            WorkflowResource resource = git.getFile(aId);
             return workflowMapper.readValue(resource);
         }
     }

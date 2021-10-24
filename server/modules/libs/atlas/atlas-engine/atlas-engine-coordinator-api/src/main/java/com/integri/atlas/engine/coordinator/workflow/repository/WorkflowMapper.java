@@ -24,5 +24,5 @@ import com.integri.atlas.engine.coordinator.workflow.Workflow;
  * @author Ivica Cardic
  */
 public interface WorkflowMapper {
-    Workflow readValue(IdentifiableResource resource);
+    Workflow readValue(WorkflowResource workflowResource);
 }
