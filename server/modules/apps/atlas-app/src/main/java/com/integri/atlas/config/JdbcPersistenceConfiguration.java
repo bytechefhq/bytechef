@@ -24,9 +24,8 @@ import com.integri.atlas.repository.engine.jdbc.context.PostgresJdbcContextRepos
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.repository.engine.jdbc.job.MysqlJdbcJobRepository;
 import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
-import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcCounterRepository;
 import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
-import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcCounterRepository;
+import com.integri.atlas.repository.engine.jdbc.task.JdbcCounterRepository;
 import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
@@ -40,6 +39,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 @Configuration
 @ConditionalOnProperty(name="atlas.persistence.provider",havingValue="jdbc")
 public class JdbcPersistenceConfiguration {
+
+    @Bean
+    CounterRepository counterRepository(JdbcTemplate aJdbcOperations) {
+        return new JdbcCounterRepository(aJdbcOperations);
+    }
 
     @Configuration
     @ConditionalOnProperty(name = "spring.sql.init.platform", havingValue = "mysql")
@@ -71,11 +75,6 @@ public class JdbcPersistenceConfiguration {
             repo.setObjectMapper(aObjectMapper);
             return repo;
         }
-
-        @Bean
-        CounterRepository counterRepository(JdbcTemplate aJdbcOperations) {
-            return new MysqlJdbcCounterRepository(aJdbcOperations);
-        }
     }
 
     @Configuration
@@ -104,11 +103,6 @@ public class JdbcPersistenceConfiguration {
             repo.setJdbcTemplate(aJdbcTemplate);
             repo.setObjectMapper(aObjectMapper);
             return repo;
-        }
-
-        @Bean
-        CounterRepository counterRepository(JdbcTemplate aJdbcOperations) {
-            return new PostgresJdbcCounterRepository(aJdbcOperations);
         }
     }
 }
