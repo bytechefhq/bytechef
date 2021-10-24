@@ -19,4 +19,5 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.testcontainers:mysql:1.16.2"
+    testImplementation "org.testcontainers:postgresql:1.16.2"
 }
