@@ -10,4 +10,13 @@ dependencies {
     } else {
         runtimeOnly "mysql:mysql-connector-java"
     }
+
+    testImplementation "com.fasterxml.jackson.core:jackson-databind"
+    testImplementation "mysql:mysql-connector-java"
+    testImplementation "org.postgresql:postgresql"
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.boot:spring-boot-test"
+    testImplementation "org.testcontainers:mysql:1.16.2"
 }
