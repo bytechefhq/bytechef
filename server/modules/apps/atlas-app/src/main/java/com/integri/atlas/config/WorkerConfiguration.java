@@ -18,14 +18,14 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.engine.worker.task.TaskDispatcherAdapterTaskHandlerResolver;
-import com.integri.atlas.engine.worker.Worker;
-import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.worker.task.TaskHandlerResolver;
 import com.integri.atlas.engine.core.task.spel.TempDir;
+import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
+import com.integri.atlas.engine.worker.task.TaskDispatcherAdapterTaskHandlerResolver;
+import com.integri.atlas.engine.worker.task.TaskHandlerResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;

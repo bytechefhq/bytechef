@@ -23,6 +23,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Arik Cohen
+ */
 public class MapContext extends MapObject implements Context {
 
     public MapContext() {

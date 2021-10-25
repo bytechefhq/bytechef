@@ -43,6 +43,8 @@ import java.util.regex.Pattern;
  * A URI wrapper that can parse out information about an S3 URI.
  *
  * Imported from Amazon's v1 SDK.
+ *
+ * @author Arik Cohen
  */
 class AmazonS3URI {
 

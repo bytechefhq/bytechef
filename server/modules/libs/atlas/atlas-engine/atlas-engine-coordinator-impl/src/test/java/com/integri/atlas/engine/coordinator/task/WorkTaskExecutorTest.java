@@ -18,12 +18,14 @@
 
 package com.integri.atlas.engine.coordinator.task;
 
-import com.integri.atlas.engine.coordinator.task.WorkTaskDispatcher;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Arik Cohen
+ */
 public class WorkTaskExecutorTest {
 
     @Test

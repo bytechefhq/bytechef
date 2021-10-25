@@ -19,8 +19,8 @@
 package com.integri.atlas.engine.core;
 
 import com.google.common.base.Throwables;
-import com.integri.atlas.engine.core.task.WorkflowTask;
 import com.integri.atlas.engine.core.task.SimpleWorkflowTask;
+import com.integri.atlas.engine.core.task.WorkflowTask;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.time.Duration;

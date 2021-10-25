@@ -23,6 +23,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
+/**
+ * @author Arik Cohen
+ */
 public class BashTest {
 
     @Test

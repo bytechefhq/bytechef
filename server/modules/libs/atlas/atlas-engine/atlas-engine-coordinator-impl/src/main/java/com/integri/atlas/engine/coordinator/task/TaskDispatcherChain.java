@@ -21,9 +21,11 @@ package com.integri.atlas.engine.coordinator.task;
 import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskDispatcherResolver;
-
 import java.util.List;
 
+/**
+ * @author Arik Cohen
+ */
 public class TaskDispatcherChain implements TaskDispatcher<Task> {
 
     private List<TaskDispatcherResolver> resolvers;

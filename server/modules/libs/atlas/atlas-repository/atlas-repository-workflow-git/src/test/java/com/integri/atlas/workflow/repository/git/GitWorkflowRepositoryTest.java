@@ -18,20 +18,22 @@
 
 package com.integri.atlas.workflow.repository.git;
 
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormatType;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
-import com.integri.atlas.engine.coordinator.workflow.Workflow;
-import java.util.Arrays;
-import java.util.List;
-
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.repository.workflow.git.GitOperations;
 import com.integri.atlas.repository.workflow.git.GitWorkflowRepository;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+/**
+ * @author Arik Cohen
+ */
 public class GitWorkflowRepositoryTest {
 
     @Test
@@ -49,15 +51,20 @@ public class GitWorkflowRepositoryTest {
         public List<WorkflowResource> getHeadFiles() {
             return Arrays.asList(
                 new WorkflowResource(
-                    "demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"),
-                    WorkflowFormatType.YAML)
+                    "demo/hello/123",
+                    resolver.getResource("file:workflows/demo/hello.yaml"),
+                    WorkflowFormatType.YAML
+                )
             );
         }
 
         @Override
         public WorkflowResource getFile(String aFileId) {
             return new WorkflowResource(
-                "demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"), WorkflowFormatType.YAML);
+                "demo/hello/123",
+                resolver.getResource("file:workflows/demo/hello.yaml"),
+                WorkflowFormatType.YAML
+            );
         }
     }
 }

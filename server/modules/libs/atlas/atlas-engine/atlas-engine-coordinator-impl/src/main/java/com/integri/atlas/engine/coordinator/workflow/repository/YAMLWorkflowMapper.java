@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,6 @@ import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.error.ErrorObject;
 import com.integri.atlas.engine.core.task.SimpleWorkflowTask;
 import com.integri.atlas.engine.core.task.Task;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,6 +34,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen

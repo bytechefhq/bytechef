@@ -23,6 +23,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author Arik Cohen
+ */
 public class JdbcCounterRepository implements CounterRepository {
 
     private final JdbcOperations jdbc;
@@ -38,7 +41,11 @@ public class JdbcCounterRepository implements CounterRepository {
             jdbc.queryForObject("select value from counter where id = ? for update", Long.class, aCounterName);
             jdbc.update("update counter set value = ? where id = ?", aValue, aCounterName);
         } catch (EmptyResultDataAccessException e) {
-            jdbc.update("insert into counter (id,value,create_time) values (?,?,current_timestamp)", aCounterName, aValue);
+            jdbc.update(
+                "insert into counter (id,value,create_time) values (?,?,current_timestamp)",
+                aCounterName,
+                aValue
+            );
         }
     }
 
@@ -51,10 +58,8 @@ public class JdbcCounterRepository implements CounterRepository {
         return value;
     }
 
-
     @Override
     public void delete(String aCounterName) {
         jdbc.update("delete from counter where id = ?", aCounterName);
     }
-
 }

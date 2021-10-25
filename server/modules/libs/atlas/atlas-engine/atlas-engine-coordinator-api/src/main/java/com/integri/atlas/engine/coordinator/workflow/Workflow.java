@@ -28,6 +28,7 @@ import java.util.List;
  * the execution of a job.
  *
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Jun 12, 2016
  */
 public interface Workflow extends Errorable {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,20 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.integri.atlas.engine.coordinator.workflow.repository;
 
+import java.util.Objects;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 public enum WorkflowFormatType {
-    JSON, YAML;
+    JSON,
+    YAML;
 
     public static WorkflowFormatType parse(String fileName) {
         return Objects.equals(StringUtils.lowerCase(FilenameUtils.getExtension(fileName)), "json") ? JSON : YAML;

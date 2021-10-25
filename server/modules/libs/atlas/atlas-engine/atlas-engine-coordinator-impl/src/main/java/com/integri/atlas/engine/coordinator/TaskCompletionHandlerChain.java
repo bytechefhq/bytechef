@@ -22,6 +22,9 @@ import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Arik Cohen
+ */
 public class TaskCompletionHandlerChain implements TaskCompletionHandler {
 
     private List<TaskCompletionHandler> taskCompletionHandlers = new ArrayList<>();

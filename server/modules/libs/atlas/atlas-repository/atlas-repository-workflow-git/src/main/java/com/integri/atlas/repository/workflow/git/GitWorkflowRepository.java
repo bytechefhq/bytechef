@@ -19,14 +19,16 @@
 package com.integri.atlas.repository.workflow.git;
 
 import com.integri.atlas.engine.config.WorkflowRepositoryProperties.GitProperties;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
-
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Arik Cohen
+ */
 public class GitWorkflowRepository implements WorkflowRepository {
 
     private final GitOperations git;
@@ -53,7 +55,10 @@ public class GitWorkflowRepository implements WorkflowRepository {
     public List<Workflow> findAll() {
         synchronized (this) {
             List<WorkflowResource> resources = git.getHeadFiles();
-            List<Workflow> workflows = resources.stream().map(r -> workflowMapper.readValue(r)).collect(Collectors.toList());
+            List<Workflow> workflows = resources
+                .stream()
+                .map(r -> workflowMapper.readValue(r))
+                .collect(Collectors.toList());
             return workflows;
         }
     }

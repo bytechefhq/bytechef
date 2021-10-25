@@ -20,6 +20,9 @@ package com.integri.atlas.engine.core.task;
 
 import com.integri.atlas.engine.core.Accessor;
 
+/**
+ * @author Arik Cohen
+ */
 public interface Task extends Accessor {
     /**
      * Get the type of the task. Type strings

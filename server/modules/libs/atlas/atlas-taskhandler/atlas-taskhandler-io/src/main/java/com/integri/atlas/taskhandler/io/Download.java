@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 /**
  * Simple task handler which performs the download of a file (given its URL).
  *
+ * @author Arik Cohen
  * @since Sep 06, 2018
  */
 @Component("io/download")

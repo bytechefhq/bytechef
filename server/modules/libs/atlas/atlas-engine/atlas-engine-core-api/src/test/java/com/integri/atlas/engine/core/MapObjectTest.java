@@ -21,10 +21,12 @@ package com.integri.atlas.engine.core;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Arik Cohen
+ */
 public class MapObjectTest {
 
     @Test

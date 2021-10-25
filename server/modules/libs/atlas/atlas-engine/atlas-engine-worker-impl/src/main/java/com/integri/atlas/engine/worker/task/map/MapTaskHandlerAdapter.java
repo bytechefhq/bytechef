@@ -24,17 +24,16 @@ import com.integri.atlas.engine.core.error.Error;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.MapTaskDispatcher;
-import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.core.task.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.engine.worker.task.TaskHandler;
+import com.integri.atlas.engine.worker.task.TaskHandlerResolver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import com.integri.atlas.engine.worker.task.TaskHandler;
-import com.integri.atlas.engine.worker.task.TaskHandlerResolver;
 import org.springframework.context.annotation.Lazy;
 
 /**

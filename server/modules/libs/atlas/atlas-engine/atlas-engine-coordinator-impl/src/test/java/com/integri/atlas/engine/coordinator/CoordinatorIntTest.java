@@ -19,21 +19,22 @@
 package com.integri.atlas.engine.coordinator;
 
 import com.google.common.collect.ImmutableMap;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
+import com.integri.atlas.engine.coordinator.task.WorkTaskDispatcher;
+import com.integri.atlas.engine.coordinator.workflow.repository.ResourceBasedWorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.coordinator.workflow.repository.ResourceBasedWorkflowRepository;
-import com.integri.atlas.engine.worker.task.DefaultTaskHandlerResolver;
-import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.engine.worker.task.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.TaskHandler;
-import com.integri.atlas.engine.coordinator.task.WorkTaskDispatcher;
 import com.integri.atlas.taskhandler.io.Print;
 import com.integri.atlas.taskhandler.random.RandomInt;
 import com.integri.atlas.taskhandler.time.Sleep;
@@ -41,13 +42,14 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.integri.atlas.engine.worker.Worker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+/**
+ * @author Arik Cohen
+ */
 @SpringBootTest
 public class CoordinatorIntTest {
 

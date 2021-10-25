@@ -19,17 +19,17 @@
 package com.integri.atlas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.repository.engine.jdbc.context.MysqlJdbcContextRepository;
-import com.integri.atlas.repository.engine.jdbc.context.PostgresJdbcContextRepository;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
-import com.integri.atlas.repository.engine.jdbc.job.MysqlJdbcJobRepository;
-import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
-import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
-import com.integri.atlas.repository.engine.jdbc.task.JdbcCounterRepository;
-import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
+import com.integri.atlas.repository.engine.jdbc.context.MysqlJdbcContextRepository;
+import com.integri.atlas.repository.engine.jdbc.context.PostgresJdbcContextRepository;
+import com.integri.atlas.repository.engine.jdbc.job.MysqlJdbcJobRepository;
+import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
+import com.integri.atlas.repository.engine.jdbc.task.JdbcCounterRepository;
+import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
+import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
-@ConditionalOnProperty(name="atlas.persistence.provider",havingValue="jdbc")
+@ConditionalOnProperty(name = "atlas.persistence.provider", havingValue = "jdbc")
 public class JdbcPersistenceConfiguration {
 
     @Bean
@@ -82,7 +82,10 @@ public class JdbcPersistenceConfiguration {
     public static class PostgresJdbcPersistenceConfiguration {
 
         @Bean
-        TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
+        TaskExecutionRepository jdbcJobTaskRepository(
+            NamedParameterJdbcTemplate aJdbcTemplate,
+            ObjectMapper aObjectMapper
+        ) {
             PostgresJdbcTaskExecutionRepository jdbcJobTaskRepository = new PostgresJdbcTaskExecutionRepository();
             jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
             jdbcJobTaskRepository.setObjectMapper(aObjectMapper);

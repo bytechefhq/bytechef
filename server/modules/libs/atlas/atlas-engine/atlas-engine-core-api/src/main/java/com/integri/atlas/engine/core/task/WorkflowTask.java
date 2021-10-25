@@ -20,6 +20,9 @@ package com.integri.atlas.engine.core.task;
 
 import java.util.List;
 
+/**
+ * @author Arik Cohen
+ */
 public interface WorkflowTask extends Task {
     /**
      * Get the numeric order of the task

@@ -27,6 +27,9 @@ import com.integri.atlas.engine.worker.task.TaskHandler;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Arik Cohen
+ */
 @Component("media/dar")
 class Dar implements TaskHandler<String> {
 

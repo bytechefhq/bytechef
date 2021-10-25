@@ -20,6 +20,9 @@ package com.integri.atlas.engine.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * @author Arik Cohen
+ */
 @ConfigurationProperties(prefix = "atlas")
 public class AtlasProperties {
 

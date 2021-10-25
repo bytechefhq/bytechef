@@ -18,6 +18,9 @@
 
 package com.integri.atlas.engine.coordinator.job;
 
+/**
+ * @author Arik Cohen
+ */
 public enum JobStatus {
     CREATED,
     STARTED,

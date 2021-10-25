@@ -24,7 +24,6 @@ import com.integri.atlas.engine.core.task.ControlTask;
 import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskDispatcherResolver;
-
 import java.util.Objects;
 
 /**

@@ -18,11 +18,10 @@
 
 package com.integri.atlas.engine.coordinator.error;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 import com.integri.atlas.engine.core.error.ErrorHandler;
 import com.integri.atlas.engine.core.error.Errorable;
+import java.lang.reflect.Method;
+import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 

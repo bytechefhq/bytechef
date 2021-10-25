@@ -18,7 +18,6 @@
 
 package com.integri.atlas.engine.coordinator.workflow;
 
-import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
@@ -30,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+/**
+ * @author Arik Cohen
+ */
 public class SimpleWorkflow extends MapObject implements Workflow {
 
     public SimpleWorkflow(Map<String, Object> aSource) {

@@ -19,16 +19,16 @@
 package com.integri.atlas.engine.coordinator.event;
 
 import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.event.Events;
 import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.task.TaskStatus;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

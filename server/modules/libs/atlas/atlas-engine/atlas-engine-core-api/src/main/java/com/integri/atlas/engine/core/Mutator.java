@@ -18,6 +18,9 @@
 
 package com.integri.atlas.engine.core;
 
+/**
+ * @author Arik Cohen
+ */
 public interface Mutator {
     /**
      * Creates an association between the given key

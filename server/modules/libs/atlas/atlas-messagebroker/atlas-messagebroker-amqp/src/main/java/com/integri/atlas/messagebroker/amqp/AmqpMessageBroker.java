@@ -18,13 +18,16 @@
 
 package com.integri.atlas.messagebroker.amqp;
 
+import com.integri.atlas.engine.coordinator.messagebroker.Exchanges;
 import com.integri.atlas.engine.core.error.Prioritizable;
 import com.integri.atlas.engine.core.error.Retryable;
-import com.integri.atlas.engine.coordinator.messagebroker.Exchanges;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.util.Assert;
 
+/**
+ * @author Arik Cohen
+ */
 public class AmqpMessageBroker implements MessageBroker {
 
     private AmqpTemplate amqpTemplate;

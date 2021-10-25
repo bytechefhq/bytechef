@@ -19,15 +19,15 @@
 package com.integri.atlas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.config.CoordinatorProperties;
 import com.integri.atlas.engine.config.AtlasProperties;
+import com.integri.atlas.engine.config.CoordinatorProperties;
 import com.integri.atlas.engine.config.WorkerProperties;
 import com.integri.atlas.engine.coordinator.Coordinator;
-import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.coordinator.event.EventListener;
 import com.integri.atlas.engine.coordinator.messagebroker.Exchanges;
-import com.integri.atlas.messagebroker.jms.JmsMessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
+import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.messagebroker.jms.JmsMessageBroker;
 import java.util.Map;
 import javax.jms.ConnectionFactory;
 import javax.jms.Message;
