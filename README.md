@@ -922,3 +922,11 @@ curl -s \
 ```
 # License
 Integri Atlas is released under version 2.0 of the [Apache License](LICENSE). 
+
+# Useful gradle tasks
+1. gw spotlessApply - run source formatting
+2. gw test - run unit tests
+3. gw integrationTest - run integration tests with local mysql
+4. gw integrationTest -Ppostgres - run integration tests with local postgres
+5. gw integrationTest -testcontainers - run integration tests with mysql via docker
+6. gw integrationTest -testcontainers-postgres  run integration tests with postgres via docker
