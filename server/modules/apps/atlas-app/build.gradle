@@ -24,6 +24,7 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-rest")
     implementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-bento4")
     implementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-core")
+    implementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-csv")
     implementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-io")
     implementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-media")
     implementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-random")
