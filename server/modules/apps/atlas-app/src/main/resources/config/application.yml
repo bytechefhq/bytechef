@@ -4,7 +4,7 @@ management:
       base-path: /management
       exposure:
         include:
-          ['configprops', 'env', 'health', 'info', 'logfile', 'loggers', 'threaddump', 'caches']
+          ['caches', 'configprops', 'env', 'health', 'info', 'logfile', 'loggers', 'threaddump']
   info:
     git:
       mode: full
