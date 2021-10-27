@@ -3,6 +3,12 @@ logging:
     ROOT: INFO
     com.integri.atlas: DEBUG
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 spring:
   devtools:
     restart:
