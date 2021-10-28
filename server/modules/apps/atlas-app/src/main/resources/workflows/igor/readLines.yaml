@@ -25,10 +25,18 @@ tasks:
     type: io/print
     text: Reading ${path}
        
-  - label: csvLines
+  - name: csvLines
+    label: Read Lines From File
     type: csv/readLines
     path: ${path}
     containsHeader: ${containsHeader}
+
+  - label: Lets Iterate
+    type: each
+    list: ${csvLines}
+    iteratee:
+      type: io/print
+      text: Line ${item}
     
   - label: Print end of process
     type: io/print
