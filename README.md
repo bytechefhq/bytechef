@@ -256,7 +256,7 @@ Registering webhooks is done when creating the job. E.g.:
 
 ```
 {
-  "workflowId": "demo/hello",
+  "workflowId": "samples/hello",
   "inputs": {
     ...
   },
@@ -696,7 +696,7 @@ Start a demo job:
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"workflowId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
+     -d '{"workflowId":"samples/hello","inputs":{"yourName":"Joe Jones"}}' \
      http://localhost:8080/jobs
 ```
 
@@ -712,7 +712,7 @@ Which should give you something like this as a response:
   "id": "8221553af238431ab006cc178eb59129",
   "label": "Hello Demo",
   "priority": 0,
-  "workflowId": "demo/hello",
+  "workflowId": "samples/hello",
   "status": "CREATED",
   "tags": []
 }
@@ -721,7 +721,7 @@ Which should give you something like this as a response:
 
 If you'll refresh your browser page now you should see the executing job. 
 
-In case you are wondering, the `demo/hello` workflow is located at <a href="https://github.com/integri/atlas/blob/master/server/modules/apps/atlas-app/src/main/resources/workflows/demo/hello.yaml" target="_blank">here</a>
+In case you are wondering, the `samples/hello` workflow is located at <a href="https://github.com/integri/atlas/blob/master/server/modules/apps/atlas-app/src/main/resources/workflow/samples/hello.yaml" target="_blank">here</a>
 
 
 ## Writing your first workflow
@@ -779,13 +779,13 @@ From another terminal window, start a Worker:
 ./scripts/worker.sh 
 ```
 
-Execute the demo workflow: 
+Execute the sample workflow: 
 
 ```
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"workflowId":"demo/hello","inputs":{"yourName":"Joe Jones"}}' \
+     -d '{"workflowId":"samples/hello","inputs":{"yourName":"Joe Jones"}}' \
      http://localhost:8080/jobs
 ```
 
@@ -855,7 +855,7 @@ atlas.workflow-repository.git.branch=master
 atlas.workflow-repository.git.username=me
 atlas.workflow-repository.git.password=secret
 # folders within the git repo that are scanned for workflows.
-atlas.workflow-repository.git.search-paths=demo/,video/
+atlas.workflow-repository.git.search-paths=samples/,video/
 # enable file system based workflow repository
 atlas.workflow-repository.filesystem.enabled=true
 # location of workflows on the file system.
