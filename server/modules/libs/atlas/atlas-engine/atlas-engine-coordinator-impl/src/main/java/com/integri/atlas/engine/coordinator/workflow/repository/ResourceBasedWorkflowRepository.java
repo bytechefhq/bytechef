@@ -34,10 +34,10 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  */
 public class ResourceBasedWorkflowRepository implements WorkflowRepository {
 
-    private String locationPattern = "classpath:workflows/**/*.yaml";
+    private String locationPattern = "classpath:workflow/**/*.yaml";
     private WorkflowMapper workflowMapper;
 
-    private static final String PREFIX = "workflows/";
+    private static final String PREFIX = "workflow/";
 
     public ResourceBasedWorkflowRepository(WorkflowMapper workflowMapper) {
         this.workflowMapper = workflowMapper;
