@@ -40,7 +40,7 @@ public class GitWorkflowRepositoryTest {
     public void test1() {
         GitWorkflowRepository r = new GitWorkflowRepository(new DummyGitOperations(), new YAMLWorkflowMapper());
         List<Workflow> findAll = r.findAll();
-        Assertions.assertEquals("demo/hello/123", findAll.iterator().next().getId());
+        Assertions.assertEquals("samples/hello/123", findAll.iterator().next().getId());
     }
 
     private static class DummyGitOperations implements GitOperations {
@@ -51,8 +51,8 @@ public class GitWorkflowRepositoryTest {
         public List<WorkflowResource> getHeadFiles() {
             return Arrays.asList(
                 new WorkflowResource(
-                    "demo/hello/123",
-                    resolver.getResource("file:workflows/demo/hello.yaml"),
+                    "samples/hello/123",
+                    resolver.getResource("file:workflow/samples/hello.yaml"),
                     WorkflowFormatType.YAML
                 )
             );
@@ -61,8 +61,8 @@ public class GitWorkflowRepositoryTest {
         @Override
         public WorkflowResource getFile(String aFileId) {
             return new WorkflowResource(
-                "demo/hello/123",
-                resolver.getResource("file:workflows/demo/hello.yaml"),
+                "samples/hello/123",
+                resolver.getResource("file:workflow/samples/hello.yaml"),
                 WorkflowFormatType.YAML
             );
         }
