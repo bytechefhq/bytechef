@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -35,18 +34,18 @@ public class ReadLinesTest {
 
     @Test
     public void testReadLines() throws IOException {
-		ReadLines readLines = new ReadLines();
+        ReadLines readLines = new ReadLines();
 
-		ClassPathResource cpr = new ClassPathResource("ls/test_1.csv");
+        ClassPathResource cpr = new ClassPathResource("ls/test_1.csv");
 
         SimpleTaskExecution task = new SimpleTaskExecution();
 
         task.set("path", cpr.getFile().getAbsolutePath());
         task.set("containsHeader", true);
 
-		List<String> lines = readLines.handle(task);
+        List<String> lines = readLines.handle(task);
 
-		Assertions.assertEquals(
+        Assertions.assertEquals(
             Set.of("A;B;C;D", "1;2;3;4", "A;1;B;2", "ABCD;1234;EFGH;5678"),
             lines.stream().collect(Collectors.toSet())
         );
@@ -54,20 +53,19 @@ public class ReadLinesTest {
 
     @Test
     public void testReadLinesNoHeaders() throws IOException {
-		ReadLines readLines = new ReadLines();
+        ReadLines readLines = new ReadLines();
         ClassPathResource cpr = new ClassPathResource("ls/test_2.csv");
 
-		SimpleTaskExecution task = new SimpleTaskExecution();
+        SimpleTaskExecution task = new SimpleTaskExecution();
 
-		task.set("path", cpr.getFile().getAbsolutePath());
-		task.set("containsHeader", false);
+        task.set("path", cpr.getFile().getAbsolutePath());
+        task.set("containsHeader", false);
 
-		List<String> lines = readLines.handle(task);
+        List<String> lines = readLines.handle(task);
 
-		Assertions.assertEquals(
-			Set.of("A;B;C;D", "1;2;3;4", "A;1;B;2", "ABCD;1234;EFGH;5678"),
-			lines.stream().collect(Collectors.toSet())
-		);
+        Assertions.assertEquals(
+            Set.of("A;B;C;D", "1;2;3;4", "A;1;B;2", "ABCD;1234;EFGH;5678"),
+            lines.stream().collect(Collectors.toSet())
+        );
     }
-
 }

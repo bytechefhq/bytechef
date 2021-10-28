@@ -20,7 +20,6 @@ package com.integri.atlas.taskhandler.csv;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.TaskHandler;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,37 +38,36 @@ import org.springframework.stereotype.Component;
 @Component("csv/readLines")
 class ReadLines implements TaskHandler<List<String>> {
 
-	private static final Logger logger = LoggerFactory.getLogger(ReadLines.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReadLines.class);
 
     @Override
     public List<String> handle(TaskExecution taskExecution) throws IOException {
-		Path root = Paths.get(taskExecution.getRequiredString("path"));
+        Path root = Paths.get(taskExecution.getRequiredString("path"));
 
-		Boolean containsHeader = taskExecution.getBoolean("containsHeader");
+        Boolean containsHeader = taskExecution.getBoolean("containsHeader");
 
-		return getLines(root, containsHeader);
+        return getLines(root, containsHeader);
     }
 
     private List<String> getLines(Path path, boolean containsHeader) throws IOException {
-		List<String> lines = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
 
-		try (FileReader fileReader = new FileReader(path.toFile())) {
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
+        try (FileReader fileReader = new FileReader(path.toFile())) {
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-			String line = null;
+            String line = null;
 
-			if (containsHeader) {
-				line = bufferedReader.readLine();
+            if (containsHeader) {
+                line = bufferedReader.readLine();
 
-				logger.trace("Skipp header content {}", line);
-			}
+                logger.trace("Skipp header content {}", line);
+            }
 
-			while ((line = bufferedReader.readLine()) != null) {
-				lines.add(line);
-			}
-		}
+            while ((line = bufferedReader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
 
-		return lines;
-	}
-
+        return lines;
+    }
 }
