@@ -1,4 +1,4 @@
-label: Read Lines Demo
+label: Print File Content Sample
 
 inputs:
   - name: path
