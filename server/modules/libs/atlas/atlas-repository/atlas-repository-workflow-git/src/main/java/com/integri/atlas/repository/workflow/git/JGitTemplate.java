@@ -20,7 +20,7 @@ package com.integri.atlas.repository.workflow.git;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormatType;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormat;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import java.io.File;
 import java.util.ArrayList;
@@ -160,7 +160,7 @@ public class JGitTemplate implements GitOperations {
             return new WorkflowResource(
                 aPath + ":" + abbreviated.name(),
                 new ByteArrayResource(data),
-                WorkflowFormatType.parse(aPath)
+                WorkflowFormat.parse(aPath)
             );
         }
     }
