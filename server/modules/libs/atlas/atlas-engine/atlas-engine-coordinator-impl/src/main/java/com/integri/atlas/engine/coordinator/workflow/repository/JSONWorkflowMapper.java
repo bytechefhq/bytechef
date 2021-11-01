@@ -18,16 +18,19 @@
 
 package com.integri.atlas.engine.coordinator.workflow.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 
 /**
  * @author Ivica Cardic
  */
-public class JSONWorkflowMapper implements WorkflowMapper, WorkflowMapperResolver {
+public class JSONWorkflowMapper extends BaseWorkflowMapper implements WorkflowMapperResolver {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public Workflow readValue(WorkflowResource workflowResource) {
-        return null;
+    public Workflow readValue(WorkflowResource aWorkflowResource) {
+        return readValue(aWorkflowResource, objectMapper);
     }
 
     @Override
