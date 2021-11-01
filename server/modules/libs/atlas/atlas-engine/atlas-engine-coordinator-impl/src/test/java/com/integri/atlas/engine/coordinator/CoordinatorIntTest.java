@@ -63,7 +63,16 @@ public class CoordinatorIntTest {
     private TaskExecutionRepository taskRepository;
 
     @Test
-    public void testStartJob() throws SQLException {
+    public void testStartJob_JSON() {
+        testStartJob("samples/hello.json");
+    }
+
+    @Test
+    public void testStartJob_YAML() {
+        testStartJob("samples/hello.yaml");
+    }
+
+    public void testStartJob(String workflowId) {
         Coordinator coordinator = new Coordinator();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
@@ -118,7 +127,7 @@ public class CoordinatorIntTest {
 
         Job job = coordinator.create(
             MapObject.of(
-                ImmutableMap.of("workflowId", "samples/hello", "inputs", Collections.singletonMap("yourName", "me"))
+                ImmutableMap.of("workflowId", workflowId, "inputs", Collections.singletonMap("yourName", "me"))
             )
         );
 
@@ -134,7 +143,7 @@ public class CoordinatorIntTest {
             () -> {
                 Coordinator coordinator = new Coordinator();
                 coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(new YAMLWorkflowMapper()));
-                coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello")));
+                coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello.json")));
             }
         );
     }
