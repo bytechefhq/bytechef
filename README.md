@@ -827,7 +827,7 @@ See [Adaptive Streaming with Integri Atlas](https://medium.com/@arik.c.mail/adap
 
 Rather than storing the workflows in your local file system you can use Git to store them for you. This has great advantages, not the least of which is workflow versioning, Pull Requests and everything else Git has to offer.
 
-To enable Git as a workflow repository set the `atlas.workflow-repository.git.enabled` flag to `true` in `./scripts/development.sh` and restart Integri Atlas. By default, Integri Atlas will use the demo repository [atlas-workflows](https://github.com/creactiviti/atlas-workflows).
+To enable Git as a workflow repository set the `atlas.workflow-repository.git.enabled` flag to `true` in `./scripts/development.sh` and restart Integri Atlas. By default, Integri Atlas will use the demo repository [atlas-workflows](https://github.com/integrihq/integri-workflows).
 
 You can change it by using the `atlas.workflow-repository.git.url` and `atlas.workflow-repository.git.search-paths` configuration parameters.  
 
