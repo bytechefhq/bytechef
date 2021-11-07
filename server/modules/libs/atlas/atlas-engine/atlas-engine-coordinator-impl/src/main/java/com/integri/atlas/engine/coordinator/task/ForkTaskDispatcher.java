@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.task;
 
-import com.integri.atlas.engine.coordinator.ForkTaskCompletionHandler;
+import com.integri.atlas.engine.coordinator.task.completion.ForkTaskCompletionHandler;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;

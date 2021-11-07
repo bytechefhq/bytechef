@@ -16,8 +16,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator;
+package com.integri.atlas.engine.coordinator.task.completion;
 
+import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.Context;

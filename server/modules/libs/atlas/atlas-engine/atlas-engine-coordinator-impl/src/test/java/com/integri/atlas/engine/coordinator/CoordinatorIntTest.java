@@ -23,6 +23,7 @@ import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.task.DefaultTaskDispatcher;
+import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.workflow.repository.ResourceBasedWorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;

@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.task;
 
-import com.integri.atlas.engine.coordinator.ParallelTaskCompletionHandler;
+import com.integri.atlas.engine.coordinator.task.completion.ParallelTaskCompletionHandler;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;
