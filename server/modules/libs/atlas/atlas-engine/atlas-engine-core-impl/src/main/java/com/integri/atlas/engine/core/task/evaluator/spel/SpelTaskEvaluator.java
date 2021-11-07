@@ -16,11 +16,11 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.ArrayList;
 import java.util.Collections;

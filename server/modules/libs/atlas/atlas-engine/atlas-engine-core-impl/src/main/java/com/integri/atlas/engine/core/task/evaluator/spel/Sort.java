@@ -16,10 +16,11 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -27,17 +28,14 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Feb, 19 2020
+ * @since Feb, 25 2020
  */
-class Concat implements MethodExecutor {
+class Sort implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        List<?> l1 = (List<?>) aArguments[0];
-        List<?> l2 = (List<?>) aArguments[1];
-        List<Object> joined = new ArrayList<>(l1.size() + l2.size());
-        joined.addAll(l1);
-        joined.addAll(l2);
-        return new TypedValue(joined);
+        Collection<?> list = (Collection<?>) aArguments[0];
+        List<?> sorted = list.stream().sorted().collect(Collectors.toList());
+        return new TypedValue(sorted);
     }
 }

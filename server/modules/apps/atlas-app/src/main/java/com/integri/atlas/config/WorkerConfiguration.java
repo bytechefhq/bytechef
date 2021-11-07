@@ -20,8 +20,8 @@ package com.integri.atlas.config;
 
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
-import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.core.task.spel.TempDir;
+import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.spel.TempDir;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
 import com.integri.atlas.engine.worker.task.TaskDispatcherAdapterTaskHandlerResolver;

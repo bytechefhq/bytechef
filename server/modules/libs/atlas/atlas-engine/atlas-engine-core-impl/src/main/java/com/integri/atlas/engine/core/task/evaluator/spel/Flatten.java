@@ -16,10 +16,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -29,19 +29,13 @@ import org.springframework.expression.TypedValue;
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-class Cast<T> implements MethodExecutor {
-
-    private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
-
-    private final Class<T> type;
-
-    Cast(Class<T> aType) {
-        type = aType;
-    }
+class Flatten implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        T value = type.cast(conversionService.convert(aArguments[0], type));
-        return new TypedValue(value);
+        @SuppressWarnings("unchecked")
+        List<List<?>> list = (List<List<?>>) aArguments[0];
+        List<?> flat = list.stream().flatMap(List::stream).collect(Collectors.toList());
+        return new TypedValue(flat);
     }
 }

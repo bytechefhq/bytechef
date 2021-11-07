@@ -16,10 +16,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import java.io.File;
-import org.apache.commons.io.FilenameUtils;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -29,14 +29,19 @@ import org.springframework.expression.TypedValue;
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-public class TempDir implements MethodExecutor {
+class Cast<T> implements MethodExecutor {
+
+    private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
+
+    private final Class<T> type;
+
+    Cast(Class<T> aType) {
+        type = aType;
+    }
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        if (tmpDir.endsWith(File.separator)) {
-            tmpDir = FilenameUtils.getFullPathNoEndSeparator(tmpDir);
-        }
-        return new TypedValue(tmpDir);
+        T value = type.cast(conversionService.convert(aArguments[0], type));
+        return new TypedValue(value);
     }
 }

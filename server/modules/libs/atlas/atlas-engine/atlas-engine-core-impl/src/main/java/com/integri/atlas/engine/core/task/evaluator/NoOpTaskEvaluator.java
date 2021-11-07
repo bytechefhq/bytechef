@@ -16,22 +16,16 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator;
 
-import java.util.Date;
-import org.springframework.expression.AccessException;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.MethodExecutor;
-import org.springframework.expression.TypedValue;
+import com.integri.atlas.engine.core.context.Context;
+import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 
-/**
- * @author Arik Cohen
- * @since Mar, 03 2020
- */
-class Now implements MethodExecutor {
+public class NoOpTaskEvaluator implements TaskEvaluator {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        return new TypedValue(new Date());
+    public TaskExecution evaluate(TaskExecution aJobTask, Context aContext) {
+        return aJobTask;
     }
 }

@@ -25,7 +25,7 @@ import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.core.task.TaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.TaskStatus;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
