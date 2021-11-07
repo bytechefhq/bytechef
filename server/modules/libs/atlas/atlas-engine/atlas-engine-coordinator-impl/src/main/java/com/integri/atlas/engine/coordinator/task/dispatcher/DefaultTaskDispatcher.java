@@ -16,13 +16,13 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.task;
+package com.integri.atlas.engine.coordinator.task.dispatcher;
 
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.core.task.TaskDispatcher;
-import com.integri.atlas.engine.core.task.TaskDispatcherResolver;
+import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.Objects;
 import org.springframework.util.Assert;

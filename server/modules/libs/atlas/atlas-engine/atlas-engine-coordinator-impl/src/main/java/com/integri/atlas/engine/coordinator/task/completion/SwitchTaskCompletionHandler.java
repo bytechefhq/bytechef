@@ -18,14 +18,13 @@
 
 package com.integri.atlas.engine.coordinator.task.completion;
 
-import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskDispatcher;
+import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.TaskStatus;

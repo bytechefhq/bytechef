@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.task;
+package com.integri.atlas.engine.coordinator.task.dispatcher;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

@@ -16,8 +16,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.task;
+package com.integri.atlas.engine.coordinator.task.dispatcher;
 
+import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import org.junit.jupiter.api.Assertions;
