@@ -21,6 +21,7 @@ package com.integri.atlas.engine.coordinator;
 import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
+import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;

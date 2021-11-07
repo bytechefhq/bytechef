@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.task.completion;
 
-import com.integri.atlas.engine.coordinator.JobExecutor;
+import com.integri.atlas.engine.coordinator.job.executor.JobExecutor;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
