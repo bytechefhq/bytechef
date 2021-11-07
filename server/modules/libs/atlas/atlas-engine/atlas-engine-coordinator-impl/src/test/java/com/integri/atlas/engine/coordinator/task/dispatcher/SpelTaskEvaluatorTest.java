@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
@@ -311,7 +312,8 @@ public class SpelTaskEvaluatorTest {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().methodExecutor("tempDir", new TempDir()).build();
         TaskExecution jt = SimpleTaskExecution.of("tempDir", "${tempDir()}");
         TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
-        Assertions.assertEquals(System.getProperty("java.io.tmpdir"), evaluated.get("tempDir"));
+        Assertions.assertEquals(
+            FilenameUtils.getFullPathNoEndSeparator(System.getProperty("java.io.tmpdir")), evaluated.get("tempDir"));
     }
 
     @Test
