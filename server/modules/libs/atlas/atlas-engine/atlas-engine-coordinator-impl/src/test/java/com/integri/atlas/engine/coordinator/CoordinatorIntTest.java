@@ -36,10 +36,10 @@ import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.task.DefaultTaskHandlerResolver;
-import com.integri.atlas.engine.worker.task.TaskHandler;
-import com.integri.atlas.taskhandler.io.Print;
-import com.integri.atlas.taskhandler.random.RandomInt;
-import com.integri.atlas.taskhandler.time.Sleep;
+import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.task.handler.io.Print;
+import com.integri.atlas.task.handler.random.RandomInt;
+import com.integri.atlas.task.handler.time.Sleep;
 
 import java.util.Collections;
 import java.util.HashMap;
