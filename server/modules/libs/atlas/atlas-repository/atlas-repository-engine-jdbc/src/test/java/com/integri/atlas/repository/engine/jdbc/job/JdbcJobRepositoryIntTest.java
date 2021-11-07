@@ -20,7 +20,7 @@ package com.integri.atlas.repository.engine.jdbc.job;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-import com.integri.atlas.engine.coordinator.Page;
+import com.integri.atlas.engine.coordinator.data.Page;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.JobSummary;

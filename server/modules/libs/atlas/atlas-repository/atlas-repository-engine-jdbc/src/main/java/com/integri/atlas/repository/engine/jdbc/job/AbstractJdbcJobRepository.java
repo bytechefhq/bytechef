@@ -19,8 +19,8 @@
 package com.integri.atlas.repository.engine.jdbc.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.Page;
-import com.integri.atlas.engine.coordinator.ResultPage;
+import com.integri.atlas.engine.coordinator.data.Page;
+import com.integri.atlas.engine.coordinator.data.ResultPage;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobSummary;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
