@@ -19,8 +19,8 @@
 package com.integri.atlas.engine.worker;
 
 import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.messagebroker.Queues;
-import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
+import com.integri.atlas.engine.core.message.broker.Queues;
+import com.integri.atlas.engine.core.message.broker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;

@@ -49,7 +49,7 @@ import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowReposito
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.error.ErrorHandler;
 import com.integri.atlas.engine.core.event.EventPublisher;
-import com.integri.atlas.engine.core.messagebroker.MessageBroker;
+import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.dispatcher.MapTaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;

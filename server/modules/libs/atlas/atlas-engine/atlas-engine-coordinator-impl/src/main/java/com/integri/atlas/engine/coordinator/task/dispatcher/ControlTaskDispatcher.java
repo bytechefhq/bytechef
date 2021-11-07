@@ -18,8 +18,8 @@
 
 package com.integri.atlas.engine.coordinator.task.dispatcher;
 
-import com.integri.atlas.engine.coordinator.messagebroker.Exchanges;
-import com.integri.atlas.engine.core.messagebroker.MessageBroker;
+import com.integri.atlas.engine.coordinator.message.broker.Exchanges;
+import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.ControlTask;
 import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
