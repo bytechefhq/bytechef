@@ -30,13 +30,13 @@ import org.springframework.util.Assert;
 /**
  * @author Arik Cohen
  */
-public class WorkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
+public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final MessageBroker messageBroker;
 
     private static final String DEFAULT_QUEUE = Queues.TASKS;
 
-    public WorkTaskDispatcher(MessageBroker aMessageBroker) {
+    public DefaultTaskDispatcher(MessageBroker aMessageBroker) {
         messageBroker = Objects.requireNonNull(aMessageBroker);
     }
 

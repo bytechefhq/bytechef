@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
-import com.integri.atlas.engine.coordinator.task.WorkTaskDispatcher;
+import com.integri.atlas.engine.coordinator.task.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.workflow.repository.ResourceBasedWorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;
@@ -38,7 +38,7 @@ import com.integri.atlas.engine.worker.task.TaskHandler;
 import com.integri.atlas.taskhandler.io.Print;
 import com.integri.atlas.taskhandler.random.RandomInt;
 import com.integri.atlas.taskhandler.time.Sleep;
-import java.sql.SQLException;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,7 +102,7 @@ public class CoordinatorIntTest {
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
         coordinatorMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
-        WorkTaskDispatcher taskDispatcher = new WorkTaskDispatcher(coordinatorMessageBroker);
+        DefaultTaskDispatcher taskDispatcher = new DefaultTaskDispatcher(coordinatorMessageBroker);
         coordinator.setTaskDispatcher(taskDispatcher);
         coordinator.setEventPublisher(e -> {});
 

@@ -44,7 +44,7 @@ import com.integri.atlas.engine.coordinator.task.SubflowJobStatusEventListener;
 import com.integri.atlas.engine.coordinator.task.SubflowTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.SwitchTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.TaskDispatcherChain;
-import com.integri.atlas.engine.coordinator.task.WorkTaskDispatcher;
+import com.integri.atlas.engine.coordinator.task.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.error.ErrorHandler;
@@ -304,8 +304,8 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    WorkTaskDispatcher workTaskDispatcher() {
-        return new WorkTaskDispatcher(messageBroker);
+    DefaultTaskDispatcher workTaskDispatcher() {
+        return new DefaultTaskDispatcher(messageBroker);
     }
 
     @Bean
