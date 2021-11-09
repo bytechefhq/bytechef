@@ -20,8 +20,8 @@ package com.integri.atlas.engine.core.task.evaluator.spel;
 
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

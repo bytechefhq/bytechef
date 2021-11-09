@@ -46,7 +46,9 @@ public class DefaultTaskExecutorTest {
     public void test3() {
         SimpleTaskExecution task = new SimpleTaskExecution();
         task.setNode("encoder.xlarge");
-        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder.xlarge", k));
+        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) ->
+            Assertions.assertEquals("encoder.xlarge", k)
+        );
         executor.dispatch(task);
     }
 }
