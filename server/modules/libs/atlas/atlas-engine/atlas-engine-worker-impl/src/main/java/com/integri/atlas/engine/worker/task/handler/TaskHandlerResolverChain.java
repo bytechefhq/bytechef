@@ -16,32 +16,38 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.task;
+package com.integri.atlas.engine.worker.task.handler;
 
 import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import java.util.List;
+import java.util.Objects;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Arik Cohen
+ * @since Feb, 21 2020
  */
+@Primary
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE)
-public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
+class TaskHandlerResolverChain implements TaskHandlerResolver {
 
-    private Map<String, TaskHandler<?>> taskHandlers = new HashMap<String, TaskHandler<?>>();
+    private final List<TaskHandlerResolver> resolvers;
 
-    public DefaultTaskHandlerResolver(Map<String, TaskHandler<?>> aTaskHandlers) {
-        taskHandlers = aTaskHandlers;
+    TaskHandlerResolverChain(List<TaskHandlerResolver> aResolvers) {
+        resolvers = Objects.requireNonNull(aResolvers);
     }
 
     @Override
-    public TaskHandler<?> resolve(Task aJobTask) {
-        return taskHandlers.get(aJobTask.getType());
+    public TaskHandler<?> resolve(Task aTask) {
+        for (TaskHandlerResolver resolver : resolvers) {
+            TaskHandler<?> handler = resolver.resolve(aTask);
+            if (handler != null) {
+                return handler;
+            }
+        }
+        throw new IllegalArgumentException("Unknown task handler: " + aTask.getType());
     }
 }

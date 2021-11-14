@@ -24,7 +24,7 @@ import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.evaluator.spel.TempDir;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
-import com.integri.atlas.engine.worker.task.TaskDispatcherAdapterTaskHandlerResolver;
+import com.integri.atlas.engine.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
