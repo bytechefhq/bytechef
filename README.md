@@ -1,6 +1,6 @@
 # Introduction
 
-Integri Atlas is an open-source, distributed extendable automated workflow engine built on Spring Boot, designed to be dead simple. 
+Integri Atlas is an open-source, extendable automated workflow engine built on Spring Boot, designed to be dead simple. 
 
 Integri Atlas can run on one or a thousand machines depending on your scaling needs. 
 
