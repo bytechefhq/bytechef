@@ -93,6 +93,8 @@ atlas:
     subscriptions:
       tasks: "5"
   workflow-repository:
+    database:
+      enabled: true
     classpath:
       enabled: true
     git:
