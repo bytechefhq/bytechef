@@ -20,6 +20,8 @@ package com.integri.atlas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
@@ -30,9 +32,11 @@ import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
 import com.integri.atlas.repository.engine.jdbc.task.JdbcCounterRepository;
 import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
 import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
+import com.integri.atlas.repository.workflow.jdbc.MySqlJDBCWorkflowRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -48,6 +52,19 @@ public class JdbcPersistenceConfiguration {
     @Configuration
     @ConditionalOnProperty(name = "spring.sql.init.platform", havingValue = "mysql")
     public static class MysqlJdbcPersistenceConfiguration {
+
+        @Bean
+        @ConditionalOnProperty(name = "atlas.workflow-repository.database.enabled", havingValue = "true")
+        @Order(4)
+        WorkflowRepository jdbcWorkflowRepository(
+            NamedParameterJdbcTemplate aJdbcTemplate,
+            WorkflowMapper aWorkflowMapper
+        ) {
+            MySqlJDBCWorkflowRepository mySqlJDBCWorkflowRepository = new MySqlJDBCWorkflowRepository();
+            mySqlJDBCWorkflowRepository.setJdbcTemplate(aJdbcTemplate);
+            mySqlJDBCWorkflowRepository.setWorkflowMapper(aWorkflowMapper);
+            return mySqlJDBCWorkflowRepository;
+        }
 
         @Bean
         TaskExecutionRepository jdbcJobTaskRepository(
