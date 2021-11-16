@@ -79,7 +79,7 @@ public class MySqlJDBCWorkflowRepository implements WorkflowRepository {
         sqlParameterSource.addValue("format", format);
 
         jdbcTemplate.update(
-            "insert into workflow (id, content, format) values " + "(:id, :content, :format)",
+            "insert into workflow (id, content, format) values (:id, :content, :format)",
             sqlParameterSource
         );
 
