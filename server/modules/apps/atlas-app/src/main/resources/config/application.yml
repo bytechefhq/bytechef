@@ -46,6 +46,8 @@ spring:
   application:
     name: atlas-app
   jackson:
+    default-property-inclusion:
+      non_null
     serialization:
       write-dates-as-timestamps: false
       write-null-map-values: false
