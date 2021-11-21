@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnCoordinator
-public class JobsController {
+public class JobController {
 
     @Autowired
     private JobRepository jobRepository;
