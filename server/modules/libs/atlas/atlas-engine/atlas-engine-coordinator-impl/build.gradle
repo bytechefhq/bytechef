@@ -16,13 +16,10 @@ dependencies {
 
     testImplementation "commons-io:commons-io"
     testImplementation "mysql:mysql-connector-java"
-    testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "org.postgresql:postgresql"
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.springframework.boot:spring-boot-test"
-    testImplementation "org.testcontainers:mysql:1.16.2"
-    testImplementation "org.testcontainers:postgresql:1.16.2"
+    testImplementation "org.testcontainers:mysql"
+    testImplementation "org.testcontainers:postgresql"
     testImplementation project(":modules:libs:atlas:atlas-repository:atlas-repository-engine-jdbc")
     testImplementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-io")
     testImplementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-random")

@@ -20,35 +20,9 @@ dependencies {
     implementation 'org.zeroturnaround:zt-exec'
     implementation 'software.amazon.awssdk:s3'
 
-    // temp
-    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
-    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
-    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
-    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-workflow-git")
-    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-workflow-jdbc")
-    implementation project(":modules:libs:atlas:atlas-rest")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-bento4")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-core")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-io")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-media")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-random")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-s3")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-shell")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-time")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-impl")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-impl")
-
-
     testImplementation "mysql:mysql-connector-java"
     testImplementation "org.apache.commons:commons-lang3"
-    testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "org.springframework:spring-jdbc"
     testImplementation "org.springframework.security:spring-security-core"
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.springframework.boot:spring-boot-test"
 }
