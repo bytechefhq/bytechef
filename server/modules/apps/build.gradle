@@ -2,7 +2,6 @@ plugins {
     id "com.integri.java-application-conventions"
     id "com.google.cloud.tools.jib"
     id "com.gorylenko.gradle-git-properties"
-    id "io.spring.nohttp"
     id "org.sonarqube"
     id "org.springframework.boot"
 }
@@ -11,12 +10,11 @@ subprojects {
     apply plugin: "com.integri.java-application-conventions"
     apply plugin: "com.google.cloud.tools.jib"
     apply plugin: "com.gorylenko.gradle-git-properties"
-    apply plugin: "io.spring.nohttp"
     apply plugin: "org.sonarqube"
     apply plugin: "org.springframework.boot"
 
     apply from: "gradle/docker.gradle"
-    apply from: "gradle/sonar.gradle"
+    apply from: "${rootDir}/gradle/sonar.gradle"
 
     if (project.hasProperty("prod")) {
         apply from: "gradle/profile_prod.gradle"
@@ -32,16 +30,6 @@ subprojects {
     gitProperties {
         failOnNoGitDirectory = false
         keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
-    }
-
-    checkstyle {
-        toolVersion "${checkstyleVersion}"
-        configFile file("checkstyle.xml")
-        checkstyleTest.enabled = false
-    }
-
-    nohttp {
-        source.include "build.gradle", "README.md"
     }
 
     configurations {

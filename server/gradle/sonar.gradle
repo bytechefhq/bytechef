@@ -12,7 +12,7 @@ jacocoTestReport {
     }
 }
 
-file("sonar-project.properties").withReader {
+file("${rootDir}/sonar-project.properties").withReader {
     Properties sonarProperties = new Properties()
     sonarProperties.load(it)
 
