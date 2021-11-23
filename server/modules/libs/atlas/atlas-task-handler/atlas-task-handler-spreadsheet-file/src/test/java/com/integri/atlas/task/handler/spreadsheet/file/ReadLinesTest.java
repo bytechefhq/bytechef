@@ -16,10 +16,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.task.handler.csv;
+package com.integri.atlas.task.handler.spreadsheet.file;
 
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.task.handler.csv.ReadLines;
+import com.integri.atlas.task.handler.spreadsheet.file.ReadLines;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
