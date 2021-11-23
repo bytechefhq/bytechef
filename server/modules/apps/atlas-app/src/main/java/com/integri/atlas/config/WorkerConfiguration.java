@@ -41,7 +41,7 @@ public class WorkerConfiguration {
     Worker worker(
         TaskHandlerResolver aTaskHandlerResolver,
         MessageBroker aMessageBroker,
-        @Lazy EventPublisher aEventPublisher,
+        EventPublisher aEventPublisher,
         Environment aEnvironment
     ) {
         return Worker
