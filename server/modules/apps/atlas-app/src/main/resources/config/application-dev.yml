@@ -32,7 +32,6 @@ spring:
   sql:
     init:
       mode: always
-      platform: mysql
 
 server:
   port: 9777
