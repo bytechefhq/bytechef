@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.engine.jdbc.task;
+package com.integri.atlas.repository.engine.jdbc.counter;
 
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import org.springframework.dao.EmptyResultDataAccessException;

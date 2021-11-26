@@ -29,7 +29,7 @@ import com.integri.atlas.repository.engine.jdbc.context.MysqlJdbcContextReposito
 import com.integri.atlas.repository.engine.jdbc.context.PostgresJdbcContextRepository;
 import com.integri.atlas.repository.engine.jdbc.job.MysqlJdbcJobRepository;
 import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
-import com.integri.atlas.repository.engine.jdbc.task.JdbcCounterRepository;
+import com.integri.atlas.repository.engine.jdbc.counter.JdbcCounterRepository;
 import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
 import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
 import com.integri.atlas.repository.workflow.jdbc.JDBCWorkflowRepository;
