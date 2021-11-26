@@ -32,7 +32,7 @@ import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
 import com.integri.atlas.repository.engine.jdbc.task.JdbcCounterRepository;
 import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
 import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
-import com.integri.atlas.repository.workflow.jdbc.MySqlJDBCWorkflowRepository;
+import com.integri.atlas.repository.workflow.jdbc.JDBCWorkflowRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,7 +60,7 @@ public class JdbcPersistenceConfiguration {
             NamedParameterJdbcTemplate aJdbcTemplate,
             WorkflowMapper aWorkflowMapper
         ) {
-            MySqlJDBCWorkflowRepository mySqlJDBCWorkflowRepository = new MySqlJDBCWorkflowRepository();
+            JDBCWorkflowRepository mySqlJDBCWorkflowRepository = new JDBCWorkflowRepository();
             mySqlJDBCWorkflowRepository.setJdbcTemplate(aJdbcTemplate);
             mySqlJDBCWorkflowRepository.setWorkflowMapper(aWorkflowMapper);
             return mySqlJDBCWorkflowRepository;

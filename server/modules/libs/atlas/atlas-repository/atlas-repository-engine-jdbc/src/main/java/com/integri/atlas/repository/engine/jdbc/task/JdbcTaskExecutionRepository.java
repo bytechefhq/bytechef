@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Arik Cohe
  * @author Ivica Cardic
  */
-public abstract class AbstractJdbcTaskExecutionRepository implements TaskExecutionRepository {
+public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     private NamedParameterJdbcOperations jdbc;
     private ObjectMapper json = new ObjectMapper();
@@ -47,7 +47,13 @@ public abstract class AbstractJdbcTaskExecutionRepository implements TaskExecuti
     public void create(TaskExecution aTaskExecution) {
         SqlParameterSource sqlParameterSource = createSqlParameterSource(aTaskExecution);
 
-        jdbc.update(getCreateSql(), sqlParameterSource);
+        jdbc.update(
+            "insert into task_execution " +
+            "  (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) " +
+            "values " +
+            "  (:id,:parentId,:jobId,:serializedExecution,:status,:progress,:createTime,:priority,:taskNumber)",
+            sqlParameterSource
+        );
     }
 
     @Override
@@ -98,7 +104,11 @@ public abstract class AbstractJdbcTaskExecutionRepository implements TaskExecuti
         }
         SqlParameterSource sqlParameterSource = createSqlParameterSource(merged);
 
-        jdbc.update(getMergeSQL(), sqlParameterSource);
+        jdbc.update(
+            "update task_execution set " +
+            "  serialized_execution=:serializedExecution,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ",
+            sqlParameterSource
+        );
 
         return merged;
     }
@@ -110,10 +120,6 @@ public abstract class AbstractJdbcTaskExecutionRepository implements TaskExecuti
     public void setObjectMapper(ObjectMapper aJson) {
         json = aJson;
     }
-
-    protected abstract String getCreateSql();
-
-    protected abstract String getMergeSQL();
 
     private SqlParameterSource createSqlParameterSource(TaskExecution aTaskExecution) {
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
