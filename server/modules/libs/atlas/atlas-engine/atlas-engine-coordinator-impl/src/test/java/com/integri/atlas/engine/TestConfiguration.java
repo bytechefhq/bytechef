@@ -21,6 +21,8 @@ package com.integri.atlas.engine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
+import com.integri.atlas.engine.core.json.DefaultJsonMapper;
+import com.integri.atlas.engine.core.json.JsonMapper;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.repository.engine.jdbc.context.JdbcContextRepository;
@@ -49,29 +51,38 @@ public class TestConfiguration {
     }
 
     @Bean
-    TaskExecutionRepository jdbcJobTaskRepository(
-        NamedParameterJdbcTemplate aJdbcTemplate,
-        ObjectMapper aObjectMapper
-    ) {
+    TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
         JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
+
         jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobTaskRepository.setObjectMapper(aObjectMapper);
+        jdbcJobTaskRepository.setJsonMapper(jsonMapper);
+
         return jdbcJobTaskRepository;
     }
 
     @Bean
-    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
+
         jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, aObjectMapper));
+        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, jsonMapper));
+        jdbcJobRepository.setJsonMapper(jsonMapper);
+
         return jdbcJobRepository;
     }
 
     @Bean
-    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
-        JdbcContextRepository repo = new JdbcContextRepository();
-        repo.setJdbcTemplate(aJdbcTemplate);
-        repo.setObjectMapper(aObjectMapper);
-        return repo;
+    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
+        JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
+
+        jdbcContextRepository.setJdbcTemplate(aJdbcTemplate);
+        jdbcContextRepository.setJsonMapper(jsonMapper);
+
+        return jdbcContextRepository;
+    }
+
+    @Bean
+    JsonMapper jsonMapper() {
+        return new DefaultJsonMapper(new ObjectMapper());
     }
 }

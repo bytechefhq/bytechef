@@ -18,7 +18,6 @@
 
 package com.integri.atlas.repository.engine.jdbc.context;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
