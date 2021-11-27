@@ -16,20 +16,20 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.config;
+package com.integri.atlas.config;
 
 /**
  * @author Arik Cohen
  */
-public class SerializationProperties {
+public class MessageBrokerProperties {
 
-    private String dateFormat;
+    private String provider;
 
-    public String getDateFormat() {
-        return dateFormat;
+    public String getProvider() {
+        return provider;
     }
 
-    public void setDateFormat(String aDateFormat) {
-        dateFormat = aDateFormat;
+    public void setProvider(String aProvider) {
+        provider = aProvider;
     }
 }
