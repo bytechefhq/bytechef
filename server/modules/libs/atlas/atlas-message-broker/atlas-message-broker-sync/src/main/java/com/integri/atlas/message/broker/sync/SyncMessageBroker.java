@@ -16,8 +16,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.message.broker;
+package com.integri.atlas.message.broker.sync;
 
+import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
