@@ -18,7 +18,11 @@
 
 package com.integri.atlas.task.handler.binary.file;
 
-import static com.integri.atlas.engine.core.task.description.TaskDescription.description;
+import static com.integri.atlas.engine.core.task.TaskDescriptor.task;
+import static com.integri.atlas.engine.core.task.description.TaskDescription.property;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyType.SELECT;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyType.STRING;
 
 import com.integri.atlas.engine.core.task.TaskDescriptor;
 import com.integri.atlas.engine.core.task.description.TaskDescription;
@@ -27,7 +31,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinaryFileTaskDescriptor implements TaskDescriptor {
 
-    private static final TaskDescription TASK_DESCRIPTION = description();
+    private static final TaskDescription TASK_DESCRIPTION = task("binaryFile")
+        .displayName("Binary File")
+        .description("Directs a stream based on true/false results of comparisons")
+        .properties(
+            property("operation")
+                .displayName("Operation")
+                .type(SELECT)
+                .description("Operation to do with the file.")
+                .options(option("Read", "READ"), option("Write", "WRITE"))
+                .defaultValue("read")
+                .required(true),
+            property("filePath")
+                .displayName("File Path")
+                .type(STRING)
+                .description("Path of the file to read or path to which the file should be written.")
+                .defaultValue("")
+                .placeholder("/data/your_file.pdf")
+                .required(true),
+            property("dataPropertyName")
+                .displayName("Property Name")
+                .type(STRING)
+                .description(
+                    "Name of the binary property to which to write the data of the read file or which contains the data for the file to be written."
+                )
+                .defaultValue("data")
+                .required(true)
+        );
 
     @Override
     public TaskDescription getDescription() {
