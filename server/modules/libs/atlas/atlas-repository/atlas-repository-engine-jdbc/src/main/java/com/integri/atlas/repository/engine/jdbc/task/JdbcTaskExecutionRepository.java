@@ -18,7 +18,6 @@
 
 package com.integri.atlas.repository.engine.jdbc.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.core.json.JsonMapper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;

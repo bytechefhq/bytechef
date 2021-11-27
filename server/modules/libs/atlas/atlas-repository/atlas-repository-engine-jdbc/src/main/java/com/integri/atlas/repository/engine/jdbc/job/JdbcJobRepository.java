@@ -157,7 +157,7 @@ public class JdbcJobRepository implements JobRepository {
         this.jsonMapper = jsonMapper;
     }
 
-        protected MapSqlParameterSource createSqlParameterSource(Job aJob) {
+    protected MapSqlParameterSource createSqlParameterSource(Job aJob) {
         SimpleJob job = new SimpleJob(aJob);
         Assert.notNull(aJob, "job must not be null");
         Assert.notNull(aJob.getId(), "job status must not be null");
@@ -194,7 +194,7 @@ public class JdbcJobRepository implements JobRepository {
         map.put("priority", aRs.getInt("priority"));
         map.put("inputs", jsonMapper.deserialize(aRs.getString("inputs"), Map.class));
         map.put("outputs", jsonMapper.deserialize(aRs.getString("outputs"), Map.class));
-        map.put("webhooks", jsonMapper.deserialize( aRs.getString("webhooks"), List.class));
+        map.put("webhooks", jsonMapper.deserialize(aRs.getString("webhooks"), List.class));
         map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
         return new SimpleJob(map);
     }
