@@ -26,11 +26,10 @@ import static com.integri.atlas.engine.core.task.description.TaskDescription.pro
 import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.*;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.properties;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.propertyGroup;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.propertyOption;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.propertyOptionValue;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.group;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyType.BOOLEAN;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyType.COLLECTION;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyType.DATE_TIME;
@@ -741,33 +740,33 @@ public class TaskDescriptionTest {
                                     parameterValues("stringValue2")
                                 )
                         )
-                        .propertyOptions(
+                        .options(
                             property("name6")
                                 .name("name6")
                                 .displayName("displayName3")
                                 .type(SELECT)
-                                .propertyOptions(
-                                    propertyOption("option1", 3, "description1"),
-                                    propertyOption("option2", "optionValue2", "description2")
+                                .options(
+                                    option("option1", 3, "description1"),
+                                    option("option2", "optionValue2", "description2")
                                 )
                                 .defaultValue("option1"),
                             property("name6")
                                 .displayName("displayName6")
                                 .type(COLLECTION)
-                                .propertyOptions(
+                                .options(
                                     property("name8")
                                         .displayName("displayName8")
                                         .type(SELECT)
-                                        .propertyOptions(
-                                            propertyOption("option1", 3, "description1"),
-                                            propertyOption("option2", "optionValue2", "description2")
+                                        .options(
+                                            option("option1", 3, "description1"),
+                                            option("option2", "optionValue2", "description2")
                                         ),
                                     property("name3").displayName("displayName").type(STRING),
                                     property("name9")
                                         .displayName("displayName9")
                                         .type(COLLECTION)
-                                        .propertyOptions(
-                                            propertyGroup(
+                                        .options(
+                                            group(
                                                 "name9",
                                                 "displayName",
                                                 properties(
@@ -780,8 +779,8 @@ public class TaskDescriptionTest {
                             property("name10")
                                 .displayName("displayName10")
                                 .type(COLLECTION)
-                                .propertyOptions(
-                                    propertyGroup(
+                                .options(
+                                    group(
                                         "name10",
                                         "displayName",
                                         properties(
@@ -829,12 +828,12 @@ public class TaskDescriptionTest {
                         }
                     },
                     "name":"name5",
-                    "propertyOptions":[
+                    "options":[
                         {
                             "defaultValue":"option1",
                             "displayName":"displayName3",
                             "name":"name6",
-                            "propertyOptions":[
+                            "options":[
                                 {
                                     "name":"option1",
                                     "value":3,
@@ -851,11 +850,11 @@ public class TaskDescriptionTest {
                         {
                             "displayName":"displayName6",
                             "name":"name6",
-                            "propertyOptions":[
+                            "options":[
                                 {
                                     "displayName":"displayName8",
                                     "name":"name8",
-                                    "propertyOptions":[
+                                    "options":[
                                         {
                                             "name":"option1",
                                             "value":3,
@@ -877,7 +876,7 @@ public class TaskDescriptionTest {
                                 {
                                     "displayName":"displayName9",
                                     "name":"name9",
-                                    "propertyOptions":[
+                                    "options":[
                                         {
                                             "name":"name9",
                                             "displayName":"displayName",
@@ -903,7 +902,7 @@ public class TaskDescriptionTest {
                         {
                             "displayName":"displayName10",
                             "name":"name10",
-                            "propertyOptions":[
+                            "options":[
                                 {
                                     "name":"name10",
                                     "displayName":"displayName",
@@ -1731,7 +1730,7 @@ public class TaskDescriptionTest {
             .displayName("displayName")
             .displayOption(displayOption())
             .name("name")
-            .propertyOptions(propertyOption("option1", 1), propertyOption("option2", 2))
+            .options(option("option1", 1), option("option2", 2))
             .placeholder("placeholder")
             .required(true)
             .type(STRING)
@@ -1745,7 +1744,7 @@ public class TaskDescriptionTest {
             "displayName":"displayName",
             "displayOption":{},
             "name":"name",
-            "propertyOptions":[
+            "options":[
                 {
                     "name":"option1",
                     "value":1
@@ -1767,7 +1766,7 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskPropertyOption() throws JsonProcessingException, JSONException {
-        TaskPropertyOption taskPropertyOption = propertyOption("name", 1);
+        TaskPropertyOption taskPropertyOption = option("name", 1);
 
         jsonAssertEquals(
             """
@@ -1779,7 +1778,7 @@ public class TaskDescriptionTest {
             taskPropertyOption
         );
 
-        taskPropertyOption = propertyOption("name", "value");
+        taskPropertyOption = option("name", "value");
 
         jsonAssertEquals(
             """
@@ -1791,7 +1790,7 @@ public class TaskDescriptionTest {
             taskPropertyOption
         );
 
-        taskPropertyOption = propertyOption("name", 1, "description");
+        taskPropertyOption = option("name", 1, "description");
 
         jsonAssertEquals(
             """
@@ -1804,7 +1803,7 @@ public class TaskDescriptionTest {
             taskPropertyOption
         );
 
-        taskPropertyOption = propertyOption("name", "value", "description");
+        taskPropertyOption = option("name", "value", "description");
 
         jsonAssertEquals(
             """
@@ -1820,11 +1819,11 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskPropertyOptionValue() throws JsonProcessingException {
-        TaskPropertyOptionValue taskPropertyOptionValue = propertyOptionValue(1);
+        TaskPropertyOptionValue taskPropertyOptionValue = TaskPropertyOptionValue.optionValue(1);
 
         assertEquals("1", taskPropertyOptionValue);
 
-        taskPropertyOptionValue = propertyOptionValue("value");
+        taskPropertyOptionValue = optionValue("value");
 
         assertEquals("\"value\"", taskPropertyOptionValue);
     }

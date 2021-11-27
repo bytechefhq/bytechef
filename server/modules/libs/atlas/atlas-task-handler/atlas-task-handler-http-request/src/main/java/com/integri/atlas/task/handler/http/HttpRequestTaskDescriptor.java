@@ -27,8 +27,8 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.minVal
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.properties;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.propertyGroup;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.propertyOption;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.group;
+import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyType.*;
 
 import com.integri.atlas.engine.core.task.TaskDescriptor;
@@ -47,12 +47,12 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                     property("authenticationType")
                         .displayName("Authentication Type")
                         .type(SELECT)
-                        .propertyOptions(
-                            propertyOption("basicAuth", "Basic Auth"),
-                            propertyOption("digestAuth", "Digest Auth"),
-                            propertyOption("headerAuth", "Header Auth"),
-                            propertyOption("oAuth2", "OAuth2"),
-                            propertyOption("", "None")
+                        .options(
+                            option("basicAuth", "Basic Auth"),
+                            option("digestAuth", "Digest Auth"),
+                            option("headerAuth", "Header Auth"),
+                            option("oAuth2", "OAuth2"),
+                            option("", "None")
                         )
                 )
                 .credentials(
@@ -67,13 +67,13 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
             property("requestMethod")
                 .displayName("Request Method")
                 .type(SELECT)
-                .propertyOptions(
-                    propertyOption("DELETE", "DELETE"),
-                    propertyOption("GET", "GET"),
-                    propertyOption("HEAD", "HEAD"),
-                    propertyOption("PATCH", "PATCH"),
-                    propertyOption("POST", "POST"),
-                    propertyOption("PUT", "PUT")
+                .options(
+                    option("DELETE", "DELETE"),
+                    option("GET", "GET"),
+                    option("HEAD", "HEAD"),
+                    option("PATCH", "PATCH"),
+                    option("POST", "POST"),
+                    option("PUT", "PUT")
                 )
                 .description("The request method to use.")
                 .defaultValue("GET"),
@@ -92,11 +92,7 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
             property("responseFormat")
                 .displayName("Response Format")
                 .type(SELECT)
-                .propertyOptions(
-                    propertyOption("File", "file"),
-                    propertyOption("JSON", "json"),
-                    propertyOption("String", "string")
-                )
+                .options(option("File", "file"), option("JSON", "json"), option("String", "string"))
                 .description("The format in which the data gets returned from the URL.")
                 .defaultValue("json"),
             property("dataPropertyName")
@@ -123,7 +119,7 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                 .type(COLLECTION)
                 .defaultValue("data")
                 .placeholder("Add Option")
-                .propertyOptions(
+                .options(
                     property("rawParameters")
                         .displayName("RAW Parameters")
                         .type(BOOLEAN)
@@ -135,11 +131,11 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         .displayName("Body Content Type")
                         .type(SELECT)
                         .description("Content-Type to use when sending body parameters.")
-                        .propertyOptions(
-                            propertyOption("RAW", "raw"),
-                            propertyOption("Form-Data", "form-data"),
-                            propertyOption("Form-Urlencoded", "form-urlencoded"),
-                            propertyOption("Binary", "binary")
+                        .options(
+                            option("RAW", "raw"),
+                            option("Form-Data", "form-data"),
+                            option("Form-Urlencoded", "form-urlencoded"),
+                            option("Binary", "binary")
                         )
                         .defaultValue("raw")
                         .displayOption(show("requestMethod", "PATCH", "POST", "PUT")),
@@ -148,12 +144,12 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         .type(SELECT)
                         .description("Mime-Type to use when sending body as raw content.")
                         // from Postman
-                        .propertyOptions(
-                            propertyOption("JSON", "json"),
-                            propertyOption("Text", "text"),
-                            propertyOption("HTML", "html"),
-                            propertyOption("JavaScript", "javascript"),
-                            propertyOption("XML", "xml")
+                        .options(
+                            option("JSON", "json"),
+                            option("Text", "text"),
+                            option("HTML", "html"),
+                            option("JavaScript", "javascript"),
+                            option("XML", "xml")
                         )
                         .defaultValue("json")
                         .displayOption(
@@ -213,8 +209,8 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                 .placeholder("Add Parameter")
                 .propertyTypeOption(multipleValues(true))
                 .displayOption(show("rawParameters", parameterValues(false)))
-                .propertyOptions(
-                    propertyGroup(
+                .options(
+                    group(
                         "parameter",
                         "Parameter",
                         properties(
@@ -247,8 +243,8 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                 .placeholder("Add Parameter")
                 .propertyTypeOption(multipleValues(true))
                 .displayOption(show("rawParameters", parameterValues(false)))
-                .propertyOptions(
-                    propertyGroup(
+                .options(
+                    group(
                         "parameter",
                         "Parameter",
                         properties(
@@ -317,8 +313,8 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         parameterValues("PATCH", "POST", "PUT")
                     )
                 )
-                .propertyOptions(
-                    propertyGroup(
+                .options(
+                    group(
                         "parameter",
                         "Parameter",
                         properties(

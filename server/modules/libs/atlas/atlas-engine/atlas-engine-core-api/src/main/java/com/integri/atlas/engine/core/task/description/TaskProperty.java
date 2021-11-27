@@ -35,7 +35,7 @@ public final class TaskProperty implements TaskPropertyOption {
     private String displayName;
     private DisplayOption displayOption;
     private String name;
-    private List<TaskPropertyOption> propertyOptions;
+    private List<TaskPropertyOption> options;
     private String placeholder;
     private Boolean required;
     private TaskPropertyType type;
@@ -571,8 +571,8 @@ public final class TaskProperty implements TaskPropertyOption {
         return this;
     }
 
-    public TaskProperty propertyOptions(TaskPropertyOption... options) {
-        this.propertyOptions = List.of(options);
+    public TaskProperty options(TaskPropertyOption... options) {
+        this.options = List.of(options);
 
         return this;
     }
@@ -615,8 +615,8 @@ public final class TaskProperty implements TaskPropertyOption {
         return name;
     }
 
-    public List<TaskPropertyOption> getPropertyOptions() {
-        return propertyOptions;
+    public List<TaskPropertyOption> getOptions() {
+        return options;
     }
 
     public String getPlaceholder() {
