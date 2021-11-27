@@ -63,7 +63,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Jun 12, 2016
  */
-public class Coordinator {
+public class Coordinator implements CoordinatorControl {
 
     private WorkflowRepository workflowRepository;
     private JobRepository jobRepository;
