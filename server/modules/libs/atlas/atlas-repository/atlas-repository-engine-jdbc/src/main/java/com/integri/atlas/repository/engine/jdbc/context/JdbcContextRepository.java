@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.json.Json;
+import com.integri.atlas.engine.core.json.JsonMapper;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,15 +38,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JdbcContextRepository implements ContextRepository {
 
     private JdbcTemplate jdbc;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private JsonMapper jsonMapper;
 
     @Override
-    public void push(String aStackId, Context aContext) {
+    public void push(String aStackId, Context context) {
         jdbc.update(
             "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",
             UUIDGenerator.generate(),
             aStackId,
-            Json.serialize(objectMapper, aContext),
+            jsonMapper.serialize(context),
             new Date()
         );
     }
@@ -65,14 +65,14 @@ public class JdbcContextRepository implements ContextRepository {
     @SuppressWarnings("unchecked")
     private Context contextRowMapper(ResultSet aResultSet, int aIndex) throws SQLException {
         String serialized = aResultSet.getString(2);
-        return new MapContext(Json.deserialize(objectMapper, serialized, Map.class));
+        return new MapContext(jsonMapper.deserialize(serialized, Map.class));
     }
 
     public void setJdbcTemplate(JdbcTemplate aJdbcTemplate) {
         jdbc = aJdbcTemplate;
     }
 
-    public void setObjectMapper(ObjectMapper aObjectMapper) {
-        objectMapper = aObjectMapper;
+    public void setJsonMapper(JsonMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
     }
 }
