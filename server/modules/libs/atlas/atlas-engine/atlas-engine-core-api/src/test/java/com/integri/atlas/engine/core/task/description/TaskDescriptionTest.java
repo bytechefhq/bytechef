@@ -21,21 +21,19 @@ package com.integri.atlas.engine.core.task.description;
 import static com.integri.atlas.engine.core.task.description.DisplayOption.displayOption;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskCredential.credential;
-import static com.integri.atlas.engine.core.task.description.TaskDescription.description;
-import static com.integri.atlas.engine.core.task.description.TaskDescription.property;
+import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.properties;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.group;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.DATE_TIME_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.BOOLEAN;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.COLLECTION;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.DATE_TIME;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.NUMBER;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.SELECT;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.STRING;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyTypeOption.propertyTypeOption;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -657,12 +655,12 @@ public class TaskDescriptionTest {
     public void testTaskAuthentication() throws JsonProcessingException, JSONException {
         TaskAuthentication taskAuthentication = authentication()
             .credentials(credential())
-            .properties(TaskProperty.property());
+            .properties(TaskProperty.STRING_PROPERTY("name"));
 
         jsonAssertEquals(
             """
         {
-            "credentials":[{}],"properties":[{}]
+            "credentials":[{}],"properties":[{name:"name",type:STRING}]
         }
         """,
             taskAuthentication
@@ -685,13 +683,12 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskDescription() throws JsonProcessingException, JSONException {
-        TaskDescription taskDescription = description()
-            .name("name")
+        TaskDescription taskDescription = task("name")
             .displayName("displayName")
             .description("description")
             .subtitle("subtitle")
-            .authentication(authentication().credentials(credential()).properties(TaskProperty.property()))
-            .properties(TaskProperty.property())
+            .authentication(authentication().credentials(credential()).properties(TaskProperty.STRING_PROPERTY("name")))
+            .properties(TaskProperty.STRING_PROPERTY("name"))
             .icon("icon")
             .version(1);
 
@@ -700,13 +697,13 @@ public class TaskDescriptionTest {
         {
             "authentication":{
                 "credentials":[{}],
-                "properties":[{}]
+                "properties":[{name:"name",type:STRING}]
             },
             "description":"description",
             "displayName":"displayName",
             "name":"name",
             "icon":"icon",
-            "properties":[{}],
+            "properties":[{"name":"name","type":"STRING"}],
             "subtitle":"subtitle",
             "version":1.0
         }
@@ -715,19 +712,17 @@ public class TaskDescriptionTest {
         );
 
         taskDescription =
-            description()
-                .name("name")
+            task("name")
                 .displayName("displayName")
                 .description("description")
                 .icon("icon")
                 .version(1)
                 .properties(
-                    property("name2").displayName("displayName").type(BOOLEAN),
-                    property("name3").displayName("displayName").type(STRING),
-                    property("name4").displayName("displayName").type(DATE_TIME),
-                    property("name5")
+                    BOOLEAN_PROPERTY("name2").displayName("displayName"),
+                    STRING_PROPERTY("name3").displayName("displayName"),
+                    DATE_TIME_PROPERTY("name4").displayName("displayName"),
+                    COLLECTION_PROPERTY("name5")
                         .displayName("displayName")
-                        .type(COLLECTION)
                         .displayOption(
                             displayOption()
                                 .hide("parameterName1", 3333)
@@ -741,53 +736,43 @@ public class TaskDescriptionTest {
                                 )
                         )
                         .options(
-                            property("name6")
-                                .name("name6")
+                            SELECT_PROPERTY("name6")
                                 .displayName("displayName3")
-                                .type(SELECT)
                                 .options(
                                     option("option1", 3, "description1"),
                                     option("option2", "optionValue2", "description2")
                                 )
                                 .defaultValue("option1"),
-                            property("name6")
+                            COLLECTION_PROPERTY("name6")
                                 .displayName("displayName6")
-                                .type(COLLECTION)
                                 .options(
-                                    property("name8")
+                                    SELECT_PROPERTY("name8")
                                         .displayName("displayName8")
-                                        .type(SELECT)
                                         .options(
                                             option("option1", 3, "description1"),
                                             option("option2", "optionValue2", "description2")
                                         ),
-                                    property("name3").displayName("displayName").type(STRING),
-                                    property("name9")
+                                    STRING_PROPERTY("name3").displayName("displayName"),
+                                    COLLECTION_PROPERTY("name9")
                                         .displayName("displayName9")
-                                        .type(COLLECTION)
                                         .options(
-                                            group(
-                                                "name9",
-                                                "displayName",
-                                                properties(
-                                                    property("name").displayName("displayName").type(STRING),
-                                                    property("name").displayName("displayName").type(NUMBER)
+                                            GROUP_PROPERTY("name9")
+                                                .displayName("displayName")
+                                                .fields(
+                                                    STRING_PROPERTY("name").displayName("displayName"),
+                                                    NUMBER_PROPERTY("name").displayName("displayName")
                                                 )
-                                            )
                                         )
-                                ),
-                            property("name10")
-                                .displayName("displayName10")
-                                .type(COLLECTION)
-                                .options(
-                                    group(
-                                        "name10",
-                                        "displayName",
-                                        properties(
-                                            property("name").displayName("displayName").type(STRING),
-                                            property("name").displayName("displayName").type(NUMBER)
-                                        )
-                                    )
+                                )
+                        ),
+                    COLLECTION_PROPERTY("name10")
+                        .displayName("displayName10")
+                        .options(
+                            GROUP_PROPERTY("name10")
+                                .displayName("displayName")
+                                .fields(
+                                    STRING_PROPERTY("name").displayName("displayName"),
+                                    NUMBER_PROPERTY("name").displayName("displayName")
                                 )
                         )
                 );
@@ -828,11 +813,13 @@ public class TaskDescriptionTest {
                         }
                     },
                     "name":"name5",
+                    "type":"COLLECTION",
                     "options":[
                         {
                             "defaultValue":"option1",
                             "displayName":"displayName3",
                             "name":"name6",
+                            "type":"SELECT",
                             "options":[
                                 {
                                     "name":"option1",
@@ -844,17 +831,18 @@ public class TaskDescriptionTest {
                                     "value":"optionValue2",
                                     "description":"description2"
                                 }
-                            ],
-                            "type":"SELECT"
+                            ]
                         },
                         {
                             "displayName":"displayName6",
                             "name":"name6",
+                            "type":"COLLECTION",
                             "options":[
                                 {
                                     "displayName":"displayName8",
                                     "name":"name8",
-                                    "options":[
+                                    "type":"SELECT"
+                                    ,"options":[
                                         {
                                             "name":"option1",
                                             "value":3,
@@ -865,8 +853,7 @@ public class TaskDescriptionTest {
                                             "value":"optionValue2",
                                             "description":"description2"
                                         }
-                                    ],
-                                    "type":"SELECT"
+                                    ]
                                 },
                                 {
                                     "displayName":"displayName",
@@ -876,11 +863,13 @@ public class TaskDescriptionTest {
                                 {
                                     "displayName":"displayName9",
                                     "name":"name9",
+                                    "type":"COLLECTION",
                                     "options":[
                                         {
-                                            "name":"name9",
                                             "displayName":"displayName",
-                                            "properties":[
+                                            "name":"name9",
+                                            "type":"COLLECTION",
+                                            "fields":[
                                                 {
                                                     "displayName":"displayName",
                                                     "name":"name",
@@ -893,42 +882,40 @@ public class TaskDescriptionTest {
                                                 }
                                             ]
                                         }
-                                    ],
-                                    "type":"COLLECTION"
-                                }
-                            ],
-                            "type":"COLLECTION"
-                        },
-                        {
-                            "displayName":"displayName10",
-                            "name":"name10",
-                            "options":[
-                                {
-                                    "name":"name10",
-                                    "displayName":"displayName",
-                                    "properties":[
-                                        {
-                                            "displayName":"displayName",
-                                            "name":"name",
-                                            "type":"STRING"
-                                        },
-                                        {
-                                            "displayName":"displayName",
-                                            "name":"name",
-                                            "type":"NUMBER"
-                                        }
                                     ]
                                 }
-                            ],
-                            "type":"COLLECTION"
+                            ]
                         }
-                    ],
-                    "type":"COLLECTION"
+                    ]
+                },
+                {
+                    "displayName":"displayName10",
+                    "name":"name10",
+                    "type":"COLLECTION",
+                    "options":[
+                        {
+                            "displayName":"displayName",
+                            "name":"name10",
+                            "type":"COLLECTION",
+                            "fields":[
+                                {
+                                    "displayName":"displayName",
+                                    "name":"name",
+                                    "type":"STRING"
+                                },
+                                {
+                                    "displayName":"displayName",
+                                    "name":"name",
+                                    "type":"NUMBER"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ],
             "version":1.0
         }
-        """,
+                """,
             taskDescription
         );
     }
@@ -1723,18 +1710,15 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskProperty() throws JsonProcessingException, JSONException {
-        TaskProperty taskProperty = TaskProperty
-            .property()
+        TaskProperty taskProperty = SELECT_PROPERTY("name")
             .defaultValue(2)
             .description("description")
             .displayName("displayName")
             .displayOption(displayOption())
-            .name("name")
             .options(option("option1", 1), option("option2", 2))
             .placeholder("placeholder")
             .required(true)
-            .type(STRING)
-            .propertyTypeOption(propertyTypeOption());
+            .typeOption(propertyTypeOption());
 
         jsonAssertEquals(
             """
@@ -1756,8 +1740,8 @@ public class TaskDescriptionTest {
             ],
             "placeholder":"placeholder",
             "required":true,
-            "type":"STRING",
-            "propertyTypeOption":{}
+            "type":"SELECT",
+            "typeOption":{"multipleValues":false}
         }
         """,
             taskProperty
@@ -1819,7 +1803,7 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskPropertyOptionValue() throws JsonProcessingException {
-        TaskPropertyOptionValue taskPropertyOptionValue = TaskPropertyOptionValue.optionValue(1);
+        TaskPropertyOptionValue taskPropertyOptionValue = optionValue(1);
 
         assertEquals("1", taskPropertyOptionValue);
 

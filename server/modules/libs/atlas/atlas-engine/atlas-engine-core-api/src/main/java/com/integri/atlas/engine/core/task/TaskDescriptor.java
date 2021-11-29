@@ -24,9 +24,5 @@ import com.integri.atlas.engine.core.task.description.TaskDescription;
  * @author Ivica Cardic
  */
 public interface TaskDescriptor {
-    static TaskDescription task(String name) {
-        return TaskDescription.description().name(name);
-    }
-
     TaskDescription getDescription();
 }

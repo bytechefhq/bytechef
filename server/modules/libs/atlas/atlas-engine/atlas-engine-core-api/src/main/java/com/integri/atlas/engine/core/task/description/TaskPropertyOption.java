@@ -20,60 +20,64 @@ package com.integri.atlas.engine.core.task.description;
 
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
 
-import java.util.List;
-
 /**
  * @author Ivica Cardic
  */
-public sealed interface TaskPropertyOption
-    permits TaskProperty, TaskPropertyOption.TaskPropertyOptionItem, TaskPropertyOption.TaskPropertyGroup {
-    static TaskPropertyOption group(String name, String displayName, List<TaskProperty> properties) {
-        return new TaskPropertyGroup(name, displayName, properties);
+public final class TaskPropertyOption {
+
+    private String name;
+    private TaskPropertyOptionValue value;
+    private String description;
+
+    public static TaskPropertyOption option(String name, int value) {
+        return new TaskPropertyOption(name, optionValue(value), null);
     }
 
-    static TaskPropertyOption option(String name, int value) {
-        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), null);
+    public static TaskPropertyOption option(String name, String value) {
+        return new TaskPropertyOption(name, optionValue(value), null);
     }
 
-    static TaskPropertyOption option(String name, String value) {
-        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), null);
+    public static TaskPropertyOption option(String name, int value, String description) {
+        return new TaskPropertyOption(name, optionValue(value), description);
     }
 
-    static TaskPropertyOption option(String name, int value, String description) {
-        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), description);
+    public static TaskPropertyOption option(String name, String value, String description) {
+        return new TaskPropertyOption(name, optionValue(value), description);
     }
 
-    static TaskPropertyOption option(String name, String value, String description) {
-        return new TaskPropertyOptionItem(name, TaskPropertyOptionValue.optionValue(value), description);
+    TaskPropertyOption(String name, TaskPropertyOptionValue value, String description) {
+        this.name = name;
+        this.value = value;
+        this.description = description;
     }
 
-    record TaskPropertyGroup(String name, String displayName, List<TaskProperty> properties)
-        implements TaskPropertyOption {
-        public String getName() {
-            return name;
-        }
+    public TaskPropertyOption name(String name) {
+        this.name = name;
 
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        public List<TaskProperty> getProperties() {
-            return properties;
-        }
+        return this;
     }
 
-    record TaskPropertyOptionItem(String name, TaskPropertyOptionValue value, String description)
-        implements TaskPropertyOption {
-        public String getName() {
-            return name;
-        }
+    public TaskPropertyOption description(String description) {
+        this.description = description;
 
-        public String getDescription() {
-            return description;
-        }
+        return this;
+    }
 
-        public TaskPropertyOptionValue getValue() {
-            return value;
-        }
+    public TaskPropertyOption value(TaskPropertyOptionValue value) {
+        this.value = value;
+
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public TaskPropertyOptionValue getValue() {
+        return value;
     }
 }
