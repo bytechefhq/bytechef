@@ -18,18 +18,20 @@
 
 package com.integri.atlas.task.handler.http;
 
-import static com.integri.atlas.engine.core.task.TaskDescriptor.task;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
-import static com.integri.atlas.engine.core.task.description.TaskDescription.property;
+import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.minValue;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.properties;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.group;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.*;
 
 import com.integri.atlas.engine.core.task.TaskDescriptor;
 import com.integri.atlas.engine.core.task.description.TaskDescription;
@@ -44,9 +46,8 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
         .authentication(
             authentication()
                 .properties(
-                    property("authenticationType")
+                    SELECT_PROPERTY("authenticationType")
                         .displayName("Authentication Type")
-                        .type(SELECT)
                         .options(
                             option("basicAuth", "Basic Auth"),
                             option("digestAuth", "Digest Auth"),
@@ -62,11 +63,12 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                 )
         )
         .properties(
+            //
             // General
+            //
 
-            property("requestMethod")
+            SELECT_PROPERTY("requestMethod")
                 .displayName("Request Method")
-                .type(SELECT)
                 .options(
                     option("DELETE", "DELETE"),
                     option("GET", "GET"),
@@ -77,59 +79,51 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                 )
                 .description("The request method to use.")
                 .defaultValue("GET"),
-            property("url")
+            STRING_PROPERTY("url")
                 .displayName("URL")
-                .type(STRING)
                 .description("The URL to make the request to")
                 .placeholder("http://example.com/index.html")
                 .defaultValue("")
                 .required(true),
-            property("allowUnauthorizedCerts")
+            BOOLEAN_PROPERTY("allowUnauthorizedCerts")
                 .displayName("Allow Unauthorized Certs")
-                .type(BOOLEAN)
                 .description("Download the response even if SSL certificate validation is not possible.")
                 .defaultValue(false),
-            property("responseFormat")
+            SELECT_PROPERTY("responseFormat")
                 .displayName("Response Format")
-                .type(SELECT)
                 .options(option("File", "file"), option("JSON", "json"), option("String", "string"))
                 .description("The format in which the data gets returned from the URL.")
                 .defaultValue("json"),
-            property("dataPropertyName")
+            STRING_PROPERTY("dataPropertyName")
                 .displayName("Property Name")
-                .type(STRING)
+                .displayOption(show("responseFormat", "json", "string"))
                 .description("Name of the property to which to write the response data.")
                 .defaultValue("data")
-                .required(true)
-                .displayOption(show("responseFormat", "json", "string")),
-            property("dataPropertyName")
+                .required(true),
+            STRING_PROPERTY("dataPropertyName")
                 .displayName("Binary Property")
-                .type(STRING)
+                .displayOption(show("responseFormat", "file"))
                 .description("Name of the binary property to which to write the data of the read file.")
                 .defaultValue("data")
-                .required(true)
-                .displayOption(show("responseFormat", "file")),
-            property("statusPropertyName")
+                .required(true),
+            STRING_PROPERTY("statusPropertyName")
                 .displayName("Status Name")
-                .type(STRING)
                 .description("Name of the property to which to write the response status.")
                 .defaultValue("status"),
-            property("options")
+            COLLECTION_PROPERTY("options")
                 .displayName("Options")
-                .type(COLLECTION)
                 .defaultValue("data")
                 .placeholder("Add Option")
                 .options(
-                    property("rawParameters")
+                    BOOLEAN_PROPERTY("rawParameters")
                         .displayName("RAW Parameters")
-                        .type(BOOLEAN)
                         .description(
                             "If the query and/or body parameters should be set via the key-value pair UI or RAW."
                         )
                         .defaultValue(false),
-                    property("bodyContentType")
+                    SELECT_PROPERTY("bodyContentType")
                         .displayName("Body Content Type")
-                        .type(SELECT)
+                        .displayOption(show("requestMethod", "PATCH", "POST", "PUT"))
                         .description("Content-Type to use when sending body parameters.")
                         .options(
                             option("RAW", "raw"),
@@ -137,21 +131,9 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                             option("Form-Urlencoded", "form-urlencoded"),
                             option("Binary", "binary")
                         )
-                        .defaultValue("raw")
-                        .displayOption(show("requestMethod", "PATCH", "POST", "PUT")),
-                    property("rawMimeType")
+                        .defaultValue("raw"),
+                    SELECT_PROPERTY("rawMimeType")
                         .displayName("Raw Mime Type")
-                        .type(SELECT)
-                        .description("Mime-Type to use when sending body as raw content.")
-                        // from Postman
-                        .options(
-                            option("JSON", "json"),
-                            option("Text", "text"),
-                            option("HTML", "html"),
-                            option("JavaScript", "javascript"),
-                            option("XML", "xml")
-                        )
-                        .defaultValue("json")
                         .displayOption(
                             show(
                                 "bodyContentType",
@@ -159,116 +141,109 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                                 "requestMethod",
                                 parameterValues("PATCH", "POST", "PUT")
                             )
-                        ),
-                    property("followAllRedirects")
+                        )
+                        .description("Mime-Type to use when sending body as raw content.")
+                        .options(
+                            option("JSON", "json"),
+                            option("Text", "text"),
+                            option("HTML", "html"),
+                            option("JavaScript", "javascript"),
+                            option("XML", "xml")
+                        )
+                        .defaultValue("json"),
+                    BOOLEAN_PROPERTY("fullResponse")
+                        .displayName("Full Response")
+                        .description("Returns the full reponse data instead of only the body.")
+                        .defaultValue(false),
+                    BOOLEAN_PROPERTY("followAllRedirects")
                         .displayName("Follow All Redirects")
-                        .type(BOOLEAN)
                         .description("Follow non-GET HTTP 3xx redirects.")
                         .defaultValue(false),
-                    property("followRedirect")
+                    BOOLEAN_PROPERTY("followRedirect")
                         .displayName("Follow GET Redirect")
-                        .type(BOOLEAN)
                         .description("Follow GET HTTP 3xx redirects.")
                         .defaultValue(false),
-                    property("ignoreResponseCode")
+                    BOOLEAN_PROPERTY("ignoreResponseCode")
                         .displayName("Ignore Response Code")
-                        .type(BOOLEAN)
                         .description("Succeeds also when status code is not 2xx.")
                         .defaultValue(false),
-                    //                        property("bodyContentCustomMimeType")
-                    //                            .displayName("MIME Type")
-                    //                            .type(STRING)
-                    //                            .description("Specify the mime type for raw/custom body type.")
-                    //                            .defaultValue(false),
-                    property("proxy")
+                    STRING_PROPERTY("proxy")
                         .displayName("Proxy")
-                        .type(STRING)
                         .description("HTTP proxy to use.")
                         .placeholder("http://myproxy:3128")
                         .defaultValue(""),
-                    property("timeout")
+                    NUMBER_PROPERTY("timeout")
                         .displayName("Timeout")
-                        .type(NUMBER)
                         .description("Time in ms to wait for the server to send response before aborting the request.")
                         .defaultValue(1000)
-                        .propertyTypeOption(minValue(1))
+                        .typeOption(minValue(1))
                 ),
-            // Query Parameters
-
-            property("queryParametersRaw")
-                .displayName("Query Parameters")
-                .type(STRING)
-                .description("Query parameters as RAW.")
-                .defaultValue("")
-                .displayOption(show("rawParameters", true)),
-            property("queryParametersKeyValue")
-                .displayName("Header Parameters")
-                .type(COLLECTION)
-                .description("Query parameters to send.")
-                .defaultValue("")
-                .placeholder("Add Parameter")
-                .propertyTypeOption(multipleValues(true))
-                .displayOption(show("rawParameters", parameterValues(false)))
-                .options(
-                    group(
-                        "parameter",
-                        "Parameter",
-                        properties(
-                            property("name")
-                                .displayName("Name")
-                                .type(STRING)
-                                .description("Name of the parameter.")
-                                .defaultValue(""),
-                            property("value")
-                                .displayName("Value")
-                                .type(STRING)
-                                .description("Name of the parameter.")
-                                .defaultValue("")
-                        )
-                    )
-                ),
+            //
             // Header Parameters
+            //
 
-            property("headerParametersRaw")
+            STRING_PROPERTY("headerParametersRaw")
                 .displayName("Header Parameters")
-                .type(STRING)
+                .displayOption(show("rawParameters", true))
                 .description("Header parameters as RAW.")
-                .defaultValue("")
-                .displayOption(show("rawParameters", true)),
-            property("headerParametersKeyValue")
+                .defaultValue(""),
+            COLLECTION_PROPERTY("headerParametersKeyValue")
                 .displayName("Header Parameters")
-                .type(COLLECTION)
+                .displayOption(show("rawParameters", parameterValues(false)))
                 .description("Header parameters to send.")
                 .defaultValue("")
                 .placeholder("Add Parameter")
-                .propertyTypeOption(multipleValues(true))
-                .displayOption(show("rawParameters", parameterValues(false)))
+                .typeOption(multipleValues(true))
                 .options(
-                    group(
-                        "parameter",
-                        "Parameter",
-                        properties(
-                            property("name")
+                    GROUP_PROPERTY("parameter")
+                        .displayName("Parameter")
+                        .fields(
+                            STRING_PROPERTY("name")
                                 .displayName("Name")
-                                .type(STRING)
                                 .description("Name of the parameter.")
                                 .defaultValue(""),
-                            property("value")
+                            STRING_PROPERTY("value")
                                 .displayName("Value")
-                                .type(STRING)
                                 .description("Name of the parameter.")
                                 .defaultValue("")
                         )
-                    )
                 ),
-            // Body Content
+            //
+            // Query Parameters
+            //
 
-            property("binaryPropertyName")
+            STRING_PROPERTY("queryParametersRaw")
+                .displayName("Query Parameters")
+                .displayOption(show("rawParameters", true))
+                .description("Query parameters as RAW.")
+                .defaultValue(""),
+            COLLECTION_PROPERTY("queryParametersKeyValue")
+                .displayName("Header Parameters")
+                .displayOption(show("rawParameters", parameterValues(false)))
+                .description("Query parameters to send.")
+                .defaultValue("")
+                .placeholder("Add Parameter")
+                .typeOption(multipleValues(true))
+                .options(
+                    GROUP_PROPERTY("parameter")
+                        .displayName("Parameter")
+                        .fields(
+                            STRING_PROPERTY("name")
+                                .displayName("Name")
+                                .description("Name of the parameter.")
+                                .defaultValue(""),
+                            STRING_PROPERTY("value")
+                                .displayName("Value")
+                                .description("Name of the parameter.")
+                                .defaultValue("")
+                        )
+                ),
+            //
+            // Body Content
+            //
+
+            STRING_PROPERTY("binaryPropertyName")
                 .displayName("Binary Property")
-                .type(STRING)
-                .description("Name of the binary property which contains the data for the file to be uploaded.")
-                .defaultValue("data")
-                .required(true)
                 .displayOption(
                     show(
                         "rawParameters",
@@ -278,12 +253,12 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )
-                ),
-            property("bodyParametersRaw")
+                )
+                .description("Name of the binary property which contains the data for the file to be uploaded.")
+                .defaultValue("data")
+                .required(true),
+            STRING_PROPERTY("bodyParametersRaw")
                 .displayName("Body Parameters")
-                .type(STRING)
-                .description("Body parameters as RAW.")
-                .defaultValue("")
                 .displayOption(
                     show(
                         "rawParameters",
@@ -293,14 +268,11 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )
-                ),
-            property("bodyParametersKeyValue")
+                )
+                .description("Body parameters as RAW.")
+                .defaultValue(""),
+            COLLECTION_PROPERTY("bodyParametersKeyValue")
                 .displayName("Body Parameters")
-                .type(COLLECTION)
-                .description("Body parameters to send.")
-                .defaultValue("")
-                .placeholder("Add Parameter")
-                .propertyTypeOption(multipleValues(true))
                 .displayOption(
                     show(
                         "rawParameters",
@@ -313,23 +285,23 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         parameterValues("PATCH", "POST", "PUT")
                     )
                 )
+                .description("Body parameters to send.")
+                .defaultValue("")
+                .placeholder("Add Parameter")
+                .typeOption(multipleValues(true))
                 .options(
-                    group(
-                        "parameter",
-                        "Parameter",
-                        properties(
-                            property("name")
+                    GROUP_PROPERTY("parameter")
+                        .displayName("Parameter")
+                        .fields(
+                            STRING_PROPERTY("name")
                                 .displayName("Name")
-                                .type(STRING)
                                 .description("Name of the parameter.")
                                 .defaultValue(""),
-                            property("value")
+                            STRING_PROPERTY("value")
                                 .displayName("Value")
-                                .type(STRING)
                                 .description("Name of the parameter.")
                                 .defaultValue("")
                         )
-                    )
                 )
         );
 
