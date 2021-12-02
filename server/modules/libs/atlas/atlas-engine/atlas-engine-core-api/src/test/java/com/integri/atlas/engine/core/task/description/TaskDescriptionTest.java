@@ -1121,6 +1121,22 @@ public class TaskDescriptionTest {
             taskParameter
         );
 
+        taskParameter = parameter("parameter1", parameterValue((LocalDateTime) null));
+
+        jsonAssertEquals("""
+        {
+             "parameter1":"null"
+        }
+        """, taskParameter);
+
+        taskParameter = parameter("parameter1", parameterValue((JsonNode) null));
+
+        jsonAssertEquals("""
+        {
+             "parameter1":"null"
+        }
+        """, taskParameter);
+
         taskParameter = parameter("parameter1", List.of(parameter(1)), "parameter2", List.of(parameter(2)));
 
         jsonAssertEquals(

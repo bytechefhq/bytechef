@@ -163,7 +163,11 @@ public sealed interface TaskParameterValue
                 JsonGenerator jsonGenerator,
                 SerializerProvider serializerProvider
             ) throws IOException {
-                jsonGenerator.writeString(taskPropertyValueDateTime.value.toString());
+                if (taskPropertyValueDateTime.value == null) {
+                    jsonGenerator.writeString("null");
+                } else {
+                    jsonGenerator.writeString(taskPropertyValueDateTime.value.toString());
+                }
             }
         }
     }
@@ -195,7 +199,11 @@ public sealed interface TaskParameterValue
                 JsonGenerator jsonGenerator,
                 SerializerProvider serializerProvider
             ) throws IOException {
-                jsonGenerator.writeString(taskPropertyValueJSON.value.toString());
+                if (taskPropertyValueJSON.value == null) {
+                    jsonGenerator.writeString("null");
+                } else {
+                    jsonGenerator.writeString(taskPropertyValueJSON.value.toString());
+                }
             }
         }
     }
