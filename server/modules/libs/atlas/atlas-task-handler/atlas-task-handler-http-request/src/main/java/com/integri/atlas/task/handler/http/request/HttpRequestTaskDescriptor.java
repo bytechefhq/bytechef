@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.task.handler.http;
+package com.integri.atlas.task.handler.http.request;
 
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpRequestTaskDescriptor implements TaskDescriptor {
 
-    private static final TaskDescription TASK_DESCRIPTION = task("httpRequest")
+    public static final TaskDescription TASK_DESCRIPTION = task("httpRequest")
         .displayName("HTTP Request")
         .description("Makes an HTTP request and returns the response data")
         .authentication(
@@ -49,17 +49,18 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                     SELECT_PROPERTY("authenticationType")
                         .displayName("Authentication Type")
                         .options(
-                            option("basicAuth", "Basic Auth"),
-                            option("digestAuth", "Digest Auth"),
-                            option("headerAuth", "Header Auth"),
-                            option("oAuth2", "OAuth2"),
-                            option("", "None")
+                            option("Basic Auth", "BASIC_AUTH"),
+                            option("Digest Auth", "DIGEST_AUTH"),
+                            option("Header Auth", "HEADER_AUTH"),
+                            option("OAuth2", "OAUTH2"),
+                            option("None", "")
                         )
                 )
                 .credentials(
-                    credential("httpBasicAuth").required(true).displayOption(show("authentication", "basicAuth")),
-                    credential("httpDigestAuth").required(true).displayOption(show("authentication", "digestAuth")),
-                    credential("oAuthApi").required(true).displayOption(show("authentication", "oAuth2"))
+                    credential("httpBasicAuth").required(true).displayOption(show("authentication", "BASIC_AUTH")),
+                    credential("httpDigestAuth").required(true).displayOption(show("authentication", "DIGEST_AUTH")),
+                    credential("httpHeaderAuth").required(true).displayOption(show("authentication", "HEADER_AUTH")),
+                    credential("oAuthApi").required(true).displayOption(show("authentication", "OAUTH2"))
                 )
         )
         .properties(
@@ -91,28 +92,15 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                 .defaultValue(false),
             SELECT_PROPERTY("responseFormat")
                 .displayName("Response Format")
-                .options(option("File", "file"), option("JSON", "json"), option("String", "string"))
+                .options(option("Binary", "BINARY"), option("JSON", "JSON"), option("String", "STRING"))
                 .description("The format in which the data gets returned from the URL.")
-                .defaultValue("json"),
-            STRING_PROPERTY("dataPropertyName")
-                .displayName("Property Name")
-                .displayOption(show("responseFormat", "json", "string"))
-                .description("Name of the property to which to write the response data.")
-                .defaultValue("data")
-                .required(true),
-            STRING_PROPERTY("dataPropertyName")
-                .displayName("Binary Property")
-                .displayOption(show("responseFormat", "file"))
-                .description("Name of the binary property to which to write the data of the read file.")
-                .defaultValue("data")
-                .required(true),
+                .defaultValue("JSON"),
             STRING_PROPERTY("statusPropertyName")
                 .displayName("Status Name")
                 .description("Name of the property to which to write the response status.")
                 .defaultValue("status"),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
-                .defaultValue("data")
                 .placeholder("Add Option")
                 .options(
                     BOOLEAN_PROPERTY("rawParameters")
@@ -126,34 +114,15 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         .displayOption(show("requestMethod", "PATCH", "POST", "PUT"))
                         .description("Content-Type to use when sending body parameters.")
                         .options(
-                            option("RAW", "raw"),
-                            option("Form-Data", "form-data"),
-                            option("Form-Urlencoded", "form-urlencoded"),
-                            option("Binary", "binary")
+                            option("JSON", "JSON"),
+                            option("Form-Data", "FORM_DATA"),
+                            option("Form-Urlencoded", "FORM_URLENCODED"),
+                            option("Binary", "BINARY")
                         )
-                        .defaultValue("raw"),
-                    SELECT_PROPERTY("rawMimeType")
-                        .displayName("Raw Mime Type")
-                        .displayOption(
-                            show(
-                                "bodyContentType",
-                                parameterValues("raw"),
-                                "requestMethod",
-                                parameterValues("PATCH", "POST", "PUT")
-                            )
-                        )
-                        .description("Mime-Type to use when sending body as raw content.")
-                        .options(
-                            option("JSON", "json"),
-                            option("Text", "text"),
-                            option("HTML", "html"),
-                            option("JavaScript", "javascript"),
-                            option("XML", "xml")
-                        )
-                        .defaultValue("json"),
+                        .defaultValue("JSON"),
                     BOOLEAN_PROPERTY("fullResponse")
                         .displayName("Full Response")
-                        .description("Returns the full reponse data instead of only the body.")
+                        .description("Returns the full response data instead of only the body.")
                         .defaultValue(false),
                     BOOLEAN_PROPERTY("followAllRedirects")
                         .displayName("Follow All Redirects")
@@ -242,21 +211,6 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
             // Body Content
             //
 
-            STRING_PROPERTY("binaryPropertyName")
-                .displayName("Binary Property")
-                .displayOption(
-                    show(
-                        "rawParameters",
-                        parameterValues(true),
-                        "bodyContentType",
-                        parameterValues("binary"),
-                        "requestMethod",
-                        parameterValues("PATCH", "POST", "PUT")
-                    )
-                )
-                .description("Name of the binary property which contains the data for the file to be uploaded.")
-                .defaultValue("data")
-                .required(true),
             STRING_PROPERTY("bodyParametersRaw")
                 .displayName("Body Parameters")
                 .displayOption(
@@ -264,7 +218,7 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         "rawParameters",
                         parameterValues(true),
                         "bodyContentType",
-                        parameterValues("raw", "form-data", "form-urlencoded"),
+                        parameterValues("JSON", "FORM_DATA", "FORM_URLENCODED"),
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )
@@ -278,9 +232,7 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         "rawParameters",
                         parameterValues(false),
                         "bodyContentType",
-                        parameterValues("raw", "form-data", "form-urlencoded"),
-                        "rawMimeType",
-                        parameterValues("json"),
+                        parameterValues("JSON", "FORM_DATA", "FORM_URLENCODED"),
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )

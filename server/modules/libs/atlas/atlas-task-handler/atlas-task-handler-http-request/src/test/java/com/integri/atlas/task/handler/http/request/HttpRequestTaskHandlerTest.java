@@ -16,17 +16,6 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.task.handler.http;
+package com.integri.atlas.task.handler.http.request;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import org.springframework.stereotype.Component;
-
-@Component("httpRequest")
-public class HttpRequestTaskHandler implements TaskHandler<Object> {
-
-    @Override
-    public Object handle(TaskExecution aTask) throws Exception {
-        return null;
-    }
-}
+public class HttpRequestTaskHandlerTest {}
