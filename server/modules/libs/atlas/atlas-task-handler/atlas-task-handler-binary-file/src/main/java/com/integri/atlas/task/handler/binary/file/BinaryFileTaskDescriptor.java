@@ -19,6 +19,8 @@
 package com.integri.atlas.task.handler.binary.file;
 
 import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.BINARY_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
@@ -31,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinaryFileTaskDescriptor implements TaskDescriptor {
 
-    private static final TaskDescription TASK_DESCRIPTION = task("binaryFile")
+    public static final TaskDescription TASK_DESCRIPTION = task("binaryFile")
         .displayName("Binary File")
         .description("Reads or writes a binary file from/toto disk")
         .properties(
@@ -48,12 +50,6 @@ public class BinaryFileTaskDescriptor implements TaskDescriptor {
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
                 .required(true),
-            STRING_PROPERTY("dataPropertyName")
-                .displayName("Property Name")
-                .displayOption(show("operation", "READ"))
-                .description("The name of the binary property to which to write the data of the read file.")
-                .defaultValue("data")
-                .required(true),
             STRING_PROPERTY("fileName")
                 .displayName("File Name")
                 .displayOption(show("operation", "WRITE"))
@@ -61,11 +57,10 @@ public class BinaryFileTaskDescriptor implements TaskDescriptor {
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
                 .required(true),
-            STRING_PROPERTY("dataPropertyName")
-                .displayName("Property Name")
+            BINARY_PROPERTY("binaryItem")
+                .displayName("Binary Item")
                 .displayOption(show("operation", "WRITE"))
-                .description("The name of the binary property which contains the data for the file to be written.")
-                .defaultValue("data")
+                .description("The Binary Item property which contains the data for the file to be written.")
                 .required(true)
         );
 
