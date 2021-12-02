@@ -25,20 +25,16 @@ import static com.integri.atlas.engine.core.task.description.TaskDescription.tas
 import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.DATE_TIME_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyTypeOption.propertyTypeOption;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -708,214 +704,6 @@ public class TaskDescriptionTest {
             "version":1.0
         }
         """,
-            taskDescription
-        );
-
-        taskDescription =
-            task("name")
-                .displayName("displayName")
-                .description("description")
-                .icon("icon")
-                .version(1)
-                .properties(
-                    BOOLEAN_PROPERTY("name2").displayName("displayName"),
-                    STRING_PROPERTY("name3").displayName("displayName"),
-                    DATE_TIME_PROPERTY("name4").displayName("displayName"),
-                    COLLECTION_PROPERTY("name5")
-                        .displayName("displayName")
-                        .displayOption(
-                            displayOption()
-                                .hide("parameterName1", 3333)
-                                .show(
-                                    "parameterName1",
-                                    parameterValues(2),
-                                    "parameterName2",
-                                    parameterValues(true),
-                                    "parameterName3",
-                                    parameterValues("stringValue2")
-                                )
-                        )
-                        .options(
-                            SELECT_PROPERTY("name6")
-                                .displayName("displayName3")
-                                .options(
-                                    option("option1", 3, "description1"),
-                                    option("option2", "optionValue2", "description2")
-                                )
-                                .defaultValue("option1"),
-                            COLLECTION_PROPERTY("name6")
-                                .displayName("displayName6")
-                                .options(
-                                    SELECT_PROPERTY("name8")
-                                        .displayName("displayName8")
-                                        .options(
-                                            option("option1", 3, "description1"),
-                                            option("option2", "optionValue2", "description2")
-                                        ),
-                                    STRING_PROPERTY("name3").displayName("displayName"),
-                                    COLLECTION_PROPERTY("name9")
-                                        .displayName("displayName9")
-                                        .options(
-                                            GROUP_PROPERTY("name9")
-                                                .displayName("displayName")
-                                                .fields(
-                                                    STRING_PROPERTY("name").displayName("displayName"),
-                                                    NUMBER_PROPERTY("name").displayName("displayName")
-                                                )
-                                        )
-                                )
-                        ),
-                    COLLECTION_PROPERTY("name10")
-                        .displayName("displayName10")
-                        .options(
-                            GROUP_PROPERTY("name10")
-                                .displayName("displayName")
-                                .fields(
-                                    STRING_PROPERTY("name").displayName("displayName"),
-                                    NUMBER_PROPERTY("name").displayName("displayName")
-                                )
-                        )
-                );
-
-        jsonAssertEquals(
-            """
-        {
-            "description":"description",
-            "displayName":"displayName",
-            "name":"name",
-            "icon":"icon",
-            "properties":[
-                {
-                    "displayName":"displayName",
-                    "name":"name2",
-                    "type":"BOOLEAN"
-                },
-                {
-                    "displayName":"displayName",
-                    "name":"name3",
-                    "type":"STRING"
-                },
-                {
-                    "displayName":"displayName",
-                    "name":"name4",
-                    "type":"DATE_TIME"
-                },
-                {
-                    "displayName":"displayName",
-                    "displayOption":{
-                        "hide":{
-                            "parameterName1":[3333]
-                        },
-                        "show":{
-                            "parameterName3":["stringValue2"],
-                            "parameterName2":[true],
-                            "parameterName1":[2]
-                        }
-                    },
-                    "name":"name5",
-                    "type":"COLLECTION",
-                    "options":[
-                        {
-                            "defaultValue":"option1",
-                            "displayName":"displayName3",
-                            "name":"name6",
-                            "type":"SELECT",
-                            "options":[
-                                {
-                                    "name":"option1",
-                                    "value":3,
-                                    "description":"description1"
-                                },
-                                {
-                                    "name":"option2",
-                                    "value":"optionValue2",
-                                    "description":"description2"
-                                }
-                            ]
-                        },
-                        {
-                            "displayName":"displayName6",
-                            "name":"name6",
-                            "type":"COLLECTION",
-                            "options":[
-                                {
-                                    "displayName":"displayName8",
-                                    "name":"name8",
-                                    "type":"SELECT"
-                                    ,"options":[
-                                        {
-                                            "name":"option1",
-                                            "value":3,
-                                            "description":"description1"
-                                        },
-                                        {
-                                            "name":"option2",
-                                            "value":"optionValue2",
-                                            "description":"description2"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "displayName":"displayName",
-                                    "name":"name3",
-                                    "type":"STRING"
-                                },
-                                {
-                                    "displayName":"displayName9",
-                                    "name":"name9",
-                                    "type":"COLLECTION",
-                                    "options":[
-                                        {
-                                            "displayName":"displayName",
-                                            "name":"name9",
-                                            "type":"COLLECTION",
-                                            "fields":[
-                                                {
-                                                    "displayName":"displayName",
-                                                    "name":"name",
-                                                    "type":"STRING"
-                                                },
-                                                {
-                                                    "displayName":"displayName",
-                                                    "name":"name",
-                                                    "type":"NUMBER"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "displayName":"displayName10",
-                    "name":"name10",
-                    "type":"COLLECTION",
-                    "options":[
-                        {
-                            "displayName":"displayName",
-                            "name":"name10",
-                            "type":"COLLECTION",
-                            "fields":[
-                                {
-                                    "displayName":"displayName",
-                                    "name":"name",
-                                    "type":"STRING"
-                                },
-                                {
-                                    "displayName":"displayName",
-                                    "name":"name",
-                                    "type":"NUMBER"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "version":1.0
-        }
-                """,
             taskDescription
         );
     }
@@ -1726,7 +1514,7 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskProperty() throws JsonProcessingException, JSONException {
-        TaskProperty taskProperty = SELECT_PROPERTY("name")
+        TaskProperty<?> taskProperty = SELECT_PROPERTY("name")
             .defaultValue(2)
             .description("description")
             .displayName("displayName")
