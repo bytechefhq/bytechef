@@ -87,6 +87,9 @@ atlas:
     provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  storage:
+    provider: base64
+    fileStorageDir: /integri
   worker:
     enabled: true
     subscriptions:
