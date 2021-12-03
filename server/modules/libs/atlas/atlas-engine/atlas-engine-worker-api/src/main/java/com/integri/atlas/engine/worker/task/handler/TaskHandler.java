@@ -27,5 +27,5 @@ import com.integri.atlas.engine.core.task.TaskExecution;
  * @since Jun 12, 2016
  */
 public interface TaskHandler<O> {
-    O handle(TaskExecution aTask) throws Exception;
+    O handle(TaskExecution taskExecution) throws Exception;
 }

@@ -45,22 +45,22 @@ public class BinaryFileTaskDescriptor implements TaskDescriptor {
                 .required(true),
             STRING_PROPERTY("fileName")
                 .displayName("File Name")
-                .displayOption(show("operation", "READ"))
                 .description("The path of the file to read.")
+                .displayOption(show("operation", "READ"))
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
                 .required(true),
             STRING_PROPERTY("fileName")
                 .displayName("File Name")
-                .displayOption(show("operation", "WRITE"))
                 .description("The path to which the file should be written.")
+                .displayOption(show("operation", "WRITE"))
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
                 .required(true),
             BINARY_PROPERTY("binaryItem")
                 .displayName("Binary Item")
-                .displayOption(show("operation", "WRITE"))
                 .description("The Binary Item property which contains the data for the file to be written.")
+                .displayOption(show("operation", "WRITE"))
                 .required(true)
         );
 
