@@ -20,7 +20,9 @@ package com.integri.atlas.json.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Ivica Cardic
@@ -29,10 +31,25 @@ public class BinaryItemTest {
 
     @Test
     public void testOf() {
-        assertThat(BinaryItem.of("fileName.txt", "data"))
-            .hasFieldOrPropertyWithValue("data", "data")
-            .hasFieldOrPropertyWithValue("extension", "txt")
-            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-            .hasFieldOrPropertyWithValue("name", "fileName.txt");
+        JSONAssert.assertEquals(
+            new BinaryItem()
+                .put("data", "data")
+                .put("extension", "txt")
+                .put("mimeType", "text/plain")
+                .put("name", "fileName.txt"),
+            BinaryItem.of("/tmp/fileName.txt", "data"),
+            true
+        );
+
+        JSONAssert.assertEquals(
+            new BinaryItem()
+                .put("data", "data")
+                .put("extension", "txt")
+                .put("mimeType", "text/plain")
+                .put("name", "fileName.txt")
+                .put("key", "value"),
+            BinaryItem.of("/tmp/fileName.txt", "data", Map.of("key", "value")),
+            true
+        );
     }
 }
