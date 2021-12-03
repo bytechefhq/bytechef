@@ -21,6 +21,7 @@ package com.integri.atlas.json.item;
 import com.integri.atlas.engine.core.storage.StorageService;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.io.InputStream;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author Ivica Cardic
@@ -38,7 +39,11 @@ public class BinaryItemHelper {
     public BinaryItem writeBinaryData(String fileName, InputStream inputStream) {
         return BinaryItem.of(
             fileName,
-            storageService.write(BUCKET_NAME, UUIDGenerator.generate() + "_" + fileName, inputStream)
+            storageService.write(
+                BUCKET_NAME,
+                UUIDGenerator.generate() + "_" + FilenameUtils.getName(fileName),
+                inputStream
+            )
         );
     }
 
