@@ -442,6 +442,18 @@ public class HttpRequestTaskDescriptorTest {
                             }
                         ],
                         "placeholder":"Add Parameter"
+                    },
+                    {
+                        "description":"The Binary property that represents binary data.",
+                        "displayName":"Binary",
+                        "displayOption":{
+                            "show":{
+                                "bodyContentType":["BINARY"],
+                                "requestMethod":["PATCH","POST","PUT"]
+                            }
+                        },
+                        "name":"bodyBinaryItem",
+                        "type":"BINARY"
                     }
                 ],
                 "version":1.0
