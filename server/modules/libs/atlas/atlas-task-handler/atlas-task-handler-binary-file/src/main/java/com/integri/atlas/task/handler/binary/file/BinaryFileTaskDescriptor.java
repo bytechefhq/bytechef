@@ -58,8 +58,8 @@ public class BinaryFileTaskDescriptor implements TaskDescriptor {
                 .placeholder("/data/your_file.pdf")
                 .required(true),
             BINARY_PROPERTY("binaryItem")
-                .displayName("Binary Item")
-                .description("The Binary Item property which contains the data for the file to be written.")
+                .displayName("Binary")
+                .description("The Binary property which contains the data for the file to be written.")
                 .displayOption(show("operation", "WRITE"))
                 .required(true)
         );

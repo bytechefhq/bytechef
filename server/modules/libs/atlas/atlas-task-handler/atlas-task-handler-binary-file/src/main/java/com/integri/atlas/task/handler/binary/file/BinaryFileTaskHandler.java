@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -60,7 +61,7 @@ public class BinaryFileTaskHandler implements TaskHandler<JSONObject> {
                 jsonObject = binaryNodeHelper.writeBinaryData(fileName, inputStream);
             }
         } else {
-            BinaryItem binaryItem = taskExecution.getRequired("binaryItem", BinaryItem.class);
+            BinaryItem binaryItem = BinaryItem.of(taskExecution.getRequired("binaryItem", String.class));
 
             try (InputStream inputStream = binaryNodeHelper.openDataInputStream(binaryItem)) {
                 jsonObject =
