@@ -33,6 +33,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
 @EnableConfigurationProperties(AtlasProperties.class)
 public class WorkflowRepositoryConfiguration {

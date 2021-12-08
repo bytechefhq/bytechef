@@ -18,6 +18,9 @@ package com.integri.atlas.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * @author Ivica Cardic
+ */
 @ConfigurationProperties(prefix = "atlas.storage", ignoreUnknownFields = false)
 public class StorageProperties {
 
