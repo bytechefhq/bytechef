@@ -19,14 +19,14 @@ package com.integri.atlas.task.handler.http.request;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.util.List;
-import org.json.JSONObject;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component("httpRequest")
-public class HttpRequestTaskHandler implements TaskHandler<List<? extends JSONObject>> {
+public class HttpRequestTaskHandler implements TaskHandler<List<Map<String, Object>>> {
 
     @Override
-    public List<? extends JSONObject> handle(TaskExecution aTask) throws Exception {
+    public List<Map<String, Object>> handle(TaskExecution aTask) throws Exception {
         return null;
     }
 }
