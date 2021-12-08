@@ -14,38 +14,37 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.json.item;
+package com.integri.atlas.engine.core.binary;
 
 import com.integri.atlas.engine.core.storage.StorageService;
-import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.io.InputStream;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author Ivica Cardic
  */
-public class BinaryItemHelper {
+public class BinaryHelper {
 
     private static final String BUCKET_NAME = "binary";
 
     private final StorageService storageService;
 
-    public BinaryItemHelper(StorageService storageService) {
+    public BinaryHelper(StorageService storageService) {
         this.storageService = storageService;
     }
 
-    public BinaryItem writeBinaryData(String fileName, InputStream inputStream) {
-        return BinaryItem.of(
-            fileName,
-            storageService.write(
-                BUCKET_NAME,
-                UUIDGenerator.generate() + "_" + FilenameUtils.getName(fileName),
-                inputStream
-            )
-        );
+    public InputStream openDataInputStream(Binary binary) {
+        return storageService.openInputStream(BUCKET_NAME, binary.getData());
     }
 
-    public InputStream openDataInputStream(BinaryItem binaryItem) {
-        return storageService.openInputStream(BUCKET_NAME, binaryItem.getData());
+    public String readBinaryData(Binary binary) {
+        return storageService.read(BUCKET_NAME, binary.getData());
+    }
+
+    public Binary writeBinaryData(String fileName, String data) {
+        return Binary.of(fileName, storageService.write(BUCKET_NAME, data));
+    }
+
+    public Binary writeBinaryData(String fileName, InputStream inputStream) {
+        return Binary.of(fileName, storageService.write(BUCKET_NAME, inputStream));
     }
 }

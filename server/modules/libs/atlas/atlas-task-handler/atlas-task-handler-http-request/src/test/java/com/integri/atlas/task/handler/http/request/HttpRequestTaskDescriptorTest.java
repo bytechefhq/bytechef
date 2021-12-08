@@ -452,8 +452,8 @@ public class HttpRequestTaskDescriptorTest {
                                 "requestMethod":["PATCH","POST","PUT"]
                             }
                         },
-                        "name":"bodyBinaryItem",
-                        "type":"BINARY"
+                        "name":"bodyBinary ",
+                        "type":"JSON"
                     }
                 ],
                 "version":1.0

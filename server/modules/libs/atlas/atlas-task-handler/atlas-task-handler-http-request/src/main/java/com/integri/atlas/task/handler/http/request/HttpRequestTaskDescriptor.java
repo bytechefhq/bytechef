@@ -20,10 +20,10 @@ import static com.integri.atlas.engine.core.task.description.TaskAuthentication.
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
 import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.BINARY_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
@@ -254,7 +254,7 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                                 .defaultValue("")
                         )
                 ),
-            BINARY_PROPERTY("bodyBinaryItem")
+            JSON_PROPERTY("bodyBinary ")
                 .displayName("Binary")
                 .description("The Binary property that represents binary data.")
                 .displayOption(

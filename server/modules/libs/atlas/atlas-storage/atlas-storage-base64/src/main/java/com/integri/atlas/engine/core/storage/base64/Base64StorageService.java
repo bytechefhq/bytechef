@@ -30,13 +30,20 @@ import java.util.Base64;
 public class Base64StorageService implements StorageService {
 
     @Override
-    public String write(String bucketName, String fileName, InputStream inputStream) {
+    public String write(String bucketName, String data) throws StorageException {
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        return encoder.encodeToString(data.getBytes());
+    }
+
+    @Override
+    public String write(String bucketName, InputStream inputStream) {
         Base64.Encoder encoder = Base64.getEncoder();
 
         try {
             return encoder.encodeToString(toByteArray(inputStream));
         } catch (IOException ioe) {
-            throw new StorageException("Failed to store file " + fileName, ioe);
+            throw new StorageException("Failed to store file", ioe);
         }
     }
 
@@ -60,5 +67,12 @@ public class Base64StorageService implements StorageService {
         Base64.Decoder decoder = Base64.getDecoder();
 
         return new ByteArrayInputStream(decoder.decode(fileName));
+    }
+
+    @Override
+    public String read(String bucketName, String fileName) throws StorageException {
+        Base64.Decoder decoder = Base64.getDecoder();
+
+        return new String(decoder.decode(fileName));
     }
 }

@@ -17,7 +17,6 @@
 package com.integri.atlas.task.handler.binary.file;
 
 import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.BINARY_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
@@ -41,6 +40,11 @@ public class BinaryFileTaskDescriptor implements TaskDescriptor {
                 .options(option("Read to file", "READ"), option("Write from file", "WRITE"))
                 .defaultValue("read")
                 .required(true),
+            JSON_PROPERTY("binary")
+                .displayName("Binary")
+                .description("The Binary property which contains the data for the file to be written.")
+                .displayOption(show("operation", "WRITE"))
+                .required(true),
             STRING_PROPERTY("fileName")
                 .displayName("File Name")
                 .description("The path of the file to read.")
@@ -54,11 +58,6 @@ public class BinaryFileTaskDescriptor implements TaskDescriptor {
                 .displayOption(show("operation", "WRITE"))
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
-                .required(true),
-            BINARY_PROPERTY("binaryItem")
-                .displayName("Binary")
-                .description("The Binary property which contains the data for the file to be written.")
-                .displayOption(show("operation", "WRITE"))
                 .required(true)
         );
 

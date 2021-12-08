@@ -18,6 +18,8 @@ package com.integri.atlas.engine.core.storage.file;
 
 import com.integri.atlas.engine.core.storage.StorageService;
 import com.integri.atlas.engine.core.storage.exception.StorageException;
+import com.integri.atlas.engine.core.uuid.UUIDGenerator;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,14 +41,15 @@ public class FileStorageService implements StorageService {
     }
 
     @Override
-    public String write(String bucketName, String fileName, InputStream inputStream) throws StorageException {
-        if (fileName.contains("..")) {
-            // This is a security check
+    public String write(String bucketName, String data) throws StorageException {
+        return write(bucketName, new ByteArrayInputStream(data.getBytes()));
+    }
 
-            throw new StorageException("Cannot store file with relative path outside current directory " + fileName);
-        }
-
+    @Override
+    public String write(String bucketName, InputStream inputStream) throws StorageException {
         Path path = resolveDirectory(bucketName);
+
+        String fileName = UUIDGenerator.generate();
 
         path = path.resolve(fileName);
 
@@ -71,6 +74,17 @@ public class FileStorageService implements StorageService {
 
         try {
             return Files.newInputStream(path.resolve(fileName), StandardOpenOption.READ);
+        } catch (IOException ioe) {
+            throw new StorageException("Failed to open file " + fileName, ioe);
+        }
+    }
+
+    @Override
+    public String read(String bucketName, String fileName) throws StorageException {
+        Path path = resolveDirectory(bucketName);
+
+        try {
+            return Files.readString(path.resolve(fileName));
         } catch (IOException ioe) {
             throw new StorageException("Failed to open file " + fileName, ioe);
         }

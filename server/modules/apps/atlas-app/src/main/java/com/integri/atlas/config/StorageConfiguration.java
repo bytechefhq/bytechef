@@ -16,6 +16,7 @@
 
 package com.integri.atlas.config;
 
+import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.storage.StorageService;
 import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
 import com.integri.atlas.engine.core.storage.file.FileStorageService;
@@ -28,6 +29,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class StorageConfiguration {
+
+    @Bean
+    BinaryHelper binaryHelper(StorageService storageService) {
+        return new BinaryHelper(storageService);
+    }
 
     @Bean
     @ConditionalOnProperty(name = "atlas.storage.provider", havingValue = "base64")

@@ -20,7 +20,6 @@ package com.integri.atlas.engine.core.task.description;
  * @author Ivica Cardic
  */
 public enum TaskPropertyType {
-    BINARY,
     BOOLEAN,
     COLLECTION,
     COLOR,
