@@ -25,6 +25,8 @@ import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
+import com.integri.atlas.engine.coordinator.workflow.repository.JSONWorkflowMapper;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
@@ -65,15 +67,15 @@ public class CoordinatorIntTest {
 
     @Test
     public void testStartJob_JSON() {
-        testStartJob("samples/hello.json");
+        testStartJob("samples/hello.json", new JSONWorkflowMapper());
     }
 
     @Test
     public void testStartJob_YAML() {
-        testStartJob("samples/hello.yaml");
+        testStartJob("samples/hello.yaml", new YAMLWorkflowMapper());
     }
 
-    public void testStartJob(String workflowId) {
+    public void testStartJob(String workflowId, WorkflowMapper workflowMapper) {
         Coordinator coordinator = new Coordinator();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
@@ -98,7 +100,7 @@ public class CoordinatorIntTest {
         coordinator.setContextRepository(contextRepository);
 
         coordinator.setJobRepository(jobRepository);
-        coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(new YAMLWorkflowMapper()));
+        coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(workflowMapper));
         coordinator.setJobTaskRepository(taskRepository);
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
@@ -110,7 +112,7 @@ public class CoordinatorIntTest {
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
         jobExecutor.setContextRepository(contextRepository);
         jobExecutor.setJobTaskRepository(taskRepository);
-        jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(new YAMLWorkflowMapper()));
+        jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(workflowMapper));
         jobExecutor.setTaskDispatcher(taskDispatcher);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
         coordinator.setJobExecutor(jobExecutor);
@@ -120,7 +122,7 @@ public class CoordinatorIntTest {
         taskCompletionHandler.setJobExecutor(jobExecutor);
         taskCompletionHandler.setJobRepository(jobRepository);
         taskCompletionHandler.setJobTaskRepository(taskRepository);
-        taskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository(new YAMLWorkflowMapper()));
+        taskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository(workflowMapper));
         taskCompletionHandler.setEventPublisher(e -> {});
         taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
         coordinator.setTaskCompletionHandler(taskCompletionHandler);
@@ -143,7 +145,7 @@ public class CoordinatorIntTest {
             IllegalArgumentException.class,
             () -> {
                 Coordinator coordinator = new Coordinator();
-                coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(new YAMLWorkflowMapper()));
+                coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(new JSONWorkflowMapper()));
                 coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello.json")));
             }
         );
