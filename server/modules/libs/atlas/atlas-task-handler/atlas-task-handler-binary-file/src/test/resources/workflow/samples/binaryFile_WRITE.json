@@ -1,0 +1,33 @@
+{
+  "label": "Binary File - WRITE operation",
+  "inputs": [
+    {
+      "name": "binary",
+      "label": "Binary property",
+      "type": "JSON",
+      "required": true
+    },
+    {
+      "name": "fileName",
+      "label": "Absolute file path to write t",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "writeToFile",
+      "value": "${writeToFile}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "writeToFile",
+      "label": "Write to file",
+      "type": "binaryFile",
+      "operation": "WRITE",
+      "binary": "${binary}",
+      "fileName": "${fileName}"
+    }
+  ]
+}
