@@ -26,5 +26,6 @@ dependencies {
     testImplementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
     testImplementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-impl")
     testImplementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    testImplementation project(":modules:libs:atlas:atlas-test-support")
     testImplementation project(":modules:libs:atlas:atlas-workflow-repository:atlas-workflow-repository-resource")
 }
