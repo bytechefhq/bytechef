@@ -1,0 +1,27 @@
+{
+  "label": "Spreadsheet File - READ operation",
+  "inputs": [
+    {
+      "name": "items",
+      "label": "JSON array of items",
+      "type": "JSON",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "writeToSpreadsheet",
+      "value": "${writeToBSpreadsheet}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "writeToBSpreadsheet",
+      "label": "Write to the spreadsheet file",
+      "type": "spreadsheetFile",
+      "operation": "WRITE",
+      "fileFormat": "CSV",
+      "items": "${items}"
+    }
+  ]
+}
