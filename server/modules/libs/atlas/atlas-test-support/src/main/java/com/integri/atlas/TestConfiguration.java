@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine;
+package com.integri.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
+import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.json.DefaultJsonMapper;
-import com.integri.atlas.engine.core.json.JsonMapper;
+import com.integri.atlas.engine.core.json.DefaultJSONHelper;
+import com.integri.atlas.engine.core.json.JSONHelper;
+import com.integri.atlas.engine.core.storage.StorageService;
+import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
@@ -44,43 +47,58 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class TestConfiguration {
 
     @Bean
-    CounterRepository counterRepository(JdbcTemplate aJdbcOperations) {
-        return new JdbcCounterRepository(aJdbcOperations);
+    BinaryHelper binaryHelper() {
+        return new BinaryHelper(storageService());
     }
 
     @Bean
-    TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
+    CounterRepository counterRepository(JdbcTemplate jdbcTemplate) {
+        return new JdbcCounterRepository(jdbcTemplate);
+    }
+
+    @Bean
+    TaskExecutionRepository jdbcJobTaskRepository(
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+        JSONHelper jsonMapper
+    ) {
         JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
 
-        jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
+        jdbcJobTaskRepository.setJdbcOperations(namedParameterJdbcTemplate);
         jdbcJobTaskRepository.setJsonMapper(jsonMapper);
 
         return jdbcJobTaskRepository;
     }
 
     @Bean
-    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, JSONHelper jsonMapper) {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
-        jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, jsonMapper));
+        jdbcJobRepository.setJdbcOperations(namedParameterJdbcTemplate);
+        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(namedParameterJdbcTemplate, jsonMapper));
         jdbcJobRepository.setJsonMapper(jsonMapper);
 
         return jdbcJobRepository;
     }
 
     @Bean
-    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
+    ContextRepository jdbcContextRepository(JdbcTemplate jdbcTemplate, JSONHelper jsonMapper) {
         JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
 
-        jdbcContextRepository.setJdbcTemplate(aJdbcTemplate);
+        jdbcContextRepository.setJdbcTemplate(jdbcTemplate);
         jdbcContextRepository.setJsonMapper(jsonMapper);
 
         return jdbcContextRepository;
     }
 
     @Bean
-    JsonMapper jsonMapper() {
-        return new DefaultJsonMapper(new ObjectMapper());
+    JSONHelper jsonMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        return new DefaultJSONHelper(objectMapper);
+    }
+
+    @Bean
+    StorageService storageService() {
+        return new Base64StorageService();
     }
 }
