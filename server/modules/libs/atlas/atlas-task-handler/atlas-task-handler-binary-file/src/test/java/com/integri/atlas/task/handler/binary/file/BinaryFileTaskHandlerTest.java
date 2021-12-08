@@ -16,18 +16,20 @@
 
 package com.integri.atlas.task.handler.binary.file;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.integri.atlas.engine.core.binary.Binary;
+import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.storage.StorageService;
 import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.json.item.BinaryItem;
-import com.integri.atlas.json.item.BinaryItemHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import org.apache.commons.io.FilenameUtils;
-import org.json.JSONObject;
+import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -37,8 +39,8 @@ import org.springframework.core.io.ClassPathResource;
 public class BinaryFileTaskHandlerTest {
 
     private static final StorageService storageService = new Base64StorageService();
-    private static final BinaryItemHelper binaryItemHelper = new BinaryItemHelper(storageService);
-    private static final BinaryFileTaskHandler binaryFileTaskHandler = new BinaryFileTaskHandler(binaryItemHelper);
+    private static final BinaryHelper binaryHelper = new BinaryHelper(storageService);
+    private static final BinaryFileTaskHandler binaryFileTaskHandler = new BinaryFileTaskHandler(binaryHelper);
 
     @Test
     public void testReadOperation() throws Exception {
@@ -46,15 +48,14 @@ public class BinaryFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), "READ", null);
 
-        assertEquals(
-            new JSONObject()
-                .put("data", storageService.write("bucketName", file.getAbsolutePath(), new FileInputStream(file)))
-                .put("extension", "txt")
-                .put("mimeType", "text/plain")
-                .put("name", FilenameUtils.getName(file.getAbsolutePath())),
-            binaryFileTaskHandler.handle(taskExecution),
-            true
-        );
+        assertThat(binaryFileTaskHandler.handle(taskExecution))
+            .hasFieldOrPropertyWithValue(
+                "data",
+                storageService.write("bucketName", Files.contentOf(file, Charset.defaultCharset()))
+            )
+            .hasFieldOrPropertyWithValue("extension", FilenameUtils.getExtension(file.getAbsolutePath()))
+            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
+            .hasFieldOrPropertyWithValue("name", FilenameUtils.getName(file.getAbsolutePath()));
     }
 
     @Test
@@ -64,15 +65,10 @@ public class BinaryFileTaskHandlerTest {
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(
             file.getAbsolutePath(),
             "WRITE",
-            BinaryItem
-                .of(
-                    file.getAbsolutePath(),
-                    storageService.write("bucketName", file.getAbsolutePath(), new FileInputStream(file))
-                )
-                .toString()
+            Binary.of(file.getAbsolutePath(), storageService.write("bucketName", new FileInputStream(file)))
         );
 
-        assertEquals(new JSONObject().put("bytes", 5), binaryFileTaskHandler.handle(taskExecution), true);
+        assertThat(binaryFileTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
     }
 
     private File getFile() throws IOException {
@@ -81,10 +77,10 @@ public class BinaryFileTaskHandlerTest {
         return classPathResource.getFile();
     }
 
-    private SimpleTaskExecution getSimpleTaskExecution(String fileName, String operation, String binaryItem) {
+    private SimpleTaskExecution getSimpleTaskExecution(String fileName, String operation, Binary binary) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("binaryItem", binaryItem);
+        taskExecution.put("binary", binary);
         taskExecution.put("fileName", fileName);
         taskExecution.put("operation", operation);
 
