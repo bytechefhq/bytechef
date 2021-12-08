@@ -23,7 +23,7 @@ import com.integri.atlas.engine.coordinator.job.JobSummary;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.json.JsonMapper;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import java.sql.ResultSet;
@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
 public class JdbcJobRepository implements JobRepository {
 
     protected NamedParameterJdbcOperations jdbc;
-    protected JsonMapper jsonMapper;
+    protected JSONHelper jsonMapper;
     protected TaskExecutionRepository jobTaskRepository;
 
     public static final int DEFAULT_PAGE_SIZE = 20;
@@ -151,7 +151,7 @@ public class JdbcJobRepository implements JobRepository {
         jdbc = aJdbcOperations;
     }
 
-    public void setJsonMapper(JsonMapper jsonMapper) {
+    public void setJsonMapper(JSONHelper jsonMapper) {
         this.jsonMapper = jsonMapper;
     }
 

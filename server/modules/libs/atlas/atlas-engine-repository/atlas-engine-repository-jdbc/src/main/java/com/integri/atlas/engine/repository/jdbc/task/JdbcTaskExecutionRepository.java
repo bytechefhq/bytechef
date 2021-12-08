@@ -16,7 +16,7 @@
 
 package com.integri.atlas.engine.repository.jdbc.task;
 
-import com.integri.atlas.engine.core.json.JsonMapper;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.TaskStatus;
@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     private NamedParameterJdbcOperations jdbc;
-    private JsonMapper jsonMapper;
+    private JSONHelper jsonMapper;
 
     @Override
     public void create(TaskExecution aTaskExecution) {
@@ -114,7 +114,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         jdbc = aJdbcOperations;
     }
 
-    public void setJsonMapper(JsonMapper jsonMapper) {
+    public void setJsonMapper(JSONHelper jsonMapper) {
         this.jsonMapper = jsonMapper;
     }
 

@@ -22,7 +22,7 @@ import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.json.JsonMapper;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
@@ -65,7 +65,7 @@ public class JdbcPersistenceConfiguration {
     }
 
     @Bean
-    TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
+    TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, JSONHelper jsonMapper) {
         JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
 
         jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
@@ -75,7 +75,7 @@ public class JdbcPersistenceConfiguration {
     }
 
     @Bean
-    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, JSONHelper jsonMapper) {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
         jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
@@ -86,7 +86,7 @@ public class JdbcPersistenceConfiguration {
     }
 
     @Bean
-    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, JsonMapper jsonMapper) {
+    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, JSONHelper jsonMapper) {
         JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
 
         jdbcContextRepository.setJdbcTemplate(aJdbcTemplate);
