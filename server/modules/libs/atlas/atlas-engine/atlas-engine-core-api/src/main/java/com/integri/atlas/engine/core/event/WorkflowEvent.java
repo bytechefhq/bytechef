@@ -18,7 +18,6 @@
 
 package com.integri.atlas.engine.core.event;
 
-import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
@@ -60,7 +59,7 @@ public class WorkflowEvent extends MapObject implements Accessor {
     public static WorkflowEvent of(String aType, String aKey, Object aValue) {
         Assert.notNull(aKey, "key must not be null");
         Assert.notNull(aValue, "value for " + aKey + " must not be null");
-        return of(aType, ImmutableMap.of(aKey, aValue));
+        return of(aType, Map.of(aKey, aValue));
     }
 
     public static WorkflowEvent of(String aType, String aKey1, Object aValue1, String aKey2, Object aValue2) {
@@ -68,13 +67,13 @@ public class WorkflowEvent extends MapObject implements Accessor {
         Assert.notNull(aValue1, "value for " + aKey1 + " must not be null");
         Assert.notNull(aKey2, "key must not be null");
         Assert.notNull(aValue2, "value for " + aKey2 + " must not be null");
-        return of(aType, ImmutableMap.of(aKey1, aValue1, aKey2, aValue2));
+        return of(aType, Map.of(aKey1, aValue1, aKey2, aValue2));
     }
 
     public static WorkflowEvent of(String aType, Map<String, Object> aProperties) {
         Assert.notNull(aType, "event type must not be null");
         Map<String, Object> source = new HashMap<>(
-            ImmutableMap.of("id", UUIDGenerator.generate(), "type", aType, "createTime", new Date())
+            Map.of("id", UUIDGenerator.generate(), "type", aType, "createTime", new Date())
         );
         source.putAll(aProperties);
         return new WorkflowEvent(source);
