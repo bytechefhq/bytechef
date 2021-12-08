@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.spreadsheet.file;
+package com.integri.atlas.task.handler.spreadsheet.file.processor;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import java.util.List;
-import org.json.JSONObject;
-import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.io.InputStream;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * @author Ivica Cardic
  */
-@Component("spreadsheetFile")
-public class SpreadsheetFileTask implements TaskHandler<List<? extends JSONObject>> {
+public class XLSXSpreadsheetProcessor extends XLSSpreadsheetProcessor {
 
     @Override
-    public List<? extends JSONObject> handle(TaskExecution aTask) throws Exception {
-        return null;
+    protected Workbook getWorkbook() {
+        return new XSSFWorkbook();
+    }
+
+    @Override
+    protected Workbook getWorkbook(InputStream inputStream) throws IOException {
+        return new XSSFWorkbook(inputStream);
     }
 }
