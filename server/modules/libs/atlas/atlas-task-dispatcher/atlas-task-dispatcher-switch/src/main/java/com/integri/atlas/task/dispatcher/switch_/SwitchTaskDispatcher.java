@@ -19,6 +19,7 @@
 package com.integri.atlas.task.dispatcher.switch_;
 
 import com.integri.atlas.engine.core.Accessor;
+import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
@@ -122,7 +123,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals("switch")) {
+        if (aTask.getType().equals(DSL.SWITCH)) {
             return this;
         }
         return null;
