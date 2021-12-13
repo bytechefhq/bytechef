@@ -80,7 +80,7 @@ public class SpreadsheetFileTaskDescriptorTest {
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"],
-                                 "readFromBinary":[true]
+                                 "inputType":["BINARY"]
                             }
                         },
                         "name":"binary",
@@ -122,24 +122,12 @@ public class SpreadsheetFileTaskDescriptorTest {
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"],
-                                "readFromBinary":[false]
+                                "inputType":["JSON"]
                             }
                         },
                         "name":"items",
                         "required":true,
                         "type":"JSON"
-                    },
-                    {
-                        "defaultValue":true,
-                        "description":"Read data from the Binary property.",
-                        "displayName":"Read from Binary",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"]
-                            }
-                        },
-                        "name":"readFromBinary",
-                        "type":"BOOLEAN"
                     },
                     {
                         "displayName":"Options",
@@ -194,6 +182,28 @@ public class SpreadsheetFileTaskDescriptorTest {
                                 },
                                 "name":"includeEmptyCells",
                                 "type":"BOOLEAN"
+                            },
+                            {
+                                "defaultValue":"JSON",
+                                "description":"Input type to use when writing data.",
+                                "displayName":"Input Content Type",
+                                "displayOption":{
+                                    "show":{
+                                        "operation":["WRITE"]
+                                    }
+                                },
+                                "name":"inputType",
+                                "options":[
+                                    {
+                                        "name":"JSON",
+                                        "value":"JSON"
+                                    },
+                                    {
+                                        "name":"Binary",
+                                        "value":"BINARY"
+                                    }
+                                ],
+                                "type":"SELECT"
                             },
                             {
                                 "description":"The range to read from the table. If set to a number it will be the starting row.",

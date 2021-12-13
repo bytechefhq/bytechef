@@ -56,7 +56,7 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
             JSON_PROPERTY("binary")
                 .displayName("Binary")
                 .description("The Binary property which contains JSON data.")
-                .displayOption(show("operation", parameterValues("WRITE"), "readFromBinary", parameterValues(true)))
+                .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("BINARY")))
                 .required(true),
             SELECT_PROPERTY("fileFormat")
                 .displayName("FileFormat")
@@ -71,13 +71,8 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
             JSON_PROPERTY("items")
                 .displayName("JSON array of items")
                 .description("Data to write to the file.")
-                .displayOption(show("operation", parameterValues("WRITE"), "readFromBinary", parameterValues(false)))
+                .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("JSON")))
                 .required(true),
-            BOOLEAN_PROPERTY("readFromBinary")
-                .displayName("Read from Binary")
-                .description("Read data from the Binary property.")
-                .displayOption(show("operation", "WRITE"))
-                .defaultValue(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
@@ -104,6 +99,12 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
                         .description("When reading from file the empty cells will be filled with an empty string.")
                         .displayOption(show("operation", "READ"))
                         .defaultValue(false),
+                    SELECT_PROPERTY("inputType")
+                        .displayName("Input Content Type")
+                        .description("Input type to use when writing data.")
+                        .displayOption(show("operation", "WRITE"))
+                        .options(option("JSON", "JSON"), option("Binary", "BINARY"))
+                        .defaultValue("JSON"),
                     GROUP_PROPERTY("range")
                         .displayName("Range")
                         .description(
