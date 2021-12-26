@@ -55,7 +55,7 @@ include("modules:libs:atlas:atlas-task-dispatcher:atlas-task-dispatcher-subflow"
 include("modules:libs:atlas:atlas-task-dispatcher:atlas-task-dispatcher-switch")
 include("modules:libs:atlas:atlas-task-handler:atlas-task-handler-bento4")
 include("modules:libs:atlas:atlas-task-handler:atlas-task-handler-core")
-include("modules:libs:atlas:atlas-task-handler:atlas-task-handler-http-request")
+include("modules:libs:atlas:atlas-task-handler:atlas-task-handler-http-client")
 include("modules:libs:atlas:atlas-task-handler:atlas-task-handler-local-file")
 include("modules:libs:atlas:atlas-task-handler:atlas-task-handler-spreadsheet-file")
 include("modules:libs:atlas:atlas-task-handler:atlas-task-handler-io")
