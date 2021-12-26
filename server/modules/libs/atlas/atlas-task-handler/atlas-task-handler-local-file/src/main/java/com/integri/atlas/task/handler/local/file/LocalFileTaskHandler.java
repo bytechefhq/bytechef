@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.binary.file;
+package com.integri.atlas.task.handler.local.file;
 
 import com.integri.atlas.engine.core.binary.Binary;
 import com.integri.atlas.engine.core.binary.BinaryHelper;
@@ -31,8 +31,8 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("binaryFile")
-public class BinaryFileTaskHandler implements TaskHandler<Object> {
+@Component("localFile")
+public class LocalFileTaskHandler implements TaskHandler<Object> {
 
     private enum Operation {
         READ,
@@ -41,7 +41,7 @@ public class BinaryFileTaskHandler implements TaskHandler<Object> {
 
     private final BinaryHelper binaryHelper;
 
-    public BinaryFileTaskHandler(BinaryHelper binaryHelper) {
+    public LocalFileTaskHandler(BinaryHelper binaryHelper) {
         this.binaryHelper = binaryHelper;
     }
 
