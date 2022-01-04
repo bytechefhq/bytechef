@@ -167,6 +167,30 @@ Executes each branch in the `branches` as a seperate and isolated sub-flow. Bran
          millis: ${randomNumber}      
 ```
 
+## If
+
+Executes true/false branch based on the `conditions` and `combineOperation` value.
+
+```
+- type: if
+  conditions:
+    - boolean:
+        value1: true
+        operation: ==
+        value2: false
+    - number:
+        value1: 1
+        operation: ==
+        value2: 1
+  combineOperation: any
+  caseTrue:
+    - type: io/print
+      text: true branch
+  caseFalse:
+    - type: io/print
+      text: false branch
+```
+
 ## Switch
 
 Executes one and only one branch of execution based on the `expression` value.
