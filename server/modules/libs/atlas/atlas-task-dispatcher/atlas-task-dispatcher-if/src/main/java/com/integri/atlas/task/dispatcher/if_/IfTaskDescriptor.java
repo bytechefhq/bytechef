@@ -153,7 +153,15 @@ public class IfTaskDescriptor implements TaskDescriptor {
                              matches or only if ALL are met.
                             """
                 )
-                .defaultValue("all")
+                .defaultValue("all"),
+            COLLECTION_PROPERTY("caseTrue")
+                .description("List of tasks that will be executed when result of resolving all conditions is TRUE")
+                .displayName("Case TRUE")
+                .placeholder("Add Task"),
+            COLLECTION_PROPERTY("caseFalse")
+                .description("List of tasks that will be executed when result of resolving all conditions is FALSE")
+                .displayName("Case FALSE")
+                .placeholder("Add Task")
         );
 
     @Override
