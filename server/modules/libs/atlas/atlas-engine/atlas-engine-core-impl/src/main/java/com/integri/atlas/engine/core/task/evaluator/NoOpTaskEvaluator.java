@@ -26,4 +26,9 @@ public class NoOpTaskEvaluator implements TaskEvaluator {
     public TaskExecution evaluate(TaskExecution aJobTask, Context aContext) {
         return aJobTask;
     }
+
+    @Override
+    public <T> T evaluate(String expression, Class<T> returnType) {
+        return null;
+    }
 }

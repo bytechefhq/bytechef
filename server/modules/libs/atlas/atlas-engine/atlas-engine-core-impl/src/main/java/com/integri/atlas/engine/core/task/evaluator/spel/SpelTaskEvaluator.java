@@ -95,6 +95,10 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         methodExecutors = Collections.unmodifiableMap(map);
     }
 
+    public <T> T evaluate(String expression, Class<T> returnType) {
+        return parser.parseExpression(expression).getValue(returnType);
+    }
+
     @Override
     public TaskExecution evaluate(TaskExecution aJobTask, Context aContext) {
         Map<String, Object> map = aJobTask.asMap();
