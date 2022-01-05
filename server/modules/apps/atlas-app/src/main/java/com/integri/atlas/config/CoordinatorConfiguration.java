@@ -50,8 +50,8 @@ import com.integri.atlas.task.dispatcher.fork.ForkTaskDispatcher;
 import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDefinition;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDispatcher;
-import com.integri.atlas.task.dispatcher.if_.IfTaskHelper;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
+import com.integri.atlas.task.dispatcher.if_.util.IfTaskUtil;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
 import com.integri.atlas.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
@@ -78,7 +78,7 @@ public class CoordinatorConfiguration {
     private JobRepository jobRepository;
 
     @Autowired
-    private TaskExecutionRepository taskExecutionRepo;
+    private TaskExecutionRepository taskExecutionRepository;
 
     @Autowired
     private ContextRepository contextRepository;
@@ -104,7 +104,7 @@ public class CoordinatorConfiguration {
         coordinator.setContextRepository(contextRepository);
         coordinator.setEventPublisher(eventPublisher);
         coordinator.setJobRepository(jobRepository);
-        coordinator.setJobTaskRepository(taskExecutionRepo);
+        coordinator.setJobTaskRepository(taskExecutionRepository);
         coordinator.setWorkflowRepository(workflowRepository);
         coordinator.setJobExecutor(jobExecutor());
         coordinator.setTaskDispatcher(taskDispatcher());
@@ -123,7 +123,7 @@ public class CoordinatorConfiguration {
     TaskExecutionErrorHandler jobTaskErrorHandler() {
         TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
         jobTaskErrorHandler.setJobRepository(jobRepository);
-        jobTaskErrorHandler.setJobTaskRepository(taskExecutionRepo);
+        jobTaskErrorHandler.setJobTaskRepository(taskExecutionRepository);
         jobTaskErrorHandler.setTaskDispatcher(taskDispatcher());
         jobTaskErrorHandler.setEventPublisher(eventPublisher);
         return jobTaskErrorHandler;
@@ -152,7 +152,7 @@ public class CoordinatorConfiguration {
         taskCompletionHandler.setContextRepository(contextRepository);
         taskCompletionHandler.setJobExecutor(jobExecutor());
         taskCompletionHandler.setJobRepository(jobRepository);
-        taskCompletionHandler.setJobTaskRepository(taskExecutionRepo);
+        taskCompletionHandler.setJobTaskRepository(taskExecutionRepository);
         taskCompletionHandler.setWorkflowRepository(workflowRepository);
         taskCompletionHandler.setEventPublisher(eventPublisher);
         taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
@@ -162,7 +162,7 @@ public class CoordinatorConfiguration {
     @Bean
     SwitchTaskCompletionHandler switchTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
         return new SwitchTaskCompletionHandler(
-            taskExecutionRepo,
+            taskExecutionRepository,
             aTaskCompletionHandler,
             taskDispatcher(),
             contextRepository,
@@ -171,17 +171,17 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskHelper ifTaskHelper() {
-        return new IfTaskHelper();
+    IfTaskUtil ifTaskHelper() {
+        return new IfTaskUtil();
     }
 
     @Bean
     IfTaskCompletionHandler ifTaskCompletionHandler(
         TaskCompletionHandler aTaskCompletionHandler,
-        IfTaskHelper ifTaskHelper
+        IfTaskUtil ifTaskHelper
     ) {
         return new IfTaskCompletionHandler(
-            taskExecutionRepo,
+            taskExecutionRepository,
             aTaskCompletionHandler,
             taskDispatcher(),
             contextRepository,
@@ -191,15 +191,13 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher, IfTaskHelper ifTaskHelper) {
+    IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher) {
         return new IfTaskDispatcher(
             contextRepository,
-            counterRepository,
             messageBroker,
             taskDispatcher,
-            taskExecutionRepo,
-            SpelTaskEvaluator.builder().environment(environment).build(),
-            ifTaskHelper
+            taskExecutionRepository,
+            SpelTaskEvaluator.builder().environment(environment).build()
         );
     }
 
@@ -212,7 +210,7 @@ public class CoordinatorConfiguration {
     SwitchTaskDispatcher switchTaskDispatcher(TaskDispatcher aTaskDispatcher) {
         return new SwitchTaskDispatcher(
             aTaskDispatcher,
-            taskExecutionRepo,
+            taskExecutionRepository,
             messageBroker,
             contextRepository,
             SpelTaskEvaluator.builder().environment(environment).build()
@@ -221,12 +219,12 @@ public class CoordinatorConfiguration {
 
     @Bean
     EachTaskCompletionHandler eachTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-        return new EachTaskCompletionHandler(taskExecutionRepo, aTaskCompletionHandler, counterRepository);
+        return new EachTaskCompletionHandler(taskExecutionRepository, aTaskCompletionHandler, counterRepository);
     }
 
     @Bean
     MapTaskCompletionHandler mapTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-        return new MapTaskCompletionHandler(taskExecutionRepo, aTaskCompletionHandler, counterRepository);
+        return new MapTaskCompletionHandler(taskExecutionRepository, aTaskCompletionHandler, counterRepository);
     }
 
     @Bean
@@ -234,14 +232,14 @@ public class CoordinatorConfiguration {
         ParallelTaskCompletionHandler dispatcher = new ParallelTaskCompletionHandler();
         dispatcher.setCounterRepository(counterRepository);
         dispatcher.setTaskCompletionHandler(aTaskCompletionHandler);
-        dispatcher.setTaskExecutionRepository(taskExecutionRepo);
+        dispatcher.setTaskExecutionRepository(taskExecutionRepository);
         return dispatcher;
     }
 
     @Bean
     ForkTaskCompletionHandler forkTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
         return new ForkTaskCompletionHandler(
-            taskExecutionRepo,
+            taskExecutionRepository,
             aTaskCompletionHandler,
             counterRepository,
             taskDispatcher(),
@@ -259,7 +257,7 @@ public class CoordinatorConfiguration {
     SubflowJobStatusEventListener subflowJobStatusEventListener() {
         return new SubflowJobStatusEventListener(
             jobRepository,
-            taskExecutionRepo,
+            taskExecutionRepository,
             coordinator(),
             SpelTaskEvaluator.builder().environment(environment).build()
         );
@@ -269,7 +267,7 @@ public class CoordinatorConfiguration {
     DefaultJobExecutor jobExecutor() {
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
         jobExecutor.setContextRepository(contextRepository);
-        jobExecutor.setJobTaskRepository(taskExecutionRepo);
+        jobExecutor.setJobTaskRepository(taskExecutionRepository);
         jobExecutor.setWorkflowRepository(workflowRepository);
         jobExecutor.setTaskDispatcher(taskDispatcher());
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
@@ -281,7 +279,7 @@ public class CoordinatorConfiguration {
         TaskDispatcherChain taskDispatcher = new TaskDispatcherChain();
         List<TaskDispatcherResolver> resolvers = Arrays.asList(
             eachTaskDispatcher(taskDispatcher),
-            ifTaskDispatcher(taskDispatcher, ifTaskHelper()),
+            ifTaskDispatcher(taskDispatcher),
             mapTaskDispatcher(taskDispatcher),
             parallelTaskDispatcher(taskDispatcher),
             forkTaskDispatcher(taskDispatcher),
@@ -303,7 +301,7 @@ public class CoordinatorConfiguration {
     EachTaskDispatcher eachTaskDispatcher(TaskDispatcher aTaskDispatcher) {
         return new EachTaskDispatcher(
             aTaskDispatcher,
-            taskExecutionRepo,
+            taskExecutionRepository,
             messageBroker,
             contextRepository,
             counterRepository,
@@ -316,7 +314,7 @@ public class CoordinatorConfiguration {
         return MapTaskDispatcher
             .builder()
             .taskDispatcher(aTaskDispatcher)
-            .taskExecutionRepository(taskExecutionRepo)
+            .taskExecutionRepository(taskExecutionRepository)
             .messageBroker(messageBroker)
             .contextRepository(contextRepository)
             .counterRepository(counterRepository)
@@ -331,7 +329,7 @@ public class CoordinatorConfiguration {
         dispatcher.setCounterRepository(counterRepository);
         dispatcher.setMessageBroker(messageBroker);
         dispatcher.setTaskDispatcher(aTaskDispatcher);
-        dispatcher.setTaskExecutionRepository(taskExecutionRepo);
+        dispatcher.setTaskExecutionRepository(taskExecutionRepository);
         return dispatcher;
     }
 
@@ -340,7 +338,7 @@ public class CoordinatorConfiguration {
         ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
         forkTaskDispatcher.setTaskDispatcher(aTaskDispatcher);
         forkTaskDispatcher.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
-        forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepo);
+        forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepository);
         forkTaskDispatcher.setMessageBroker(messageBroker);
         forkTaskDispatcher.setContextRepository(contextRepository);
         forkTaskDispatcher.setCounterRepository(counterRepository);
@@ -354,12 +352,12 @@ public class CoordinatorConfiguration {
 
     @Bean
     TaskStartedEventListener taskStartedEventListener() {
-        return new TaskStartedEventListener(taskExecutionRepo, taskDispatcher(), jobRepository);
+        return new TaskStartedEventListener(taskExecutionRepository, taskDispatcher(), jobRepository);
     }
 
     @Bean
     TaskProgressedEventListener taskProgressedEventListener() {
-        return new TaskProgressedEventListener(taskExecutionRepo);
+        return new TaskProgressedEventListener(taskExecutionRepository);
     }
 
     @Bean
