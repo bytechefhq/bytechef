@@ -1,0 +1,23 @@
+subprojects {
+    dependencies {
+        testImplementation "commons-io:commons-io"
+        testImplementation "mysql:mysql-connector-java"
+        testImplementation "org.postgresql:postgresql"
+        testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
+        testImplementation "org.testcontainers:mysql"
+        testImplementation "org.testcontainers:postgresql"
+        testImplementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
+        testImplementation project(":modules:libs:atlas:task-handler:task-handler-io")
+        testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")
+        testImplementation project(":modules:libs:atlas:task-handler:task-handler-time")
+        testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
+        testImplementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
+        testImplementation project(":modules:libs:atlas:engine:engine-worker-impl")
+        testImplementation project(":modules:libs:atlas:json")
+        testImplementation project(":modules:libs:atlas:message-broker:message-broker-sync")
+        testImplementation project(":modules:libs:atlas:storage:storage-base64")
+        testImplementation project(":modules:libs:atlas:storage:storage-file")
+        testImplementation project(":modules:libs:atlas:test-support")
+        testImplementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
+    }
+}
