@@ -19,7 +19,7 @@ package com.integri.atlas.engine.core.task.description;
 import static com.integri.atlas.engine.core.task.description.DisplayOption.displayOption;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskCredential.credential;
-import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
@@ -677,7 +677,7 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskDescription() throws JsonProcessingException, JSONException {
-        TaskDescription taskDescription = task("name")
+        TaskSpecification taskDescription = task("name")
             .displayName("displayName")
             .description("description")
             .subtitle("subtitle")

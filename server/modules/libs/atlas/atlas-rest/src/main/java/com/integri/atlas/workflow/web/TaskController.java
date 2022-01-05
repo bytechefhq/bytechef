@@ -17,8 +17,8 @@
 package com.integri.atlas.workflow.web;
 
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.engine.core.task.TaskDescriptor;
-import com.integri.atlas.engine.core.task.description.TaskDescription;
+import com.integri.atlas.engine.core.task.TaskDefinition;
+import com.integri.atlas.engine.core.task.description.TaskSpecification;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,22 +33,22 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class TaskController {
 
-    private final List<TaskDescriptor> taskDescriptors;
+    private final List<TaskDefinition> taskDescriptors;
 
-    public TaskController(List<TaskDescriptor> taskDescriptors) {
+    public TaskController(List<TaskDefinition> taskDescriptors) {
         this.taskDescriptors = taskDescriptors;
     }
 
     @GetMapping(value = "/tasks")
-    public List<TaskDescription> getTaskDescriptors() {
-        return taskDescriptors.stream().map(TaskDescriptor::getDescription).collect(Collectors.toList());
+    public List<TaskSpecification> getTaskDescriptors() {
+        return taskDescriptors.stream().map(TaskDefinition::getSpecification).collect(Collectors.toList());
     }
 
     @GetMapping(value = "/tasks/{name}")
-    public TaskDescription getTaskDescriptors(@PathVariable("name") String name) {
+    public TaskSpecification getTaskDescriptors(@PathVariable("name") String name) {
         return taskDescriptors
             .stream()
-            .map(TaskDescriptor::getDescription)
+            .map(TaskDefinition::getSpecification)
             .filter(taskDescription -> Objects.equals(taskDescription.getName(), name))
             .findFirst()
             .orElseThrow();

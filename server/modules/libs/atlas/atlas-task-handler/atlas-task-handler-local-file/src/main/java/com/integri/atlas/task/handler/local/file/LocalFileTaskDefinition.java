@@ -16,21 +16,21 @@
 
 package com.integri.atlas.task.handler.local.file;
 
-import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDescriptor;
-import com.integri.atlas.engine.core.task.description.TaskDescription;
+import com.integri.atlas.engine.core.task.TaskDefinition;
+import com.integri.atlas.engine.core.task.description.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocalFileTaskDescriptor implements TaskDescriptor {
+public class LocalFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskDescription TASK_DESCRIPTION = task("localFile")
+    public static final TaskSpecification TASK_DESCRIPTION = task("localFile")
         .displayName("Local File")
         .description("Reads or writes a binary file from/to disk")
         .properties(
@@ -62,7 +62,7 @@ public class LocalFileTaskDescriptor implements TaskDescriptor {
         );
 
     @Override
-    public TaskDescription getDescription() {
+    public TaskSpecification getSpecification() {
         return TASK_DESCRIPTION;
     }
 }

@@ -18,7 +18,7 @@ package com.integri.atlas.task.handler.http.client;
 
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
-import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
@@ -32,14 +32,14 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.multip
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDescriptor;
-import com.integri.atlas.engine.core.task.description.TaskDescription;
+import com.integri.atlas.engine.core.task.TaskDefinition;
+import com.integri.atlas.engine.core.task.description.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HttpClientTaskDescriptor implements TaskDescriptor {
+public class HttpClientTaskDefinition implements TaskDefinition {
 
-    public static final TaskDescription TASK_DESCRIPTION = task("httpClient")
+    public static final TaskSpecification TASK_DESCRIPTION = task("httpClient")
         .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data")
         .authentication(
@@ -268,7 +268,7 @@ public class HttpClientTaskDescriptor implements TaskDescriptor {
         );
 
     @Override
-    public TaskDescription getDescription() {
+    public TaskSpecification getSpecification() {
         return TASK_DESCRIPTION;
     }
 }
