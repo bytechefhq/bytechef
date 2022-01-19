@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.local.file;
+package com.integri.atlas.task.handler.binary.file;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.task.handler.binary.file.BinaryFileTaskDefinition;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -27,7 +28,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class LocalFileTaskDescriptorTest {
+public class BinaryFileTaskDescriptorTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,13 +37,13 @@ public class LocalFileTaskDescriptorTest {
     };
 
     @Test
-    public void testLocalFileTaskDescription() throws JsonProcessingException {
+    public void testBinaryFileTaskDescription() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
                 "description":"Reads or writes a binary file from/to disk",
-                "displayName":"Local File",
-                "name":"localFile",
+                "displayName":"Binary File",
+                "name":"binaryFile",
                 "properties":[
                     {
                         "defaultValue":"READ",
@@ -107,7 +108,7 @@ public class LocalFileTaskDescriptorTest {
                 }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(LocalFileTaskDefinition.TASK_DESCRIPTION)
+                objectMapper.writeValueAsString(BinaryFileTaskDefinition.TASK_DESCRIPTION)
             ),
             true
         );

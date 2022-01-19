@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.local.file;
+package com.integri.atlas.task.handler.binary.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +23,7 @@ import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.binary.Binary;
 import com.integri.atlas.task.handler.BaseTaskHandlerIntTest;
+import com.integri.atlas.task.handler.binary.file.BinaryFileTaskHandler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -36,15 +37,15 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
+public class BinaryFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
     @Test
     public void testRead() throws IOException {
         File sampleFile = getFile();
 
         Job job = startJob(
-            "samples/localFile_READ.json",
-            Map.of("localFile", new LocalFileTaskHandler(binaryHelper)),
+            "samples/binaryFile_READ.json",
+            Map.of("binaryFile", new BinaryFileTaskHandler(binaryHelper)),
             Map.of("fileName", sampleFile.getAbsolutePath())
         );
 
@@ -68,8 +69,8 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
         File tempFile = Files.newTemporaryFile();
 
         Job job = startJob(
-            "samples/localFile_WRITE.json",
-            Map.of("localFile", new LocalFileTaskHandler(binaryHelper)),
+            "samples/binaryFile_WRITE.json",
+            Map.of("binaryFile", new BinaryFileTaskHandler(binaryHelper)),
             Map.of(
                 "binary",
                 binaryHelper.writeBinaryData(

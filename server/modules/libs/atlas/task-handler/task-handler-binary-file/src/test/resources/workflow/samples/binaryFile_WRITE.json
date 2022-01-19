@@ -24,7 +24,7 @@
     {
       "name": "writeToFile",
       "label": "Write to file",
-      "type": "localFile",
+      "type": "binaryFile",
       "operation": "WRITE",
       "binary": "${binary}",
       "fileName": "${fileName}"
