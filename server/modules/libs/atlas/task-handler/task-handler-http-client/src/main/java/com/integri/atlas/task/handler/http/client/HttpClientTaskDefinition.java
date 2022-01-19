@@ -22,7 +22,6 @@ import static com.integri.atlas.engine.core.task.description.TaskParameterValue.
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
@@ -91,7 +90,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                 .defaultValue(false),
             SELECT_PROPERTY("responseFormat")
                 .displayName("Response Format")
-                .options(option("Binary", "BINARY"), option("JSON", "JSON"), option("String", "STRING"))
+                .options(option("File", "FILE"), option("JSON", "JSON"), option("String", "STRING"))
                 .description("The format in which the data gets returned from the URL.")
                 .defaultValue("JSON"),
             STRING_PROPERTY("statusPropertyName")
@@ -116,7 +115,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                             option("JSON", "JSON"),
                             option("Form-Data", "FORM_DATA"),
                             option("Form-Urlencoded", "FORM_URLENCODED"),
-                            option("Binary", "BINARY")
+                            option("File", "FILE")
                         )
                         .defaultValue("JSON"),
                     BOOLEAN_PROPERTY("fullResponse")
@@ -254,13 +253,13 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                                 .defaultValue("")
                         )
                 ),
-            JSON_PROPERTY("bodyBinary")
-                .displayName("Binary")
-                .description("The Binary property that represents binary data.")
+            STRING_PROPERTY("filePath")
+                .displayName("File")
+                .description("The file path property that represents the file data.")
                 .displayOption(
                     show(
                         "bodyContentType",
-                        parameterValues("BINARY"),
+                        parameterValues("FILE"),
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )

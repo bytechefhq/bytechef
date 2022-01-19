@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class HttpClientTaskDescriptorTest {
+public class HttpClientTaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -172,8 +172,8 @@ public class HttpClientTaskDescriptorTest {
                         "type":"SELECT",
                         "options":[
                             {
-                                "name":"Binary",
-                                "value":"BINARY"
+                                "name":"File",
+                                "value":"FILE"
                             },
                             {
                                 "name":"JSON",
@@ -230,8 +230,8 @@ public class HttpClientTaskDescriptorTest {
                                         "value":"FORM_URLENCODED"
                                     },
                                     {
-                                        "name":"Binary",
-                                        "value":"BINARY"
+                                        "name":"File",
+                                        "value":"FILE"
                                     }
                                 ]
                             },
@@ -442,16 +442,16 @@ public class HttpClientTaskDescriptorTest {
                         "placeholder":"Add Parameter"
                     },
                     {
-                        "description":"The Binary property that represents binary data.",
-                        "displayName":"Binary",
+                        "description":"The file path property that represents the file data.",
+                        "displayName":"File",
                         "displayOption":{
                             "show":{
-                                "bodyContentType":["BINARY"],
+                                "bodyContentType":["FILE"],
                                 "requestMethod":["PATCH","POST","PUT"]
                             }
                         },
-                        "name":"bodyBinary",
-                        "type":"JSON"
+                        "name":"filePath",
+                        "type":"STRING"
                     }
                 ],
                 "version":1.0

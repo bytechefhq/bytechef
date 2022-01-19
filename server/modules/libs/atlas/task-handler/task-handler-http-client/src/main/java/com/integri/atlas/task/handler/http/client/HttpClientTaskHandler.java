@@ -23,10 +23,10 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component("httpClient")
-public class HttpClientTaskHandler implements TaskHandler<List<Map<String, Object>>> {
+public class HttpClientTaskHandler implements TaskHandler<Object> {
 
     @Override
-    public List<Map<String, Object>> handle(TaskExecution aTask) throws Exception {
+    public Object handle(TaskExecution aTask) throws Exception {
         return null;
     }
 }
