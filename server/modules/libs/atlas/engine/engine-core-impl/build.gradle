@@ -10,5 +10,5 @@ dependencies {
     implementation "org.springframework:spring-expression"
     implementation "org.springframework.boot:spring-boot"
 
-    testImplementation project(":modules:libs:atlas:storage:storage-base64")
+    testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
 }
