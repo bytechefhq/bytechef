@@ -91,7 +91,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                 .defaultValue(false),
             SELECT_PROPERTY("responseFormat")
                 .displayName("Response Format")
-                .options(option("File", "FILE"), option("JSON", "JSON"), option("String", "STRING"))
+                .options(option("Binary", "BINARY"), option("JSON", "JSON"), option("String", "STRING"))
                 .description("The format in which the data gets returned from the URL.")
                 .defaultValue("JSON"),
             STRING_PROPERTY("statusPropertyName")
@@ -116,7 +116,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                             option("JSON", "JSON"),
                             option("Form-Data", "FORM_DATA"),
                             option("Form-Urlencoded", "FORM_URLENCODED"),
-                            option("File", "FILE")
+                            option("Binary", "BINARY")
                         )
                         .defaultValue("JSON"),
                     BOOLEAN_PROPERTY("fullResponse")
@@ -254,13 +254,13 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                                 .defaultValue("")
                         )
                 ),
-            STRING_PROPERTY("filePath")
+            STRING_PROPERTY("fileName")
                 .displayName("File")
                 .description("The file path property that represents the file data.")
                 .displayOption(
                     show(
                         "bodyContentType",
-                        parameterValues("FILE"),
+                        parameterValues("BINARY"),
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )
