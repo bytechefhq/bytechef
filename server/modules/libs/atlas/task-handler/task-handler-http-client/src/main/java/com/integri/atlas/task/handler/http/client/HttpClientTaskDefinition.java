@@ -50,6 +50,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                             option("Basic Auth", "BASIC_AUTH"),
                             option("Digest Auth", "DIGEST_AUTH"),
                             option("Header Auth", "HEADER_AUTH"),
+                            option("Query Auth", "QUERY_AUTH"),
                             option("OAuth2", "OAUTH2"),
                             option("None", "")
                         )
