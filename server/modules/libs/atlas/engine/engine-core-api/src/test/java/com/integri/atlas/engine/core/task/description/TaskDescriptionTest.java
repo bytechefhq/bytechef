@@ -911,7 +911,7 @@ public class TaskDescriptionTest {
 
         jsonAssertEquals("""
         {
-             "parameter1":"null"
+             "parameter1":""
         }
         """, taskParameter);
 
