@@ -22,5 +22,5 @@ import com.integri.atlas.engine.core.task.description.TaskSpecification;
  * @author Ivica Cardic
  */
 public interface TaskDefinition {
-    TaskSpecification getSpecification();
+    TaskSpecification getTaskSpecification();
 }

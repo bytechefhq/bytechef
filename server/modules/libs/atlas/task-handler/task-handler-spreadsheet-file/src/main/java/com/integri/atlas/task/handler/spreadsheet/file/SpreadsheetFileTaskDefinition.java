@@ -141,7 +141,7 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
         );
 
     @Override
-    public TaskSpecification getSpecification() {
+    public TaskSpecification getTaskSpecification() {
         return TASK_SPECIFICATION;
     }
 }
