@@ -51,7 +51,6 @@ import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandl
 import com.integri.atlas.task.dispatcher.if_.IfTaskDefinition;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDispatcher;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
-import com.integri.atlas.task.dispatcher.if_.util.IfTaskUtil;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
 import com.integri.atlas.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
@@ -139,7 +138,7 @@ public class CoordinatorConfiguration {
                 parallelTaskCompletionHandler(taskCompletionHandlerChain),
                 forkTaskCompletionHandler(taskCompletionHandlerChain),
                 switchTaskCompletionHandler(taskCompletionHandlerChain),
-                ifTaskCompletionHandler(taskCompletionHandlerChain, ifTaskHelper()),
+                ifTaskCompletionHandler(taskCompletionHandlerChain),
                 defaultTaskCompletionHandler()
             )
         );
@@ -171,22 +170,14 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskUtil ifTaskHelper() {
-        return new IfTaskUtil();
-    }
-
-    @Bean
     IfTaskCompletionHandler ifTaskCompletionHandler(
-        TaskCompletionHandler aTaskCompletionHandler,
-        IfTaskUtil ifTaskHelper
-    ) {
+        TaskCompletionHandler aTaskCompletionHandler) {
         return new IfTaskCompletionHandler(
             taskExecutionRepository,
             aTaskCompletionHandler,
             taskDispatcher(),
             contextRepository,
-            SpelTaskEvaluator.builder().environment(environment).build(),
-            ifTaskHelper
+            SpelTaskEvaluator.builder().environment(environment).build()
         );
     }
 
