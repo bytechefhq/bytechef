@@ -21,7 +21,6 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.create;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;
@@ -30,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinaryFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_DESCRIPTION = create("binaryFile")
+    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("binaryFile")
         .displayName("Binary File")
         .description("Reads or writes a binary file from/to disk")
         .properties(
@@ -63,6 +62,6 @@ public class BinaryFileTaskDefinition implements TaskDefinition {
 
     @Override
     public TaskSpecification getSpecification() {
-        return TASK_DESCRIPTION;
+        return TASK_SPECIFICATION;
     }
 }
