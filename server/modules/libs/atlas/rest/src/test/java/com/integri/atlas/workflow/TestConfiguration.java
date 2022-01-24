@@ -42,12 +42,12 @@ public class TestConfiguration {
     private WorkflowRepository workflowRepository;
 
     @Bean
-    TaskDefinition task1Definition() {
+    TaskDefinition task1TaskSpecification() {
         return () -> TaskSpecification.create("task1");
     }
 
     @Bean
-    TaskDefinition task2Definition() {
+    TaskDefinition task2TaskSpecification() {
         return () -> TaskSpecification.create("task2");
     }
 }
