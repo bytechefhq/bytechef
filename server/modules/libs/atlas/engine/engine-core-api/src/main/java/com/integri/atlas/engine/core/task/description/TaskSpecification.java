@@ -34,7 +34,7 @@ public class TaskSpecification {
     private String subtitle;
     private float version = 1;
 
-    public static TaskSpecification task(String name) {
+    public static TaskSpecification create(String name) {
         return new TaskSpecification().name(name);
     }
 

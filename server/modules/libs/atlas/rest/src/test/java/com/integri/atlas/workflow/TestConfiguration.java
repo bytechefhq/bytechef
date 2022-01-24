@@ -43,11 +43,11 @@ public class TestConfiguration {
 
     @Bean
     TaskDefinition task1Definition() {
-        return () -> TaskSpecification.task("task1");
+        return () -> TaskSpecification.create("task1");
     }
 
     @Bean
     TaskDefinition task2Definition() {
-        return () -> TaskSpecification.task("task2");
+        return () -> TaskSpecification.create("task2");
     }
 }

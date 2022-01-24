@@ -26,7 +26,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.create;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpreadsheetFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_DESCRIPTION = task("spreadsheetFile")
+    public static final TaskSpecification TASK_DESCRIPTION = create("spreadsheetFile")
         .displayName("Spreadsheet File")
         .description("Reads and writes data from a spreadsheet file")
         .properties(
