@@ -1,9 +1,9 @@
 {
-  "label": "Binary File - WRITE operation",
+  "label": "Local File - WRITE operation",
   "inputs": [
     {
-      "name": "binary",
-      "label": "Binary property",
+      "name": "fileEntry",
+      "label": "File property",
       "type": "JSON",
       "required": true
     },
@@ -26,7 +26,7 @@
       "label": "Write to file",
       "type": "localFile",
       "operation": "WRITE",
-      "binary": "${binary}",
+      "fileEntry": "${fileEntry}",
       "fileName": "${fileName}"
     }
   ]

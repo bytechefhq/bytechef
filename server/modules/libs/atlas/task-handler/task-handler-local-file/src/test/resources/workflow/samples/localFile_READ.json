@@ -1,5 +1,5 @@
 {
-  "label": "Binary File - READ operation",
+  "label": "Local File - READ operation",
   "inputs": [
     {
       "name": "fileName",
