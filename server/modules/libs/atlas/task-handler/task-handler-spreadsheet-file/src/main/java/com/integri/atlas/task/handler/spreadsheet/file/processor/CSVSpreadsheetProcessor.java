@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file.processor;
 
-import com.integri.atlas.engine.core.util.MapUtil;
+import com.integri.atlas.task.handler.spreadsheet.file.util.MapUtil;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

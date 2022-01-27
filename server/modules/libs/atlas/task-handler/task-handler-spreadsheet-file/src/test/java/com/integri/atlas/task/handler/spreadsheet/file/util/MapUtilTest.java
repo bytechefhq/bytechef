@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.util;
+package com.integri.atlas.task.handler.spreadsheet.file.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Ivica Cardic
+ */
 public class MapUtilTest {
 
     @Test
