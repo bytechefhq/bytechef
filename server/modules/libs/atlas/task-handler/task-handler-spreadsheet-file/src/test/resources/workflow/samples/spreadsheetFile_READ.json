@@ -2,8 +2,8 @@
   "label": "Spreadsheet File - READ operation",
   "inputs": [
     {
-      "name": "binary",
-      "label": "Binary property",
+      "name": "fileEntry",
+      "label": "File property",
       "type": "JSON",
       "required": true
     }
@@ -20,7 +20,7 @@
       "label": "Read from the spreadsheet file",
       "type": "spreadsheetFile",
       "operation": "READ",
-      "binary": "${binary}",
+      "fileEntry": "${fileEntry}",
       "includeEmptyCells": true
     }
   ]
