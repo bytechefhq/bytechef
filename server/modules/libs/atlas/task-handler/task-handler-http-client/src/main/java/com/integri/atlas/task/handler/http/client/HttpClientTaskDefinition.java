@@ -22,6 +22,7 @@ import static com.integri.atlas.engine.core.task.description.TaskParameterValue.
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
@@ -254,9 +255,9 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                                 .defaultValue("")
                         )
                 ),
-            STRING_PROPERTY("fileName")
+            JSON_PROPERTY("fileEntry")
                 .displayName("File")
-                .description("The file path property that represents the file data.")
+                .description("The object property which contains a reference to the file with data to upload.")
                 .displayOption(
                     show(
                         "bodyContentType",

@@ -176,8 +176,8 @@ public class HttpClientTaskDefinitionTest {
                         "type":"SELECT",
                         "options":[
                             {
-                                "name":"File",
-                                "value":"FILE"
+                                "name":"Binary",
+                                "value":"BINARY"
                             },
                             {
                                 "name":"JSON",
@@ -234,8 +234,8 @@ public class HttpClientTaskDefinitionTest {
                                         "value":"FORM_URLENCODED"
                                     },
                                     {
-                                        "name":"File",
-                                        "value":"FILE"
+                                        "name":"Binary",
+                                        "value":"BINARY"
                                     }
                                 ]
                             },
@@ -446,16 +446,16 @@ public class HttpClientTaskDefinitionTest {
                         "placeholder":"Add Parameter"
                     },
                     {
-                        "description":"The file path property that represents the file data.",
+                        "description":"The object property which contains a reference to the file with data to upload.",
                         "displayName":"File",
                         "displayOption":{
                             "show":{
-                                "bodyContentType":["FILE"],
+                                "bodyContentType":["BINARY"],
                                 "requestMethod":["PATCH","POST","PUT"]
                             }
                         },
-                        "name":"filePath",
-                        "type":"STRING"
+                        "name":"fileEntry",
+                        "type":"JSON"
                     }
                 ],
                 "version":1.0
