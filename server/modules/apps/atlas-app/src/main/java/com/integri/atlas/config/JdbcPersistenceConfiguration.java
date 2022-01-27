@@ -65,32 +65,32 @@ public class JdbcPersistenceConfiguration {
     }
 
     @Bean
-    TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, JSONHelper jsonMapper) {
+    TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, JSONHelper jsonHelper) {
         JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
 
         jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobTaskRepository.setJsonMapper(jsonMapper);
+        jdbcJobTaskRepository.setJsonHelper(jsonHelper);
 
         return jdbcJobTaskRepository;
     }
 
     @Bean
-    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, JSONHelper jsonMapper) {
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, JSONHelper jsonHelper) {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
         jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, jsonMapper));
-        jdbcJobRepository.setJsonMapper(jsonMapper);
+        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, jsonHelper));
+        jdbcJobRepository.setJsonHelper(jsonHelper);
 
         return jdbcJobRepository;
     }
 
     @Bean
-    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, JSONHelper jsonMapper) {
+    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, JSONHelper jsonHelper) {
         JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
 
         jdbcContextRepository.setJdbcTemplate(aJdbcTemplate);
-        jdbcContextRepository.setJsonMapper(jsonMapper);
+        jdbcContextRepository.setJsonHelper(jsonHelper);
 
         return jdbcContextRepository;
     }

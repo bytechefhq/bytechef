@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     private NamedParameterJdbcOperations jdbc;
-    private JSONHelper jsonMapper;
+    private JSONHelper jsonHelper;
 
     @Override
     public void create(TaskExecution aTaskExecution) {
@@ -58,7 +58,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         List<TaskExecution> query = jdbc.query(
             "select * from task_execution where id = :id",
             Collections.singletonMap("id", aTaskExecutionId),
-            this::jobTaskRowMappper
+            this::jobTaskRowMapper
         );
         if (query.size() == 1) {
             return query.get(0);
@@ -71,7 +71,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         return jdbc.query(
             "select * from task_execution where parent_id = :parentId order by task_number",
             Collections.singletonMap("parentId", aParentId),
-            this::jobTaskRowMappper
+            this::jobTaskRowMapper
         );
     }
 
@@ -80,7 +80,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         return jdbc.query(
             "select * From task_execution where job_id = :jobId order by create_time asc",
             Collections.singletonMap("jobId", aJobId),
-            this::jobTaskRowMappper
+            this::jobTaskRowMapper
         );
     }
 
@@ -90,7 +90,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         TaskExecution current = jdbc.queryForObject(
             "select * from task_execution where id = :id for update",
             Collections.singletonMap("id", aTaskExecution.getId()),
-            this::jobTaskRowMappper
+            this::jobTaskRowMapper
         );
         SimpleTaskExecution merged = SimpleTaskExecution.of(aTaskExecution);
         if (current.getStatus().isTerminated() && aTaskExecution.getStatus() == TaskStatus.STARTED) {
@@ -114,8 +114,8 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         jdbc = aJdbcOperations;
     }
 
-    public void setJsonMapper(JSONHelper jsonMapper) {
-        this.jsonMapper = jsonMapper;
+    public void setJsonHelper(JSONHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
     }
 
     private SqlParameterSource createSqlParameterSource(TaskExecution aTaskExecution) {
@@ -128,14 +128,14 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         sqlParameterSource.addValue("createTime", aTaskExecution.getCreateTime());
         sqlParameterSource.addValue("startTime", aTaskExecution.getStartTime());
         sqlParameterSource.addValue("endTime", aTaskExecution.getEndTime());
-        sqlParameterSource.addValue("serializedExecution", jsonMapper.serialize(aTaskExecution));
+        sqlParameterSource.addValue("serializedExecution", jsonHelper.serialize(aTaskExecution));
         sqlParameterSource.addValue("priority", aTaskExecution.getPriority());
         sqlParameterSource.addValue("taskNumber", aTaskExecution.getTaskNumber());
         return sqlParameterSource;
     }
 
     @SuppressWarnings("unchecked")
-    private TaskExecution jobTaskRowMappper(ResultSet aRs, int aIndex) throws SQLException {
-        return SimpleTaskExecution.of(jsonMapper.deserialize(aRs.getString("serialized_execution"), Map.class));
+    private TaskExecution jobTaskRowMapper(ResultSet aRs, int aIndex) throws SQLException {
+        return SimpleTaskExecution.of(jsonHelper.deserialize(aRs.getString("serialized_execution"), Map.class));
     }
 }

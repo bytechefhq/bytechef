@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
 public class JdbcJobRepository implements JobRepository {
 
     protected NamedParameterJdbcOperations jdbc;
-    protected JSONHelper jsonMapper;
+    protected JSONHelper jsonHelper;
     protected TaskExecutionRepository jobTaskRepository;
 
     public static final int DEFAULT_PAGE_SIZE = 20;
@@ -151,8 +151,8 @@ public class JdbcJobRepository implements JobRepository {
         jdbc = aJdbcOperations;
     }
 
-    public void setJsonMapper(JSONHelper jsonMapper) {
-        this.jsonMapper = jsonMapper;
+    public void setJsonHelper(JSONHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
     }
 
     protected MapSqlParameterSource createSqlParameterSource(Job aJob) {
@@ -171,9 +171,9 @@ public class JdbcJobRepository implements JobRepository {
         sqlParameterSource.addValue("startTime", job.getStartTime());
         sqlParameterSource.addValue("endTime", job.getEndTime());
         sqlParameterSource.addValue("priority", job.getPriority());
-        sqlParameterSource.addValue("inputs", jsonMapper.serialize(job.getInputs()));
-        sqlParameterSource.addValue("outputs", jsonMapper.serialize(job.getOutputs()));
-        sqlParameterSource.addValue("webhooks", jsonMapper.serialize(job.getWebhooks()));
+        sqlParameterSource.addValue("inputs", jsonHelper.serialize(job.getInputs()));
+        sqlParameterSource.addValue("outputs", jsonHelper.serialize(job.getOutputs()));
+        sqlParameterSource.addValue("webhooks", jsonHelper.serialize(job.getWebhooks()));
         sqlParameterSource.addValue("parentTaskExecutionId", job.getParentTaskExecutionId());
         return sqlParameterSource;
     }
@@ -190,9 +190,9 @@ public class JdbcJobRepository implements JobRepository {
         map.put("endTime", aRs.getTimestamp("end_time"));
         map.put("execution", getExecution(aRs.getString("id")));
         map.put("priority", aRs.getInt("priority"));
-        map.put("inputs", jsonMapper.deserialize(aRs.getString("inputs"), Map.class));
-        map.put("outputs", jsonMapper.deserialize(aRs.getString("outputs"), Map.class));
-        map.put("webhooks", jsonMapper.deserialize(aRs.getString("webhooks"), List.class));
+        map.put("inputs", jsonHelper.deserialize(aRs.getString("inputs"), Map.class));
+        map.put("outputs", jsonHelper.deserialize(aRs.getString("outputs"), Map.class));
+        map.put("webhooks", jsonHelper.deserialize(aRs.getString("webhooks"), List.class));
         map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
         return new SimpleJob(map);
     }
@@ -208,9 +208,9 @@ public class JdbcJobRepository implements JobRepository {
         map.put("startTime", aRs.getTimestamp("start_time"));
         map.put("endTime", aRs.getTimestamp("end_time"));
         map.put("priority", aRs.getInt("priority"));
-        map.put("inputs", jsonMapper.deserialize(aRs.getString("inputs"), Map.class));
-        map.put("outputs", jsonMapper.deserialize(aRs.getString("outputs"), Map.class));
-        map.put("webhooks", jsonMapper.deserialize(aRs.getString("webhooks"), List.class));
+        map.put("inputs", jsonHelper.deserialize(aRs.getString("inputs"), Map.class));
+        map.put("outputs", jsonHelper.deserialize(aRs.getString("outputs"), Map.class));
+        map.put("webhooks", jsonHelper.deserialize(aRs.getString("webhooks"), List.class));
         map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
         return new JobSummary(new SimpleJob(map));
     }
