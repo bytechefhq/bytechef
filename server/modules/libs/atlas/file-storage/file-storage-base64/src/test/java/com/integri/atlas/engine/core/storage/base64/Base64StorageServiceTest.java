@@ -16,6 +16,8 @@
 
 package com.integri.atlas.engine.core.storage.base64;
 
+import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,12 +32,11 @@ public class Base64StorageServiceTest {
 
     private static final String string = "test string";
 
-    private static final Base64StorageService base64StorageService = new Base64StorageService();
+    private static final Base64FileStorageService base64StorageService = new Base64FileStorageService();
 
     @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.openInputStream(
-            "binary",
             Base64.getEncoder().encodeToString(string.getBytes())
         );
 
@@ -45,14 +46,16 @@ public class Base64StorageServiceTest {
     @Test
     public void testRead() {
         Assertions
-            .assertThat(base64StorageService.read("binary", Base64.getEncoder().encodeToString(string.getBytes())))
+            .assertThat(base64StorageService.read(Base64.getEncoder().encodeToString(string.getBytes())))
             .isEqualTo(string);
     }
 
     @Test
     public void testWrite() {
+        FileEntry fileEntry = base64StorageService.write("fileEntry", new ByteArrayInputStream(string.getBytes()));
+
         Assertions
-            .assertThat(base64StorageService.write("binary", new ByteArrayInputStream(string.getBytes())))
-            .isEqualTo(Base64.getEncoder().encodeToString(string.getBytes()));
+            .assertThat(fileEntry.getUrl())
+            .isEqualTo("base64:" + Base64.getEncoder().encodeToString(string.getBytes()));
     }
 }
