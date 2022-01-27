@@ -25,7 +25,7 @@ dependencies {
     implementation project(":modules:libs:atlas:message-broker:message-broker-jms")
     implementation project(":modules:libs:atlas:message-broker:message-broker-kafka")
     implementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
-    implementation project(":modules:libs:atlas:rest")
+    implementation project(":modules:libs:atlas:engine-rest")
     implementation project(":modules:libs:atlas:file-storage:file-storage-base64")
     implementation project(":modules:libs:atlas:file-storage:file-storage-fs")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-each")

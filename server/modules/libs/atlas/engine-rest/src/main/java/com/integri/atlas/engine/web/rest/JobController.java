@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.workflow.web;
+package com.integri.atlas.engine.web.rest;
 
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
