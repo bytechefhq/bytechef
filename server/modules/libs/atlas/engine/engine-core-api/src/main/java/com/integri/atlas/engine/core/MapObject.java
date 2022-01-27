@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.core;
 
-import com.integri.atlas.engine.core.binary.converter.BinaryConverter;
+import com.integri.atlas.engine.core.file.storage.converter.FileEntryConverter;
 import com.integri.atlas.engine.core.task.SimpleWorkflowTask;
 import com.integri.atlas.engine.core.task.WorkflowTask;
 import java.lang.reflect.Array;
@@ -49,7 +49,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
     private static final ConversionService conversionService = new DefaultConversionService() {
         {
-            addConverter(new BinaryConverter());
+            addConverter(new FileEntryConverter());
         }
     };
 

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.storage.exception;
+package com.integri.atlas.engine.core.file.storage.exception;
 
-public class StorageFileNotFoundException extends RuntimeException {
+public class FileStorageException extends RuntimeException {
 
-    public StorageFileNotFoundException(String message) {
+    public FileStorageException(String message) {
         super(message);
     }
 
-    public StorageFileNotFoundException(String message, Throwable cause) {
+    public FileStorageException(String message, Throwable cause) {
         super(message, cause);
     }
 }
