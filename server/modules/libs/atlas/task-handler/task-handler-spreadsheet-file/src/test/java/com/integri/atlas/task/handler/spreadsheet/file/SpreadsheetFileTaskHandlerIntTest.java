@@ -23,7 +23,7 @@ import com.atlas.json.JSONArrayUtil;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
-import com.integri.atlas.engine.core.binary.Binary;
+import com.integri.atlas.engine.core.file.storage.FileEntry;
 import com.integri.atlas.task.handler.BaseTaskHandlerIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -48,10 +48,10 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Job job = startJob(
             "samples/spreadsheetFile_READ.json",
-            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(binaryHelper, jsonHelper)),
+            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
             Map.of(
-                "binary",
-                binaryHelper.writeBinaryData(
+                "fileEntry",
+                fileStorageService.write(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(sampleFile, Charset.defaultCharset())
                 )
@@ -73,7 +73,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
     public void testWrite() throws IOException {
         Job job = startJob(
             "samples/spreadsheetFile_WRITE.json",
-            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(binaryHelper, jsonHelper)),
+            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
             Map.of("items", JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())))
         );
 
@@ -81,17 +81,17 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        Binary binary = outputs.get("writeToSpreadsheet", Binary.class);
+        FileEntry fileEntry = outputs.get("writeToSpreadsheet", FileEntry.class);
         File sampleFile = getFile("sample_header.csv");
 
         job =
             startJob(
                 "samples/spreadsheetFile_READ.json",
-                Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(binaryHelper, jsonHelper)),
+                Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
                 Map.of(
-                    "binary",
-                    binaryHelper.writeBinaryData(
-                        sampleFile.getAbsolutePath(),
+                    "fileEntry",
+                    fileStorageService.write(
+                        sampleFile.getName(),
                         Files.contentOf(sampleFile, Charset.defaultCharset())
                     )
                 )
@@ -105,7 +105,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
             true
         );
 
-        assertThat(binary.getName()).isEqualTo("spreadsheet.csv");
+        assertThat(fileEntry.getName()).isEqualTo("spreadsheet.csv");
     }
 
     private File getFile(String fileName) throws IOException {
