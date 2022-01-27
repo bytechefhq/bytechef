@@ -18,8 +18,8 @@
 
 package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.context.Context;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
@@ -65,12 +65,11 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
     private SpelTaskEvaluator(Builder aBuilder) {
         Map<String, MethodExecutor> map = new HashMap<>();
-        map.put(
-            "binary",
-            new Binary(
-                aBuilder.applicationContext == null ? null : aBuilder.applicationContext.getBean(BinaryHelper.class)
-            )
-        );
+
+        if (aBuilder.applicationContext != null) {
+            map.put("addFile", new AddFile(aBuilder.applicationContext.getBean(FileStorageService.class)));
+        }
+
         map.put("boolean", new Cast<>(Boolean.class));
         map.put("byte", new Cast<>(Byte.class));
         map.put("char", new Cast<>(Character.class));

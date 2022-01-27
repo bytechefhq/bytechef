@@ -16,7 +16,7 @@
 
 package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import com.integri.atlas.engine.core.binary.BinaryHelper;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -26,12 +26,12 @@ import org.springframework.expression.TypedValue;
  *
  * @author Ivica Cardic
  */
-class Binary implements MethodExecutor {
+class AddFile implements MethodExecutor {
 
-    private final BinaryHelper binaryHelper;
+    private final FileStorageService fileStorageService;
 
-    public Binary(BinaryHelper binaryHelper) {
-        this.binaryHelper = binaryHelper;
+    public AddFile(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -45,6 +45,6 @@ class Binary implements MethodExecutor {
             data = String.valueOf(arguments[1]);
         }
 
-        return new TypedValue(binaryHelper.writeBinaryData(fileName, data));
+        return new TypedValue(fileStorageService.write(fileName, data));
     }
 }
