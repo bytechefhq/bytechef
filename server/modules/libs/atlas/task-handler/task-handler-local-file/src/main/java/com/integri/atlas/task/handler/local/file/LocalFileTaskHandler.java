@@ -54,12 +54,12 @@ public class LocalFileTaskHandler implements TaskHandler<Object> {
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {
-                result = fileStorageService.write(fileName, inputStream);
+                result = fileStorageService.addFile(fileName, inputStream);
             }
         } else {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
 
-            try (InputStream inputStream = fileStorageService.openInputStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageService.getContentStream(fileEntry.getUrl())) {
                 result =
                     Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
             }

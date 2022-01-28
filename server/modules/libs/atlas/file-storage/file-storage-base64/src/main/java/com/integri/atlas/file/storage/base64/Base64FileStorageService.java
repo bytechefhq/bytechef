@@ -31,16 +31,25 @@ import java.util.Base64;
 public class Base64FileStorageService implements FileStorageService {
 
     @Override
-    public InputStream openInputStream(String url) {
-        Base64.Decoder decoder = Base64.getDecoder();
+    public FileEntry addFile(String fileName, String data) throws FileStorageException {
+        Base64.Encoder encoder = Base64.getEncoder();
 
-        String filePath = getFilePath(url);
-
-        return new ByteArrayInputStream(decoder.decode(filePath));
+        return FileEntry.of(fileName, "base64:" + encoder.encodeToString(data.getBytes()));
     }
 
     @Override
-    public String read(String url) throws FileStorageException {
+    public FileEntry addFile(String fileName, InputStream inputStream) {
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        try {
+            return FileEntry.of(fileName, "base64:" + encoder.encodeToString(toByteArray(inputStream)));
+        } catch (IOException ioe) {
+            throw new FileStorageException("Failed to store file", ioe);
+        }
+    }
+
+    @Override
+    public String getContent(String url) throws FileStorageException {
         String filePath = getFilePath(url);
 
         Base64.Decoder decoder = Base64.getDecoder();
@@ -49,21 +58,12 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry write(String fileName, String data) throws FileStorageException {
-        Base64.Encoder encoder = Base64.getEncoder();
+    public InputStream getContentStream(String url) {
+        Base64.Decoder decoder = Base64.getDecoder();
 
-        return FileEntry.of(fileName, "base64:" + encoder.encodeToString(data.getBytes()));
-    }
+        String filePath = getFilePath(url);
 
-    @Override
-    public FileEntry write(String fileName, InputStream inputStream) {
-        Base64.Encoder encoder = Base64.getEncoder();
-
-        try {
-            return FileEntry.of(fileName, "base64:" + encoder.encodeToString(toByteArray(inputStream)));
-        } catch (IOException ioe) {
-            throw new FileStorageException("Failed to store file", ioe);
-        }
+        return new ByteArrayInputStream(decoder.decode(filePath));
     }
 
     private String getFilePath(String url) {

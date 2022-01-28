@@ -95,7 +95,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
-            try (InputStream inputStream = fileStorageService.openInputStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageService.getContentStream(fileEntry.getUrl())) {
                 result =
                     spreadsheetProcessor.read(
                         inputStream,
@@ -122,7 +122,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
             if (taskExecution.containsKey("fileEntry")) {
                 FileEntry fileEntry = taskExecution.get("fileEntry", FileEntry.class);
 
-                items = jsonHelper.read(fileStorageService.read(fileEntry.getUrl()));
+                items = jsonHelper.read(fileStorageService.getContent(fileEntry.getUrl()));
             } else {
                 items = taskExecution.get("items");
             }
@@ -131,7 +131,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
-            return fileStorageService.write(
+            return fileStorageService.addFile(
                 fileName,
                 new ByteArrayInputStream(
                     spreadsheetProcessor.write(items, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))

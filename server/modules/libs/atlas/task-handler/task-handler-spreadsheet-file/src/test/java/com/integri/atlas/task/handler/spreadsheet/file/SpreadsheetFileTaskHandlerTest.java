@@ -287,7 +287,7 @@ public class SpreadsheetFileTaskHandlerTest {
             includeEmptyCells,
             range,
             readAsString,
-            file == null ? null : fileStorageService.write(file.getName(), new FileInputStream(file))
+            file == null ? null : fileStorageService.addFile(file.getName(), new FileInputStream(file))
         );
     }
 
@@ -471,7 +471,7 @@ public class SpreadsheetFileTaskHandlerTest {
             (FileEntry) spreadsheetFileTaskHandler.handle(
                 getWriteSimpleTaskExecution(
                     fileFormat,
-                    fileStorageService.write(
+                    fileStorageService.addFile(
                         "sample.json",
                         Files.contentOf(getFile("sample.json"), Charset.defaultCharset())
                     ),

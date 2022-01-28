@@ -45,7 +45,10 @@ public class LocalFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), "READ", null);
 
-        FileEntry fileEntry = fileStorageService.write(file.getName(), Files.contentOf(file, Charset.defaultCharset()));
+        FileEntry fileEntry = fileStorageService.addFile(
+            file.getName(),
+            Files.contentOf(file, Charset.defaultCharset())
+        );
 
         assertThat(localFileTaskHandler.handle(taskExecution))
             .hasFieldOrPropertyWithValue("extension", FilenameUtils.getExtension(file.getAbsolutePath()))
@@ -61,7 +64,7 @@ public class LocalFileTaskHandlerTest {
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(
             file.getAbsolutePath(),
             "WRITE",
-            fileStorageService.write(file.getName(), new FileInputStream(file))
+            fileStorageService.addFile(file.getName(), new FileInputStream(file))
         );
 
         assertThat(localFileTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
