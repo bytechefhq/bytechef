@@ -37,7 +37,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpClientTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("httpClient")
+    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
+        .create("httpClient")
         .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data")
         .authentication(

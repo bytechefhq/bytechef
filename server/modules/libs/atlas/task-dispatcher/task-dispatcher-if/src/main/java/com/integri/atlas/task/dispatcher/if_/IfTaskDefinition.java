@@ -36,7 +36,8 @@ import com.integri.atlas.engine.core.task.description.TaskSpecification;
  */
 public class IfTaskDefinition implements TaskDefinition {
 
-    private static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("if")
+    private static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
+        .create("if")
         .displayName("IF")
         .description("Directs a stream based on true/false results of comparisons")
         .properties(
