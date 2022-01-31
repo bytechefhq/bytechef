@@ -20,7 +20,9 @@ import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matija Petanjek
@@ -41,13 +43,17 @@ public class IfTaskUtil {
         List<String> conditions = new ArrayList<>();
 
         for (MapObject condition : aConditions) {
-            for (String key : condition.keySet()) {
-                MapObject conditionParts = condition.get(key, MapObject.class);
+            for (String operandType : condition.keySet()) {
+                MapObject conditionParts = condition.get(operandType, MapObject.class);
+
+                String conditionTemplate = conditionTemplates
+                    .get(operandType)
+                    .get(conditionParts.getRequiredString("operation"));
 
                 conditions.add(
-                    conditionParts.getRequiredString("value1") +
-                    conditionParts.getRequiredString("operation") +
-                    conditionParts.getRequiredString("value2")
+                    conditionTemplate
+                        .replace("${value1}", conditionParts.getRequiredString("value1"))
+                        .replace("${value2}", conditionParts.getRequiredString("value2"))
                 );
             }
         }
@@ -63,5 +69,51 @@ public class IfTaskUtil {
         }
 
         throw new IllegalArgumentException("Invalid combine operation: " + combineOperation);
+    }
+
+    private static final Map<String, Map<String, String>> conditionTemplates = new HashMap<>();
+
+    static {
+        conditionTemplates.put(
+            "boolean",
+            Map.ofEntries(
+                Map.entry("equals", "${value1} == ${value2}"),
+                Map.entry("notEquals", "${value1} != ${value2}")
+            )
+        );
+
+        conditionTemplates.put(
+            "dateTime",
+            Map.ofEntries(
+                Map.entry("after", "LocalDateTime.parse(${value1}).isAfter(LocalDateTime.parse(${value2}))"),
+                Map.entry("before", "LocalDateTime.parse(${value1}).isBefore(LocalDateTime.parse(${value2}))")
+            )
+        );
+
+        conditionTemplates.put(
+            "number",
+            Map.ofEntries(
+                Map.entry("equals", "${value1} == ${value2}"),
+                Map.entry("notEquals", "${value1} != ${value2}"),
+                Map.entry("greater", "${value1} > ${value2}"),
+                Map.entry("less", "${value1} < ${value2}"),
+                Map.entry("greaterEquals", "${value1} >= ${value2}"),
+                Map.entry("lessEquals", "${value1} <= ${value2}")
+            )
+        );
+
+        conditionTemplates.put(
+            "string",
+            Map.ofEntries(
+                Map.entry("equals", "${value1}.equals(${value2})"),
+                Map.entry("notEquals", "!${value1}.equals(${value2})"),
+                Map.entry("contains", "${value1}.contains(${value2})"),
+                Map.entry("notContains", "!${value1}.contains(${value2})"),
+                Map.entry("startsWith", "${value1}.startsWith(${value2})"),
+                Map.entry("endsWith", "${value1}.endsWith(${value2})"),
+                Map.entry("isEmpty", "${value1}.isEmpty()"),
+                Map.entry("regex", "Pattern.matches(${value1}, ${value2})")
+            )
+        );
     }
 }
