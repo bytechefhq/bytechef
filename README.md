@@ -176,11 +176,11 @@ Executes true/false branch based on the `conditions` and `combineOperation` valu
   conditions:
     - boolean:
         value1: true
-        operation: ==
+        operation: notEquals
         value2: false
     - number:
         value1: 1
-        operation: ==
+        operation: greater
         value2: 1
   combineOperation: any
   caseTrue:
