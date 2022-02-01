@@ -24,7 +24,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLEC
 import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.minValue;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
@@ -45,7 +45,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
         .authentication(
             authentication()
                 .properties(
-                    SELECT_PROPERTY("authenticationType")
+                    OPTION_PROPERTY("authenticationType")
                         .displayName("Authentication Type")
                         .options(
                             option("Basic Auth", "BASIC_AUTH"),
@@ -72,7 +72,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
             // General properties
             //
 
-            SELECT_PROPERTY("requestMethod")
+            OPTION_PROPERTY("requestMethod")
                 .displayName("Request Method")
                 .options(
                     option("DELETE", "DELETE"),
@@ -94,7 +94,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                 .displayName("Allow Unauthorized Certs")
                 .description("Download the response even if SSL certificate validation is not possible.")
                 .defaultValue(false),
-            SELECT_PROPERTY("responseFormat")
+            OPTION_PROPERTY("responseFormat")
                 .displayName("Response Format")
                 .description("The format in which the data gets returned from the URL.")
                 .options(option("Binary", "BINARY"), option("JSON", "JSON"), option("String", "STRING"))
@@ -109,7 +109,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                             "If the query and/or body parameters should be set via the key-value pair UI or RAW."
                         )
                         .defaultValue(false),
-                    SELECT_PROPERTY("bodyContentType")
+                    OPTION_PROPERTY("bodyContentType")
                         .displayName("Body Content Type")
                         .description("Content-Type to use when sending body parameters.")
                         .displayOption(show("requestMethod", "PATCH", "POST", "PUT"))

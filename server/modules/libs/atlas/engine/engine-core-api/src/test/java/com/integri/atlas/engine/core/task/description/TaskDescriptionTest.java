@@ -22,7 +22,7 @@ import static com.integri.atlas.engine.core.task.description.TaskCredential.cred
 import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyTypeOption.propertyTypeOption;
@@ -1512,7 +1512,7 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskProperty() throws JsonProcessingException, JSONException {
-        TaskProperty<?> taskProperty = SELECT_PROPERTY("name")
+        TaskProperty<?> taskProperty = OPTION_PROPERTY("name")
             .defaultValue(2)
             .description("description")
             .displayName("displayName")
