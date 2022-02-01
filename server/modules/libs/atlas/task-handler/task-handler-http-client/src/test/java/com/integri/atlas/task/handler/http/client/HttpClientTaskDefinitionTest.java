@@ -47,7 +47,7 @@ public class HttpClientTaskDefinitionTest {
                             "required":true,
                             "displayOption":{
                                 "show":{
-                                    "authentication":["BASIC_AUTH"]
+                                    "authenticationType":["BASIC_AUTH"]
                                 }
                             }
                         },
@@ -56,7 +56,7 @@ public class HttpClientTaskDefinitionTest {
                             "required":true,
                             "displayOption":{
                                 "show":{
-                                    "authentication":["DIGEST_AUTH"]
+                                    "authenticationType":["DIGEST_AUTH"]
                                 }
                             }
                         },
@@ -65,18 +65,18 @@ public class HttpClientTaskDefinitionTest {
                             required: true,
                             displayOption: {
                                 show: {
-                                    authentication: [
+                                    authenticationType: [
                                         "HEADER_AUTH",
                                     ],
                                 },
                             },
                         },
                         {
-                            "name":"oAuthApi",
+                            "name":"oAuth2Auth",
                             "required":true,
                             "displayOption":{
                                 "show":{
-                                    "authentication":["OAUTH2"]
+                                    "authenticationType":["OAUTH2"]
                                 }
                             }
                         }
@@ -189,14 +189,6 @@ public class HttpClientTaskDefinitionTest {
                             }
                         ]
                     },
-
-                    {
-                        "defaultValue":"status",
-                        "description":"Name of the property to which to write the response status.",
-                        "displayName":"Status Name",
-                        "name":"statusPropertyName",
-                        "type":"STRING"
-                    },
                     {
                         "displayName":"Options",
                         "name":"options",
@@ -262,7 +254,7 @@ public class HttpClientTaskDefinitionTest {
                             },
                             {
                                 "defaultValue":false,
-                                "description":"Succeeds also when status code is not 2xx.",
+                                "description":"Succeeds also when the status code is not 2xx.",
                                 "displayName":"Ignore Response Code",
                                 "name":"ignoreResponseCode",
                                 "type":"BOOLEAN"
@@ -277,7 +269,7 @@ public class HttpClientTaskDefinitionTest {
                             },
                             {
                                 "defaultValue":1000,
-                                "description":"Time in ms to wait for the server to send response before aborting the request.",
+                                "description":"Time in ms to wait for the server to send a response before aborting the request.",
                                 "displayName":"Timeout",
                                 "name":"timeout",
                                 "type":"NUMBER",
@@ -291,7 +283,7 @@ public class HttpClientTaskDefinitionTest {
                     },
                     {
                         "defaultValue":"",
-                        "description":"Header parameters as RAW.",
+                        "description":"Header parameters to send as RAW.",
                         "displayName":"Header Parameters",
                         "displayOption":{
                             "hide":{
@@ -330,7 +322,7 @@ public class HttpClientTaskDefinitionTest {
                                     },
                                     {
                                         "defaultValue":"",
-                                        "description":"Name of the parameter.",
+                                        "description":"Value of the parameter.",
                                         "displayName":"Value",
                                         "name":"value","type":"STRING"
                                     }
@@ -380,7 +372,7 @@ public class HttpClientTaskDefinitionTest {
                                     },
                                     {
                                         "defaultValue":"",
-                                        "description":"Name of the parameter.",
+                                        "description":"Value of the parameter.",
                                         "displayName":"Value",
                                         "name":"value",
                                         "type":"STRING"
@@ -435,7 +427,7 @@ public class HttpClientTaskDefinitionTest {
                                     },
                                     {
                                         "defaultValue":"",
-                                        "description":"Name of the parameter.",
+                                        "description":"Value of the parameter.",
                                         "displayName":"Value",
                                         "name":"value",
                                         "type":"STRING"

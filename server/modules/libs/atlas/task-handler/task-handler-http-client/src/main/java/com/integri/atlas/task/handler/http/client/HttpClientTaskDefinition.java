@@ -57,15 +57,19 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                         )
                 )
                 .credentials(
-                    credential("httpBasicAuth").required(true).displayOption(show("authentication", "BASIC_AUTH")),
-                    credential("httpDigestAuth").required(true).displayOption(show("authentication", "DIGEST_AUTH")),
-                    credential("httpHeaderAuth").required(true).displayOption(show("authentication", "HEADER_AUTH")),
-                    credential("oAuthApi").required(true).displayOption(show("authentication", "OAUTH2"))
+                    credential("httpBasicAuth").required(true).displayOption(show("authenticationType", "BASIC_AUTH")),
+                    credential("httpDigestAuth")
+                        .required(true)
+                        .displayOption(show("authenticationType", "DIGEST_AUTH")),
+                    credential("httpHeaderAuth")
+                        .required(true)
+                        .displayOption(show("authenticationType", "HEADER_AUTH")),
+                    credential("oAuth2Auth").required(true).displayOption(show("authenticationType", "OAUTH2"))
                 )
         )
         .properties(
             //
-            // General
+            // General properties
             //
 
             SELECT_PROPERTY("requestMethod")
@@ -92,13 +96,9 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                 .defaultValue(false),
             SELECT_PROPERTY("responseFormat")
                 .displayName("Response Format")
-                .options(option("Binary", "BINARY"), option("JSON", "JSON"), option("String", "STRING"))
                 .description("The format in which the data gets returned from the URL.")
+                .options(option("Binary", "BINARY"), option("JSON", "JSON"), option("String", "STRING"))
                 .defaultValue("JSON"),
-            STRING_PROPERTY("statusPropertyName")
-                .displayName("Status Name")
-                .description("Name of the property to which to write the response status.")
-                .defaultValue("status"),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
@@ -134,7 +134,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                         .defaultValue(false),
                     BOOLEAN_PROPERTY("ignoreResponseCode")
                         .displayName("Ignore Response Code")
-                        .description("Succeeds also when status code is not 2xx.")
+                        .description("Succeeds also when the status code is not 2xx.")
                         .defaultValue(false),
                     STRING_PROPERTY("proxy")
                         .displayName("Proxy")
@@ -143,17 +143,19 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                         .defaultValue(""),
                     NUMBER_PROPERTY("timeout")
                         .displayName("Timeout")
-                        .description("Time in ms to wait for the server to send response before aborting the request.")
+                        .description(
+                            "Time in ms to wait for the server to send a response before aborting the request."
+                        )
                         .defaultValue(1000)
                         .typeOption(minValue(1))
                 ),
             //
-            // Header Parameters
+            // Header properties
             //
 
             STRING_PROPERTY("headerParametersRaw")
                 .displayName("Header Parameters")
-                .description("Header parameters as RAW.")
+                .description("Header parameters to send as RAW.")
                 .displayOption(show("rawParameters", true))
                 .defaultValue(""),
             COLLECTION_PROPERTY("headerParametersKeyValue")
@@ -173,12 +175,12 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                                 .defaultValue(""),
                             STRING_PROPERTY("value")
                                 .displayName("Value")
-                                .description("Name of the parameter.")
+                                .description("Value of the parameter.")
                                 .defaultValue("")
                         )
                 ),
             //
-            // Query Parameters
+            // Query properties
             //
 
             STRING_PROPERTY("queryParametersRaw")
@@ -203,12 +205,12 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                                 .defaultValue(""),
                             STRING_PROPERTY("value")
                                 .displayName("Value")
-                                .description("Name of the parameter.")
+                                .description("Value of the parameter.")
                                 .defaultValue("")
                         )
                 ),
             //
-            // Body Content
+            // Body Content properties
             //
 
             STRING_PROPERTY("bodyParametersRaw")
@@ -251,7 +253,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                                 .defaultValue(""),
                             STRING_PROPERTY("value")
                                 .displayName("Value")
-                                .description("Name of the parameter.")
+                                .description("Value of the parameter.")
                                 .defaultValue("")
                         )
                 ),
