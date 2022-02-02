@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.binary.file;
+package com.integri.atlas.task.handler.local.file;
 
 import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
@@ -27,11 +27,11 @@ import com.integri.atlas.engine.core.task.description.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BinaryFileTaskDefinition implements TaskDefinition {
+public class LocalFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
+    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("localFile")
         .create("binaryFile")
-        .displayName("Binary File")
+        .displayName("Local File")
         .description("Reads or writes a binary file from/to disk")
         .properties(
             SELECT_PROPERTY("operation")

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.binary.file;
+package com.integri.atlas.task.handler.local.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
@@ -24,7 +24,6 @@ import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.storage.StorageService;
 import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.task.handler.binary.file.BinaryFileTaskHandler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,11 +36,11 @@ import org.springframework.core.io.ClassPathResource;
 /**
  * @author Ivica Cardic
  */
-public class BinaryFileTaskHandlerTest {
+public class LocalFileTaskHandlerTest {
 
     private static final StorageService storageService = new Base64StorageService();
     private static final BinaryHelper binaryHelper = new BinaryHelper(storageService);
-    private static final BinaryFileTaskHandler binaryFileTaskHandler = new BinaryFileTaskHandler(binaryHelper);
+    private static final LocalFileTaskHandler localFileTaskHandler = new LocalFileTaskHandler(binaryHelper);
 
     @Test
     public void testReadOperation() throws Exception {
@@ -49,7 +48,7 @@ public class BinaryFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), "READ", null);
 
-        assertThat(binaryFileTaskHandler.handle(taskExecution))
+        assertThat(localFileTaskHandler.handle(taskExecution))
             .hasFieldOrPropertyWithValue(
                 "data",
                 storageService.write("bucketName", Files.contentOf(file, Charset.defaultCharset()))
@@ -69,7 +68,7 @@ public class BinaryFileTaskHandlerTest {
             Binary.of(file.getAbsolutePath(), storageService.write("bucketName", new FileInputStream(file)))
         );
 
-        assertThat(binaryFileTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
+        assertThat(localFileTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
     }
 
     private File getFile() throws IOException {
