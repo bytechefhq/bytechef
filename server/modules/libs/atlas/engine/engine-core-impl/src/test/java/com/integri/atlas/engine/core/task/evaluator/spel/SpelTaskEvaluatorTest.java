@@ -18,28 +18,22 @@
 
 package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;
-import com.integri.atlas.engine.core.file.storage.FileEntry;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
 /**
@@ -417,39 +411,5 @@ public class SpelTaskEvaluatorTest {
         MapContext ctx = new MapContext();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals("${config('no.such.property')}", evaluated.getString("myValue"));
-    }
-
-    @Test
-    public void test43() {
-        ApplicationContext applicationContext = mock(ApplicationContext.class);
-
-        when(applicationContext.getBean(FileStorageService.class)).thenReturn(new Base64FileStorageService());
-
-        SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().applicationContext(applicationContext).build();
-
-        TaskExecution taskExecution = evaluator.evaluate(
-            SimpleTaskExecution.of("fileEntry", "${writeFileEntry('sample.txt', 'data')}"),
-            new MapContext()
-        );
-
-        org.assertj.core.api.Assertions
-            .assertThat((FileEntry) taskExecution.get("fileEntry"))
-            .hasFieldOrPropertyWithValue("url", "base64:" + Base64.getEncoder().encodeToString("data".getBytes()))
-            .hasFieldOrPropertyWithValue("extension", "txt")
-            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-            .hasFieldOrPropertyWithValue("name", "sample.txt");
-    }
-
-    @Test
-    public void test44() {
-        SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution taskExecution = SimpleTaskExecution.of("result", "${fileEntry.name} ${fileEntry.url}");
-
-        TaskExecution evaluated = evaluator.evaluate(
-            taskExecution,
-            new MapContext(Collections.singletonMap("fileEntry", FileEntry.of("sample.txt", "/tmp/fileName.txt")))
-        );
-
-        assertEquals("sample.txt /tmp/fileName.txt", evaluated.getString("result"));
     }
 }

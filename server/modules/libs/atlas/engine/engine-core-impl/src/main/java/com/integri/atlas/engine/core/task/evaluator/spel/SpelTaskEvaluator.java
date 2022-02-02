@@ -19,7 +19,6 @@
 package com.integri.atlas.engine.core.task.evaluator.spel;
 
 import com.integri.atlas.engine.core.context.Context;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
@@ -31,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -65,10 +63,6 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
     private SpelTaskEvaluator(Builder aBuilder) {
         Map<String, MethodExecutor> map = new HashMap<>();
-
-        if (aBuilder.applicationContext != null) {
-            map.put("addFile", new AddFile(aBuilder.applicationContext.getBean(FileStorageService.class)));
-        }
 
         map.put("boolean", new Cast<>(Boolean.class));
         map.put("byte", new Cast<>(Byte.class));
@@ -180,15 +174,8 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
     public static class Builder {
 
-        private ApplicationContext applicationContext;
         private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
         private Environment environment = new EmptyEnvironment();
-
-        public Builder applicationContext(ApplicationContext applicationContext) {
-            this.applicationContext = applicationContext;
-
-            return this;
-        }
 
         public Builder methodExecutor(String aMethodName, MethodExecutor aMethodExecutor) {
             methodExecutors.put(aMethodName, aMethodExecutor);
