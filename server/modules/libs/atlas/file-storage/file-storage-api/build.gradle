@@ -1,0 +1,11 @@
+dependencies {
+    api "org.springframework:spring-core"
+
+    implementation "commons-io:commons-io"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.apache.tika:tika-core"
+    implementation "org.springframework:spring-expression"
+
+    testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
+    testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
+}

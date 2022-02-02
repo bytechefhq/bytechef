@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.file.storage.converter;
+package com.integri.atlas.file.storage.converter;
 
-import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileEntry;
 import java.util.Map;
 import org.springframework.core.convert.converter.Converter;
 

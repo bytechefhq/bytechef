@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.evaluator.spel;
+package com.integri.atlas.file.storage.spel;
 
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.FileStorageService;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -26,11 +26,11 @@ import org.springframework.expression.TypedValue;
  *
  * @author Ivica Cardic
  */
-class AddFile implements MethodExecutor {
+public class StoreFile implements MethodExecutor {
 
     private final FileStorageService fileStorageService;
 
-    public AddFile(FileStorageService fileStorageService) {
+    public StoreFile(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
@@ -45,6 +45,6 @@ class AddFile implements MethodExecutor {
             data = String.valueOf(arguments[1]);
         }
 
-        return new TypedValue(fileStorageService.addFile(fileName, data));
+        return new TypedValue(fileStorageService.storeFile(fileName, data));
     }
 }
