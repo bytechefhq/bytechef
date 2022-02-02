@@ -23,7 +23,7 @@ import com.atlas.json.JSONArrayUtil;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
-import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.task.handler.BaseTaskHandlerIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
             Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
             Map.of(
                 "fileEntry",
-                fileStorageService.addFile(
+                fileStorageService.storeFile(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(sampleFile, Charset.defaultCharset())
                 )
@@ -90,7 +90,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
                 Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
                 Map.of(
                     "fileEntry",
-                    fileStorageService.addFile(
+                    fileStorageService.storeFile(
                         sampleFile.getName(),
                         Files.contentOf(sampleFile, Charset.defaultCharset())
                     )

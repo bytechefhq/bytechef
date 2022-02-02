@@ -16,9 +16,9 @@
 
 package com.integri.atlas.file.storage.base64;
 
-import com.integri.atlas.engine.core.file.storage.FileEntry;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
-import com.integri.atlas.engine.core.file.storage.exception.FileStorageException;
+import com.integri.atlas.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.exception.FileStorageException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,14 +31,14 @@ import java.util.Base64;
 public class Base64FileStorageService implements FileStorageService {
 
     @Override
-    public FileEntry addFile(String fileName, String data) throws FileStorageException {
+    public FileEntry storeFile(String fileName, String data) throws FileStorageException {
         Base64.Encoder encoder = Base64.getEncoder();
 
         return FileEntry.of(fileName, "base64:" + encoder.encodeToString(data.getBytes()));
     }
 
     @Override
-    public FileEntry addFile(String fileName, InputStream inputStream) {
+    public FileEntry storeFile(String fileName, InputStream inputStream) {
         Base64.Encoder encoder = Base64.getEncoder();
 
         try {
@@ -49,7 +49,7 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public String getContent(String url) throws FileStorageException {
+    public String readFileContent(String url) throws FileStorageException {
         String filePath = getFilePath(url);
 
         Base64.Decoder decoder = Base64.getDecoder();
@@ -58,7 +58,7 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getContentStream(String url) {
+    public InputStream getFileContentStream(String url) {
         Base64.Decoder decoder = Base64.getDecoder();
 
         String filePath = getFilePath(url);

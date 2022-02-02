@@ -16,7 +16,7 @@
 
 package com.integri.atlas.file.storage.filesystem;
 
-import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -39,29 +39,29 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testOpenInputStream() throws IOException {
-        FileEntry fileEntry = fileStorageService.addFile(
+        FileEntry fileEntry = fileStorageService.storeFile(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );
 
-        InputStream inputStream = fileStorageService.getContentStream(fileEntry.getUrl());
+        InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
 
         Assertions.assertThat(new String(inputStream.readAllBytes())).isEqualTo(TEST_STRING);
     }
 
     @Test
     public void testRead() {
-        FileEntry fileEntry = fileStorageService.addFile(
+        FileEntry fileEntry = fileStorageService.storeFile(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );
 
-        Assertions.assertThat(fileStorageService.getContent(fileEntry.getUrl())).isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl())).isEqualTo(TEST_STRING);
     }
 
     @Test
     public void testWrite() {
-        FileEntry fileEntry = fileStorageService.addFile(
+        FileEntry fileEntry = fileStorageService.storeFile(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );

@@ -16,10 +16,10 @@
 
 package com.integri.atlas.task.handler.local.file;
 
-import com.integri.atlas.engine.core.file.storage.FileEntry;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileStorageService;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -54,12 +54,12 @@ public class LocalFileTaskHandler implements TaskHandler<Object> {
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {
-                result = fileStorageService.addFile(fileName, inputStream);
+                result = fileStorageService.storeFile(fileName, inputStream);
             }
         } else {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
 
-            try (InputStream inputStream = fileStorageService.getContentStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
                 result =
                     Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
             }
