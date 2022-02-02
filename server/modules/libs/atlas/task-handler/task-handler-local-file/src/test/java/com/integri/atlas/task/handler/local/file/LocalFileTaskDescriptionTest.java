@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class LocalFileTaskDescriptorTest {
+public class LocalFileTaskDescriptionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -63,14 +63,14 @@ public class LocalFileTaskDescriptorTest {
                         ]
                     },
                     {
-                        "description":"The Binary property which contains the data for the file to be written.",
-                        "displayName":"Binary",
+                        "description":"The object property which contains a reference to the file to be written.",
+                        "displayName":"File",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
                             }
                         },
-                        "name":"binary",
+                        "name":"fileEntry",
                         "required":true,
                         "type":"JSON"
                     },

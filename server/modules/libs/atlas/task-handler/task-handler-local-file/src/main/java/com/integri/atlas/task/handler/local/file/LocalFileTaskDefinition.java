@@ -29,8 +29,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocalFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("localFile")
-        .create("binaryFile")
+    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
+        .create("localFile")
         .displayName("Local File")
         .description("Reads or writes a binary file from/to disk")
         .properties(
@@ -40,9 +40,9 @@ public class LocalFileTaskDefinition implements TaskDefinition {
                 .options(option("Read to file", "READ"), option("Write from file", "WRITE"))
                 .defaultValue("READ")
                 .required(true),
-            JSON_PROPERTY("binary")
-                .displayName("Binary")
-                .description("The Binary property which contains the data for the file to be written.")
+            JSON_PROPERTY("fileEntry")
+                .displayName("File")
+                .description("The object property which contains a reference to the file to be written.")
                 .displayOption(show("operation", "WRITE"))
                 .required(true),
             STRING_PROPERTY("fileName")

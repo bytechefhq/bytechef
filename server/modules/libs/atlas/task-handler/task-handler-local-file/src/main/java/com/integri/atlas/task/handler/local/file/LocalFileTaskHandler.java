@@ -16,8 +16,8 @@
 
 package com.integri.atlas.task.handler.local.file;
 
-import com.integri.atlas.engine.core.binary.Binary;
-import com.integri.atlas.engine.core.binary.BinaryHelper;
+import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.io.FileInputStream;
@@ -39,10 +39,10 @@ public class LocalFileTaskHandler implements TaskHandler<Object> {
         WRITE,
     }
 
-    private final BinaryHelper binaryHelper;
+    private final FileStorageService fileStorageService;
 
-    public LocalFileTaskHandler(BinaryHelper binaryHelper) {
-        this.binaryHelper = binaryHelper;
+    public LocalFileTaskHandler(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -54,12 +54,12 @@ public class LocalFileTaskHandler implements TaskHandler<Object> {
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {
-                result = binaryHelper.writeBinaryData(fileName, inputStream);
+                result = fileStorageService.write(fileName, inputStream);
             }
         } else {
-            Binary binary = taskExecution.getRequired("binary", Binary.class);
+            FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
 
-            try (InputStream inputStream = binaryHelper.openDataInputStream(binary)) {
+            try (InputStream inputStream = fileStorageService.openInputStream(fileEntry.getUrl())) {
                 result =
                     Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
             }
