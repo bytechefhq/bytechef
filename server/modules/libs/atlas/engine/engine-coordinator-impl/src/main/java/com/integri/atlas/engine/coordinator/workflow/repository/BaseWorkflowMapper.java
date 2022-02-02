@@ -17,7 +17,6 @@
 package com.integri.atlas.engine.coordinator.workflow.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Throwables;
 import com.integri.atlas.engine.coordinator.workflow.SimpleWorkflow;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.DSL;
@@ -71,7 +70,7 @@ public abstract class BaseWorkflowMapper implements WorkflowMapper {
             workflowMap.put(DSL.TASKS, tasks);
             return workflowMap;
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

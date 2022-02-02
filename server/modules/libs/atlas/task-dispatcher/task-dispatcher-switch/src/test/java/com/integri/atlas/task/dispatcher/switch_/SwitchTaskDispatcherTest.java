@@ -24,7 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
@@ -35,6 +34,7 @@ import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -60,10 +60,7 @@ public class SwitchTaskDispatcherTest {
             SpelTaskEvaluator.create()
         );
         SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set(
-            "cases",
-            Arrays.asList(ImmutableMap.of("key", "k1", "tasks", Arrays.asList(ImmutableMap.of("type", "print"))))
-        );
+        task.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
         task.set("expression", "k1");
         dispatcher.dispatch(task);
         ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
@@ -82,10 +79,7 @@ public class SwitchTaskDispatcherTest {
             SpelTaskEvaluator.create()
         );
         SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set(
-            "cases",
-            Arrays.asList(ImmutableMap.of("key", "k1", "tasks", Arrays.asList(ImmutableMap.of("type", "print"))))
-        );
+        task.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
         task.set("expression", "k2");
         dispatcher.dispatch(task);
         verify(taskDispatcher, times(0)).dispatch(any());
@@ -105,8 +99,8 @@ public class SwitchTaskDispatcherTest {
         task.set(
             "cases",
             Arrays.asList(
-                ImmutableMap.of("key", "k1", "tasks", Arrays.asList(ImmutableMap.of("type", "print"))),
-                ImmutableMap.of("key", "k2", "tasks", Arrays.asList(ImmutableMap.of("type", "sleep")))
+                Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print"))),
+                Map.of("key", "k2", "tasks", Arrays.asList(Map.of("type", "sleep")))
             )
         );
         task.set("expression", "k2");
@@ -130,8 +124,8 @@ public class SwitchTaskDispatcherTest {
         task.set(
             "cases",
             Arrays.asList(
-                ImmutableMap.of("key", "k1", "tasks", Arrays.asList(ImmutableMap.of("type", "print"))),
-                ImmutableMap.of("key", "k2", "tasks", Arrays.asList(ImmutableMap.of("type", "sleep")))
+                Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print"))),
+                Map.of("key", "k2", "tasks", Arrays.asList(Map.of("type", "sleep")))
             )
         );
         task.set("default", Collections.singletonMap("value", "1234"));

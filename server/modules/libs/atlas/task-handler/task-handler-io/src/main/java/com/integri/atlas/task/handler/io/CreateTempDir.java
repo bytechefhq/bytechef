@@ -18,10 +18,12 @@
 
 package com.integri.atlas.task.handler.io;
 
-import com.google.common.io.Files;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,6 +35,10 @@ class CreateTempDir implements TaskHandler<String> {
 
     @Override
     public String handle(TaskExecution aTask) throws IOException {
-        return Files.createTempDir().getAbsolutePath();
+        Path path = Files.createTempDirectory("createTempDir_");
+
+        File file = path.toFile();
+
+        return file.getAbsolutePath();
     }
 }

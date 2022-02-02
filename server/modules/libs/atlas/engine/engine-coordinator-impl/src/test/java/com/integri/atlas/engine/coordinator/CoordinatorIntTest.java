@@ -18,7 +18,6 @@
 
 package com.integri.atlas.engine.coordinator;
 
-import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
@@ -129,9 +128,7 @@ public class CoordinatorIntTest {
         coordinator.setMessageBroker(messageBroker);
 
         Job job = coordinator.create(
-            MapObject.of(
-                ImmutableMap.of("workflowId", workflowId, "inputs", Collections.singletonMap("yourName", "me"))
-            )
+            MapObject.of(Map.of("workflowId", workflowId, "inputs", Collections.singletonMap("yourName", "me")))
         );
 
         Job completedJob = jobRepository.getById(job.getId());

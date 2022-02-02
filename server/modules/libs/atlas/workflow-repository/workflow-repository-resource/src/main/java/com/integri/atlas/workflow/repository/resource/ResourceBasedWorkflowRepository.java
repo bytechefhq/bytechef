@@ -18,7 +18,6 @@
 
 package com.integri.atlas.workflow.repository.resource;
 
-import com.google.common.base.Throwables;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormat;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
@@ -59,7 +58,7 @@ public class ResourceBasedWorkflowRepository implements WorkflowRepository {
             Resource[] resources = resolver.getResources(locationPattern);
             return Arrays.asList(resources).stream().map(r -> read(r)).collect(Collectors.toList());
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -69,7 +68,7 @@ public class ResourceBasedWorkflowRepository implements WorkflowRepository {
             String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length());
             return workflowMapper.readValue(new WorkflowResource(id, aResource, WorkflowFormat.parse(uri)));
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

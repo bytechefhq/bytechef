@@ -18,7 +18,6 @@
 
 package com.integri.atlas.task.handler.media;
 
-import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.time.Duration;
@@ -64,7 +63,7 @@ class Vsplit implements TaskHandler<List<Map<String, Object>>> {
             if (duration - (start + end) < MIN_CHUNK_SIZE) {
                 end = duration - start;
             }
-            chunks.add(ImmutableMap.of("start", start, "end", end));
+            chunks.add(Map.of("start", start, "end", end));
             start = start + end;
         }
         return chunks;

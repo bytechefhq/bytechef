@@ -21,7 +21,6 @@ package com.integri.atlas.engine.core.task.evaluator.spel;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
@@ -31,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -178,10 +178,7 @@ public class SpelTaskEvaluatorTest {
     public void test16() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
         TaskExecution jt = SimpleTaskExecution.of("message", "${item1}-${item2}");
-        TaskExecution evaluated = evaluator.evaluate(
-            jt,
-            new MapContext(ImmutableMap.of("item1", "hello", "item2", "world"))
-        );
+        TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Map.of("item1", "hello", "item2", "world")));
         Assertions.assertEquals("hello-world", evaluated.get("message"));
     }
 
