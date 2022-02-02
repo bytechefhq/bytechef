@@ -20,8 +20,7 @@ package com.integri.atlas.config;
 
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
-import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.core.task.evaluator.spel.TempDir;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
 import com.integri.atlas.engine.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -31,10 +30,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 @Configuration
 @ConditionalOnWorker
@@ -45,16 +44,14 @@ public class WorkerConfiguration {
         TaskHandlerResolver aTaskHandlerResolver,
         MessageBroker aMessageBroker,
         EventPublisher aEventPublisher,
-        Environment aEnvironment
+        TaskEvaluator taskEvaluator
     ) {
         return Worker
             .builder()
             .withTaskHandlerResolver(aTaskHandlerResolver)
             .withMessageBroker(aMessageBroker)
             .withEventPublisher(aEventPublisher)
-            .withTaskEvaluator(
-                SpelTaskEvaluator.builder().methodExecutor("tempDir", new TempDir()).environment(aEnvironment).build()
-            )
+            .withTaskEvaluator(taskEvaluator)
             .build();
     }
 
@@ -62,11 +59,8 @@ public class WorkerConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     TaskHandlerResolver taskDispatcherTaskHandlerResolverAdapter(
         @Lazy TaskHandlerResolver aResolver,
-        Environment aEnvironment
+        TaskEvaluator taskEvaluator
     ) {
-        return new TaskDispatcherAdapterTaskHandlerResolver(
-            aResolver,
-            SpelTaskEvaluator.builder().methodExecutor("tempDir", new TempDir()).environment(aEnvironment).build()
-        );
+        return new TaskDispatcherAdapterTaskHandlerResolver(aResolver, taskEvaluator);
     }
 }

@@ -41,7 +41,7 @@ import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
-import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.task.dispatcher.each.EachTaskDispatcher;
@@ -64,10 +64,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 @Configuration
 @ConditionalOnCoordinator
@@ -95,7 +95,7 @@ public class CoordinatorConfiguration {
     private EventPublisher eventPublisher;
 
     @Autowired
-    private Environment environment;
+    private TaskEvaluator taskEvaluator;
 
     @Bean
     Coordinator coordinator() {
@@ -154,7 +154,7 @@ public class CoordinatorConfiguration {
         taskCompletionHandler.setJobTaskRepository(taskExecutionRepository);
         taskCompletionHandler.setWorkflowRepository(workflowRepository);
         taskCompletionHandler.setEventPublisher(eventPublisher);
-        taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
+        taskCompletionHandler.setTaskEvaluator(taskEvaluator);
         return taskCompletionHandler;
     }
 
@@ -165,7 +165,7 @@ public class CoordinatorConfiguration {
             aTaskCompletionHandler,
             taskDispatcher(),
             contextRepository,
-            SpelTaskEvaluator.builder().environment(environment).build()
+            taskEvaluator
         );
     }
 
@@ -176,7 +176,7 @@ public class CoordinatorConfiguration {
             aTaskCompletionHandler,
             taskDispatcher(),
             contextRepository,
-            SpelTaskEvaluator.builder().environment(environment).build()
+            taskEvaluator
         );
     }
 
@@ -187,7 +187,7 @@ public class CoordinatorConfiguration {
             messageBroker,
             taskDispatcher,
             taskExecutionRepository,
-            SpelTaskEvaluator.builder().environment(environment).build()
+            taskEvaluator
         );
     }
 
@@ -203,7 +203,7 @@ public class CoordinatorConfiguration {
             taskExecutionRepository,
             messageBroker,
             contextRepository,
-            SpelTaskEvaluator.builder().environment(environment).build()
+            taskEvaluator
         );
     }
 
@@ -234,7 +234,7 @@ public class CoordinatorConfiguration {
             counterRepository,
             taskDispatcher(),
             contextRepository,
-            SpelTaskEvaluator.builder().environment(environment).build()
+            taskEvaluator
         );
     }
 
@@ -245,12 +245,7 @@ public class CoordinatorConfiguration {
 
     @Bean
     SubflowJobStatusEventListener subflowJobStatusEventListener() {
-        return new SubflowJobStatusEventListener(
-            jobRepository,
-            taskExecutionRepository,
-            coordinator(),
-            SpelTaskEvaluator.builder().environment(environment).build()
-        );
+        return new SubflowJobStatusEventListener(jobRepository, taskExecutionRepository, coordinator(), taskEvaluator);
     }
 
     @Bean
@@ -260,7 +255,7 @@ public class CoordinatorConfiguration {
         jobExecutor.setJobTaskRepository(taskExecutionRepository);
         jobExecutor.setWorkflowRepository(workflowRepository);
         jobExecutor.setTaskDispatcher(taskDispatcher());
-        jobExecutor.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
+        jobExecutor.setTaskEvaluator(taskEvaluator);
         return jobExecutor;
     }
 
@@ -295,7 +290,7 @@ public class CoordinatorConfiguration {
             messageBroker,
             contextRepository,
             counterRepository,
-            SpelTaskEvaluator.builder().environment(environment).build()
+            taskEvaluator
         );
     }
 
@@ -308,7 +303,7 @@ public class CoordinatorConfiguration {
             .messageBroker(messageBroker)
             .contextRepository(contextRepository)
             .counterRepository(counterRepository)
-            .taskEvaluator(SpelTaskEvaluator.builder().environment(environment).build())
+            .taskEvaluator(taskEvaluator)
             .build();
     }
 
@@ -327,7 +322,7 @@ public class CoordinatorConfiguration {
     ForkTaskDispatcher forkTaskDispatcher(TaskDispatcher aTaskDispatcher) {
         ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
         forkTaskDispatcher.setTaskDispatcher(aTaskDispatcher);
-        forkTaskDispatcher.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
+        forkTaskDispatcher.setTaskEvaluator(taskEvaluator);
         forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepository);
         forkTaskDispatcher.setMessageBroker(messageBroker);
         forkTaskDispatcher.setContextRepository(contextRepository);
