@@ -18,7 +18,6 @@
 
 package com.integri.atlas.engine.core;
 
-import com.integri.atlas.engine.core.file.storage.converter.FileEntryConverter;
 import com.integri.atlas.engine.core.task.SimpleWorkflowTask;
 import com.integri.atlas.engine.core.task.WorkflowTask;
 import java.lang.reflect.Array;
@@ -33,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 
@@ -47,11 +46,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private static final ConversionService conversionService = new DefaultConversionService() {
-        {
-            addConverter(new FileEntryConverter());
-        }
-    };
+    private static final DefaultConversionService conversionService = new DefaultConversionService();
 
     public MapObject() {
         map = new HashMap<>();
@@ -59,6 +54,10 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
     public MapObject(Map<String, Object> aSource) {
         map = new HashMap<String, Object>(aSource);
+    }
+
+    public static void addConverter(Converter<?, ?> converter) {
+        conversionService.addConverter(converter);
     }
 
     @Override
