@@ -29,20 +29,20 @@ import java.util.Map;
  */
 public class IfTaskUtil {
 
-    public static boolean resolveCase(TaskEvaluator taskEvaluator, TaskExecution aIfTask) {
-        List<MapObject> conditions = aIfTask.getList("conditions", MapObject.class);
-        String combineOperation = aIfTask.getRequiredString("combineOperation");
+    public static boolean resolveCase(TaskEvaluator taskEvaluator, TaskExecution ifTask) {
+        List<MapObject> conditions = ifTask.getList("conditions", MapObject.class);
+        String combineOperation = ifTask.getRequiredString("combineOperation");
 
         return taskEvaluator.evaluate(
-            String.join(getBooleanOperator(combineOperation), getConditions(conditions)),
+            String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)),
             Boolean.class
         );
     }
 
-    private static List<String> getConditions(List<MapObject> aConditions) {
-        List<String> conditions = new ArrayList<>();
+    private static List<String> getConditionExpressions(List<MapObject> conditions) {
+        List<String> conditionExpressions = new ArrayList<>();
 
-        for (MapObject condition : aConditions) {
+        for (MapObject condition : conditions) {
             for (String operandType : condition.keySet()) {
                 MapObject conditionParts = condition.get(operandType, MapObject.class);
 
@@ -50,7 +50,7 @@ public class IfTaskUtil {
                     .get(operandType)
                     .get(conditionParts.getRequiredString("operation"));
 
-                conditions.add(
+                conditionExpressions.add(
                     conditionTemplate
                         .replace("${value1}", conditionParts.getRequiredString("value1"))
                         .replace("${value2}", conditionParts.getRequiredString("value2"))
@@ -58,7 +58,7 @@ public class IfTaskUtil {
             }
         }
 
-        return conditions;
+        return conditionExpressions;
     }
 
     private static String getBooleanOperator(String combineOperation) {

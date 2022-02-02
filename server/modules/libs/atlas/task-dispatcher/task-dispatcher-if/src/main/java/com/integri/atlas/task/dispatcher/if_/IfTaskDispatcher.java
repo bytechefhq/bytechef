@@ -44,7 +44,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     private final ContextRepository contextRepository;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
-    private final TaskExecutionRepository taskExecutionRepo;
+    private final TaskExecutionRepository taskExecutionRepository;
     private final TaskEvaluator taskEvaluator;
 
     public IfTaskDispatcher(
@@ -57,16 +57,16 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         this.contextRepository = contextRepository;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
-        taskExecutionRepo = taskExecutionRepository;
+        this.taskExecutionRepository = taskExecutionRepository;
         this.taskEvaluator = taskEvaluator;
     }
 
     @Override
-    public void dispatch(TaskExecution aTask) {
-        SimpleTaskExecution ifTask = SimpleTaskExecution.of(aTask);
+    public void dispatch(TaskExecution taskExecution) {
+        SimpleTaskExecution ifTask = SimpleTaskExecution.of(taskExecution);
         ifTask.setStartTime(new Date());
         ifTask.setStatus(TaskStatus.STARTED);
-        taskExecutionRepo.merge(ifTask);
+        taskExecutionRepository.merge(ifTask);
 
         List<MapObject> tasks;
 
@@ -88,10 +88,10 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
             execution.setPriority(ifTask.getPriority());
             MapContext context = new MapContext(contextRepository.peek(ifTask.getId()));
             contextRepository.push(execution.getId(), context);
-            taskExecutionRepo.create(execution);
+            taskExecutionRepository.create(execution);
             taskDispatcher.dispatch(execution);
         } else {
-            SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
+            SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
             completion.setStartTime(new Date());
             completion.setEndTime(new Date());
             completion.setExecutionTime(0);
