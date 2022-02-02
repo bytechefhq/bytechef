@@ -48,7 +48,7 @@ import com.integri.atlas.task.dispatcher.each.EachTaskDispatcher;
 import com.integri.atlas.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.fork.ForkTaskDispatcher;
 import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandler;
-import com.integri.atlas.task.dispatcher.if_.IfTaskDefinition;
+import com.integri.atlas.task.dispatcher.if_.IfTaskDeclaration;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDispatcher;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
@@ -192,8 +192,8 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskDefinition ifTaskDefinition() {
-        return new IfTaskDefinition();
+    IfTaskDeclaration ifTaskDeclaration() {
+        return new IfTaskDeclaration();
     }
 
     @Bean

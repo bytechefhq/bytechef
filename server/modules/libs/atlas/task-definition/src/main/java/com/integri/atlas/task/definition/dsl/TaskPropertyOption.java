@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition.dsl;
 
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyOptionValue.optionValue;
 
 /**
  * @author Ivica Cardic

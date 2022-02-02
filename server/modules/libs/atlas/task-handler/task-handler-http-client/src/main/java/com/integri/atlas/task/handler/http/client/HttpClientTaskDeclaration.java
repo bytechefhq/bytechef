@@ -16,62 +16,52 @@
 
 package com.integri.atlas.task.handler.http.client;
 
-import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
-import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
-import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.minValue;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.task.definition.dsl.TaskCredential.*;
+import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.minValue;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.multipleValues;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDefinition;
-import com.integri.atlas.engine.core.task.description.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HttpClientTaskDefinition implements TaskDefinition {
+public class HttpClientTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("httpClient")
         .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data")
-        .authentication(
-            authentication()
-                .properties(
-                    OPTION_PROPERTY("authenticationType")
-                        .displayName("Authentication Type")
-                        .options(
-                            option("Basic Auth", "BASIC_AUTH"),
-                            option("Digest Auth", "DIGEST_AUTH"),
-                            option("Header Auth", "HEADER_AUTH"),
-                            option("Query Auth", "QUERY_AUTH"),
-                            option("OAuth2", "OAUTH2"),
-                            option("None", "")
-                        )
-                )
-                .credentials(
-                    credential("httpBasicAuth").required(true).displayOption(show("authenticationType", "BASIC_AUTH")),
-                    credential("httpDigestAuth")
-                        .required(true)
-                        .displayOption(show("authenticationType", "DIGEST_AUTH")),
-                    credential("httpHeaderAuth")
-                        .required(true)
-                        .displayOption(show("authenticationType", "HEADER_AUTH")),
-                    credential("oAuth2Auth").required(true).displayOption(show("authenticationType", "OAUTH2"))
-                )
+        .credentials(
+            credential("httpBasicAuth").required(true).displayOption(show("authenticationType", "BASIC_AUTH")),
+            credential("httpDigestAuth").required(true).displayOption(show("authenticationType", "DIGEST_AUTH")),
+            credential("httpHeaderAuth").required(true).displayOption(show("authenticationType", "HEADER_AUTH")),
+            credential("oAuth2Auth").required(true).displayOption(show("authenticationType", "OAUTH2"))
         )
         .properties(
             //
             // General properties
             //
 
+            OPTION_PROPERTY("authenticationType")
+                .displayName("Authentication Type")
+                .options(
+                    option("Basic Auth", "BASIC_AUTH"),
+                    option("Digest Auth", "DIGEST_AUTH"),
+                    option("Header Auth", "HEADER_AUTH"),
+                    option("Query Auth", "QUERY_AUTH"),
+                    option("OAuth2", "OAUTH2"),
+                    option("None", "")
+                ),
             OPTION_PROPERTY("requestMethod")
                 .displayName("Request Method")
                 .options(
@@ -271,7 +261,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
         );
 
     @Override
-    public TaskSpecification getTaskSpecification() {
+    public TaskSpecification getSpecification() {
         return TASK_SPECIFICATION;
     }
 }

@@ -17,8 +17,8 @@
 package com.integri.atlas.engine.web.rest;
 
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.engine.core.task.TaskDefinition;
-import com.integri.atlas.engine.core.task.description.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,24 +33,24 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class TaskController {
 
-    private final List<TaskDefinition> taskDescriptors;
+    private final List<TaskDeclaration> taskDeclarations;
 
-    public TaskController(List<TaskDefinition> taskDescriptors) {
-        this.taskDescriptors = taskDescriptors;
-    }
-
-    @GetMapping(value = "/tasks")
-    public List<TaskSpecification> getTaskDescriptors() {
-        return taskDescriptors.stream().map(TaskDefinition::getTaskSpecification).collect(Collectors.toList());
+    public TaskController(List<TaskDeclaration> taskDeclarations) {
+        this.taskDeclarations = taskDeclarations;
     }
 
     @GetMapping(value = "/tasks/{name}")
-    public TaskSpecification getTaskDescriptors(@PathVariable("name") String name) {
-        return taskDescriptors
+    public TaskSpecification getTaskSpecification(@PathVariable("name") String name) {
+        return taskDeclarations
             .stream()
-            .map(TaskDefinition::getTaskSpecification)
-            .filter(taskDescription -> Objects.equals(taskDescription.getName(), name))
+            .map(TaskDeclaration::getSpecification)
+            .filter(taskSpecification -> Objects.equals(taskSpecification.getName(), name))
             .findFirst()
             .orElseThrow();
+    }
+
+    @GetMapping(value = "/tasks")
+    public List<TaskSpecification> getTaskSpecifications() {
+        return taskDeclarations.stream().map(TaskDeclaration::getSpecification).collect(Collectors.toList());
     }
 }

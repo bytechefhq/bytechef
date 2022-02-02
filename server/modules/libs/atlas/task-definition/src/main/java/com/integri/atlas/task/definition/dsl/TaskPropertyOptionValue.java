@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition.dsl;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

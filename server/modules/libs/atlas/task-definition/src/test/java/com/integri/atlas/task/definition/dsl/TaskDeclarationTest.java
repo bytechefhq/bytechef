@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition.dsl;
 
-import static com.integri.atlas.engine.core.task.description.DisplayOption.displayOption;
-import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
-import static com.integri.atlas.engine.core.task.description.TaskCredential.credential;
-import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
-import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
-import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyTypeOption.propertyTypeOption;
+import static com.integri.atlas.task.definition.dsl.DisplayOption.displayOption;
+import static com.integri.atlas.task.definition.dsl.TaskCredential.credential;
+import static com.integri.atlas.task.definition.dsl.TaskParameter.parameter;
+import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValue;
+import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyOptionValue.optionValue;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyTypeOption.propertyTypeOption;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,7 +41,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class TaskDescriptionTest {
+public class TaskDeclarationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -645,22 +643,6 @@ public class TaskDescriptionTest {
     }
 
     @Test
-    public void testTaskAuthentication() throws JsonProcessingException, JSONException {
-        TaskAuthentication taskAuthentication = authentication()
-            .credentials(credential())
-            .properties(TaskProperty.STRING_PROPERTY("name"));
-
-        jsonAssertEquals(
-            """
-        {
-            "credentials":[{}],"properties":[{name:"name",type:STRING}]
-        }
-        """,
-            taskAuthentication
-        );
-    }
-
-    @Test
     public void testTaskCredential() throws JsonProcessingException, JSONException {
         TaskCredential taskCredential = credential().displayOption(displayOption()).name("name").required(true);
 
@@ -681,7 +663,7 @@ public class TaskDescriptionTest {
             .displayName("displayName")
             .description("description")
             .subtitle("subtitle")
-            .authentication(authentication().credentials(credential()).properties(TaskProperty.STRING_PROPERTY("name")))
+            .credentials(credential())
             .properties(TaskProperty.STRING_PROPERTY("name"))
             .icon("icon")
             .version(1);
@@ -689,10 +671,7 @@ public class TaskDescriptionTest {
         jsonAssertEquals(
             """
         {
-            "authentication":{
-                "credentials":[{}],
-                "properties":[{name:"name",type:STRING}]
-            },
+            "credentials":[{}],
             "description":"description",
             "displayName":"displayName",
             "name":"name",
@@ -912,14 +891,6 @@ public class TaskDescriptionTest {
         jsonAssertEquals("""
         {
              "parameter1":""
-        }
-        """, taskParameter);
-
-        taskParameter = parameter("parameter1", parameterValue((JsonNode) null));
-
-        jsonAssertEquals("""
-        {
-             "parameter1":"null"
         }
         """, taskParameter);
 

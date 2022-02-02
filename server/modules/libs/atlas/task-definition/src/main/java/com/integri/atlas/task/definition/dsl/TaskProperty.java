@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition.dsl;
 
-import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
+import static com.integri.atlas.task.definition.dsl.TaskParameter.parameter;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -752,7 +751,7 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
             this.type = TaskPropertyType.JSON;
         }
 
-        public JSONTaskProperty defaultValue(JsonNode defaultValue) {
+        public JSONTaskProperty defaultValue(TaskParameter.TaskParameterMap defaultValue) {
             this.defaultValue = parameter(defaultValue);
 
             return this;

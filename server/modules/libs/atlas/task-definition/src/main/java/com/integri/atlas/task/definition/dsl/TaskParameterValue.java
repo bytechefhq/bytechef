@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.task.description;
+package com.integri.atlas.task.definition.dsl;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -35,7 +34,6 @@ public sealed interface TaskParameterValue
     permits
         TaskParameterValue.TaskPropertyValueBoolean,
         TaskParameterValue.TaskPropertyValueDateTime,
-        TaskParameterValue.TaskPropertyValueJSON,
         TaskParameterValue.TaskPropertyValueNumber,
         TaskParameterValue.TaskPropertyValueString {
     static TaskParameterValue parameterValue(boolean value) {
@@ -52,10 +50,6 @@ public sealed interface TaskParameterValue
 
     static TaskParameterValue parameterValue(float value) {
         return new TaskPropertyValueNumber(value);
-    }
-
-    static TaskParameterValue parameterValue(JsonNode value) {
-        return new TaskPropertyValueJSON(value);
     }
 
     static TaskParameterValue parameterValue(LocalDateTime value) {
@@ -83,10 +77,6 @@ public sealed interface TaskParameterValue
     }
 
     static List<TaskParameterValue> parameterValues(Float... values) {
-        return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
-    }
-
-    static List<TaskParameterValue> parameterValues(JsonNode... values) {
         return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
     }
 
@@ -165,42 +155,6 @@ public sealed interface TaskParameterValue
                     jsonGenerator.writeString("");
                 } else {
                     jsonGenerator.writeString(taskPropertyValueDateTime.value.toString());
-                }
-            }
-        }
-    }
-
-    @JsonSerialize(using = TaskPropertyValueJSON.TaskPropertyValueTypeJSONSerializer.class)
-    final class TaskPropertyValueJSON implements TaskParameterValue {
-
-        private JsonNode value;
-
-        private TaskPropertyValueJSON() {}
-
-        private TaskPropertyValueJSON(JsonNode value) {
-            this.value = value;
-        }
-
-        static class TaskPropertyValueTypeJSONSerializer extends StdSerializer<TaskPropertyValueJSON> {
-
-            private TaskPropertyValueTypeJSONSerializer() {
-                this(null);
-            }
-
-            private TaskPropertyValueTypeJSONSerializer(Class<TaskPropertyValueJSON> clazz) {
-                super(clazz);
-            }
-
-            @Override
-            public void serialize(
-                TaskPropertyValueJSON taskPropertyValueJSON,
-                JsonGenerator jsonGenerator,
-                SerializerProvider serializerProvider
-            ) throws IOException {
-                if (taskPropertyValueJSON.value == null) {
-                    jsonGenerator.writeString("null");
-                } else {
-                    jsonGenerator.writeString(taskPropertyValueJSON.value.toString());
                 }
             }
         }

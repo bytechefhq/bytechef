@@ -16,25 +16,25 @@
 
 package com.integri.atlas.task.dispatcher.if_;
 
-import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.DATE_TIME_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.hide;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.DATE_TIME_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.hide;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.multipleValues;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
+import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDefinition;
-import com.integri.atlas.engine.core.task.description.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.dsl.TaskSpecification;
 
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDefinition implements TaskDefinition {
+public class IfTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("if")
@@ -163,7 +163,7 @@ public class IfTaskDefinition implements TaskDefinition {
         );
 
     @Override
-    public TaskSpecification getTaskSpecification() {
+    public TaskSpecification getSpecification() {
         return TASK_SPECIFICATION;
     }
 }
