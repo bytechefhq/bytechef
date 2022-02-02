@@ -16,7 +16,7 @@
 
 package com.integri.atlas.engine;
 
-import com.integri.atlas.engine.coordinator.Coordinator;
+import com.integri.atlas.engine.coordinator.CoordinatorControl;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.task.TaskDefinition;
@@ -33,7 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class TestConfiguration {
 
     @MockBean
-    private Coordinator coordinator;
+    private CoordinatorControl coordinatorControl;
 
     @MockBean
     private JobRepository jobRepository;

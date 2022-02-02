@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.web.rest;
 
-import com.integri.atlas.engine.coordinator.Coordinator;
+import com.integri.atlas.engine.coordinator.CoordinatorControl;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.coordinator.data.Page;
 import com.integri.atlas.engine.coordinator.job.Job;
@@ -51,7 +51,7 @@ public class JobController {
     private JobRepository jobRepository;
 
     @Autowired
-    private Coordinator coordinator;
+    private CoordinatorControl coordinatorControl;
 
     @GetMapping(value = "/jobs")
     public Page<JobSummary> list(@RequestParam(value = "p", defaultValue = "1") Integer aPageNumber) {
@@ -60,7 +60,7 @@ public class JobController {
 
     @PostMapping("/jobs")
     public Job create(@RequestBody Map<String, Object> aJobRequest) {
-        return coordinator.create(aJobRequest);
+        return coordinatorControl.create(aJobRequest);
     }
 
     @GetMapping(value = "/jobs/{id}")
@@ -83,11 +83,11 @@ public class JobController {
 
     @PutMapping(value = "/jobs/{id}/restart")
     public Job restart(@PathVariable("id") String aJobId) {
-        return coordinator.resume(aJobId);
+        return coordinatorControl.resume(aJobId);
     }
 
     @PutMapping(value = "/jobs/{id}/stop")
     public Job step(@PathVariable("id") String aJobId) {
-        return coordinator.stop(aJobId);
+        return coordinatorControl.stop(aJobId);
     }
 }

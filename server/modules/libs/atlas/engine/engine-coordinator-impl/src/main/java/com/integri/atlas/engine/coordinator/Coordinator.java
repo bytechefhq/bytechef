@@ -92,6 +92,7 @@ public class Coordinator implements CoordinatorControl {
      * @return Job
      *           The instance of the Job
      */
+    @Override
     public Job create(Map<String, Object> aJobParams) {
         Assert.notNull(aJobParams, "request can't be null");
         MapObject jobParams = MapObject.of(aJobParams);
@@ -203,6 +204,7 @@ public class Coordinator implements CoordinatorControl {
      *          The id of the job to resume.
      * @return The resumed job
      */
+    @Override
     public Job resume(String aJobId) {
         log.debug("Resuming job {}", aJobId);
         Job job = jobRepository.getById(aJobId);

@@ -19,11 +19,16 @@ package com.integri.atlas.engine.coordinator;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.core.error.Errorable;
 import com.integri.atlas.engine.core.task.TaskExecution;
+import java.util.Map;
 
 public interface CoordinatorControl {
     void complete(TaskExecution completion);
 
+    Job create(Map<String, Object> aJobParams);
+
     void handleError(Errorable errorable);
+
+    Job resume(String aJobId);
 
     Job stop(String jobId);
 }
