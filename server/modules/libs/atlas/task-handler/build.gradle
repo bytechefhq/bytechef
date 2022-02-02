@@ -9,6 +9,8 @@ subprojects {
         compileOnly "org.springframework:spring-context"
         compileOnly project(":modules:libs:atlas:engine:engine-worker-api")
         compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")
+        compileOnly project(":modules:libs:atlas:task-specification")
+
         testImplementation "com.google.guava:guava"
         testImplementation "commons-io:commons-io"
         testImplementation "org.apache.commons:commons-lang3"
@@ -26,6 +28,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:message-broker:message-broker-sync")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
+        testImplementation project(":modules:libs:atlas:task-specification")
         testImplementation project(":modules:libs:atlas:test-support")
         testImplementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
     }
