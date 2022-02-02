@@ -36,7 +36,7 @@ import com.integri.atlas.engine.core.task.description.TaskSpecification;
  */
 public class IfTaskDefinition implements TaskDefinition {
 
-    private static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
+    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("if")
         .displayName("IF")
         .description("Directs a stream based on true/false results of comparisons")
@@ -156,12 +156,10 @@ public class IfTaskDefinition implements TaskDefinition {
                 .defaultValue("ALL"),
             COLLECTION_PROPERTY("caseTrue")
                 .description("List of tasks that will be executed when result of resolving all conditions is TRUE")
-                .displayName("Case TRUE")
-                .placeholder("Add Task"),
+                .displayName("Case TRUE"),
             COLLECTION_PROPERTY("caseFalse")
                 .description("List of tasks that will be executed when result of resolving all conditions is FALSE")
                 .displayName("Case FALSE")
-                .placeholder("Add Task")
         );
 
     @Override
