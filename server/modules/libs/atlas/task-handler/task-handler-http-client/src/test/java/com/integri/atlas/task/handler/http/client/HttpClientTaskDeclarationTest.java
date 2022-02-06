@@ -443,7 +443,7 @@ public class HttpClientTaskDeclarationTest {
                             }
                         },
                         "name":"fileEntry",
-                        "type":"JSON"
+                        "type":"FILE_ENTRY"
                     }
                 ],
                 "version":1.0

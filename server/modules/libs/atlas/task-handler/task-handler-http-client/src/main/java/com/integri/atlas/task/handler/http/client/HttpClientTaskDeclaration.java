@@ -20,8 +20,8 @@ import static com.integri.atlas.task.definition.dsl.TaskCredential.*;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
@@ -247,7 +247,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                                 .defaultValue("")
                         )
                 ),
-            JSON_PROPERTY("fileEntry")
+            FILE_ENTRY_PROPERTY("fileEntry")
                 .displayName("File")
                 .description("The object property which contains a reference to the file with data to upload.")
                 .displayOption(

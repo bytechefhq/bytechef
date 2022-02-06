@@ -65,7 +65,7 @@ public class SpreadsheetFileTaskDeclarationTest {
                         ]
                     },
                     {
-                        "description":"The object property which contains the reference to the spreadsheet file to read from.",
+                        "description":"The object property which contains a reference to the spreadsheet file to read from.",
                         "displayName":"File",
                         "displayOption":{
                             "show":{
@@ -74,7 +74,7 @@ public class SpreadsheetFileTaskDeclarationTest {
                         },
                         "name":"fileEntry",
                         "required":true,
-                        "type":"JSON"
+                        "type":"FILE_ENTRY"
                     },
                                         {
                         "description":"The object property which contains reference to the file with JSON data.",
@@ -87,7 +87,7 @@ public class SpreadsheetFileTaskDeclarationTest {
                         },
                         "name":"fileEntry",
                         "required":true,
-                        "type":"JSON"
+                        "type":"FILE_ENTRY"
                     },
                     {
                         "defaultValue":"CSV",

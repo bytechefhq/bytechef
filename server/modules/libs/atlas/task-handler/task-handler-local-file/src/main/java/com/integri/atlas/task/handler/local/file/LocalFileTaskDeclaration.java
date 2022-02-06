@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.local.file;
 
+import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
@@ -40,7 +41,7 @@ public class LocalFileTaskDeclaration implements TaskDeclaration {
                 .options(option("Read to file", "READ"), option("Write from file", "WRITE"))
                 .defaultValue("READ")
                 .required(true),
-            JSON_PROPERTY("fileEntry")
+            FILE_ENTRY_PROPERTY("fileEntry")
                 .displayName("File")
                 .description("The object property which contains a reference to the file to be written.")
                 .displayOption(show("operation", "WRITE"))
