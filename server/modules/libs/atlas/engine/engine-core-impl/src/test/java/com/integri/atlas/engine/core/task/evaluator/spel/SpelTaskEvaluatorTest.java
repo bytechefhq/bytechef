@@ -21,8 +21,10 @@ package com.integri.atlas.engine.core.task.evaluator.spel;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.io.File;
@@ -30,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
@@ -408,5 +411,25 @@ public class SpelTaskEvaluatorTest {
         MapContext ctx = new MapContext();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals("${config('no.such.property')}", evaluated.getString("myValue"));
+    }
+
+    @Test
+    public void test43() {
+        SpelTaskEvaluator evaluator = SpelTaskEvaluator
+            .builder()
+            .jsonHelper(new JSONHelper(new ObjectMapper()))
+            .build();
+
+        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${parseJSON('{\"field1\": \"value1\"}')}");
+
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
+
+        Assertions.assertEquals(Map.of("field1", "value1"), evaluatedTaskExecution.get("myValue", Map.class));
+
+        taskExecution = SimpleTaskExecution.of("myValue", "${parseJSON('[{\"field1\": \"value1\"}]')}");
+
+        evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
+
+        Assertions.assertEquals(List.of(Map.of("field1", "value1")), evaluatedTaskExecution.get("myValue", List.class));
     }
 }
