@@ -16,7 +16,6 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
@@ -52,11 +51,9 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
     }
 
     private final FileStorageService fileStorageService;
-    private final JSONHelper jsonHelper;
 
-    public SpreadsheetFileTaskHandler(FileStorageService fileStorageService, JSONHelper jsonHelper) {
+    public SpreadsheetFileTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
-        this.jsonHelper = jsonHelper;
     }
 
     @Override

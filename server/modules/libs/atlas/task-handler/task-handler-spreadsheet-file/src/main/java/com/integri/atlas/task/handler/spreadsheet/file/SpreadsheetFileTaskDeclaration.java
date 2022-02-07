@@ -57,11 +57,6 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                 .description("The object property which contains a reference to the spreadsheet file to read from.")
                 .displayOption(show("operation", "READ"))
                 .required(true),
-            FILE_ENTRY_PROPERTY("fileEntry")
-                .displayName("File")
-                .description("The object property which contains reference to the file with JSON data.")
-                .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("FILE")))
-                .required(true),
             OPTION_PROPERTY("fileFormat")
                 .displayName("FileFormat")
                 .description("The format of the file to save the data.")
@@ -111,9 +106,7 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                         .defaultValue("JSON"),
                     GROUP_PROPERTY("range")
                         .displayName("Range")
-                        .description(
-                            "The range to read from the table. If set to a number it will be the starting row."
-                        )
+                        .description("The range to read from the table.")
                         .displayOption(show("operation", "READ"))
                         .fields(
                             NUMBER_PROPERTY("startRow").displayName("Start Row index"),

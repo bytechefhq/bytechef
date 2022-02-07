@@ -76,19 +76,6 @@ public class SpreadsheetFileTaskDeclarationTest {
                         "required":true,
                         "type":"FILE_ENTRY"
                     },
-                                        {
-                        "description":"The object property which contains reference to the file with JSON data.",
-                        "displayName":"File",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"],
-                                 "inputType":["FILE"]
-                            }
-                        },
-                        "name":"fileEntry",
-                        "required":true,
-                        "type":"FILE_ENTRY"
-                    },
                     {
                         "defaultValue":"CSV",
                         "description":"The format of the file to save the data.",
@@ -208,7 +195,7 @@ public class SpreadsheetFileTaskDeclarationTest {
                                 "type":"SELECT"
                             },
                             {
-                                "description":"The range to read from the table. If set to a number it will be the starting row.",
+                                "description":"The range to read from the table.",
                                 "displayName":"Range",
                                 "displayOption":{
                                     "show":{
