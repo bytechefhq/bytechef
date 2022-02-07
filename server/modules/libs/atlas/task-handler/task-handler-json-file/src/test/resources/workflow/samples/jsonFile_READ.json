@@ -1,0 +1,27 @@
+{
+  "label": "JSON File - READ operation",
+  "inputs": [
+    {
+      "name": "fileEntry",
+      "label": "File property",
+      "type": "JSON",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "readFromJSONFile",
+      "value": "${readFromJSONFile}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "readFromJSONFile",
+      "label": "Read from the json file",
+      "type": "jsonFile",
+      "operation": "READ",
+      "fileEntry": "${fileEntry}",
+      "includeEmptyCells": true
+    }
+  ]
+}
