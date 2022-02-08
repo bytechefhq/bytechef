@@ -307,8 +307,8 @@ public class HttpClientTaskDeclarationTest {
                             {
                                 "displayName":"Parameter",
                                 "name":"parameter",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
                                         "defaultValue":"",
                                         "description":"Name of the parameter.",
@@ -357,8 +357,8 @@ public class HttpClientTaskDeclarationTest {
                             {
                                 "displayName":"Parameter",
                                 "name":"parameter",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
                                         "defaultValue":"",
                                         "description":"Name of the parameter.",
@@ -412,8 +412,8 @@ public class HttpClientTaskDeclarationTest {
                             {
                                 "displayName":"Parameter",
                                 "name":"parameter",
-                                "type":"COLLECTION",
-                                "fields":[
+                                "type":"GROUP",
+                                "groupProperties":[
                                     {
                                         "defaultValue":"",
                                         "description":"Name of the parameter.",

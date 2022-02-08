@@ -72,11 +72,11 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
                         .defaultValue(""),
                     GROUP_PROPERTY("range")
                         .displayName("Range")
-                        .description("The range to read from the json array.")
+                        .description("The range to read from the JSON array.")
                         .displayOption(show("operation", "READ"))
-                        .fields(
-                            NUMBER_PROPERTY("startIndex").displayName("Start index of the json array"),
-                            NUMBER_PROPERTY("endIndex").displayName("End index of the json array")
+                        .groupProperties(
+                            NUMBER_PROPERTY("startIndex").displayName("The start index of the JSON array"),
+                            NUMBER_PROPERTY("endIndex").displayName("The end index of the JSON array")
                         )
                 )
         );
