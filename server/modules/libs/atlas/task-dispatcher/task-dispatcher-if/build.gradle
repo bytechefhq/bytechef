@@ -1,4 +1,6 @@
 dependencies {
     api project(":modules:libs:atlas:engine:engine-core-api")
     api project(":modules:libs:atlas:engine:engine-coordinator-api")
+
+    testImplementation project(":modules:libs:atlas:test-support")
 }
