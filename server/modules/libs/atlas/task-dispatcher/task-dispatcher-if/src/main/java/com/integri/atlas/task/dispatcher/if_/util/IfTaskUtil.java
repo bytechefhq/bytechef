@@ -85,8 +85,14 @@ public class IfTaskUtil {
         conditionTemplates.put(
             "dateTime",
             Map.ofEntries(
-                Map.entry("after", "LocalDateTime.parse(${value1}).isAfter(LocalDateTime.parse(${value2}))"),
-                Map.entry("before", "LocalDateTime.parse(${value1}).isBefore(LocalDateTime.parse(${value2}))")
+                Map.entry(
+                    "after",
+                    "T(java.time.LocalDateTime).parse('${value1}').isAfter(T(java.time.LocalDateTime).parse('${value2}'))"
+                ),
+                Map.entry(
+                    "before",
+                    "T(java.time.LocalDateTime).parse('${value1}').isBefore(T(java.time.LocalDateTime).parse('${value2}'))"
+                )
             )
         );
 
@@ -105,14 +111,14 @@ public class IfTaskUtil {
         conditionTemplates.put(
             "string",
             Map.ofEntries(
-                Map.entry("equals", "${value1}.equals(${value2})"),
-                Map.entry("notEquals", "!${value1}.equals(${value2})"),
-                Map.entry("contains", "${value1}.contains(${value2})"),
-                Map.entry("notContains", "!${value1}.contains(${value2})"),
-                Map.entry("startsWith", "${value1}.startsWith(${value2})"),
-                Map.entry("endsWith", "${value1}.endsWith(${value2})"),
-                Map.entry("isEmpty", "${value1}.isEmpty()"),
-                Map.entry("regex", "Pattern.matches(${value1}, ${value2})")
+                Map.entry("equals", "'${value1}'.equals('${value2}')"),
+                Map.entry("notEquals", "!'${value1}'.equals('${value2}')"),
+                Map.entry("contains", "'${value1}'.contains('${value2}')"),
+                Map.entry("notContains", "!'${value1}'.contains('${value2}')"),
+                Map.entry("startsWith", "'${value1}'.startsWith('${value2}')"),
+                Map.entry("endsWith", "'${value1}'.endsWith('${value2}')"),
+                Map.entry("isEmpty", "'${value1}'.isEmpty()"),
+                Map.entry("regex", "'${value1}' matches '${value2}'")
             )
         );
     }
