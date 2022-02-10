@@ -1,0 +1,126 @@
+label: If Task Number Operands
+
+inputs:
+  - name: value1
+    type: number
+    required: true
+
+  - name: value2
+    type: number
+    required: true
+
+outputs:
+  - name: equalsResult
+    value: ${equalsResult}
+
+  - name: notEqualsResult
+    value: ${notEqualsResult}
+
+  - name: greaterResult
+    value: ${greaterResult}
+
+  - name: lessResult
+    value: ${lessResult}
+
+  - name: greaterEqualsResult
+    value: ${greaterEqualsResult}
+
+  - name: lessEqualsResult
+    value: ${lessEqualsResult}
+
+tasks:
+  - type: if
+    conditions:
+      - number:
+          value1: ${value1}
+          operation: equals
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: equalsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: equalsResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - number:
+          value1: ${value1}
+          operation: notEquals
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: notEqualsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: notEqualsResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - number:
+          value1: ${value1}
+          operation: greater
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: greaterResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: greaterResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - number:
+          value1: ${value1}
+          operation: less
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: lessResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: lessResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - number:
+          value1: ${value1}
+          operation: greaterEquals
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: greaterEqualsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: greaterEqualsResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - number:
+          value1: ${value1}
+          operation: lessEquals
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: lessEqualsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: lessEqualsResult
+        type: core/var
+        value: "false branch"
