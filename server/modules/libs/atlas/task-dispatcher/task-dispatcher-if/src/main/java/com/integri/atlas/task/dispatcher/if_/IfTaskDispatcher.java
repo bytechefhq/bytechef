@@ -64,8 +64,10 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     @Override
     public void dispatch(TaskExecution taskExecution) {
         SimpleTaskExecution ifTask = SimpleTaskExecution.of(taskExecution);
+
         ifTask.setStartTime(new Date());
         ifTask.setStatus(TaskStatus.STARTED);
+
         taskExecutionRepository.merge(ifTask);
 
         List<MapObject> tasks;
@@ -78,7 +80,9 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
         if (tasks.size() > 0) {
             MapObject task = tasks.get(0);
+
             SimpleTaskExecution execution = SimpleTaskExecution.of(task);
+
             execution.setId(UUIDGenerator.generate());
             execution.setStatus(TaskStatus.CREATED);
             execution.setCreateTime(new Date());
@@ -86,15 +90,21 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
             execution.setJobId(ifTask.getJobId());
             execution.setParentId(ifTask.getId());
             execution.setPriority(ifTask.getPriority());
+
             MapContext context = new MapContext(contextRepository.peek(ifTask.getId()));
+
             contextRepository.push(execution.getId(), context);
+
             taskExecutionRepository.create(execution);
+
             taskDispatcher.dispatch(execution);
         } else {
             SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
+
             completion.setStartTime(new Date());
             completion.setEndTime(new Date());
             completion.setExecutionTime(0);
+
             messageBroker.send(Queues.COMPLETIONS, completion);
         }
     }
@@ -104,6 +114,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         if (aTask.getType().equals(DSL.IF)) {
             return this;
         }
+
         return null;
     }
 }
