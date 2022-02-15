@@ -1,15 +1,4 @@
 dependencies {
-    implementation "com.google.guava:guava"
-
-    api project(":modules:libs:atlas:engine:engine-core-api")
-    api project(":modules:libs:atlas:engine:engine-coordinator-api")
-    implementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
-    implementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
-    implementation project(":modules:libs:atlas:engine:engine-core-impl")
-    implementation project(":modules:libs:atlas:engine:engine-worker-impl")
-    implementation project(":modules:libs:atlas:message-broker:message-broker-sync")
-    implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
-    implementation project(":modules:libs:atlas:task-handler:task-handler-core")
-
+    testImplementation project(":modules:libs:atlas:task-handler:task-handler-core")
     testImplementation project(":modules:libs:atlas:test-support")
 }
