@@ -14,7 +14,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:json")
         testImplementation project(":modules:libs:atlas:message-broker:message-broker-sync")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
-        testImplementation project(":modules:libs:atlas:file-storage:file-storage-fs")
+        testImplementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
         testImplementation project(":modules:libs:atlas:test-support")
         testImplementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
     }
