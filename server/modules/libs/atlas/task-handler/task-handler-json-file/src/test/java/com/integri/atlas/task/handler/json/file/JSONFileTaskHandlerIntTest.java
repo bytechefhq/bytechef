@@ -23,8 +23,9 @@ import com.atlas.json.JSONArrayUtil;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
+import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.task.handler.BaseTaskHandlerIntTest;
+import com.integri.atlas.task.handler.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -40,7 +41,7 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class JSONFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
+public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Test
     public void testRead() throws IOException {
@@ -48,7 +49,6 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Job job = startJob(
             "samples/jsonFile_READ.json",
-            Map.of("jsonFile", new JSONFileTaskHandler(fileStorageService, jsonHelper)),
             Map.of(
                 "fileEntry",
                 fileStorageService.storeFile(
@@ -73,7 +73,6 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
     public void testWrite() throws IOException {
         Job job = startJob(
             "samples/jsonFile_WRITE.json",
-            Map.of("jsonFile", new JSONFileTaskHandler(fileStorageService, jsonHelper)),
             Map.of("items", JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())))
         );
 
@@ -87,7 +86,6 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
         job =
             startJob(
                 "samples/jsonFile_READ.json",
-                Map.of("jsonFile", new JSONFileTaskHandler(fileStorageService, jsonHelper)),
                 Map.of(
                     "fileEntry",
                     fileStorageService.storeFile(
@@ -106,6 +104,11 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
         );
 
         assertThat(fileEntry.getName()).isEqualTo("file.json");
+    }
+
+    @Override
+    protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
+        return Map.of("jsonFile", new JSONFileTaskHandler(fileStorageService, jsonHelper));
     }
 
     private File getFile(String fileName) throws IOException {
