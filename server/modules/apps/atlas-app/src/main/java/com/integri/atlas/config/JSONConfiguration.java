@@ -19,7 +19,6 @@
 package com.integri.atlas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.json.DefaultJSONHelper;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +40,6 @@ public class JSONConfiguration implements Jackson2ObjectMapperBuilderCustomizer 
 
     @Bean
     public JSONHelper jsonHelper(ObjectMapper objectMapper) {
-        return new DefaultJSONHelper(objectMapper);
+        return new JSONHelper(objectMapper);
     }
 }

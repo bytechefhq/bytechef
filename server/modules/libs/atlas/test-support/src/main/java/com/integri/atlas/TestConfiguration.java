@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.json.DefaultJSONHelper;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
@@ -94,7 +93,7 @@ public class TestConfiguration {
 
     @Bean
     JSONHelper jsonMapper(ObjectMapper objectMapper) {
-        return new DefaultJSONHelper(objectMapper);
+        return new JSONHelper(objectMapper);
     }
 
     @Bean
