@@ -1,9 +1,10 @@
 #!/bin/bash
 
-docker rm -f mysql
+docker rm -f postgres
 
-docker run --name mysql \
-  -e MYSQL_DATABASE=atlas \
-  -e MYSQL_ROOT_PASSWORD=root \
-  -p 3306:3306 \
-  -d mysql/mysql-server:latest
+docker run --name postgres \
+  -e POSTGRES_DB=integri \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  -d postgres:14
