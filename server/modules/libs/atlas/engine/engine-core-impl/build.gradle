@@ -1,5 +1,4 @@
 dependencies {
-    api "com.fasterxml.jackson.core:jackson-databind"
     api project(":modules:libs:atlas:engine:engine-core-api")
 
     implementation "com.google.guava:guava"

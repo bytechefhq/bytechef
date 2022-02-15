@@ -1,6 +1,1 @@
-dependencies {
-    api project(":modules:libs:atlas:engine:engine-core-api")
-    api project(":modules:libs:atlas:engine:engine-coordinator-api")
 
-    implementation "org.springframework:spring-core"
-}

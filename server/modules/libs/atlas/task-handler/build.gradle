@@ -1,6 +1,17 @@
 subprojects {
     dependencies {
+        compileOnly "com.google.guava:guava"
+        compileOnly "commons-io:commons-io"
+        compileOnly "com.fasterxml.jackson.core:jackson-databind"
+        compileOnly "org.apache.commons:commons-lang3"
+        compileOnly "org.slf4j:slf4j-api"
+        compileOnly "org.springframework:spring-core"
+        compileOnly "org.springframework:spring-context"
+        compileOnly project(":modules:libs:atlas:engine:engine-worker-api")
+        compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")
+        testImplementation "com.google.guava:guava"
         testImplementation "commons-io:commons-io"
+        testImplementation "org.apache.commons:commons-lang3"
         testImplementation "org.postgresql:postgresql"
         testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
         testImplementation "org.testcontainers:postgresql"

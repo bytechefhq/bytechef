@@ -1,9 +1,1 @@
-dependencies {
-    api project(":modules:libs:atlas:engine:engine-core-api")
-    api project(":modules:libs:atlas:engine:engine-coordinator-api")
 
-    implementation "org.springframework:spring-core"
-
-    testImplementation "com.google.guava:guava"
-    testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
-}
