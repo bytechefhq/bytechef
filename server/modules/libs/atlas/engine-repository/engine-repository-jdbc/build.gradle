@@ -8,9 +8,10 @@ dependencies {
     runtimeOnly "org.postgresql:postgresql"
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
-    testImplementation "org.postgresql:postgresql"
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
     testImplementation "org.testcontainers:postgresql"
     testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
     testImplementation project(":modules:libs:atlas:test-support")
+
+    testRuntimeOnly "org.postgresql:postgresql"
 }

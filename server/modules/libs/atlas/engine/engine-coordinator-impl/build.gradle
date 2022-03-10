@@ -13,7 +13,6 @@ dependencies {
     implementation "org.springframework.retry:spring-retry"
 
     testImplementation "commons-io:commons-io"
-    testImplementation "org.postgresql:postgresql"
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
     testImplementation "org.testcontainers:postgresql"
     testImplementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
@@ -25,4 +24,6 @@ dependencies {
     testImplementation project(":modules:libs:atlas:message-broker:message-broker-sync")
     testImplementation project(":modules:libs:atlas:test-support")
     testImplementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
+
+    testRuntimeOnly "org.postgresql:postgresql"
 }
