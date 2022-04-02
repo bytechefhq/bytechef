@@ -14,45 +14,19 @@
  * limitations under the License.
  */
 
-package com.atlas.json;
+package com.integri.atlas.json;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.atlas.json.JSONArrayUtil;
-import com.atlas.json.JSONObjectUtil;
-import com.atlas.json.converter.JSONArrayConverter;
-import com.atlas.json.serializer.JSONArrayStdSerializer;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.util.List;
-import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * @author Ivica Cardic
  */
 public class JSONArrayUtilTest {
-
-    private static final ConversionService conversionService = new DefaultConversionService() {
-        {
-            addConverter(new JSONArrayConverter());
-        }
-    };
-
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
-        {
-            SimpleModule simpleModule = new SimpleModule();
-
-            simpleModule.addSerializer(JSONArray.class, new JSONArrayStdSerializer());
-
-            registerModule(simpleModule);
-        }
-    };
 
     @Test
     public void testJSONArrayB() {
@@ -79,27 +53,6 @@ public class JSONArrayUtilTest {
         assertEquals(
             new JSONArray().put(new JSONObject().put("key", "value")),
             JSONArrayUtil.of(List.of(JSONObjectUtil.of("key", "value"))),
-            true
-        );
-    }
-
-    @Test
-    public void testJacksonSerialization() throws JsonProcessingException {
-        assertEquals(
-            """
-            [{"key1": "value1"}, {"key2": "value2"}]""",
-            objectMapper.writeValueAsString(
-                JSONArrayUtil.of(JSONObjectUtil.of("key1", "value1"), JSONObjectUtil.of("key2", "value2"))
-            ),
-            true
-        );
-    }
-
-    @Test
-    public void testConversion() {
-        assertEquals(
-            JSONArrayUtil.of(JSONObjectUtil.of("key1", "value1"), JSONObjectUtil.of("key2", "value2")),
-            conversionService.convert(List.of(Map.of("key1", "value1"), Map.of("key2", "value2")), JSONArray.class),
             true
         );
     }

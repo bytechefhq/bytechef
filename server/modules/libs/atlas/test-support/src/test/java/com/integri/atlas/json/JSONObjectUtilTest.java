@@ -14,45 +14,23 @@
  * limitations under the License.
  */
 
-package com.atlas.json;
+package com.integri.atlas.json;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.atlas.json.JSONArrayUtil;
-import com.atlas.json.JSONObjectUtil;
-import com.atlas.json.converter.JSONObjectConverter;
-import com.atlas.json.serializer.JSONObjectStdSerializer;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.util.List;
 import java.util.Map;
+
+import com.integri.atlas.test.json.JSONArrayUtil;
+import com.integri.atlas.test.json.JSONObjectUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * @author Ivica Cardic
  */
 public class JSONObjectUtilTest {
-
-    private static final ConversionService conversionService = new DefaultConversionService() {
-        {
-            addConverter(new JSONObjectConverter());
-        }
-    };
-
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
-        {
-            SimpleModule simpleModule = new SimpleModule();
-
-            simpleModule.addSerializer(JSONObject.class, new JSONObjectStdSerializer());
-
-            registerModule(simpleModule);
-        }
-    };
 
     @Test
     public void testOf() {
@@ -279,25 +257,6 @@ public class JSONObjectUtilTest {
         assertEquals(
             new JSONObject().put("key", "value1"),
             JSONObjectUtil.of(Map.of("key", "value"), value -> value + 1),
-            true
-        );
-    }
-
-    @Test
-    public void testJacksonSerialization() throws JsonProcessingException {
-        assertEquals(
-            """
-           {"key": "value"}""",
-            objectMapper.writeValueAsString(JSONObjectUtil.of("key", "value")),
-            true
-        );
-    }
-
-    @Test
-    public void testConversion() {
-        assertEquals(
-            JSONObjectUtil.of("key", "value"),
-            conversionService.convert(Map.of("key", "value"), JSONObject.class),
             true
         );
     }

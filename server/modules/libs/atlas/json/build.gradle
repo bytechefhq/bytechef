@@ -1,6 +1,0 @@
-dependencies {
-    api "com.fasterxml.jackson.core:jackson-databind"
-    api "org.json:json"
-
-    implementation "org.springframework:spring-core"
-}
