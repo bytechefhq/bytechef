@@ -39,9 +39,9 @@ public class ParseJSON implements MethodExecutor {
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
         String json = (String) arguments[0];
 
-        try {
+        if (json.startsWith("{")) {
             return new TypedValue(jsonHelper.deserialize(json, Map.class));
-        } catch (RuntimeException e) {
+        } else {
             return new TypedValue(jsonHelper.deserialize(json, List.class));
         }
     }
