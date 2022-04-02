@@ -63,41 +63,41 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        SimpleTaskExecution ifTask = SimpleTaskExecution.of(taskExecution);
+        SimpleTaskExecution ifTaskExecution = SimpleTaskExecution.of(taskExecution);
 
-        ifTask.setStartTime(new Date());
-        ifTask.setStatus(TaskStatus.STARTED);
+        ifTaskExecution.setStartTime(new Date());
+        ifTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionRepository.merge(ifTask);
+        taskExecutionRepository.merge(ifTaskExecution);
 
-        List<MapObject> tasks;
+        List<MapObject> subtaskDefinitions;
 
-        if (IfTaskUtil.resolveCase(taskEvaluator, ifTask)) {
-            tasks = ifTask.getList("caseTrue", MapObject.class);
+        if (IfTaskUtil.resolveCase(taskEvaluator, ifTaskExecution)) {
+            subtaskDefinitions = ifTaskExecution.getList("caseTrue", MapObject.class);
         } else {
-            tasks = ifTask.getList("caseFalse", MapObject.class);
+            subtaskDefinitions = ifTaskExecution.getList("caseFalse", MapObject.class);
         }
 
-        if (tasks.size() > 0) {
-            MapObject task = tasks.get(0);
+        if (subtaskDefinitions.size() > 0) {
+            MapObject taskDefinition = subtaskDefinitions.get(0);
 
-            SimpleTaskExecution execution = SimpleTaskExecution.of(task);
+            SimpleTaskExecution subtaskExecution = SimpleTaskExecution.of(taskDefinition);
 
-            execution.setId(UUIDGenerator.generate());
-            execution.setStatus(TaskStatus.CREATED);
-            execution.setCreateTime(new Date());
-            execution.setTaskNumber(1);
-            execution.setJobId(ifTask.getJobId());
-            execution.setParentId(ifTask.getId());
-            execution.setPriority(ifTask.getPriority());
+            subtaskExecution.setId(UUIDGenerator.generate());
+            subtaskExecution.setStatus(TaskStatus.CREATED);
+            subtaskExecution.setCreateTime(new Date());
+            subtaskExecution.setTaskNumber(1);
+            subtaskExecution.setJobId(ifTaskExecution.getJobId());
+            subtaskExecution.setParentId(ifTaskExecution.getId());
+            subtaskExecution.setPriority(ifTaskExecution.getPriority());
 
-            MapContext context = new MapContext(contextRepository.peek(ifTask.getId()));
+            MapContext context = new MapContext(contextRepository.peek(ifTaskExecution.getId()));
 
-            contextRepository.push(execution.getId(), context);
+            contextRepository.push(subtaskExecution.getId(), context);
 
-            taskExecutionRepository.create(execution);
+            taskExecutionRepository.create(subtaskExecution);
 
-            taskDispatcher.dispatch(execution);
+            taskDispatcher.dispatch(subtaskExecution);
         } else {
             SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
 
@@ -110,8 +110,8 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     }
 
     @Override
-    public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(DSL.IF)) {
+    public TaskDispatcher resolve(Task task) {
+        if (task.getType().equals(DSL.IF)) {
             return this;
         }
 

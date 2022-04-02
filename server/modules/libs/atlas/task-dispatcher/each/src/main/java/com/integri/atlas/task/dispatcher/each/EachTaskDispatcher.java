@@ -50,62 +50,75 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepo;
+    private final TaskExecutionRepository taskExecutionRepository;
     private final MessageBroker messageBroker;
     private final ContextRepository contextRepository;
     private final CounterRepository counterRepository;
 
     public EachTaskDispatcher(
-        TaskDispatcher aTaskDispatcher,
-        TaskExecutionRepository aTaskExecutionRepo,
-        MessageBroker aMessageBroker,
-        ContextRepository aContextRepository,
-        CounterRepository aCounterRepository,
-        TaskEvaluator aTaskEvaluator
+        TaskDispatcher taskDispatcher,
+        TaskExecutionRepository taskExecutionRepository,
+        MessageBroker messageBroker,
+        ContextRepository contextRepository,
+        CounterRepository counterRepository,
+        TaskEvaluator taskEvaluator
     ) {
-        taskDispatcher = aTaskDispatcher;
-        taskExecutionRepo = aTaskExecutionRepo;
-        messageBroker = aMessageBroker;
-        contextRepository = aContextRepository;
-        counterRepository = aCounterRepository;
-        taskEvaluator = aTaskEvaluator;
+        this.taskDispatcher = taskDispatcher;
+        this.taskExecutionRepository = taskExecutionRepository;
+        this.messageBroker = messageBroker;
+        this.contextRepository = contextRepository;
+        this.counterRepository = counterRepository;
+        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
-    public void dispatch(TaskExecution aTask) {
-        List<Object> list = aTask.getList("list", Object.class);
-        Assert.notNull(list, "'list' property can't be null");
-        Map<String, Object> iteratee = aTask.getMap("iteratee");
-        Assert.notNull(iteratee, "'iteratee' property can't be null");
+    public void dispatch(TaskExecution taskExecution) {
+        Map<String, Object> iteratee = taskExecution.getMap("iteratee");
+        List<Object> list = taskExecution.getList("list", Object.class);
 
-        SimpleTaskExecution parentEachTask = SimpleTaskExecution.of(aTask);
-        parentEachTask.setStartTime(new Date());
-        parentEachTask.setStatus(TaskStatus.STARTED);
-        taskExecutionRepo.merge(parentEachTask);
+        Assert.notNull(iteratee, "'iteratee' property can't be null");
+        Assert.notNull(list, "'list' property can't be null");
+
+        SimpleTaskExecution eachTaskExecution = SimpleTaskExecution.of(taskExecution);
+
+        eachTaskExecution.setStartTime(new Date());
+        eachTaskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecutionRepository.merge(eachTaskExecution);
 
         if (list.size() > 0) {
-            counterRepository.set(aTask.getId(), list.size());
+            counterRepository.set(taskExecution.getId(), list.size());
+
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
-                SimpleTaskExecution eachTask = SimpleTaskExecution.of(iteratee);
-                eachTask.setId(UUIDGenerator.generate());
-                eachTask.setParentId(aTask.getId());
-                eachTask.setStatus(TaskStatus.CREATED);
-                eachTask.setJobId(aTask.getJobId());
-                eachTask.setCreateTime(new Date());
-                eachTask.setPriority(aTask.getPriority());
-                eachTask.setTaskNumber(i + 1);
-                MapContext context = new MapContext(contextRepository.peek(aTask.getId()));
-                context.set(aTask.getString("itemVar", "item"), item);
-                context.set(aTask.getString("itemIndex", "itemIndex"), i);
-                contextRepository.push(eachTask.getId(), context);
-                TaskExecution evaluatedEachTask = taskEvaluator.evaluate(eachTask, context);
-                taskExecutionRepo.create(evaluatedEachTask);
-                taskDispatcher.dispatch(evaluatedEachTask);
+                SimpleTaskExecution subtaskTaskExecution = SimpleTaskExecution.of(iteratee);
+
+                subtaskTaskExecution.setId(UUIDGenerator.generate());
+                subtaskTaskExecution.setParentId(taskExecution.getId());
+                subtaskTaskExecution.setStatus(TaskStatus.CREATED);
+                subtaskTaskExecution.setJobId(taskExecution.getJobId());
+                subtaskTaskExecution.setCreateTime(new Date());
+                subtaskTaskExecution.setPriority(taskExecution.getPriority());
+                subtaskTaskExecution.setTaskNumber(i + 1);
+
+                MapContext context = new MapContext(contextRepository.peek(taskExecution.getId()));
+
+                context.set(taskExecution.getString("itemVar", "item"), item);
+                context.set(taskExecution.getString("itemIndex", "itemIndex"), i);
+
+                contextRepository.push(subtaskTaskExecution.getId(), context);
+
+                TaskExecution evaluatedSubtaskExecution = taskEvaluator.evaluate(subtaskTaskExecution, context);
+
+                taskExecutionRepository.create(evaluatedSubtaskExecution);
+
+                taskDispatcher.dispatch(evaluatedSubtaskExecution);
             }
         } else {
-            SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
+            SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
+
             completion.setEndTime(new Date());
+
             messageBroker.send(Queues.COMPLETIONS, completion);
         }
     }
