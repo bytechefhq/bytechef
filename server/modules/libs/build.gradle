@@ -63,4 +63,11 @@ subprojects {
         testImplementation "org.springframework.boot:spring-boot-starter-test"
         testImplementation "org.springframework.boot:spring-boot-starter-web"
     }
+    configurations {
+        all {
+            /* exclude junit 4 dependencies */
+            exclude group: 'junit', module: 'junit'
+            exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        }
+    }
 }
