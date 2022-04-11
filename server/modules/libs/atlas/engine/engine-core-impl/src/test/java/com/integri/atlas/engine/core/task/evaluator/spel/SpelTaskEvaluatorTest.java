@@ -432,4 +432,58 @@ public class SpelTaskEvaluatorTest {
 
         Assertions.assertEquals(List.of(Map.of("field1", "value1")), evaluatedTaskExecution.get("myValue", List.class));
     }
+    @Test
+    public void test45() {
+        SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().xmlHelper(new XMLHelper()).build();
+
+        TaskExecution taskExecution = SimpleTaskExecution.of(
+            "myValue",
+            "${readXML('<root><element>value</element></root>')}"
+        );
+
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
+
+        Assertions.assertEquals(Map.of("element", "value"), evaluatedTaskExecution.get("myValue"));
+
+        taskExecution =
+            SimpleTaskExecution.of(
+                "myValue",
+                "${readXML('<root><element>value1</element><element>value2</element></root>')}"
+            );
+
+        evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
+
+        Assertions.assertEquals(Map.of("element", List.of("value1", "value2")), evaluatedTaskExecution.get("myValue"));
+    }
+
+    @Test
+    public void test46() {
+        SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().xmlHelper(new XMLHelper()).build();
+
+        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${writeXML(map)}");
+
+        MapContext mapContext = new MapContext();
+
+        mapContext.set("map", Map.of("field1", "value1"));
+
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
+
+        Assertions.assertEquals(
+            "<root><field1>value1</field1></root>",
+            evaluatedTaskExecution.get("myValue", String.class)
+        );
+
+        taskExecution = SimpleTaskExecution.of("myValue", "${writeXML(list)}");
+
+        mapContext = new MapContext();
+
+        mapContext.set("list", List.of(Map.of("field", "value1"), Map.of("field", "value2")));
+
+        evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
+
+        Assertions.assertEquals(
+            "<root><item><field>value1</field></item><item><field>value2</field></item></root>",
+            evaluatedTaskExecution.get("myValue", String.class)
+        );
+    }
 }
