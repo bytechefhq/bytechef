@@ -8,7 +8,7 @@ dependencies {
     implementation "org.springframework:spring-context"
     implementation project(":modules:libs:atlas:engine:engine-core-api")
     implementation project(":modules:libs:atlas:message-broker:message-broker-sync")
-    implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-map")
+    implementation project(":modules:libs:atlas:task-dispatcher:map")
 
     testImplementation "org.apache.commons:commons-lang3"
     testImplementation "org.springframework:spring-jdbc"
