@@ -10,14 +10,14 @@
   ],
   "outputs": [
     {
-      "name": "readFromFile",
-      "value": "${readFromFile}"
+      "name": "readLocalFile",
+      "value": "${readLocalFile}"
     }
   ],
   "tasks": [
     {
-      "name": "readFromFile",
-      "label": "Read from file",
+      "name": "readLocalFile",
+      "label": "Read from local file",
       "type": "localFile",
       "operation": "READ",
       "fileName": "${fileName}"

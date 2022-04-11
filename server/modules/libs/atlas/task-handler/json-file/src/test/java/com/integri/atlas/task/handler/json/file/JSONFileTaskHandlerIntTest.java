@@ -64,7 +64,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         JSONAssert.assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-            JSONArrayUtil.of((List<?>) outputs.get("readFromJSONFile")),
+            JSONArrayUtil.of((List<?>) outputs.get("readJSONFile")),
             true
         );
     }
@@ -80,7 +80,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        FileEntry fileEntry = outputs.get("writeToJSONFile", FileEntry.class);
+        FileEntry fileEntry = outputs.get("writeJSONFile", FileEntry.class);
         File sampleFile = getFile("sample.json");
 
         job =
@@ -99,7 +99,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(sampleFile, Charset.defaultCharset())),
-            JSONArrayUtil.of((List<?>) outputs.get("readFromJSONFile")),
+            JSONArrayUtil.of((List<?>) outputs.get("readJSONFile")),
             true
         );
 

@@ -111,7 +111,6 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 TaskExecution evaluatedSubtaskExecution = taskEvaluator.evaluate(subtaskTaskExecution, context);
 
                 taskExecutionRepository.create(evaluatedSubtaskExecution);
-
                 taskDispatcher.dispatch(evaluatedSubtaskExecution);
             }
         } else {

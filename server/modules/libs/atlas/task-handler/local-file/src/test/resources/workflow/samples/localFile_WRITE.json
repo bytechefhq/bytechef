@@ -16,14 +16,14 @@
   ],
   "outputs": [
     {
-      "name": "writeToFile",
-      "value": "${writeToFile}"
+      "name": "writeLocalFile",
+      "value": "${writeLocalFile}"
     }
   ],
   "tasks": [
     {
-      "name": "writeToFile",
-      "label": "Write to file",
+      "name": "writeLocalFile",
+      "label": "Write to the local file",
       "type": "localFile",
       "operation": "WRITE",
       "fileEntry": "${fileEntry}",

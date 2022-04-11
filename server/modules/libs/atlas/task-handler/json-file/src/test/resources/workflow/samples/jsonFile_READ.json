@@ -4,20 +4,20 @@
     {
       "name": "fileEntry",
       "label": "File property",
-      "type": "JSON",
+      "type": "FILE_ENTRY",
       "required": true
     }
   ],
   "outputs": [
     {
-      "name": "readFromJSONFile",
-      "value": "${readFromJSONFile}"
+      "name": "readJSONFile",
+      "value": "${readJSONFile}"
     }
   ],
   "tasks": [
     {
-      "name": "readFromJSONFile",
-      "label": "Read from the json file",
+      "name": "readJSONFile",
+      "label": "Read from the JSON file",
       "type": "jsonFile",
       "operation": "READ",
       "fileEntry": "${fileEntry}",

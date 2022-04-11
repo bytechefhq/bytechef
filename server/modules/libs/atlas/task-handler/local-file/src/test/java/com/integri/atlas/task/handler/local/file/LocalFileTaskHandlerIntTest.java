@@ -54,7 +54,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
             Files.contentOf(getFile(), Charset.defaultCharset())
         );
 
-        assertThat(outputs.get("readFromFile", FileEntry.class))
+        assertThat(outputs.get("readLocalFile", FileEntry.class))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "sample.txt")
@@ -83,7 +83,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        assertThat((Map<?, ?>) outputs.get("writeToFile")).hasFieldOrPropertyWithValue("bytes", 5);
+        assertThat((Map<?, ?>) outputs.get("writeLocalFile")).hasFieldOrPropertyWithValue("bytes", 5);
     }
 
     @Override

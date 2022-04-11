@@ -40,26 +40,26 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("jsonFile")
         .displayName("JSON File")
-        .description("Reads and writes data from a json file")
+        .description("Reads and writes data from a JSON file")
         .properties(
             OPTION_PROPERTY("operation")
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
-                    option("Read from file", "READ", "Reads data from a json file."),
-                    option("Write to file", "WRITE", "Writes the data to a json file.")
+                    option("Read from file", "READ", "Reads data from a JSON file."),
+                    option("Write to file", "WRITE", "Writes the data to a JSON file.")
                 )
                 .defaultValue("READ")
                 .required(true),
             FILE_ENTRY_PROPERTY("fileEntry")
                 .displayName("File")
-                .description("The object property which contains a reference to the json file to read from.")
+                .description("The object property which contains a reference to the JSON file to read from.")
                 .displayOption(show("operation", "READ"))
                 .required(true),
             JSON_PROPERTY("items")
                 .displayName("JSON array of items")
                 .description("Data to write to the file.")
-                .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("JSON")))
+                .displayOption(show("operation", parameterValues("WRITE")))
                 .required(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")

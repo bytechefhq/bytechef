@@ -40,7 +40,7 @@ public class JSONFileTaskDeclarationTest {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Reads and writes data from a json file",
+                "description":"Reads and writes data from a JSON file",
                 "displayName":"JSON File",
                 "name":"jsonFile",
                 "properties":[
@@ -55,17 +55,17 @@ public class JSONFileTaskDeclarationTest {
                             {
                                 "name":"Read from file",
                                 "value":"READ",
-                                "description": "Reads data from a json file."
+                                "description": "Reads data from a JSON file."
                             },
                             {
                                 "name":"Write to file",
                                 "value":"WRITE",
-                                 "description": "Writes the data to a json file."
+                                 "description": "Writes the data to a JSON file."
                             }
                         ]
                     },
                     {
-                        "description":"The object property which contains a reference to the json file to read from.",
+                        "description":"The object property which contains a reference to the JSON file to read from.",
                         "displayName":"File",
                         "displayOption":{
                             "show":{
@@ -81,8 +81,7 @@ public class JSONFileTaskDeclarationTest {
                         "displayName":"JSON array of items",
                         "displayOption":{
                             "show":{
-                                "operation":["WRITE"],
-                                "inputType":["JSON"]
+                                "operation":["WRITE"]
                             }
                         },
                         "name":"items",

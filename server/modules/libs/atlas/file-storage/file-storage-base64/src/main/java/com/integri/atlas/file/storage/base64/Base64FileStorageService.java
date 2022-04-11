@@ -58,23 +58,23 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public String readFileContent(String url) throws FileStorageException {
-        String filePath = getFilePath(url);
+        String fileContent = getFileContent(url);
 
         Base64.Decoder decoder = Base64.getDecoder();
 
-        return new String(decoder.decode(filePath));
+        return new String(decoder.decode(fileContent));
     }
 
     @Override
     public InputStream getFileContentStream(String url) {
         Base64.Decoder decoder = Base64.getDecoder();
 
-        String filePath = getFilePath(url);
+        String fileContent = getFileContent(url);
 
-        return new ByteArrayInputStream(decoder.decode(filePath));
+        return new ByteArrayInputStream(decoder.decode(fileContent));
     }
 
-    private String getFilePath(String url) {
+    private String getFileContent(String url) {
         return url.replace("base64:", "");
     }
 

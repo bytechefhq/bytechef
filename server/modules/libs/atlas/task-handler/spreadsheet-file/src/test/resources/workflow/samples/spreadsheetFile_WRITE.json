@@ -1,5 +1,5 @@
 {
-  "label": "Spreadsheet File - READ operation",
+  "label": "Spreadsheet File - WRITE operation",
   "inputs": [
     {
       "name": "items",
@@ -10,13 +10,13 @@
   ],
   "outputs": [
     {
-      "name": "writeToSpreadsheet",
-      "value": "${writeToBSpreadsheet}"
+      "name": "writeSpreadsheetFile",
+      "value": "${writeSpreadsheetFile}"
     }
   ],
   "tasks": [
     {
-      "name": "writeToBSpreadsheet",
+      "name": "writeSpreadsheetFile",
       "label": "Write to the spreadsheet file",
       "type": "spreadsheetFile",
       "operation": "WRITE",
