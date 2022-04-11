@@ -1,7 +1,6 @@
 dependencies {
     api project(":modules:libs:atlas:engine:engine-worker-api")
 
-    implementation "com.google.guava:guava"
     implementation "commons-io:commons-io"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
