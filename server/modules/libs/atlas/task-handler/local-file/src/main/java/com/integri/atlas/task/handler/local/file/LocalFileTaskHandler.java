@@ -54,7 +54,7 @@ public class LocalFileTaskHandler implements TaskHandler<Object> {
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {
-                result = fileStorageService.storeFile(fileName, inputStream);
+                result = fileStorageService.storeFileContent(fileName, inputStream);
             }
         } else {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);

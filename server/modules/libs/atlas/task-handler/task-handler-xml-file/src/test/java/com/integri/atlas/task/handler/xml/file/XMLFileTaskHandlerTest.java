@@ -48,7 +48,7 @@ public class XMLFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFile(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
 
         assertThat((List<?>) xmlFileTaskHandler.handle(taskExecution))
@@ -56,7 +56,7 @@ public class XMLFileTaskHandlerTest {
 
         taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFile(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
         taskExecution.put("range", Map.of("startIndex", 1, "endIndex", 2));
 

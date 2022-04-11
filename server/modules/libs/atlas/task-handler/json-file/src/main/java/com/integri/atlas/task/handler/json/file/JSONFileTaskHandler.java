@@ -92,7 +92,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                return fileStorageService.storeFile(fileName, inputStream);
+                return fileStorageService.storeFileContent(fileName, inputStream);
             }
         }
 

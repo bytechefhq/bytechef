@@ -39,7 +39,7 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testDelete() {
-        FileEntry fileEntry = fileStorageService.storeFile(
+        FileEntry fileEntry = fileStorageService.storeFileContent(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );
@@ -53,7 +53,7 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testOpenInputStream() throws IOException {
-        FileEntry fileEntry = fileStorageService.storeFile(
+        FileEntry fileEntry = fileStorageService.storeFileContent(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );
@@ -65,7 +65,7 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testRead() {
-        FileEntry fileEntry = fileStorageService.storeFile(
+        FileEntry fileEntry = fileStorageService.storeFileContent(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );
@@ -75,7 +75,7 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testWrite() {
-        FileEntry fileEntry = fileStorageService.storeFile(
+        FileEntry fileEntry = fileStorageService.storeFileContent(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
         );

@@ -25,14 +25,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Ivica Cardic
@@ -100,7 +96,7 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                return fileStorageService.storeFile(fileName, inputStream);
+                return fileStorageService.storeFileContent(fileName, inputStream);
             }
         }
 

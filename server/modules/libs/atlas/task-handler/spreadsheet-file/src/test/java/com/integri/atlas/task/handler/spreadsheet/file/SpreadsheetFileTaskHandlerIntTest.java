@@ -51,7 +51,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskIntTest {
             "samples/spreadsheetFile_READ.json",
             Map.of(
                 "fileEntry",
-                fileStorageService.storeFile(
+                fileStorageService.storeFileContent(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(sampleFile, Charset.defaultCharset())
                 )
@@ -88,7 +88,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskIntTest {
                 "samples/spreadsheetFile_READ.json",
                 Map.of(
                     "fileEntry",
-                    fileStorageService.storeFile(
+                    fileStorageService.storeFileContent(
                         sampleFile.getName(),
                         Files.contentOf(sampleFile, Charset.defaultCharset())
                     )

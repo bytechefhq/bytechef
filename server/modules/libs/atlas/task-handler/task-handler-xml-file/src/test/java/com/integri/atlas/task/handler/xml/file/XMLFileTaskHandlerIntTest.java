@@ -24,7 +24,6 @@ import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.xml.XMLHelper;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.json.JSONArrayUtil;
 import com.integri.atlas.task.handler.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +51,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
             "samples/xmlFile_READ.json",
             Map.of(
                 "fileEntry",
-                fileStorageService.storeFile(
+                fileStorageService.storeFileContent(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(sampleFile, Charset.defaultCharset())
                 )
@@ -91,7 +90,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
                 "samples/xmlFile_READ.json",
                 Map.of(
                     "fileEntry",
-                    fileStorageService.storeFile(
+                    fileStorageService.storeFileContent(
                         sampleFile.getName(),
                         Files.contentOf(sampleFile, Charset.defaultCharset())
                     )

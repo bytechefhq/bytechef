@@ -26,11 +26,11 @@ import org.springframework.expression.TypedValue;
  *
  * @author Ivica Cardic
  */
-public class StoreFile implements MethodExecutor {
+public class StoreFileContent implements MethodExecutor {
 
     private final FileStorageService fileStorageService;
 
-    public StoreFile(FileStorageService fileStorageService) {
+    public StoreFileContent(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
@@ -45,6 +45,6 @@ public class StoreFile implements MethodExecutor {
             data = String.valueOf(arguments[1]);
         }
 
-        return new TypedValue(fileStorageService.storeFile(fileName, data));
+        return new TypedValue(fileStorageService.storeFileContent(fileName, data));
     }
 }

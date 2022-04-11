@@ -27,9 +27,9 @@ public interface FileStorageService {
 
     boolean fileExists(String url) throws FileStorageException;
 
-    FileEntry storeFile(String fileName, String data) throws FileStorageException;
+    FileEntry storeFileContent(String fileName, String data) throws FileStorageException;
 
-    FileEntry storeFile(String fileName, InputStream inputStream) throws FileStorageException;
+    FileEntry storeFileContent(String fileName, InputStream inputStream) throws FileStorageException;
 
     String readFileContent(String url) throws FileStorageException;
 

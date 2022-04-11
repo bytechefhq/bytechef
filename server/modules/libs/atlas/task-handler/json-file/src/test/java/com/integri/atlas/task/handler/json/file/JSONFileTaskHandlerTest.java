@@ -55,7 +55,7 @@ public class JSONFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFile(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
 
         assertEquals(
@@ -66,7 +66,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFile(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
         taskExecution.put("range", Map.of("startIndex", 1, "endIndex", 3));
 
