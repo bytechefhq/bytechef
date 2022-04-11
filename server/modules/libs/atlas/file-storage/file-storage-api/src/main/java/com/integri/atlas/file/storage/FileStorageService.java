@@ -23,6 +23,10 @@ import java.io.InputStream;
  * @author Ivica Cardic
  */
 public interface FileStorageService {
+    void deleteFile(String url) throws FileStorageException;
+
+    boolean fileExists(String url) throws FileStorageException;
+
     FileEntry storeFile(String fileName, String data) throws FileStorageException;
 
     FileEntry storeFile(String fileName, InputStream inputStream) throws FileStorageException;

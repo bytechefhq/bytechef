@@ -42,6 +42,26 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
+    public void deleteFile(String url) throws FileStorageException {
+        Path path = resolveDirectory();
+        String filePath = getFilePath(url);
+
+        try {
+            Files.delete(path.resolve(filePath));
+        } catch (IOException ioe) {
+            throw new FileStorageException("Failed to delete file " + filePath, ioe);
+        }
+    }
+
+    @Override
+    public boolean fileExists(String url) throws FileStorageException {
+        Path path = resolveDirectory();
+        String filePath = getFilePath(url);
+
+        return path.resolve(filePath).toFile().exists();
+    }
+
+    @Override
     public FileEntry storeFile(String fileName, String data) throws FileStorageException {
         return storeFile(fileName, new ByteArrayInputStream(data.getBytes()));
     }

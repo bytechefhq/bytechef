@@ -38,6 +38,20 @@ public class FileSystemFileStorageServiceTest {
     );
 
     @Test
+    public void testDelete() {
+        FileEntry fileEntry = fileStorageService.storeFile(
+            "fileName.txt",
+            new ByteArrayInputStream(TEST_STRING.getBytes())
+        );
+
+        Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl())).isEqualTo(TEST_STRING);
+
+        fileStorageService.deleteFile(fileEntry.getUrl());
+
+        Assertions.assertThat(fileStorageService.fileExists(fileEntry.getUrl())).isFalse();
+    }
+
+    @Test
     public void testOpenInputStream() throws IOException {
         FileEntry fileEntry = fileStorageService.storeFile(
             "fileName.txt",
