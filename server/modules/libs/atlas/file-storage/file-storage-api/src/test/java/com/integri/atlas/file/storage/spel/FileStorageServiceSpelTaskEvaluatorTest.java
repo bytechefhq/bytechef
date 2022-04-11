@@ -20,6 +20,7 @@ import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.util.Base64;
 import org.assertj.core.api.Assertions;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ReadFileTest {
+public class FileStorageServiceSpelTaskEvaluatorTest {
 
     @Test
     public void testReadFile() {
@@ -49,5 +50,25 @@ public class ReadFileTest {
         );
 
         Assertions.assertThat((String) taskExecution.get("fileContent")).isEqualTo("data");
+    }
+
+    @Test
+    public void testStoreFile() {
+        SpelTaskEvaluator evaluator = SpelTaskEvaluator
+            .builder()
+            .methodExecutor("storeFile", new StoreFile(new Base64FileStorageService()))
+            .build();
+
+        TaskExecution taskExecution = evaluator.evaluate(
+            SimpleTaskExecution.of("fileEntry", "${storeFile('sample.txt', 'data')}"),
+            new MapContext()
+        );
+
+        Assertions
+            .assertThat((FileEntry) taskExecution.get("fileEntry"))
+            .hasFieldOrPropertyWithValue("url", "base64:" + Base64.getEncoder().encodeToString("data".getBytes()))
+            .hasFieldOrPropertyWithValue("extension", "txt")
+            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
+            .hasFieldOrPropertyWithValue("name", "sample.txt");
     }
 }
