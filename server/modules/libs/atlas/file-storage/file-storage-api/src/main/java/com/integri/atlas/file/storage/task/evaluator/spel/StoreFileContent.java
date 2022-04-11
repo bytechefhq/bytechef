@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.file.storage.spel;
+package com.integri.atlas.file.storage.task.evaluator.spel;
 
 import com.integri.atlas.file.storage.FileStorageService;
 import org.springframework.expression.AccessException;
@@ -26,18 +26,25 @@ import org.springframework.expression.TypedValue;
  *
  * @author Ivica Cardic
  */
-public class ReadFile implements MethodExecutor {
+public class StoreFile implements MethodExecutor {
 
     private final FileStorageService fileStorageService;
 
-    public ReadFile(FileStorageService fileStorageService) {
+    public StoreFile(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        String fileUrl = (String) arguments[0];
+        String data;
+        String fileName = (String) arguments[0];
 
-        return new TypedValue(fileStorageService.readFileContent(fileUrl));
+        if (arguments[1] instanceof String) {
+            data = (String) arguments[1];
+        } else {
+            data = String.valueOf(arguments[1]);
+        }
+
+        return new TypedValue(fileStorageService.storeFile(fileName, data));
     }
 }
