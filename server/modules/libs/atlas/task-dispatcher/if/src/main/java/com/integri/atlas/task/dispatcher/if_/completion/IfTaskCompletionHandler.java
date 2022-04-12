@@ -91,25 +91,24 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subtaskDefinitions.size()) {
             MapObject subtaskDefinition = subtaskDefinitions.get(taskExecution.getTaskNumber());
 
-            SimpleTaskExecution subtaskExecution = SimpleTaskExecution.of(subtaskDefinition);
+            SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(subtaskDefinition);
 
-            subtaskExecution.setId(UUIDGenerator.generate());
-            subtaskExecution.setStatus(TaskStatus.CREATED);
-            subtaskExecution.setCreateTime(new Date());
-            subtaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
-            subtaskExecution.setJobId(ifTaskExecution.getJobId());
-            subtaskExecution.setParentId(ifTaskExecution.getId());
-            subtaskExecution.setPriority(ifTaskExecution.getPriority());
+            subTaskExecution.setId(UUIDGenerator.generate());
+            subTaskExecution.setStatus(TaskStatus.CREATED);
+            subTaskExecution.setCreateTime(new Date());
+            subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
+            subTaskExecution.setJobId(ifTaskExecution.getJobId());
+            subTaskExecution.setParentId(ifTaskExecution.getId());
+            subTaskExecution.setPriority(ifTaskExecution.getPriority());
 
             MapContext context = new MapContext(contextRepository.peek(ifTaskExecution.getId()));
 
-            contextRepository.push(subtaskExecution.getId(), context);
+            contextRepository.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedExecution = taskEvaluator.evaluate(subtaskExecution, context);
+            TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionRepository.create(evaluatedExecution);
-
-            taskDispatcher.dispatch(evaluatedExecution);
+            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskDispatcher.dispatch(evaluatedSubTaskExecution);
         }
         // no more tasks to execute -- complete the If
         else {

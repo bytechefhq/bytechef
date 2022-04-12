@@ -134,11 +134,11 @@ public class CoordinatorConfiguration {
         taskCompletionHandlerChain.setTaskCompletionHandlers(
             Arrays.asList(
                 eachTaskCompletionHandler(taskCompletionHandlerChain),
+                forkTaskCompletionHandler(taskCompletionHandlerChain),
+                ifTaskCompletionHandler(taskCompletionHandlerChain),
                 mapTaskCompletionHandler(taskCompletionHandlerChain),
                 parallelTaskCompletionHandler(taskCompletionHandlerChain),
-                forkTaskCompletionHandler(taskCompletionHandlerChain),
                 switchTaskCompletionHandler(taskCompletionHandlerChain),
-                ifTaskCompletionHandler(taskCompletionHandlerChain),
                 defaultTaskCompletionHandler()
             )
         );
@@ -159,10 +159,16 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    SwitchTaskCompletionHandler switchTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-        return new SwitchTaskCompletionHandler(
+    EachTaskCompletionHandler eachTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new EachTaskCompletionHandler(taskExecutionRepository, aTaskCompletionHandler, counterRepository);
+    }
+
+    @Bean
+    ForkTaskCompletionHandler forkTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new ForkTaskCompletionHandler(
             taskExecutionRepository,
             aTaskCompletionHandler,
+            counterRepository,
             taskDispatcher(),
             contextRepository,
             taskEvaluator
@@ -181,38 +187,6 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher) {
-        return new IfTaskDispatcher(
-            contextRepository,
-            messageBroker,
-            taskDispatcher,
-            taskExecutionRepository,
-            taskEvaluator
-        );
-    }
-
-    @Bean
-    IfTaskDeclaration ifTaskDeclaration() {
-        return new IfTaskDeclaration();
-    }
-
-    @Bean
-    SwitchTaskDispatcher switchTaskDispatcher(TaskDispatcher aTaskDispatcher) {
-        return new SwitchTaskDispatcher(
-            aTaskDispatcher,
-            taskExecutionRepository,
-            messageBroker,
-            contextRepository,
-            taskEvaluator
-        );
-    }
-
-    @Bean
-    EachTaskCompletionHandler eachTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-        return new EachTaskCompletionHandler(taskExecutionRepository, aTaskCompletionHandler, counterRepository);
-    }
-
-    @Bean
     MapTaskCompletionHandler mapTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
         return new MapTaskCompletionHandler(taskExecutionRepository, aTaskCompletionHandler, counterRepository);
     }
@@ -227,25 +201,19 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    ForkTaskCompletionHandler forkTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-        return new ForkTaskCompletionHandler(
+    SubflowJobStatusEventListener subflowJobStatusEventListener() {
+        return new SubflowJobStatusEventListener(jobRepository, taskExecutionRepository, coordinator(), taskEvaluator);
+    }
+
+    @Bean
+    SwitchTaskCompletionHandler switchTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new SwitchTaskCompletionHandler(
             taskExecutionRepository,
             aTaskCompletionHandler,
-            counterRepository,
             taskDispatcher(),
             contextRepository,
             taskEvaluator
         );
-    }
-
-    @Bean
-    SubflowTaskDispatcher subflowTaskDispatcher() {
-        return new SubflowTaskDispatcher(messageBroker);
-    }
-
-    @Bean
-    SubflowJobStatusEventListener subflowJobStatusEventListener() {
-        return new SubflowJobStatusEventListener(jobRepository, taskExecutionRepository, coordinator(), taskEvaluator);
     }
 
     @Bean
@@ -265,21 +233,39 @@ public class CoordinatorConfiguration {
         List<TaskDispatcherResolver> resolvers = Arrays.asList(
             eachTaskDispatcher(taskDispatcher),
             ifTaskDispatcher(taskDispatcher),
+            forkTaskDispatcher(taskDispatcher),
             mapTaskDispatcher(taskDispatcher),
             parallelTaskDispatcher(taskDispatcher),
-            forkTaskDispatcher(taskDispatcher),
             switchTaskDispatcher(taskDispatcher),
             controlTaskDispatcher(),
             subflowTaskDispatcher(),
-            workTaskDispatcher()
+            defaultTaskDispatcher()
         );
+
         taskDispatcher.setResolvers(resolvers);
+
         return taskDispatcher;
     }
 
     @Bean
     ControlTaskDispatcher controlTaskDispatcher() {
         return new ControlTaskDispatcher(messageBroker);
+    }
+
+    @Bean
+    DefaultTaskDispatcher defaultTaskDispatcher() {
+        return new DefaultTaskDispatcher(messageBroker);
+    }
+
+    @Bean
+    IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher) {
+        return new IfTaskDispatcher(
+            contextRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepository,
+            taskEvaluator
+        );
     }
 
     @Bean
@@ -292,6 +278,18 @@ public class CoordinatorConfiguration {
             counterRepository,
             taskEvaluator
         );
+    }
+
+    @Bean
+    ForkTaskDispatcher forkTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
+        forkTaskDispatcher.setTaskDispatcher(aTaskDispatcher);
+        forkTaskDispatcher.setTaskEvaluator(taskEvaluator);
+        forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepository);
+        forkTaskDispatcher.setMessageBroker(messageBroker);
+        forkTaskDispatcher.setContextRepository(contextRepository);
+        forkTaskDispatcher.setCounterRepository(counterRepository);
+        return forkTaskDispatcher;
     }
 
     @Bean
@@ -319,20 +317,24 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    ForkTaskDispatcher forkTaskDispatcher(TaskDispatcher aTaskDispatcher) {
-        ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
-        forkTaskDispatcher.setTaskDispatcher(aTaskDispatcher);
-        forkTaskDispatcher.setTaskEvaluator(taskEvaluator);
-        forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepository);
-        forkTaskDispatcher.setMessageBroker(messageBroker);
-        forkTaskDispatcher.setContextRepository(contextRepository);
-        forkTaskDispatcher.setCounterRepository(counterRepository);
-        return forkTaskDispatcher;
+    SubflowTaskDispatcher subflowTaskDispatcher() {
+        return new SubflowTaskDispatcher(messageBroker);
     }
 
     @Bean
-    DefaultTaskDispatcher workTaskDispatcher() {
-        return new DefaultTaskDispatcher(messageBroker);
+    SwitchTaskDispatcher switchTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        return new SwitchTaskDispatcher(
+            aTaskDispatcher,
+            taskExecutionRepository,
+            messageBroker,
+            contextRepository,
+            taskEvaluator
+        );
+    }
+
+    @Bean
+    IfTaskDeclaration ifTaskDeclaration() {
+        return new IfTaskDeclaration();
     }
 
     @Bean
