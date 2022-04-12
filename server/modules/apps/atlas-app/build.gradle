@@ -33,6 +33,7 @@ dependencies {
     implementation project(":modules:libs:atlas:task-dispatcher:if")
     implementation project(":modules:libs:atlas:task-dispatcher:map")
     implementation project(":modules:libs:atlas:task-dispatcher:parallel")
+    implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-sequence")
     implementation project(":modules:libs:atlas:task-dispatcher:subflow")
     implementation project(":modules:libs:atlas:task-dispatcher:switch")
     implementation project(":modules:libs:atlas:task-handler:bento4")

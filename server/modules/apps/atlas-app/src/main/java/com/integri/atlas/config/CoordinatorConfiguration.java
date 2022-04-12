@@ -55,6 +55,9 @@ import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
 import com.integri.atlas.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.integri.atlas.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
+import com.integri.atlas.task.dispatcher.sequence.SequenceTaskDeclaration;
+import com.integri.atlas.task.dispatcher.sequence.SequenceTaskDispatcher;
+import com.integri.atlas.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.integri.atlas.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
 import com.integri.atlas.task.dispatcher.switch_.SwitchTaskDispatcher;
@@ -138,6 +141,7 @@ public class CoordinatorConfiguration {
                 ifTaskCompletionHandler(taskCompletionHandlerChain),
                 mapTaskCompletionHandler(taskCompletionHandlerChain),
                 parallelTaskCompletionHandler(taskCompletionHandlerChain),
+                sequenceTaskCompletionHandler(taskCompletionHandlerChain),
                 switchTaskCompletionHandler(taskCompletionHandlerChain),
                 defaultTaskCompletionHandler()
             )
@@ -201,6 +205,17 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
+    SequenceTaskCompletionHandler sequenceTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new SequenceTaskCompletionHandler(
+            taskExecutionRepository,
+            aTaskCompletionHandler,
+            taskDispatcher(),
+            contextRepository,
+            taskEvaluator
+        );
+    }
+
+    @Bean
     SubflowJobStatusEventListener subflowJobStatusEventListener() {
         return new SubflowJobStatusEventListener(jobRepository, taskExecutionRepository, coordinator(), taskEvaluator);
     }
@@ -236,6 +251,7 @@ public class CoordinatorConfiguration {
             forkTaskDispatcher(taskDispatcher),
             mapTaskDispatcher(taskDispatcher),
             parallelTaskDispatcher(taskDispatcher),
+            sequenceTaskDispatcher(taskDispatcher),
             switchTaskDispatcher(taskDispatcher),
             controlTaskDispatcher(),
             subflowTaskDispatcher(),
@@ -317,6 +333,17 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
+    SequenceTaskDispatcher sequenceTaskDispatcher(TaskDispatcher taskDispatcher) {
+        return new SequenceTaskDispatcher(
+            contextRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepository,
+            taskEvaluator
+        );
+    }
+
+    @Bean
     SubflowTaskDispatcher subflowTaskDispatcher() {
         return new SubflowTaskDispatcher(messageBroker);
     }
@@ -335,6 +362,11 @@ public class CoordinatorConfiguration {
     @Bean
     IfTaskDeclaration ifTaskDeclaration() {
         return new IfTaskDeclaration();
+    }
+
+    @Bean
+    SequenceTaskDeclaration sequenceTaskDeclaration() {
+        return new SequenceTaskDeclaration();
     }
 
     @Bean

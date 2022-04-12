@@ -87,6 +87,8 @@ public class DSL {
 
     public static final String PARALLEL = "parallel";
 
+    public static final String SEQUENCE = "sequence";
+
     public static final String FORK = "fork";
 
     public static final String CURRENT_TASK = "currentTask";
