@@ -9,7 +9,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
         testImplementation project(":modules:libs:atlas:engine:engine-worker-impl")
         testImplementation project(":modules:libs:atlas:task-definition")
-        testImplementation project(":modules:libs:atlas:task-handler:core")
+        testImplementation project(":modules:libs:atlas:task-handler:task-handler-core")
         testImplementation project(":modules:libs:atlas:test-support")
 
         testRuntimeOnly "org.testcontainers:postgresql"
