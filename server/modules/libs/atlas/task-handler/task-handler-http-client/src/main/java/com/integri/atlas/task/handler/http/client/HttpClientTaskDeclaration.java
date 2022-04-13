@@ -74,9 +74,9 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                 )
                 .description("The request method to use.")
                 .defaultValue("GET"),
-            STRING_PROPERTY("url")
-                .displayName("URL")
-                .description("The URL to make the request to")
+            STRING_PROPERTY("uri")
+                .displayName("URI")
+                .description("The URI to make the request to")
                 .placeholder("http://example.com/index.html")
                 .defaultValue("")
                 .required(true),
@@ -179,7 +179,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                 .displayOption(show("rawParameters", true))
                 .defaultValue(""),
             COLLECTION_PROPERTY("queryParametersKeyValue")
-                .displayName("Header Parameters")
+                .displayName("Query Parameters")
                 .description("Query parameters to send.")
                 .displayOption(show("rawParameters", parameterValues(false)))
                 .defaultValue("")

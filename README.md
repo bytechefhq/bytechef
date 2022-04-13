@@ -60,7 +60,7 @@ tasks:
     endInclusive: 10000              --+
                             
   - label: Print a greeting 
-    type: io/print             
+    type: io/print        
     text: Hello ${yourName} 
                            
   - label: Sleep a little
@@ -122,7 +122,7 @@ Applies the function `iteratee` to each item in `list`, in parallel. Note, that 
   list: [1000,2000,3000]
   iteratee:
     type: time/sleep         
-    millis: ${item} 
+    millis: ${item}
 ```
 
 This will generate three parallel tasks, one for each items in the list, which will `sleep` for 1, 2 and 3 seconds respectively.
