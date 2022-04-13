@@ -36,13 +36,13 @@ import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatche
 import com.integri.atlas.engine.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
+import com.integri.atlas.engine.core.counter.repository.CounterRepository;
 import com.integri.atlas.engine.core.error.ErrorHandler;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.task.dispatcher.each.EachTaskDispatcher;
 import com.integri.atlas.task.dispatcher.each.completion.EachTaskCompletionHandler;

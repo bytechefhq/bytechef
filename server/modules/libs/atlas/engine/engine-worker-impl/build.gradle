@@ -6,6 +6,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation project(":modules:libs:atlas:engine:engine-core-api")
+    implementation project(":modules:libs:atlas:engine-repository:engine-repository-memory")
     implementation project(":modules:libs:atlas:message-broker:message-broker-sync")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-map")
 
