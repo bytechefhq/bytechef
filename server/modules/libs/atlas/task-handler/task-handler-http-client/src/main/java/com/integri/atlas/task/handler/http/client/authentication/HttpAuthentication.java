@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.http.client;
+package com.integri.atlas.task.handler.http.client.authentication;
 
-public class HttpClientTaskHandlerTest {}
+/**
+ * @author Matija Petanjek
+ */
+public interface HttpAuthentication {
+    public String getAuthorizationHeader() throws Exception;
+}
