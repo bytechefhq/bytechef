@@ -52,3 +52,4 @@ dependencies {
     implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
     implementation project(":modules:libs:atlas:task-handler:task-handler-transform-json")
 }
+
