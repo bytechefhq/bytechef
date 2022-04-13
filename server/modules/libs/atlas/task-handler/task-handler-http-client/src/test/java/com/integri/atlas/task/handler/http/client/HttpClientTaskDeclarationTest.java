@@ -150,9 +150,9 @@ public class HttpClientTaskDeclarationTest {
                     },
                     {
                         "defaultValue":"",
-                        "description":"The URL to make the request to",
-                        "displayName":"URL",
-                        "name":"url",
+                        "description":"The URI to make the request to",
+                        "displayName":"URI",
+                        "name":"uri",
                         "required":true,
                         "type":"STRING",
                         "placeholder":"http://example.com/index.html"
@@ -342,7 +342,7 @@ public class HttpClientTaskDeclarationTest {
                     {
                         "defaultValue":"",
                         "description":"Query parameters to send.",
-                        "displayName":"Header Parameters",
+                        "displayName":"Query Parameters",
                         "displayOption":{
                             "show":{
                                 "rawParameters":[false]

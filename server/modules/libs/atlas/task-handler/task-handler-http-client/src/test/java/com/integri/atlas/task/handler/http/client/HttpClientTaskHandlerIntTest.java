@@ -50,7 +50,7 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
 
     @BeforeAll
     public static void setUp() throws IOException {
-        httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
+        httpServer = HttpServer.create(new InetSocketAddress("localhost", 8081), 0);
         executorService = Executors.newFixedThreadPool(5);
         httpServer.setExecutor(executorService);
         httpServer.createContext("/test", new TestHttpHandler());
