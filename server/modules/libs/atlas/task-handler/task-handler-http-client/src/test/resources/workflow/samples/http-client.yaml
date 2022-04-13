@@ -1,0 +1,12 @@
+label: Http Client Test
+
+tasks:
+  - type: httpClient
+    requestMethod: GET
+    authenticationType: BASIC_AUTH
+    uri: http://localhost:8080/test
+    responseFormat: JSON
+    name: testResponse
+    credentials:
+      username: username
+      password: password
