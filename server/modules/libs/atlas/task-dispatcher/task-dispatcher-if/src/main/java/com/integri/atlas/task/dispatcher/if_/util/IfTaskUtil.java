@@ -23,20 +23,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
  * @author Matija Petanjek
  */
 public class IfTaskUtil {
 
-    public static boolean resolveCase(TaskEvaluator taskEvaluator, TaskExecution ifTask) {
+    private static final ExpressionParser expressionParser = new SpelExpressionParser();
+
+    public static boolean resolveCase(TaskExecution ifTask) {
         List<MapObject> conditions = ifTask.getList("conditions", MapObject.class);
         String combineOperation = ifTask.getRequiredString("combineOperation");
 
-        return taskEvaluator.evaluate(
-            String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)),
-            Boolean.class
-        );
+        return expressionParser
+            .parseExpression(String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)))
+            .getValue(Boolean.class);
     }
 
     private static List<String> getConditionExpressions(List<MapObject> conditions) {

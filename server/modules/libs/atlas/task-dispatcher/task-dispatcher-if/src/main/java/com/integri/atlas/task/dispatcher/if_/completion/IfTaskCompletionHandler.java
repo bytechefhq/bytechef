@@ -82,7 +82,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
         List<MapObject> subtaskDefinitions;
 
-        if (IfTaskUtil.resolveCase(taskEvaluator, ifTaskExecution)) {
+        if (IfTaskUtil.resolveCase(ifTaskExecution)) {
             subtaskDefinitions = ifTaskExecution.getList("caseTrue", MapObject.class);
         } else {
             subtaskDefinitions = ifTaskExecution.getList("caseFalse", MapObject.class);
