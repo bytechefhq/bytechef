@@ -76,7 +76,7 @@ public class CoordinatorIntTest {
     }
 
     public void testStartJob(String workflowId, WorkflowMapper workflowMapper) {
-        Coordinator coordinator = new Coordinator();
+        CoordinatorImpl coordinator = new CoordinatorImpl();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
@@ -142,7 +142,7 @@ public class CoordinatorIntTest {
         Assertions.assertThrows(
             IllegalArgumentException.class,
             () -> {
-                Coordinator coordinator = new Coordinator();
+                CoordinatorImpl coordinator = new CoordinatorImpl();
                 coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(new JSONWorkflowMapper()));
                 coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello.json")));
             }
