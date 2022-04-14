@@ -20,15 +20,10 @@ package com.integri.atlas.engine.worker.task.handler;
 
 import com.integri.atlas.engine.core.task.Task;
 import java.util.Map;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Arik Cohen
  */
-@Component
-@Order(Ordered.LOWEST_PRECEDENCE)
 public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
 
     private final Map<String, TaskHandler<?>> taskHandlers;

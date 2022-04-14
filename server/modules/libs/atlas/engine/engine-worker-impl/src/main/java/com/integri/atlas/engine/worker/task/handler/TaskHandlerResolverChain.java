@@ -19,8 +19,6 @@
 package com.integri.atlas.engine.worker.task.handler;
 
 import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.context.annotation.Primary;
@@ -30,24 +28,22 @@ import org.springframework.stereotype.Component;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-@Primary
-@Component
 public class TaskHandlerResolverChain implements TaskHandlerResolver {
 
-    private final List<TaskHandlerResolver> resolvers;
-
-    public TaskHandlerResolverChain(List<TaskHandlerResolver> aResolvers) {
-        resolvers = Objects.requireNonNull(aResolvers);
-    }
+    private List<TaskHandlerResolver> taskHandlerResolvers;
 
     @Override
     public TaskHandler<?> resolve(Task aTask) {
-        for (TaskHandlerResolver resolver : resolvers) {
-            TaskHandler<?> handler = resolver.resolve(aTask);
+        for (TaskHandlerResolver taskHandlerResolver : taskHandlerResolvers) {
+            TaskHandler<?> handler = taskHandlerResolver.resolve(aTask);
             if (handler != null) {
                 return handler;
             }
         }
         throw new IllegalArgumentException("Unknown task handler: " + aTask.getType());
+    }
+
+    public void setTaskHandlerResolvers(List<TaskHandlerResolver> taskHandlerResolvers) {
+        this.taskHandlerResolvers = Objects.requireNonNull(taskHandlerResolvers);
     }
 }

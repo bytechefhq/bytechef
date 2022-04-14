@@ -22,14 +22,19 @@ import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
+import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
+import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
+import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolverChain;
+import com.integri.atlas.task.handler.map.MapTaskDispatcherAdapterTaskHandler;
+import java.util.List;
+import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Primary;
 
 /**
  * @author Arik Cohen
@@ -40,27 +45,51 @@ import org.springframework.core.annotation.Order;
 public class WorkerConfiguration {
 
     @Bean
+    DefaultTaskHandlerResolver defaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
+        return new DefaultTaskHandlerResolver(taskHandlers);
+    }
+
+    @Bean
+    TaskDispatcherAdapterTaskHandlerResolver taskDispatcherTaskHandlerResolverAdapter(
+        TaskHandlerResolver taskHandlerResolver,
+        TaskEvaluator taskEvaluator
+    ) {
+        return new TaskDispatcherAdapterTaskHandlerResolver(
+            Map.of(
+                "map",
+                new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, taskEvaluator, WorkerImpl.builder())
+            )
+        );
+    }
+
+    @Bean
+    @Primary
+    TaskHandlerResolver taskHandlerResolver(TaskEvaluator taskEvaluator, Map<String, TaskHandler<?>> taskHandlers) {
+        TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
+
+        taskHandlerResolverChain.setTaskHandlerResolvers(
+            List.of(
+                taskDispatcherTaskHandlerResolverAdapter(taskHandlerResolverChain, taskEvaluator),
+                defaultTaskHandlerResolver(taskHandlers)
+            )
+        );
+
+        return taskHandlerResolverChain;
+    }
+
+    @Bean
     Worker worker(
         TaskHandlerResolver aTaskHandlerResolver,
         MessageBroker aMessageBroker,
         EventPublisher aEventPublisher,
         TaskEvaluator taskEvaluator
     ) {
-        return Worker
+        return WorkerImpl
             .builder()
             .withTaskHandlerResolver(aTaskHandlerResolver)
             .withMessageBroker(aMessageBroker)
             .withEventPublisher(aEventPublisher)
             .withTaskEvaluator(taskEvaluator)
             .build();
-    }
-
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    TaskHandlerResolver taskDispatcherTaskHandlerResolverAdapter(
-        @Lazy TaskHandlerResolver aResolver,
-        TaskEvaluator taskEvaluator
-    ) {
-        return new TaskDispatcherAdapterTaskHandlerResolver(aResolver, taskEvaluator);
     }
 }
