@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.worker.task.concurrency;
+package com.integri.atlas.engine.worker.concurrency;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +22,9 @@ import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author Ivica Cardic
+ */
 public class CurrentThreadExecutorService extends AbstractExecutorService {
 
     /**
@@ -30,8 +33,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     private final Object lock = new Object();
 
     /*
-     * Conceptually, these two variables describe the executor being in
-     * one of three states:
+     * Conceptually, these two variables describe the executor being in one of three states:
      *   - Active: shutdown == false
      *   - Shutdown: runningTasks > 0 and shutdown == true
      *   - Terminated: runningTasks == 0 and shutdown == true
@@ -60,16 +62,17 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     public void shutdown() {
         synchronized (lock) {
             shutdown = true;
+
             if (runningTasks == 0) {
                 lock.notifyAll();
             }
         }
     }
 
-    // See newDirectExecutorService javadoc for unusual behavior of this method.
     @Override
     public List<Runnable> shutdownNow() {
         shutdown();
+
         return Collections.emptyList();
     }
 
@@ -91,6 +94,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
                     return false;
                 } else {
                     long now = System.nanoTime();
+
                     TimeUnit.NANOSECONDS.timedWait(lock, nanos);
                     nanos -= System.nanoTime() - now; // subtract the actual time we waited
                 }
@@ -108,6 +112,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
             if (shutdown) {
                 throw new RejectedExecutionException("Executor already shutdown");
             }
+
             runningTasks++;
         }
     }
