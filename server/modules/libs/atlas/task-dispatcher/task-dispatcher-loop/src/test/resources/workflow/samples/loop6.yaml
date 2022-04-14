@@ -1,0 +1,23 @@
+label: Loop 1
+
+tasks:
+  - type: loop
+    iteratee:
+      type: sequence
+      tasks:
+        - name: sumVar1
+          type: core/var
+          value: ${1 + itemIndex}
+        - type: if
+          conditions:
+            - number:
+                value1: ${itemIndex}
+                operation: greater
+                value2: 5
+          combineOperation: any
+          caseTrue:
+           - type: loop-break
+          caseFalse:
+            - name: sumVar2
+              type: core/var
+              value: ${sumVar1 + 2}

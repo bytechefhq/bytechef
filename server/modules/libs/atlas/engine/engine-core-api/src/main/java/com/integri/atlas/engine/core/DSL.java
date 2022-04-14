@@ -81,6 +81,10 @@ public class DSL {
 
     public static final String IF = "if";
 
+    public static final String LOOP = "loop";
+
+    public static final String LOOP_BREAK = "loop-break";
+
     public static final String SWITCH = "switch";
 
     public static final String EACH = "each";
