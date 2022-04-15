@@ -18,8 +18,8 @@
 
 package com.integri.atlas.message.broker.kafka;
 
-import com.integri.atlas.engine.core.error.Retryable;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
+import com.integri.atlas.engine.core.task.Retryable;
 import java.util.concurrent.TimeUnit;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;

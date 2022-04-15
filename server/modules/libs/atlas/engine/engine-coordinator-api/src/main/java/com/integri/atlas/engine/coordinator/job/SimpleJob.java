@@ -23,7 +23,7 @@ import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.error.Error;
 import com.integri.atlas.engine.core.error.ErrorObject;
-import com.integri.atlas.engine.core.error.Prioritizable;
+import com.integri.atlas.engine.core.priority.Prioritizable;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.Collections;
 import java.util.Date;

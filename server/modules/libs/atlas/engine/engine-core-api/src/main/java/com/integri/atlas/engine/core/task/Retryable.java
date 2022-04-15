@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.error;
+package com.integri.atlas.engine.core.task;
 
 /**
  * An interface which indiciates that a message

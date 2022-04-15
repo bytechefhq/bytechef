@@ -16,20 +16,18 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.error;
+package com.integri.atlas.engine.core.task;
 
 /**
+ * An interface which denotes an object (typically a {@link com.integri.atlas.engine.core.task.Task} able to
+ * report its progress.
  *
  * @author Arik Cohen
- * @since Jun 2, 2017
+ * @since Sep 06, 2018
  */
-public interface Prioritizable {
-    public static final int DEFAULT_PRIORITY = 0;
-
+public interface Progressable {
     /**
-     * Retrives the priority value
-     *
-     * @return int
+     *  @return the current progress value, a number between 0 and 100.
      */
-    int getPriority();
+    int getProgress();
 }
