@@ -30,7 +30,7 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableAutoConfiguration
 @SpringBootConfiguration
 @ComponentScan
-public class TestConfiguration {
+public class RestTestConfiguration {
 
     @MockBean
     private Coordinator coordinator;

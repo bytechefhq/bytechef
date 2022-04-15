@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Primary;
  * @author Arik Cohen
  */
 @Configuration
-public class EventsConfiguration {
+public class EventListenerConfiguration {
 
     @Bean
     @Primary

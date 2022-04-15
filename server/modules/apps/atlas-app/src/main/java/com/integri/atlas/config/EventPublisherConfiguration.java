@@ -22,14 +22,13 @@ import com.integri.atlas.engine.core.event.DistributedEventPublisher;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 
 /**
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
 @Configuration
-class EventConfiguration {
+class EventPublisherConfiguration {
 
     @Bean
     DistributedEventPublisher defaultEventPublisher(MessageBroker aMessageBroker) {
