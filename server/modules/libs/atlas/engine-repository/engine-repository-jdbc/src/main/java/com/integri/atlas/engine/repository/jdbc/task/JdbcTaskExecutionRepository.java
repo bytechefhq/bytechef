@@ -67,6 +67,15 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
     }
 
     @Override
+    public List<TaskExecution> findByJobId(String jobId) {
+        return jdbc.query(
+            "select * from task_execution where job_id = :jobId order by task_number",
+            Collections.singletonMap("jobId", jobId),
+            this::jobTaskRowMapper
+        );
+    }
+
+    @Override
     public List<TaskExecution> findByParentId(String aParentId) {
         return jdbc.query(
             "select * from task_execution where parent_id = :parentId order by task_number",

@@ -38,6 +38,11 @@ public class JdbcContextRepository implements ContextRepository {
     private JSONHelper jsonHelper;
 
     @Override
+    public void delete(String stackId) {
+        jdbc.update("delete from context where stack_id = ?", stackId);
+    }
+
+    @Override
     public void push(String aStackId, Context context) {
         jdbc.update(
             "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",

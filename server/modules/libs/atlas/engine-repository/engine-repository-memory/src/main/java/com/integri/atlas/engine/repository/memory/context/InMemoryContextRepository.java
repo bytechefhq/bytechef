@@ -35,6 +35,11 @@ public class InMemoryContextRepository implements ContextRepository {
     private final Map<String, Deque<Context>> contexts = new HashMap<>();
 
     @Override
+    public void delete(String stackId) {
+        contexts.remove(stackId);
+    }
+
+    @Override
     public void push(String aStackId, Context aContext) {
         Deque<Context> stack = contexts.get(aStackId);
         if (stack == null) {
