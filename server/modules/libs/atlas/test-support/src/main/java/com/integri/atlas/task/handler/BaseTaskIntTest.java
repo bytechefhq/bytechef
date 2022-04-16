@@ -31,6 +31,7 @@ import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.error.Error;
+import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.message.broker.Queues;
@@ -69,6 +70,9 @@ public abstract class BaseTaskIntTest {
 
     @Autowired
     protected JSONHelper jsonHelper;
+
+    @Autowired
+    private EventPublisher eventPublisher;
 
     @Autowired
     protected FileStorageService fileStorageService;
@@ -128,7 +132,7 @@ public abstract class BaseTaskIntTest {
             .builder()
             .withTaskHandlerResolver(taskHandlerResolverChain)
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
+            .withEventPublisher(eventPublisher)
             .withTaskEvaluator(SpelTaskEvaluator.create())
             .build();
 
@@ -153,7 +157,7 @@ public abstract class BaseTaskIntTest {
         );
 
         coordinator.setErrorHandler(getJobTaskErrorHandler(taskDispatcherChain));
-        coordinator.setEventPublisher(e -> {});
+        coordinator.setEventPublisher(eventPublisher);
         coordinator.setTaskDispatcher(taskDispatcherChain);
 
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
@@ -173,7 +177,7 @@ public abstract class BaseTaskIntTest {
         defaultTaskCompletionHandler.setJobRepository(jobRepository);
         defaultTaskCompletionHandler.setJobTaskRepository(taskExecutionRepository);
         defaultTaskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper()));
-        defaultTaskCompletionHandler.setEventPublisher(e -> {});
+        defaultTaskCompletionHandler.setEventPublisher(eventPublisher);
         defaultTaskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
