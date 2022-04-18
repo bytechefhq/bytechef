@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,11 @@ public class FileSystemFileStorageServiceTest {
     private static final String TEST_STRING = "test string";
 
     private static final FileSystemFileStorageService fileStorageService = new FileSystemFileStorageService(
-        "/tmp/integri/files"
+        "/tmp/test/integri/files"
     );
 
     @Test
-    public void testDelete() {
+    public void testDeleteFile() {
         FileEntry fileEntry = fileStorageService.storeFileContent(
             "fileName.txt",
             new ByteArrayInputStream(TEST_STRING.getBytes())
@@ -47,6 +48,22 @@ public class FileSystemFileStorageServiceTest {
         Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl())).isEqualTo(TEST_STRING);
 
         fileStorageService.deleteFile(fileEntry.getUrl());
+
+        Assertions.assertThat(fileStorageService.fileExists(fileEntry.getUrl())).isFalse();
+    }
+
+    @Test
+    public void testDeleteFiles() throws InterruptedException {
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+            "fileName.txt",
+            new ByteArrayInputStream(TEST_STRING.getBytes())
+        );
+
+        Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl())).isEqualTo(TEST_STRING);
+
+        TimeUnit.SECONDS.sleep(2);
+
+        fileStorageService.deleteFiles(TimeUnit.SECONDS.toMillis(1));
 
         Assertions.assertThat(fileStorageService.fileExists(fileEntry.getUrl())).isFalse();
     }
