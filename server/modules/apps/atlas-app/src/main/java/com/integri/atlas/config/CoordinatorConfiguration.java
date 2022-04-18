@@ -127,6 +127,11 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
+    JobStatusWebhookEventListener jobStatusWebhookEventHandler() {
+        return new JobStatusWebhookEventListener(jobRepository);
+    }
+
+    @Bean
     TaskExecutionErrorHandler jobTaskErrorHandler() {
         TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
         jobTaskErrorHandler.setJobRepository(jobRepository);
@@ -221,11 +226,6 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    SubflowJobStatusEventListener subflowJobStatusEventListener() {
-        return new SubflowJobStatusEventListener(jobRepository, taskExecutionRepository, coordinator(), taskEvaluator);
-    }
-
-    @Bean
     SwitchTaskCompletionHandler switchTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
         return new SwitchTaskCompletionHandler(
             taskExecutionRepository,
@@ -289,6 +289,11 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
+    IfTaskDeclaration ifTaskDeclaration() {
+        return new IfTaskDeclaration();
+    }
+
+    @Bean
     IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher) {
         return new IfTaskDispatcher(
             contextRepository,
@@ -348,6 +353,11 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
+    SequenceTaskDeclaration sequenceTaskDeclaration() {
+        return new SequenceTaskDeclaration();
+    }
+
+    @Bean
     SequenceTaskDispatcher sequenceTaskDispatcher(TaskDispatcher taskDispatcher) {
         return new SequenceTaskDispatcher(
             contextRepository,
@@ -356,6 +366,11 @@ public class CoordinatorConfiguration {
             taskExecutionRepository,
             taskEvaluator
         );
+    }
+
+    @Bean
+    SubflowJobStatusEventListener subflowJobStatusEventListener() {
+        return new SubflowJobStatusEventListener(jobRepository, taskExecutionRepository, coordinator(), taskEvaluator);
     }
 
     @Bean
@@ -375,32 +390,17 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskDeclaration ifTaskDeclaration() {
-        return new IfTaskDeclaration();
-    }
-
-    @Bean
-    SequenceTaskDeclaration sequenceTaskDeclaration() {
-        return new SequenceTaskDeclaration();
-    }
-
-    @Bean
     TaskStartedEventListener taskStartedEventListener() {
         return new TaskStartedEventListener(taskExecutionRepository, taskDispatcher(), jobRepository);
     }
 
     @Bean
-    TaskProgressedEventListener taskProgressedEventListener() {
-        return new TaskProgressedEventListener(taskExecutionRepository);
-    }
-
-    @Bean
-    JobStatusWebhookEventListener webhookEventHandler() {
-        return new JobStatusWebhookEventListener(jobRepository);
-    }
-
-    @Bean
     TaskStartedWebhookEventListener taskStartedWebhookEventListener() {
         return new TaskStartedWebhookEventListener(jobRepository);
+    }
+
+    @Bean
+    TaskProgressedEventListener taskProgressedEventListener() {
+        return new TaskProgressedEventListener(taskExecutionRepository);
     }
 }
