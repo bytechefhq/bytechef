@@ -42,7 +42,7 @@ public class Base64FileStorageService implements FileStorageService {
     public FileEntry storeFileContent(String fileName, String data) throws FileStorageException {
         Base64.Encoder encoder = Base64.getEncoder();
 
-        return FileEntry.of(fileName, "base64:" + encoder.encodeToString(data.getBytes()));
+        return FileEntry.of(fileName, encoder.encodeToString(data.getBytes()));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class Base64FileStorageService implements FileStorageService {
         Base64.Encoder encoder = Base64.getEncoder();
 
         try {
-            return FileEntry.of(fileName, "base64:" + encoder.encodeToString(toByteArray(inputStream)));
+            return FileEntry.of(fileName, encoder.encodeToString(toByteArray(inputStream)));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to store file", ioe);
         }
@@ -58,24 +58,16 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public String readFileContent(String url) throws FileStorageException {
-        String fileContent = getFileContent(url);
-
         Base64.Decoder decoder = Base64.getDecoder();
 
-        return new String(decoder.decode(fileContent));
+        return new String(decoder.decode(url));
     }
 
     @Override
     public InputStream getFileContentStream(String url) {
         Base64.Decoder decoder = Base64.getDecoder();
 
-        String fileContent = getFileContent(url);
-
-        return new ByteArrayInputStream(decoder.decode(fileContent));
-    }
-
-    private String getFileContent(String url) {
-        return url.replace("base64:", "");
+        return new ByteArrayInputStream(decoder.decode(url));
     }
 
     private byte[] toByteArray(InputStream inputStream) throws FileStorageException, IOException {

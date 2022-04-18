@@ -82,12 +82,10 @@ public class FileSystemFileStorageServiceTest {
 
         String path = fileEntry.getUrl();
 
-        Assertions.assertThat(path).startsWith("file:/tmp/integri/files/");
+        Assertions.assertThat(path).startsWith("/tmp/test/integri/files/");
 
         String url = fileEntry.getUrl();
 
-        Assertions
-            .assertThat(Files.contentOf(new File(url.replace("file:", "")), Charset.defaultCharset()))
-            .isEqualTo(TEST_STRING);
+        Assertions.assertThat(Files.contentOf(new File(url), Charset.defaultCharset())).isEqualTo(TEST_STRING);
     }
 }
