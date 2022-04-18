@@ -1,10 +1,12 @@
 dependencies {
-    api "org.springframework:spring-core"
+    api "org.springframework:spring-expression"
 
     implementation "commons-io:commons-io"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.apache.tika:tika-core"
-    implementation "org.springframework:spring-expression"
+    implementation "org.jobrunr:jobrunr-spring-boot-starter"
+    implementation "org.springframework:spring-core"
+    implementation project(":modules:libs:atlas:engine:engine-core-api")
 
     testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
     testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
