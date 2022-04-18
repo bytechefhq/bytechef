@@ -34,6 +34,9 @@ public class Base64FileStorageService implements FileStorageService {
     public void deleteFile(String url) throws FileStorageException {}
 
     @Override
+    public void deleteFiles(long retentionTime) throws FileStorageException {}
+
+    @Override
     public boolean fileExists(String url) throws FileStorageException {
         return true;
     }
