@@ -34,5 +34,5 @@ import com.integri.atlas.engine.core.task.TaskExecution;
  * @since Jan 28, 2017
  */
 public interface TaskHandlerResolver {
-    TaskHandler<?> resolve(Task aTask);
+    TaskHandler<?> resolve(Task task);
 }

@@ -38,24 +38,37 @@ import java.util.List;
  */
 public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final ContextRepository contextRepository;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher taskDispatcher;
-    private final ContextRepository contextRepository;
     private final TaskEvaluator taskEvaluator;
+    private final TaskExecutionRepository taskExecutionRepository;
 
     public IfTaskCompletionHandler(
-        TaskExecutionRepository taskExecutionRepository,
+        ContextRepository contextRepository,
         TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher taskDispatcher,
-        ContextRepository contextRepository,
-        TaskEvaluator taskEvaluator
+        TaskEvaluator taskEvaluator,
+        TaskExecutionRepository taskExecutionRepository
     ) {
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.contextRepository = contextRepository;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
-        this.contextRepository = contextRepository;
         this.taskEvaluator = taskEvaluator;
+        this.taskExecutionRepository = taskExecutionRepository;
+    }
+
+    @Override
+    public boolean canHandle(TaskExecution taskExecution) {
+        String parentId = taskExecution.getParentId();
+
+        if (parentId != null) {
+            TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
+
+            return parentTaskExecution.getType().equals(DSL.IF);
+        }
+
+        return false;
     }
 
     @Override
@@ -93,13 +106,13 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
             SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(subtaskDefinition);
 
-            subTaskExecution.setId(UUIDGenerator.generate());
-            subTaskExecution.setStatus(TaskStatus.CREATED);
             subTaskExecution.setCreateTime(new Date());
-            subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
+            subTaskExecution.setId(UUIDGenerator.generate());
             subTaskExecution.setJobId(ifTaskExecution.getJobId());
             subTaskExecution.setParentId(ifTaskExecution.getId());
             subTaskExecution.setPriority(ifTaskExecution.getPriority());
+            subTaskExecution.setStatus(TaskStatus.CREATED);
+            subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
 
             MapContext context = new MapContext(contextRepository.peek(ifTaskExecution.getId()));
 
@@ -137,17 +150,5 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
             taskCompletionHandler.handle(ifTaskExecution);
         }
-    }
-
-    @Override
-    public boolean canHandle(TaskExecution aTaskExecution) {
-        String parentId = aTaskExecution.getParentId();
-
-        if (parentId != null) {
-            TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
-
-            return parentTaskExecution.getType().equals(DSL.IF);
-        }
-        return false;
     }
 }

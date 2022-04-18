@@ -35,10 +35,9 @@ public interface TaskDispatcherResolver {
      * {@link TaskExecution} instance or <code>null</code>
      * if one can not be resolved.
      *
-     * @param aTask
-     *           The {@link TaskExecution} instance
-     * @return a {@link TaskDispatcher} instance to execute the given task or <code>null</code> if
-     *         unable to resolve one.
+     * @param task The {@link TaskExecution} instance
+     * @return a {@link TaskDispatcher} instance to execute the given task or <code>null</code> if unable to resolve
+     *         one.
      */
-    TaskDispatcher resolve(Task aTask);
+    TaskDispatcher resolve(Task task);
 }

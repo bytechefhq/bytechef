@@ -43,7 +43,7 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
 
     @Test
     public void testIfTaskDispatcher_Boolean() {
-        Job job = startJob("samples/conditions-boolean.yaml", Map.of("value1", "true", "value2", "false"));
+        Job job = startJob("samples/if-conditions-boolean.yaml", Map.of("value1", "true", "value2", "false"));
 
         Context context = contextRepository.peek(job.getId());
 
@@ -54,7 +54,7 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
     @Test
     public void testIfTaskDispatcher_DateTime() {
         Job job = startJob(
-            "samples/conditions-dateTime.yaml",
+            "samples/if-conditions-dateTime.yaml",
             Map.of("value1", "2022-01-01T00:00:00", "value2", "2022-01-01T00:00:01")
         );
 
@@ -66,7 +66,7 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
 
     @Test
     public void testIfTaskDispatcher_Number() {
-        Job job = startJob("samples/conditions-number.yaml", Map.of("value1", 100, "value2", 200));
+        Job job = startJob("samples/if-conditions-number.yaml", Map.of("value1", 100, "value2", 200));
 
         Context context = contextRepository.peek(job.getId());
 
@@ -80,7 +80,7 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
 
     @Test
     public void testIfTaskDispatcher_String() {
-        Job job = startJob("samples/conditions-string.yaml", Map.of("value1", "Hello World", "value2", "Hello"));
+        Job job = startJob("samples/if-conditions-string.yaml", Map.of("value1", "Hello World", "value2", "Hello"));
 
         Context context = contextRepository.peek(job.getId());
 
@@ -101,11 +101,11 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new IfTaskCompletionHandler(
-                taskExecutionRepository,
+                contextRepository,
                 taskCompletionHandler,
                 taskDispatcher,
-                contextRepository,
-                SpelTaskEvaluator.create()
+                SpelTaskEvaluator.create(),
+                taskExecutionRepository
             )
         );
     }
@@ -120,8 +120,8 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
                 contextRepository,
                 coordinatorMessageBroker,
                 taskDispatcher,
-                taskExecutionRepository,
-                SpelTaskEvaluator.create()
+                SpelTaskEvaluator.create(),
+                taskExecutionRepository
             )
         );
     }

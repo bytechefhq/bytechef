@@ -111,7 +111,7 @@ public class CoordinatorIntTest {
 
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
         jobExecutor.setContextRepository(contextRepository);
-        jobExecutor.setJobTaskRepository(taskRepository);
+        jobExecutor.setTaskExecutionRepository(taskRepository);
         jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(workflowMapper));
         jobExecutor.setTaskDispatcher(taskDispatcher);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
@@ -121,7 +121,7 @@ public class CoordinatorIntTest {
         taskCompletionHandler.setContextRepository(contextRepository);
         taskCompletionHandler.setJobExecutor(jobExecutor);
         taskCompletionHandler.setJobRepository(jobRepository);
-        taskCompletionHandler.setJobTaskRepository(taskRepository);
+        taskCompletionHandler.setTaskExecutionRepository(taskRepository);
         taskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository(workflowMapper));
         taskCompletionHandler.setEventPublisher(e -> {});
         taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());

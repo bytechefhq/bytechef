@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * @author Ivica Cardic
  * @author Matija Petanjek
  */
 public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
@@ -44,17 +45,30 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskEvaluator taskEvaluator;
 
     public SequenceTaskCompletionHandler(
-        TaskExecutionRepository taskExecutionRepository,
+        ContextRepository contextRepository,
         TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher taskDispatcher,
-        ContextRepository contextRepository,
-        TaskEvaluator taskEvaluator
+        TaskEvaluator taskEvaluator,
+        TaskExecutionRepository taskExecutionRepository
     ) {
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.contextRepository = contextRepository;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
-        this.contextRepository = contextRepository;
         this.taskEvaluator = taskEvaluator;
+        this.taskExecutionRepository = taskExecutionRepository;
+    }
+
+    @Override
+    public boolean canHandle(TaskExecution aTaskExecution) {
+        String parentId = aTaskExecution.getParentId();
+
+        if (parentId != null) {
+            TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
+
+            return parentTaskExecution.getType().equals(DSL.SEQUENCE);
+        }
+
+        return false;
     }
 
     @Override
@@ -86,13 +100,13 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
             SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(subtaskDefinition);
 
-            subTaskExecution.setId(UUIDGenerator.generate());
-            subTaskExecution.setStatus(TaskStatus.CREATED);
             subTaskExecution.setCreateTime(new Date());
-            subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
+            subTaskExecution.setId(UUIDGenerator.generate());
             subTaskExecution.setJobId(sequenceTaskExecution.getJobId());
             subTaskExecution.setParentId(sequenceTaskExecution.getId());
             subTaskExecution.setPriority(sequenceTaskExecution.getPriority());
+            subTaskExecution.setStatus(TaskStatus.CREATED);
+            subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
 
             MapContext context = new MapContext(contextRepository.peek(sequenceTaskExecution.getId()));
 
@@ -138,18 +152,5 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
             taskCompletionHandler.handle(sequenceTaskExecution);
         }
-    }
-
-    @Override
-    public boolean canHandle(TaskExecution aTaskExecution) {
-        String parentId = aTaskExecution.getParentId();
-
-        if (parentId != null) {
-            TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
-
-            return parentTaskExecution.getType().equals(DSL.SEQUENCE);
-        }
-
-        return false;
     }
 }

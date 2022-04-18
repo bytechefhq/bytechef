@@ -28,12 +28,12 @@ public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
 
     private final Map<String, TaskHandler<?>> taskHandlers;
 
-    public DefaultTaskHandlerResolver(Map<String, TaskHandler<?>> aTaskHandlers) {
-        taskHandlers = aTaskHandlers;
+    public DefaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
+        this.taskHandlers = taskHandlers;
     }
 
     @Override
-    public TaskHandler<?> resolve(Task aJobTask) {
-        return taskHandlers.get(aJobTask.getType());
+    public TaskHandler<?> resolve(Task task) {
+        return taskHandlers.get(task.getType());
     }
 }
