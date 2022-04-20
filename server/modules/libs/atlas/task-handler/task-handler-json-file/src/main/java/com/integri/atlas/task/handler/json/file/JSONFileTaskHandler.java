@@ -21,12 +21,15 @@ import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +44,11 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
         this.jsonHelper = jsonHelper;
     }
 
+    private enum FileType {
+        JSON,
+        JSONL,
+    }
+
     private enum Operation {
         READ,
         WRITE,
@@ -50,16 +58,18 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
     private final JSONHelper jsonHelper;
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
+        FileType fileType = FileType.valueOf(StringUtils.upperCase(taskExecution.get("fileType", String.class, "JSON")));
         Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
             Map<String, Integer> range = taskExecution.get("range");
-
             Integer rangeStartIndex = null;
+            List<Map<String, ?>> items;
 
             if (range != null) {
                 rangeStartIndex = range.get("startIndex");
@@ -71,7 +81,21 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                 rangeEndIndex = range.get("endIndex");
             }
 
-            List<Map<String, ?>> items = jsonHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()));
+            if (fileType == FileType.JSON) {
+                items = jsonHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()));
+            } else {
+                try (
+                    BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(fileStorageService.getFileContentStream(fileEntry.getUrl()))
+                    )
+                ) {
+                    items =
+                        bufferedReader
+                            .lines()
+                            .map(line -> (Map<String, ?>) jsonHelper.deserialize(line, Map.class))
+                            .collect(Collectors.toList());
+                }
+            }
 
             if (
                 (rangeStartIndex != null && rangeStartIndex > 0) ||
@@ -82,17 +106,24 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
 
             result = items;
         } else {
-            String fileName = taskExecution.get("fileName", String.class, "file.json");
+            String fileName = taskExecution.get("fileName", String.class, "file.jsonl");
             List<Map<String, ?>> items = taskExecution.get("items");
-
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-            try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                printWriter.println(jsonHelper.serialize(items));
+            if (fileType == FileType.JSON) {
+                try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
+                    printWriter.println(jsonHelper.serialize(items));
+                }
+            } else {
+                try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
+                    for (Map<String, ?> item : items) {
+                        printWriter.println(jsonHelper.serialize(item));
+                    }
+                }
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                return fileStorageService.storeFileContent(fileName, inputStream);
+                result = fileStorageService.storeFileContent(fileName, inputStream);
             }
         }
 
