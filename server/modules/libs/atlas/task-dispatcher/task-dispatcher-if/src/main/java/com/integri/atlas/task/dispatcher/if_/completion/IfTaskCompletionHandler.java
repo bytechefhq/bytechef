@@ -125,23 +125,25 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the If
         else {
-            Context parentContext;
+            String contextId;
 
             // If is root level, get the job's context
             if (ifTaskExecution.getParentId() == null) {
-                parentContext = contextRepository.peek(ifTaskExecution.getJobId());
+                contextId = ifTaskExecution.getJobId();
             }
             // otherwise get its parent's context
             else {
-                parentContext = contextRepository.peek(ifTaskExecution.getParentId());
+                contextId = ifTaskExecution.getParentId();
             }
 
-            Context thisContext = contextRepository.peek(ifTaskExecution.getId());
+            Context parentContext = contextRepository.peek(contextId);
+
             MapContext newContext = new MapContext(parentContext);
+            Context thisContext = contextRepository.peek(ifTaskExecution.getId());
 
             newContext.putAll(thisContext.asMap());
 
-            contextRepository.push(taskExecution.getJobId(), newContext);
+            contextRepository.push(contextId, newContext);
 
             ifTaskExecution.setEndTime(new Date());
             ifTaskExecution.setExecutionTime(
