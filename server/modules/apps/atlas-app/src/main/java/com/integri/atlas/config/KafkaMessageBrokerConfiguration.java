@@ -220,11 +220,14 @@ public class KafkaMessageBrokerConfiguration implements KafkaListenerConfigurer 
                 "start"
             );
         }
+
         if (workerProperties.isEnabled()) {
             Map<String, Object> subscriptions = workerProperties.getSubscriptions();
+
             subscriptions.forEach((k, v) ->
                 registerListenerEndpoint(aRegistrar, k, Integer.valueOf((String) v), worker, "handle")
             );
+
             registerListenerEndpoint(aRegistrar, Exchanges.CONTROL, 1, worker, "handle");
         }
     }

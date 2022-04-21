@@ -118,6 +118,7 @@ public class AmqpMessageBrokerConfiguration implements ApplicationContextAware, 
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar aRegistrar) {
         CoordinatorProperties coordinatorProperties = properties.getCoordinator();
         WorkerProperties workerProperties = properties.getWorker();
+
         if (coordinatorProperties.isEnabled()) {
             Coordinator coordinator = applicationContext.getBean(Coordinator.class);
 
@@ -157,13 +158,16 @@ public class AmqpMessageBrokerConfiguration implements ApplicationContextAware, 
                 "create"
             );
         }
+
         if (workerProperties.isEnabled()) {
             Worker worker = applicationContext.getBean(Worker.class);
 
             Map<String, Object> subscriptions = workerProperties.getSubscriptions();
+
             subscriptions.forEach((k, v) ->
                 registerListenerEndpoint(aRegistrar, k, Integer.valueOf((String) v), worker, "handle")
             );
+
             registerListenerEndpoint(aRegistrar, controlQueue(), controlExchange(), 1, worker, "handle");
         }
     }

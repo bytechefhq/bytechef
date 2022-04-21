@@ -102,6 +102,7 @@ public class JmsMessageBrokerConfiguration implements ApplicationContextAware, J
     public void configureJmsListeners(JmsListenerEndpointRegistrar aRegistrar) {
         CoordinatorProperties coordinatorProperties = properties.getCoordinator();
         WorkerProperties workerProperties = properties.getWorker();
+
         if (coordinatorProperties.isEnabled()) {
             Coordinator coordinator = applicationContext.getBean(Coordinator.class);
 
@@ -141,13 +142,16 @@ public class JmsMessageBrokerConfiguration implements ApplicationContextAware, J
                 "create"
             );
         }
+
         if (workerProperties.isEnabled()) {
             Worker worker = applicationContext.getBean(Worker.class);
 
             Map<String, Object> subscriptions = workerProperties.getSubscriptions();
+
             subscriptions.forEach((k, v) ->
                 registerListenerEndpoint(aRegistrar, k, Integer.valueOf((String) v), worker, "handle")
             );
+
             registerListenerEndpoint(aRegistrar, Exchanges.CONTROL + "/" + Exchanges.CONTROL, 1, worker, "handle");
         }
     }

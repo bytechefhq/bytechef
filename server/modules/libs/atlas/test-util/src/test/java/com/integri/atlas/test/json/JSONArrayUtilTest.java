@@ -18,10 +18,9 @@ package com.integri.atlas.test.json;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import java.util.List;
-
 import com.integri.atlas.test.json.JSONArrayUtil;
 import com.integri.atlas.test.json.JSONObjectUtil;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
