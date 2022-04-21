@@ -78,7 +78,7 @@ public class XMLFileTaskDeclarationTest {
                     },
                     {
                         "description":"Data to write to the file.",
-                        "displayName":"JSON array of items",
+                        "displayName":"JSON object or array of items",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
@@ -87,6 +87,18 @@ public class XMLFileTaskDeclarationTest {
                         "name":"items",
                         "required":true,
                         "type":"JSON"
+                    },
+                    {
+                        "defaultValue":true,
+                        "description":"The input JSON is array?",
+                        "displayName":"Is Array",
+                        "displayOption":{
+                            "show":{
+                                "operation":["READ"]
+                            }
+                        },
+                        "name":"isArray",
+                        "type":"BOOLEAN"
                     },
                     {
                         "displayName":"Options",
@@ -110,6 +122,7 @@ public class XMLFileTaskDeclarationTest {
                                 "displayName":"Range",
                                 "displayOption":{
                                     "show":{
+                                        "isArray":[true],
                                         "operation":["READ"]
                                     }
                                 },

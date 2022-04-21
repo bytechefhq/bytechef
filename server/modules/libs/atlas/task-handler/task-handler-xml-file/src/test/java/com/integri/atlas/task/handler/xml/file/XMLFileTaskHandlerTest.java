@@ -43,8 +43,23 @@ public class XMLFileTaskHandlerTest {
     private static final XMLFileTaskHandler xmlFileTaskHandler = new XMLFileTaskHandler(fileStorageService, xmlHelper);
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testRead() throws Exception {
-        File file = getFile();
+        File file = getFile("sample.xml");
+
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+        taskExecution.put("isArray", false);
+        taskExecution.put("operation", "READ");
+
+        assertThat((Map<String, ?>) xmlFileTaskHandler.handle(taskExecution))
+            .isEqualTo(xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), Map.class));
+    }
+
+    @Test
+    public void testReadArray() throws Exception {
+        File file = getFile("sample_array.xml");
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
@@ -65,7 +80,32 @@ public class XMLFileTaskHandlerTest {
 
     @Test
     public void testWrite() throws Exception {
-        File file = getFile();
+        File file = getFile("sample.xml");
+
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.put("items", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), Map.class));
+        taskExecution.put("operation", "WRITE");
+
+        FileEntry fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
+
+        assertThat(xmlHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()), List.class))
+            .isEqualTo(xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), List.class));
+
+        assertThat(fileEntry.getName()).isEqualTo("file.xml");
+
+        taskExecution.put("fileName", "test.xml");
+        taskExecution.put("items", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), Map.class));
+        taskExecution.put("operation", "WRITE");
+
+        fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
+
+        assertThat(fileEntry.getName()).isEqualTo("test.xml");
+    }
+
+    @Test
+    public void testWriteArray() throws Exception {
+        File file = getFile("sample_array.xml");
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
@@ -88,8 +128,8 @@ public class XMLFileTaskHandlerTest {
         assertThat(fileEntry.getName()).isEqualTo("test.xml");
     }
 
-    private File getFile() throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/sample.xml");
+    private File getFile(String filename) throws IOException {
+        ClassPathResource classPathResource = new ClassPathResource("dependencies/" + filename);
 
         return classPathResource.getFile();
     }

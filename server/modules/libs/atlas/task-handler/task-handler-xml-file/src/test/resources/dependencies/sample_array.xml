@@ -1,4 +1,4 @@
-<root>
+<Flowers>
     <Flower id="45">
         <name>Poppy</name>
         <color>RED</color>
@@ -12,4 +12,5 @@
             </Florist>
         </Florists>
     </Flower>
-</root>
+    <Flower id="46"><name>Rose</name><color>YELLOW</color><petals>5</petals></Flower>
+</Flowers>

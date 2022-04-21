@@ -17,6 +17,7 @@
 package com.integri.atlas.task.handler.xml.file;
 
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
@@ -57,10 +58,15 @@ public class XMLFileTaskDeclaration implements TaskDeclaration {
                 .displayOption(show("operation", "READ"))
                 .required(true),
             JSON_PROPERTY("items")
-                .displayName("JSON array of items")
+                .displayName("JSON object or array of items")
                 .description("Data to write to the file.")
                 .displayOption(show("operation", parameterValues("WRITE")))
                 .required(true),
+            BOOLEAN_PROPERTY("isArray")
+                .displayName("Is Array")
+                .description("The input JSON is array?")
+                .displayOption(show("operation", "READ"))
+                .defaultValue(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
@@ -73,7 +79,7 @@ public class XMLFileTaskDeclaration implements TaskDeclaration {
                     GROUP_PROPERTY("range")
                         .displayName("Range")
                         .description("The range to read from the XML array.")
-                        .displayOption(show("operation", "READ"))
+                        .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true)))
                         .groupProperties(
                             NUMBER_PROPERTY("startIndex").displayName("The start index of the XML array"),
                             NUMBER_PROPERTY("endIndex").displayName("The end index of the XML array")
