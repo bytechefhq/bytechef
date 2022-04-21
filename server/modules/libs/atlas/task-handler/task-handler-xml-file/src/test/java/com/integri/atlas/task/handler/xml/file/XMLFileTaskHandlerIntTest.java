@@ -24,7 +24,7 @@ import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.xml.XMLHelper;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.task.handler.BaseTaskIntTest;
+import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;

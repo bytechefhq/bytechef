@@ -24,7 +24,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
         testImplementation project(":modules:libs:atlas:task-definition")
-        testImplementation project(":modules:libs:atlas:test-support")
+        testImplementation project(":modules:libs:atlas:test-util")
         testImplementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
 
         testRuntimeOnly "org.postgresql:postgresql"

@@ -21,7 +21,7 @@ import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.BaseTaskIntTest;
+import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;

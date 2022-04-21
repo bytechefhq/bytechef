@@ -27,7 +27,7 @@ import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
-import com.integri.atlas.task.handler.BaseTaskIntTest;
+import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import com.integri.atlas.task.handler.core.Var;
 import java.util.List;
 import java.util.Map;
