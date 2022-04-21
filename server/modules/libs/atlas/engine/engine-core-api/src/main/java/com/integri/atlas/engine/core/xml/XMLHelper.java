@@ -17,7 +17,9 @@
 package com.integri.atlas.engine.core.xml;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import java.io.InputStream;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -50,6 +52,14 @@ public class XMLHelper {
     public String serialize(Object value, String rootName) {
         try {
             return xmlMapper.writer().withRootName(rootName).writeValueAsString(value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Stream<Map<String, ?>> stream(InputStream inputStream) {
+        try {
+            return new XMLStreamReaderStream(inputStream, xmlMapper);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
