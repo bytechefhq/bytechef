@@ -62,62 +62,85 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        FileType fileType = FileType.valueOf(StringUtils.upperCase(taskExecution.get("fileType", String.class, "JSON")));
+        FileType fileType = FileType.valueOf(
+            StringUtils.upperCase(taskExecution.get("fileType", String.class, "JSON"))
+        );
+        boolean isArray = taskExecution.get("isArray", Boolean.class, true);
         Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
-            Map<String, Integer> range = taskExecution.get("range");
-            Integer rangeStartIndex = null;
-            List<Map<String, ?>> items;
 
-            if (range != null) {
-                rangeStartIndex = range.get("startIndex");
-            }
+            if (isArray) {
+                Map<String, Integer> range = taskExecution.get("range");
+                Integer rangeStartIndex = null;
+                List<Map<String, ?>> items;
 
-            Integer rangeEndIndex = null;
-
-            if (range != null) {
-                rangeEndIndex = range.get("endIndex");
-            }
-
-            if (fileType == FileType.JSON) {
-                items = jsonHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()));
-            } else {
-                try (
-                    BufferedReader bufferedReader = new BufferedReader(
-                        new InputStreamReader(fileStorageService.getFileContentStream(fileEntry.getUrl()))
-                    )
-                ) {
-                    items =
-                        bufferedReader
-                            .lines()
-                            .map(line -> (Map<String, ?>) jsonHelper.deserialize(line, Map.class))
-                            .collect(Collectors.toList());
+                if (range != null) {
+                    rangeStartIndex = range.get("startIndex");
                 }
-            }
 
-            if (
-                (rangeStartIndex != null && rangeStartIndex > 0) ||
-                (rangeEndIndex != null && rangeEndIndex < items.size())
-            ) {
-                items = items.subList(rangeStartIndex == null ? 0 : rangeStartIndex, rangeEndIndex);
-            }
+                Integer rangeEndIndex = null;
 
-            result = items;
+                if (range != null) {
+                    rangeEndIndex = range.get("endIndex");
+                }
+
+                if (fileType == FileType.JSON) {
+                    items = jsonHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()));
+                } else {
+                    try (
+                        BufferedReader bufferedReader = new BufferedReader(
+                            new InputStreamReader(fileStorageService.getFileContentStream(fileEntry.getUrl()))
+                        )
+                    ) {
+                        items =
+                            bufferedReader
+                                .lines()
+                                .map(line -> (Map<String, ?>) jsonHelper.deserialize(line, Map.class))
+                                .collect(Collectors.toList());
+                    }
+                }
+
+                if (
+                    (rangeStartIndex != null && rangeStartIndex > 0) ||
+                    (rangeEndIndex != null && rangeEndIndex < items.size())
+                ) {
+                    items = items.subList(rangeStartIndex == null ? 0 : rangeStartIndex, rangeEndIndex);
+                }
+
+                result = items;
+            } else {
+                result = jsonHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
+            }
         } else {
-            String fileName = taskExecution.get("fileName", String.class, "file.jsonl");
-            List<Map<String, ?>> items = taskExecution.get("items");
+            String fileName = taskExecution.get(
+                "fileName",
+                String.class,
+                "file." + (fileType == FileType.JSON ? "json" : "jsonl")
+            );
+            Object object = taskExecution.get("items");
+
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-            if (fileType == FileType.JSON) {
+            Object object = taskExecution.get("json");
+
+            if (object instanceof Map) {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                    printWriter.println(jsonHelper.serialize(items));
+                    printWriter.println(jsonHelper.serialize(object));
                 }
             } else {
-                try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                    for (Map<String, ?> item : items) {
-                        printWriter.println(jsonHelper.serialize(item));
+                List<Map<String, ?>> items = (List<Map<String, ?>>) object;
+
+                if (fileType == FileType.JSON) {
+                    try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
+                        printWriter.println(jsonHelper.serialize(items));
+                    }
+                } else {
+                    try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
+                        for (Map<String, ?> item : items) {
+                            printWriter.println(jsonHelper.serialize(item));
+                        }
                     }
                 }
             }

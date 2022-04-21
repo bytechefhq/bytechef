@@ -3,7 +3,7 @@
   "inputs": [
     {
       "name": "items",
-      "label": "JSON array of items",
+      "label": "JSON object or array of items",
       "type": "JSON",
       "required": true
     }
