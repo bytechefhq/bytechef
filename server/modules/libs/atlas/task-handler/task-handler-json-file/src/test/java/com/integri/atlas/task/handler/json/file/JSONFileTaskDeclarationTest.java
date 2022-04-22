@@ -135,28 +135,29 @@ public class JSONFileTaskDeclarationTest {
                                 "name":"fileName",
                                 "type":"STRING"
                             },
-                            {
-                                "description":"The range to read from the JSON array.",
-                                "displayName":"Range",
+                                                        {
+                                "description":"The amount of child elements to return in a page.",
+                                "displayName":"Page Size",
                                 "displayOption":{
                                     "show":{
                                         "isArray":[true],
                                         "operation":["READ"]
                                     }
                                 },
-                                "name":"range",
-                                "type":"GROUP",
-                                "groupProperties":[
-                                    {
-                                        "displayName":"The start index of the JSON array",
-                                        "name":"startIndex",
-                                        "type":"NUMBER"
-                                    },
-                                    {
-                                        "displayName":"The end index of the JSON array",
-                                        "name":"endIndex","type":"NUMBER"
+                                "name":"pageSize",
+                                "type":"NUMBER"
+                            },
+                            {
+                                "description":"The page number to get.",
+                                "displayName":"Page Number",
+                                "displayOption":{
+                                    "show":{
+                                        "isArray":[true],
+                                        "operation":["READ"]
                                     }
-                                ]
+                                },
+                                "name":"pageNumber",
+                                "type":"NUMBER"
                             },
                         ],
                         "placeholder":"Add Option"

@@ -104,14 +104,14 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                         .displayOption(show("operation", "WRITE"))
                         .options(option("JSON", "JSON"), option("File", "FILE"))
                         .defaultValue("JSON"),
-                    GROUP_PROPERTY("range")
-                        .displayName("Range")
-                        .description("The range to read from the table.")
-                        .displayOption(show("operation", "READ"))
-                        .groupProperties(
-                            NUMBER_PROPERTY("startRow").displayName("The start row index"),
-                            NUMBER_PROPERTY("endRow").displayName("The end row index")
-                        ),
+                    NUMBER_PROPERTY("pageSize")
+                        .displayName("Page Size")
+                        .description("The amount of child elements to return in a page.")
+                        .displayOption(show("operation", "READ")),
+                    NUMBER_PROPERTY("pageNumber")
+                        .displayName("Page Number")
+                        .description("The page number to get.")
+                        .displayOption(show("operation", "READ")),
                     BOOLEAN_PROPERTY("readAsString")
                         .displayName("Read As String")
                         .description(

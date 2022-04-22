@@ -67,32 +67,27 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
             boolean headerRow = taskExecution.getBoolean("headerRow", true);
             boolean includeEmptyCells = taskExecution.getBoolean("includeEmptyCells", false);
+            Integer pageSize = taskExecution.get("pageSize");
+            Integer pageNumber = taskExecution.get("pageNumber");
             boolean readAsString = taskExecution.getBoolean("readAsString", false);
-            Map<String, Integer> range = taskExecution.get("range");
             String sheetName = taskExecution.get("sheetName", null);
 
-            Integer rangeStartRow = null;
-
-            if (range != null) {
-                rangeStartRow = range.get("startRow");
-            }
-
-            Integer rangeEndRow = null;
-
-            if (range != null) {
-                rangeEndRow = range.get("endRow");
-            }
-
-            String extension = fileEntry.getExtension();
-
-            FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());
-
-            rangeStartRow = rangeStartRow == null ? 0 : rangeStartRow;
-            rangeEndRow = rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow;
-
-            SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
-
             try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+                String extension = fileEntry.getExtension();
+
+                FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());
+
+                SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
+
+                Integer rangeStartRow = null;
+                Integer rangeEndRow = null;
+
+                if (pageSize != null && pageNumber != null) {
+                    rangeStartRow = pageSize * pageNumber - pageSize;
+
+                    rangeEndRow = rangeStartRow + pageSize;
+                }
+
                 result =
                     spreadsheetProcessor.read(
                         inputStream,
@@ -100,8 +95,8 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
                             delimiter,
                             headerRow,
                             includeEmptyCells,
-                            rangeStartRow,
-                            rangeEndRow,
+                            rangeStartRow == null ? 0 : rangeStartRow,
+                            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
                             readAsString,
                             sheetName
                         )

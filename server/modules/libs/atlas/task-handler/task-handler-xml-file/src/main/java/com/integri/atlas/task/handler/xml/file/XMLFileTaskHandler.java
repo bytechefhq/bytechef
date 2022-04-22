@@ -63,19 +63,10 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
 
             if (isArray) {
-                Map<String, Integer> range = taskExecution.get("range");
-                Integer rangeStartIndex = null;
+                Integer pageSize = taskExecution.get("pageSize");
+                Integer pageNumber = taskExecution.get("pageNumber");
+
                 List<Map<String, ?>> items;
-
-                if (range != null) {
-                    rangeStartIndex = range.get("startIndex");
-                }
-
-                Integer rangeEndIndex = null;
-
-                if (range != null) {
-                    rangeEndIndex = range.get("endIndex");
-                }
 
                 try (
                     Stream<Map<String, ?>> stream = xmlHelper.stream(
@@ -85,11 +76,20 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
                     items = stream.toList();
                 }
 
+                Integer rangeStartIndex = null;
+                Integer rangeEndIndex = null;
+
+                if (pageSize != null && pageNumber != null) {
+                    rangeStartIndex = pageSize * pageNumber - pageSize;
+
+                    rangeEndIndex = rangeStartIndex + pageSize;
+                }
+
                 if (
                     (rangeStartIndex != null && rangeStartIndex > 0) ||
                     (rangeEndIndex != null && rangeEndIndex < items.size())
                 ) {
-                    items = items.subList(rangeStartIndex == null ? 0 : rangeStartIndex, rangeEndIndex);
+                    items = items.subList(rangeStartIndex, rangeEndIndex);
                 }
 
                 result = items;
