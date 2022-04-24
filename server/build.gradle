@@ -4,6 +4,7 @@ plugins {
     id "com.github.ben-manes.versions"
     id "com.github.spotbugs"
     id "com.integri.java-common-conventions"
+    id "org.sonarqube"
 }
 
 allprojects {
@@ -14,6 +15,10 @@ subprojects {
     apply plugin: "checkstyle"
     apply plugin: "com.diffplug.spotless"
     apply plugin: "com.github.spotbugs"
+    apply plugin: "com.integri.java-common-conventions"
+    apply plugin: "org.sonarqube"
+
+    apply from: "${rootDir}/gradle/sonar.gradle"
 
     eclipse {
         sourceSets {
@@ -104,11 +109,62 @@ subprojects {
         }
     }
 
+    test {
+        useJUnitPlatform()
+        exclude "**/*IntTest*"
+        testLogging {
+            events "FAILED", "SKIPPED"
+        }
+        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
+        // uncomment if the tests reports are not generated
+        // ignoreFailures true
+        reports.html.enabled = false
+    }
+
+    task integrationTest(type: Test) {
+        useJUnitPlatform()
+        description = "Execute integration tests."
+        group = "verification"
+        include "**/*IntTest*"
+        testLogging {
+            events "FAILED", "SKIPPED"
+        }
+        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
+
+        if (project.hasProperty("testcontainers")) {
+            environment "spring.profiles.active", "testcontainers"
+        }
+
+        // uncomment if the tests reports are not generated
+        // ignoreFailures true
+        reports.html.enabled = false
+    }
+
+    check.dependsOn integrationTest
+
+    task testReport(type: TestReport) {
+        destinationDir = file("$buildDir/reports/tests")
+        reportOn test
+    }
+
+    task integrationTestReport(type: TestReport) {
+        destinationDir = file("$buildDir/reports/tests")
+        reportOn integrationTest
+    }
+
     task cleanResources(type: Delete) {
         delete "build/resources"
+    }
+
+    configurations {
+        all {
+            /* exclude junit 4 dependencies */
+            exclude group: 'junit', module: 'junit'
+            exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        }
     }
 }
 
 wrapper {
-    gradleVersion = "7.2.0"
+    gradleVersion = "7.4.0"
 }

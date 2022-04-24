@@ -6,4 +6,6 @@ dependencies {
     implementation "org.springframework:spring-webmvc"
     implementation project(":modules:libs:atlas:engine:engine-coordinator-api")
     implementation project(":modules:libs:atlas:task-definition")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-web"
 }

@@ -1,14 +1,10 @@
 plugins {
-    id "org.sonarqube"
     id "org.springframework.boot" version "${springBootVersion}" apply false
 }
 
 subprojects {
     apply plugin: "com.integri.java-library-conventions"
     apply plugin: "io.spring.dependency-management"
-    apply plugin: "org.sonarqube"
-
-    apply from: "${rootDir}/gradle/sonar.gradle"
 
     dependencyManagement {
         imports {
@@ -16,58 +12,7 @@ subprojects {
         }
     }
 
-    test {
-        useJUnitPlatform()
-        exclude "**/*IntTest*"
-        testLogging {
-            events "FAILED", "SKIPPED"
-        }
-        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
-        // uncomment if the tests reports are not generated
-        // ignoreFailures true
-        reports.html.enabled = false
-    }
-
-    task integrationTest(type: Test) {
-        useJUnitPlatform()
-        description = "Execute integration tests."
-        group = "verification"
-        include "**/*IntTest*"
-        testLogging {
-            events "FAILED", "SKIPPED"
-        }
-        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
-
-        if (project.hasProperty("testcontainers")) {
-            environment "spring.profiles.active", "testcontainers"
-        }
-
-        // uncomment if the tests reports are not generated
-        // ignoreFailures true
-        reports.html.enabled = false
-    }
-
-    check.dependsOn integrationTest
-
-    task testReport(type: TestReport) {
-        destinationDir = file("$buildDir/reports/tests")
-        reportOn test
-    }
-
-    task integrationTestReport(type: TestReport) {
-        destinationDir = file("$buildDir/reports/tests")
-        reportOn integrationTest
-    }
-
     dependencies {
         testImplementation "org.springframework.boot:spring-boot-starter-test"
-        testImplementation "org.springframework.boot:spring-boot-starter-web"
-    }
-    configurations {
-        all {
-            /* exclude junit 4 dependencies */
-            exclude group: 'junit', module: 'junit'
-            exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-        }
     }
 }
