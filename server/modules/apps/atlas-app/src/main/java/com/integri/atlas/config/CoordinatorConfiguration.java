@@ -46,6 +46,7 @@ import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.task.dispatcher.each.EachTaskDispatcher;
 import com.integri.atlas.task.dispatcher.each.completion.EachTaskCompletionHandler;
@@ -70,9 +71,12 @@ import com.integri.atlas.task.dispatcher.switch_.SwitchTaskDispatcher;
 import com.integri.atlas.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Arik Cohen
@@ -83,28 +87,35 @@ import org.springframework.context.annotation.Configuration;
 public class CoordinatorConfiguration {
 
     @Autowired
-    private JobRepository jobRepository;
-
-    @Autowired
-    private TaskExecutionRepository taskExecutionRepository;
-
-    @Autowired
     private ContextRepository contextRepository;
-
-    @Autowired
-    private WorkflowRepository workflowRepository;
 
     @Autowired
     private CounterRepository counterRepository;
 
     @Autowired
-    private MessageBroker messageBroker;
+    private Environment environment;
 
     @Autowired
     private EventPublisher eventPublisher;
 
     @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private MessageBroker messageBroker;
+
+    @Autowired
+    private TaskExecutionRepository taskExecutionRepository;
+
     private TaskEvaluator taskEvaluator;
+
+    @Autowired
+    private WorkflowRepository workflowRepository;
+
+    @PostConstruct
+    private void afterPropertiesSet() {
+        taskEvaluator = SpelTaskEvaluator.builder().environment(environment).build();
+    }
 
     @Bean
     ContextJobStatusEventListener contextJobStatusEventHandler(ContextService contextService) {

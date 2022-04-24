@@ -21,19 +21,15 @@ package com.integri.atlas.engine.core.task.evaluator.spel;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.xml.XMLHelper;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
@@ -412,108 +408,5 @@ public class SpelTaskEvaluatorTest {
         MapContext ctx = new MapContext();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals("${config('no.such.property')}", evaluated.getString("myValue"));
-    }
-
-    @Test
-    public void test43() {
-        SpelTaskEvaluator evaluator = SpelTaskEvaluator
-            .builder()
-            .jsonHelper(new JSONHelper(new ObjectMapper()))
-            .build();
-
-        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${readJSON('{\"field1\": \"value1\"}')}");
-
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
-
-        Assertions.assertEquals(Map.of("field1", "value1"), evaluatedTaskExecution.get("myValue", Map.class));
-
-        taskExecution = SimpleTaskExecution.of("myValue", "${readJSON('[{\"field1\": \"value1\"}]')}");
-
-        evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
-
-        Assertions.assertEquals(List.of(Map.of("field1", "value1")), evaluatedTaskExecution.get("myValue", List.class));
-    }
-
-    @Test
-    public void test44() {
-        SpelTaskEvaluator evaluator = SpelTaskEvaluator
-            .builder()
-            .jsonHelper(new JSONHelper(new ObjectMapper()))
-            .build();
-
-        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${writeJSON(map)}");
-
-        MapContext mapContext = new MapContext();
-
-        mapContext.set("map", Map.of("field1", "value1"));
-
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
-
-        Assertions.assertEquals("{\"field1\":\"value1\"}", evaluatedTaskExecution.get("myValue", String.class));
-
-        taskExecution = SimpleTaskExecution.of("myValue", "${writeJSON(list)}");
-
-        mapContext = new MapContext();
-
-        mapContext.set("list", List.of(Map.of("field1", "value1")));
-
-        evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
-
-        Assertions.assertEquals("[{\"field1\":\"value1\"}]", evaluatedTaskExecution.get("myValue", String.class));
-    }
-
-    @Test
-    public void test45() {
-        SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().xmlHelper(new XMLHelper()).build();
-
-        TaskExecution taskExecution = SimpleTaskExecution.of(
-            "myValue",
-            "${readXML('<root><element>value</element></root>')}"
-        );
-
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
-
-        Assertions.assertEquals(Map.of("element", "value"), evaluatedTaskExecution.get("myValue"));
-
-        taskExecution =
-            SimpleTaskExecution.of(
-                "myValue",
-                "${readXML('<root><element>value1</element><element>value2</element></root>')}"
-            );
-
-        evaluatedTaskExecution = evaluator.evaluate(taskExecution, new MapContext());
-
-        Assertions.assertEquals(Map.of("element", List.of("value1", "value2")), evaluatedTaskExecution.get("myValue"));
-    }
-
-    @Test
-    public void test46() {
-        SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().xmlHelper(new XMLHelper()).build();
-
-        TaskExecution taskExecution = SimpleTaskExecution.of("myValue", "${writeXML(map)}");
-
-        MapContext mapContext = new MapContext();
-
-        mapContext.set("map", Map.of("field1", "value1"));
-
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
-
-        Assertions.assertEquals(
-            "<root><field1>value1</field1></root>",
-            evaluatedTaskExecution.get("myValue", String.class)
-        );
-
-        taskExecution = SimpleTaskExecution.of("myValue", "${writeXML(list)}");
-
-        mapContext = new MapContext();
-
-        mapContext.set("list", List.of(Map.of("field", "value1"), Map.of("field", "value2")));
-
-        evaluatedTaskExecution = evaluator.evaluate(taskExecution, mapContext);
-
-        Assertions.assertEquals(
-            "<root><item><field>value1</field></item><item><field>value2</field></item></root>",
-            evaluatedTaskExecution.get("myValue", String.class)
-        );
     }
 }

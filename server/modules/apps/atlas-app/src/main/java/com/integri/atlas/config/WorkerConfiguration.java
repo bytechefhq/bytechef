@@ -21,6 +21,8 @@ package com.integri.atlas.config;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.spel.TempDir;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.annotation.ConditionalOnWorker;
@@ -32,9 +34,12 @@ import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolverChain;
 import com.integri.atlas.task.handler.map.MapTaskDispatcherAdapterTaskHandler;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Arik Cohen
@@ -44,6 +49,17 @@ import org.springframework.context.annotation.Primary;
 @ConditionalOnWorker
 public class WorkerConfiguration {
 
+    @Autowired
+    private Environment environment;
+
+    private TaskEvaluator taskEvaluator;
+
+    @PostConstruct
+    private void afterPropertiesSet() {
+        taskEvaluator =
+            SpelTaskEvaluator.builder().environment(environment).methodExecutor("tempDir", new TempDir()).build();
+    }
+
     @Bean
     DefaultTaskHandlerResolver defaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
         return new DefaultTaskHandlerResolver(taskHandlers);
@@ -51,8 +67,7 @@ public class WorkerConfiguration {
 
     @Bean
     TaskDispatcherAdapterTaskHandlerResolver taskDispatcherTaskHandlerResolverAdapter(
-        TaskHandlerResolver taskHandlerResolver,
-        TaskEvaluator taskEvaluator
+        TaskHandlerResolver taskHandlerResolver
     ) {
         return new TaskDispatcherAdapterTaskHandlerResolver(
             Map.of(
@@ -64,12 +79,12 @@ public class WorkerConfiguration {
 
     @Bean
     @Primary
-    TaskHandlerResolver taskHandlerResolver(TaskEvaluator taskEvaluator, Map<String, TaskHandler<?>> taskHandlers) {
+    TaskHandlerResolver taskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
-                taskDispatcherTaskHandlerResolverAdapter(taskHandlerResolverChain, taskEvaluator),
+                taskDispatcherTaskHandlerResolverAdapter(taskHandlerResolverChain),
                 defaultTaskHandlerResolver(taskHandlers)
             )
         );
@@ -78,17 +93,12 @@ public class WorkerConfiguration {
     }
 
     @Bean
-    Worker worker(
-        TaskHandlerResolver aTaskHandlerResolver,
-        MessageBroker aMessageBroker,
-        EventPublisher aEventPublisher,
-        TaskEvaluator taskEvaluator
-    ) {
+    Worker worker(TaskHandlerResolver taskHandlerResolver, MessageBroker messageBroker, EventPublisher eventPublisher) {
         return WorkerImpl
             .builder()
-            .withTaskHandlerResolver(aTaskHandlerResolver)
-            .withMessageBroker(aMessageBroker)
-            .withEventPublisher(aEventPublisher)
+            .withTaskHandlerResolver(taskHandlerResolver)
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(eventPublisher)
             .withTaskEvaluator(taskEvaluator)
             .build();
     }
