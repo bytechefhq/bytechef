@@ -17,8 +17,6 @@
 package com.integri.atlas.task.dispatcher.sequence;
 
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
@@ -96,11 +94,6 @@ public class SequenceTaskDispatcherIntTest extends BaseTaskIntTest {
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
         return Map.of("core/var", testVar);
-    }
-
-    @Override
-    protected WorkflowMapper getWorkflowMapper() {
-        return new YAMLWorkflowMapper();
     }
 
     private static class TestVar extends Var {

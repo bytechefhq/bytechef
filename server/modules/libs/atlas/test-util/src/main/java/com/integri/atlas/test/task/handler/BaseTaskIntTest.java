@@ -28,6 +28,7 @@ import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatche
 import com.integri.atlas.engine.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.integri.atlas.engine.coordinator.workflow.repository.JSONWorkflowMapper;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
+import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.error.Error;
@@ -98,8 +99,8 @@ public abstract class BaseTaskIntTest {
         return Map.of();
     }
 
-    protected WorkflowMapper getWorkflowMapper() {
-        return new JSONWorkflowMapper();
+    protected WorkflowMapper getWorkflowMapper(String workflowId) {
+        return workflowId.endsWith(".json") ? new JSONWorkflowMapper() : new YAMLWorkflowMapper();
     }
 
     protected Job startJob(String workflowId, Map<String, ?> inputs) {
@@ -138,7 +139,7 @@ public abstract class BaseTaskIntTest {
 
         coordinator.setContextRepository(contextRepository);
         coordinator.setJobRepository(jobRepository);
-        coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper()));
+        coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper(workflowId)));
         coordinator.setJobTaskRepository(taskExecutionRepository);
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
@@ -164,7 +165,7 @@ public abstract class BaseTaskIntTest {
 
         jobExecutor.setContextRepository(contextRepository);
         jobExecutor.setTaskExecutionRepository(taskExecutionRepository);
-        jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper()));
+        jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper(workflowId)));
         jobExecutor.setTaskDispatcher(taskDispatcherChain);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
 
@@ -176,7 +177,9 @@ public abstract class BaseTaskIntTest {
         defaultTaskCompletionHandler.setJobExecutor(jobExecutor);
         defaultTaskCompletionHandler.setJobRepository(jobRepository);
         defaultTaskCompletionHandler.setTaskExecutionRepository(taskExecutionRepository);
-        defaultTaskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper()));
+        defaultTaskCompletionHandler.setWorkflowRepository(
+            new ResourceBasedWorkflowRepository(getWorkflowMapper(workflowId))
+        );
         defaultTaskCompletionHandler.setEventPublisher(eventPublisher);
         defaultTaskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
 

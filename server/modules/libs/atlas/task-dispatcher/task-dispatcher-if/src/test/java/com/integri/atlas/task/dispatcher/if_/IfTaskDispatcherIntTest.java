@@ -18,8 +18,6 @@ package com.integri.atlas.task.dispatcher.if_;
 
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
@@ -129,10 +127,5 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
         return Map.of("core/var", new Var());
-    }
-
-    @Override
-    protected WorkflowMapper getWorkflowMapper() {
-        return new YAMLWorkflowMapper();
     }
 }
