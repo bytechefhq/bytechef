@@ -16,11 +16,12 @@
 
 package com.integri.atlas.task.handler.xml.file;
 
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.xml.XMLHelper;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.task.handler.xml.helper.XMLHelper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -37,9 +38,11 @@ import org.springframework.stereotype.Component;
 @Component("xmlFile")
 public class XMLFileTaskHandler implements TaskHandler<Object> {
 
+    private final JSONHelper jsonHelper;
     private final XMLHelper xmlHelper;
 
-    public XMLFileTaskHandler(FileStorageService fileStorageService, XMLHelper xmlHelper) {
+    public XMLFileTaskHandler(JSONHelper jsonHelper, FileStorageService fileStorageService, XMLHelper xmlHelper) {
+        this.jsonHelper = jsonHelper;
         this.fileStorageService = fileStorageService;
         this.xmlHelper = xmlHelper;
     }
@@ -98,12 +101,12 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get("fileName", String.class, "file.xml");
-            Object object = taskExecution.get("items");
+            Object input = jsonHelper.checkJSON(taskExecution.getRequired("input"));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                printWriter.println(xmlHelper.serialize(object));
+                printWriter.println(xmlHelper.serialize(input));
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {

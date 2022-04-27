@@ -128,7 +128,7 @@ public class JSONFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("items", JSONObjectUtil.toMap(Files.contentOf(file, Charset.defaultCharset())));
+        taskExecution.put("input", JSONObjectUtil.toMap(Files.contentOf(file, Charset.defaultCharset())));
         taskExecution.put("fileType", "JSON");
         taskExecution.put("operation", "WRITE");
 
@@ -149,7 +149,7 @@ public class JSONFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("items", JSONArrayUtil.toList(Files.contentOf(file, Charset.defaultCharset())));
+        taskExecution.put("input", JSONArrayUtil.toList(Files.contentOf(file, Charset.defaultCharset())));
         taskExecution.put("fileType", "JSON");
         taskExecution.put("operation", "WRITE");
 
@@ -165,7 +165,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("fileName", "test.json");
         taskExecution.put("fileType", "JSON");
-        taskExecution.put("items", JSONArrayUtil.toList(Files.contentOf(file, Charset.defaultCharset())));
+        taskExecution.put("input", JSONArrayUtil.toList(Files.contentOf(file, Charset.defaultCharset())));
         taskExecution.put("operation", "WRITE");
 
         fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
@@ -180,7 +180,7 @@ public class JSONFileTaskHandlerTest {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         taskExecution.put(
-            "items",
+            "input",
             JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
         );
         taskExecution.put("fileType", "JSONL");
@@ -199,7 +199,7 @@ public class JSONFileTaskHandlerTest {
         taskExecution.put("fileName", "test.jsonl");
         taskExecution.put("fileType", "JSONL");
         taskExecution.put(
-            "items",
+            "input",
             JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
         );
         taskExecution.put("operation", "WRITE");

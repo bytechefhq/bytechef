@@ -2,9 +2,9 @@
   "label": "JSON File - READ operation",
   "inputs": [
     {
-      "name": "items",
-      "label": "JSON object or array of items",
-      "type": "JSON",
+      "name": "input",
+      "label": "Object or array of objects",
+      "types": ["ARRAY", "OBJECT"],
       "required": true
     }
   ],
@@ -20,7 +20,7 @@
       "label": "Write to the XML file",
       "type": "xmlFile",
       "operation": "WRITE",
-      "items": "${items}"
+      "input": "${input}"
     }
   ]
 }

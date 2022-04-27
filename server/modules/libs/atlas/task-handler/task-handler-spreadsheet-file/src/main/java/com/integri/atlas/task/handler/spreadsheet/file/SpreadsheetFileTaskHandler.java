@@ -16,6 +16,8 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
@@ -50,9 +52,11 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
         WRITE,
     }
 
+    private final JSONHelper jsonHelper;
     private final FileStorageService fileStorageService;
 
-    public SpreadsheetFileTaskHandler(FileStorageService fileStorageService) {
+    public SpreadsheetFileTaskHandler(JSONHelper jsonHelper, FileStorageService fileStorageService) {
+        this.jsonHelper = jsonHelper;
         this.fileStorageService = fileStorageService;
     }
 
@@ -109,7 +113,10 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
                 String.class,
                 "spreadsheet." + StringUtils.lowerCase(fileFormat.name())
             );
-            List<Map<String, ?>> items = taskExecution.get("items");
+            List<Map<String, ?>> input = jsonHelper.checkJSONArray(
+                taskExecution.getRequired("input"),
+                new TypeReference<>() {}
+            );
 
             String sheetName = taskExecution.get("sheetName", String.class, "Sheet");
 
@@ -118,7 +125,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
             return fileStorageService.storeFileContent(
                 fileName,
                 new ByteArrayInputStream(
-                    spreadsheetProcessor.write(items, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))
+                    spreadsheetProcessor.write(input, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))
                 )
             );
         }
