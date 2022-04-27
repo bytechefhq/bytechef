@@ -219,6 +219,13 @@ public class KafkaMessageBrokerConfiguration implements KafkaListenerConfigurer 
                 coordinator,
                 "start"
             );
+            registerListenerEndpoint(
+                aRegistrar,
+                Queues.SUBFLOWS,
+                coordinatorProperties.getSubscriptions().getJobs(),
+                coordinator,
+                "create"
+            );
         }
 
         if (workerProperties.isEnabled()) {
