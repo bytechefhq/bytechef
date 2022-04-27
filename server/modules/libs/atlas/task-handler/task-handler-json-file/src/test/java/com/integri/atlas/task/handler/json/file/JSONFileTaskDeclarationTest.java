@@ -136,6 +136,18 @@ public class JSONFileTaskDeclarationTest {
                                 "type":"STRING"
                             },
                             {
+                                "description":"The path where the array is e.g 'data'. Leave blank to use the top level object.",
+                                "displayName":"Path",
+                                "displayOption":{
+                                    "show":{
+                                        "isArray":[true],
+                                        "operation":["READ"]
+                                    }
+                                },
+                                "name":"path",
+                                "type":"STRING"
+                            },
+                            {
                                 "description":"The amount of child elements to return in a page.",
                                 "displayName":"Page Size",
                                 "displayOption":{
