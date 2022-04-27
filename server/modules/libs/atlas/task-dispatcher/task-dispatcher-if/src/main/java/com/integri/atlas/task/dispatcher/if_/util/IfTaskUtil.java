@@ -34,12 +34,20 @@ public class IfTaskUtil {
     private static final ExpressionParser expressionParser = new SpelExpressionParser();
 
     public static boolean resolveCase(TaskExecution ifTask) {
-        List<MapObject> conditions = ifTask.getList("conditions", MapObject.class);
-        String combineOperation = ifTask.getRequiredString("combineOperation");
+        boolean rawConditions = ifTask.get("rawConditions", Boolean.class, false);
 
-        return expressionParser
-            .parseExpression(String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)))
-            .getValue(Boolean.class);
+        if (rawConditions) {
+            return ifTask.get("conditions", Boolean.class);
+        } else {
+            List<MapObject> conditionsUI = ifTask.getList("conditions", MapObject.class);
+            String combineOperation = ifTask.getRequiredString("combineOperation");
+
+            return expressionParser
+                .parseExpression(
+                    String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditionsUI))
+                )
+                .getValue(Boolean.class);
+        }
     }
 
     private static List<String> getConditionExpressions(List<MapObject> conditions) {

@@ -63,6 +63,15 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
     }
 
     @Test
+    public void testIfTaskDispatcher_Expression() {
+        Job job = startJob("samples/if-conditions-expression.yaml", Map.of("value1", 100, "value2", 200));
+
+        Context context = contextRepository.peek(job.getId());
+
+        Assertions.assertEquals("false branch", context.get("equalsResult"));
+    }
+
+    @Test
     public void testIfTaskDispatcher_Number() {
         Job job = startJob("samples/if-conditions-number.yaml", Map.of("value1", 100, "value2", 200));
 

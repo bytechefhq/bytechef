@@ -45,9 +45,32 @@ public class IfTaskDeclarationTest {
                 "displayName":"IF",
                 "name":"if",
                 "properties":[
+                     {
+                        "defaultValue":false,
+                        "description":"If the conditions should be set via the key-value pair in UI or as an raw expression).",
+                        "displayName":"RAW Conditions",
+                        "name":"rawConditions",
+                        "type":"BOOLEAN"
+                    },
+                    {
+                        "description":"The conditions expressed as an expression.",
+                        "displayName":"Conditions",
+                        "displayOption":{
+                            "show":{
+                                "rawConditions":[true]
+                            }
+                        },
+                        "name":"conditions",
+                        "type":"STRING"
+                    },
                     {
                         "description":"The type of values to compare.",
                         "displayName":"Conditions",
+                        "displayOption":{
+                            "show":{
+                                "rawConditions":[false]
+                            }
+                        },
                         "name":"conditions",
                         "type":"COLLECTION",
                         "typeOption":{
@@ -279,6 +302,11 @@ public class IfTaskDeclarationTest {
                         "defaultValue":"ALL",
                         "description":"If multiple conditions are set, this setting decides if it is true as soon as ANY condition\\n matches or only if ALL are met.\\n",
                         "displayName":"Combine",
+                        "displayOption":{
+                            "show":{
+                                "rawConditions":[false]
+                            }
+                        },
                         "name":"combineOperation",
                         "type":"SELECT",
                         "options":[
