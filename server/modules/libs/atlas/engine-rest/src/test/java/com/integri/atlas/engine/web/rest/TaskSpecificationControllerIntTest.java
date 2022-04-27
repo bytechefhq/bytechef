@@ -32,7 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @AutoConfigureMockMvc
 @SpringBootTest
-public class TaskControllerIntTest {
+public class TaskSpecificationControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +40,7 @@ public class TaskControllerIntTest {
     @Test
     public void testGetTaskSpecification() throws Exception {
         mockMvc
-            .perform(get("/tasks/task1").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/task-specifications/task1").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(
                 content()
@@ -64,7 +64,7 @@ public class TaskControllerIntTest {
     @Test
     public void testGetTaskSpecifications() throws Exception {
         mockMvc
-            .perform(get("/tasks").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/task-specifications").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(
                 content()
