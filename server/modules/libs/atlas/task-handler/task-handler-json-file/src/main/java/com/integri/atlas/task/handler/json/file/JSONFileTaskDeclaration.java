@@ -16,15 +16,12 @@
 
 package com.integri.atlas.task.handler.json.file;
 
-import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValue;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.INTEGER_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
@@ -42,15 +39,15 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("jsonFile")
         .displayName("JSON File")
-        .description("Reads and writes data from a JSON file")
+        .description("Reads and writes data from a JSON file.")
         .properties(
-            OPTION_PROPERTY("fileType")
+            SELECT_PROPERTY("fileType")
                 .displayName("File Type")
                 .description("The file type to choose.")
                 .options(option("JSON", "JSON"), option("JSON Line", "JSONL"))
                 .defaultValue("JSON")
                 .required(true),
-            OPTION_PROPERTY("operation")
+            SELECT_PROPERTY("operation")
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
@@ -59,19 +56,19 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
                 )
                 .defaultValue("READ")
                 .required(true),
-            FILE_ENTRY_PROPERTY("fileEntry")
+            JSON_PROPERTY("fileEntry")
                 .displayName("File")
                 .description("The object property which contains a reference to the JSON file to read from.")
                 .displayOption(show("operation", "READ"))
                 .required(true),
-            JSON_PROPERTY("items")
-                .displayName("JSON object or array of items")
-                .description("Data to write to the file.")
+            JSON_PROPERTY("input")
+                .displayName("Input")
+                .description("Object or array of objects to write to the file.")
                 .displayOption(show("operation", parameterValues("WRITE")))
                 .required(true),
             BOOLEAN_PROPERTY("isArray")
                 .displayName("Is Array")
-                .description("The input JSON is array?")
+                .description("The object input is array?")
                 .displayOption(show("operation", "READ"))
                 .defaultValue(true),
             COLLECTION_PROPERTY("options")
@@ -82,12 +79,12 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
                         .displayName("File Name")
                         .description("File name to set for binary data. By default, \"file.json\" will be used.")
                         .displayOption(show("operation", "WRITE"))
-                        .defaultValue(""),
-                    NUMBER_PROPERTY("pageSize")
+                        .defaultValue("file.json"),
+                    INTEGER_PROPERTY("pageSize")
                         .displayName("Page Size")
                         .description("The amount of child elements to return in a page.")
                         .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true))),
-                    NUMBER_PROPERTY("pageNumber")
+                    INTEGER_PROPERTY("pageNumber")
                         .displayName("Page Number")
                         .description("The page number to get.")
                         .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true)))

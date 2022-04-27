@@ -40,7 +40,7 @@ public class XMLFileTaskDeclarationTest {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Reads and writes data from a XML file",
+                "description":"Reads and writes data from a XML file.",
                 "displayName":"XML File",
                 "name":"xmlFile",
                 "properties":[
@@ -74,23 +74,23 @@ public class XMLFileTaskDeclarationTest {
                         },
                         "name":"fileEntry",
                         "required":true,
-                        "type":"FILE_ENTRY"
+                        "type":"JSON"
                     },
                     {
-                        "description":"Data to write to the file.",
-                        "displayName":"JSON object or array of items",
+                        "description":"Object or array of objects to write to the file.",
+                        "displayName":"Input",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
                             }
                         },
-                        "name":"items",
+                        "name":"input",
                         "required":true,
                         "type":"JSON"
                     },
                     {
                         "defaultValue":true,
-                        "description":"The input JSON is array?",
+                        "description":"The object input is array?",
                         "displayName":"Is Array",
                         "displayOption":{
                             "show":{
@@ -106,7 +106,7 @@ public class XMLFileTaskDeclarationTest {
                         "type":"COLLECTION",
                         "options":[
                             {
-                                "defaultValue":"",
+                                "defaultValue":"file.xml",
                                 "description":"File name to set for binary data. By default, \\"file.xml\\" will be used.",
                                 "displayName":"File Name",
                                 "displayOption":{
@@ -127,7 +127,7 @@ public class XMLFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"pageSize",
-                                "type":"NUMBER"
+                                "type":"INTEGER"
                             },
                             {
                                 "description":"The page number to get.",
@@ -139,7 +139,7 @@ public class XMLFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"pageNumber",
-                                "type":"NUMBER"
+                                "type":"INTEGER"
                             },
                         ],
                         "placeholder":"Add Option"

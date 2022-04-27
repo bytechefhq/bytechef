@@ -40,85 +40,35 @@ public sealed interface TaskParameter
         return parameterValue(value);
     }
 
-    static TaskParameter parameter(Boolean... values) {
-        return new TaskParameterList(
-            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
-        );
-    }
-
-    static TaskParameter parameter(int value) {
+    static TaskParameter parameter(double value) {
         return parameterValue(value);
-    }
-
-    static TaskParameter parameter(Integer... values) {
-        return new TaskParameterList(
-            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
-        );
-    }
-
-    static TaskParameter parameter(TaskParameterMap value) {
-        return value;
-    }
-
-    static TaskParameter parameter(TaskParameterMap... values) {
-        return new TaskParameterList(Stream.of(values).collect(Collectors.toList()));
-    }
-
-    static TaskParameter parameter(LocalDateTime value) {
-        return parameterValue(value);
-    }
-
-    static TaskParameter parameter(LocalDateTime... values) {
-        return new TaskParameterList(
-            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
-        );
-    }
-
-    static TaskParameter parameter(long value) {
-        return parameterValue(value);
-    }
-
-    static TaskParameter parameter(Long... values) {
-        return new TaskParameterList(
-            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
-        );
     }
 
     static TaskParameter parameter(float value) {
         return parameterValue(value);
     }
 
-    static TaskParameter parameter(Float... values) {
-        return new TaskParameterList(
-            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
-        );
-    }
-
-    static TaskParameter parameter(double value) {
+    static TaskParameter parameter(int value) {
         return parameterValue(value);
     }
 
-    static TaskParameter parameter(Double... values) {
-        return new TaskParameterList(
-            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
-        );
+    static TaskParameter parameter(long value) {
+        return parameterValue(value);
+    }
+
+    static TaskParameter parameter(LocalDateTime value) {
+        return parameterValue(value);
     }
 
     static TaskParameter parameter(String value) {
         return parameterValue(value);
     }
 
-    static TaskParameter parameter(String... values) {
-        return new TaskParameterList(
-            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
-        );
-    }
-
     static TaskParameter parameter(String k1, boolean value) {
         return parameter(k1, parameterValue(value));
     }
 
-    static TaskParameter parameter(String k1, Boolean... values) {
+    static TaskParameterListMap parameter(String k1, Boolean... values) {
         return new TaskParameterListMap(
             Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()))
         );
@@ -128,7 +78,7 @@ public sealed interface TaskParameter
         return parameter(k1, parameterValue(value));
     }
 
-    static TaskParameter parameter(String k1, Integer... values) {
+    static TaskParameterListMap parameter(String k1, Integer... values) {
         return new TaskParameterListMap(
             Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()))
         );
@@ -138,7 +88,7 @@ public sealed interface TaskParameter
         return parameter(k1, parameterValue(value));
     }
 
-    static TaskParameter parameter(String k1, Long... values) {
+    static TaskParameterListMap parameter(String k1, Long... values) {
         return new TaskParameterListMap(
             Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()))
         );
@@ -148,7 +98,7 @@ public sealed interface TaskParameter
         return parameter(k1, parameterValue(value));
     }
 
-    static TaskParameter parameter(String k1, Float... values) {
+    static TaskParameterListMap parameter(String k1, Float... values) {
         return new TaskParameterListMap(
             Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()))
         );
@@ -158,39 +108,39 @@ public sealed interface TaskParameter
         return parameter(k1, parameterValue(value));
     }
 
-    static TaskParameter parameter(String k1, Double... values) {
+    static TaskParameterListMap parameter(String k1, Double... values) {
         return new TaskParameterListMap(
             Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()))
         );
     }
 
-    static TaskParameter parameter(String k1, String value) {
+    static TaskParameterMap parameter(String k1, String value) {
         return parameter(k1, parameterValue(value));
     }
 
-    static TaskParameter parameter(String k1, String... values) {
+    static TaskParameterListMap parameter(String k1, String... values) {
         return new TaskParameterListMap(
             Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()))
         );
     }
 
-    static TaskParameter parameter(String k1, TaskParameter v1) {
+    static TaskParameterMap parameter(String k1, TaskParameter v1) {
         return new TaskParameterMap(Map.of(k1, v1));
     }
 
-    static TaskParameter parameter(String k1, List<TaskParameter> v1) {
+    static TaskParameterListMap parameter(String k1, List<TaskParameter> v1) {
         return new TaskParameterListMap(Map.of(k1, v1));
     }
 
-    static TaskParameter parameter(String k1, TaskParameter v1, String k2, TaskParameter v2) {
+    static TaskParameterMap parameter(String k1, TaskParameter v1, String k2, TaskParameter v2) {
         return new TaskParameterMap(Map.of(k1, v1, k2, v2));
     }
 
-    static TaskParameter parameter(String k1, List<TaskParameter> v1, String k2, List<TaskParameter> v2) {
+    static TaskParameterListMap parameter(String k1, List<TaskParameter> v1, String k2, List<TaskParameter> v2) {
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -201,7 +151,7 @@ public sealed interface TaskParameter
         return new TaskParameterMap(Map.of(k1, v1, k2, v2, k3, v3));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -212,7 +162,7 @@ public sealed interface TaskParameter
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2, k3, v3));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -225,7 +175,7 @@ public sealed interface TaskParameter
         return new TaskParameterMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -238,7 +188,7 @@ public sealed interface TaskParameter
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -253,7 +203,7 @@ public sealed interface TaskParameter
         return new TaskParameterMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -268,7 +218,7 @@ public sealed interface TaskParameter
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -285,7 +235,7 @@ public sealed interface TaskParameter
         return new TaskParameterMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -302,7 +252,7 @@ public sealed interface TaskParameter
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -321,7 +271,7 @@ public sealed interface TaskParameter
         return new TaskParameterMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -340,7 +290,7 @@ public sealed interface TaskParameter
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -361,7 +311,7 @@ public sealed interface TaskParameter
         return new TaskParameterMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -382,7 +332,7 @@ public sealed interface TaskParameter
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -405,7 +355,7 @@ public sealed interface TaskParameter
         return new TaskParameterMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -428,7 +378,7 @@ public sealed interface TaskParameter
         return new TaskParameterListMap(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9));
     }
 
-    static TaskParameter parameter(
+    static TaskParameterMap parameter(
         String k1,
         TaskParameter v1,
         String k2,
@@ -455,7 +405,7 @@ public sealed interface TaskParameter
         );
     }
 
-    static TaskParameter parameter(
+    static TaskParameterListMap parameter(
         String k1,
         List<TaskParameter> v1,
         String k2,
@@ -482,12 +432,62 @@ public sealed interface TaskParameter
         );
     }
 
-    static TaskParameter parameter(String k1, TaskParameter... taskParameters) {
+    static TaskParameterListMap parameter(String k1, TaskParameter... taskParameters) {
         return new TaskParameterListMap(Map.of(k1, List.of(taskParameters)));
     }
 
-    static TaskParameter parameter(TaskParameter... taskParameters) {
+    static TaskParameterList parameter(TaskParameter... taskParameters) {
         return new TaskParameterList(List.of(taskParameters));
+    }
+
+    static TaskParameter parameter(TaskParameterMap value) {
+        return value;
+    }
+
+    static TaskParameterList parameters(Boolean... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameterList parameters(TaskParameterMap... values) {
+        return new TaskParameterList(Stream.of(values).collect(Collectors.toList()));
+    }
+
+    static TaskParameterList parameters(Integer... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameterList parameters(LocalDateTime... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameterList parameters(Long... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameterList parameters(Float... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameterList parameters(Double... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameterList parameters(String... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
     }
 
     final class TaskParameterList extends ArrayList<TaskParameter> implements TaskParameter {

@@ -72,7 +72,7 @@ public class LocalFileTaskDeclarationTest {
                         },
                         "name":"fileEntry",
                         "required":true,
-                        "type":"FILE_ENTRY"
+                        "type":"JSON"
                     },
                     {
                         "defaultValue":"",

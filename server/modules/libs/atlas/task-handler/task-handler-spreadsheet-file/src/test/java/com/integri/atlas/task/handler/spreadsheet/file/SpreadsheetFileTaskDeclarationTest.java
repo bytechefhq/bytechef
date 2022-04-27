@@ -40,7 +40,7 @@ public class SpreadsheetFileTaskDeclarationTest {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Reads and writes data from a spreadsheet file",
+                "description":"Reads and writes data from a spreadsheet file.",
                 "displayName":"Spreadsheet File",
                 "name":"spreadsheetFile",
                 "properties":[
@@ -74,7 +74,7 @@ public class SpreadsheetFileTaskDeclarationTest {
                         },
                         "name":"fileEntry",
                         "required":true,
-                        "type":"FILE_ENTRY"
+                        "type":"JSON"
                     },
                     {
                         "defaultValue":"CSV",
@@ -106,15 +106,14 @@ public class SpreadsheetFileTaskDeclarationTest {
                         ]
                     },
                     {
-                        "description":"Data to write to the file.",
-                        "displayName":"JSON array of items",
+                        "description":"Object or array of objects to write to the file.",
+                        "displayName":"Input",
                         "displayOption":{
                             "show":{
-                                "operation":["WRITE"],
-                                "inputType":["JSON"]
+                                "operation":["WRITE"]
                             }
                         },
-                        "name":"items",
+                        "name":"input",
                         "required":true,
                         "type":"JSON"
                     },
@@ -173,28 +172,6 @@ public class SpreadsheetFileTaskDeclarationTest {
                                 "type":"BOOLEAN"
                             },
                             {
-                                "defaultValue":"JSON",
-                                "description":"Input type to use when writing data.",
-                                "displayName":"Input Content Type",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["WRITE"]
-                                    }
-                                },
-                                "name":"inputType",
-                                "options":[
-                                    {
-                                        "name":"JSON",
-                                        "value":"JSON"
-                                    },
-                                    {
-                                        "name":"File",
-                                        "value":"FILE"
-                                    }
-                                ],
-                                "type":"SELECT"
-                            },
-                                                        {
                                 "description":"The amount of child elements to return in a page.",
                                 "displayName":"Page Size",
                                 "displayOption":{
@@ -203,7 +180,7 @@ public class SpreadsheetFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"pageSize",
-                                "type":"NUMBER"
+                                "type":"INTEGER"
                             },
                             {
                                 "description":"The page number to get.",
@@ -214,8 +191,8 @@ public class SpreadsheetFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"pageNumber",
-                                "type":"NUMBER"
-                            },,
+                                "type":"INTEGER"
+                            },
                             {
                                 "defaultValue":false,
                                 "description":"In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",

@@ -21,7 +21,7 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROP
 import static com.integri.atlas.task.definition.dsl.TaskProperty.DATE_TIME_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.hide;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.multipleValues;
@@ -54,7 +54,7 @@ public class IfTaskDeclaration implements TaskDeclaration {
                                 .displayName("Value 1")
                                 .description("The boolean value to compare with the second one.")
                                 .defaultValue(false),
-                            OPTION_PROPERTY("operation")
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
                                 .options(option("Equal", "equal"), option("Not Equal", "notEqual"))
@@ -71,7 +71,7 @@ public class IfTaskDeclaration implements TaskDeclaration {
                                 .displayName("Value 1")
                                 .description("The date & time value to compare with the second one.")
                                 .defaultValue(null),
-                            OPTION_PROPERTY("operation")
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
                                 .options(option("After", "after"), option("Before", "before"))
@@ -88,7 +88,7 @@ public class IfTaskDeclaration implements TaskDeclaration {
                                 .displayName("Value 1")
                                 .description("The number value to compare with the second one.")
                                 .defaultValue(0),
-                            OPTION_PROPERTY("operation")
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
                                 .options(
@@ -114,7 +114,7 @@ public class IfTaskDeclaration implements TaskDeclaration {
                                 .displayName("Value 1")
                                 .description("The string value to compare with the second one.")
                                 .defaultValue(""),
-                            OPTION_PROPERTY("operation")
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
                                 .options(
@@ -141,7 +141,7 @@ public class IfTaskDeclaration implements TaskDeclaration {
                                 .displayOption(show("operation", "regex"))
                         )
                 ),
-            OPTION_PROPERTY("combineOperation")
+            SELECT_PROPERTY("combineOperation")
                 .displayName("Combine")
                 .options(
                     option("All", "ALL", "Only if all conditions are met, the workflow goes into \"true\" branch."),

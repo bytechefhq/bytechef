@@ -19,11 +19,9 @@ package com.integri.atlas.task.handler.spreadsheet.file;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.INTEGER_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
@@ -41,9 +39,9 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("spreadsheetFile")
         .displayName("Spreadsheet File")
-        .description("Reads and writes data from a spreadsheet file")
+        .description("Reads and writes data from a spreadsheet file.")
         .properties(
-            OPTION_PROPERTY("operation")
+            SELECT_PROPERTY("operation")
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
@@ -52,12 +50,12 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                 )
                 .defaultValue("READ")
                 .required(true),
-            FILE_ENTRY_PROPERTY("fileEntry")
+            JSON_PROPERTY("fileEntry")
                 .displayName("File")
                 .description("The object property which contains a reference to the spreadsheet file to read from.")
                 .displayOption(show("operation", "READ"))
                 .required(true),
-            OPTION_PROPERTY("fileFormat")
+            SELECT_PROPERTY("fileFormat")
                 .displayName("FileFormat")
                 .description("The format of the file to save the data.")
                 .displayOption(show("operation", "WRITE"))
@@ -67,10 +65,10 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                     option("XLSX", "XLSX", "Microsoft Excel")
                 )
                 .defaultValue("CSV"),
-            JSON_PROPERTY("items")
-                .displayName("JSON array of items")
-                .description("Data to write to the file.")
-                .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("JSON")))
+            JSON_PROPERTY("input")
+                .displayName("Input")
+                .description("Object or array of objects to write to the file.")
+                .displayOption(show("operation", "WRITE"))
                 .required(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
@@ -98,17 +96,11 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                         .description("When reading from file the empty cells will be filled with an empty string.")
                         .displayOption(show("operation", "READ"))
                         .defaultValue(false),
-                    OPTION_PROPERTY("inputType")
-                        .displayName("Input Content Type")
-                        .description("Input type to use when writing data.")
-                        .displayOption(show("operation", "WRITE"))
-                        .options(option("JSON", "JSON"), option("File", "FILE"))
-                        .defaultValue("JSON"),
-                    NUMBER_PROPERTY("pageSize")
+                    INTEGER_PROPERTY("pageSize")
                         .displayName("Page Size")
                         .description("The amount of child elements to return in a page.")
                         .displayOption(show("operation", "READ")),
-                    NUMBER_PROPERTY("pageNumber")
+                    INTEGER_PROPERTY("pageNumber")
                         .displayName("Page Number")
                         .description("The page number to get.")
                         .displayOption(show("operation", "READ")),
