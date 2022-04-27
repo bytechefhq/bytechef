@@ -27,7 +27,6 @@ import com.integri.atlas.engine.core.counter.repository.CounterRepository;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.core.xml.XMLHelper;
 import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
 import com.integri.atlas.engine.repository.jdbc.counter.JdbcCounterRepository;
 import com.integri.atlas.engine.repository.jdbc.job.JdbcJobRepository;
@@ -122,10 +121,5 @@ public class IntTestConfiguration {
     @Bean
     JSONHelper jsonHelper(ObjectMapper objectMapper) {
         return new JSONHelper(objectMapper);
-    }
-
-    @Bean
-    XMLHelper xmlHelper() {
-        return new XMLHelper();
     }
 }

@@ -1,0 +1,6 @@
+dependencies {
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+}

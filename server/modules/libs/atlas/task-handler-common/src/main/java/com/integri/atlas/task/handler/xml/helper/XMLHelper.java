@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.xml;
+package com.integri.atlas.task.handler.xml.helper;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
+@Component
 public class XMLHelper {
 
     private static final XmlMapper xmlMapper = new XmlMapper();
