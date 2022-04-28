@@ -418,6 +418,10 @@ public class JSONHelperTest {
             .assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> jsonHelper.checkJSONObject(List.of(Map.of("key", "value")), String.class));
 
+        Assertions
+            .assertThat(jsonHelper.checkJSONObject(jsonHelper.serialize(Map.of("key", "value"))))
+            .isEqualTo(Map.of("key", "value"));
+
         Map<String, String> map = jsonHelper.checkJSONObject(Map.of("key", "value"), new TypeReference<>() {});
 
         Assertions.assertThat(map).isEqualTo(Map.of("key", "value"));
