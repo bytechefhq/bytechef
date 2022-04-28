@@ -18,6 +18,7 @@ package com.integri.atlas.task.handler.json.helper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.TypeRef;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -252,11 +253,7 @@ public class JSONHelperTest {
 
         Assertions.assertThat(jsonHelper.read("\"item\"", String.class)).isEqualTo("item");
 
-        Assertions.assertThat((List<?>) jsonHelper.read("[2,4]")).isEqualTo(List.of(2, 4));
-
         Assertions.assertThat(jsonHelper.read("[2,4]", List.class)).isEqualTo(List.of(2, 4));
-
-        Assertions.assertThat((List<?>) jsonHelper.read("[\"item1\",\"item2\"]")).isEqualTo(List.of("item1", "item2"));
 
         Assertions
             .assertThat(jsonHelper.read("[\"item1\",\"item2\"]", List.class))
@@ -268,10 +265,6 @@ public class JSONHelperTest {
 
         Assertions
             .assertThat((List<?>) jsonHelper.read("[{\"key\":\"value\"}]"))
-            .isEqualTo(List.of(Map.of("key", "value")));
-
-        Assertions
-            .assertThat(jsonHelper.read("[{\"key\":\"value\"}]", List.class))
             .isEqualTo(List.of(Map.of("key", "value")));
 
         Assertions
@@ -342,6 +335,17 @@ public class JSONHelperTest {
                     Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))
                 )
             );
+    }
+
+    @Test
+    public void testReadList() {
+        Assertions.assertThat((List<?>) jsonHelper.read("[2,4]")).isEqualTo(List.of(2, 4));
+
+        Assertions.assertThat((List<?>) jsonHelper.read("[\"item1\",\"item2\"]")).isEqualTo(List.of("item1", "item2"));
+
+        Assertions
+            .assertThat(jsonHelper.read("[{\"key\":\"value\"}]", List.class))
+            .isEqualTo(List.of(Map.of("key", "value")));
 
         Assertions
             .assertThat(
@@ -426,6 +430,110 @@ public class JSONHelperTest {
     }
 
     @Test
+    public void testReadListFromPath() {
+        Assertions
+            .assertThat(
+                jsonHelper.read(
+                    """
+                        {
+                            "id": 77,
+                            "city": "B",
+                            "name": "A",
+                            "active": true,
+                            "description": "C",
+                            "date": "2021-12-07",
+                            "sum": 11.2,
+                            "cities": [
+                                {
+                                    "id": 77,
+                                    "city": "B",
+                                    "name": "A",
+                                    "active": true,
+                                    "description": "C",
+                                    "date": "2021-12-07",
+                                    "sum": 11.2
+                                },
+                                {
+                                    "id": 4,
+                                    "city": "city1",
+                                    "name": "name1",
+                                    "active": false,
+                                    "description": "description1",
+                                    "date": "",
+                                    "sum": 12
+                                },
+                                {
+                                    "id": 2,
+                                    "city": "city2",
+                                    "name": "A",
+                                    "active": true,
+                                    "description": "",
+                                    "date": "2021-12-09",
+                                    "sum": ""
+                                },
+                                {
+                                    "id": 5678,
+                                    "city": "city3",
+                                    "name": "ABCD",
+                                    "active": false,
+                                    "description": "EFGH",
+                                    "date": "2021-12-10",
+                                    "sum": 13.23
+                                }
+                            ]
+                        }
+                        """,
+                    "$.cities",
+                    new TypeRef<List<Map<String, ?>>>() {}
+                )
+            )
+            .isEqualTo(
+                jsonHelper.read(
+                    """
+                [
+                    {
+                        "id": 77,
+                        "city": "B",
+                        "name": "A",
+                        "active": true,
+                        "description": "C",
+                        "date": "2021-12-07",
+                        "sum": 11.2
+                    },
+                    {
+                        "id": 4,
+                        "city": "city1",
+                        "name": "name1",
+                        "active": false,
+                        "description": "description1",
+                        "date": "",
+                        "sum": 12
+                    },
+                    {
+                        "id": 2,
+                        "city": "city2",
+                        "name": "A",
+                        "active": true,
+                        "description": "",
+                        "date": "2021-12-09",
+                        "sum": ""
+                    },
+                    {
+                        "id": 5678,
+                        "city": "city3",
+                        "name": "ABCD",
+                        "active": false,
+                        "description": "EFGH",
+                        "date": "2021-12-10",
+                        "sum": 13.23
+                    }
+                ]
+                """
+                )
+            );
+    }
+
+    @Test
     public void testWrite() {
         Assertions.assertThat(jsonHelper.write(true)).isEqualTo("true");
 
@@ -435,13 +543,7 @@ public class JSONHelperTest {
 
         Assertions.assertThat(jsonHelper.write("item")).isEqualTo("\"item\"");
 
-        Assertions.assertThat(jsonHelper.write(List.of(2, 4))).isEqualTo("[2,4]");
-
-        Assertions.assertThat(jsonHelper.write(List.of("item1", "item2"))).isEqualTo("[\"item1\",\"item2\"]");
-
         Assertions.assertThat(jsonHelper.write(Map.of("key", "value"))).isEqualTo("{\"key\":\"value\"}");
-
-        Assertions.assertThat(jsonHelper.write(List.of(Map.of("key", "value")))).isEqualTo("[{\"key\":\"value\"}]");
 
         Assertions
             .assertThat(
@@ -498,6 +600,15 @@ public class JSONHelperTest {
                  """
                 )
             );
+    }
+
+    @Test
+    public void testWriteArray() {
+        Assertions.assertThat(jsonHelper.write(List.of(2, 4))).isEqualTo("[2,4]");
+
+        Assertions.assertThat(jsonHelper.write(List.of("item1", "item2"))).isEqualTo("[\"item1\",\"item2\"]");
+
+        Assertions.assertThat(jsonHelper.write(List.of(Map.of("key", "value")))).isEqualTo("[{\"key\":\"value\"}]");
 
         Assertions
             .assertThat(

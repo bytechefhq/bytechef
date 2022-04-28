@@ -21,8 +21,6 @@ import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -73,9 +71,9 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
         if (operation == Operation.READ) {
             boolean isArray = taskExecution.get("isArray", Boolean.class, true);
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
-            String path = taskExecution.get("path");
 
             if (isArray) {
+                String path = taskExecution.get("path");
                 InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
                 List<Map<String, ?>> items;
 
@@ -85,9 +83,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                             items = stream.toList();
                         }
                     } else {
-                        DocumentContext documentContext = JsonPath.parse(inputStream);
-
-                        items = documentContext.read(path);
+                        items = jsonHelper.read(inputStream, path);
                     }
                 } else {
                     try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
