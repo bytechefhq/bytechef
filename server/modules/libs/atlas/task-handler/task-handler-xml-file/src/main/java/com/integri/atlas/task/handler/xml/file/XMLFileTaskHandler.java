@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.xml.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
@@ -55,7 +56,6 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
     private final FileStorageService fileStorageService;
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
@@ -66,19 +66,24 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
 
             if (isArray) {
-                Integer pageSize = taskExecution.get("pageSize");
-                Integer pageNumber = taskExecution.get("pageNumber");
-
+                String path = taskExecution.get("path");
+                InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
                 List<Map<String, ?>> items;
 
-                try (
-                    Stream<Map<String, ?>> stream = xmlHelper.stream(
-                        fileStorageService.getFileContentStream(fileEntry.getUrl())
-                    )
-                ) {
-                    items = stream.toList();
+                if (path == null) {
+                    try (
+                        Stream<Map<String, ?>> stream = xmlHelper.stream(
+                            fileStorageService.getFileContentStream(fileEntry.getUrl())
+                        )
+                    ) {
+                        items = stream.toList();
+                    }
+                } else {
+                    items = xmlHelper.read(inputStream, path, new TypeReference<>() {});
                 }
 
+                Integer pageSize = taskExecution.get("pageSize");
+                Integer pageNumber = taskExecution.get("pageNumber");
                 Integer rangeStartIndex = null;
                 Integer rangeEndIndex = null;
 
