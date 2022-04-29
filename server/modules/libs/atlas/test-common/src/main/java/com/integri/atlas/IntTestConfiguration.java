@@ -25,7 +25,6 @@ import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.counter.repository.CounterRepository;
 import com.integri.atlas.engine.core.event.EventPublisher;
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
 import com.integri.atlas.engine.repository.jdbc.counter.JdbcCounterRepository;
@@ -39,6 +38,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -46,6 +46,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 /**
  * @author Ivica Cardic
  */
+@ComponentScan
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class IntTestConfiguration {
@@ -87,39 +88,34 @@ public class IntTestConfiguration {
     @Bean
     TaskExecutionRepository jdbcJobTaskRepository(
         NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-        JSONHelper jsonHelper
+        ObjectMapper objectMapper
     ) {
         JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
 
         jdbcJobTaskRepository.setJdbcOperations(namedParameterJdbcTemplate);
-        jdbcJobTaskRepository.setJsonHelper(jsonHelper);
+        jdbcJobTaskRepository.setObjectMapper(objectMapper);
 
         return jdbcJobTaskRepository;
     }
 
     @Bean
-    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, JSONHelper jsonHelper) {
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, ObjectMapper objectMapper) {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
         jdbcJobRepository.setJdbcOperations(namedParameterJdbcTemplate);
-        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(namedParameterJdbcTemplate, jsonHelper));
-        jdbcJobRepository.setJsonHelper(jsonHelper);
+        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(namedParameterJdbcTemplate, objectMapper));
+        jdbcJobRepository.setObjectMapper(objectMapper);
 
         return jdbcJobRepository;
     }
 
     @Bean
-    ContextRepository jdbcContextRepository(JdbcTemplate jdbcTemplate, JSONHelper jsonHelper) {
+    ContextRepository jdbcContextRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
 
         jdbcContextRepository.setJdbcTemplate(jdbcTemplate);
-        jdbcContextRepository.setJsonHelper(jsonHelper);
+        jdbcContextRepository.setObjectMapper(objectMapper);
 
         return jdbcContextRepository;
-    }
-
-    @Bean
-    JSONHelper jsonHelper(ObjectMapper objectMapper) {
-        return new JSONHelper(objectMapper);
     }
 }

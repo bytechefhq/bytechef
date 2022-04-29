@@ -16,10 +16,10 @@
 
 package com.integri.atlas.task.handler.http.client.response;
 
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.http.client.header.ContentType;
+import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.Map;

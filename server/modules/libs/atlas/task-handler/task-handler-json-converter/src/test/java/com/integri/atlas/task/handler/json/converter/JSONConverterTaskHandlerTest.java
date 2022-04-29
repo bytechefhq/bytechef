@@ -19,8 +19,8 @@ package com.integri.atlas.task.handler.json.converter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

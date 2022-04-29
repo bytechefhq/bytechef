@@ -16,7 +16,8 @@
 
 package com.integri.atlas.engine.repository.jdbc.task;
 
-import com.integri.atlas.engine.core.json.JSONHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.engine.core.json.Json;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.TaskStatus;
@@ -38,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     private NamedParameterJdbcOperations jdbc;
-    private JSONHelper jsonHelper;
+    private ObjectMapper objectMapper;
 
     @Override
     public void create(TaskExecution aTaskExecution) {
@@ -123,8 +124,8 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         jdbc = aJdbcOperations;
     }
 
-    public void setJsonHelper(JSONHelper jsonHelper) {
-        this.jsonHelper = jsonHelper;
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     private SqlParameterSource createSqlParameterSource(TaskExecution aTaskExecution) {
@@ -137,7 +138,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         sqlParameterSource.addValue("createTime", aTaskExecution.getCreateTime());
         sqlParameterSource.addValue("startTime", aTaskExecution.getStartTime());
         sqlParameterSource.addValue("endTime", aTaskExecution.getEndTime());
-        sqlParameterSource.addValue("serializedExecution", jsonHelper.serialize(aTaskExecution));
+        sqlParameterSource.addValue("serializedExecution", Json.serialize(objectMapper, aTaskExecution));
         sqlParameterSource.addValue("priority", aTaskExecution.getPriority());
         sqlParameterSource.addValue("taskNumber", aTaskExecution.getTaskNumber());
         return sqlParameterSource;
@@ -145,6 +146,6 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     @SuppressWarnings("unchecked")
     private TaskExecution jobTaskRowMapper(ResultSet aRs, int aIndex) throws SQLException {
-        return SimpleTaskExecution.of(jsonHelper.deserialize(aRs.getString("serialized_execution"), Map.class));
+        return SimpleTaskExecution.of(Json.deserialize(objectMapper, aRs.getString("serialized_execution"), Map.class));
     }
 }

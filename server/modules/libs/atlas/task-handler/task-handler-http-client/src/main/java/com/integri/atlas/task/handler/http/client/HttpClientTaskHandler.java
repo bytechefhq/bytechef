@@ -17,7 +17,6 @@
 package com.integri.atlas.task.handler.http.client;
 
 import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
@@ -25,6 +24,7 @@ import com.integri.atlas.task.handler.http.client.header.ContentType;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
+import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
