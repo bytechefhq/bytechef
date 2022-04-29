@@ -47,7 +47,7 @@ public class TaskSpecificationControllerIntTest {
                     .json(
                         """
                 {
-                    "credentials":null,
+                    "authentication":null,
                     "description":null,
                     "displayName":null,
                     "name":"task1",
@@ -72,7 +72,7 @@ public class TaskSpecificationControllerIntTest {
                         """
                 [
                     {
-                        "credentials":null,
+                        "authentication":null,
                         "description":null,
                         "displayName":null,
                         "name":"task1",
@@ -82,7 +82,7 @@ public class TaskSpecificationControllerIntTest {
                         "version":1.0
                     },
                     {
-                        "credentials":null,
+                        "authentication":null,
                         "description":null,
                         "displayName":null,
                         "name":"task2",

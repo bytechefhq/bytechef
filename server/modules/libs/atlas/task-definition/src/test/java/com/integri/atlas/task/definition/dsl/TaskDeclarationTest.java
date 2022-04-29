@@ -17,6 +17,7 @@
 package com.integri.atlas.task.definition.dsl;
 
 import static com.integri.atlas.task.definition.dsl.DisplayOption.displayOption;
+import static com.integri.atlas.task.definition.dsl.TaskAuthentication.authentication;
 import static com.integri.atlas.task.definition.dsl.TaskCredential.credential;
 import static com.integri.atlas.task.definition.dsl.TaskParameter.parameter;
 import static com.integri.atlas.task.definition.dsl.TaskParameter.parameters;
@@ -639,16 +640,13 @@ public class TaskDeclarationTest {
 
     @Test
     public void testTaskCredential() throws JsonProcessingException, JSONException {
-        TaskCredential taskCredential = credential().displayOption(displayOption()).name("name").required(true);
+        TaskCredential taskCredential = credential().displayOption(displayOption()).name("name");
 
-        jsonAssertEquals(
-            """
+        jsonAssertEquals("""
         {
-            "name":"name","required":true,"displayOption":{}
+            "name":"name","displayOption":{}
         }
-        """,
-            taskCredential
-        );
+        """, taskCredential);
     }
 
     @Test
@@ -658,24 +656,24 @@ public class TaskDeclarationTest {
             .displayName("displayName")
             .description("description")
             .subtitle("subtitle")
-            .credentials(credential())
+            .authentication(authentication().credentials().properties())
             .properties(TaskProperty.STRING_PROPERTY("name"))
             .icon("icon")
             .version(1);
 
         jsonAssertEquals(
             """
-        {
-            "credentials":[{}],
-            "description":"description",
-            "displayName":"displayName",
-            "name":"name",
-            "icon":"icon",
-            "properties":[{"name":"name","type":"STRING"}],
-            "subtitle":"subtitle",
-            "version":1.0
-        }
-        """,
+            {
+                "authentication":{credentials:[],properties:[]},
+                "description":"description",
+                "displayName":"displayName",
+                "name":"name",
+                "icon":"icon",
+                "properties":[{"name":"name","type":"STRING"}],
+                "subtitle":"subtitle",
+                "version":1.0
+            }
+            """,
             taskSpecification
         );
     }

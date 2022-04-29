@@ -40,81 +40,91 @@ public class HttpClientTaskDeclarationTest {
         JSONAssert.assertEquals(
             """
             {
-                "credentials":[
-                    {
-                        "name":"httpBasicAuth",
-                        "required":true,
-                        "displayOption":{
-                            "show":{
-                                "authenticationType":["BASIC_AUTH"]
+                "authentication":{
+                    "credentials":[
+                        {
+                            "name":"httpBasicAuth",
+                            "displayOption":{
+                                "show":{
+                                    "authenticationType":["HTTP_BASIC_AUTH"]
+                                }
                             }
-                        }
-                    },
-                    {
-                        "name":"httpDigestAuth",
-                        "required":true,
-                        "displayOption":{
-                            "show":{
-                                "authenticationType":["DIGEST_AUTH"]
-                            }
-                        }
-                    },
-                    {
-                        name: 'httpHeaderAuth',
-                        required: true,
-                        displayOption: {
-                            show: {
-                                authenticationType: [
-                                    "HEADER_AUTH",
-                                ],
+                        },
+                        {
+                            name: 'httpHeaderAuth',
+                            displayOption: {
+                                show: {
+                                    authenticationType: [
+                                        "HTTP_HEADER_AUTH",
+                                    ],
+                                },
                             },
                         },
-                    },
-                    {
-                        "name":"oAuth2Auth",
-                        "required":true,
-                        "displayOption":{
-                            "show":{
-                                "authenticationType":["OAUTH2"]
+                        {
+                            name: 'httpQueryAuth',
+                            displayOption: {
+                                show: {
+                                    authenticationType: [
+                                        "HTTP_QUERY_AUTH",
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            "name":"httpDigestAuth",
+                            "displayOption":{
+                                "show":{
+                                    "authenticationType":["HTTP_DIGEST_AUTH"]
+                                }
+                            }
+                        },
+                        {
+                            "name":"oAuth2Auth",
+                            "displayOption":{
+                                "show":{
+                                    "authenticationType":["OAUTH2"]
+                                }
                             }
                         }
-                    }
-                ],
+                    ],
+                    properties:[
+                         {
+                            "displayName":"Authentication Type",
+                            "name":"authenticationType",
+                            "type":"SELECT",
+                            "options":[
+                                {
+                                    "value":"HTTP_BASIC_AUTH",
+                                    "name":"Basic Auth"
+                                },
+                                {
+                                    "value":"HTTP_DIGEST_AUTH",
+                                    "name":"Digest Auth"
+                                },
+                                {
+                                    "value":"HTTP_HEADER_AUTH",
+                                    "name":"Header Auth"
+                                },
+                                 {
+                                    "value":"HTTP_QUERY_AUTH",
+                                    "name":"Query Auth"
+                                },
+                                {
+                                    "value":"OAUTH2",
+                                    "name":"OAuth2"
+                                },
+                                {
+                                    "value":"",
+                                    "name":"None"
+                                }
+                            ]
+                        }
+                    ]
+                },
                 "description":"Makes an HTTP request and returns the response data.",
                 "displayName":"HTTP Client",
                 "name":"httpClient",
                 "properties":[
-                    {
-                        "displayName":"Authentication Type",
-                        "name":"authenticationType",
-                        "type":"SELECT",
-                        "options":[
-                            {
-                                "value":"BASIC_AUTH",
-                                "name":"Basic Auth"
-                            },
-                            {
-                                "value":"DIGEST_AUTH",
-                                "name":"Digest Auth"
-                            },
-                            {
-                                "value":"HEADER_AUTH",
-                                "name":"Header Auth"
-                            },
-                             {
-                                "value":"QUERY_AUTH",
-                                "name":"Query Auth"
-                            },
-                            {
-                                "value":"OAUTH2",
-                                "name":"OAuth2"
-                            },
-                            {
-                                "value":"",
-                                "name":"None"
-                            }
-                        ]
-                    },
                     {
                         "defaultValue":"GET",
                         "description":"The request method to use.",
