@@ -64,12 +64,12 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.ResponseFormat;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HttpClientTaskDeclaration implements TaskDeclaration {
+public class HttpClientTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = create(TASK_HTTP_CLIENT)
         .displayName("HTTP Client")

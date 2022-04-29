@@ -17,7 +17,7 @@
 package com.integri.atlas.engine.web.rest;
 
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import java.util.List;
 import java.util.Objects;
@@ -33,17 +33,17 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class TaskSpecificationController {
 
-    private final List<TaskDeclaration> taskDeclarations;
+    private final List<TaskDefinition> taskDefinitions;
 
-    public TaskSpecificationController(List<TaskDeclaration> taskDeclarations) {
-        this.taskDeclarations = taskDeclarations;
+    public TaskSpecificationController(List<TaskDefinition> taskDefinitions) {
+        this.taskDefinitions = taskDefinitions;
     }
 
     @GetMapping(value = "/task-specifications/{name}")
     public TaskSpecification getTaskSpecification(@PathVariable("name") String name) {
-        return taskDeclarations
+        return taskDefinitions
             .stream()
-            .map(TaskDeclaration::getSpecification)
+            .map(TaskDefinition::getSpecification)
             .filter(taskSpecification -> Objects.equals(taskSpecification.getName(), name))
             .findFirst()
             .orElseThrow();
@@ -51,6 +51,6 @@ public class TaskSpecificationController {
 
     @GetMapping(value = "/task-specifications")
     public List<TaskSpecification> getTaskSpecifications() {
-        return taskDeclarations.stream().map(TaskDeclaration::getSpecification).collect(Collectors.toList());
+        return taskDefinitions.stream().map(TaskDefinition::getSpecification).collect(Collectors.toList());
     }
 }

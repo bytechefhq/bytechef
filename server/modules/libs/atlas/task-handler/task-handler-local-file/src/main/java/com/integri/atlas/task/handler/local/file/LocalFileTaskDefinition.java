@@ -26,13 +26,13 @@ import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.P
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_OPERATION;
 
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.Operation;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocalFileTaskDeclaration implements TaskDeclaration {
+public class LocalFileTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create(TASK_LOCAL_FILE)

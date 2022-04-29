@@ -19,7 +19,7 @@ package com.integri.atlas.engine;
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -42,12 +42,12 @@ public class RestTestConfiguration {
     private WorkflowRepository workflowRepository;
 
     @Bean
-    TaskDeclaration task1TaskDeclaration() {
+    TaskDefinition task1TaskDefinition() {
         return () -> TaskSpecification.create("task1");
     }
 
     @Bean
-    TaskDeclaration task2TaskDeclaration() {
+    TaskDefinition task2TaskDefinition() {
         return () -> TaskSpecification.create("task2");
     }
 }

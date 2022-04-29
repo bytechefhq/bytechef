@@ -28,7 +28,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDeclarationTest {
+public class IfTaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -326,7 +326,7 @@ public class IfTaskDeclarationTest {
                 "version":1.0
             }
                 """,
-            (JSONObject) JSONParser.parseJSON(objectMapper.writeValueAsString(IfTaskDeclaration.TASK_SPECIFICATION)),
+            (JSONObject) JSONParser.parseJSON(objectMapper.writeValueAsString(IfTaskDefinition.TASK_SPECIFICATION)),
             true
         );
     }

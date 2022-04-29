@@ -30,7 +30,7 @@ import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FIL
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.TASK_FILE;
 
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class FileTaskDeclaration implements TaskDeclaration {
+public class FileTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create(TASK_FILE)

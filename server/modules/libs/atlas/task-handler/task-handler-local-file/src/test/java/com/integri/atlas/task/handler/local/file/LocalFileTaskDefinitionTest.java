@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.json.converter;
+package com.integri.atlas.task.handler.local.file;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class JSONConverterTaskDeclarationTest {
+public class LocalFileTaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,16 +36,16 @@ public class JSONConverterTaskDeclarationTest {
     };
 
     @Test
-    public void testFileTaskSpecification() throws JsonProcessingException {
+    public void testLocalFileTaskSpecification() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Converts between JSON string and object/array.",
-                "displayName":"JSON Converter",
-                "name":"jsonConverter",
+                "description":"Reads or writes a binary file from/to disk",
+                "displayName":"Local File",
+                "name":"localFile",
                 "properties":[
                     {
-                        "defaultValue":"FROM_JSON",
+                        "defaultValue":"READ",
                         "description":"The operation to perform.",
                         "displayName":"Operation",
                         "name":"operation",
@@ -53,47 +53,61 @@ public class JSONConverterTaskDeclarationTest {
                         "type":"SELECT",
                         "options":[
                             {
-                                "name":"Convert from JSON string",
-                                "value":"FROM_JSON",
-                                "description": "Converts the JSON string to object/array."
+                                "name":"Read to file",
+                                "value":"READ"
                             },
                             {
-                                "name":"Convert to JSON string",
-                                "value":"TO_JSON",
-                                 "description": "Writes the object/array to a JSON string."
+                                "name":"Write from file",
+                                "value":"WRITE"
                             }
                         ]
                     },
                     {
-                        "description":"JSON string to convert to the data.",
-                        "displayName":"Input",
+                        "description":"The object property which contains a reference to the file to be written.",
+                        "displayName":"File",
                         "displayOption":{
                             "show":{
-                                "operation":["FROM_JSON"]
+                                "operation":["WRITE"]
                             }
                         },
-                        "name":"input",
-                        "required":true,
-                        "type":"STRING"
-                    },
-                        {
-                        "description":"The data to convert to JSON string.",
-                        "displayName":"Input",
-                        "displayOption":{
-                            "show":{
-                                "operation":["TO_JSON"]
-                            }
-                        },
-                        "name":"input",
+                        "name":"fileEntry",
                         "required":true,
                         "type":"JSON"
                     },
+                    {
+                        "defaultValue":"",
+                        "description":"The path of the file to read.",
+                        "displayName":"File Name",
+                        "displayOption":{
+                            "show":{
+                                "operation":["READ"]
+                            }
+                        },
+                        "name":"fileName",
+                        "required":true,
+                        "type":"STRING",
+                        "placeholder":"/data/your_file.pdf"
+                    },
+                    {
+                        "defaultValue":"",
+                        "description":"The path to which the file should be written.",
+                        "displayName":"File Name",
+                        "displayOption":{
+                            "show":{
+                                "operation":["WRITE"]
+                            }
+                        },
+                        "name":"fileName",
+                        "required":true,
+                        "type":"STRING",
+                        "placeholder":"/data/your_file.pdf"
+                    }
                 ],
                 "version":1.0
-            }
+                }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(JSONConverterTaskDeclaration.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(LocalFileTaskDefinition.TASK_SPECIFICATION)
             ),
             true
         );
