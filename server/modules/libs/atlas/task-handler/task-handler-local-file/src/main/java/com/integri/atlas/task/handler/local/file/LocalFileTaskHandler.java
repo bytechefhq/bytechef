@@ -16,10 +16,16 @@
 
 package com.integri.atlas.task.handler.local.file;
 
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.TASK_LOCAL_FILE;
+
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.Operation;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,13 +37,8 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("localFile")
+@Component(TASK_LOCAL_FILE)
 public class LocalFileTaskHandler implements TaskHandler<Object> {
-
-    private enum Operation {
-        READ,
-        WRITE,
-    }
 
     private final FileStorageService fileStorageService;
 
@@ -49,15 +50,15 @@ public class LocalFileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        String fileName = taskExecution.getRequired("fileName");
-        Operation operation = Operation.valueOf(taskExecution.getRequired("operation"));
+        String fileName = taskExecution.getRequired(PROPERTY_FILE_NAME);
+        Operation operation = Operation.valueOf(taskExecution.getRequired(PROPERTY_OPERATION));
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {
                 result = fileStorageService.storeFileContent(fileName, inputStream);
             }
         } else {
-            FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
+            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
 
             try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
                 result =

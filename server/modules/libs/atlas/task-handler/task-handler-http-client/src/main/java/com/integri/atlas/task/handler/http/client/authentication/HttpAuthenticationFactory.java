@@ -16,6 +16,8 @@
 
 package com.integri.atlas.task.handler.http.client.authentication;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
+
 import com.integri.atlas.engine.core.MapObject;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +28,7 @@ import org.springframework.stereotype.Component;
 public class HttpAuthenticationFactory {
 
     public HttpAuthentication create(String authenticationMethod, MapObject credentials) {
-        if (authenticationMethod.equals("BASIC_AUTH")) {
+        if (authenticationMethod.equals(AuthenticationType.HTTP_BASIC_AUTH.name())) {
             return new BasicAuthentication(
                 credentials.getRequiredString("username"),
                 credentials.getRequiredString("password")

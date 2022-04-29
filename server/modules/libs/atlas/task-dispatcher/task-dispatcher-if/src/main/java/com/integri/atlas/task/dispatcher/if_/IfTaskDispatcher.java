@@ -16,6 +16,9 @@
 
 package com.integri.atlas.task.dispatcher.if_;
 
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_FALSE;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_TRUE;
+
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;
@@ -73,9 +76,9 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         List<MapObject> subtaskDefinitions;
 
         if (IfTaskUtil.resolveCase(ifTaskExecution)) {
-            subtaskDefinitions = ifTaskExecution.getList("caseTrue", MapObject.class);
+            subtaskDefinitions = ifTaskExecution.getList(PROPERTY_CASE_TRUE, MapObject.class);
         } else {
-            subtaskDefinitions = ifTaskExecution.getList("caseFalse", MapObject.class);
+            subtaskDefinitions = ifTaskExecution.getList(PROPERTY_CASE_FALSE, MapObject.class);
         }
 
         if (subtaskDefinitions.size() > 0) {

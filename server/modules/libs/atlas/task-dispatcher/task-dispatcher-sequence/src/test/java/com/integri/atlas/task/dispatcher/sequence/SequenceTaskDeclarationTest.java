@@ -42,7 +42,7 @@ public class SequenceTaskDeclarationTest {
             """
             {
                 "description":"Executes list of tasks in a sequence",
-                "displayName":"SEQUENCE",
+                "displayName":"Sequence",
                 "name":"sequence",
                 "version":1.0
             }

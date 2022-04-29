@@ -14,9 +14,9 @@ tasks:
           conditions:
             - number:
                 value1: ${item1}
-                operation: greater
+                operation: GREATER
                 value2: 5
-          combineOperation: any
+          combineOperation: ANY
           caseTrue:
            - type: loop-break
           caseFalse:

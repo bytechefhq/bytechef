@@ -42,7 +42,7 @@ public class IfTaskDeclarationTest {
             """
             {
                 "description":"Directs a stream based on true/false results of comparisons",
-                "displayName":"IF",
+                "displayName":"If",
                 "name":"if",
                 "properties":[
                      {
@@ -90,19 +90,19 @@ public class IfTaskDeclarationTest {
                                         "type":"BOOLEAN"
                                     },
                                     {
-                                        "defaultValue":"equal",
+                                        "defaultValue":"EQUALS",
                                         "description":"Compare operation to decide where to map data.",
                                         "displayName":"Operation",
                                         "name":"operation",
                                         "type":"SELECT",
                                         "options":[
                                             {
-                                                "name":"Equal",
-                                                "value":"equal"
+                                                "name":"Equals",
+                                                "value":"EQUALS"
                                             },
                                             {
-                                                "name":"Not Equal",
-                                                "value":"notEqual"
+                                                "name":"Not Equals",
+                                                "value":"NOT_EQUALS"
                                             }
                                         ]
                                     },
@@ -128,7 +128,7 @@ public class IfTaskDeclarationTest {
                                         "type":"DATE_TIME"
                                     },
                                     {
-                                        "defaultValue":"after",
+                                        "defaultValue":"AFTER",
                                         "description":"Compare operation to decide where to map data.",
                                         "displayName":"Operation",
                                         "name":"operation",
@@ -136,10 +136,10 @@ public class IfTaskDeclarationTest {
                                         "options":[
                                             {
                                                 "name":"After",
-                                                "value":"after"
+                                                "value":"AFTER"
                                             },
                                             {
-                                                "name":"Before","value":"before"
+                                                "name":"Before","value":"BEFORE"
                                             }
                                         ]
                                     },
@@ -165,39 +165,39 @@ public class IfTaskDeclarationTest {
                                         "type":"NUMBER"
                                     },
                                     {
-                                        "defaultValue":"smaller",
+                                        "defaultValue":"LESS",
                                         "description":"Compare operation to decide where to map data.",
                                         "displayName":"Operation",
                                         "name":"operation",
                                         "type":"SELECT",
                                         "options":[
                                             {
-                                                "name":"Smaller",
-                                                "value":"smaller"
+                                                "name":"Less",
+                                                "value":"LESS"
                                             },
                                             {
-                                                "name":"Smaller or Equal",
-                                                "value":"smallerEqual"
+                                                "name":"Less or Equals",
+                                                "value":"LESS_EQUALS"
                                             },
                                             {
-                                                "name":"Equal",
-                                                "value":"equal"
+                                                "name":"Equals",
+                                                "value":"EQUALS"
                                             },
                                             {
-                                                "name":"Not Equal",
-                                                "value":"notEqual"
+                                                "name":"Not Equals",
+                                                "value":"NOT_EQUALS"
                                             },
                                             {
-                                                "name":"Larger",
-                                                "value":"larger"
+                                                "name":"Greater",
+                                                "value":"GREATER"
                                             },
                                             {
-                                                "name":"Larger or Equal",
-                                                "value":"largerEqual"
+                                                "name":"Greater or Equals",
+                                                "value":"GREATER_EQUALS"
                                             },
                                             {
                                                 "name":"Empty",
-                                                "value":"empty"
+                                                "value":"EMPTY"
                                             }
                                         ]
                                     },
@@ -228,43 +228,43 @@ public class IfTaskDeclarationTest {
                                         "type":"STRING"
                                     },
                                     {
-                                        "defaultValue":"equal",
+                                        "defaultValue":"EQUALS",
                                         "description":"Compare operation to decide where to map data.",
                                         "displayName":"Operation",
                                         "name":"operation",
                                         "type":"SELECT",
                                         "options":[
                                             {
-                                                "name":"Equal",
-                                                "value":"equal"
+                                                "name":"Equals",
+                                                "value":"EQUALS"
                                             },
                                             {
-                                                "name":"Not Equal",
-                                                "value":"notEqual"
+                                                "name":"Not Equals",
+                                                "value":"NOT_EQUALS"
                                             },
                                             {
                                                 "name":"Contains",
-                                                "value":"contains"
+                                                "value":"CONTAINS"
                                             },
                                             {
                                                 "name":"Not Contains",
-                                                "value":"notContains"
+                                                "value":"NOT_CONTAINS"
                                             },
                                             {
                                                 "name":"Starts With",
-                                                "value":"startsWith"
+                                                "value":"STARTS_WITH"
                                             },
                                             {
                                                 "name":"Ends With",
-                                                "value":"endsWith"
+                                                "value":"ENDS_WITH"
                                             },
                                             {
                                                 "name":"Regex",
-                                                "value":"regex"
+                                                "value":"REGEX"
                                             },
                                             {
                                                 "name":"Empty",
-                                                "value":"empty"
+                                                "value":"EMPTY"
                                             }
                                         ]
                                     },
@@ -274,7 +274,7 @@ public class IfTaskDeclarationTest {
                                         "displayName":"Value 2",
                                         "displayOption":{
                                             "hide":{
-                                                "operation":["empty","regex"]
+                                                "operation":["EMPTY","REGEX"]
                                             }
                                         },
                                         "name":"value2",
@@ -286,7 +286,7 @@ public class IfTaskDeclarationTest {
                                         "displayName":"Regex",
                                         "displayOption":{
                                             "show":{
-                                                "operation":["regex"]
+                                                "operation":["REGEX"]
                                             }
                                         },
                                         "name":"value2",

@@ -282,7 +282,7 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     }
 
     public static DisplayOption show(String k1) {
-        return DisplayOption.displayOption().hide(k1, List.of());
+        return DisplayOption.displayOption().show(k1, List.of());
     }
 
     public static DisplayOption show(String k1, Boolean... values) {

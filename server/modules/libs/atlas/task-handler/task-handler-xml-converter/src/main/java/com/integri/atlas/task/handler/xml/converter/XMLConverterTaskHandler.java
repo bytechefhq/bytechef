@@ -16,9 +16,12 @@
 
 package com.integri.atlas.task.handler.xml.converter;
 
+import static com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.*;
+
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.Operation;
 import com.integri.atlas.task.handler.xml.helper.XMLHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -26,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("xmlConverter")
+@Component(TASK_XML_CONVERTER)
 public class XMLConverterTaskHandler implements TaskHandler<Object> {
 
     private final JSONHelper jsonHelper;
@@ -37,21 +40,16 @@ public class XMLConverterTaskHandler implements TaskHandler<Object> {
         this.xmlHelper = xmlHelper;
     }
 
-    private enum Operation {
-        FROM_XML,
-        TO_XML,
-    }
-
     @Override
     public Object handle(TaskExecution taskExecution) {
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
 
         if (operation == Operation.FROM_XML) {
-            String input = taskExecution.getRequiredString("input");
+            String input = taskExecution.getRequiredString(PROPERTY_INPUT);
 
             return xmlHelper.read(input);
         } else {
-            Object input = jsonHelper.checkJSON(taskExecution.getRequired("input"));
+            Object input = jsonHelper.checkJSON(taskExecution.getRequired(PROPERTY_INPUT));
 
             return xmlHelper.write(input);
         }

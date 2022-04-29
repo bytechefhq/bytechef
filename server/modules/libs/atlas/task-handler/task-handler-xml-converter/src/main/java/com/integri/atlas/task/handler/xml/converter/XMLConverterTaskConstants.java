@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.sequence;
-
-import com.integri.atlas.task.definition.TaskDeclaration;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+package com.integri.atlas.task.handler.xml.converter;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDeclaration implements TaskDeclaration {
+public class XMLConverterTaskConstants {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(SequenceTaskConstants.TASK_SEQUENCE)
-        .displayName("Sequence")
-        .description("Executes list of tasks in a sequence");
+    public static final String PROPERTY_OPERATION = "operation";
+    public static final String PROPERTY_INPUT = "input";
+    static final String TASK_XML_CONVERTER = "xmlConverter";
 
-    @Override
-    public TaskSpecification getSpecification() {
-        return TASK_SPECIFICATION;
+    enum Operation {
+        FROM_XML,
+        TO_XML,
     }
 }

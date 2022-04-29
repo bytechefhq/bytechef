@@ -16,6 +16,9 @@
 
 package com.integri.atlas.task.handler.http.client.response;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_FULL_RESPONSE;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
+
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.http.client.header.ContentType;
@@ -37,9 +40,9 @@ public class HttpResponseHandler {
     }
 
     public Object handle(TaskExecution taskExecution, HttpResponse httpResponse) {
-        boolean fullResponse = taskExecution.getBoolean("fullResponse", false);
+        boolean fullResponse = taskExecution.getBoolean(PROPERTY_FULL_RESPONSE);
 
-        String responseFormat = taskExecution.getString("responseFormat");
+        String responseFormat = taskExecution.getString(PROPERTY_RESPONSE_FORMAT);
 
         if (responseFormat == null) {
             return null;

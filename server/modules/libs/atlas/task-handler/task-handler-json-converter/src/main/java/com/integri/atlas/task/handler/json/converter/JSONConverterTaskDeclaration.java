@@ -22,6 +22,10 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
+import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.*;
+import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.Operation;
+import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.PROPERTY_INPUT;
+import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.PROPERTY_OPERATION;
 
 import com.integri.atlas.task.definition.TaskDeclaration;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
@@ -34,28 +38,36 @@ import org.springframework.stereotype.Component;
 public class JSONConverterTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create("jsonConverter")
+        .create(TASK_JSON_CONVERTER)
         .displayName("JSON Converter")
         .description("Converts between JSON string and object/array.")
         .properties(
-            SELECT_PROPERTY("operation")
+            SELECT_PROPERTY(PROPERTY_OPERATION)
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
-                    option("Convert from JSON string", "FROM_JSON", "Converts the JSON string to object/array."),
-                    option("Convert to JSON string", "TO_JSON", "Writes the object/array to a JSON string.")
+                    option(
+                        "Convert from JSON string",
+                        Operation.FROM_JSON.name(),
+                        "Converts the JSON string to object/array."
+                    ),
+                    option(
+                        "Convert to JSON string",
+                        Operation.TO_JSON.name(),
+                        "Writes the object/array to a JSON string."
+                    )
                 )
-                .defaultValue("FROM_JSON")
+                .defaultValue(Operation.FROM_JSON.name())
                 .required(true),
-            STRING_PROPERTY("input")
+            STRING_PROPERTY(PROPERTY_INPUT)
                 .displayName("Input")
                 .description("JSON string to convert to the data.")
-                .displayOption(show("operation", parameterValues("FROM_JSON")))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.FROM_JSON.name())))
                 .required(true),
-            JSON_PROPERTY("input")
+            JSON_PROPERTY(PROPERTY_INPUT)
                 .displayName("Input")
                 .description("The data to convert to JSON string.")
-                .displayOption(show("operation", parameterValues("TO_JSON")))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.TO_JSON.name())))
                 .required(true)
         );
 

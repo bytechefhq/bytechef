@@ -16,9 +16,12 @@
 
 package com.integri.atlas.task.handler.json.converter;
 
+import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.TASK_JSON_CONVERTER;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.Operation;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -26,18 +29,13 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("jsonConverter")
+@Component(TASK_JSON_CONVERTER)
 public class JSONConverterTaskHandler implements TaskHandler<Object> {
 
     private final JSONHelper jsonHelper;
 
     public JSONConverterTaskHandler(JSONHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
-    }
-
-    private enum Operation {
-        FROM_JSON,
-        TO_JSON,
     }
 
     @Override

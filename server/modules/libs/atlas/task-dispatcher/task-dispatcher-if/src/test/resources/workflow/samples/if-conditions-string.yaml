@@ -39,9 +39,9 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: equals
+          operation: EQUALS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: equalsResult
         type: core/var
@@ -55,9 +55,9 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: notEquals
+          operation: NOT_EQUALS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: notEqualsResult
         type: core/var
@@ -71,9 +71,9 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: contains
+          operation: CONTAINS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: containsResult
         type: core/var
@@ -87,9 +87,9 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: notContains
+          operation: NOT_CONTAINS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: notContainsResult
         type: core/var
@@ -103,7 +103,7 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: startsWith
+          operation: STARTS_WITH
           value2: ${value2}
     combineOperation: any
     caseTrue:
@@ -119,7 +119,7 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: endsWith
+          operation: ENDS_WITH
           value2: ${value2}
     combineOperation: any
     caseTrue:
@@ -135,9 +135,9 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: isEmpty
+          operation: EMPTY
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: isEmptyResult
         type: core/var
@@ -151,9 +151,9 @@ tasks:
     conditions:
       - string:
           value1: ${value1}
-          operation: regex
+          operation: REGEX
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: regexResult
         type: core/var

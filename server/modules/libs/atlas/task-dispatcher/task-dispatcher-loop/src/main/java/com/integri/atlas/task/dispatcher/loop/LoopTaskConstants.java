@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.sequence;
-
-import com.integri.atlas.task.definition.TaskDeclaration;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+package com.integri.atlas.task.dispatcher.loop;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDeclaration implements TaskDeclaration {
+public class LoopTaskConstants {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(SequenceTaskConstants.TASK_SEQUENCE)
-        .displayName("Sequence")
-        .description("Executes list of tasks in a sequence");
-
-    @Override
-    public TaskSpecification getSpecification() {
-        return TASK_SPECIFICATION;
-    }
+    public static final String TASK_LOOP = "loop";
 }

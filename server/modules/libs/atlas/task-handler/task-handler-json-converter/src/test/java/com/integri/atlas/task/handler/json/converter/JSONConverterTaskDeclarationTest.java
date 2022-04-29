@@ -19,13 +19,10 @@ package com.integri.atlas.task.handler.json.converter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.task.definition.TaskDeclaration;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONParser;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic

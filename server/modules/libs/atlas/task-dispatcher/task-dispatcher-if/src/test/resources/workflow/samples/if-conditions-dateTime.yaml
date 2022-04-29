@@ -21,9 +21,9 @@ tasks:
     conditions:
       - dateTime:
           value1: ${value1}
-          operation: after
+          operation: AFTER
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: afterResult
         type: core/var
@@ -37,9 +37,9 @@ tasks:
     conditions:
       - dateTime:
           value1: ${value1}
-          operation: before
+          operation: BEFORE
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: beforeResult
         type: core/var

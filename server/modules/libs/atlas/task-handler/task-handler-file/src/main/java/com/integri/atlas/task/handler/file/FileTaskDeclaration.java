@@ -23,6 +23,12 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
+import static com.integri.atlas.task.handler.file.FileTaskConstants.Operation;
+import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_CONTENT;
+import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.file.FileTaskConstants.TASK_FILE;
 
 import com.integri.atlas.task.definition.TaskDeclaration;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
@@ -35,37 +41,37 @@ import org.springframework.stereotype.Component;
 public class FileTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create("file")
+        .create(TASK_FILE)
         .displayName("File")
         .description("Reads and writes data from a file")
         .properties(
-            SELECT_PROPERTY("operation")
+            SELECT_PROPERTY(PROPERTY_OPERATION)
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
-                    option("Read from file", "READ", "Reads data from a file."),
-                    option("Write to file", "WRITE", "Writes the data to a file.")
+                    option("Read from file", Operation.READ.name(), "Reads data from a file."),
+                    option("Write to file", Operation.WRITE.name(), "Writes the data to a file.")
                 )
-                .defaultValue("READ")
+                .defaultValue(Operation.READ.name())
                 .required(true),
-            JSON_PROPERTY("fileEntry")
+            JSON_PROPERTY(PROPERTY_FILE_ENTRY)
                 .displayName("File")
                 .description("The object property which contains a reference to the file to read from.")
-                .displayOption(show("operation", "READ"))
+                .displayOption(show(PROPERTY_OPERATION, Operation.READ.name()))
                 .required(true),
-            STRING_PROPERTY("content")
+            STRING_PROPERTY(PROPERTY_CONTENT)
                 .displayName("Content")
                 .description("String to write to the file.")
-                .displayOption(show("operation", parameterValues("WRITE")))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.WRITE.name())))
                 .required(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
                 .options(
-                    STRING_PROPERTY("fileName")
+                    STRING_PROPERTY(PROPERTY_FILE_NAME)
                         .displayName("File Name")
                         .description("File name to set for binary data. By default, \"file.txt\" will be used.")
-                        .displayOption(show("operation", "WRITE"))
+                        .displayOption(show(PROPERTY_OPERATION, Operation.WRITE.name()))
                         .defaultValue("file.txt")
                 )
         );

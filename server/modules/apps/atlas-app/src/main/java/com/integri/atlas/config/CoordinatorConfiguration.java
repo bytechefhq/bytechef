@@ -55,7 +55,9 @@ import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandl
 import com.integri.atlas.task.dispatcher.if_.IfTaskDeclaration;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDispatcher;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
+import com.integri.atlas.task.dispatcher.loop.LoopBreakTaskDeclaration;
 import com.integri.atlas.task.dispatcher.loop.LoopBreakTaskDispatcher;
+import com.integri.atlas.task.dispatcher.loop.LoopTaskDeclaration;
 import com.integri.atlas.task.dispatcher.loop.LoopTaskDispatcher;
 import com.integri.atlas.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
@@ -73,7 +75,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -268,6 +269,11 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
+    LoopBreakTaskDeclaration loopBreakTaskDeclaration() {
+        return new LoopBreakTaskDeclaration();
+    }
+
+    @Bean
     LoopBreakTaskDispatcher loopBreakTaskDispatcher() {
         return new LoopBreakTaskDispatcher(messageBroker, taskExecutionRepository);
     }
@@ -281,6 +287,11 @@ public class CoordinatorConfiguration {
             taskEvaluator,
             taskExecutionRepository
         );
+    }
+
+    @Bean
+    LoopTaskDeclaration loopTaskDeclaration() {
+        return new LoopTaskDeclaration();
     }
 
     @Bean
