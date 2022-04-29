@@ -97,22 +97,6 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the switch
         else {
-            // if switch is root level, update the job's context
-            if (switchTask.getParentId() == null) {
-                Context parentContext = contextRepository.peek(switchTask.getJobId());
-                Context thisContext = contextRepository.peek(switchTask.getId());
-                MapContext newContext = new MapContext(parentContext);
-                newContext.putAll(thisContext.asMap());
-                contextRepository.push(aTaskExecution.getJobId(), newContext);
-            }
-            // otherwise update the its parent's context
-            else {
-                Context parentContext = contextRepository.peek(switchTask.getParentId());
-                Context thisContext = contextRepository.peek(switchTask.getId());
-                MapContext newContext = new MapContext(parentContext);
-                newContext.putAll(thisContext.asMap());
-                contextRepository.push(switchTask.getParentId(), newContext);
-            }
             switchTask.setEndTime(new Date());
             switchTask.setExecutionTime(switchTask.getEndTime().getTime() - switchTask.getStartTime().getTime());
             taskCompletionHandler.handle(switchTask);

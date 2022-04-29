@@ -9,31 +9,6 @@ inputs:
     type: string
     required: true
 
-outputs:
-  - name: equalsResult
-    value: ${equalsResult}
-
-  - name: notEqualsResult
-    value: ${notEqualsResult}
-
-  - name: containsResult
-    value: ${containsResult}
-
-  - name: notContainsResult
-    value: ${notContainsResult}
-
-  - name: startsWithResult
-    value: ${startsWithResult}
-
-  - name: endsWithResult
-    value: ${endsWithResult}
-
-  - name: isEmptyResult
-    value: ${isEmptyResult}
-
-  - name: regexResult
-    value: ${regexResult}
-
 tasks:
   - type: if
     conditions:

@@ -9,10 +9,6 @@ inputs:
       type: string
       required: true
 
-outputs:
-    - name: equalsResult
-      value: ${equalsResult}
-
 tasks:
     - type: if
       rawConditions: true

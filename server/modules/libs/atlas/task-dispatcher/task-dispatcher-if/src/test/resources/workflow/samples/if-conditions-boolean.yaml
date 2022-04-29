@@ -9,13 +9,6 @@ inputs:
     type: string
     required: true
 
-outputs:
-  - name: equalsResult
-    value: ${equalsResult}
-
-  - name: notEqualsResult
-    value: ${notEqualsResult}
-
 tasks:
   - type: if
     conditions:

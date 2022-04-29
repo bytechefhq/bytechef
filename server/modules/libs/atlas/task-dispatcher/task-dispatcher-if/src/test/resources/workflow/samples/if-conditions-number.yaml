@@ -9,25 +9,6 @@ inputs:
     type: number
     required: true
 
-outputs:
-  - name: equalsResult
-    value: ${equalsResult}
-
-  - name: notEqualsResult
-    value: ${notEqualsResult}
-
-  - name: greaterResult
-    value: ${greaterResult}
-
-  - name: lessResult
-    value: ${lessResult}
-
-  - name: greaterEqualsResult
-    value: ${greaterEqualsResult}
-
-  - name: lessEqualsResult
-    value: ${lessEqualsResult}
-
 tasks:
   - type: if
     conditions:

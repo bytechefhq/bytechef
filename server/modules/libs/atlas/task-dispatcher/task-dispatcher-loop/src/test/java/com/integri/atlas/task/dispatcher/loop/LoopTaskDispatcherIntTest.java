@@ -98,15 +98,15 @@ public class LoopTaskDispatcherIntTest extends BaseTaskIntTest {
         );
     }
 
-    //    @Test
-    //    public void testLoopTaskDispatcher5() {
-    //        startJob("samples/loop5.yaml", Map.of());
-    //
-    //        Assertions.assertEquals(
-    //            IntStream.rangeClosed(4, 8).boxed().collect(Collectors.toList()),
-    //            testVar.get("sumVar2")
-    //        );
-    //    }
+    @Test
+    public void testLoopTaskDispatcher5() {
+        startJob("samples/loop5.yaml", Map.of());
+
+        Assertions.assertEquals(
+            IntStream.rangeClosed(4, 8).boxed().collect(Collectors.toList()),
+            testVar.get("sumVar2")
+        );
+    }
 
     @Test
     public void testLoopTaskDispatcher6() {
