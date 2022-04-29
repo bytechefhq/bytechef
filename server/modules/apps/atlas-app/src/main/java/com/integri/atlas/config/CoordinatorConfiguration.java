@@ -21,10 +21,10 @@ package com.integri.atlas.config;
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
+import com.integri.atlas.engine.coordinator.context.ContextService;
 import com.integri.atlas.engine.coordinator.error.ErrorHandlerChain;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
-import com.integri.atlas.engine.coordinator.event.ContextJobStatusEventListener;
-import com.integri.atlas.engine.coordinator.event.ContextService;
+import com.integri.atlas.engine.coordinator.event.DeleteContextEventListener;
 import com.integri.atlas.engine.coordinator.event.JobStatusWebhookEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskProgressedEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskStartedEventListener;
@@ -75,6 +75,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -119,8 +120,9 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    ContextJobStatusEventListener contextJobStatusEventHandler(ContextService contextService) {
-        return new ContextJobStatusEventListener(contextService, jobRepository);
+    @ConditionalOnProperty(name = "atlas.context.delete-listener.enabled", havingValue = "true")
+    DeleteContextEventListener deleteContextEventListener(ContextService contextService) {
+        return new DeleteContextEventListener(contextService, jobRepository);
     }
 
     @Bean
