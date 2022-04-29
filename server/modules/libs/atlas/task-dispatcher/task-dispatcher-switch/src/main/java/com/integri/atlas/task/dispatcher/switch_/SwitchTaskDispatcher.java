@@ -42,90 +42,109 @@ import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Jun 3, 2017
  * @see SwitchTaskCompletionHandler
  */
 public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final TaskDispatcher taskDispatcher;
-    private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepo;
     private final ContextRepository contextRepository;
     private final MessageBroker messageBroker;
+    private final TaskDispatcher taskDispatcher;
+    private final TaskEvaluator taskEvaluator;
+    private final TaskExecutionRepository taskExecutionRepository;
 
     public SwitchTaskDispatcher(
-        TaskDispatcher aTaskDispatcher,
-        TaskExecutionRepository aTaskRepo,
-        MessageBroker aMessageBroker,
-        ContextRepository aContextRepository,
-        TaskEvaluator aTaskEvaluator
+        ContextRepository contextRepository,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionRepository taskExecutionRepository,
+        TaskEvaluator taskEvaluator
     ) {
-        taskDispatcher = aTaskDispatcher;
-        taskExecutionRepo = aTaskRepo;
-        messageBroker = aMessageBroker;
-        contextRepository = aContextRepository;
-        taskEvaluator = aTaskEvaluator;
+        this.contextRepository = contextRepository;
+        this.messageBroker = messageBroker;
+        this.taskDispatcher = taskDispatcher;
+        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
-    public void dispatch(TaskExecution aTask) {
-        SimpleTaskExecution switchTask = SimpleTaskExecution.of(aTask);
-        switchTask.setStartTime(new Date());
-        switchTask.setStatus(TaskStatus.STARTED);
-        taskExecutionRepo.merge(switchTask);
-        Accessor selectedCase = resolveCase(aTask);
+    public void dispatch(TaskExecution taskExecution) {
+        SimpleTaskExecution switchTaskExecution = SimpleTaskExecution.of(taskExecution);
+
+        switchTaskExecution.setStartTime(new Date());
+        switchTaskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecutionRepository.merge(switchTaskExecution);
+
+        Accessor selectedCase = resolveCase(taskExecution);
+
         if (selectedCase.containsKey("tasks")) {
             List<MapObject> tasks = selectedCase.getList("tasks", MapObject.class, Collections.emptyList());
+
             if (tasks.size() > 0) {
-                MapObject task = tasks.get(0);
-                SimpleTaskExecution execution = SimpleTaskExecution.of(task);
-                execution.setId(UUIDGenerator.generate());
-                execution.setStatus(TaskStatus.CREATED);
-                execution.setCreateTime(new Date());
-                execution.setTaskNumber(1);
-                execution.setJobId(switchTask.getJobId());
-                execution.setParentId(switchTask.getId());
-                execution.setPriority(switchTask.getPriority());
-                MapContext context = new MapContext(contextRepository.peek(switchTask.getId()));
-                contextRepository.push(execution.getId(), context);
-                TaskExecution evaluatedExecution = taskEvaluator.evaluate(execution, context);
-                taskExecutionRepo.create(evaluatedExecution);
+                MapObject taskDefinition = tasks.get(0);
+
+                SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(taskDefinition);
+
+                subTaskExecution.setId(UUIDGenerator.generate());
+                subTaskExecution.setStatus(TaskStatus.CREATED);
+                subTaskExecution.setCreateTime(new Date());
+                subTaskExecution.setTaskNumber(1);
+                subTaskExecution.setJobId(switchTaskExecution.getJobId());
+                subTaskExecution.setParentId(switchTaskExecution.getId());
+                subTaskExecution.setPriority(switchTaskExecution.getPriority());
+
+                MapContext context = new MapContext(contextRepository.peek(switchTaskExecution.getId()));
+
+                contextRepository.push(subTaskExecution.getId(), context);
+
+                TaskExecution evaluatedExecution = taskEvaluator.evaluate(subTaskExecution, context);
+
+                taskExecutionRepository.create(evaluatedExecution);
                 taskDispatcher.dispatch(evaluatedExecution);
             } else {
-                SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
-                completion.setStartTime(new Date());
-                completion.setEndTime(new Date());
-                completion.setExecutionTime(0);
-                messageBroker.send(Queues.COMPLETIONS, completion);
+                SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
+
+                completionTaskExecution.setStartTime(new Date());
+                completionTaskExecution.setEndTime(new Date());
+                completionTaskExecution.setExecutionTime(0);
+
+                messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
             }
         } else {
-            SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
-            completion.setStartTime(new Date());
-            completion.setEndTime(new Date());
-            completion.setExecutionTime(0);
-            completion.setOutput(selectedCase.get("value"));
-            messageBroker.send(Queues.COMPLETIONS, completion);
+            SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
+
+            completionTaskExecution.setStartTime(new Date());
+            completionTaskExecution.setEndTime(new Date());
+            completionTaskExecution.setExecutionTime(0);
+            completionTaskExecution.setOutput(selectedCase.get("value"));
+
+            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
         }
     }
 
-    private Accessor resolveCase(TaskExecution aSwitch) {
-        Object expression = aSwitch.getRequired("expression");
-        List<MapObject> cases = aSwitch.getList("cases", MapObject.class);
+    @Override
+    public TaskDispatcher resolve(Task task) {
+        if (task.getType().equals(DSL.SWITCH)) {
+            return this;
+        }
+        return null;
+    }
+
+    private Accessor resolveCase(TaskExecution taskExecution) {
+        Object expression = taskExecution.getRequired("expression");
+        List<MapObject> cases = taskExecution.getList("cases", MapObject.class);
+
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
+
         for (MapObject oneCase : cases) {
             Object key = oneCase.getRequired("key");
             if (key.equals(expression)) {
                 return oneCase;
             }
         }
-        return new MapObject(aSwitch.getMap("default", Collections.emptyMap()));
-    }
 
-    @Override
-    public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(DSL.SWITCH)) {
-            return this;
-        }
-        return null;
+        return new MapObject(taskExecution.getMap("default", Collections.emptyMap()));
     }
 }

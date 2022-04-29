@@ -76,11 +76,11 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        SimpleTaskExecution completedSubtaskExecution = SimpleTaskExecution.of(taskExecution);
+        SimpleTaskExecution completedSubTaskExecution = SimpleTaskExecution.of(taskExecution);
 
-        completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
+        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionRepository.merge(completedSubtaskExecution);
+        taskExecutionRepository.merge(completedSubTaskExecution);
 
         SimpleTaskExecution ifTaskExecution = SimpleTaskExecution.of(
             taskExecutionRepository.findOne(taskExecution.getParentId())
