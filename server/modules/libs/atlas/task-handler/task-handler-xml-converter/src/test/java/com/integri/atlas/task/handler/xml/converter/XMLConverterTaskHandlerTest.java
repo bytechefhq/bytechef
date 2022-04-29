@@ -84,6 +84,6 @@ public class XMLConverterTaskHandlerTest {
         taskExecution.put("input", input);
         taskExecution.put("operation", "TO_XML");
 
-        assertThat(xmlConverterTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.serialize(input));
+        assertThat(xmlConverterTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(input));
     }
 }

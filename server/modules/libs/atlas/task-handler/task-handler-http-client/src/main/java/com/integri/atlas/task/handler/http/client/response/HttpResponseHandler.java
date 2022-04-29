@@ -48,7 +48,7 @@ public class HttpResponseHandler {
         ContentType contentType = ContentType.valueOf(responseFormat);
 
         if (contentType == ContentType.JSON) {
-            return jsonHelper.deserialize(httpResponse.body().toString(), Map.class);
+            return jsonHelper.read(httpResponse.body().toString(), Map.class);
         } else if (contentType == ContentType.STRING) {
             return httpResponse.body().toString();
         } else if (contentType == ContentType.BINARY) {

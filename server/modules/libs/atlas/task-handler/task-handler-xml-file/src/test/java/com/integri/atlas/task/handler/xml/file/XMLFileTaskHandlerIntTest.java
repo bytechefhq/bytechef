@@ -63,9 +63,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
         Accessor outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-            .isEqualTo(
-                xmlHelper.deserialize(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)
-            );
+            .isEqualTo(xmlHelper.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class));
     }
 
     @Test
@@ -74,7 +72,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
             "samples/xmlFile_WRITE.json",
             Map.of(
                 "input",
-                xmlHelper.deserialize(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)
+                xmlHelper.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)
             )
         );
 
@@ -100,7 +98,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
         outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-            .isEqualTo(xmlHelper.deserialize(Files.contentOf(sampleFile, Charset.defaultCharset()), List.class));
+            .isEqualTo(xmlHelper.read(Files.contentOf(sampleFile, Charset.defaultCharset()), List.class));
 
         assertThat(fileEntry.getName()).isEqualTo("file.xml");
     }

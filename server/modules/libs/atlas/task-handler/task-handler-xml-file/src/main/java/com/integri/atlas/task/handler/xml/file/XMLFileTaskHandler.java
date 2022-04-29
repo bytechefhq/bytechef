@@ -97,7 +97,7 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
 
                 result = items;
             } else {
-                result = xmlHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
+                result = xmlHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
             }
         } else {
             String fileName = taskExecution.get("fileName", String.class, "file.xml");
@@ -106,7 +106,7 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                printWriter.println(xmlHelper.serialize(input));
+                printWriter.println(xmlHelper.write(input));
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
