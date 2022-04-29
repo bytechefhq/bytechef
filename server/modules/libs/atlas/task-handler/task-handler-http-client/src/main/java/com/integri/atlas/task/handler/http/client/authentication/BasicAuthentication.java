@@ -24,6 +24,9 @@ import java.util.Base64;
  */
 public class BasicAuthentication implements HttpAuthentication {
 
+    private final String password;
+    private final String username;
+
     public BasicAuthentication(String username, String password) {
         this.username = username;
         this.password = password;
@@ -39,7 +42,4 @@ public class BasicAuthentication implements HttpAuthentication {
 
         return "Basic " + base64Credentials;
     }
-
-    private final String password;
-    private final String username;
 }

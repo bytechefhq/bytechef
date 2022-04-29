@@ -34,6 +34,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpResponseHandler {
 
+    private final FileStorageService fileStorageService;
+    private final JSONHelper jsonHelper;
+
     public HttpResponseHandler(FileStorageService fileStorageService, JSONHelper jsonHelper) {
         this.fileStorageService = fileStorageService;
         this.jsonHelper = jsonHelper;
@@ -60,7 +63,4 @@ public class HttpResponseHandler {
 
         throw new IllegalArgumentException("Invalid response format " + responseFormat);
     }
-
-    private final FileStorageService fileStorageService;
-    private final JSONHelper jsonHelper;
 }

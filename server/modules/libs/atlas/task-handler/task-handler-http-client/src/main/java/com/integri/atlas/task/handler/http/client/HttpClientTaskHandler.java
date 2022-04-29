@@ -37,6 +37,12 @@ import org.springframework.stereotype.Component;
 @Component(TASK_HTTP_CLIENT)
 public class HttpClientTaskHandler implements TaskHandler<Object> {
 
+    private final HttpBodyFactory httpBodyFactory;
+    private final HttpAuthenticationFactory httpAuthenticationFactory;
+    private final HttpHeadersFactory httpHeadersFactory;
+    private final QueryParamsFactory queryParamsFactory;
+    private final HttpResponseHandler httpResponseHandler;
+
     public HttpClientTaskHandler(
         HttpBodyFactory httpBodyFactory,
         HttpAuthenticationFactory httpAuthenticationFactory,
@@ -82,10 +88,4 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
 
         return uri + '?' + queryParameters;
     }
-
-    private final HttpBodyFactory httpBodyFactory;
-    private final HttpAuthenticationFactory httpAuthenticationFactory;
-    private final HttpHeadersFactory httpHeadersFactory;
-    private final QueryParamsFactory queryParamsFactory;
-    private final HttpResponseHandler httpResponseHandler;
 }
