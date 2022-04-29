@@ -21,6 +21,7 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROPERTY_URI;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_REQUEST_METHOD;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_TIMEOUT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 
@@ -33,12 +34,12 @@ import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
-import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -72,7 +73,10 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
 
         HttpResponse httpResponse = integriHttpClient.send(
             taskExecution.getRequiredString(PROPERTY_REQUEST_METHOD),
-            resolveURI(taskExecution.getRequiredString(PROPERTY_PROPERTY_URI), queryParamsFactory.getQueryParams(taskExecution)),
+            resolveURI(
+                taskExecution.getRequiredString(PROPERTY_PROPERTY_URI),
+                queryParamsFactory.getQueryParams(taskExecution)
+            ),
             httpHeadersFactory.getHttpHeaders(taskExecution),
             getBodyPublisher(taskExecution),
             getBodyHandler(taskExecution)
@@ -90,38 +94,52 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
     }
 
     private HttpRequest.BodyPublisher getBodyPublisher(TaskExecution taskExecution) {
-        if (taskExecution.containsKey("bodyParametersRaw")) {
-            return HttpRequest.BodyPublishers.ofString(taskExecution.get("bodyParametersRaw"));
-        } else if (taskExecution.containsKey("bodyParametersKeyValue")) {
-            MultiValueMap<String, String> bodyParameters = taskExecution.get(
-                "bodyParametersKeyValue",
-                MultiValueMap.class
-            );
+        HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
+        if (taskExecution.containsKey(PROPERTY_BODY_PARAMETERS)) {
+            String bodyParams;
 
-            List<String> bodyParametersList = new ArrayList<>();
-
-            StringBuilder sb = new StringBuilder();
-
-            for (Map.Entry<String, List<String>> entry : bodyParameters.entrySet()) {
-                sb.append(entry.getKey());
-                sb.append("=");
-                sb.append(StringUtils.join(entry.getValue(), ","));
-
-                bodyParametersList.add(sb.toString());
+            if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
+                bodyParams =
+                    fromBodyParameters(
+                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_BODY_PARAMETERS), String.class),
+                        (String value) -> value
+                    );
+            } else {
+                bodyParams =
+                    fromBodyParameters(
+                        taskExecution.get(PROPERTY_BODY_PARAMETERS, MultiValueMap.class),
+                        (List<String> values) -> StringUtils.join(values, ",")
+                    );
             }
 
-            return HttpRequest.BodyPublishers.ofString(StringUtils.join(bodyParametersList, "&"));
+            bodyPublisher = HttpRequest.BodyPublishers.ofString(bodyParams);
         }
 
-        return HttpRequest.BodyPublishers.noBody();
+        return bodyPublisher;
+    }
+
+    private <T> String fromBodyParameters(Map<String, T> queryParameters, Function<T, String> entryValueFunction) {
+        List<String> queryParameterList = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String, T> entry : queryParameters.entrySet()) {
+            sb.append(entry.getKey());
+            sb.append("=");
+            sb.append(entryValueFunction.apply(entry.getValue()));
+
+            queryParameterList.add(sb.toString());
+        }
+
+        return StringUtils.join(queryParameterList, "&");
     }
 
     private HttpResponse.BodyHandler getBodyHandler(TaskExecution taskExecution) {
-        if (!taskExecution.containsKey("responseFormat")) {
+        if (!taskExecution.containsKey(PROPERTY_RESPONSE_FORMAT)) {
             return HttpResponse.BodyHandlers.discarding();
         }
 
-        ContentType contentType = ContentType.valueOf(taskExecution.getString("responseFormat"));
+        ContentType contentType = ContentType.valueOf(taskExecution.getString(PROPERTY_RESPONSE_FORMAT));
 
         if (contentType == ContentType.BINARY) {
             return HttpResponse.BodyHandlers.ofInputStream();
