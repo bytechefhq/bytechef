@@ -16,10 +16,12 @@
 
 package com.integri.atlas.task.handler.http.client.params;
 
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -30,30 +32,44 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class QueryParamsFactory {
 
-    public String getQueryParams(TaskExecution taskExecution) {
-        if (taskExecution.containsKey("queryParametersRaw")) {
-            return taskExecution.getString("queryParametersRaw");
-        } else if (taskExecution.containsKey("queryParametersKeyValue")) {
-            return fromQueryParametersKeyValue(taskExecution);
-        }
+    private final JSONHelper jsonHelper;
 
-        return "";
+    public QueryParamsFactory(JSONHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
     }
 
-    private String fromQueryParametersKeyValue(TaskExecution taskExecution) {
-        MultiValueMap<String, String> queryParameters = taskExecution.get(
-            "queryParametersKeyValue",
-            MultiValueMap.class
-        );
+    @SuppressWarnings("unchecked")
+    public String getQueryParams(TaskExecution taskExecution) {
+        String queryParams = "";
 
+        if (taskExecution.containsKey("queryParameters")) {
+            if (taskExecution.getBoolean("rawParameters", false)) {
+                queryParams =
+                    fromQueryParameters(
+                        jsonHelper.checkJSONObject(taskExecution.get("queryParameters"), String.class),
+                        (String value) -> value
+                    );
+            } else {
+                queryParams =
+                    fromQueryParameters(
+                        taskExecution.get("queryParameters", MultiValueMap.class),
+                        (List<String> values) -> StringUtils.join(values, ",")
+                    );
+            }
+        }
+
+        return queryParams;
+    }
+
+    private <T> String fromQueryParameters(Map<String, T> queryParameters, Function<T, String> entryValueFunction) {
         List<String> queryParameterList = new ArrayList<>();
 
         StringBuilder sb = new StringBuilder();
 
-        for (Map.Entry<String, List<String>> entry : queryParameters.entrySet()) {
+        for (Map.Entry<String, T> entry : queryParameters.entrySet()) {
             sb.append(entry.getKey());
             sb.append("=");
-            sb.append(StringUtils.join(entry.getValue(), ","));
+            sb.append(entryValueFunction.apply(entry.getValue()));
 
             queryParameterList.add(sb.toString());
         }
