@@ -17,11 +17,8 @@
 package com.integri.atlas.task.handler.http.client;
 
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_AUTHENTICATION_TYPE;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROPERTY_URI;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_REQUEST_METHOD;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_TIMEOUT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 
@@ -29,36 +26,28 @@ import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
-import com.integri.atlas.task.handler.http.client.header.ContentType;
+import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 
 @Component(TASK_HTTP_CLIENT)
 public class HttpClientTaskHandler implements TaskHandler<Object> {
 
     public HttpClientTaskHandler(
+        HttpBodyFactory httpBodyFactory,
         HttpAuthenticationFactory httpAuthenticationFactory,
         HttpHeadersFactory httpHeadersFactory,
         HttpResponseHandler httpResponseHandler,
-        QueryParamsFactory queryParamsFactory,
-        JSONHelper jsonHelper
+        QueryParamsFactory queryParamsFactory
     ) {
+        this.httpBodyFactory = httpBodyFactory;
         this.httpAuthenticationFactory = httpAuthenticationFactory;
         this.httpHeadersFactory = httpHeadersFactory;
         this.httpResponseHandler = httpResponseHandler;
         this.queryParamsFactory = queryParamsFactory;
-        this.jsonHelper = jsonHelper;
     }
 
     @Override
@@ -78,8 +67,8 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
                 queryParamsFactory.getQueryParams(taskExecution)
             ),
             httpHeadersFactory.getHttpHeaders(taskExecution),
-            getBodyPublisher(taskExecution),
-            getBodyHandler(taskExecution)
+            httpBodyFactory.getBodyPublisher(taskExecution, this),
+            httpBodyFactory.getBodyHandler(taskExecution)
         );
 
         return httpResponseHandler.handle(taskExecution, httpResponse);
@@ -93,64 +82,9 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
         return uri + '?' + queryParameters;
     }
 
-    private HttpRequest.BodyPublisher getBodyPublisher(TaskExecution taskExecution) {
-        HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
-        if (taskExecution.containsKey(PROPERTY_BODY_PARAMETERS)) {
-            String bodyParams;
-
-            if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
-                bodyParams =
-                    fromBodyParameters(
-                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_BODY_PARAMETERS), String.class),
-                        (String value) -> value
-                    );
-            } else {
-                bodyParams =
-                    fromBodyParameters(
-                        taskExecution.get(PROPERTY_BODY_PARAMETERS, MultiValueMap.class),
-                        (List<String> values) -> StringUtils.join(values, ",")
-                    );
-            }
-
-            bodyPublisher = HttpRequest.BodyPublishers.ofString(bodyParams);
-        }
-
-        return bodyPublisher;
-    }
-
-    private <T> String fromBodyParameters(Map<String, T> queryParameters, Function<T, String> entryValueFunction) {
-        List<String> queryParameterList = new ArrayList<>();
-
-        StringBuilder sb = new StringBuilder();
-
-        for (Map.Entry<String, T> entry : queryParameters.entrySet()) {
-            sb.append(entry.getKey());
-            sb.append("=");
-            sb.append(entryValueFunction.apply(entry.getValue()));
-
-            queryParameterList.add(sb.toString());
-        }
-
-        return StringUtils.join(queryParameterList, "&");
-    }
-
-    private HttpResponse.BodyHandler getBodyHandler(TaskExecution taskExecution) {
-        if (!taskExecution.containsKey(PROPERTY_RESPONSE_FORMAT)) {
-            return HttpResponse.BodyHandlers.discarding();
-        }
-
-        ContentType contentType = ContentType.valueOf(taskExecution.getString(PROPERTY_RESPONSE_FORMAT));
-
-        if (contentType == ContentType.BINARY) {
-            return HttpResponse.BodyHandlers.ofInputStream();
-        }
-
-        return HttpResponse.BodyHandlers.ofString();
-    }
-
+    private final HttpBodyFactory httpBodyFactory;
     private final HttpAuthenticationFactory httpAuthenticationFactory;
     private final HttpHeadersFactory httpHeadersFactory;
     private final QueryParamsFactory queryParamsFactory;
-    private final JSONHelper jsonHelper;
     private final HttpResponseHandler httpResponseHandler;
 }

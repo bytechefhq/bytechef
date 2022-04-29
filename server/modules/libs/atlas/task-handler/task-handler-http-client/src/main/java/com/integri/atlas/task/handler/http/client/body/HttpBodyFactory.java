@@ -1,0 +1,106 @@
+/*
+ * Copyright 2021 <your company/name>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.integri.atlas.task.handler.http.client.body;
+
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
+
+import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.task.handler.http.client.HttpClientTaskHandler;
+import com.integri.atlas.task.handler.http.client.header.ContentType;
+import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
+
+/**
+ * @author Ivica Cardic
+ */
+@Component
+public class HttpBodyFactory {
+
+    private final JSONHelper jsonHelper;
+
+    public HttpBodyFactory(JSONHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
+    }
+
+    public HttpRequest.BodyPublisher getBodyPublisher(
+        TaskExecution taskExecution,
+        HttpClientTaskHandler httpClientTaskHandler
+    ) {
+        HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
+        if (taskExecution.containsKey(PROPERTY_BODY_PARAMETERS)) {
+            String bodyParams;
+
+            if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
+                bodyParams =
+                    fromBodyParameters(
+                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_BODY_PARAMETERS), String.class),
+                        (String value) -> value
+                    );
+            } else {
+                bodyParams =
+                    fromBodyParameters(
+                        taskExecution.get(PROPERTY_BODY_PARAMETERS, MultiValueMap.class),
+                        (List<String> values) -> StringUtils.join(values, ",")
+                    );
+            }
+
+            bodyPublisher = HttpRequest.BodyPublishers.ofString(bodyParams);
+        }
+
+        return bodyPublisher;
+    }
+
+    private <T> String fromBodyParameters(Map<String, T> queryParameters, Function<T, String> entryValueFunction) {
+        List<String> queryParameterList = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String, T> entry : queryParameters.entrySet()) {
+            sb.append(entry.getKey());
+            sb.append("=");
+            sb.append(entryValueFunction.apply(entry.getValue()));
+
+            queryParameterList.add(sb.toString());
+        }
+
+        return StringUtils.join(queryParameterList, "&");
+    }
+
+    public HttpResponse.BodyHandler getBodyHandler(TaskExecution taskExecution) {
+        if (!taskExecution.containsKey(PROPERTY_RESPONSE_FORMAT)) {
+            return HttpResponse.BodyHandlers.discarding();
+        }
+
+        ContentType contentType = ContentType.valueOf(taskExecution.getString(PROPERTY_RESPONSE_FORMAT));
+
+        if (contentType == ContentType.BINARY) {
+            return HttpResponse.BodyHandlers.ofInputStream();
+        }
+
+        return HttpResponse.BodyHandlers.ofString();
+    }
+}
