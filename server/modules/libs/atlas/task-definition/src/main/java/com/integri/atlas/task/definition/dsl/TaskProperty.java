@@ -30,9 +30,9 @@ import java.util.stream.Stream;
 public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     permits
         TaskProperty.BooleanTaskProperty,
+        TaskProperty.CollectionTaskProperty,
         TaskProperty.ColorTaskProperty,
         TaskProperty.DateTimeTaskProperty,
-        TaskProperty.CollectionTaskProperty,
         TaskProperty.GroupTaskProperty,
         TaskProperty.IntegerTaskProperty,
         TaskProperty.JSONTaskProperty,
@@ -605,34 +605,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         }
     }
 
-    public static final class ColorTaskProperty extends TaskProperty<ColorTaskProperty> {
-
-        public ColorTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.COLOR;
-        }
-
-        public ColorTaskProperty defaultValue(String defaultValue) {
-            this.defaultValue = parameter(defaultValue);
-
-            return this;
-        }
-    }
-
-    public static final class DateTimeTaskProperty extends TaskProperty<DateTimeTaskProperty> {
-
-        public DateTimeTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.DATE_TIME;
-        }
-
-        public DateTimeTaskProperty defaultValue(LocalDateTime defaultValue) {
-            this.defaultValue = parameter(defaultValue);
-
-            return this;
-        }
-    }
-
     public static final class CollectionTaskProperty extends TaskProperty<CollectionTaskProperty> {
 
         private List<TaskProperty<?>> options;
@@ -724,18 +696,36 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
             return options;
         }
 
-        public String getPlaceholder() {
-            return placeholder;
-        }
-
         public CollectionTaskProperty options(TaskProperty<?>... options) {
             this.options = List.of(options);
 
             return this;
         }
+    }
 
-        public CollectionTaskProperty placeholder(String placeholder) {
-            this.placeholder = placeholder;
+    public static final class ColorTaskProperty extends TaskProperty<ColorTaskProperty> {
+
+        public ColorTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.COLOR;
+        }
+
+        public ColorTaskProperty defaultValue(String defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+    }
+
+    public static final class DateTimeTaskProperty extends TaskProperty<DateTimeTaskProperty> {
+
+        public DateTimeTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.DATE_TIME;
+        }
+
+        public DateTimeTaskProperty defaultValue(LocalDateTime defaultValue) {
+            this.defaultValue = parameter(defaultValue);
 
             return this;
         }
@@ -772,10 +762,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
             this.defaultValue = parameter(value);
 
             return this;
-        }
-
-        public String getPlaceholder() {
-            return placeholder;
         }
     }
 
@@ -891,8 +877,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
 
     public static final class StringTaskProperty extends TaskProperty<StringTaskProperty> {
 
-        private String placeholder;
-
         public StringTaskProperty(String name) {
             this.name = name;
             this.type = TaskPropertyType.STRING;
@@ -902,16 +886,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
             this.defaultValue = parameter(value);
 
             return this;
-        }
-
-        public StringTaskProperty placeholder(String placeholder) {
-            this.placeholder = placeholder;
-
-            return this;
-        }
-
-        public String getPlaceholder() {
-            return placeholder;
         }
     }
 }
