@@ -1604,7 +1604,7 @@ public class TaskDefinitionTest {
     public void testGroupTaskProperty() throws JsonProcessingException, JSONException {
         TaskProperty<?> taskProperty = TaskProperty
             .GROUP_PROPERTY("name")
-            .groupProperties(STRING_PROPERTY("stringProperty"))
+            .fields(STRING_PROPERTY("stringProperty"))
             .description("description")
             .displayName("displayName")
             .displayOption(displayOption())

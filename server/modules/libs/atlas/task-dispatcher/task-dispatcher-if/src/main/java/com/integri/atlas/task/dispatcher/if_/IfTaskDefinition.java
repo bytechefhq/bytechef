@@ -71,7 +71,7 @@ public class IfTaskDefinition implements TaskDefinition {
                 .options(
                     GROUP_PROPERTY(PROPERTY_BOOLEAN)
                         .displayName("Boolean")
-                        .groupProperties(
+                        .fields(
                             BOOLEAN_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The boolean value to compare with the second one.")
@@ -91,7 +91,7 @@ public class IfTaskDefinition implements TaskDefinition {
                         ),
                     GROUP_PROPERTY(PROPERTY_DATE_TIME)
                         .displayName("Date & Time")
-                        .groupProperties(
+                        .fields(
                             DATE_TIME_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The date & time value to compare with the second one.")
@@ -111,7 +111,7 @@ public class IfTaskDefinition implements TaskDefinition {
                         ),
                     GROUP_PROPERTY(PROPERTY_NUMBER)
                         .displayName("Number")
-                        .groupProperties(
+                        .fields(
                             NUMBER_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The number value to compare with the second one.")
@@ -137,7 +137,7 @@ public class IfTaskDefinition implements TaskDefinition {
                         ),
                     GROUP_PROPERTY(PROPERTY_STRING)
                         .displayName("String")
-                        .groupProperties(
+                        .fields(
                             STRING_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The string value to compare with the second one.")

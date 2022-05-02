@@ -743,21 +743,21 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
 
     public static final class GroupTaskProperty extends TaskProperty<GroupTaskProperty> {
 
-        private List<TaskProperty<?>> groupProperties;
+        private List<TaskProperty<?>> fields;
 
         public GroupTaskProperty(String name) {
             this.name = name;
             this.type = TaskPropertyType.GROUP;
         }
 
-        public GroupTaskProperty groupProperties(TaskProperty<?>... fields) {
-            this.groupProperties = List.of(fields);
+        public GroupTaskProperty fields(TaskProperty<?>... fields) {
+            this.fields = List.of(fields);
 
             return this;
         }
 
-        public List<TaskProperty<?>> getGroupProperties() {
-            return groupProperties;
+        public List<TaskProperty<?>> getFields() {
+            return fields;
         }
     }
 
