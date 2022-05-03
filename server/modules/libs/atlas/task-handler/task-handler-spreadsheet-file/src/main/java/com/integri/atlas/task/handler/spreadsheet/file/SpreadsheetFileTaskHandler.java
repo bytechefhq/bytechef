@@ -75,8 +75,8 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
             FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
             boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
             boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
-            Integer pageSize = taskExecution.get(PROPERTY_PAGE_SIZE);
-            Integer pageNumber = taskExecution.get(PROPERTY_PAGE_NUMBER);
+            Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
+            Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
             boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
             String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, null);
 
