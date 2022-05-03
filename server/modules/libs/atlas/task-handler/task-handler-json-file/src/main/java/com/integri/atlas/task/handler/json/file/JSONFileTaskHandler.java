@@ -122,7 +122,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getDefaultFileName(fileType));
-            Object input = jsonHelper.checkJSON(taskExecution.getRequired("input"));
+            Object input = jsonHelper.check(taskExecution.getRequired("input"));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

@@ -76,11 +76,11 @@ public class JSONHelper {
         );
     }
 
-    public Object checkJSON(Object object) {
-        return checkJSON(object, null);
+    public Object check(Object object) {
+        return check(object, null);
     }
 
-    public Object checkJSON(Object object, Class<?> clazz) {
+    public Object check(Object object, Class<?> clazz) {
         Object result = null;
 
         if (object != null) {
@@ -114,16 +114,16 @@ public class JSONHelper {
         return result;
     }
 
-    public <T> List<T> checkJSONArray(Object object, Class<T> itemClass) {
-        return checkJSONArray(object, typeFactory.constructType(itemClass));
+    public <T> List<T> checkArray(Object object, Class<T> itemClass) {
+        return checkArray(object, typeFactory.constructType(itemClass));
     }
 
-    public <T> List<T> checkJSONArray(Object object, TypeReference<T> typeReference) {
-        return checkJSONArray(object, typeFactory.constructType(typeReference));
+    public <T> List<T> checkArray(Object object, TypeReference<T> typeReference) {
+        return checkArray(object, typeFactory.constructType(typeReference));
     }
 
     @SuppressWarnings({ "raw", "unchecked" })
-    public <T> List<T> checkJSONArray(Object object, JavaType itemType) {
+    public <T> List<T> checkArray(Object object, JavaType itemType) {
         List<T> items = null;
 
         if (object != null) {
@@ -149,20 +149,20 @@ public class JSONHelper {
         return items;
     }
 
-    public Map<String, ?> checkJSONObject(Object object) {
-        return checkJSONObject(object, (JavaType) null);
+    public Map<String, ?> checkObject(Object object) {
+        return checkObject(object, (JavaType) null);
     }
 
-    public <T> Map<String, T> checkJSONObject(Object object, Class<T> itemClass) {
-        return checkJSONObject(object, typeFactory.constructType(itemClass));
+    public <T> Map<String, T> checkObject(Object object, Class<T> itemClass) {
+        return checkObject(object, typeFactory.constructType(itemClass));
     }
 
-    public <T> Map<String, T> checkJSONObject(Object object, TypeReference<T> typeReference) {
-        return checkJSONObject(object, typeFactory.constructType(typeReference));
+    public <T> Map<String, T> checkObject(Object object, TypeReference<T> typeReference) {
+        return checkObject(object, typeFactory.constructType(typeReference));
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Map<String, T> checkJSONObject(Object object, JavaType valueType) {
+    public <T> Map<String, T> checkObject(Object object, JavaType valueType) {
         Map<String, T> result = null;
 
         if (object != null) {

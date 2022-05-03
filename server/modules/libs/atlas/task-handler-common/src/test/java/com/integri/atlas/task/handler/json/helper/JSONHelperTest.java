@@ -33,76 +33,76 @@ public class JSONHelperTest {
     private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
 
     @Test
-    public void testCheckJSON() {
+    public void testCheck() {
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSON(true));
-
-        Assertions
-            .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSON(true, Boolean.class));
-
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> jsonHelper.checkJSON(2));
+            .isThrownBy(() -> jsonHelper.check(true));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSON(2, Integer.class));
+            .isThrownBy(() -> jsonHelper.check(true, Boolean.class));
+
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> jsonHelper.check(2));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSON("2"));
+            .isThrownBy(() -> jsonHelper.check(2, Integer.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSON("2", String.class));
+            .isThrownBy(() -> jsonHelper.check("2"));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSON("item"));
+            .isThrownBy(() -> jsonHelper.check("2", String.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSON("item", String.class));
-
-        Assertions.assertThat((List<?>) jsonHelper.checkJSON("[2,4]")).isEqualTo(List.of(2, 4));
-
-        Assertions.assertThat(jsonHelper.checkJSON("[2,4]", List.class)).isEqualTo(List.of(2, 4));
+            .isThrownBy(() -> jsonHelper.check("item"));
 
         Assertions
-            .assertThat((List<?>) jsonHelper.checkJSON("[\"item1\",\"item2\"]"))
+            .assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> jsonHelper.check("item", String.class));
+
+        Assertions.assertThat((List<?>) jsonHelper.check("[2,4]")).isEqualTo(List.of(2, 4));
+
+        Assertions.assertThat(jsonHelper.check("[2,4]", List.class)).isEqualTo(List.of(2, 4));
+
+        Assertions
+            .assertThat((List<?>) jsonHelper.check("[\"item1\",\"item2\"]"))
             .isEqualTo(List.of("item1", "item2"));
 
         Assertions
-            .assertThat(jsonHelper.checkJSON("[\"item1\",\"item2\"]", List.class))
+            .assertThat(jsonHelper.check("[\"item1\",\"item2\"]", List.class))
             .isEqualTo(List.of("item1", "item2"));
 
         Assertions
-            .assertThat((Map<?, ?>) jsonHelper.checkJSON(Map.of("key", "value")))
+            .assertThat((Map<?, ?>) jsonHelper.check(Map.of("key", "value")))
             .isEqualTo(Map.of("key", "value"));
 
         Assertions
-            .assertThat(jsonHelper.checkJSON(Map.of("key", "value"), Map.class))
+            .assertThat(jsonHelper.check(Map.of("key", "value"), Map.class))
             .isEqualTo(Map.of("key", "value"));
 
         Assertions
-            .assertThat((List<?>) jsonHelper.checkJSON(List.of(Map.of("key", "value"))))
+            .assertThat((List<?>) jsonHelper.check(List.of(Map.of("key", "value"))))
             .isEqualTo(List.of(Map.of("key", "value")));
 
         Assertions
-            .assertThat(jsonHelper.checkJSON(List.of(Map.of("key", "value")), List.class))
+            .assertThat(jsonHelper.check(List.of(Map.of("key", "value")), List.class))
             .isEqualTo(List.of(Map.of("key", "value")));
 
         Assertions
-            .assertThat((Map<?, ?>) jsonHelper.checkJSON(jsonHelper.write(Map.of("key", "value"))))
+            .assertThat((Map<?, ?>) jsonHelper.check(jsonHelper.write(Map.of("key", "value"))))
             .isEqualTo(Map.of("key", "value"));
 
         Assertions
-            .assertThat(jsonHelper.checkJSON(jsonHelper.write(Map.of("key", "value")), Map.class))
+            .assertThat(jsonHelper.check(jsonHelper.write(Map.of("key", "value")), Map.class))
             .isEqualTo(Map.of("key", "value"));
 
         Assertions
             .assertThat(
-                (List<?>) jsonHelper.checkJSON(
+                (List<?>) jsonHelper.check(
                     jsonHelper.write(List.of(Map.of("key1", "value1"), Map.of("key2", "value2")))
                 )
             )
@@ -110,7 +110,7 @@ public class JSONHelperTest {
 
         Assertions
             .assertThat(
-                jsonHelper.checkJSON(
+                jsonHelper.check(
                     jsonHelper.write(List.of(Map.of("key1", "value1"), Map.of("key2", "value2"))),
                     List.class
                 )
@@ -119,70 +119,70 @@ public class JSONHelperTest {
     }
 
     @Test
-    public void testCheckJSONArray() {
+    public void testCheckArray() {
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray(true, new TypeReference<>() {}));
+            .isThrownBy(() -> jsonHelper.checkArray(true, new TypeReference<>() {}));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray(true, Boolean.class));
+            .isThrownBy(() -> jsonHelper.checkArray(true, Boolean.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray(2, new TypeReference<>() {}));
+            .isThrownBy(() -> jsonHelper.checkArray(2, new TypeReference<>() {}));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray(2, Integer.class));
+            .isThrownBy(() -> jsonHelper.checkArray(2, Integer.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray("2", new TypeReference<>() {}));
+            .isThrownBy(() -> jsonHelper.checkArray("2", new TypeReference<>() {}));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray("2", String.class));
+            .isThrownBy(() -> jsonHelper.checkArray("2", String.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray("item", new TypeReference<>() {}));
+            .isThrownBy(() -> jsonHelper.checkArray("item", new TypeReference<>() {}));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray("item", String.class));
+            .isThrownBy(() -> jsonHelper.checkArray("item", String.class));
 
-        List<Integer> list = jsonHelper.checkJSONArray("[2,4]", new TypeReference<>() {});
+        List<Integer> list = jsonHelper.checkArray("[2,4]", new TypeReference<>() {});
 
         Assertions.assertThat(list).containsAll(List.of(2, 4));
 
-        Assertions.assertThat(jsonHelper.checkJSONArray("[2,4]", Integer.class)).containsAll(List.of(2, 4));
+        Assertions.assertThat(jsonHelper.checkArray("[2,4]", Integer.class)).containsAll(List.of(2, 4));
 
         Assertions
-            .assertThat(jsonHelper.checkJSONArray("[\"item1\",\"item2\"]", String.class))
+            .assertThat(jsonHelper.checkArray("[\"item1\",\"item2\"]", String.class))
             .isEqualTo(List.of("item1", "item2"));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray(Map.of("key", "value"), Map.class));
+            .isThrownBy(() -> jsonHelper.checkArray(Map.of("key", "value"), Map.class));
 
         Assertions
-            .assertThat(jsonHelper.checkJSONArray(List.of(Map.of("key", "value")), Map.class))
+            .assertThat(jsonHelper.checkArray(List.of(Map.of("key", "value")), Map.class))
             .isEqualTo(List.of(Map.of("key", "value")));
 
-        Assertions.assertThat(jsonHelper.checkJSONArray(Set.of(2, 3), Integer.class)).containsAll(List.of(2, 3));
+        Assertions.assertThat(jsonHelper.checkArray(Set.of(2, 3), Integer.class)).containsAll(List.of(2, 3));
 
         Assertions
-            .assertThat(jsonHelper.checkJSONArray(Set.of(Map.of("key", "value")), Map.class))
+            .assertThat(jsonHelper.checkArray(Set.of(Map.of("key", "value")), Map.class))
             .isEqualTo(List.of(Map.of("key", "value")));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONArray(jsonHelper.write(Map.of("key", "value")), Map.class));
+            .isThrownBy(() -> jsonHelper.checkArray(jsonHelper.write(Map.of("key", "value")), Map.class));
 
         Assertions
             .assertThat(
-                jsonHelper.checkJSONArray(
+                jsonHelper.checkArray(
                     jsonHelper.write(List.of(Map.of("key1", "value1"), Map.of("key2", "value2"))),
                     Map.class
                 )
@@ -191,45 +191,45 @@ public class JSONHelperTest {
     }
 
     @Test
-    public void testCheckJSONObject() {
+    public void testCheckObject() {
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONObject(true, Boolean.class));
+            .isThrownBy(() -> jsonHelper.checkObject(true, Boolean.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONObject(2, Integer.class));
+            .isThrownBy(() -> jsonHelper.checkObject(2, Integer.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONObject("2", String.class));
+            .isThrownBy(() -> jsonHelper.checkObject("2", String.class));
 
         Assertions
             .assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONObject("item", String.class));
+            .isThrownBy(() -> jsonHelper.checkObject("item", String.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONObject("[2,4]", String.class));
+            .isThrownBy(() -> jsonHelper.checkObject("[2,4]", String.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONObject("[\"item1\",\"item2\"]", String.class));
+            .isThrownBy(() -> jsonHelper.checkObject("[\"item1\",\"item2\"]", String.class));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.checkJSONObject(List.of(Map.of("key", "value")), String.class));
+            .isThrownBy(() -> jsonHelper.checkObject(List.of(Map.of("key", "value")), String.class));
 
         Assertions
-            .assertThat(jsonHelper.checkJSONObject(jsonHelper.write(Map.of("key", "value"))))
+            .assertThat(jsonHelper.checkObject(jsonHelper.write(Map.of("key", "value"))))
             .isEqualTo(Map.of("key", "value"));
 
-        Map<String, String> map = jsonHelper.checkJSONObject(Map.of("key", "value"), new TypeReference<>() {});
+        Map<String, String> map = jsonHelper.checkObject(Map.of("key", "value"), new TypeReference<>() {});
 
         Assertions.assertThat(map).isEqualTo(Map.of("key", "value"));
 
         Assertions
-            .assertThat(jsonHelper.checkJSONObject(jsonHelper.write(Map.of("key", "value")), String.class))
+            .assertThat(jsonHelper.checkObject(jsonHelper.write(Map.of("key", "value")), String.class))
             .isEqualTo(Map.of("key", "value"));
     }
 

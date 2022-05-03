@@ -111,7 +111,7 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.xml");
-            Object input = jsonHelper.checkJSON(taskExecution.getRequired(PROPERTY_INPUT));
+            Object input = jsonHelper.check(taskExecution.getRequired(PROPERTY_INPUT));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

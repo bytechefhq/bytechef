@@ -49,7 +49,7 @@ public class QueryParamsFactory {
             if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
                 queryParams =
                     fromQueryParameters(
-                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_QUERY_PARAMETERS), String.class),
+                        jsonHelper.checkObject(taskExecution.get(PROPERTY_QUERY_PARAMETERS), String.class),
                         (String value) -> value
                     );
             } else {

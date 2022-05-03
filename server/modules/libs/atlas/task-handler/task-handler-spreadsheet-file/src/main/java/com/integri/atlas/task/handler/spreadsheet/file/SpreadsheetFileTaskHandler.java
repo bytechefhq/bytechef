@@ -115,7 +115,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
                 StringUtils.upperCase(taskExecution.getRequired(PROPERTY_FILE_FORMAT))
             );
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getaDefaultFileName(fileFormat));
-            List<Map<String, ?>> items = jsonHelper.checkJSONArray(
+            List<Map<String, ?>> items = jsonHelper.checkArray(
                 taskExecution.getRequired(PROPERTY_ITEMS),
                 new TypeReference<>() {}
             );
