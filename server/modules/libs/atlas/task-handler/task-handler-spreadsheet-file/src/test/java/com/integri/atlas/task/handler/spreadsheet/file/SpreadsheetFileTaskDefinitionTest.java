@@ -111,14 +111,14 @@ public class SpreadsheetFileTaskDefinitionTest {
                         ]
                     },
                     {
-                        "description":"Object or array of objects to write to the file.",
-                        "displayName":"Input",
+                        "description":"The array of objects to write to the file.",
+                        "displayName":"Items",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
                             }
                         },
-                        "name":"input",
+                        "name":"items",
                         "required":true,
                         "type":"JSON"
                     },
