@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xml.converter;
+package com.integri.atlas.task.handler.xml.helpers;
 
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
@@ -22,22 +22,22 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
-import static com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.*;
+import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.*;
 
 import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
-import com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.Operation;
+import com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.Operation;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class XMLConverterTaskDefinition implements TaskDefinition {
+public class XmlHelpersTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(TASK_XML_CONVERTER)
-        .displayName("XML Converter")
+        .create(TASK_XML_HELPERS)
+        .displayName("XML Helpers")
         .description("Converts between XML string and object/array.")
         .properties(
             SELECT_PROPERTY(PROPERTY_OPERATION)
@@ -46,22 +46,22 @@ public class XMLConverterTaskDefinition implements TaskDefinition {
                 .options(
                     option(
                         "Convert from XML string",
-                        Operation.FROM_XML.name(),
+                        Operation.XML_TO_JSON.name(),
                         "Converts the XML string to object/array."
                     ),
-                    option("Convert to XML string", "TO_XML", "Writes the object/array to a XML string.")
+                    option("Convert to XML string", "JSON_TO_XML", "Writes the object/array to a XML string.")
                 )
-                .defaultValue(Operation.FROM_XML.name())
+                .defaultValue(Operation.XML_TO_JSON.name())
                 .required(true),
-            STRING_PROPERTY(PROPERTY_INPUT)
-                .displayName("Input")
-                .description("XML string to convert to the data.")
-                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.FROM_XML.name())))
+            STRING_PROPERTY(PROPERTY_SOURCE)
+                .displayName("Source")
+                .description("The XML string to convert to the data.")
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.XML_TO_JSON.name())))
                 .required(true),
-            JSON_PROPERTY(PROPERTY_INPUT)
-                .displayName("Input")
+            JSON_PROPERTY(PROPERTY_SOURCE)
+                .displayName("Source")
                 .description("The data to convert to XML string.")
-                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.TO_XML.name())))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.JSON_TO_XML.name())))
                 .required(true)
         );
 

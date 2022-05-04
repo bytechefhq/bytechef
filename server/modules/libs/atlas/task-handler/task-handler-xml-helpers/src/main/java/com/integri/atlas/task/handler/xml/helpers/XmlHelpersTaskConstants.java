@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xml.converter;
+package com.integri.atlas.task.handler.xml.helpers;
 
 /**
  * @author Ivica Cardic
  */
-public class XMLConverterTaskConstants {
+public class XmlHelpersTaskConstants {
 
     public static final String PROPERTY_OPERATION = "operation";
-    public static final String PROPERTY_INPUT = "input";
-    static final String TASK_XML_CONVERTER = "xmlConverter";
+    public static final String PROPERTY_SOURCE = "source";
+    static final String TASK_XML_HELPERS = "xmlHelpers";
 
     enum Operation {
-        FROM_XML,
-        TO_XML,
+        XML_TO_JSON,
+        JSON_TO_XML,
     }
 }
