@@ -71,7 +71,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
         Job job = startJob(
             "samples/xmlFile_WRITE.json",
             Map.of(
-                "input",
+                "source",
                 xmlHelper.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)
             )
         );

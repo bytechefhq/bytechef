@@ -23,12 +23,12 @@ public class XMLFileTaskConstants {
 
     public static final String PROPERTY_OPERATION = "operation";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
-    public static final String PROPERTY_INPUT = "input";
     public static final String PROPERTY_IS_ARRAY = "isArray";
     public static final String PROPERTY_FILE_NAME = "fileName";
     public static final String PROPERTY_PATH = "path";
     public static final String PROPERTY_PAGE_SIZE = "pageSize";
     public static final String PROPERTY_PAGE_NUMBER = "pageNumber";
+    public static final String PROPERTY_SOURCE = "source";
     static final String TASK_XML_FILE = "xmlFile";
 
     enum Operation {

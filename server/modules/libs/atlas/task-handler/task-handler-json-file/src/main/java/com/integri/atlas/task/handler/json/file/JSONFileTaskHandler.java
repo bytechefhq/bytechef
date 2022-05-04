@@ -24,6 +24,7 @@ import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PRO
 import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PAGE_SIZE;
 import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PATH;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_SOURCE;
 import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.TASK_JSON_FILE;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -122,17 +123,17 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getDefaultFileName(fileType));
-            Object input = jsonHelper.check(taskExecution.getRequired("input"));
+            Object source = jsonHelper.check(taskExecution.getRequired(PROPERTY_SOURCE));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             if (fileType == FileType.JSON) {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                    printWriter.println(jsonHelper.write(input));
+                    printWriter.println(jsonHelper.write(source));
                 }
             } else {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                    for (Map<String, ?> item : (List<Map<String, ?>>) input) {
+                    for (Map<String, ?> item : (List<Map<String, ?>>) source) {
                         printWriter.println(jsonHelper.write(item));
                     }
                 }

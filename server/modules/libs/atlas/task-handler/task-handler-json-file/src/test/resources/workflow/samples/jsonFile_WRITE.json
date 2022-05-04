@@ -2,7 +2,7 @@
   "label": "JSON File - WRITE operation",
   "inputs": [
     {
-      "name": "input",
+      "name": "source",
       "label": "Object or array of objects",
       "type": "JSON",
       "required": true
@@ -20,7 +20,7 @@
       "label": "Write to the JSON file",
       "type": "jsonFile",
       "operation": "WRITE",
-      "input": "${input}"
+      "source": "${source}"
     }
   ]
 }

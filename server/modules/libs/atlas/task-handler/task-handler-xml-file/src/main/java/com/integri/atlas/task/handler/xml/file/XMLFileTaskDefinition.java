@@ -56,9 +56,9 @@ public class XMLFileTaskDefinition implements TaskDefinition {
                 .description("The object property which contains a reference to the XML file to read from.")
                 .displayOption(show(PROPERTY_OPERATION, Operation.READ.name()))
                 .required(true),
-            JSON_PROPERTY(PROPERTY_INPUT)
-                .displayName("Input")
-                .description("Object or array of objects to write to the file.")
+            JSON_PROPERTY(PROPERTY_SOURCE)
+                .displayName("Source")
+                .description("The data to write to the file.")
                 .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.WRITE.name())))
                 .required(true),
             BOOLEAN_PROPERTY(PROPERTY_IS_ARRAY)

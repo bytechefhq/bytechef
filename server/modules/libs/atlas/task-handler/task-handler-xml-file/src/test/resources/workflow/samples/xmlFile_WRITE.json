@@ -2,7 +2,7 @@
   "label": "JSON File - READ operation",
   "inputs": [
     {
-      "name": "input",
+      "name": "source",
       "label": "Object or array of objects",
       "types": ["ARRAY", "OBJECT"],
       "required": true
@@ -20,7 +20,7 @@
       "label": "Write to the XML file",
       "type": "xmlFile",
       "operation": "WRITE",
-      "input": "${input}"
+      "source": "${source}"
     }
   ]
 }

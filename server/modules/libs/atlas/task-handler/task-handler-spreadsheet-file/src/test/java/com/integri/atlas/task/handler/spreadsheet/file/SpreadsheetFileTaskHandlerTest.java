@@ -312,11 +312,11 @@ public class SpreadsheetFileTaskHandlerTest {
         return taskExecution;
     }
 
-    private SimpleTaskExecution getWriteSimpleTaskExecution(String fileFormat, List<Object> input) {
+    private SimpleTaskExecution getWriteSimpleTaskExecution(String fileFormat, List<Object> items) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         taskExecution.put("fileFormat", fileFormat);
-        taskExecution.put("input", input);
+        taskExecution.put("items", items);
         taskExecution.put("operation", "WRITE");
 
         return taskExecution;

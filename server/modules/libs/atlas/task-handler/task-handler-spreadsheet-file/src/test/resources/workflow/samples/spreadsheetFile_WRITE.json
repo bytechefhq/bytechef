@@ -2,8 +2,8 @@
   "label": "Spreadsheet File - WRITE operation",
   "inputs": [
     {
-      "name": "input",
-      "label": "Object or array of objects",
+      "name": "items",
+      "label": "Array of objects",
       "type": "JSON",
       "required": true
     }
@@ -21,7 +21,7 @@
       "type": "spreadsheetFile",
       "operation": "WRITE",
       "fileFormat": "CSV",
-      "input": "${input}"
+      "items": "${items}"
     }
   ]
 }
