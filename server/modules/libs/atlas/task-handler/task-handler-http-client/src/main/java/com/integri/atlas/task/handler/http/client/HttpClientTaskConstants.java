@@ -45,17 +45,17 @@ public class HttpClientTaskConstants {
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_HTTP_BASIC_AUTH = "httpBasicAuth";
     public static final String PROPERTY_HTTP_DIGEST_AUTH = "httpDigestAuth";
-    public static final String PROPERTY_HTTP_HEADER_AUTH = "httpHeaderAuth";
-    public static final String PROPERTY_HTTP_QUERY_AUTH = "httpQueryAuth";
-    public static final String PROPERTY_O_AUTH_2_AUTH = "oAuth2Auth";
+    public static final String PROPERTY_HTTP_BEARER_TOKEN = "httpBearerToken";
+    public static final String PROPERTY_HTTP_API_KEY = "httpApiKey";
+    public static final String PROPERTY_OAUTH2 = "oAuth2";
     public static final String TASK_HTTP_CLIENT = "httpClient";
 
     public enum AuthenticationType {
+        HTTP_API_KEY,
         HTTP_BASIC_AUTH,
+        HTTP_BEARER_TOKEN,
         HTTP_DIGEST_AUTH,
-        HTTP_HEADER_AUTH,
         OAUTH2,
-        HTTP_QUERY_AUTH,
     }
 
     public enum BodyContentType {

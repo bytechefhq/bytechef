@@ -43,6 +43,16 @@ public class HttpClientTaskDefinitionTest {
                 "authentication":{
                     "credentials":[
                         {
+                            name: 'httpApiKey',
+                            displayOption: {
+                                show: {
+                                    authenticationType: [
+                                        "HTTP_API_KEY",
+                                    ],
+                                },
+                            },
+                        },
+                        {
                             "name":"httpBasicAuth",
                             "displayOption":{
                                 "show":{
@@ -51,21 +61,11 @@ public class HttpClientTaskDefinitionTest {
                             }
                         },
                         {
-                            name: 'httpHeaderAuth',
+                            name: 'httpBearerToken',
                             displayOption: {
                                 show: {
                                     authenticationType: [
-                                        "HTTP_HEADER_AUTH",
-                                    ],
-                                },
-                            },
-                        },
-                        {
-                            name: 'httpQueryAuth',
-                            displayOption: {
-                                show: {
-                                    authenticationType: [
-                                        "HTTP_QUERY_AUTH",
+                                        "HTTP_BEARER_TOKEN",
                                     ],
                                 },
                             },
@@ -79,7 +79,7 @@ public class HttpClientTaskDefinitionTest {
                             }
                         },
                         {
-                            "name":"oAuth2Auth",
+                            "name":"oAuth2",
                             "displayOption":{
                                 "show":{
                                     "authenticationType":["OAUTH2"]
@@ -94,20 +94,20 @@ public class HttpClientTaskDefinitionTest {
                             "type":"SELECT",
                             "options":[
                                 {
+                                    "value":"HTTP_API_KEY",
+                                    "name":"API Key"
+                                },
+                                {
+                                    "value":"HTTP_BEARER_TOKEN",
+                                    "name":"Bearer Token"
+                                },
+                                {
                                     "value":"HTTP_BASIC_AUTH",
                                     "name":"Basic Auth"
                                 },
                                 {
                                     "value":"HTTP_DIGEST_AUTH",
                                     "name":"Digest Auth"
-                                },
-                                {
-                                    "value":"HTTP_HEADER_AUTH",
-                                    "name":"Header Auth"
-                                },
-                                 {
-                                    "value":"HTTP_QUERY_AUTH",
-                                    "name":"Query Auth"
                                 },
                                 {
                                     "value":"OAUTH2",
