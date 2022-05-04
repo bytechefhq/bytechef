@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.json.converter;
+package com.integri.atlas.task.handler.object_.helpers;
 
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
@@ -22,10 +22,10 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
-import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.*;
-import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.Operation;
-import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.PROPERTY_INPUT;
-import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.*;
+import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.Operation;
+import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.PROPERTY_SOURCE;
 
 import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
@@ -35,11 +35,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class JSONConverterTaskDefinition implements TaskDefinition {
+public class ObjectHelpersTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(TASK_JSON_CONVERTER)
-        .displayName("JSON Converter")
+        .create(TASK_OBJECT_HELPERS)
+        .displayName("Object Helpers")
         .description("Converts between JSON string and object/array.")
         .properties(
             SELECT_PROPERTY(PROPERTY_OPERATION)
@@ -48,26 +48,26 @@ public class JSONConverterTaskDefinition implements TaskDefinition {
                 .options(
                     option(
                         "Convert from JSON string",
-                        Operation.FROM_JSON.name(),
+                        Operation.JSON_PARSE.name(),
                         "Converts the JSON string to object/array."
                     ),
                     option(
                         "Convert to JSON string",
-                        Operation.TO_JSON.name(),
+                        Operation.JSON_STRINGIFY.name(),
                         "Writes the object/array to a JSON string."
                     )
                 )
-                .defaultValue(Operation.FROM_JSON.name())
+                .defaultValue(Operation.JSON_PARSE.name())
                 .required(true),
-            STRING_PROPERTY(PROPERTY_INPUT)
-                .displayName("Input")
-                .description("JSON string to convert to the data.")
-                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.FROM_JSON.name())))
+            STRING_PROPERTY(PROPERTY_SOURCE)
+                .displayName("Source")
+                .description("The JSON string to convert to the data.")
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.JSON_PARSE.name())))
                 .required(true),
-            JSON_PROPERTY(PROPERTY_INPUT)
-                .displayName("Input")
+            JSON_PROPERTY(PROPERTY_SOURCE)
+                .displayName("Source")
                 .description("The data to convert to JSON string.")
-                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.TO_JSON.name())))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.JSON_STRINGIFY.name())))
                 .required(true)
         );
 
