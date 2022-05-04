@@ -353,7 +353,7 @@ public class HttpClientTaskDefinitionTest {
                                 "displayName":"Parameter",
                                 "name":"parameter",
                                 "type":"GROUP",
-                                "groupProperties":[
+                                "fields":[
                                     {
                                         "defaultValue":"",
                                         "description":"Name of the parameter.",
@@ -402,7 +402,7 @@ public class HttpClientTaskDefinitionTest {
                                 "displayName":"Parameter",
                                 "name":"parameter",
                                 "type":"GROUP",
-                                "groupProperties":[
+                                "fields":[
                                     {
                                         "defaultValue":"",
                                         "description":"Name of the parameter.",
@@ -456,7 +456,7 @@ public class HttpClientTaskDefinitionTest {
                                 "displayName":"Parameter",
                                 "name":"parameter",
                                 "type":"GROUP",
-                                "groupProperties":[
+                                "fields":[
                                     {
                                         "defaultValue":"",
                                         "description":"Name of the parameter.",

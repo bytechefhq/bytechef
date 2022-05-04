@@ -1617,7 +1617,7 @@ public class TaskDefinitionTest {
             "description":"description",
             "displayName":"displayName",
             "displayOption":{},
-            "groupProperties": [
+            "fields": [
                 {
                     "name":"stringProperty",
                     "type":"STRING"
