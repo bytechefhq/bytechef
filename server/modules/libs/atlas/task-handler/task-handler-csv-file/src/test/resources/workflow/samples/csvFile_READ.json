@@ -1,0 +1,27 @@
+{
+  "label": "CSV File - READ operation",
+  "inputs": [
+    {
+      "name": "fileEntry",
+      "label": "File property",
+      "type": "FILE_ENTRY",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "readCsvFile",
+      "value": "${readCsvFile}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "readCsvFile",
+      "label": "Read from the csv file",
+      "type": "csvFile",
+      "operation": "READ",
+      "fileEntry": "${fileEntry}",
+      "includeEmptyCells": true
+    }
+  ]
+}
