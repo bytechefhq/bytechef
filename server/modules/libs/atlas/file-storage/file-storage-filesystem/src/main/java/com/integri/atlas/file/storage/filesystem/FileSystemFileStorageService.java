@@ -50,7 +50,7 @@ public class FileSystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory();
 
         try {
-            Files.delete(path.resolve(url));
+            Files.delete(path.resolve(url.replace("file:", "")));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to delete file " + url, ioe);
         }
@@ -78,7 +78,7 @@ public class FileSystemFileStorageService implements FileStorageService {
     public boolean fileExists(String url) throws FileStorageException {
         Path path = resolveDirectory();
 
-        return path.resolve(url).toFile().exists();
+        return path.resolve(url.replace("file:", "")).toFile().exists();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class FileSystemFileStorageService implements FileStorageService {
             throw new FileStorageException("Failed to store empty file " + fileName);
         }
 
-        return FileEntry.of(fileName, path.toString());
+        return FileEntry.of(fileName, "file:" + path);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class FileSystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory();
 
         try {
-            return Files.readString(path.resolve(url));
+            return Files.readString(path.resolve(url.replace("file:", "")));
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to open file " + url, ioe);
         }
@@ -128,7 +128,7 @@ public class FileSystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory();
 
         try {
-            return Files.newInputStream(path.resolve(url), StandardOpenOption.READ);
+            return Files.newInputStream(path.resolve(url.replace("file:", "")), StandardOpenOption.READ);
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to open file " + url, ioe);
         }
