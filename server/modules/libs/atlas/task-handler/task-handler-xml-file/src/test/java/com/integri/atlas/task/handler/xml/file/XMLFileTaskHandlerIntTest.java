@@ -23,7 +23,7 @@ import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.task.handler.xml.helper.XMLHelper;
+import com.integri.atlas.task.handler.xml.helper.XmlHelper;
 import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -39,9 +39,9 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
+public class XmlFileTaskHandlerIntTest extends BaseTaskIntTest {
 
-    private static final XMLHelper xmlHelper = new XMLHelper();
+    private static final XmlHelper xmlHelper = new XmlHelper();
 
     @Test
     public void testRead() throws IOException {
@@ -105,7 +105,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("xmlFile", new XMLFileTaskHandler(jsonHelper, fileStorageService, new XMLHelper()));
+        return Map.of("xmlFile", new XmlFileTaskHandler(jsonHelper, fileStorageService, new XmlHelper()));
     }
 
     private File getFile(String fileName) throws IOException {

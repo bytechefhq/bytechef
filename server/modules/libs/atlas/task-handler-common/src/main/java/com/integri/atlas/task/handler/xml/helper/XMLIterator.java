@@ -16,7 +16,6 @@
 
 package com.integri.atlas.task.handler.xml.helper;
 
-import com.ctc.wstx.shaded.msv.org_jp_gr_xml.dom.XMLMaker;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,13 +26,13 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * @author Ivica Cardic
  */
-class XMLIterator implements Iterator<Map<String, ?>> {
+class XmlIterator implements Iterator<Map<String, ?>> {
 
     private final XMLStreamReader xmlStreamReader;
     private final XmlMapper xmlMapper;
     private Map<String, ?> value;
 
-    public XMLIterator(XMLStreamReader xmlStreamReader, XmlMapper xmlMapper) {
+    public XmlIterator(XMLStreamReader xmlStreamReader, XmlMapper xmlMapper) {
         this.xmlStreamReader = xmlStreamReader;
         this.xmlMapper = xmlMapper;
 

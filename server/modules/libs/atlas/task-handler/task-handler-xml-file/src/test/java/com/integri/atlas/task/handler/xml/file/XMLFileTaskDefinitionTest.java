@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class XMLFileTaskDefinitionTest {
+public class XmlFileTaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -161,7 +161,7 @@ public class XMLFileTaskDefinitionTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(XMLFileTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(XmlFileTaskDefinition.TASK_SPECIFICATION)
             ),
             true
         );

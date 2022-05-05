@@ -50,21 +50,21 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-class XMLStreamReaderStream implements Stream<Map<String, ?>> {
+class XmlStreamReaderStream implements Stream<Map<String, ?>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(XMLStreamReaderStream.class);
+    private static final Logger logger = LoggerFactory.getLogger(XmlStreamReaderStream.class);
 
     private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
     private final XMLStreamReader xmlStreamReader;
     private final Stream<Map<String, ?>> stream;
 
-    public XMLStreamReaderStream(InputStream inputStream, XmlMapper xmlMapper) throws XMLStreamException {
+    public XmlStreamReaderStream(InputStream inputStream, XmlMapper xmlMapper) throws XMLStreamException {
         this.xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
 
         this.stream =
             StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(new XMLIterator(xmlStreamReader, xmlMapper), Spliterator.ORDERED),
+                Spliterators.spliteratorUnknownSize(new XmlIterator(xmlStreamReader, xmlMapper), Spliterator.ORDERED),
                 false
             );
     }

@@ -44,7 +44,7 @@ import org.xml.sax.InputSource;
  * @author Ivica Cardic
  */
 @Component
-public class XMLHelper {
+public class XmlHelper {
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final XmlMapper XML_MAPPER = new XmlMapper();
@@ -93,7 +93,7 @@ public class XMLHelper {
 
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
-            return new XMLStreamReaderStream(inputStream, XML_MAPPER);
+            return new XmlStreamReaderStream(inputStream, XML_MAPPER);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

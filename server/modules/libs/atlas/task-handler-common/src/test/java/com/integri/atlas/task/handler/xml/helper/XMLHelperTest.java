@@ -25,9 +25,9 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class XMLHelperTest {
+public class XmlHelperTest {
 
-    private static final XMLHelper xmlHelper = new XMLHelper();
+    private static final XmlHelper xmlHelper = new XmlHelper();
 
     @Test
     public void testRead() {
