@@ -53,7 +53,11 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public int countRunningJobs() {
-        return jdbcOperations.queryForObject("select count(*) from job where status='STARTED'", Map.of(), Integer.class);
+        return jdbcOperations.queryForObject(
+            "select count(*) from job where status='STARTED'",
+            Map.of(),
+            Integer.class
+        );
     }
 
     @Override
@@ -107,7 +111,9 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> getLatest() {
-        List<Job> query = jdbcOperations.query("select * from job order by create_time desc limit 1", this::jobRowMappper);
+        List<Job> query = jdbcOperations.query(
+            "select * from job order by create_time desc limit 1",
+            this::jobRowMappper);
         if (query.size() == 0) {
             return Optional.empty();
         }
@@ -128,7 +134,9 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public Page<JobSummary> getPage(int aPageNumber) {
-        Integer totalItems = jdbcOperations.getJdbcOperations().queryForObject("select count(*) from job", Integer.class);
+        Integer totalItems = jdbcOperations
+            .getJdbcOperations()
+            .queryForObject("select count(*) from job", Integer.class);
         int offset = (aPageNumber - 1) * DEFAULT_PAGE_SIZE;
         int limit = DEFAULT_PAGE_SIZE;
         List<JobSummary> items = jdbcOperations.query(

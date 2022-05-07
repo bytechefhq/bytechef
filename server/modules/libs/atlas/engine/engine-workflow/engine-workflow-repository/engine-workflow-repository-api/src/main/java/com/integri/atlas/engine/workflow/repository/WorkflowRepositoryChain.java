@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.util.Assert;
 
 /**
@@ -53,18 +52,20 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
 
     @Override
     public Workflow create(String content, String format) {
-        for (WorkflowRepository repository : repositories) {
+        for (WorkflowRepository workflowRepository : workflowRepositories) {
             try {
-                Workflow workflow = repository.create(content, format);
+                Workflow workflow = workflowRepository.create(content, format);
 
                 Cache cache = cacheManager.getCache(CACHE_ONE);
+
                 cache.put(workflow.getId(), workflow);
 
                 return workflow;
             } catch (UnsupportedOperationException e) {
-                logger.debug("Repository {} doesn't support create operation", repository);
+                logger.debug("Repository {} doesn't support create operation", workflowRepository);
             }
         }
+
         throw new RuntimeException(
             "Set atlas.workflow-repository.database.enabled=true property to create new workflow"
         );
@@ -72,11 +73,12 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
 
     @Override
     public Workflow update(String id, String content, String format) {
-        for (WorkflowRepository repository : repositories) {
+        for (WorkflowRepository repository : workflowRepositories) {
             try {
                 Workflow workflow = repository.update(id, content, format);
 
                 Cache cache = cacheManager.getCache(CACHE_ONE);
+
                 cache.put(workflow.getId(), workflow);
 
                 return workflow;
@@ -90,40 +92,49 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
     @Override
     public Workflow findOne(String aId) {
         Cache oneCache = cacheManager.getCache(CACHE_ONE);
+
         if (oneCache.get(aId) != null) {
             return (Workflow) oneCache.get(aId).get();
         }
+
         Cache allCache = cacheManager.getCache(CACHE_ALL);
+
         if (allCache.get(CACHE_ALL) != null) {
             List<Workflow> workflows = (List<Workflow>) allCache.get(CACHE_ALL).get();
+
             for (Workflow p : workflows) {
                 if (p.getId().equals(aId)) {
                     return p;
                 }
             }
         }
-        for (WorkflowRepository repository : repositories) {
+
+        for (WorkflowRepository repository : workflowRepositories) {
             try {
                 Workflow workflow = repository.findOne(aId);
+
                 oneCache.put(aId, workflow);
+
                 return workflow;
             } catch (Exception e) {
                 logger.debug("{}", e.getMessage());
             }
         }
+
         throw new IllegalArgumentException("Unknown workflow: " + aId);
     }
 
     @Override
     public List<Workflow> findAll() {
         Cache cache = cacheManager.getCache(CACHE_ALL);
+
         if (cache.get(CACHE_ALL) != null) {
             return (List<Workflow>) cache.get(CACHE_ALL).get();
         }
 
-        List<Workflow> workflows = repositories
+        List<Workflow> workflows = workflowRepositories
             .stream()
-            .map(r -> r.findAll())
+            .map(WorkflowRepository::findAll)
             .flatMap(List::stream)
             .sorted((a, b) -> {
                 if (a.getLabel() == null || b.getLabel() == null) {
@@ -133,11 +144,12 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
             })
             .collect(Collectors.toList());
         cache.put(CACHE_ALL, workflows);
+
         return workflows;
     }
 
     @Override
     public void clear() {
-        cacheManager.getCacheNames().stream().forEach(c -> cacheManager.getCache(c).clear());
+        cacheManager.getCacheNames().forEach(c -> cacheManager.getCache(c).clear());
     }
 }

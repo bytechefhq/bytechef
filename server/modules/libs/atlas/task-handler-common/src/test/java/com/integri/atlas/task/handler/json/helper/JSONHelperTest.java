@@ -34,9 +34,7 @@ public class JSONHelperTest {
 
     @Test
     public void testCheck() {
-        Assertions
-            .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.check(true));
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> jsonHelper.check(true));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
@@ -48,17 +46,13 @@ public class JSONHelperTest {
             .assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> jsonHelper.check(2, Integer.class));
 
-        Assertions
-            .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.check("2"));
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> jsonHelper.check("2"));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> jsonHelper.check("2", String.class));
 
-        Assertions
-            .assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> jsonHelper.check("item"));
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> jsonHelper.check("item"));
 
         Assertions
             .assertThatExceptionOfType(IllegalArgumentException.class)
@@ -68,21 +62,15 @@ public class JSONHelperTest {
 
         Assertions.assertThat(jsonHelper.check("[2,4]", List.class)).isEqualTo(List.of(2, 4));
 
-        Assertions
-            .assertThat((List<?>) jsonHelper.check("[\"item1\",\"item2\"]"))
-            .isEqualTo(List.of("item1", "item2"));
+        Assertions.assertThat((List<?>) jsonHelper.check("[\"item1\",\"item2\"]")).isEqualTo(List.of("item1", "item2"));
 
         Assertions
             .assertThat(jsonHelper.check("[\"item1\",\"item2\"]", List.class))
             .isEqualTo(List.of("item1", "item2"));
 
-        Assertions
-            .assertThat((Map<?, ?>) jsonHelper.check(Map.of("key", "value")))
-            .isEqualTo(Map.of("key", "value"));
+        Assertions.assertThat((Map<?, ?>) jsonHelper.check(Map.of("key", "value"))).isEqualTo(Map.of("key", "value"));
 
-        Assertions
-            .assertThat(jsonHelper.check(Map.of("key", "value"), Map.class))
-            .isEqualTo(Map.of("key", "value"));
+        Assertions.assertThat(jsonHelper.check(Map.of("key", "value"), Map.class)).isEqualTo(Map.of("key", "value"));
 
         Assertions
             .assertThat((List<?>) jsonHelper.check(List.of(Map.of("key", "value"))))
