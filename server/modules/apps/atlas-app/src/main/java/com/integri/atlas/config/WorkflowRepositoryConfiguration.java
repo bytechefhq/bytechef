@@ -28,6 +28,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -42,8 +43,11 @@ public class WorkflowRepositoryConfiguration {
 
     @Bean
     @Primary
-    WorkflowRepositoryChain workflowRepository(List<WorkflowRepository> aRepositories) {
-        return new WorkflowRepositoryChain(aRepositories);
+    WorkflowRepositoryChain workflowRepository(
+        CacheManager cacheManager,
+        List<WorkflowRepository> workflowRepositories
+    ) {
+        return new WorkflowRepositoryChain(cacheManager, workflowRepositories);
     }
 
     @Bean
