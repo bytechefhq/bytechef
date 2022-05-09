@@ -27,11 +27,14 @@ import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
+import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.http.HttpClientHelper;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component(TASK_HTTP_CLIENT)
@@ -67,14 +70,16 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
             taskExecution.getLong(PROPERTY_TIMEOUT, 10000)
         );
 
+        List<HttpHeader> httpHeaders = httpHeadersFactory.getHttpHeaders(taskExecution);
+
         HttpResponse httpResponse = httpClientHelper.send(
             taskExecution.getRequiredString(PROPERTY_REQUEST_METHOD),
             resolveURI(
                 taskExecution.getRequiredString(PROPERTY_PROPERTY_URI),
                 queryParamsFactory.getQueryParams(taskExecution)
             ),
-            httpHeadersFactory.getHttpHeaders(taskExecution),
-            httpBodyFactory.getBodyPublisher(taskExecution),
+            httpHeaders,
+            httpBodyFactory.getBodyPublisher(taskExecution, httpHeaders),
             httpBodyFactory.getBodyHandler(taskExecution)
         );
 

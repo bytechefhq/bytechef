@@ -16,14 +16,20 @@
 
 package com.integri.atlas.task.handler.http.client.body;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.BodyContentType.FORM_DATA;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_CONTENT_TYPE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.task.handler.http.client.HttpClientTaskHandler;
-import com.integri.atlas.task.handler.http.client.header.ContentType;
+import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
+import com.integri.atlas.task.handler.http.client.body.multipart.MultiPartBodyPublisher;
+import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -41,42 +47,52 @@ import org.springframework.util.MultiValueMap;
 public class HttpBodyFactory {
 
     private final JSONHelper jsonHelper;
+    private final FileStorageService fileStorageService;
 
-    public HttpBodyFactory(JSONHelper jsonHelper) {
+    public HttpBodyFactory(FileStorageService fileStorageService, JSONHelper jsonHelper) {
+        this.fileStorageService = fileStorageService;
         this.jsonHelper = jsonHelper;
     }
 
-    public HttpRequest.BodyPublisher getBodyPublisher(TaskExecution taskExecution) {
+    public HttpRequest.BodyPublisher getBodyPublisher(TaskExecution taskExecution, List<HttpHeader> httpHeaders)
+        throws IOException {
         HttpRequest.BodyPublisher bodyPublisher = HttpRequest.BodyPublishers.noBody();
         if (taskExecution.containsKey(PROPERTY_BODY_PARAMETERS)) {
-            String bodyParams;
-
-            if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
-                bodyParams =
+            if (taskExecution.getString(PROPERTY_BODY_CONTENT_TYPE).equals(FORM_DATA.name())) {
+                return HttpRequest.BodyPublishers.ofByteArray(
+                    new MultiPartBodyPublisher(taskExecution, fileStorageService, httpHeaders).build()
+                );
+            } else if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
+                return HttpRequest.BodyPublishers.ofString(
                     fromBodyParameters(
                         jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_BODY_PARAMETERS), String.class),
                         (String value) -> value
-                    );
+                    )
+                );
             } else {
-                bodyParams =
+                return HttpRequest.BodyPublishers.ofString(
                     fromBodyParameters(
                         taskExecution.get(PROPERTY_BODY_PARAMETERS, MultiValueMap.class),
                         (List<String> values) -> StringUtils.join(values, ",")
-                    );
+                    )
+                );
             }
-
-            bodyPublisher = HttpRequest.BodyPublishers.ofString(bodyParams);
+        } else if (taskExecution.containsKey(PROPERTY_FILE_ENTRY)) {
+            bodyPublisher =
+                HttpRequest.BodyPublishers.ofInputStream(() ->
+                    fileStorageService.getFileContentStream(taskExecution.getString(PROPERTY_FILE_ENTRY))
+                );
         }
 
         return bodyPublisher;
     }
 
-    private <T> String fromBodyParameters(Map<String, T> queryParameters, Function<T, String> entryValueFunction) {
+    private <T> String fromBodyParameters(Map<String, T> bodyParameters, Function<T, String> entryValueFunction) {
         List<String> queryParameterList = new ArrayList<>();
 
         StringBuilder sb = new StringBuilder();
 
-        for (Map.Entry<String, T> entry : queryParameters.entrySet()) {
+        for (Map.Entry<String, T> entry : bodyParameters.entrySet()) {
             sb.append(entry.getKey());
             sb.append("=");
             sb.append(entryValueFunction.apply(entry.getValue()));
@@ -92,9 +108,9 @@ public class HttpBodyFactory {
             return HttpResponse.BodyHandlers.discarding();
         }
 
-        ContentType contentType = ContentType.valueOf(taskExecution.getString(PROPERTY_RESPONSE_FORMAT));
+        BodyContentType bodyContentType = BodyContentType.valueOf(taskExecution.getString(PROPERTY_RESPONSE_FORMAT));
 
-        if (contentType == ContentType.BINARY) {
+        if (bodyContentType == bodyContentType.BINARY) {
             return HttpResponse.BodyHandlers.ofInputStream();
         }
 
