@@ -20,6 +20,7 @@ import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.Assert;
 
@@ -89,7 +91,11 @@ public class MultiPartBodyPublisher {
             String value = entry.getValue();
 
             if (fileStorageService.fileExists(value)) {
-                byteArrayOutputStream.write(("; filename=\"channels1.csv\"\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+                byteArrayOutputStream.write(
+                    ("; filename=\"" + fileStorageService.getFilename(value) + "\"\r\n\r\n").getBytes(
+                            StandardCharsets.UTF_8
+                        )
+                );
                 byteArrayOutputStream.write(IOUtils.toByteArray(fileStorageService.getFileContentStream(value)));
                 byteArrayOutputStream.write("\r\n".getBytes(StandardCharsets.UTF_8));
             } else {

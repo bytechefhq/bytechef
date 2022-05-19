@@ -20,6 +20,8 @@ import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.exception.FileStorageException;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +79,11 @@ public class FileSystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory();
 
         return path.resolve(url).toFile().exists();
+    }
+
+    @Override
+    public String getFilename(String url) {
+        return FilenameUtils.getName(url);
     }
 
     @Override
