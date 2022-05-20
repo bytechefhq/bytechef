@@ -16,6 +16,8 @@
 
 package com.integri.atlas.task.handler.http.client.body.multipart;
 
+import static com.integri.atlas.task.handler.http.client.header.HttpHeader.BOUNDARY_TMPL;
+
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
@@ -67,7 +69,7 @@ public class MultiPartBodyPublisher {
     private void updateMultipartHttpHeader(List<HttpHeader> httpHeaders, String boundary) {
         HttpHeader multipartHttpHeader = getMultiPartHttpHeader(httpHeaders);
 
-        multipartHttpHeader.setValue(multipartHttpHeader.getValue() + boundary);
+        multipartHttpHeader.setValue(multipartHttpHeader.getValue().replace(BOUNDARY_TMPL, boundary));
     }
 
     public byte[] build() throws IOException {

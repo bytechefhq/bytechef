@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class HttpHeader {
 
+    public static final String BOUNDARY_TMPL = "[$BOUNDARY]";
+
     private final String name;
     private String value;
 

@@ -22,6 +22,7 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_MIME_TYPE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
+import static com.integri.atlas.task.handler.http.client.header.HttpHeader.BOUNDARY_TMPL;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
@@ -79,7 +80,7 @@ public class HttpHeadersFactory {
         }
 
         if (bodyContentType == BodyContentType.FORM_DATA) {
-            return "multipart/form-data; boundary=";
+            return "multipart/form-data; boundary=" + BOUNDARY_TMPL;
         }
 
         if (bodyContentType == BodyContentType.RAW) {
