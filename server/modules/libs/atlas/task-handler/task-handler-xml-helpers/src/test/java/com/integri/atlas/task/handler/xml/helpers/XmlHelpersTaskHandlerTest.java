@@ -19,7 +19,7 @@ package com.integri.atlas.task.handler.xml.helpers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import com.integri.atlas.task.handler.xml.helper.XmlHelper;
 import java.util.List;
@@ -39,19 +39,19 @@ public class XmlHelpersTaskHandlerTest {
     public void testJSONToObject() {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        String input =
+        String source =
             """
             <Flower id="45">
                 <name>Poppy</name>
             </Flower>
             """;
 
-        taskExecution.put("input", input);
+        taskExecution.put("source", source);
         taskExecution.put("operation", "XML_TO_JSON");
 
         assertThat(xmlHelpersTaskHandler.handle(taskExecution)).isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
-        input =
+        source =
             """
             <Flowers>
                 <Flower id="45">
@@ -63,7 +63,7 @@ public class XmlHelpersTaskHandlerTest {
             </Flowers>
             """;
 
-        taskExecution.put("input", input);
+        taskExecution.put("source", source);
         taskExecution.put("operation", "XML_TO_JSON");
 
         assertThat(xmlHelpersTaskHandler.handle(taskExecution))
@@ -76,11 +76,11 @@ public class XmlHelpersTaskHandlerTest {
     public void testObjectToJSON() {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        Map<String, ?> input = Map.of("id", 45, "name", "Poppy");
+        Map<String, ?> source = Map.of("id", 45, "name", "Poppy");
 
-        taskExecution.put("input", input);
+        taskExecution.put("source", source);
         taskExecution.put("operation", "JSON_TO_XML");
 
-        assertThat(xmlHelpersTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(input));
+        assertThat(xmlHelpersTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(source));
     }
 }

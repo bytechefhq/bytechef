@@ -18,10 +18,10 @@ package com.integri.atlas.file.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.integri.atlas.engine.core.context.MapContext;
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import java.util.Collections;
 import org.assertj.core.api.Assertions;

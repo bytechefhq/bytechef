@@ -17,22 +17,27 @@
 package com.integri.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.context.service.ContextService;
+import com.integri.atlas.engine.MapObject;
+import com.integri.atlas.engine.context.repository.ContextRepository;
+import com.integri.atlas.engine.context.repository.jdbc.JdbcContextRepository;
 import com.integri.atlas.engine.coordinator.event.EventListener;
 import com.integri.atlas.engine.coordinator.event.EventListenerChain;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
-import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.counter.repository.CounterRepository;
-import com.integri.atlas.engine.core.event.EventPublisher;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
-import com.integri.atlas.engine.repository.jdbc.counter.JdbcCounterRepository;
-import com.integri.atlas.engine.repository.jdbc.job.JdbcJobRepository;
-import com.integri.atlas.engine.repository.jdbc.task.JdbcTaskExecutionRepository;
-import com.integri.atlas.file.storage.service.FileStorageService;
+import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.repository.jdbc.JdbcCounterRepository;
+import com.integri.atlas.engine.event.EventPublisher;
+import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.repository.jdbc.JdbcJobRepository;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.repository.jdbc.JdbcTaskExecutionRepository;
+import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.workflow.repository.mapper.JSONWorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapperChain;
+import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import com.integri.atlas.file.storage.converter.FileEntryConverter;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringBootConfiguration;
@@ -57,14 +62,6 @@ public class IntTestConfiguration {
     }
 
     @Bean
-    ContextService contextService(
-        ContextRepository contextRepository,
-        TaskExecutionRepository taskExecutionRepository
-    ) {
-        return new ContextService(contextRepository, taskExecutionRepository);
-    }
-
-    @Bean
     CounterRepository counterRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcCounterRepository(jdbcTemplate);
     }
@@ -86,7 +83,7 @@ public class IntTestConfiguration {
     }
 
     @Bean
-    TaskExecutionRepository jdbcJobTaskRepository(
+    TaskExecutionRepository jdbcJobTaskExecutionRepository(
         NamedParameterJdbcTemplate namedParameterJdbcTemplate,
         ObjectMapper objectMapper
     ) {
@@ -103,7 +100,7 @@ public class IntTestConfiguration {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
         jdbcJobRepository.setJdbcOperations(namedParameterJdbcTemplate);
-        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(namedParameterJdbcTemplate, objectMapper));
+        jdbcJobRepository.setJobTaskExecutionRepository(jdbcJobTaskExecutionRepository(namedParameterJdbcTemplate, objectMapper));
         jdbcJobRepository.setObjectMapper(objectMapper);
 
         return jdbcJobRepository;
@@ -117,5 +114,15 @@ public class IntTestConfiguration {
         jdbcContextRepository.setObjectMapper(objectMapper);
 
         return jdbcContextRepository;
+    }
+
+    @Bean
+    WorkflowMapper workflowMapper() {
+        return new WorkflowMapperChain(List.of(new JSONWorkflowMapper(), new YAMLWorkflowMapper()));
+    }
+
+    @Bean
+    WorkflowRepository workflowRepository(WorkflowMapper workflowMapper) {
+        return new ResourceBasedWorkflowRepository(workflowMapper);
     }
 }

@@ -16,7 +16,7 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.engine.core.MapObject;
+import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.file.storage.converter.FileEntryConverter;
 import javax.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;

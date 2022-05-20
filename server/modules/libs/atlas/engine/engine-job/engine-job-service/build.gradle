@@ -1,0 +1,9 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-job:engine-job-api")
+
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-core"
+    implementation project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-api")
+    implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-api")
+}

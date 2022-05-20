@@ -18,7 +18,7 @@ package com.integri.atlas.task.handler.xml.helpers;
 
 import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.*;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import com.integri.atlas.task.handler.xml.helper.XmlHelper;

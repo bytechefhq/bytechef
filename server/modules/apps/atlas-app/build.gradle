@@ -15,17 +15,19 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.kafka:spring-kafka"
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    implementation project(":modules:libs:atlas:engine:engine-coordinator-api")
-    implementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
-    implementation project(":modules:libs:atlas:engine:engine-core-api")
-    implementation project(":modules:libs:atlas:engine:engine-core-impl")
-    implementation project(":modules:libs:atlas:engine:engine-worker-api")
-    implementation project(":modules:libs:atlas:engine:engine-worker-impl")
-    implementation project(":modules:libs:atlas:message-broker:message-broker-amqp")
-    implementation project(":modules:libs:atlas:message-broker:message-broker-jms")
-    implementation project(":modules:libs:atlas:message-broker:message-broker-kafka")
-    implementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
-    implementation project(":modules:libs:atlas:engine-rest")
+    implementation project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-jdbc")
+    implementation project(":modules:libs:atlas:engine:engine-context:engine-context-service")
+    implementation project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
+    implementation project(":modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-jdbc")
+    implementation project(":modules:libs:atlas:engine:engine-event:engine-event-impl")
+    implementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-amqp")
+    implementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-jms")
+    implementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-kafka")
+    implementation project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-jdbc")
+    implementation project(":modules:libs:atlas:engine:engine-job:engine-job-service")
+    implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-jdbc")
+    implementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
+    implementation project(":modules:libs:atlas:engine:engine-rest")
     implementation project(":modules:libs:atlas:file-storage:file-storage-base64")
     implementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
     implementation project(":modules:libs:atlas:task-definition")
@@ -58,10 +60,12 @@ dependencies {
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-helpers")
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-file")
     implementation project(":modules:libs:atlas:task-handler-common")
-    implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-git")
-    implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-jdbc")
-    implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
+    implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-git")
+    implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-jdbc")
+    implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")
     implementation project(":modules:libs:atlas:task-handler:task-handler-transform-json")
+
+    runtimeOnly "org.postgresql:postgresql"
 
     testRuntimeOnly "org.postgresql:postgresql"
     testRuntimeOnly "org.testcontainers:postgresql"

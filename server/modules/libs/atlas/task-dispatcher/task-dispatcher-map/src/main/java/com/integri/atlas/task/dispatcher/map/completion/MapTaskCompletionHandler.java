@@ -18,13 +18,13 @@
 
 package com.integri.atlas.task.dispatcher.map.completion;
 
+import com.integri.atlas.engine.DSL;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.counter.repository.CounterRepository;
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.TaskStatus;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskStatus;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;

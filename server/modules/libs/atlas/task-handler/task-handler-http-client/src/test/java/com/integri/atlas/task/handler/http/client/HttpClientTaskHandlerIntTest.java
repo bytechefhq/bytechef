@@ -16,8 +16,8 @@
 
 package com.integri.atlas.task.handler.http.client;
 
-import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.core.context.Context;
+import com.integri.atlas.engine.context.Context;
+import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;

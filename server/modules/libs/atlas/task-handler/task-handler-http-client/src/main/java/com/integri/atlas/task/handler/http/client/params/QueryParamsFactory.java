@@ -19,7 +19,7 @@ package com.integri.atlas.task.handler.http.client.params;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_QUERY_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.util.ArrayList;
 import java.util.List;

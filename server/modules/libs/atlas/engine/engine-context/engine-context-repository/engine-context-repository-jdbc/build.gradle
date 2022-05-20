@@ -1,0 +1,12 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")
+
+    implementation "org.springframework:spring-jdbc"
+
+    testImplementation "com.fasterxml.jackson.core:jackson-databind"
+    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation project(":modules:libs:atlas:test-common")
+
+    testRuntimeOnly "org.postgresql:postgresql"
+    testRuntimeOnly "org.testcontainers:postgresql"
+}

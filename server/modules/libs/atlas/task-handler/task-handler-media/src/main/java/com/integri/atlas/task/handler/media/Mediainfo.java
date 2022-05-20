@@ -19,7 +19,7 @@
 package com.integri.atlas.task.handler.media;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.util.List;
 import java.util.Map;

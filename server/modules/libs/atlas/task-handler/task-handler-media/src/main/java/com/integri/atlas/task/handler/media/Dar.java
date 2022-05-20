@@ -22,7 +22,7 @@ import com.arakelian.jq.ImmutableJqLibrary;
 import com.arakelian.jq.ImmutableJqRequest;
 import com.arakelian.jq.JqResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.util.Map;
 import org.springframework.stereotype.Component;

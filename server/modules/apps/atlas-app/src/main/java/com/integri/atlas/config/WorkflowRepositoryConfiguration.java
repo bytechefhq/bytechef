@@ -16,14 +16,14 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.engine.coordinator.workflow.WorkflowRepositoryChain;
-import com.integri.atlas.engine.coordinator.workflow.repository.JSONWorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapperChain;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
-import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
-import com.integri.atlas.workflow.repository.git.GitWorkflowRepository;
-import com.integri.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
+import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.workflow.repository.WorkflowRepositoryChain;
+import com.integri.atlas.engine.workflow.repository.git.GitWorkflowRepository;
+import com.integri.atlas.engine.workflow.repository.mapper.JSONWorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapperChain;
+import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

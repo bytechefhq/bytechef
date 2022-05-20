@@ -16,10 +16,10 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import com.integri.atlas.file.storage.filesystem.FileSystemFileStorageService;
 import com.integri.atlas.file.storage.job.FileStorageFileRetentionCheckJobListener;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.handler.s3;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.S3Client;

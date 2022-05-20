@@ -18,10 +18,11 @@
 
 package com.integri.atlas.config;
 
+import com.integri.atlas.context.service.ContextService;
+import com.integri.atlas.engine.annotation.ConditionalOnCoordinator;
+import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.CoordinatorImpl;
-import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.engine.coordinator.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.error.ErrorHandlerChain;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
 import com.integri.atlas.engine.coordinator.event.DeleteContextEventListener;
@@ -30,24 +31,24 @@ import com.integri.atlas.engine.coordinator.event.TaskProgressedEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskStartedEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskStartedWebhookEventListener;
 import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandlerChain;
 import com.integri.atlas.engine.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.TaskDispatcherChain;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.counter.repository.CounterRepository;
-import com.integri.atlas.engine.core.error.ErrorHandler;
-import com.integri.atlas.engine.core.event.EventPublisher;
-import com.integri.atlas.engine.core.message.broker.MessageBroker;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
-import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.error.ErrorHandler;
+import com.integri.atlas.engine.event.EventPublisher;
+import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
+import com.integri.atlas.engine.message.broker.MessageBroker;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
+import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
+import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
 import com.integri.atlas.task.dispatcher.each.EachTaskDispatcher;
 import com.integri.atlas.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.fork.ForkTaskDispatcher;
@@ -104,6 +105,9 @@ public class CoordinatorConfiguration {
     private JobRepository jobRepository;
 
     @Autowired
+    private JobService jobService;
+
+    @Autowired
     private MessageBroker messageBroker;
 
     @Autowired
@@ -126,11 +130,6 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    ContextService contextService() {
-        return new ContextService(contextRepository, taskExecutionRepository);
-    }
-
-    @Bean
     ControlTaskDispatcher controlTaskDispatcher() {
         return new ControlTaskDispatcher(messageBroker);
     }
@@ -140,15 +139,14 @@ public class CoordinatorConfiguration {
         CoordinatorImpl coordinator = new CoordinatorImpl();
 
         coordinator.setContextRepository(contextRepository);
-        coordinator.setEventPublisher(eventPublisher);
-        coordinator.setJobRepository(jobRepository);
-        coordinator.setJobTaskRepository(taskExecutionRepository);
-        coordinator.setWorkflowRepository(workflowRepository);
-        coordinator.setJobExecutor(jobExecutor());
-        coordinator.setTaskDispatcher(taskDispatcher());
         coordinator.setErrorHandler(errorHandler());
-        coordinator.setTaskCompletionHandler(taskCompletionHandler());
+        coordinator.setEventPublisher(eventPublisher);
+        coordinator.setJobService(jobService);
+        coordinator.setJobExecutor(jobExecutor());
         coordinator.setMessageBroker(messageBroker);
+        coordinator.setTaskDispatcher(taskDispatcher());
+        coordinator.setTaskExecutionRepository(taskExecutionRepository);
+        coordinator.setTaskCompletionHandler(taskCompletionHandler());
 
         return coordinator;
     }

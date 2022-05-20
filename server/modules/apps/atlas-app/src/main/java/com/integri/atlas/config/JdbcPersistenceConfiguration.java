@@ -19,17 +19,17 @@
 package com.integri.atlas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.counter.repository.CounterRepository;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
-import com.integri.atlas.engine.repository.jdbc.counter.JdbcCounterRepository;
-import com.integri.atlas.engine.repository.jdbc.job.JdbcJobRepository;
-import com.integri.atlas.engine.repository.jdbc.task.JdbcTaskExecutionRepository;
-import com.integri.atlas.workflow.repository.jdbc.JdbcWorkflowRepository;
+import com.integri.atlas.engine.context.repository.ContextRepository;
+import com.integri.atlas.engine.context.repository.jdbc.JdbcContextRepository;
+import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.repository.jdbc.JdbcCounterRepository;
+import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.repository.jdbc.JdbcJobRepository;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.repository.jdbc.JdbcTaskExecutionRepository;
+import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.workflow.repository.jdbc.JdbcWorkflowRepository;
+import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -79,7 +79,7 @@ public class JdbcPersistenceConfiguration {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
         jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, objectMapper));
+        jdbcJobRepository.setJobTaskExecutionRepository(jdbcJobTaskRepository(aJdbcTemplate, objectMapper));
         jdbcJobRepository.setObjectMapper(objectMapper);
 
         return jdbcJobRepository;

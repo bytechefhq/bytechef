@@ -1,0 +1,5 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-api")
+
+    implementation "org.springframework:spring-core"
+}

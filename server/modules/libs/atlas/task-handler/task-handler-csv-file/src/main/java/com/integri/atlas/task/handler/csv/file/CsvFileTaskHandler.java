@@ -30,7 +30,7 @@ import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPE
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.TASK_CSV_FILE;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;

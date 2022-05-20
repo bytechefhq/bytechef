@@ -22,7 +22,7 @@ import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FIL
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.TASK_FILE;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;

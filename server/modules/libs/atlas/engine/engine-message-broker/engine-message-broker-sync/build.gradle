@@ -1,0 +1,6 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-common")
+    api project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-api")
+
+    implementation "org.springframework:spring-core"
+}

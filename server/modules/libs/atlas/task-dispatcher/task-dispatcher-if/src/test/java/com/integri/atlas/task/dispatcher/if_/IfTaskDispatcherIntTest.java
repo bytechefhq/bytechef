@@ -17,11 +17,11 @@
 package com.integri.atlas.task.dispatcher.if_;
 
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.core.message.broker.MessageBroker;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
-import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.message.broker.MessageBroker;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
 import com.integri.atlas.task.handler.core.Var;
