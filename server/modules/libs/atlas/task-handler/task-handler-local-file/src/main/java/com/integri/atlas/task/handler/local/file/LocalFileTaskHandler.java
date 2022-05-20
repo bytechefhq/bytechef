@@ -23,8 +23,8 @@ import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.T
 
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.dto.FileEntry;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.Operation;
 import java.io.FileInputStream;
 import java.io.InputStream;

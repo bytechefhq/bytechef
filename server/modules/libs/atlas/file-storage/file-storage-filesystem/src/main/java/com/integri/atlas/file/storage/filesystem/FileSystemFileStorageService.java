@@ -17,9 +17,9 @@
 package com.integri.atlas.file.storage.filesystem;
 
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.exception.FileStorageException;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.ByteArrayInputStream;

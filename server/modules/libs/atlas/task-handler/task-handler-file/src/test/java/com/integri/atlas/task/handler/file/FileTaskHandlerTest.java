@@ -19,9 +19,9 @@ package com.integri.atlas.task.handler.file;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.file.storage.FileStorageService;
-import com.integri.atlas.file.storage.base64.Base64FileStorageService;
+import com.integri.atlas.file.storage.dto.FileEntry;
+import com.integri.atlas.file.storage.service.FileStorageService;
+import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -21,7 +21,7 @@ package com.integri.atlas.config;
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.engine.coordinator.context.ContextService;
+import com.integri.atlas.engine.coordinator.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.error.ErrorHandlerChain;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
 import com.integri.atlas.engine.coordinator.event.DeleteContextEventListener;

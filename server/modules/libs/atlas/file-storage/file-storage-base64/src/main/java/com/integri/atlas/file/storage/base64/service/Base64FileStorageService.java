@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.file.storage.base64;
+package com.integri.atlas.file.storage.base64.service;
 
-import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.exception.FileStorageException;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

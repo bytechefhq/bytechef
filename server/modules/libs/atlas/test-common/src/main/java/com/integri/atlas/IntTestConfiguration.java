@@ -17,7 +17,7 @@
 package com.integri.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.context.ContextService;
+import com.integri.atlas.engine.coordinator.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.event.EventListener;
 import com.integri.atlas.engine.coordinator.event.EventListenerChain;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
@@ -30,8 +30,8 @@ import com.integri.atlas.engine.repository.jdbc.context.JdbcContextRepository;
 import com.integri.atlas.engine.repository.jdbc.counter.JdbcCounterRepository;
 import com.integri.atlas.engine.repository.jdbc.job.JdbcJobRepository;
 import com.integri.atlas.engine.repository.jdbc.task.JdbcTaskExecutionRepository;
-import com.integri.atlas.file.storage.FileStorageService;
-import com.integri.atlas.file.storage.base64.Base64FileStorageService;
+import com.integri.atlas.file.storage.service.FileStorageService;
+import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import com.integri.atlas.file.storage.converter.FileEntryConverter;
 import java.util.List;
 import javax.annotation.PostConstruct;

@@ -23,7 +23,7 @@ import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.file.storage.FileEntry;
+import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.test.json.JSONArrayUtil;
 import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import java.io.File;
