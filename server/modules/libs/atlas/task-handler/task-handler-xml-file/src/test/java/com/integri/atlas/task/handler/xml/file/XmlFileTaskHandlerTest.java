@@ -23,7 +23,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.xml.helper.XmlHelper;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +40,7 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class XmlFileTaskHandlerTest {
 
-    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
+    private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
     private static final XmlHelper xmlHelper = new XmlHelper();
     private static final XmlFileTaskHandler xmlFileTaskHandler = new XmlFileTaskHandler(

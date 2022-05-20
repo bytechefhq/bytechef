@@ -24,7 +24,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.test.json.JSONArrayUtil;
 import com.integri.atlas.test.json.JSONObjectUtil;
 import java.io.File;
@@ -41,11 +41,11 @@ import org.springframework.core.io.ClassPathResource;
 /**
  * @author Ivica Cardic
  */
-public class JSONFileTaskHandlerTest {
+public class JsonFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
-    private static final JSONFileTaskHandler jsonFileTaskHandler = new JSONFileTaskHandler(
+    private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
+    private static final JsonFileTaskHandler jsonFileTaskHandler = new JsonFileTaskHandler(
         fileStorageService,
         jsonHelper
     );
@@ -59,7 +59,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("isArray", false);
-        taskExecution.put("operation", "READ");
+        taskExecution.put("action", "READ");
 
         assertEquals(
             JSONObjectUtil.of(Files.contentOf(file, Charset.defaultCharset())),
@@ -76,7 +76,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("fileType", "JSON");
-        taskExecution.put("operation", "READ");
+        taskExecution.put("action", "READ");
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(file, Charset.defaultCharset())),
@@ -88,7 +88,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("fileType", "JSON");
-        taskExecution.put("operation", "READ");
+        taskExecution.put("action", "READ");
         taskExecution.put("pageNumber", 1);
         taskExecution.put("pageSize", 2);
 
@@ -103,7 +103,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("fileType", "JSONL");
-        taskExecution.put("operation", "READ");
+        taskExecution.put("action", "READ");
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset())),
@@ -115,7 +115,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("fileType", "JSONL");
-        taskExecution.put("operation", "READ");
+        taskExecution.put("action", "READ");
         taskExecution.put("pageNumber", 1);
         taskExecution.put("pageSize", 2);
 
@@ -130,7 +130,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("source", JSONObjectUtil.toMap(Files.contentOf(file, Charset.defaultCharset())));
         taskExecution.put("fileType", "JSON");
-        taskExecution.put("operation", "WRITE");
+        taskExecution.put("action", "WRITE");
 
         FileEntry fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
 
@@ -151,7 +151,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put("source", JSONArrayUtil.toList(Files.contentOf(file, Charset.defaultCharset())));
         taskExecution.put("fileType", "JSON");
-        taskExecution.put("operation", "WRITE");
+        taskExecution.put("action", "WRITE");
 
         FileEntry fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
 
@@ -166,7 +166,7 @@ public class JSONFileTaskHandlerTest {
         taskExecution.put("fileName", "test.json");
         taskExecution.put("fileType", "JSON");
         taskExecution.put("source", JSONArrayUtil.toList(Files.contentOf(file, Charset.defaultCharset())));
-        taskExecution.put("operation", "WRITE");
+        taskExecution.put("action", "WRITE");
 
         fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
 
@@ -184,7 +184,7 @@ public class JSONFileTaskHandlerTest {
             JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
         );
         taskExecution.put("fileType", "JSONL");
-        taskExecution.put("operation", "WRITE");
+        taskExecution.put("action", "WRITE");
 
         FileEntry fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
 
@@ -202,7 +202,7 @@ public class JSONFileTaskHandlerTest {
             "source",
             JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
         );
-        taskExecution.put("operation", "WRITE");
+        taskExecution.put("action", "WRITE");
 
         fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
 

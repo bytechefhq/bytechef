@@ -24,7 +24,7 @@ import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants;
 import com.integri.atlas.task.handler.http.client.header.ContentType;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.Map;
@@ -37,9 +37,9 @@ import org.springframework.stereotype.Component;
 public class HttpResponseHandler {
 
     private final FileStorageService fileStorageService;
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
 
-    public HttpResponseHandler(FileStorageService fileStorageService, JSONHelper jsonHelper) {
+    public HttpResponseHandler(FileStorageService fileStorageService, JsonHelper jsonHelper) {
         this.fileStorageService = fileStorageService;
         this.jsonHelper = jsonHelper;
     }

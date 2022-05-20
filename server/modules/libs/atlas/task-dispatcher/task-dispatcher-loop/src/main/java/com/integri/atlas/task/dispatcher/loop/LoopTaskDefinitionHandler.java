@@ -16,23 +16,22 @@
 
 package com.integri.atlas.task.dispatcher.loop;
 
-import static com.integri.atlas.task.dispatcher.loop.LoopTaskConstants.*;
-
-import com.integri.atlas.task.definition.TaskDefinition;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+import com.integri.atlas.task.definition.TaskDefinitionHandler;
+import com.integri.atlas.task.definition.dsl.DSL;
+import com.integri.atlas.task.definition.dsl.TaskDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class LoopTaskDefinition implements TaskDefinition {
+public class LoopTaskDefinitionHandler implements TaskDefinitionHandler {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(TASK_LOOP)
+    private static final TaskDefinition TASK_DEFINITION = DSL
+        .create(LoopTaskConstants.TASK_LOOP)
         .displayName("Loop")
         .description("Loops sequentially over list of items.");
 
     @Override
-    public TaskSpecification getSpecification() {
-        return TASK_SPECIFICATION;
+    public TaskDefinition getTaskDefinition() {
+        return TASK_DEFINITION;
     }
 }

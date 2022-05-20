@@ -34,7 +34,7 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.util.MapUtils;
 import com.integri.atlas.task.handler.util.ValueUtils;
 import java.io.ByteArrayInputStream;
@@ -71,10 +71,10 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
         XLSX,
     }
 
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
     private final FileStorageService fileStorageService;
 
-    public XlsxFileTaskHandler(JSONHelper jsonHelper, FileStorageService fileStorageService) {
+    public XlsxFileTaskHandler(JsonHelper jsonHelper, FileStorageService fileStorageService) {
         this.jsonHelper = jsonHelper;
         this.fileStorageService = fileStorageService;
     }

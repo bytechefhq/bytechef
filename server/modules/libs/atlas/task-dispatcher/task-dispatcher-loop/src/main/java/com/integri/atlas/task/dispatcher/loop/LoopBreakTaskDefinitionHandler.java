@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.sequence;
+package com.integri.atlas.task.dispatcher.loop;
 
-import com.integri.atlas.task.definition.TaskDefinition;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+import static com.integri.atlas.task.dispatcher.loop.LoopBreakTaskConstants.TASK_LOOP_BREAK;
+
+import com.integri.atlas.task.definition.TaskDefinitionHandler;
+import com.integri.atlas.task.definition.dsl.DSL;
+import com.integri.atlas.task.definition.dsl.TaskDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDefinition implements TaskDefinition {
+public class LoopBreakTaskDefinitionHandler implements TaskDefinitionHandler {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(SequenceTaskConstants.TASK_SEQUENCE)
-        .displayName("Sequence")
-        .description("Executes list of tasks in a sequence");
+    private static final TaskDefinition TASK_DEFINITION = DSL
+        .create(TASK_LOOP_BREAK)
+        .displayName("Loop Break")
+        .description("Breaks loop execution.");
 
     @Override
-    public TaskSpecification getSpecification() {
-        return TASK_SPECIFICATION;
+    public TaskDefinition getTaskDefinition() {
+        return TASK_DEFINITION;
     }
 }

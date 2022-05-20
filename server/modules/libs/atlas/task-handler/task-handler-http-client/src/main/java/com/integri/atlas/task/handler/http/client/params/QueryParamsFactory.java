@@ -20,7 +20,7 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +35,9 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class QueryParamsFactory {
 
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
 
-    public QueryParamsFactory(JSONHelper jsonHelper) {
+    public QueryParamsFactory(JsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 

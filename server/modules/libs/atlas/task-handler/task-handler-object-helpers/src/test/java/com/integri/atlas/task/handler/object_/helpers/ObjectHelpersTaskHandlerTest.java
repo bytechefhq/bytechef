@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ObjectHelpersTaskHandlerTest {
 
-    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
+    private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
     private static final ObjectHelpersTaskHandler objectHelpersTaskHandler = new ObjectHelpersTaskHandler(jsonHelper);
 
     @Test

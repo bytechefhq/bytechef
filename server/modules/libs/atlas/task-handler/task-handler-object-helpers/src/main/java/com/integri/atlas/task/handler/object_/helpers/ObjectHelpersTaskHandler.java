@@ -21,7 +21,7 @@ import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskCo
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.Operation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -32,9 +32,9 @@ import org.springframework.stereotype.Component;
 @Component(TASK_OBJECT_HELPERS)
 public class ObjectHelpersTaskHandler implements TaskHandler<Object> {
 
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
 
-    public ObjectHelpersTaskHandler(JSONHelper jsonHelper) {
+    public ObjectHelpersTaskHandler(JsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 

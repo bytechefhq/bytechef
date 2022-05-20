@@ -45,12 +45,12 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class JSONHelper {
+public class JsonHelper {
 
     private final ObjectMapper objectMapper;
     private final TypeFactory typeFactory = TypeFactory.defaultInstance();
 
-    public JSONHelper(ObjectMapper objectMapper) {
+    public JsonHelper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
 
         Configuration.setDefaults(
@@ -236,7 +236,7 @@ public class JSONHelper {
 
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
-            return new JSONParserStream(inputStream, objectMapper);
+            return new JsonParserStream(inputStream, objectMapper);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

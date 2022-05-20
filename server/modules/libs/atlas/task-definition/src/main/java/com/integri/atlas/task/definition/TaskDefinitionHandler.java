@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.loop;
+package com.integri.atlas.task.definition;
 
-import static com.integri.atlas.task.dispatcher.loop.LoopBreakTaskConstants.TASK_LOOP_BREAK;
-
-import com.integri.atlas.task.definition.TaskDefinition;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+import com.integri.atlas.task.definition.dsl.TaskDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class LoopBreakTaskDefinition implements TaskDefinition {
-
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(TASK_LOOP_BREAK)
-        .displayName("Loop Break")
-        .description("Breaks loop execution.");
-
-    @Override
-    public TaskSpecification getSpecification() {
-        return TASK_SPECIFICATION;
-    }
+public interface TaskDefinitionHandler {
+    TaskDefinition getTaskDefinition();
 }

@@ -16,23 +16,22 @@
 
 package com.integri.atlas.task.handler.json.file;
 
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_FILE_ENTRY;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_FILE_NAME;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_FILE_TYPE;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_IS_ARRAY;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_OPERATION;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PAGE_NUMBER;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PAGE_SIZE;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PATH;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_SOURCE;
-import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.TASK_JSON_FILE;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_FILE_TYPE;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_IS_ARRAY;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_PAGE_NUMBER;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_PAGE_SIZE;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_PATH;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_SOURCE;
+import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.TASK_JSON_FILE;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.FileType;
-import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.FileType;
+import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,12 +49,12 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component(TASK_JSON_FILE)
-public class JSONFileTaskHandler implements TaskHandler<Object> {
+public class JsonFileTaskHandler implements TaskHandler<Object> {
 
     private final FileStorageService fileStorageService;
-    private final JSONHelper jsonHelper;
+    private final JsonHelper jsonHelper;
 
-    public JSONFileTaskHandler(FileStorageService fileStorageService, JSONHelper jsonHelper) {
+    public JsonFileTaskHandler(FileStorageService fileStorageService, JsonHelper jsonHelper) {
         this.fileStorageService = fileStorageService;
         this.jsonHelper = jsonHelper;
     }
@@ -68,11 +67,11 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
         FileType fileType = FileType.valueOf(
             StringUtils.upperCase(taskExecution.get(PROPERTY_FILE_TYPE, String.class, FileType.JSON.name()))
         );
-        JSONFileTaskConstants.Operation operation = JSONFileTaskConstants.Operation.valueOf(
-            StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION))
+        JsonFileTaskConstants.Action action = JsonFileTaskConstants.Action.valueOf(
+            StringUtils.upperCase(taskExecution.getRequired("action"))
         );
 
-        if (operation == JSONFileTaskConstants.Operation.READ) {
+        if (action == JsonFileTaskConstants.Action.READ) {
             boolean isArray = taskExecution.get(PROPERTY_IS_ARRAY, Boolean.class, true);
             FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
 
@@ -123,7 +122,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getDefaultFileName(fileType));
-            Object source = jsonHelper.check(taskExecution.getRequired(PROPERTY_SOURCE));
+            Object source = taskExecution.getRequired(PROPERTY_SOURCE);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
