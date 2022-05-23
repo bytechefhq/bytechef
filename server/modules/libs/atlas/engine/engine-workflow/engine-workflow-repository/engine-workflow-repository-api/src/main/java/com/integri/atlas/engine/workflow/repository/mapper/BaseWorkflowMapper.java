@@ -17,7 +17,7 @@
 package com.integri.atlas.engine.workflow.repository.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.error.ErrorObject;
 import com.integri.atlas.engine.task.SimpleWorkflowTask;
 import com.integri.atlas.engine.task.Task;
@@ -44,10 +44,12 @@ public abstract class BaseWorkflowMapper implements WorkflowMapper {
     public Workflow readValue(WorkflowResource aWorkflowResource, ObjectMapper objectMapper) {
         try {
             Map<String, Object> jsonMap = parse(aWorkflowResource, objectMapper);
-            jsonMap.put(DSL.ID, aWorkflowResource.getId());
+            jsonMap.put(Constants.ID, aWorkflowResource.getId());
             return new SimpleWorkflow(jsonMap);
         } catch (Exception e) {
-            SimpleWorkflow workflow = new SimpleWorkflow(Collections.singletonMap(DSL.ID, aWorkflowResource.getId()));
+            SimpleWorkflow workflow = new SimpleWorkflow(
+                Collections.singletonMap(Constants.ID, aWorkflowResource.getId())
+            );
             workflow.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
             return workflow;
         }
@@ -58,7 +60,7 @@ public abstract class BaseWorkflowMapper implements WorkflowMapper {
             String workflow = IOUtils.toString(in);
             Map<String, Object> workflowMap = objectMapper.readValue(workflow, Map.class);
             validate(workflowMap);
-            List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(DSL.TASKS);
+            List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(Constants.TASKS);
             Assert.notNull(rawTasks, "no tasks found");
             Assert.notEmpty(rawTasks, "no tasks found");
             List<Task> tasks = new ArrayList<>();
@@ -68,7 +70,7 @@ public abstract class BaseWorkflowMapper implements WorkflowMapper {
                 mutableTask.setTaskNumber(i + 1);
                 tasks.add(mutableTask);
             }
-            workflowMap.put(DSL.TASKS, tasks);
+            workflowMap.put(Constants.TASKS, tasks);
             return workflowMap;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -81,16 +83,16 @@ public abstract class BaseWorkflowMapper implements WorkflowMapper {
     }
 
     private void validateOutputs(Map<String, Object> aWorkflow) {
-        List<Map<String, Object>> outputs = (List<Map<String, Object>>) aWorkflow.get(DSL.OUTPUTS);
+        List<Map<String, Object>> outputs = (List<Map<String, Object>>) aWorkflow.get(Constants.OUTPUTS);
         for (int i = 0; outputs != null && i < outputs.size(); i++) {
             Map<String, Object> output = outputs.get(i);
-            Assert.notNull(output.get(DSL.NAME), "output definition must specify a 'name'");
-            Assert.notNull(output.get(DSL.VALUE), "output definition must specify a 'value'");
+            Assert.notNull(output.get(Constants.NAME), "output definition must specify a 'name'");
+            Assert.notNull(output.get(Constants.VALUE), "output definition must specify a 'value'");
         }
     }
 
     private void validateReservedWords(Map<String, Object> aWorkflow) {
-        List<String> reservedWords = Arrays.asList(DSL.RESERVED_WORDS);
+        List<String> reservedWords = Arrays.asList(Constants.RESERVED_WORDS);
         for (Map.Entry<String, Object> entry : aWorkflow.entrySet()) {
             String k = entry.getKey();
             Object v = entry.getValue();

@@ -19,7 +19,7 @@ package com.integri.atlas.task.dispatcher.if_;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_FALSE;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_TRUE;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.repository.ContextRepository;
@@ -115,7 +115,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(DSL.IF)) {
+        if (task.getType().equals(Constants.IF)) {
             return this;
         }
 

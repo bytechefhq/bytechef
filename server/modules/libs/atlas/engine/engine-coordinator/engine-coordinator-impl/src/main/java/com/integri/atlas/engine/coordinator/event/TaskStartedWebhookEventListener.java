@@ -19,7 +19,7 @@
 package com.integri.atlas.engine.coordinator.event;
 
 import com.integri.atlas.engine.Accessor;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
@@ -48,7 +48,7 @@ public class TaskStartedWebhookEventListener implements EventListener {
     }
 
     private void handleEvent(WorkflowEvent aEvent) {
-        String jobId = aEvent.getRequiredString(DSL.JOB_ID);
+        String jobId = aEvent.getRequiredString(Constants.JOB_ID);
         Job job = jobRepository.getById(jobId);
         if (job == null) {
             logger.warn("Unknown job: {}", jobId);
@@ -56,10 +56,10 @@ public class TaskStartedWebhookEventListener implements EventListener {
         }
         List<Accessor> webhooks = job.getWebhooks();
         for (Accessor webhook : webhooks) {
-            if (Events.TASK_STARTED.equals(webhook.getRequiredString(DSL.TYPE))) {
+            if (Events.TASK_STARTED.equals(webhook.getRequiredString(Constants.TYPE))) {
                 MapObject webhookEvent = new MapObject(webhook.asMap());
-                webhookEvent.put(DSL.EVENT, aEvent.asMap());
-                rest.postForObject(webhook.getRequiredString(DSL.URL), webhookEvent, String.class);
+                webhookEvent.put(Constants.EVENT, aEvent.asMap());
+                rest.postForObject(webhook.getRequiredString(Constants.URL), webhookEvent, String.class);
             }
         }
     }

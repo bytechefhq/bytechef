@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.loop;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.message.broker.MessageBroker;
@@ -117,7 +117,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (DSL.LOOP.equals(task.getType())) {
+        if (Constants.LOOP.equals(task.getType())) {
             return this;
         }
 

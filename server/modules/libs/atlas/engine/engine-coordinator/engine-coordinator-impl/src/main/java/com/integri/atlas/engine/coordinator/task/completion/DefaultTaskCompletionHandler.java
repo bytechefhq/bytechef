@@ -19,7 +19,7 @@
 package com.integri.atlas.engine.coordinator.task.completion;
 
 import com.integri.atlas.engine.Accessor;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.repository.ContextRepository;
@@ -111,7 +111,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         List<Accessor> outputs = workflow.getOutputs();
 
         for (Accessor output : outputs) {
-            jobTaskExecution.set(output.getRequiredString(DSL.NAME), output.getRequiredString(DSL.VALUE));
+            jobTaskExecution.set(output.getRequiredString(Constants.NAME), output.getRequiredString(Constants.VALUE));
         }
 
         TaskExecution evaluatedJobTaskExecution = taskEvaluator.evaluate(jobTaskExecution, context);

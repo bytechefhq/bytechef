@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.loop;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -58,7 +58,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         SimpleTaskExecution taskExecution = SimpleTaskExecution.of(taskExecutionRepository.findOne(taskExecutionId));
 
-        if (DSL.LOOP.equals(taskExecution.getType())) {
+        if (Constants.LOOP.equals(taskExecution.getType())) {
             return taskExecution;
         } else {
             return findLoopTaskExecution(taskExecution.getParentId());
@@ -67,7 +67,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(DSL.LOOP_BREAK)) {
+        if (task.getType().equals(Constants.LOOP_BREAK)) {
             return this;
         }
 

@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.dispatcher.each;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.counter.repository.CounterRepository;
@@ -126,7 +126,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(DSL.EACH)) {
+        if (aTask.getType().equals(Constants.EACH)) {
             return this;
         }
         return null;

@@ -16,7 +16,7 @@
 
 package com.integri.atlas.engine.worker;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.message.broker.sync.SyncMessageBroker;
 import com.integri.atlas.engine.task.CancelTask;
@@ -109,7 +109,7 @@ public class WorkerTest {
         SimpleTaskExecution task = new SimpleTaskExecution();
         task.setId("1234");
         task.setJobId("4567");
-        task.set(DSL.TYPE, "var");
+        task.set(Constants.TYPE, "var");
         task.set("value", "${myVar}");
         task.set("pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")));
         worker.handle(task);

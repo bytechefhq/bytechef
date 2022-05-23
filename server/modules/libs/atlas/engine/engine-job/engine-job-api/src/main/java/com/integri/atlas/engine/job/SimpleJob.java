@@ -19,7 +19,7 @@
 package com.integri.atlas.engine.job;
 
 import com.integri.atlas.engine.Accessor;
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.error.Error;
 import com.integri.atlas.engine.error.ErrorObject;
@@ -52,139 +52,139 @@ public class SimpleJob extends MapObject implements Job {
 
     @Override
     public String getId() {
-        return getString(DSL.ID);
+        return getString(Constants.ID);
     }
 
     @Override
     public String getParentTaskExecutionId() {
-        return getString(DSL.PARENT_TASK_EXECUTION_ID);
+        return getString(Constants.PARENT_TASK_EXECUTION_ID);
     }
 
     public void setParentTaskExecutionId(String aTaskExecutionId) {
-        set(DSL.PARENT_TASK_EXECUTION_ID, aTaskExecutionId);
+        set(Constants.PARENT_TASK_EXECUTION_ID, aTaskExecutionId);
     }
 
     public void setId(String aId) {
-        set(DSL.ID, aId);
+        set(Constants.ID, aId);
     }
 
     @Override
     public int getCurrentTask() {
-        return getInteger(DSL.CURRENT_TASK, -1);
+        return getInteger(Constants.CURRENT_TASK, -1);
     }
 
     public void setCurrentTask(int aCurrentStep) {
-        set(DSL.CURRENT_TASK, aCurrentStep);
+        set(Constants.CURRENT_TASK, aCurrentStep);
     }
 
     @Override
     public String getLabel() {
-        return getString(DSL.LABEL);
+        return getString(Constants.LABEL);
     }
 
     public void setLabel(String aLabel) {
-        set(DSL.LABEL, aLabel);
+        set(Constants.LABEL, aLabel);
     }
 
     @Override
     public Error getError() {
-        if (get(DSL.ERROR) != null) {
-            return new ErrorObject(getMap(DSL.ERROR));
+        if (get(Constants.ERROR) != null) {
+            return new ErrorObject(getMap(Constants.ERROR));
         }
         return null;
     }
 
     public void setError(Error aError) {
-        set(DSL.ERROR, aError);
+        set(Constants.ERROR, aError);
     }
 
     @Override
     public List<TaskExecution> getExecution() {
-        List<TaskExecution> list = getList(DSL.EXECUTION, TaskExecution.class);
+        List<TaskExecution> list = getList(Constants.EXECUTION, TaskExecution.class);
         return list != null ? list : Collections.emptyList();
     }
 
     @Override
     public JobStatus getStatus() {
-        String value = getString(DSL.STATUS);
+        String value = getString(Constants.STATUS);
         return value != null ? JobStatus.valueOf(value) : null;
     }
 
     public void setStatus(JobStatus aStatus) {
-        set(DSL.STATUS, aStatus);
+        set(Constants.STATUS, aStatus);
     }
 
     public void setEndTime(Date aEndTime) {
-        set(DSL.END_TIME, aEndTime);
+        set(Constants.END_TIME, aEndTime);
     }
 
     public void setStartTime(Date aStartTime) {
-        set(DSL.START_TIME, aStartTime);
+        set(Constants.START_TIME, aStartTime);
     }
 
     @Override
     public Date getCreateTime() {
-        return getDate(DSL.CREATE_TIME);
+        return getDate(Constants.CREATE_TIME);
     }
 
     public void setCreateTime(Date aCreateTime) {
-        set(DSL.CREATE_TIME, aCreateTime);
+        set(Constants.CREATE_TIME, aCreateTime);
     }
 
     @Override
     public String getWorkflowId() {
-        return getString(DSL.WORKFLOW_ID);
+        return getString(Constants.WORKFLOW_ID);
     }
 
     public void setWorkflowId(String aWorkflowId) {
-        set(DSL.WORKFLOW_ID, aWorkflowId);
+        set(Constants.WORKFLOW_ID, aWorkflowId);
     }
 
     @Override
     public Date getStartTime() {
-        return getDate(DSL.START_TIME);
+        return getDate(Constants.START_TIME);
     }
 
     @Override
     public Date getEndTime() {
-        return getDate(DSL.END_TIME);
+        return getDate(Constants.END_TIME);
     }
 
     @Override
     public int getPriority() {
-        return getInteger(DSL.PRIORITY, Prioritizable.DEFAULT_PRIORITY);
+        return getInteger(Constants.PRIORITY, Prioritizable.DEFAULT_PRIORITY);
     }
 
     public void setPriority(int aPriority) {
-        set(DSL.PRIORITY, aPriority);
+        set(Constants.PRIORITY, aPriority);
     }
 
     @Override
     public Accessor getInputs() {
-        Map<String, Object> map = getMap(DSL.INPUTS);
+        Map<String, Object> map = getMap(Constants.INPUTS);
         return map != null ? new MapObject(map) : new MapObject();
     }
 
     public void setInputs(Accessor aInputs) {
-        set(DSL.INPUTS, aInputs);
+        set(Constants.INPUTS, aInputs);
     }
 
     @Override
     public Accessor getOutputs() {
-        Map<String, Object> map = getMap(DSL.OUTPUTS);
+        Map<String, Object> map = getMap(Constants.OUTPUTS);
         return map != null ? new MapObject(map) : new MapObject();
     }
 
     public void setOutputs(Accessor aOutputs) {
-        set(DSL.OUTPUTS, aOutputs);
+        set(Constants.OUTPUTS, aOutputs);
     }
 
     @Override
     public List<Accessor> getWebhooks() {
-        return getList(DSL.WEBHOOKS, Accessor.class, Collections.emptyList());
+        return getList(Constants.WEBHOOKS, Accessor.class, Collections.emptyList());
     }
 
     public void setWebhooks(List<Accessor> aWebhooks) {
-        set(DSL.WEBHOOKS, aWebhooks);
+        set(Constants.WEBHOOKS, aWebhooks);
     }
 }
