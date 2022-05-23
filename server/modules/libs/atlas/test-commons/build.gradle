@@ -16,6 +16,6 @@ dependencies {
     implementation project(":modules:libs:atlas:file-storage:file-storage-base64")
     implementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
     implementation project(":modules:libs:atlas:task-handler:task-handler-core")
-    implementation project(":modules:libs:atlas:task-handler-common")
+    implementation project(":modules:libs:atlas:task-handler-commons")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")
 }
