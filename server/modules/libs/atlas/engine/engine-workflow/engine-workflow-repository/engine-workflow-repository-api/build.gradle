@@ -1,5 +1,4 @@
 dependencies {
-    api project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-api")
     api project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-api")
 
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
