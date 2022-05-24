@@ -16,7 +16,7 @@ tasks:
                 value2: 5
           combineOperation: aNY
           caseTrue:
-           - type: loop-break
+            - type: loop-break
           caseFalse:
             - name: sumVar2
               type: core/var

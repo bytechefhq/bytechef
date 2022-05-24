@@ -19,35 +19,41 @@
 package com.integri.atlas.engine.web.rest;
 
 import com.integri.atlas.engine.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.engine.coordinator.cache.Clearable;
+import com.integri.atlas.engine.cache.Clearable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 @RestController
 @ConditionalOnCoordinator
-class CacheController {
+public class CacheController {
 
-    @Autowired(required = false)
-    private List<Clearable> clearables = Collections.emptyList();
+    private static final Logger logger = LoggerFactory.getLogger(CacheController.class);
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final List<Clearable> clearables;
+
+    public CacheController(@Autowired(required = false) List<Clearable> clearables) {
+        this.clearables = clearables == null ? Collections.emptyList() : clearables;
+    }
 
     @RequestMapping(value = "/caches/clear", method = { RequestMethod.GET, RequestMethod.POST })
-    public Map<String, String> clear() {
-        for (Clearable c : clearables) {
-            logger.info("Clearing: {}", c.getClass().getName());
-            c.clear();
+    public ResponseEntity<Void> clear() {
+        for (Clearable clearable : clearables) {
+            logger.info("Clearing: {}", clearable.getClass().getName());
+
+            clearable.clear();
         }
-        return Collections.singletonMap("status", "OK");
+
+        return ResponseEntity.ok().build();
     }
 }

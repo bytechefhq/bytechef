@@ -51,14 +51,14 @@ public class IfTaskUtil {
         if (rawConditions) {
             return ifTask.getBoolean(PROPERTY_CONDITIONS);
         } else {
-            List<MapObject> conditionsUI = ifTask.getList(PROPERTY_CONDITIONS, MapObject.class);
+            List<MapObject> conditions = ifTask.getList(PROPERTY_CONDITIONS, MapObject.class);
             String combineOperation = ifTask.getRequiredString(PROPERTY_COMBINE_OPERATION);
 
-            return expressionParser
-                .parseExpression(
-                    String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditionsUI))
-                )
+            Boolean result = expressionParser
+                .parseExpression(String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)))
                 .getValue(Boolean.class);
+
+            return result != null && result;
         }
     }
 

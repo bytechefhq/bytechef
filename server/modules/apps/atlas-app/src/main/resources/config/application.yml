@@ -4,13 +4,22 @@ management:
       base-path: /management
       exposure:
         include:
-          ['caches', 'configprops', 'env', 'health', 'info', 'logfile', 'loggers', 'threaddump']
+          [
+            "caches",
+            "configprops",
+            "env",
+            "health",
+            "info",
+            "logfile",
+            "loggers",
+            "threaddump",
+          ]
   info:
     git:
       mode: full
   health:
-#    db:
-#      enabled: false
+    #    db:
+    #      enabled: false
     group:
       liveness:
         include: livenessState
@@ -19,10 +28,10 @@ management:
     rabbit:
       enabled: false
   metrics:
-#    export:
-#      prometheus:
-#        enabled: true
-#        step: 60
+    #    export:
+    #      prometheus:
+    #        enabled: true
+    #        step: 60
     enable:
       http: true
       jvm: true
@@ -46,8 +55,7 @@ spring:
   application:
     name: atlas-app
   jackson:
-    default-property-inclusion:
-      non_null
+    default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
       write-null-map-values: false

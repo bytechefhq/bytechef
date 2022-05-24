@@ -45,12 +45,12 @@ public class HttpClientHelper {
                 .build();
     }
 
-    public HttpResponse send(
+    public HttpResponse<?> send(
         String httpMethod,
         String uri,
         List<HttpHeader> headers,
         HttpRequest.BodyPublisher bodyPublisher,
-        HttpResponse.BodyHandler bodyHandler
+        HttpResponse.BodyHandler<?> bodyHandler
     ) throws Exception {
         HttpRequest.Builder httpRequestBuilder = HttpRequest
             .newBuilder()

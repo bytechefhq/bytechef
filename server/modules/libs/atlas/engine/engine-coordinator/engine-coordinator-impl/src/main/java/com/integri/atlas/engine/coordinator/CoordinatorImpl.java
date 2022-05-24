@@ -54,15 +54,15 @@ import org.springframework.util.Assert;
  */
 public class CoordinatorImpl implements Coordinator {
 
+    private ContextRepository contextRepository;
+    private ErrorHandler errorHandler;
+    private EventPublisher eventPublisher;
+    private MessageBroker messageBroker;
+    private JobExecutor jobExecutor;
     private JobService jobService;
     private TaskExecutionRepository taskExecutionRepository;
-    private EventPublisher eventPublisher;
-    private ContextRepository contextRepository;
     private TaskDispatcher taskDispatcher;
-    private ErrorHandler errorHandler;
     private TaskCompletionHandler taskCompletionHandler;
-    private JobExecutor jobExecutor;
-    private MessageBroker messageBroker;
 
     private static final String INPUTS = "inputs";
 
