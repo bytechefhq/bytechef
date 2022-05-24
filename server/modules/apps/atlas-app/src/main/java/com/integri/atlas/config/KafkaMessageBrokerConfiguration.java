@@ -222,7 +222,7 @@ public class KafkaMessageBrokerConfiguration implements KafkaListenerConfigurer 
             registerListenerEndpoint(
                 aRegistrar,
                 Queues.SUBFLOWS,
-                coordinatorProperties.getSubscriptions().getJobs(),
+                coordinatorProperties.getSubscriptions().getSubflows(),
                 coordinator,
                 "create"
             );
