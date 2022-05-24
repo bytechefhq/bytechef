@@ -21,34 +21,21 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  *
- * Used for specifying an authentification.
+ * Used for specifying an authentification type.
  */
 public class TaskAuthentication {
 
-    private List<TaskCredential> credentials;
-    private List<TaskProperty<?>> properties;
+    private List<TaskPropertyOption> options;
 
-    public static TaskAuthentication authentication() {
-        return new TaskAuthentication();
-    }
+    TaskAuthentication() {}
 
-    public TaskAuthentication credentials(TaskCredential... credentials) {
-        this.credentials = List.of(credentials);
+    public TaskAuthentication options(TaskPropertyOption... options) {
+        this.options = List.of(options);
 
         return this;
     }
 
-    public TaskAuthentication properties(TaskProperty... properties) {
-        this.properties = List.of(properties);
-
-        return this;
-    }
-
-    public List<TaskCredential> getCredentials() {
-        return credentials;
-    }
-
-    public List<TaskProperty<?>> getProperties() {
-        return properties;
+    public List<TaskPropertyOption> getOptions() {
+        return options;
     }
 }

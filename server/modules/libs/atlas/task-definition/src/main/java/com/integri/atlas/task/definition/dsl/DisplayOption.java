@@ -16,464 +16,141 @@
 
 package com.integri.atlas.task.definition.dsl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
  */
 public class DisplayOption {
 
-    private Map<String, List<TaskParameterValue>> hide;
-    private Map<String, List<TaskParameterValue>> show;
+    private Map<String, DisplayOptionEntryValue> hideWhen;
+    private Map<String, DisplayOptionEntryValue> showWhen;
 
     private DisplayOption() {}
 
-    public static DisplayOption displayOption() {
-        return new DisplayOption();
+    public Map<String, DisplayOptionEntryValue> getHideWhen() {
+        return hideWhen;
     }
 
-    public DisplayOption hide(String k1) {
-        hide = Map.of(k1, List.of());
-
-        return this;
+    public Map<String, DisplayOptionEntryValue> getShowWhen() {
+        return showWhen;
     }
 
-    public DisplayOption hide(String k1, Boolean... values) {
-        this.hide = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+    static DisplayOption build(List<DisplayOptionEntry> displayOptionEntries) {
+        DisplayOption displayOption = new DisplayOption();
 
-        return this;
+        for (DisplayOptionEntry displayOptionEntry : displayOptionEntries) {
+            if (displayOptionEntry instanceof HideDisplayOptionEntry hideDisplayOptionEntry) {
+                if (displayOption.hideWhen == null) {
+                    displayOption.hideWhen = new HashMap<>();
+                }
+
+                displayOption.hideWhen.computeIfAbsent(
+                    hideDisplayOptionEntry.propertyName,
+                    key -> displayOptionEntry.value
+                );
+            } else if (displayOptionEntry instanceof ShowDisplayOptionEntry showDisplayOptionEntry) {
+                if (displayOption.showWhen == null) {
+                    displayOption.showWhen = new HashMap<>();
+                }
+
+                displayOption.showWhen.computeIfAbsent(
+                    showDisplayOptionEntry.propertyName,
+                    key -> displayOptionEntry.value
+                );
+            }
+        }
+
+        return displayOption;
     }
 
-    public DisplayOption hide(String k1, Integer... values) {
-        this.hide = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+    public abstract static class DisplayOptionEntry {
 
-        return this;
+        protected final String propertyName;
+        protected final DisplayOptionEntryValue value = new DisplayOptionEntryValue();
+
+        public DisplayOptionEntry(String propertyName) {
+            this.propertyName = propertyName;
+        }
+
+        public DisplayOptionEntry in(Boolean... values) {
+            this.value.values = List.of(values);
+
+            return this;
+        }
+
+        public DisplayOptionEntry in(Integer... values) {
+            this.value.values = List.of(values);
+
+            return this;
+        }
+
+        public DisplayOptionEntry in(Long... values) {
+            this.value.values = List.of(values);
+
+            return this;
+        }
+
+        public DisplayOptionEntry in(Float... values) {
+            this.value.values = List.of(values);
+
+            return this;
+        }
+
+        public DisplayOptionEntry in(Double... values) {
+            this.value.values = List.of(values);
+
+            return this;
+        }
+
+        public DisplayOptionEntry in(String... values) {
+            this.value.values = List.of(values);
+
+            return this;
+        }
+
+        public DisplayOptionEntry of(TaskProperty.Type type) {
+            this.value.type = type;
+
+            return this;
+        }
+
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        public DisplayOptionEntryValue getValue() {
+            return value;
+        }
     }
 
-    public DisplayOption hide(String k1, Long... values) {
-        this.hide = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+    public static class DisplayOptionEntryValue {
 
-        return this;
+        private TaskProperty.Type type;
+        private List<Object> values;
+
+        public TaskProperty.Type getType() {
+            return type;
+        }
+
+        public List<?> getValues() {
+            return values;
+        }
     }
 
-    public DisplayOption hide(String k1, Float... values) {
-        this.hide = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+    public static class HideDisplayOptionEntry extends DisplayOptionEntry {
 
-        return this;
+        public HideDisplayOptionEntry(String propertyName) {
+            super(propertyName);
+        }
     }
 
-    public DisplayOption hide(String k1, Double... values) {
-        this.hide = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+    public static class ShowDisplayOptionEntry extends DisplayOptionEntry {
 
-        return this;
-    }
-
-    public DisplayOption hide(String k1, String... values) {
-        this.hide = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-
-        return this;
-    }
-
-    public DisplayOption hide(String k1, List<TaskParameterValue> v1) {
-        this.hide = Map.of(k1, v1);
-
-        return this;
-    }
-
-    public DisplayOption hide(String k1, List<TaskParameterValue> v1, String k2, List<TaskParameterValue> v2) {
-        this.hide = Map.of(k1, v1, k2, v2);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3, k4, v4);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
-
-        return this;
-    }
-
-    public DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9,
-        String k10,
-        List<TaskParameterValue> v10
-    ) {
-        this.hide = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
-
-        return this;
-    }
-
-    public DisplayOption show(String k1) {
-        show = Map.of(k1, List.of());
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, Boolean... values) {
-        this.show = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, Integer... values) {
-        this.show = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, Long... values) {
-        this.show = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, Float... values) {
-        this.show = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, Double... values) {
-        this.show = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, String... values) {
-        this.show = Map.of(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, TaskParameterValue... v1) {
-        this.show = Map.of(k1, List.of(v1));
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, List<TaskParameterValue> v1) {
-        this.show = Map.of(k1, v1);
-
-        return this;
-    }
-
-    public DisplayOption show(String k1, List<TaskParameterValue> v1, String k2, List<TaskParameterValue> v2) {
-        this.show = Map.of(k1, v1, k2, v2);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3, k4, v4);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
-
-        return this;
-    }
-
-    public DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9,
-        String k10,
-        List<TaskParameterValue> v10
-    ) {
-        this.show = Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
-
-        return this;
-    }
-
-    public Map<String, List<TaskParameterValue>> getHide() {
-        return hide;
-    }
-
-    public Map<String, List<TaskParameterValue>> getShow() {
-        return show;
+        public ShowDisplayOptionEntry(String propertyName) {
+            super(propertyName);
+        }
     }
 }

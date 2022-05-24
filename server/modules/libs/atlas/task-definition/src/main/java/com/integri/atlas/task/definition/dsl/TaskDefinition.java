@@ -23,71 +23,69 @@ import java.util.List;
  *
  * Used for specifying a task type.
  */
-public class TaskSpecification {
+public class TaskDefinition {
 
+    private List<TaskAction> actions;
     private TaskAuthentication authentication;
     private String description;
     private String displayName;
-    private String name;
     private String icon;
-    private List<TaskProperty<?>> properties;
+    private String name;
     private String subtitle;
     private float version = 1;
 
-    public static TaskSpecification create(String name) {
-        return new TaskSpecification().name(name);
-    }
+    TaskDefinition() {}
 
-    public TaskSpecification authentication(TaskAuthentication authentication) {
-        this.authentication = authentication;
+    public TaskDefinition actions(TaskAction... actions) {
+        this.actions = List.of(actions);
 
         return this;
     }
 
-    public static TaskAuthentication credentials(TaskCredential... credentials) {
-        return TaskAuthentication.authentication().credentials(credentials);
+    public TaskDefinition authentication(TaskPropertyOption... options) {
+        this.authentication = new TaskAuthentication().options(options);
+
+        return this;
     }
 
-    public TaskSpecification description(String description) {
+    public TaskDefinition description(String description) {
         this.description = description;
 
         return this;
     }
 
-    public TaskSpecification displayName(String displayName) {
+    public TaskDefinition displayName(String displayName) {
         this.displayName = displayName;
 
         return this;
     }
 
-    public TaskSpecification name(String name) {
-        this.name = name;
-
-        return this;
-    }
-
-    public TaskSpecification icon(String icon) {
+    public TaskDefinition icon(String icon) {
         this.icon = icon;
 
         return this;
     }
 
-    public TaskSpecification properties(TaskProperty... properties) {
-        this.properties = List.of(properties);
+    public TaskDefinition name(String name) {
+        this.name = name;
 
         return this;
     }
 
-    public TaskSpecification subtitle(String subtitle) {
+    public TaskDefinition subtitle(String subtitle) {
         this.subtitle = subtitle;
 
         return this;
     }
 
-    public TaskSpecification version(float version) {
+    public TaskDefinition version(float version) {
         this.version = version;
 
         return this;
+    }
+
+    public List<TaskAction> getActions() {
+        return actions;
     }
 
     public TaskAuthentication getAuthentication() {
@@ -102,16 +100,12 @@ public class TaskSpecification {
         return displayName;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public String getIcon() {
         return icon;
     }
 
-    public List<TaskProperty<?>> getProperties() {
-        return properties;
+    public String getName() {
+        return name;
     }
 
     public String getSubtitle() {
