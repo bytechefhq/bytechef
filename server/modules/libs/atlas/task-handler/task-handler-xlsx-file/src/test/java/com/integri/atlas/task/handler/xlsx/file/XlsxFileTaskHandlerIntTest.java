@@ -103,7 +103,7 @@ public class XlsxFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("xlsxFile", new XlsxFileTaskHandler(jsonHelper, fileStorageService));
+        return Map.of("xlsxFile", new XlsxFileTaskHandler(fileStorageService));
     }
 
     private File getFile(String fileName) throws IOException {

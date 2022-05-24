@@ -40,7 +40,7 @@ public class XmlHelpersTaskDefinitionHandler implements TaskDefinitionHandler {
         .create(TASK_XML_HELPERS)
         .displayName("XML Helpers")
         .description("Converts between XML string and object/array.")
-        .actions(
+        .operations(
             OPERATION(Operation.XML_TO_JSON.name())
                 .displayName("Convert from XML string")
                 .description("Converts the XML string to object/array.")

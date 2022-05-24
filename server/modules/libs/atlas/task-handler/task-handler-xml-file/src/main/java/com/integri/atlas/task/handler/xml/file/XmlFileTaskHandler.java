@@ -19,7 +19,6 @@ package com.integri.atlas.task.handler.xml.file;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_IS_ARRAY;
-import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_PAGE_SIZE;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_SOURCE;
@@ -30,7 +29,6 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.Operation;
 import com.integri.atlas.task.handler.xml.helper.XmlHelper;
 import java.io.ByteArrayInputStream;
@@ -49,11 +47,9 @@ import org.springframework.stereotype.Component;
 @Component(TASK_XML_FILE)
 public class XmlFileTaskHandler implements TaskHandler<Object> {
 
-    private final JsonHelper jsonHelper;
     private final XmlHelper xmlHelper;
 
-    public XmlFileTaskHandler(JsonHelper jsonHelper, FileStorageService fileStorageService, XmlHelper xmlHelper) {
-        this.jsonHelper = jsonHelper;
+    public XmlFileTaskHandler(FileStorageService fileStorageService, XmlHelper xmlHelper) {
         this.fileStorageService = fileStorageService;
         this.xmlHelper = xmlHelper;
     }
@@ -64,7 +60,7 @@ public class XmlFileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
             boolean isArray = taskExecution.get(PROPERTY_IS_ARRAY, Boolean.class, true);
@@ -111,7 +107,7 @@ public class XmlFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.xml");
-            Object source = jsonHelper.check(taskExecution.getRequired(PROPERTY_SOURCE));
+            Object source = taskExecution.getRequired(PROPERTY_SOURCE);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

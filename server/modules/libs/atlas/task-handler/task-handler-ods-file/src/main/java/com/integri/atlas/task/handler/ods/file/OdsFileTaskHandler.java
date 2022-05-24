@@ -21,7 +21,6 @@ import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPE
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_HEADER_ROW;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
-import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_PAGE_SIZE;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_READ_AS_STRING;
@@ -29,7 +28,6 @@ import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPE
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_SHEET_NAME;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.TASK_ODS_FILE;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -37,7 +35,6 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.util.MapUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -59,11 +56,9 @@ import org.springframework.stereotype.Component;
 @Component(TASK_ODS_FILE)
 public class OdsFileTaskHandler implements TaskHandler<Object> {
 
-    private final JsonHelper jsonHelper;
     private final FileStorageService fileStorageService;
 
-    public OdsFileTaskHandler(JsonHelper jsonHelper, FileStorageService fileStorageService) {
-        this.jsonHelper = jsonHelper;
+    public OdsFileTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
@@ -71,7 +66,7 @@ public class OdsFileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
             FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
@@ -107,10 +102,7 @@ public class OdsFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.ods");
-            List<Map<String, ?>> rows = jsonHelper.checkArray(
-                taskExecution.getRequired(PROPERTY_ROWS),
-                new TypeReference<>() {}
-            );
+            List<Map<String, ?>> rows = taskExecution.getRequired(PROPERTY_ROWS);
 
             String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, String.class, "Sheet");
 
@@ -281,7 +273,12 @@ public class OdsFileTaskHandler implements TaskHandler<Object> {
     }
 
     private record ReadConfiguration(
-        boolean headerRow, boolean includeEmptyCells, long rangeStartRow, long rangeEndRow, boolean readAsString, String sheetName
+        boolean headerRow,
+        boolean includeEmptyCells,
+        long rangeStartRow,
+        long rangeEndRow,
+        boolean readAsString,
+        String sheetName
     ) {}
 
     private record WriteConfiguration(String fileName, String sheetName) {}

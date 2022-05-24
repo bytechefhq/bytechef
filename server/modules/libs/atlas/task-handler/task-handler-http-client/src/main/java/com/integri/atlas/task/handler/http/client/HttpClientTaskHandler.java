@@ -16,9 +16,7 @@
 
 package com.integri.atlas.task.handler.http.client;
 
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_AUTHENTICATION_TYPE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROPERTY_URI;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_REQUEST_METHOD;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_TIMEOUT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 
@@ -64,7 +62,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         HttpClientHelper httpClientHelper = new HttpClientHelper(
             httpAuthenticationFactory.create(
-                taskExecution.getRequiredString(PROPERTY_AUTHENTICATION_TYPE),
+                taskExecution.getRequiredString("authentication"),
                 taskExecution.get("credentials", MapObject.class)
             ),
             taskExecution.getLong(PROPERTY_TIMEOUT, 10000)
@@ -72,8 +70,8 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
 
         List<HttpHeader> httpHeaders = httpHeadersFactory.getHttpHeaders(taskExecution);
 
-        HttpResponse httpResponse = httpClientHelper.send(
-            taskExecution.getRequiredString(PROPERTY_REQUEST_METHOD),
+        HttpResponse<?> httpResponse = httpClientHelper.send(
+            taskExecution.getRequiredString("operation"),
             resolveURI(
                 taskExecution.getRequiredString(PROPERTY_PROPERTY_URI),
                 queryParamsFactory.getQueryParams(taskExecution)

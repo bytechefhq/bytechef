@@ -21,7 +21,6 @@ package com.integri.atlas.task.handler.xml.file;
  */
 public class XmlFileTaskConstants {
 
-    public static final String PROPERTY_OPERATION = "operation";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_IS_ARRAY = "isArray";
     public static final String PROPERTY_FILE_NAME = "fileName";

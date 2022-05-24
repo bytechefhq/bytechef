@@ -67,11 +67,11 @@ public class JsonFileTaskHandler implements TaskHandler<Object> {
         FileType fileType = FileType.valueOf(
             StringUtils.upperCase(taskExecution.get(PROPERTY_FILE_TYPE, String.class, FileType.JSON.name()))
         );
-        JsonFileTaskConstants.Action action = JsonFileTaskConstants.Action.valueOf(
-            StringUtils.upperCase(taskExecution.getRequired("action"))
+        JsonFileTaskConstants.Operation operation = JsonFileTaskConstants.Operation.valueOf(
+            StringUtils.upperCase(taskExecution.getRequired("operation"))
         );
 
-        if (action == JsonFileTaskConstants.Action.READ) {
+        if (operation == JsonFileTaskConstants.Operation.READ) {
             boolean isArray = taskExecution.get(PROPERTY_IS_ARRAY, Boolean.class, true);
             FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
 

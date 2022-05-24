@@ -36,83 +36,110 @@ public class FileTaskDefinitionTest {
     };
 
     @Test
-    public void testFileTaskSpecification() throws JsonProcessingException {
+    public void testFileTaskDefinition() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Reads and writes data from a file",
-                "displayName":"File",
-                "name":"file",
-                "properties":[
+              "description": "Reads and writes data from a file",
+              "displayName": "File",
+              "name": "file",
+              "operations": [
+                {
+                  "description": "Reads data from a csv file.",
+                  "name": "READ",
+                  "inputs": [
                     {
-                        "defaultValue":"READ",
-                        "description":"The operation to perform.",
-                        "displayName":"Operation",
-                        "name":"operation",
-                        "required":true,
-                        "type":"SELECT",
-                        "options":[
-                            {
-                                "name":"Read from file",
-                                "value":"READ",
-                                "description": "Reads data from a file."
-                            },
-                            {
-                                "name":"Write to file",
-                                "value":"WRITE",
-                                 "description": "Writes the data to a file."
-                            }
-                        ]
-                    },
-                    {
-                        "description":"The object property which contains a reference to the file to read from.",
-                        "displayName":"File",
-                        "displayOption":{
-                            "show":{
-                                "operation":["READ"]
-                            }
+                      "description": "The object property which contains a reference to the file to read from.",
+                      "displayName": "File",
+                      "name": "fileEntry",
+                      "required": true,
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
                         },
-                        "name":"fileEntry",
-                        "required":true,
-                        "type":"JSON"
-                    },
-                    {
-                        "description":"String to write to the file.",
-                        "displayName":"Content",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"]
-                            }
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
                         },
-                        "name":"content",
-                        "required":true,
-                        "type":"STRING"
-                    },
-                    {
-                        "displayName":"Options",
-                        "name":"options",
-                        "type":"COLLECTION",
-                        "options":[
-                            {
-                                "defaultValue":"file.txt",
-                                "description":"File name to set for binary data. By default, \\"file.txt\\" will be used.",
-                                "displayName":"File Name",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["WRITE"]
-                                    }
-                                },
-                                "name":"fileName",
-                                "type":"STRING"
-                            }
-                        ],
-                        "placeholder":"Add Option"
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
                     }
-                ],
-                "version":1.0
+                  ],
+                  "outputs": [
+                    {
+                      "type": "STRING"
+                    }
+                  ],
+                  "displayName": "Read from file"
+                },
+                {
+                  "description": "Writes the data to a csv file.",
+                  "name": "WRITE",
+                  "inputs": [
+                    {
+                      "description": "String to write to the file.",
+                      "displayName": "Content",
+                      "name": "content",
+                      "required": true,
+                      "type": "STRING"
+                    },
+                    {
+                      "description": "File name to set for binary data. By default, \\"file.txt\\" will be used.",
+                      "displayName": "File Name",
+                      "name": "fileName",
+                      "defaultValue": "file.txt",
+                      "type": "STRING"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
+                    }
+                  ],
+                  "displayName": "Write to file"
+                }
+              ],
+              "version": 1
             }
             """,
-            (JSONObject) JSONParser.parseJSON(objectMapper.writeValueAsString(FileTaskDefinition.TASK_SPECIFICATION)),
+            (JSONObject) JSONParser.parseJSON(
+                objectMapper.writeValueAsString(new FileTaskDefinitionHandler().getTaskDefinition())
+            ),
             true
         );
     }

@@ -21,7 +21,6 @@ package com.integri.atlas.task.handler.csv.file;
  */
 public class CsvFileTaskConstants {
 
-    public static final String PROPERTY_OPERATION = "operation";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_ROWS = "rows";
     public static final String PROPERTY_DELIMITER = "delimiter";

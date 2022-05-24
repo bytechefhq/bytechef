@@ -18,7 +18,6 @@ package com.integri.atlas.task.handler.local.file;
 
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_NAME;
-import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.TASK_LOCAL_FILE;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
@@ -51,7 +50,7 @@ public class LocalFileTaskHandler implements TaskHandler<Object> {
         Object result;
 
         String fileName = taskExecution.getRequired(PROPERTY_FILE_NAME);
-        Operation operation = Operation.valueOf(taskExecution.getRequired(PROPERTY_OPERATION));
+        Operation operation = Operation.valueOf(taskExecution.getRequired("operation"));
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {

@@ -40,7 +40,7 @@ public class FileTaskDefinitionHandler implements TaskDefinitionHandler {
         .create(TASK_FILE)
         .displayName("File")
         .description("Reads and writes data from a file")
-        .actions(
+        .operations(
             OPERATION(Operation.READ.name())
                 .displayName("Read from file")
                 .description("Reads data from a csv file.")

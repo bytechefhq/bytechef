@@ -36,132 +36,177 @@ public class XmlFileTaskDefinitionTest {
     };
 
     @Test
-    public void testXMLFileTaskSpecification() throws JsonProcessingException {
+    public void testXMLFileTaskDefinition() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
-            {
-                "description":"Reads and writes data from a XML file.",
-                "displayName":"XML File",
-                "name":"xmlFile",
-                "properties":[
+           {
+              "description": "Reads and writes data from a XML file.",
+              "displayName": "XML File",
+              "name": "xmlFile",
+              "operations": [
+                {
+                  "description": "Reads data from a XML file.",
+                  "name": "READ",
+                  "inputs": [
                     {
-                        "defaultValue":"READ",
-                        "description":"The operation to perform.",
-                        "displayName":"Operation",
-                        "name":"operation",
-                        "required":true,
-                        "type":"SELECT",
-                        "options":[
-                            {
-                                "name":"Read from file",
-                                "value":"READ",
-                                "description": "Reads data from a XML file."
-                            },
-                            {
-                                "name":"Write to file",
-                                "value":"WRITE",
-                                 "description": "Writes the data to a XML file."
-                            }
-                        ]
-                    },
-                    {
-                        "description":"The object property which contains a reference to the XML file to read from.",
-                        "displayName":"File",
-                        "displayOption":{
-                            "show":{
-                                "operation":["READ"]
-                            }
+                      "description": "The object property which contains a reference to the XML file to read from.",
+                      "displayName": "File",
+                      "name": "fileEntry",
+                      "required": true,
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
                         },
-                        "name":"fileEntry",
-                        "required":true,
-                        "type":"JSON"
-                    },
-                    {
-                        "description":"The data to write to the file.",
-                        "displayName":"Source",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"]
-                            }
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
                         },
-                        "name":"source",
-                        "required":true,
-                        "type":"JSON"
-                    },
-                    {
-                        "defaultValue":true,
-                        "description":"The object input is array?",
-                        "displayName":"Is Array",
-                        "displayOption":{
-                            "show":{
-                                "operation":["READ"]
-                            }
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
                         },
-                        "name":"isArray",
-                        "type":"BOOLEAN"
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
                     },
                     {
-                        "displayName":"Options",
-                        "name":"options",
-                        "type":"COLLECTION",
-                        "options":[
-                            {
-                                "defaultValue":"file.xml",
-                                "description":"File name to set for binary data. By default, \\"file.xml\\" will be used.",
-                                "displayName":"File Name",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["WRITE"]
-                                    }
-                                },
-                                "name":"fileName",
-                                "type":"STRING"
-                            },
-                            {
-                                "description":"The path where the array is e.g 'data'. Leave blank to use the top level object.",
-                                "displayName":"Path",
-                                "displayOption":{
-                                    "show":{
-                                        "isArray":[true],
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"path",
-                                "type":"STRING"
-                            },
-                            {
-                                "description":"The amount of child elements to return in a page.",
-                                "displayName":"Page Size",
-                                "displayOption":{
-                                    "show":{
-                                        "isArray":[true],
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"pageSize",
-                                "type":"INTEGER"
-                            },
-                            {
-                                "description":"The page number to get.",
-                                "displayName":"Page Number",
-                                "displayOption":{
-                                    "show":{
-                                        "isArray":[true],
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"pageNumber",
-                                "type":"INTEGER"
-                            },
-                        ],
-                        "placeholder":"Add Option"
+                      "description": "The object input is array?",
+                      "displayName": "Is Array",
+                      "name": "isArray",
+                      "defaultValue": true,
+                      "type": "BOOLEAN"
+                    },
+                    {
+                      "displayName": "Options",
+                      "placeholder": "Add Option",
+                      "options": [
+                        {
+                          "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
+                          "displayOption": {
+                            "showWhen": {
+                              "isArray": {
+                                "values": [
+                                  true
+                                ]
+                              }
+                            }
+                          },
+                          "displayName": "Path",
+                          "name": "path",
+                          "type": "STRING"
+                        },
+                        {
+                          "description": "The amount of child elements to return in a page.",
+                          "displayOption": {
+                            "showWhen": {
+                              "isArray": {
+                                "values": [
+                                  true
+                                ]
+                              }
+                            }
+                          },
+                          "displayName": "Page Size",
+                          "name": "pageSize",
+                          "type": "INTEGER"
+                        },
+                        {
+                          "description": "The page number to get.",
+                          "displayOption": {
+                            "showWhen": {
+                              "isArray": {
+                                "values": [
+                                  true
+                                ]
+                              }
+                            }
+                          },
+                          "displayName": "Page Number",
+                          "name": "pageNumber",
+                          "type": "INTEGER"
+                        }
+                      ]
                     }
-                ],
-                "version":1.0
+                  ],
+                  "outputs": [
+                    {
+                      "type": "ARRAY"
+                    },
+                    {
+                      "type": "OBJECT"
+                    }
+                  ],
+                  "displayName": "Read from file"
+                },
+                {
+                  "description": "Writes the data to a XML file.",
+                  "name": "WRITE",
+                  "inputs": [
+                    {
+                      "description": "The data to write to the file.",
+                      "displayName": "Source",
+                      "name": "source",
+                      "required": true,
+                      "types": [
+                        {
+                          "type": "ARRAY"
+                        },
+                        {
+                          "type": "OBJECT"
+                        }
+                      ]
+                    },
+                    {
+                      "description": "File name to set for binary data. By default, \\"file.xml\\" will be used.",
+                      "displayName": "File Name",
+                      "name": "fileName",
+                      "defaultValue": "file.xml",
+                      "type": "STRING"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
+                    }
+                  ],
+                  "displayName": "Write to file"
+                }
+              ],
+              "version": 1
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(XmlFileTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(new XmlFileTaskDefinitionHandler().getTaskDefinition())
             ),
             true
         );

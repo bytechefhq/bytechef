@@ -36,78 +36,115 @@ public class LocalFileTaskDefinitionTest {
     };
 
     @Test
-    public void testLocalFileTaskSpecification() throws JsonProcessingException {
+    public void testLocalFileTaskDefinition() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Reads or writes a binary file from/to disk",
-                "displayName":"Local File",
-                "name":"localFile",
-                "properties":[
+              "description": "Reads or writes a binary file from/to disk",
+              "displayName": "Local File",
+              "name": "localFile",
+              "operations": [
+                {
+                  "name": "READ",
+                  "inputs": [
                     {
-                        "defaultValue":"READ",
-                        "description":"The operation to perform.",
-                        "displayName":"Operation",
-                        "name":"operation",
-                        "required":true,
-                        "type":"SELECT",
-                        "options":[
-                            {
-                                "name":"Read to file",
-                                "value":"READ"
-                            },
-                            {
-                                "name":"Write from file",
-                                "value":"WRITE"
-                            }
-                        ]
-                    },
-                    {
-                        "description":"The object property which contains a reference to the file to be written.",
-                        "displayName":"File",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"]
-                            }
-                        },
-                        "name":"fileEntry",
-                        "required":true,
-                        "type":"JSON"
-                    },
-                    {
-                        "defaultValue":"",
-                        "description":"The path of the file to read.",
-                        "displayName":"File Name",
-                        "displayOption":{
-                            "show":{
-                                "operation":["READ"]
-                            }
-                        },
-                        "name":"fileName",
-                        "required":true,
-                        "type":"STRING",
-                        "placeholder":"/data/your_file.pdf"
-                    },
-                    {
-                        "defaultValue":"",
-                        "description":"The path to which the file should be written.",
-                        "displayName":"File Name",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"]
-                            }
-                        },
-                        "name":"fileName",
-                        "required":true,
-                        "type":"STRING",
-                        "placeholder":"/data/your_file.pdf"
+                      "description": "The path of the file to read.",
+                      "displayName": "File Name",
+                      "name": "fileName",
+                      "placeholder": "/data/your_file.pdf",
+                      "required": true,
+                      "type": "STRING"
                     }
-                ],
-                "version":1.0
+                  ],
+                  "outputs": [
+                    {
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
+                    }
+                  ],
+                  "displayName": "Read to file"
+                },
+                {
+                  "name": "WRITE",
+                  "inputs": [
+                    {
+                      "description": "The object property which contains a reference to the file to be written.",
+                      "displayName": "File",
+                      "name": "fileEntry",
+                      "required": true,
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
+                        }
+                      ]
+                    },
+                    {
+                      "description": "The path to which the file should be written.",
+                      "displayName": "File Name",
+                      "name": "fileName",
+                      "placeholder": "/data/your_file.pdf",
+                      "required": true,
+                      "type": "STRING"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "type": "OBJECT",
+                      "properties": [
+                        {
+                          "name": "bytes",
+                          "type": "INTEGER"
+                        }
+                      ]
+                    }
+                  ],
+                  "displayName": "Write from file"
                 }
+              ],
+              "version": 1
+            }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(LocalFileTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(new LocalFileTaskDefinitionHandler().getTaskDefinition())
             ),
             true
         );

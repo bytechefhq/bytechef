@@ -22,19 +22,16 @@ import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPE
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_HEADER_ROW;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
-import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_PAGE_SIZE;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_READ_AS_STRING;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_ROWS;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.TASK_CSV_FILE;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.util.MapUtils;
 import com.integri.atlas.task.handler.util.ValueUtils;
 import java.io.BufferedReader;
@@ -61,11 +58,9 @@ public class CsvFileTaskHandler implements TaskHandler<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvFileTaskHandler.class);
 
-    private final JsonHelper jsonHelper;
     private final FileStorageService fileStorageService;
 
-    public CsvFileTaskHandler(JsonHelper jsonHelper, FileStorageService fileStorageService) {
-        this.jsonHelper = jsonHelper;
+    public CsvFileTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
@@ -73,7 +68,7 @@ public class CsvFileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
             String delimiter = taskExecution.getString(PROPERTY_DELIMITER, ",");
@@ -109,10 +104,7 @@ public class CsvFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.csv");
-            List<Map<String, ?>> rows = jsonHelper.checkArray(
-                taskExecution.getRequired(PROPERTY_ROWS),
-                new TypeReference<>() {}
-            );
+            List<Map<String, ?>> rows = taskExecution.getRequired(PROPERTY_ROWS);
 
             return fileStorageService.storeFileContent(fileName, new ByteArrayInputStream(write(rows)));
         }
@@ -253,6 +245,11 @@ public class CsvFileTaskHandler implements TaskHandler<Object> {
     }
 
     private record ReadConfiguration(
-        String delimiter, boolean headerRow, boolean includeEmptyCells, long rangeStartRow, long rangeEndRow, boolean readAsString
+        String delimiter,
+        boolean headerRow,
+        boolean includeEmptyCells,
+        long rangeStartRow,
+        long rangeEndRow,
+        boolean readAsString
     ) {}
 }

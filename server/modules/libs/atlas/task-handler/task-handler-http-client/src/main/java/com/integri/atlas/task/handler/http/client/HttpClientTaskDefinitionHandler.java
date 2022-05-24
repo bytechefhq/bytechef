@@ -199,7 +199,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
             option("Digest Auth", AuthenticationType.HTTP_DIGEST_AUTH.name()),
             option("OAuth2", AuthenticationType.OAUTH2.name())
         )
-        .actions(
+        .operations(
             OPERATION(RequestMethod.GET.name())
                 .displayName("GET")
                 .description("The request method to use.")

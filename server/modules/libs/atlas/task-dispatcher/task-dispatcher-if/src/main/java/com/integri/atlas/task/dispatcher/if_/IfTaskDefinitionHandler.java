@@ -53,7 +53,7 @@ public class IfTaskDefinitionHandler implements TaskDefinitionHandler {
         .create(TASK_IF)
         .displayName("If")
         .description("Directs a stream based on true/false results of comparisons")
-        .actions(
+        .operations(
             OPERATION("Branch")
                 .inputs(
                     BOOLEAN_PROPERTY(PROPERTY_RAW_CONDITIONS)

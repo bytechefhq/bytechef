@@ -22,19 +22,16 @@ import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PRO
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_HEADER_ROW;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
-import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_PAGE_SIZE;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_READ_AS_STRING;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_SHEET_NAME;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.TASK_XLSX_FILE;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import com.integri.atlas.task.handler.util.MapUtils;
 import com.integri.atlas.task.handler.util.ValueUtils;
 import java.io.ByteArrayInputStream;
@@ -71,11 +68,9 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
         XLSX,
     }
 
-    private final JsonHelper jsonHelper;
     private final FileStorageService fileStorageService;
 
-    public XlsxFileTaskHandler(JsonHelper jsonHelper, FileStorageService fileStorageService) {
-        this.jsonHelper = jsonHelper;
+    public XlsxFileTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
@@ -83,7 +78,7 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
             FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
@@ -124,10 +119,7 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getaDefaultFileName());
-            List<Map<String, ?>> rows = jsonHelper.checkArray(
-                taskExecution.getRequired(PROPERTY_ROWS),
-                new TypeReference<>() {}
-            );
+            List<Map<String, ?>> rows = taskExecution.getRequired(PROPERTY_ROWS);
 
             String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, String.class, "Sheet");
 
@@ -328,7 +320,12 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
     }
 
     private record ReadConfiguration(
-        boolean headerRow, boolean includeEmptyCells, long rangeStartRow, long rangeEndRow, boolean readAsString, String sheetName
+        boolean headerRow,
+        boolean includeEmptyCells,
+        long rangeStartRow,
+        long rangeEndRow,
+        boolean readAsString,
+        String sheetName
     ) {}
 
     private record WriteConfiguration(String fileName, String sheetName) {}

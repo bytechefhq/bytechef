@@ -53,7 +53,7 @@ public class XlsxFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .create(TASK_XLSX_FILE)
         .displayName("XLSX File")
         .description("Reads and writes data from a XLS/XLSX file.")
-        .actions(
+        .operations(
             OPERATION(Operation.READ.name())
                 .displayName("Read from file")
                 .description("Reads data from a XLS/XLSX file.")
