@@ -1,7 +1,7 @@
 subprojects {
     dependencies {
         compileOnly "org.springframework:spring-core"
-        compileOnly project(":modules:libs:atlas:engine:engine-common")
+        compileOnly project(":modules:libs:atlas:engine:engine-commons")
         compileOnly project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-api")
         compileOnly project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")
         compileOnly project(":modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-api")

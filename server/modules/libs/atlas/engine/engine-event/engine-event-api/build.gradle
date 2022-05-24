@@ -1,5 +1,5 @@
 dependencies {
-    api project(":modules:libs:atlas:engine:engine-common")
+    api project(":modules:libs:atlas:engine:engine-commons")
 
     implementation "org.springframework:spring-core"
 }

@@ -39,7 +39,7 @@ include("modules:libs:atlas:engine:engine-context:engine-context-repository:engi
 include("modules:libs:atlas:engine:engine-context:engine-context-service")
 include("modules:libs:atlas:engine:engine-coordinator:engine-coordinator-api")
 include("modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
-include("modules:libs:atlas:engine:engine-common")
+include("modules:libs:atlas:engine:engine-commons")
 include("modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-api")
 include("modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-jdbc")
 include("modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-memory")

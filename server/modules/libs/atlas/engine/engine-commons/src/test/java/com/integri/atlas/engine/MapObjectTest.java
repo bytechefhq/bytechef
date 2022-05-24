@@ -18,7 +18,6 @@
 
 package com.integri.atlas.engine;
 
-import com.integri.atlas.engine.MapObject;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

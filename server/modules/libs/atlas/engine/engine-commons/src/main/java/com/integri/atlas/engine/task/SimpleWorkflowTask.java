@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.task;
 
-import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import java.util.List;
 import java.util.Map;
@@ -38,54 +38,54 @@ public class SimpleWorkflowTask extends MapObject implements WorkflowTask {
 
     @Override
     public String getType() {
-        return getString(DSL.TYPE);
+        return getString(Constants.TYPE);
     }
 
     @Override
     public String getName() {
-        return getString(DSL.NAME);
+        return getString(Constants.NAME);
     }
 
     @Override
     public String getLabel() {
-        return getString(DSL.LABEL);
+        return getString(Constants.LABEL);
     }
 
     @Override
     public String getNode() {
-        return getString(DSL.NODE);
+        return getString(Constants.NODE);
     }
 
     public void setNode(String aNode) {
-        set(DSL.NODE, aNode);
+        set(Constants.NODE, aNode);
     }
 
     @Override
     public int getTaskNumber() {
-        return getInteger(DSL.TASK_NUMBER, -1);
+        return getInteger(Constants.TASK_NUMBER, -1);
     }
 
     public void setTaskNumber(int aTaskNumber) {
-        set(DSL.TASK_NUMBER, aTaskNumber);
+        set(Constants.TASK_NUMBER, aTaskNumber);
     }
 
     @Override
     public String getTimeout() {
-        return getString(DSL.TIMEOUT);
+        return getString(Constants.TIMEOUT);
     }
 
     @Override
     public List<WorkflowTask> getPre() {
-        return getList(DSL.PRE, WorkflowTask.class, List.of());
+        return getList(Constants.PRE, WorkflowTask.class, List.of());
     }
 
     @Override
     public List<WorkflowTask> getPost() {
-        return getList(DSL.POST, WorkflowTask.class, List.of());
+        return getList(Constants.POST, WorkflowTask.class, List.of());
     }
 
     @Override
     public List<WorkflowTask> getFinalize() {
-        return getList(DSL.FINALIZE, WorkflowTask.class, List.of());
+        return getList(Constants.FINALIZE, WorkflowTask.class, List.of());
     }
 }
