@@ -28,20 +28,22 @@ import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.http.HttpClientHelper;
-import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
+import com.integri.atlas.task.handler.http.client.params.HttpQueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Matija Petanjek
+ */
 @Component(TASK_HTTP_CLIENT)
 public class HttpClientTaskHandler implements TaskHandler<Object> {
 
     private final HttpBodyFactory httpBodyFactory;
     private final HttpAuthenticationFactory httpAuthenticationFactory;
     private final HttpHeadersFactory httpHeadersFactory;
-    private final QueryParamsFactory queryParamsFactory;
+    private final HttpQueryParamsFactory queryParamsFactory;
     private final HttpResponseHandler httpResponseHandler;
 
     public HttpClientTaskHandler(
@@ -49,7 +51,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
         HttpAuthenticationFactory httpAuthenticationFactory,
         HttpHeadersFactory httpHeadersFactory,
         HttpResponseHandler httpResponseHandler,
-        QueryParamsFactory queryParamsFactory
+        HttpQueryParamsFactory queryParamsFactory
     ) {
         this.httpBodyFactory = httpBodyFactory;
         this.httpAuthenticationFactory = httpAuthenticationFactory;

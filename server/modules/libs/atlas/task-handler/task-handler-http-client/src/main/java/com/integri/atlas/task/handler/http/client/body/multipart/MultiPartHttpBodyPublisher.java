@@ -16,44 +16,39 @@
 
 package com.integri.atlas.task.handler.http.client.body.multipart;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.header.HttpHeader.BOUNDARY_TMPL;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.util.Assert;
 
 /**
  * @author Matija Petanjek
  */
-public class MultiPartBodyPublisher {
+public class MultiPartHttpBodyPublisher {
 
-    private String boundary = UUID.randomUUID().toString();
-    private TaskExecution taskExecution;
-    private FileStorageService fileStorageService;
-    private List<HttpHeader> httpHeaders;
+    private final String boundary = UUID.randomUUID().toString();
+    private final FileStorageService fileStorageService;
+    private final List<HttpHeader> httpHeaders;
+    private final TaskExecution taskExecution;
 
-    public MultiPartBodyPublisher(
-        TaskExecution taskExecution,
+    public MultiPartHttpBodyPublisher(
         FileStorageService fileStorageService,
-        List<HttpHeader> httpHeaders
+        List<HttpHeader> httpHeaders,
+        TaskExecution taskExecution
     ) {
-        this.taskExecution = taskExecution;
         this.fileStorageService = fileStorageService;
         this.httpHeaders = httpHeaders;
+        this.taskExecution = taskExecution;
     }
 
     private HttpHeader getMultiPartHttpHeader(List<HttpHeader> httpHeaders) {
@@ -81,7 +76,7 @@ public class MultiPartBodyPublisher {
     private byte[] getHttpBodyPartsBytes(TaskExecution taskExecution) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        Map<String, String> bodyParametersMap = taskExecution.get("bodyParameters", Map.class);
+        Map<String, String> bodyParametersMap = taskExecution.get(PROPERTY_BODY_PARAMETERS);
 
         for (Map.Entry<String, String> entry : bodyParametersMap.entrySet()) {
             byteArrayOutputStream.write(
@@ -94,9 +89,7 @@ public class MultiPartBodyPublisher {
 
             if (fileStorageService.fileExists(value)) {
                 byteArrayOutputStream.write(
-                    ("; filename=\"" + fileStorageService.getFilename(value) + "\"\r\n\r\n").getBytes(
-                            StandardCharsets.UTF_8
-                        )
+                    ("; filename=\"" + FilenameUtils.getName(value) + "\"\r\n\r\n").getBytes(StandardCharsets.UTF_8)
                 );
                 byteArrayOutputStream.write(IOUtils.toByteArray(fileStorageService.getFileContentStream(value)));
                 byteArrayOutputStream.write("\r\n".getBytes(StandardCharsets.UTF_8));
