@@ -22,7 +22,7 @@ import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
-import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
+import com.integri.atlas.task.handler.http.client.params.HttpQueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
 import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import com.sun.net.httpserver.HttpServer;
@@ -77,11 +77,11 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
         return Map.of(
             "httpClient",
             new HttpClientTaskHandler(
-                new HttpBodyFactory(fileStorageService, jsonHelper),
+                new HttpBodyFactory(fileStorageService),
                 new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(jsonHelper),
+                new HttpHeadersFactory(),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
-                new QueryParamsFactory(jsonHelper)
+                new HttpQueryParamsFactory()
             )
         );
     }
