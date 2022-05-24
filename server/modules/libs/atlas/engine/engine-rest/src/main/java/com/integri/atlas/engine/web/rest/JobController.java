@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,12 +55,12 @@ public class JobController {
         this.jobRepository = jobRepository;
     }
 
-    @GetMapping(value = "/jobs")
+    @GetMapping(value = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<JobSummary> list(@RequestParam(value = "pageNumber", defaultValue = "1") Integer pageNumber) {
         return jobRepository.getPage(pageNumber);
     }
 
-    @PostMapping("/jobs")
+    @PostMapping(value = "/jobs", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Job create(@RequestBody Map<String, Object> jobRequestMap) {
         return coordinator.create(jobRequestMap);
     }
@@ -69,7 +70,7 @@ public class JobController {
         return jobRepository.getById(jobId);
     }
 
-    @GetMapping(value = "/jobs/latest")
+    @GetMapping(value = "/jobs/latest", produces = MediaType.APPLICATION_JSON_VALUE)
     public Job latest() {
         Optional<Job> job = jobRepository.getLatest();
 
