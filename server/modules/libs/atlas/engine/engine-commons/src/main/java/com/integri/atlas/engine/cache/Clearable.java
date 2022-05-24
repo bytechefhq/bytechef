@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.cache;
+package com.integri.atlas.engine.cache;
 
 /**
  * Allows a class that holds (typically temporary, cache, etc.) state
