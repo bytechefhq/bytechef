@@ -9,7 +9,7 @@ subprojects {
         compileOnly project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-api")
         compileOnly project(":modules:libs:atlas:engine:engine-worker:engine-worker-api")
         compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")
-        compileOnly project(":modules:libs:atlas:task-definition")
+        compileOnly project(":modules:libs:atlas:task-definition:task-definition-api")
         compileOnly project(":modules:libs:atlas:task-handler-commons")
 
         testImplementation "com.fasterxml.jackson.core:jackson-annotations"
@@ -25,7 +25,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-sync")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
-        testImplementation project(":modules:libs:atlas:task-definition")
+        testImplementation project(":modules:libs:atlas:task-definition:task-definition-api")
         testImplementation project(":modules:libs:atlas:task-handler-commons")
         testImplementation project(":modules:libs:atlas:test-commons")
         testImplementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")

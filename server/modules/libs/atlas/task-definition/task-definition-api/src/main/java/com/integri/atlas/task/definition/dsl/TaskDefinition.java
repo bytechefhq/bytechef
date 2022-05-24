@@ -25,22 +25,16 @@ import java.util.List;
  */
 public class TaskDefinition {
 
-    private List<TaskAction> actions;
     private TaskAuthentication authentication;
     private String description;
     private String displayName;
     private String icon;
     private String name;
+    private List<TaskOperation> operations;
     private String subtitle;
     private float version = 1;
 
     TaskDefinition() {}
-
-    public TaskDefinition actions(TaskAction... actions) {
-        this.actions = List.of(actions);
-
-        return this;
-    }
 
     public TaskDefinition authentication(TaskPropertyOption... options) {
         this.authentication = new TaskAuthentication().options(options);
@@ -72,6 +66,12 @@ public class TaskDefinition {
         return this;
     }
 
+    public TaskDefinition operations(TaskOperation... operations) {
+        this.operations = List.of(operations);
+
+        return this;
+    }
+
     public TaskDefinition subtitle(String subtitle) {
         this.subtitle = subtitle;
 
@@ -82,10 +82,6 @@ public class TaskDefinition {
         this.version = version;
 
         return this;
-    }
-
-    public List<TaskAction> getActions() {
-        return actions;
     }
 
     public TaskAuthentication getAuthentication() {
@@ -106,6 +102,10 @@ public class TaskDefinition {
 
     public String getName() {
         return name;
+    }
+
+    public List<TaskOperation> getOperations() {
+        return operations;
     }
 
     public String getSubtitle() {

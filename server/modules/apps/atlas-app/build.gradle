@@ -30,7 +30,7 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-rest")
     implementation project(":modules:libs:atlas:file-storage:file-storage-base64")
     implementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
-    implementation project(":modules:libs:atlas:task-definition")
+    implementation project(":modules:libs:atlas:task-definition:task-definition-api")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-each")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-fork")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-if")
