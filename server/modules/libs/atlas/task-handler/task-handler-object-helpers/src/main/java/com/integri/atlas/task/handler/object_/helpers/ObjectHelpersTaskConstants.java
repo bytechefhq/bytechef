@@ -23,9 +23,4 @@ public class ObjectHelpersTaskConstants {
 
     public static final String PROPERTY_SOURCE = "source";
     static final String TASK_OBJECT_HELPERS = "objectHelpers";
-
-    public enum Operation {
-        JSON_PARSE,
-        JSON_STRINGIFY,
-    }
 }

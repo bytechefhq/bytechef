@@ -88,7 +88,12 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("localFile", new LocalFileTaskHandler(fileStorageService));
+        return Map.of(
+            "localFile/read",
+            new LocalFileReadTaskHandler(fileStorageService),
+            "localFile/write",
+            new LocalFileWriteTaskHandler(fileStorageService)
+        );
     }
 
     private File getFile() throws IOException {

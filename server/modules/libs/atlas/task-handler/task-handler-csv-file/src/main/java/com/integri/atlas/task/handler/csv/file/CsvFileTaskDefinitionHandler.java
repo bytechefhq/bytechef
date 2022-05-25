@@ -26,7 +26,6 @@ import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
 import static com.integri.atlas.task.definition.dsl.DSL.OPTIONS;
 import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_DELIMITER;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_FILE_NAME;
@@ -54,7 +53,7 @@ public class CsvFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .displayName("CSV File")
         .description("Reads and writes data from a csv file.")
         .operations(
-            OPERATION(Operation.READ.name())
+            OPERATION("read")
                 .displayName("Read from file")
                 .description("Reads data from a csv file.")
                 .inputs(
@@ -95,7 +94,7 @@ public class CsvFileTaskDefinitionHandler implements TaskDefinitionHandler {
                         )
                 )
                 .outputs(ARRAY_PROPERTY()),
-            OPERATION(Operation.WRITE.name())
+            OPERATION("write")
                 .displayName("Write to file")
                 .description("Writes the data to a csv file.")
                 .inputs(

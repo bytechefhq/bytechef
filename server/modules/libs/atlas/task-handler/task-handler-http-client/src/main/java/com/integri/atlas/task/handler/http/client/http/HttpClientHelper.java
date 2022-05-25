@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.http.client.http;
 
+import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.RequestMethod;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthentication;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import java.net.URI;
@@ -46,7 +47,7 @@ public class HttpClientHelper {
     }
 
     public HttpResponse<?> send(
-        String httpMethod,
+        RequestMethod requestMethod,
         String uri,
         List<HttpHeader> headers,
         HttpRequest.BodyPublisher bodyPublisher,
@@ -54,7 +55,7 @@ public class HttpClientHelper {
     ) throws Exception {
         HttpRequest.Builder httpRequestBuilder = HttpRequest
             .newBuilder()
-            .method(httpMethod, bodyPublisher)
+            .method(requestMethod.name(), bodyPublisher)
             .uri(URI.create(uri))
             .header("Authorization", httpAuthentication.getAuthorizationHeader());
 

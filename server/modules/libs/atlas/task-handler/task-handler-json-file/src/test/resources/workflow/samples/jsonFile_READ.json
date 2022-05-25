@@ -18,8 +18,7 @@
     {
       "name": "readJSONFile",
       "label": "Read from the JSON file",
-      "type": "jsonFile",
-      "operation": "READ",
+      "type": "jsonFile/read",
       "fileEntry": "${fileEntry}",
       "includeEmptyCells": true
     }

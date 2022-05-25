@@ -24,10 +24,5 @@ public class FileTaskConstants {
     public static final String PROPERTY_CONTENT = "content";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_FILE_NAME = "fileName";
-    static final String TASK_FILE = "file";
-
-    public enum Operation {
-        READ,
-        WRITE,
-    }
+    public static final String TASK_FILE = "file";
 }

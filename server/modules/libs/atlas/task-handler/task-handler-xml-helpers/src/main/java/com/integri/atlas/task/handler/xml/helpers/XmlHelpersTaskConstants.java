@@ -23,9 +23,4 @@ public class XmlHelpersTaskConstants {
 
     public static final String PROPERTY_SOURCE = "source";
     static final String TASK_XML_HELPERS = "xmlHelpers";
-
-    enum Operation {
-        XML_TO_JSON,
-        JSON_TO_XML,
-    }
 }

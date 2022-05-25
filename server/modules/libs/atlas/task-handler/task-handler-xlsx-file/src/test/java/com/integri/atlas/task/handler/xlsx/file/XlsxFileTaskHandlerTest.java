@@ -43,7 +43,12 @@ import org.springframework.core.io.ClassPathResource;
 public class XlsxFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final XlsxFileTaskHandler spreadsheetFileTaskHandler = new XlsxFileTaskHandler(fileStorageService);
+    private static final XlsxFileReadTaskHandler xlsxFileReadTaskHandler = new XlsxFileReadTaskHandler(
+        fileStorageService
+    );
+    private static final XlsxFileWriteTaskHandler xlsxFileWriteTaskHandler = new XlsxFileWriteTaskHandler(
+        fileStorageService
+    );
 
     @Test
     public void testReadXLS() throws Exception {
@@ -57,7 +62,7 @@ public class XlsxFileTaskHandlerTest {
 
     @Test
     public void testWriteXLSX() throws Exception {
-        FileEntry fileEntry = (FileEntry) spreadsheetFileTaskHandler.handle(
+        FileEntry fileEntry = xlsxFileWriteTaskHandler.handle(
             getWriteSimpleTaskExecution(
                 JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))
             )
@@ -66,7 +71,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, true, null, null, false, fileEntry)
                 )
             ),
@@ -312,7 +317,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, null, null, false, getFile("sample_header." + extension))
                 )
             ),
@@ -324,7 +329,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, false)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, true, null, null, false, getFile("sample_header." + extension))
                 )
             ),
@@ -336,7 +341,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, true)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, null, null, true, getFile("sample_header." + extension))
                 )
             ),
@@ -348,7 +353,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, true)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, true, null, null, true, getFile("sample_header." + extension))
                 )
             ),
@@ -360,7 +365,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, false)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(
                         false,
                         false,
@@ -379,7 +384,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, true)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, false, null, null, true, getFile("sample_no_header." + extension))
                 )
             ),
@@ -391,7 +396,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, false)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, true, null, null, false, getFile("sample_no_header." + extension))
                 )
             ),
@@ -403,7 +408,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, true)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, true, null, null, true, getFile("sample_no_header." + extension))
                 )
             ),
@@ -415,7 +420,7 @@ public class XlsxFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
+                (List<?>) xlsxFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header." + extension))
                 )
             ),

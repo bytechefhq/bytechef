@@ -45,7 +45,11 @@ public class JsonFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
     private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
-    private static final JsonFileTaskHandler jsonFileTaskHandler = new JsonFileTaskHandler(
+    private static final JsonFileReadTaskHandler jsonFileReadTaskHandler = new JsonFileReadTaskHandler(
+        fileStorageService,
+        jsonHelper
+    );
+    private static final JsonFileWriteTaskHandler jsonFileWriteTaskHandler = new JsonFileWriteTaskHandler(
         fileStorageService,
         jsonHelper
     );
@@ -63,7 +67,7 @@ public class JsonFileTaskHandlerTest {
 
         assertEquals(
             JSONObjectUtil.of(Files.contentOf(file, Charset.defaultCharset())),
-            JSONObjectUtil.of((Map<String, ?>) jsonFileTaskHandler.handle(taskExecution)),
+            JSONObjectUtil.of((Map<String, ?>) jsonFileReadTaskHandler.handle(taskExecution)),
             true
         );
     }
@@ -80,7 +84,7 @@ public class JsonFileTaskHandlerTest {
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(file, Charset.defaultCharset())),
-            JSONArrayUtil.of((List<?>) jsonFileTaskHandler.handle(taskExecution)),
+            JSONArrayUtil.of((List<?>) jsonFileReadTaskHandler.handle(taskExecution)),
             true
         );
 
@@ -92,7 +96,7 @@ public class JsonFileTaskHandlerTest {
         taskExecution.put("pageNumber", 1);
         taskExecution.put("pageSize", 2);
 
-        Assertions.assertThat(((List<?>) jsonFileTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
+        Assertions.assertThat(((List<?>) jsonFileReadTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
     }
 
     @Test
@@ -107,7 +111,7 @@ public class JsonFileTaskHandlerTest {
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset())),
-            JSONArrayUtil.of((List<?>) jsonFileTaskHandler.handle(taskExecution)),
+            JSONArrayUtil.of((List<?>) jsonFileReadTaskHandler.handle(taskExecution)),
             true
         );
 
@@ -119,7 +123,7 @@ public class JsonFileTaskHandlerTest {
         taskExecution.put("pageNumber", 1);
         taskExecution.put("pageSize", 2);
 
-        Assertions.assertThat(((List<?>) jsonFileTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
+        Assertions.assertThat(((List<?>) jsonFileReadTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
     }
 
     @Test
@@ -132,7 +136,7 @@ public class JsonFileTaskHandlerTest {
         taskExecution.put("fileType", "JSON");
         taskExecution.put("operation", "WRITE");
 
-        FileEntry fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
+        FileEntry fileEntry = jsonFileWriteTaskHandler.handle(taskExecution);
 
         assertEquals(
             JSONObjectUtil.of(Files.contentOf(file, Charset.defaultCharset())),
@@ -153,7 +157,7 @@ public class JsonFileTaskHandlerTest {
         taskExecution.put("fileType", "JSON");
         taskExecution.put("operation", "WRITE");
 
-        FileEntry fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
+        FileEntry fileEntry = jsonFileWriteTaskHandler.handle(taskExecution);
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(file, Charset.defaultCharset())),
@@ -168,7 +172,7 @@ public class JsonFileTaskHandlerTest {
         taskExecution.put("source", JSONArrayUtil.toList(Files.contentOf(file, Charset.defaultCharset())));
         taskExecution.put("operation", "WRITE");
 
-        fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
+        fileEntry = jsonFileWriteTaskHandler.handle(taskExecution);
 
         assertThat(fileEntry.getName()).isEqualTo("test.json");
     }
@@ -186,7 +190,7 @@ public class JsonFileTaskHandlerTest {
         taskExecution.put("fileType", "JSONL");
         taskExecution.put("operation", "WRITE");
 
-        FileEntry fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
+        FileEntry fileEntry = jsonFileWriteTaskHandler.handle(taskExecution);
 
         assertEquals(
             JSONArrayUtil.ofLines(Files.contentOf(file, Charset.defaultCharset())),
@@ -204,7 +208,7 @@ public class JsonFileTaskHandlerTest {
         );
         taskExecution.put("operation", "WRITE");
 
-        fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
+        fileEntry = jsonFileWriteTaskHandler.handle(taskExecution);
 
         assertThat(fileEntry.getName()).isEqualTo("test.jsonl");
     }

@@ -35,9 +35,4 @@ public class JsonFileTaskConstants {
         JSON,
         JSONL,
     }
-
-    public enum Operation {
-        READ,
-        WRITE,
-    }
 }

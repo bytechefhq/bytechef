@@ -26,7 +26,6 @@ import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
 import static com.integri.atlas.task.definition.dsl.DSL.OPTIONS;
 import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_HEADER_ROW;
@@ -54,7 +53,7 @@ public class OdsFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .displayName("ODS File")
         .description("Reads and writes data from a ODS file.")
         .operations(
-            OPERATION(Operation.READ.name())
+            OPERATION("read")
                 .displayName("Read from file")
                 .description("Reads data from a ODS file.")
                 .inputs(
@@ -97,7 +96,7 @@ public class OdsFileTaskDefinitionHandler implements TaskDefinitionHandler {
                         )
                 )
                 .outputs(ARRAY_PROPERTY()),
-            OPERATION(Operation.WRITE.name())
+            OPERATION("write")
                 .displayName("Write to file")
                 .description("Writes the data to a ODS file.")
                 .inputs(

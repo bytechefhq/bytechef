@@ -31,10 +31,15 @@ import org.junit.jupiter.api.Test;
 public class ObjectHelpersTaskHandlerTest {
 
     private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
-    private static final ObjectHelpersTaskHandler objectHelpersTaskHandler = new ObjectHelpersTaskHandler(jsonHelper);
+    private static final ObjectHelpersParseTaskHandler objectHelpersParseTaskHandler = new ObjectHelpersParseTaskHandler(
+        jsonHelper
+    );
+    private static final ObjectHelpersStringifyTaskHandler ObjectHelpersStringifyTaskHandler = new ObjectHelpersStringifyTaskHandler(
+        jsonHelper
+    );
 
     @Test
-    public void testJSONToObject() {
+    public void testParse() {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         String input = """
@@ -46,7 +51,7 @@ public class ObjectHelpersTaskHandlerTest {
         taskExecution.put("input", input);
         taskExecution.put("operation", "JSON_PARSE");
 
-        assertThat(objectHelpersTaskHandler.handle(taskExecution)).isEqualTo(Map.of("key", 3));
+        assertThat(objectHelpersParseTaskHandler.handle(taskExecution)).isEqualTo(Map.of("key", 3));
 
         input =
             """
@@ -60,11 +65,11 @@ public class ObjectHelpersTaskHandlerTest {
         taskExecution.put("input", input);
         taskExecution.put("operation", "JSON_PARSE");
 
-        assertThat(objectHelpersTaskHandler.handle(taskExecution)).isEqualTo(List.of(Map.of("key", 3)));
+        assertThat(objectHelpersParseTaskHandler.handle(taskExecution)).isEqualTo(List.of(Map.of("key", 3)));
     }
 
     @Test
-    public void testObjectToJSON() {
+    public void testStringify() {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         Map<String, Integer> input = Map.of("key", 3);
@@ -72,6 +77,6 @@ public class ObjectHelpersTaskHandlerTest {
         taskExecution.put("input", input);
         taskExecution.put("operation", "JSON_STRINGIFY");
 
-        assertThat(objectHelpersTaskHandler.handle(taskExecution)).isEqualTo(jsonHelper.write(input));
+        assertThat(ObjectHelpersStringifyTaskHandler.handle(taskExecution)).isEqualTo(jsonHelper.write(input));
     }
 }

@@ -27,7 +27,6 @@ import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.DSL;
 import com.integri.atlas.task.definition.dsl.TaskDefinition;
-import com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.Operation;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,7 +40,7 @@ public class XmlHelpersTaskDefinitionHandler implements TaskDefinitionHandler {
         .displayName("XML Helpers")
         .description("Converts between XML string and object/array.")
         .operations(
-            OPERATION(Operation.XML_TO_JSON.name())
+            OPERATION("parse")
                 .displayName("Convert from XML string")
                 .description("Converts the XML string to object/array.")
                 .inputs(
@@ -51,7 +50,7 @@ public class XmlHelpersTaskDefinitionHandler implements TaskDefinitionHandler {
                         .required(true)
                 )
                 .outputs(OBJECT_PROPERTY()),
-            OPERATION(Operation.JSON_TO_XML.name())
+            OPERATION("stringify")
                 .displayName("Convert to XML string")
                 .description("Writes the object/array to a XML string.")
                 .inputs(

@@ -33,10 +33,15 @@ public class XmlHelpersTaskHandlerTest {
 
     private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
     private static final XmlHelper xmlHelper = new XmlHelper();
-    private static final XmlHelpersTaskHandler xmlHelpersTaskHandler = new XmlHelpersTaskHandler(xmlHelper);
+    private static final XmlHelpersParseTaskHandler xmlHelpersParseTaskHandler = new XmlHelpersParseTaskHandler(
+        xmlHelper
+    );
+    private static final XmlHelpersStringifyTaskHandler xmlHelpersStringifyTaskHandler = new XmlHelpersStringifyTaskHandler(
+        xmlHelper
+    );
 
     @Test
-    public void testJSONToObject() {
+    public void testParse() {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         String source =
@@ -49,7 +54,7 @@ public class XmlHelpersTaskHandlerTest {
         taskExecution.put("source", source);
         taskExecution.put("operation", "XML_TO_JSON");
 
-        assertThat(xmlHelpersTaskHandler.handle(taskExecution)).isEqualTo(Map.of("id", "45", "name", "Poppy"));
+        assertThat(xmlHelpersParseTaskHandler.handle(taskExecution)).isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
         source =
             """
@@ -66,14 +71,14 @@ public class XmlHelpersTaskHandlerTest {
         taskExecution.put("source", source);
         taskExecution.put("operation", "XML_TO_JSON");
 
-        assertThat(xmlHelpersTaskHandler.handle(taskExecution))
+        assertThat(xmlHelpersParseTaskHandler.handle(taskExecution))
             .isEqualTo(
                 Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose")))
             );
     }
 
     @Test
-    public void testObjectToJSON() {
+    public void testStringify() {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         Map<String, ?> source = Map.of("id", 45, "name", "Poppy");
@@ -81,6 +86,6 @@ public class XmlHelpersTaskHandlerTest {
         taskExecution.put("source", source);
         taskExecution.put("operation", "JSON_TO_XML");
 
-        assertThat(xmlHelpersTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(source));
+        assertThat(xmlHelpersStringifyTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(source));
     }
 }

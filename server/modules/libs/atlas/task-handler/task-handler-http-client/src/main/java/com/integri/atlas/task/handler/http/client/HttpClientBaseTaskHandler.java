@@ -18,11 +18,11 @@ package com.integri.atlas.task.handler.http.client;
 
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROPERTY_URI;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_TIMEOUT;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.RequestMethod;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
@@ -32,13 +32,11 @@ import com.integri.atlas.task.handler.http.client.params.HttpQueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
 import java.net.http.HttpResponse;
 import java.util.List;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
  */
-@Component(TASK_HTTP_CLIENT)
-public class HttpClientTaskHandler implements TaskHandler<Object> {
+public abstract class HttpClientBaseTaskHandler implements TaskHandler<Object> {
 
     private final HttpBodyFactory httpBodyFactory;
     private final HttpAuthenticationFactory httpAuthenticationFactory;
@@ -46,7 +44,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
     private final HttpQueryParamsFactory queryParamsFactory;
     private final HttpResponseHandler httpResponseHandler;
 
-    public HttpClientTaskHandler(
+    public HttpClientBaseTaskHandler(
         HttpBodyFactory httpBodyFactory,
         HttpAuthenticationFactory httpAuthenticationFactory,
         HttpHeadersFactory httpHeadersFactory,
@@ -73,7 +71,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
         List<HttpHeader> httpHeaders = httpHeadersFactory.getHttpHeaders(taskExecution);
 
         HttpResponse<?> httpResponse = httpClientHelper.send(
-            taskExecution.getRequiredString("operation"),
+            getRequestMethod(),
             resolveURI(
                 taskExecution.getRequiredString(PROPERTY_PROPERTY_URI),
                 queryParamsFactory.getQueryParams(taskExecution)
@@ -85,6 +83,8 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
 
         return httpResponseHandler.handle(taskExecution, httpResponse);
     }
+
+    protected abstract RequestMethod getRequestMethod();
 
     private String resolveURI(String uri, String queryParameters) {
         if (queryParameters.isEmpty()) {

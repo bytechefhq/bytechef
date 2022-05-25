@@ -46,7 +46,7 @@ public class XmlFileTaskDefinitionTest {
               "operations": [
                 {
                   "description": "Reads data from a XML file.",
-                  "name": "READ",
+                  "name": "read",
                   "inputs": [
                     {
                       "description": "The object property which contains a reference to the XML file to read from.",
@@ -148,7 +148,7 @@ public class XmlFileTaskDefinitionTest {
                 },
                 {
                   "description": "Writes the data to a XML file.",
-                  "name": "WRITE",
+                  "name": "write",
                   "inputs": [
                     {
                       "description": "The data to write to the file.",

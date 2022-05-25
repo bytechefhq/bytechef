@@ -38,7 +38,6 @@ import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.TASK_
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.DSL;
 import com.integri.atlas.task.definition.dsl.TaskDefinition;
-import com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.Operation;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,7 +51,7 @@ public class XmlFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .displayName("XML File")
         .description("Reads and writes data from a XML file.")
         .operations(
-            OPERATION(Operation.READ.name())
+            OPERATION("read")
                 .displayName("Read from file")
                 .description("Reads data from a XML file.")
                 .inputs(
@@ -85,7 +84,7 @@ public class XmlFileTaskDefinitionHandler implements TaskDefinitionHandler {
                         )
                 )
                 .outputs(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
-            OPERATION(Operation.WRITE.name())
+            OPERATION("write")
                 .displayName("Write to file")
                 .description("Writes the data to a XML file.")
                 .inputs(

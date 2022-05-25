@@ -111,7 +111,12 @@ public class JsonFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("jsonFile", new JsonFileTaskHandler(fileStorageService, jsonHelper));
+        return Map.of(
+            "jsonFile/read",
+            new JsonFileReadTaskHandler(fileStorageService, jsonHelper),
+            "jsonFile/write",
+            new JsonFileWriteTaskHandler(fileStorageService, jsonHelper)
+        );
     }
 
     private File getFile(String fileName) throws IOException {

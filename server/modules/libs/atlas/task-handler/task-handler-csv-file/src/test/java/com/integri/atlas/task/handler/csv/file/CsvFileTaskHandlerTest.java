@@ -43,7 +43,10 @@ import org.springframework.core.io.ClassPathResource;
 public class CsvFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final CsvFileTaskHandler csvFileTaskHandler = new CsvFileTaskHandler(fileStorageService);
+    private static final CsvFileReadTaskHandler csvFileReadTaskHandler = new CsvFileReadTaskHandler(fileStorageService);
+    private static final CsvFileWriteTaskHandler csvFileWriteTaskHandler = new CsvFileWriteTaskHandler(
+        fileStorageService
+    );
 
     @Test
     public void testReadCSV() throws Exception {
@@ -52,7 +55,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, null, null, false, getFile("sample_header.csv"))
                 )
             ),
@@ -64,7 +67,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, false)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, true, null, null, false, getFile("sample_header.csv"))
                 )
             ),
@@ -76,7 +79,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, true)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, null, null, true, getFile("sample_header.csv"))
                 )
             ),
@@ -88,7 +91,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, true)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, true, null, null, true, getFile("sample_header.csv"))
                 )
             ),
@@ -100,7 +103,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, false)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, false, null, null, false, getFile("sample_no_header.csv"))
                 )
             ),
@@ -112,7 +115,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, true)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, false, null, null, true, getFile("sample_no_header.csv"))
                 )
             ),
@@ -124,7 +127,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, false)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, true, null, null, false, getFile("sample_no_header.csv"))
                 )
             ),
@@ -136,7 +139,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, true)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, true, null, null, true, getFile("sample_no_header.csv"))
                 )
             ),
@@ -148,7 +151,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
+                csvFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header.csv"))
                 )
             ),
@@ -158,7 +161,7 @@ public class CsvFileTaskHandlerTest {
 
     @Test
     public void testWriteCSV() throws Exception {
-        FileEntry fileEntry = (FileEntry) csvFileTaskHandler.handle(
+        FileEntry fileEntry = csvFileWriteTaskHandler.handle(
             getWriteSimpleTaskExecution(
                 JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))
             )
@@ -167,9 +170,7 @@ public class CsvFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
             JSONArrayUtil.of(
-                (List<?>) csvFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, true, null, null, false, fileEntry)
-                )
+                csvFileReadTaskHandler.handle(getReadSimpleTaskExecution(true, true, null, null, false, fileEntry))
             ),
             true
         );
@@ -390,7 +391,6 @@ public class CsvFileTaskHandlerTest {
         taskExecution.put("fileEntry", fileEntry);
         taskExecution.put("headerRow", headerRow);
         taskExecution.put("includeEmptyCells", includeEmptyCells);
-        taskExecution.put("operation", "READ");
         taskExecution.put("pageNumber", pageNumber);
         taskExecution.put("pageSize", pageSize);
         taskExecution.put("readAsString", readAsString);
@@ -402,7 +402,6 @@ public class CsvFileTaskHandlerTest {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         taskExecution.put("rows", items);
-        taskExecution.put("operation", "WRITE");
 
         return taskExecution;
     }

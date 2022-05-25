@@ -70,7 +70,7 @@ public class HttpClientTaskDefinitionTest {
               "operations": [
                 {
                   "description": "The request method to use.",
-                  "name": "GET",
+                  "name": "get",
                   "inputs": [
                     {
                       "description": "The URI to make the request to",
@@ -271,7 +271,7 @@ public class HttpClientTaskDefinitionTest {
                 },
                 {
                   "description": "The request method to use.",
-                  "name": "POST",
+                  "name": "post",
                   "inputs": [
                     {
                       "description": "The URI to make the request to",
@@ -663,7 +663,7 @@ public class HttpClientTaskDefinitionTest {
                 },
                 {
                   "description": "The request method to use.",
-                  "name": "PUT",
+                  "name": "put",
                   "inputs": [
                     {
                       "description": "The URI to make the request to",
@@ -1056,7 +1056,7 @@ public class HttpClientTaskDefinitionTest {
                 },
                 {
                   "description": "The request method to use.",
-                  "name": "PATCH",
+                  "name": "patch",
                   "inputs": [
                     {
                       "description": "The URI to make the request to",
@@ -1449,7 +1449,7 @@ public class HttpClientTaskDefinitionTest {
                 },
                 {
                   "description": "The request method to use.",
-                  "name": "DELETE",
+                  "name": "delete",
                   "inputs": [
                     {
                       "description": "The URI to make the request to",
@@ -1701,7 +1701,7 @@ public class HttpClientTaskDefinitionTest {
                 },
                 {
                   "description": "The request method to use.",
-                  "name": "HEAD",
+                  "name": "head",
                   "inputs": [
                     {
                       "description": "The URI to make the request to",

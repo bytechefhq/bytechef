@@ -18,8 +18,7 @@
     {
       "name": "writeOdsFile",
       "label": "Write to the ODS file",
-      "type": "odsFile",
-      "operation": "WRITE",
+      "type": "odsFile/write",
       "rows": "${rows}"
     }
   ]

@@ -46,7 +46,7 @@ public class XlsxFileTaskDefinitionTest {
               "operations": [
                 {
                   "description": "Reads data from a XLS/XLSX file.",
-                  "name": "READ",
+                  "name": "read",
                   "inputs": [
                     {
                       "description": "The object property which contains a reference to the XLS/XLSX file to read from.",
@@ -133,7 +133,7 @@ public class XlsxFileTaskDefinitionTest {
                 },
                 {
                   "description": "Writes the data to a XLS/XLSX file.",
-                  "name": "WRITE",
+                  "name": "write",
                   "inputs": [
                     {
                       "description": "The array of objects to write to the file.",

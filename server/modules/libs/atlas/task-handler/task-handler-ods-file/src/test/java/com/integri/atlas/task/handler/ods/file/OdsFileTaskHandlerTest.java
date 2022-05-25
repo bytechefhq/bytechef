@@ -43,7 +43,10 @@ import org.springframework.core.io.ClassPathResource;
 public class OdsFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final OdsFileTaskHandler odsFileTaskHandler = new OdsFileTaskHandler(fileStorageService);
+    private static final OdsFileReadTaskHandler odsFileReadTaskHandler = new OdsFileReadTaskHandler(fileStorageService);
+    private static final OdsFileWriteTaskHandler odsFileWriteTaskHandler = new OdsFileWriteTaskHandler(
+        fileStorageService
+    );
 
     @Test
     public void testReadODS() throws Exception {
@@ -52,7 +55,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, null, null, false, getFile("sample_header.ods"))
                 )
             ),
@@ -64,7 +67,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, false)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, true, null, null, false, getFile("sample_header.ods"))
                 )
             ),
@@ -76,7 +79,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, true)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, null, null, true, getFile("sample_header.ods"))
                 )
             ),
@@ -88,7 +91,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, true)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, true, null, null, true, getFile("sample_header.ods"))
                 )
             ),
@@ -100,7 +103,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, false)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, false, null, null, false, getFile("sample_no_header.ods"))
                 )
             ),
@@ -112,7 +115,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, true)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, false, null, null, true, getFile("sample_no_header.ods"))
                 )
             ),
@@ -124,7 +127,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, false)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, true, null, null, false, getFile("sample_no_header.ods"))
                 )
             ),
@@ -136,7 +139,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, true)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(false, true, null, null, true, getFile("sample_no_header.ods"))
                 )
             ),
@@ -148,7 +151,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
+                odsFileReadTaskHandler.handle(
                     getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header.ods"))
                 )
             ),
@@ -158,7 +161,7 @@ public class OdsFileTaskHandlerTest {
 
     @Test
     public void testWriteODS() throws Exception {
-        FileEntry fileEntry = (FileEntry) odsFileTaskHandler.handle(
+        FileEntry fileEntry = odsFileWriteTaskHandler.handle(
             getWriteSimpleTaskExecution(
                 JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))
             )
@@ -167,9 +170,7 @@ public class OdsFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
             JSONArrayUtil.of(
-                (List<?>) odsFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, true, null, null, false, fileEntry)
-                )
+                odsFileReadTaskHandler.handle(getReadSimpleTaskExecution(true, true, null, null, false, fileEntry))
             ),
             true
         );

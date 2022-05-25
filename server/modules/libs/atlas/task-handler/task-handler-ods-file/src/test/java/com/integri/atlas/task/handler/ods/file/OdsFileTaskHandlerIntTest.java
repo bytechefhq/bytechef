@@ -103,7 +103,12 @@ public class OdsFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("odsFile", new OdsFileTaskHandler(fileStorageService));
+        return Map.of(
+            "odsFile/read",
+            new OdsFileReadTaskHandler(fileStorageService),
+            "odsFile/write",
+            new OdsFileWriteTaskHandler(fileStorageService)
+        );
     }
 
     private File getFile(String fileName) throws IOException {

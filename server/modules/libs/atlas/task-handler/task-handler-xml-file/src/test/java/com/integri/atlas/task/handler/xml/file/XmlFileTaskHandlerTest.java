@@ -40,7 +40,11 @@ public class XmlFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
     private static final XmlHelper xmlHelper = new XmlHelper();
-    private static final XmlFileTaskHandler xmlFileTaskHandler = new XmlFileTaskHandler(
+    private static final XmlFileReadTaskHandler xmlFileReadTaskHandler = new XmlFileReadTaskHandler(
+        fileStorageService,
+        xmlHelper
+    );
+    private static final XmlFileWriteTaskHandler xmlFileWriteTaskHandler = new XmlFileWriteTaskHandler(
         fileStorageService,
         xmlHelper
     );
@@ -56,7 +60,7 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("isArray", false);
         taskExecution.put("operation", "READ");
 
-        assertThat((Map<String, ?>) xmlFileTaskHandler.handle(taskExecution))
+        assertThat((Map<String, ?>) xmlFileReadTaskHandler.handle(taskExecution))
             .isEqualTo(xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
     }
 
@@ -69,7 +73,7 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
 
-        assertThat((List<?>) xmlFileTaskHandler.handle(taskExecution))
+        assertThat((List<?>) xmlFileReadTaskHandler.handle(taskExecution))
             .isEqualTo(xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
 
         taskExecution = new SimpleTaskExecution();
@@ -79,7 +83,7 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("pageNumber", 1);
         taskExecution.put("pageSize", 2);
 
-        assertThat(((List<?>) xmlFileTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
+        assertThat(((List<?>) xmlFileReadTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
     }
 
     @Test
@@ -91,7 +95,7 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
         taskExecution.put("operation", "WRITE");
 
-        FileEntry fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
+        FileEntry fileEntry = (FileEntry) xmlFileWriteTaskHandler.handle(taskExecution);
 
         assertThat(xmlHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), List.class))
             .isEqualTo(xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
@@ -102,7 +106,7 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
         taskExecution.put("operation", "WRITE");
 
-        fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
+        fileEntry = (FileEntry) xmlFileWriteTaskHandler.handle(taskExecution);
 
         assertThat(fileEntry.getName()).isEqualTo("test.xml");
     }
@@ -116,7 +120,7 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
         taskExecution.put("operation", "WRITE");
 
-        FileEntry fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
+        FileEntry fileEntry = (FileEntry) xmlFileWriteTaskHandler.handle(taskExecution);
 
         assertThat(xmlHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), List.class))
             .isEqualTo(xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
@@ -127,7 +131,7 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
         taskExecution.put("operation", "WRITE");
 
-        fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
+        fileEntry = (FileEntry) xmlFileWriteTaskHandler.handle(taskExecution);
 
         assertThat(fileEntry.getName()).isEqualTo("test.xml");
     }

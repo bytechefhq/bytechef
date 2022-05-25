@@ -18,8 +18,7 @@
     {
       "name": "writeJSONFile",
       "label": "Write to the JSON file",
-      "type": "jsonFile",
-      "operation": "WRITE",
+      "type": "jsonFile/write",
       "source": "${source}"
     }
   ]

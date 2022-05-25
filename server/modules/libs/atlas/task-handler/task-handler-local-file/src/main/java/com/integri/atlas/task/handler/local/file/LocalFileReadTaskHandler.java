@@ -16,7 +16,6 @@
 
 package com.integri.atlas.task.handler.local.file;
 
-import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.TASK_LOCAL_FILE;
 
@@ -24,47 +23,28 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.Operation;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_LOCAL_FILE)
-public class LocalFileTaskHandler implements TaskHandler<Object> {
+@Component(TASK_LOCAL_FILE + "/read")
+public class LocalFileReadTaskHandler implements TaskHandler<FileEntry> {
 
     private final FileStorageService fileStorageService;
 
-    public LocalFileTaskHandler(FileStorageService fileStorageService) {
+    public LocalFileReadTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) throws Exception {
-        Object result;
-
+    public FileEntry handle(TaskExecution taskExecution) throws Exception {
         String fileName = taskExecution.getRequired(PROPERTY_FILE_NAME);
-        Operation operation = Operation.valueOf(taskExecution.getRequired("operation"));
 
-        if (operation == Operation.READ) {
-            try (InputStream inputStream = new FileInputStream(fileName)) {
-                result = fileStorageService.storeFileContent(fileName, inputStream);
-            }
-        } else {
-            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
-
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
-                result =
-                    Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
-            }
+        try (InputStream inputStream = new FileInputStream(fileName)) {
+            return fileStorageService.storeFileContent(fileName, inputStream);
         }
-
-        return result;
     }
 }

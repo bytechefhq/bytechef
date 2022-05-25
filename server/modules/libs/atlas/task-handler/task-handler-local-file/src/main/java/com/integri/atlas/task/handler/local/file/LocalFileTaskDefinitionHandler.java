@@ -28,7 +28,6 @@ import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.T
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.DSL;
 import com.integri.atlas.task.definition.dsl.TaskDefinition;
-import com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.Operation;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,7 +38,7 @@ public class LocalFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .displayName("Local File")
         .description("Reads or writes a binary file from/to disk")
         .operations(
-            OPERATION(Operation.READ.name())
+            OPERATION("read")
                 .displayName("Read to file")
                 .inputs(
                     STRING_PROPERTY(PROPERTY_FILE_NAME)
@@ -49,7 +48,7 @@ public class LocalFileTaskDefinitionHandler implements TaskDefinitionHandler {
                         .required(true)
                 )
                 .outputs(FILE_ENTRY_PROPERTY()),
-            OPERATION(Operation.WRITE.name())
+            OPERATION("write")
                 .displayName("Write from file")
                 .inputs(
                     FILE_ENTRY_PROPERTY(PROPERTY_FILE_ENTRY)

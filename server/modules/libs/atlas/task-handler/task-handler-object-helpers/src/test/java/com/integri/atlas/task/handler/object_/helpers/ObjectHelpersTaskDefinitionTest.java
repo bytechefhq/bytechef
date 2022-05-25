@@ -46,7 +46,7 @@ public class ObjectHelpersTaskDefinitionTest {
               "operations": [
                 {
                   "description": "Converts the JSON string to object/array.",
-                  "name": "JSON_PARSE",
+                  "name": "parse",
                   "inputs": [
                     {
                       "description": "The JSON string to convert to the data.",
@@ -68,7 +68,7 @@ public class ObjectHelpersTaskDefinitionTest {
                 },
                 {
                   "description": "Writes the object/array to a JSON string.",
-                  "name": "JSON_STRINGIFY",
+                  "name": "stringify",
                   "inputs": [
                     {
                       "description": "The data to convert to JSON string.",

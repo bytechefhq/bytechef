@@ -18,8 +18,7 @@
     {
       "name": "readOdsFile",
       "label": "Read from the ODS file",
-      "type": "odsFile",
-      "operation": "READ",
+      "type": "odsFile/read",
       "fileEntry": "${fileEntry}",
       "includeEmptyCells": true
     }

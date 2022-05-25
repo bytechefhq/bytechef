@@ -46,7 +46,7 @@ public class XmlHelpersTaskDefinitionTest {
               "operations": [
                 {
                   "description": "Converts the XML string to object/array.",
-                  "name": "XML_TO_JSON",
+                  "name": "parse",
                   "inputs": [
                     {
                       "description": "The XML string to convert to the data.",
@@ -65,7 +65,7 @@ public class XmlHelpersTaskDefinitionTest {
                 },
                 {
                   "description": "Writes the object/array to a XML string.",
-                  "name": "JSON_TO_XML",
+                  "name": "stringify",
                   "inputs": [
                     {
                       "description": "The data to convert to XML string.",

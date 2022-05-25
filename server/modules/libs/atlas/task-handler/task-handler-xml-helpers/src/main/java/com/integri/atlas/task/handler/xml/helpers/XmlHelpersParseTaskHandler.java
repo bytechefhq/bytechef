@@ -21,34 +21,25 @@ import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.xml.helper.XmlHelper;
-import com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.Operation;
-import org.apache.commons.lang3.StringUtils;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_XML_HELPERS)
-public class XmlHelpersTaskHandler implements TaskHandler<Object> {
+@Component(TASK_XML_HELPERS + "/parse")
+public class XmlHelpersParseTaskHandler implements TaskHandler<Map<String, ?>> {
 
     private final XmlHelper xmlHelper;
 
-    public XmlHelpersTaskHandler(XmlHelper xmlHelper) {
+    public XmlHelpersParseTaskHandler(XmlHelper xmlHelper) {
         this.xmlHelper = xmlHelper;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) {
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+    public Map<String, ?> handle(TaskExecution taskExecution) {
+        String input = taskExecution.getRequiredString(PROPERTY_SOURCE);
 
-        if (operation == Operation.XML_TO_JSON) {
-            String input = taskExecution.getRequiredString(PROPERTY_SOURCE);
-
-            return xmlHelper.read(input);
-        } else {
-            Object input = taskExecution.getRequired(PROPERTY_SOURCE);
-
-            return xmlHelper.write(input);
-        }
+        return xmlHelper.read(input);
     }
 }

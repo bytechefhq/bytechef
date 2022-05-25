@@ -16,16 +16,13 @@
 
 package com.integri.atlas.task.handler.csv.file;
 
-import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_DELIMITER;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_FILE_ENTRY;
-import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_HEADER_ROW;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_PAGE_SIZE;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_READ_AS_STRING;
-import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.PROPERTY_ROWS;
 import static com.integri.atlas.task.handler.csv.file.CsvFileTaskConstants.TASK_CSV_FILE;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
@@ -35,12 +32,9 @@ import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.util.MapUtils;
 import com.integri.atlas.task.handler.util.ValueUtils;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,60 +47,51 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_CSV_FILE)
-public class CsvFileTaskHandler implements TaskHandler<Object> {
+@Component(TASK_CSV_FILE + "/read")
+public class CsvFileReadTaskHandler implements TaskHandler<List<Map<String, ?>>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CsvFileTaskHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(CsvFileReadTaskHandler.class);
 
     private final FileStorageService fileStorageService;
 
-    public CsvFileTaskHandler(FileStorageService fileStorageService) {
+    public CsvFileReadTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) throws Exception {
-        Object result;
+    public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
+        List<Map<String, ?>> result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+        String delimiter = taskExecution.getString(PROPERTY_DELIMITER, ",");
+        FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
+        boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
+        boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
+        Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
+        boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
 
-        if (operation == Operation.READ) {
-            String delimiter = taskExecution.getString(PROPERTY_DELIMITER, ",");
-            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
-            boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
-            boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
-            Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
-            Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
-            boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
+        try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+            Integer rangeStartRow = null;
+            Integer rangeEndRow = null;
 
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
-                Integer rangeStartRow = null;
-                Integer rangeEndRow = null;
+            if (pageSize != null && pageNumber != null) {
+                rangeStartRow = pageSize * pageNumber - pageSize;
 
-                if (pageSize != null && pageNumber != null) {
-                    rangeStartRow = pageSize * pageNumber - pageSize;
-
-                    rangeEndRow = rangeStartRow + pageSize;
-                }
-
-                result =
-                    read(
-                        inputStream,
-                        new ReadConfiguration(
-                            delimiter,
-                            headerRow,
-                            includeEmptyCells,
-                            rangeStartRow == null ? 0 : rangeStartRow,
-                            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                            readAsString
-                        )
-                    );
+                rangeEndRow = rangeStartRow + pageSize;
             }
-        } else {
-            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.csv");
-            List<Map<String, ?>> rows = taskExecution.getRequired(PROPERTY_ROWS);
 
-            return fileStorageService.storeFileContent(fileName, new ByteArrayInputStream(write(rows)));
+            result =
+                read(
+                    inputStream,
+                    new ReadConfiguration(
+                        delimiter,
+                        headerRow,
+                        includeEmptyCells,
+                        rangeStartRow == null ? 0 : rangeStartRow,
+                        rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
+                        readAsString
+                    )
+                );
         }
 
         return result;
@@ -183,47 +168,6 @@ public class CsvFileTaskHandler implements TaskHandler<Object> {
         }
 
         return rows;
-    }
-
-    private byte[] write(List<Map<String, ?>> rows) {
-        boolean headerRow = false;
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-            for (Map<String, ?> item : rows) {
-                List<String> fieldNames = new ArrayList<>(item.keySet());
-                StringBuilder sb = new StringBuilder();
-
-                if (!headerRow) {
-                    headerRow = true;
-
-                    for (int j = 0; j < fieldNames.size(); j++) {
-                        sb.append(fieldNames.get(j));
-
-                        if (j < fieldNames.size() - 1) {
-                            sb.append(',');
-                        }
-                    }
-
-                    printWriter.println(sb);
-                }
-
-                sb = new StringBuilder();
-
-                for (int j = 0; j < fieldNames.size(); j++) {
-                    sb.append(item.get(fieldNames.get(j)));
-
-                    if (j < fieldNames.size() - 1) {
-                        sb.append(',');
-                    }
-                }
-
-                printWriter.println(sb);
-            }
-        }
-
-        return byteArrayOutputStream.toByteArray();
     }
 
     private Object processValue(String valueString, boolean includeEmptyCells, boolean readAsString) {
