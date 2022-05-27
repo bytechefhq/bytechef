@@ -27,7 +27,7 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.xml.helper.XmlHelper;
+import com.integri.atlas.task.handler.xml.XmlHelper;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;

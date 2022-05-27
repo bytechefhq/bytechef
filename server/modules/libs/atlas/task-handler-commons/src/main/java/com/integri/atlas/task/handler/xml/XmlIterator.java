@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xml.helper;
+package com.integri.atlas.task.handler.xml;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.util.Iterator;
