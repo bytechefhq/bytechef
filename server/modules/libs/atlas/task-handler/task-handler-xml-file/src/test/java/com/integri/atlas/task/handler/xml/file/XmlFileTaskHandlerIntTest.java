@@ -23,7 +23,7 @@ import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
-import com.integri.atlas.task.handler.xml.XmlHelper;
+import com.integri.atlas.task.handler.commons.xml.XmlHelper;
 import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;

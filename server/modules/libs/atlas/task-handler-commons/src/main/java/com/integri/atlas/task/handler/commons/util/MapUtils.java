@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.util;
+package com.integri.atlas.task.handler.commons.util;
 
 import java.util.HashMap;
 import java.util.List;
