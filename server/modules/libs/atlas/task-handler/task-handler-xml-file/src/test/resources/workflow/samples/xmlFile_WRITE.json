@@ -3,9 +3,7 @@
   "inputs": [
     {
       "name": "source",
-      "label": "Object or array of objects",
-      "types": ["ARRAY", "OBJECT"],
-      "required": true
+      "label": "Object or array of objects"
     }
   ],
   "outputs": [

@@ -4,13 +4,13 @@
     {
       "name": "fileEntry",
       "label": "File property",
-      "type": "JSON",
+      "type": "FILE_ENTRY",
       "required": true
     },
     {
       "name": "fileName",
-      "label": "Absolute file path to write t",
-      "type": "string",
+      "label": "Absolute file path to write to",
+      "type": "STRING",
       "required": true
     }
   ],

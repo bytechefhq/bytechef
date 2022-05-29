@@ -4,7 +4,7 @@
     {
       "name": "rows",
       "label": "Array of objects",
-      "type": "JSON",
+      "type": "ARRAY",
       "required": true
     }
   ],

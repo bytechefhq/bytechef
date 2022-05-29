@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.json.helper;
+package com.integri.atlas.task.handler.json;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.task.handler.json.JsonHelper;
 import com.jayway.jsonpath.TypeRef;
 import java.util.List;
 import java.util.Map;

@@ -4,7 +4,7 @@
     {
       "name": "yourName",
       "label": "Your Name",
-      "type": "string",
+      "type": "STRING",
       "required": true
     }
   ],

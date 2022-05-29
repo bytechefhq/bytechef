@@ -4,7 +4,7 @@
     {
       "name": "fileName",
       "label": "Absolute file path to read from",
-      "type": "string",
+      "type": "STRING",
       "required": true
     }
   ],

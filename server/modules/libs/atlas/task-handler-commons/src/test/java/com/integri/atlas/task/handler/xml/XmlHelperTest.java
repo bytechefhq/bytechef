@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xml.helper;
+package com.integri.atlas.task.handler.xml;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.integri.atlas.task.handler.xml.XmlHelper;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;

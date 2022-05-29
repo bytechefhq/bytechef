@@ -4,7 +4,7 @@
     {
       "name": "source",
       "label": "Object or array of objects",
-      "type": "JSON",
+      "type": "ARRAY,OBJECT",
       "required": true
     }
   ],

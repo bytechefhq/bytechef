@@ -10,7 +10,7 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-service")
     implementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-api")
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
     testImplementation project(":modules:libs:atlas:task-handler:task-handler-io")
     testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")
     testImplementation project(":modules:libs:atlas:task-handler:task-handler-time")
