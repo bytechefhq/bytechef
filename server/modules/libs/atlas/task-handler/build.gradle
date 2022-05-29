@@ -6,6 +6,8 @@ subprojects {
         compileOnly "org.slf4j:slf4j-api"
         compileOnly "org.springframework:spring-core"
         compileOnly "org.springframework:spring-context"
+        compileOnly "org.springframework:spring-jdbc"
+        compileOnly "org.springframework.boot:spring-boot"
         compileOnly project(":modules:libs:atlas:engine:engine-api")
         compileOnly project(":modules:libs:atlas:engine:engine-worker:engine-worker-api")
         compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")

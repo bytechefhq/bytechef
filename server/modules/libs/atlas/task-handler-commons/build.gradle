@@ -1,8 +1,15 @@
 dependencies {
     api "com.jayway.jsonpath:json-path"
+    api "org.springframework:spring-jdbc"
     api "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
 
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
+    testImplementation project(":modules:libs:atlas:test-commons")
+
+    testRuntimeOnly "org.postgresql:postgresql"
+    testRuntimeOnly "org.testcontainers:postgresql"
 }
