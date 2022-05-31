@@ -19,10 +19,10 @@ package com.integri.atlas.task.handler.postgresql;
 import static com.integri.atlas.task.definition.dsl.DSL.option;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.TASK_POSTGRESQL;
 
+import com.integri.atlas.task.commons.jdbc.JdbcTaskConstants;
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.DSL;
 import com.integri.atlas.task.definition.dsl.TaskDefinition;
-import com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants;
 import org.springframework.stereotype.Component;
 
 /**
