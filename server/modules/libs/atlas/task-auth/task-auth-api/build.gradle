@@ -1,0 +1,5 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-api")
+
+    implementation "org.springframework:spring-core"
+}

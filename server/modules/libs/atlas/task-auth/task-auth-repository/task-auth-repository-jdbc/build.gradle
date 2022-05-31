@@ -1,0 +1,9 @@
+dependencies {
+    api project(":modules:libs:atlas:task-auth:task-auth-repository:task-auth-repository-api")
+
+    implementation "org.springframework:spring-jdbc"
+    implementation project(":modules:libs:atlas:encryption:encryption-api")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
+    testImplementation project(":modules:libs:atlas:test-commons")
+}

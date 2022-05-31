@@ -36,6 +36,7 @@ import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandle
 import com.integri.atlas.engine.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.TaskDispatcherChain;
+import com.integri.atlas.engine.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.error.ErrorHandler;
 import com.integri.atlas.engine.event.EventPublisher;
@@ -105,6 +106,9 @@ public class CoordinatorConfiguration {
     @Autowired
     private MessageBroker messageBroker;
 
+    @Autowired(required = false)
+    private List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
+
     @Autowired
     private TaskExecutionService taskExecutionService;
 
@@ -161,7 +165,7 @@ public class CoordinatorConfiguration {
 
     @Bean
     DefaultTaskDispatcher defaultTaskDispatcher() {
-        return new DefaultTaskDispatcher(messageBroker);
+        return new DefaultTaskDispatcher(messageBroker, taskDispatcherPreSendProcessors);
     }
 
     @Bean
