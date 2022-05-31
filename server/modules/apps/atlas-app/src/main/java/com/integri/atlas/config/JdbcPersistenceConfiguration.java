@@ -19,6 +19,7 @@
 package com.integri.atlas.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.encryption.Encryption;
 import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.context.repository.jdbc.JdbcContextRepository;
 import com.integri.atlas.engine.counter.repository.CounterRepository;
@@ -30,6 +31,8 @@ import com.integri.atlas.engine.task.execution.repository.jdbc.JdbcTaskExecution
 import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.workflow.repository.jdbc.JdbcWorkflowRepository;
 import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
+import com.integri.atlas.task.auth.JdbcTaskAuthRepository;
+import com.integri.atlas.task.auth.repository.TaskAuthRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,52 +48,67 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class JdbcPersistenceConfiguration {
 
     @Bean
-    CounterRepository counterRepository(JdbcTemplate aJdbcOperations) {
-        return new JdbcCounterRepository(aJdbcOperations);
+    CounterRepository jdbcCounterRepository(JdbcTemplate jdbcTemplate) {
+        return new JdbcCounterRepository(jdbcTemplate);
     }
 
     @Bean
-    @ConditionalOnProperty(name = "atlas.workflow-repository.database.enabled", havingValue = "true")
-    @Order(4)
-    WorkflowRepository jdbcWorkflowRepository(
-        NamedParameterJdbcTemplate aJdbcTemplate,
-        WorkflowMapper aWorkflowMapper
-    ) {
-        JdbcWorkflowRepository jdbcWorkflowRepository = new JdbcWorkflowRepository();
+    ContextRepository jdbcContextRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
+        JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
 
-        jdbcWorkflowRepository.setJdbcTemplate(aJdbcTemplate);
-        jdbcWorkflowRepository.setWorkflowMapper(aWorkflowMapper);
+        jdbcContextRepository.setJdbcTemplate(jdbcTemplate);
+        jdbcContextRepository.setObjectMapper(objectMapper);
 
-        return jdbcWorkflowRepository;
+        return jdbcContextRepository;
     }
 
     @Bean
-    TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper objectMapper) {
-        JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
-
-        jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobTaskRepository.setObjectMapper(objectMapper);
-
-        return jdbcJobTaskRepository;
-    }
-
-    @Bean
-    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper objectMapper) {
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
-        jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
+        jdbcJobRepository.setJdbcTemplate(jdbcTemplate);
         jdbcJobRepository.setObjectMapper(objectMapper);
 
         return jdbcJobRepository;
     }
 
     @Bean
-    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, ObjectMapper objectMapper) {
-        JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
+    TaskExecutionRepository jdbcTaskExecutionRepository(
+        NamedParameterJdbcTemplate jdbcTemplate,
+        ObjectMapper objectMapper
+    ) {
+        JdbcTaskExecutionRepository jdbcTaskExecutionRepository = new JdbcTaskExecutionRepository();
 
-        jdbcContextRepository.setJdbcTemplate(aJdbcTemplate);
-        jdbcContextRepository.setObjectMapper(objectMapper);
+        jdbcTaskExecutionRepository.setJdbcTemplate(jdbcTemplate);
+        jdbcTaskExecutionRepository.setObjectMapper(objectMapper);
 
-        return jdbcContextRepository;
+        return jdbcTaskExecutionRepository;
+    }
+
+    @Bean
+    TaskAuthRepository jdbcTaskAuthRepository(
+        Encryption encryption,
+        NamedParameterJdbcTemplate jdbcTemplate,
+        ObjectMapper objectMapper
+    ) {
+        JdbcTaskAuthRepository jdbcTaskAuthRepository = new JdbcTaskAuthRepository();
+
+        jdbcTaskAuthRepository.setEncryption(encryption);
+        jdbcTaskAuthRepository.setJdbcTemplate(jdbcTemplate);
+        jdbcTaskAuthRepository.setObjectMapper(objectMapper);
+
+        return jdbcTaskAuthRepository;
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "atlas.workflow-repository.database.enabled", havingValue = "true")
+    @Order(4)
+    WorkflowRepository jdbcWorkflowRepository(NamedParameterJdbcTemplate jdbcTemplate, WorkflowMapper aWorkflowMapper) {
+        JdbcWorkflowRepository jdbcWorkflowRepository = new JdbcWorkflowRepository();
+
+        jdbcWorkflowRepository.setJdbcTemplate(jdbcTemplate);
+        jdbcWorkflowRepository.setWorkflowMapper(aWorkflowMapper);
+
+        return jdbcWorkflowRepository;
     }
 }

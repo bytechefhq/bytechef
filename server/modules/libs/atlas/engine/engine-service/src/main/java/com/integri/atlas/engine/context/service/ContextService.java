@@ -21,10 +21,10 @@ import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 @Transactional
 public class ContextService {
 

@@ -20,7 +20,7 @@ package com.integri.atlas.engine.counter.repository.jdbc;
 
 import com.integri.atlas.engine.counter.repository.CounterRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -28,20 +28,20 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class JdbcCounterRepository implements CounterRepository {
 
-    private final JdbcOperations jdbc;
+    private final JdbcTemplate jdbcTemplate;
 
-    public JdbcCounterRepository(JdbcOperations aJdbcOperations) {
-        jdbc = aJdbcOperations;
+    public JdbcCounterRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     @Transactional
     public void set(String counterName, long value) {
         try {
-            jdbc.queryForObject("select value from counter where id = ? for update", Long.class, counterName);
-            jdbc.update("update counter set value = ? where id = ?", value, counterName);
+            jdbcTemplate.queryForObject("select value from counter where id = ? for update", Long.class, counterName);
+            jdbcTemplate.update("update counter set value = ? where id = ?", value, counterName);
         } catch (EmptyResultDataAccessException e) {
-            jdbc.update(
+            jdbcTemplate.update(
                 "insert into counter (id,value,create_time) values (?,?,current_timestamp)",
                 counterName,
                 value
@@ -52,17 +52,21 @@ public class JdbcCounterRepository implements CounterRepository {
     @Override
     @Transactional
     public long decrement(String counterName) {
-        Long value = jdbc.queryForObject("select value from counter where id = ? for update", Long.class, counterName);
+        Long value = jdbcTemplate.queryForObject(
+            "select value from counter where id = ? for update",
+            Long.class,
+            counterName
+        );
 
         value = value - 1;
 
-        jdbc.update("update counter set value = ? where id = ?", value, counterName);
+        jdbcTemplate.update("update counter set value = ? where id = ?", value, counterName);
 
         return value;
     }
 
     @Override
     public void delete(String counterName) {
-        jdbc.update("delete from counter where id = ?", counterName);
+        jdbcTemplate.update("delete from counter where id = ?", counterName);
     }
 }

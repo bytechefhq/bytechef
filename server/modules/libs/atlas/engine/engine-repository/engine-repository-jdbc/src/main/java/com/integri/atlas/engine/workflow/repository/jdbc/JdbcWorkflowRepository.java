@@ -100,11 +100,11 @@ public class JdbcWorkflowRepository implements WorkflowRepository {
         return findOne(id);
     }
 
-    public void setJdbcTemplate(NamedParameterJdbcTemplate aJdbcTemplate) {
-        jdbcTemplate = aJdbcTemplate;
+    public void setJdbcTemplate(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void setWorkflowMapper(WorkflowMapper aWorkflowMapper) {
-        workflowMapper = aWorkflowMapper;
+    public void setWorkflowMapper(WorkflowMapper workflowMapper) {
+        this.workflowMapper = workflowMapper;
     }
 }

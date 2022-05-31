@@ -19,13 +19,13 @@ package com.integri.atlas.engine.workflow.service;
 import com.integri.atlas.engine.workflow.Workflow;
 import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
-@Component
+@Service
 @Transactional
 public class WorkflowService {
 
