@@ -192,7 +192,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
     private static final TaskDefinition TASK_DEFINITION = create(TASK_HTTP_CLIENT)
         .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data.")
-        .authentication(
+        .auth(
             option("API Key", AuthenticationType.HTTP_API_KEY.name()),
             option("Bearer Token", AuthenticationType.HTTP_BEARER_TOKEN.name()),
             option("Basic Auth", AuthenticationType.HTTP_BASIC_AUTH.name()),

@@ -64,7 +64,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         HttpClientHelper httpClientHelper = new HttpClientHelper(
             httpAuthenticationFactory.create(
-                taskExecution.getRequiredString("authentication"),
+                taskExecution.getRequiredString("auth"),
                 taskExecution.get("credentials", MapObject.class)
             ),
             taskExecution.getLong(PROPERTY_TIMEOUT, 10000)

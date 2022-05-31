@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class TaskDefinition {
 
-    private TaskAuthentication authentication;
+    private TaskAuth auth;
     private String description;
     private String displayName;
     private String icon;
@@ -36,8 +36,8 @@ public class TaskDefinition {
 
     TaskDefinition() {}
 
-    public TaskDefinition authentication(TaskPropertyOption... options) {
-        this.authentication = new TaskAuthentication().options(options);
+    public TaskDefinition auth(TaskPropertyOption... options) {
+        this.auth = new TaskAuth().options(options);
 
         return this;
     }
@@ -84,8 +84,8 @@ public class TaskDefinition {
         return this;
     }
 
-    public TaskAuthentication getAuthentication() {
-        return authentication;
+    public TaskAuth getAuth() {
+        return auth;
     }
 
     public String getDescription() {

@@ -517,14 +517,14 @@ public class TaskDefinitionTest {
             .displayName("displayName")
             .description("description")
             .subtitle("subtitle")
-            .authentication()
+            .auth()
             .icon("icon")
             .version(1);
 
         jsonAssertEquals(
             """
             {
-                "authentication":{options:[]},
+                "auth":{options:[]},
                 "description":"description",
                 "displayName":"displayName",
                 "name":"name",
