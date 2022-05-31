@@ -18,8 +18,8 @@
 
 package com.integri.atlas.task.dispatcher.fork;
 
-import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
@@ -30,7 +30,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandler;
 import java.util.Date;

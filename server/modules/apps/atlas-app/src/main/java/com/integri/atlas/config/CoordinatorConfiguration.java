@@ -18,8 +18,8 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.annotation.ConditionalOnCoordinator;
+import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.error.ErrorHandlerChain;
@@ -45,7 +45,7 @@ import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.engine.workflow.service.WorkflowService;
 import com.integri.atlas.task.dispatcher.each.EachTaskDispatcher;
 import com.integri.atlas.task.dispatcher.each.completion.EachTaskCompletionHandler;

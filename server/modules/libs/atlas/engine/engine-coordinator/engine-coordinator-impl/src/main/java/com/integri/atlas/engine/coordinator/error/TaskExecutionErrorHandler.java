@@ -31,7 +31,7 @@ import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import org.slf4j.Logger;

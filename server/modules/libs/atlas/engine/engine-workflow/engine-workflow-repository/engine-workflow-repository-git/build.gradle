@@ -1,9 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-api")
-
-    implementation "commons-io:commons-io"
-    implementation 'org.eclipse.jgit:org.eclipse.jgit'
-    implementation "org.springframework:spring-core"
-
-    testImplementation project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
-}

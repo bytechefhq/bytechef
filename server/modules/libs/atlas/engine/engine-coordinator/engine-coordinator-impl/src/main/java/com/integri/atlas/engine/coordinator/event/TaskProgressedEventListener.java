@@ -22,7 +22,7 @@ import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

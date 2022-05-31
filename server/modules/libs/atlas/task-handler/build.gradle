@@ -6,7 +6,7 @@ subprojects {
         compileOnly "org.slf4j:slf4j-api"
         compileOnly "org.springframework:spring-core"
         compileOnly "org.springframework:spring-context"
-        compileOnly project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-api")
+        compileOnly project(":modules:libs:atlas:engine:engine-api")
         compileOnly project(":modules:libs:atlas:engine:engine-worker:engine-worker-api")
         compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")
         compileOnly project(":modules:libs:atlas:task-definition:task-definition-api")
@@ -20,15 +20,15 @@ subprojects {
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-time")
         testImplementation project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
-        testImplementation project(":modules:libs:atlas:engine:engine-context:engine-context-service")
-        testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
+        testImplementation project(":modules:libs:atlas:engine:engine-repository:engine-repository-resource")
+        testImplementation project(":modules:libs:atlas:engine:engine-service")
         testImplementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-sync")
+        testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
         testImplementation project(":modules:libs:atlas:task-definition:task-definition-api")
         testImplementation project(":modules:libs:atlas:task-handler-commons")
         testImplementation project(":modules:libs:atlas:test-commons")
-        testImplementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")
 
         testRuntimeOnly "org.postgresql:postgresql"
         testRuntimeOnly "org.testcontainers:postgresql"

@@ -18,11 +18,11 @@
 
 package com.integri.atlas.engine.coordinator.task.completion;
 
-import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.job.executor.JobExecutor;
 import com.integri.atlas.engine.event.EventPublisher;
 import com.integri.atlas.engine.event.Events;
@@ -35,7 +35,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.engine.workflow.Workflow;
 import com.integri.atlas.engine.workflow.service.WorkflowService;
 import java.util.Date;

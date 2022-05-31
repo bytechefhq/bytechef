@@ -18,9 +18,9 @@
 
 package com.integri.atlas.engine.coordinator;
 
-import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.job.executor.JobExecutor;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.error.ErrorHandler;
@@ -38,7 +38,7 @@ import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;

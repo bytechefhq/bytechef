@@ -1,3 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:engine:engine-job:engine-job-api")
-}
