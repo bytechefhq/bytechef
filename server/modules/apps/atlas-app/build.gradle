@@ -7,6 +7,7 @@ springBoot {
 
 dependencies {
     implementation "org.apache.commons:commons-lang3"
+    implementation "org.jobrunr:jobrunr-spring-boot-starter"
     implementation "org.springframework.boot:spring-boot-starter-activemq"
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-amqp"
@@ -15,6 +16,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.kafka:spring-kafka"
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    implementation project(":modules:libs:atlas:encryption:encryption-filesystem")
     implementation project(":modules:libs:atlas:engine:engine-repository:engine-repository-git")
     implementation project(":modules:libs:atlas:engine:engine-repository:engine-repository-jdbc")
     implementation project(":modules:libs:atlas:engine:engine-repository:engine-repository-resource")
@@ -28,7 +30,12 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-rest")
     implementation project(":modules:libs:atlas:file-storage:file-storage-base64")
     implementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
-    implementation project(":modules:libs:atlas:task-definition:task-definition-api")
+    implementation project(":modules:libs:atlas:task-auth:task-auth-repository:task-auth-repository-jdbc")
+    implementation project(":modules:libs:atlas:task-auth:task-auth-rest")
+    implementation project(":modules:libs:atlas:task-commons")
+    implementation project(":modules:libs:atlas:task-definition:task-definition-service")
+    implementation project(":modules:libs:atlas:task-definition:task-definition-rest")
+    implementation project(":modules:libs:atlas:task-definition:task-definition-repository:task-definition-repository-memory")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-each")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-fork")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-if")
@@ -59,8 +66,8 @@ dependencies {
     implementation project(":modules:libs:atlas:task-handler:task-handler-xlsx-file")
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-helpers")
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-file")
-    implementation project(":modules:libs:atlas:task-handler-commons")
     implementation project(":modules:libs:atlas:task-handler:task-handler-transform-json")
+    implementation project(":modules:libs:atlas:task-jdbc")
 
     runtimeOnly "org.postgresql:postgresql"
 

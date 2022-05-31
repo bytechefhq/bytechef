@@ -16,25 +16,25 @@
 
 package com.integri.atlas.task.handler.local.file;
 
-import static com.integri.atlas.task.definition.dsl.DSL.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.INTEGER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
-import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.INTEGER_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OPERATION;
+import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.TASK_LOCAL_FILE;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskDefinition;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocalFileTaskDefinitionHandler implements TaskDefinitionHandler {
+public class LocalFileTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskDefinition TASK_DEFINITION = DSL
-        .create(TASK_LOCAL_FILE)
+        .createTaskDefinition(TASK_LOCAL_FILE)
         .displayName("Local File")
         .description("Reads or writes a binary file from/to disk")
         .operations(

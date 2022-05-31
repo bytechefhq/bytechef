@@ -16,17 +16,17 @@
 
 package com.integri.atlas.task.dispatcher.sequence;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDefinitionHandler implements TaskDefinitionHandler {
+public class SequenceTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskDefinition TASK_DEFINITION = DSL
-        .create(SequenceTaskConstants.TASK_SEQUENCE)
+        .createTaskDefinition(SequenceTaskConstants.TASK_SEQUENCE)
         .displayName("Sequence")
         .description("Executes list of tasks in a sequence");
 

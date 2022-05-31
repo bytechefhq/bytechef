@@ -16,16 +16,16 @@
 
 package com.integri.atlas.task.handler.xml.file;
 
-import static com.integri.atlas.task.definition.dsl.DSL.ANY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.BOOLEAN_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.INTEGER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
-import static com.integri.atlas.task.definition.dsl.DSL.OPTIONS;
-import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.showWhen;
+import static com.integri.atlas.task.definition.model.DSL.ANY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.INTEGER_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OPERATION;
+import static com.integri.atlas.task.definition.model.DSL.OPTIONS;
+import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.showWhen;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_IS_ARRAY;
@@ -35,19 +35,19 @@ import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPE
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_SOURCE;
 import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.TASK_XML_FILE;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskDefinition;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class XmlFileTaskDefinitionHandler implements TaskDefinitionHandler {
+public class XmlFileTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskDefinition TASK_DEFINITION = DSL
-        .create(TASK_XML_FILE)
+        .createTaskDefinition(TASK_XML_FILE)
         .displayName("XML File")
         .description("Reads and writes data from a XML file.")
         .operations(

@@ -43,24 +43,19 @@ public class HttpClientTaskDefinitionTest {
               "auth": {
                 "options": [
                   {
-                    "name": "API Key",
-                    "value": "HTTP_API_KEY"
+                    "value": "api_key"
                   },
                   {
-                    "name": "Bearer Token",
-                    "value": "HTTP_BEARER_TOKEN"
+                    "value": "bearer_token"
                   },
                   {
-                    "name": "Basic Auth",
-                    "value": "HTTP_BASIC_AUTH"
+                    "value": "basic_auth"
                   },
                   {
-                    "name": "Digest Auth",
-                    "value": "HTTP_DIGEST_AUTH"
+                    "value": "digest_auth"
                   },
                   {
-                    "name": "OAuth2",
-                    "value": "OAUTH2"
+                    "value": "oauth2"
                   }
                 ]
               },
