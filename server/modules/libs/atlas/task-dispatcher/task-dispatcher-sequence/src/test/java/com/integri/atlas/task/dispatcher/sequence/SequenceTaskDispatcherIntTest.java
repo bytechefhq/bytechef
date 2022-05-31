@@ -66,11 +66,11 @@ public class SequenceTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new SequenceTaskCompletionHandler(
-                contextRepository,
+                contextService,
                 taskCompletionHandler,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             )
         );
     }
@@ -82,11 +82,11 @@ public class SequenceTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new SequenceTaskDispatcher(
-                contextRepository,
+                contextService,
                 coordinatorMessageBroker,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             )
         );
     }

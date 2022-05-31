@@ -22,7 +22,7 @@ import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,12 +32,12 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskProgressedEventListener implements EventListener {
 
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public TaskProgressedEventListener(TaskExecutionRepository aTaskExecutionRepository) {
-        taskExecutionRepository = aTaskExecutionRepository;
+    public TaskProgressedEventListener(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class TaskProgressedEventListener implements EventListener {
             String taskId = aEvent.getString("taskId");
             int progress = aEvent.getInteger("progress", 0);
 
-            TaskExecution task = taskExecutionRepository.findOne(taskId);
+            TaskExecution task = taskExecutionService.getTaskExecution(taskId);
 
             if (task == null) {
                 logger.error("Unknown task: {}", taskId);
@@ -55,7 +55,7 @@ public class TaskProgressedEventListener implements EventListener {
 
                 mtask.setProgress(progress);
 
-                taskExecutionRepository.merge(mtask);
+                taskExecutionService.merge(mtask);
             }
         }
     }

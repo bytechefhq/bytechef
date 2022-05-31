@@ -18,11 +18,11 @@
 
 package com.integri.atlas.task.dispatcher.switch_;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -32,7 +32,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler;
 import java.util.Collections;
@@ -48,23 +48,23 @@ import org.springframework.util.Assert;
  */
 public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ContextRepository contextRepository;
+    private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
 
     public SwitchTaskDispatcher(
-        ContextRepository contextRepository,
+        ContextService contextService,
         MessageBroker messageBroker,
         TaskDispatcher taskDispatcher,
-        TaskExecutionRepository taskExecutionRepository,
+        TaskExecutionService taskExecutionService,
         TaskEvaluator taskEvaluator
     ) {
-        this.contextRepository = contextRepository;
+        this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
         this.taskEvaluator = taskEvaluator;
     }
 
@@ -75,7 +75,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         switchTaskExecution.setStartTime(new Date());
         switchTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionRepository.merge(switchTaskExecution);
+        taskExecutionService.merge(switchTaskExecution);
 
         Accessor selectedCase = resolveCase(taskExecution);
 
@@ -95,13 +95,13 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                 subTaskExecution.setParentId(switchTaskExecution.getId());
                 subTaskExecution.setPriority(switchTaskExecution.getPriority());
 
-                MapContext context = new MapContext(contextRepository.peek(switchTaskExecution.getId()));
+                MapContext context = new MapContext(contextService.peek(switchTaskExecution.getId()));
 
-                contextRepository.push(subTaskExecution.getId(), context);
+                contextService.push(subTaskExecution.getId(), context);
 
                 TaskExecution evaluatedExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-                taskExecutionRepository.create(evaluatedExecution);
+                taskExecutionService.create(evaluatedExecution);
                 taskDispatcher.dispatch(evaluatedExecution);
             } else {
                 SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);

@@ -48,7 +48,6 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_TIMEOUT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_VALUE;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.RequestMethod;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.ResponseFormat;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 

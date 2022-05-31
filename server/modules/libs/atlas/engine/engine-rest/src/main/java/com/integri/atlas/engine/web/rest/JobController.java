@@ -23,7 +23,7 @@ import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.data.Page;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobSummary;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -48,16 +48,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobController {
 
     private final Coordinator coordinator;
-    private final JobRepository jobRepository;
+    private final JobService jobService;
 
-    public JobController(Coordinator coordinator, JobRepository jobRepository) {
+    public JobController(Coordinator coordinator, JobService jobService) {
         this.coordinator = coordinator;
-        this.jobRepository = jobRepository;
+        this.jobService = jobService;
     }
 
     @GetMapping(value = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<JobSummary> list(@RequestParam(value = "pageNumber", defaultValue = "1") Integer pageNumber) {
-        return jobRepository.getPage(pageNumber);
+        return jobService.getJobSummaries(pageNumber);
     }
 
     @PostMapping(value = "/jobs", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -67,12 +67,12 @@ public class JobController {
 
     @GetMapping(value = "/jobs/{id}")
     public Job get(@PathVariable("id") String jobId) {
-        return jobRepository.getById(jobId);
+        return jobService.getJob(jobId);
     }
 
     @GetMapping(value = "/jobs/latest", produces = MediaType.APPLICATION_JSON_VALUE)
     public Job latest() {
-        Optional<Job> job = jobRepository.getLatest();
+        Optional<Job> job = jobService.getLatestJob();
 
         Assert.isTrue(job.isPresent(), "no jobs");
 

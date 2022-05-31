@@ -18,9 +18,9 @@
 
 package com.integri.atlas.engine.coordinator;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.job.executor.JobExecutor;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.error.ErrorHandler;
@@ -38,7 +38,7 @@ import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -46,21 +46,20 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 
 /**
- * The central class responsible for coordinating
- * and executing jobs.
+ * The central class responsible for coordinating and executing jobs.
  *
  * @author Arik Cohen
  * @since Jun 12, 2016
  */
 public class CoordinatorImpl implements Coordinator {
 
-    private ContextRepository contextRepository;
+    private ContextService contextService;
     private ErrorHandler errorHandler;
     private EventPublisher eventPublisher;
     private MessageBroker messageBroker;
     private JobExecutor jobExecutor;
     private JobService jobService;
-    private TaskExecutionRepository taskExecutionRepository;
+    private TaskExecutionService taskExecutionService;
     private TaskDispatcher taskDispatcher;
     private TaskCompletionHandler taskCompletionHandler;
 
@@ -69,11 +68,8 @@ public class CoordinatorImpl implements Coordinator {
     /**
      * Starts a job instance.
      *
-     * @param jobParamsMap
-     *          The Key-Value map representing the job
-     *          parameters
-     * @return Job
-     *           The instance of the Job
+     * @param jobParamsMap The Key-Value map representing the job parameters
+     * @return The instance of the Job
      */
     @Override
     public Job create(Map<String, Object> jobParamsMap) {
@@ -85,7 +81,7 @@ public class CoordinatorImpl implements Coordinator {
 
         MapContext context = new MapContext(jobParams.getMap(INPUTS, Collections.EMPTY_MAP));
 
-        contextRepository.push(job.getId(), context);
+        contextService.push(job.getId(), context);
 
         eventPublisher.publishEvent(
             WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus())
@@ -110,8 +106,7 @@ public class CoordinatorImpl implements Coordinator {
     /**
      * Stop a running job.
      *
-     * @param jobId
-     *          The id of the job to stop
+     * @param jobId The id of the job to stop
      *
      * @return The stopped {@link Job}
      */
@@ -122,14 +117,15 @@ public class CoordinatorImpl implements Coordinator {
             WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus())
         );
 
-        if (job.getExecution().size() > 0) {
+        if (job.getExecutions().size() > 0) {
             SimpleTaskExecution currentTask = SimpleTaskExecution.of(
-                job.getExecution().get(job.getExecution().size() - 1)
+                job.getExecutions().get(job.getExecutions().size() - 1)
             );
+
             currentTask.setStatus(TaskStatus.CANCELLED);
             currentTask.setEndTime(new Date());
 
-            taskExecutionRepository.merge(currentTask);
+            taskExecutionService.merge(currentTask);
 
             taskDispatcher.dispatch(new CancelTask(currentTask.getJobId(), currentTask.getId()));
         }
@@ -140,8 +136,7 @@ public class CoordinatorImpl implements Coordinator {
     /**
      * Resume a stopped or failed job.
      *
-     * @param jobId
-     *          The id of the job to resume.
+     * @param jobId  The id of the job to resume.
      * @return The resumed job
      */
     @Override
@@ -156,62 +151,62 @@ public class CoordinatorImpl implements Coordinator {
     /**
      * Complete a task of a given job.
      *
-     * @param aTask
-     *          The task to complete.
+     * @param aTask The task to complete.
      */
     public void complete(TaskExecution aTask) {
         try {
             taskCompletionHandler.handle(aTask);
         } catch (Exception e) {
-            SimpleTaskExecution exec = SimpleTaskExecution.of(aTask);
-            exec.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
-            handleError(exec);
+            SimpleTaskExecution taskExecution = SimpleTaskExecution.of(aTask);
+
+            taskExecution.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
+
+            handleError(taskExecution);
         }
     }
 
     /**
      * Handle an application error.
      *
-     * @param aErrorable
-     *          The erring message.
+     * @param errorable The erring message.
      */
-    public void handleError(Errorable aErrorable) {
-        errorHandler.handle(aErrorable);
+    public void handleError(Errorable errorable) {
+        errorHandler.handle(errorable);
     }
 
-    public void setContextRepository(ContextRepository aContextRepository) {
-        contextRepository = aContextRepository;
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 
-    public void setEventPublisher(EventPublisher aEventPublisher) {
-        eventPublisher = aEventPublisher;
+    public void setEventPublisher(EventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     public void setJobService(JobService jobService) {
         this.jobService = jobService;
     }
 
-    public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {
-        taskDispatcher = aTaskDispatcher;
+    public void setTaskDispatcher(TaskDispatcher taskDispatcher) {
+        this.taskDispatcher = taskDispatcher;
     }
 
-    public void setTaskExecutionRepository(TaskExecutionRepository taskExecutionRepository) {
-        this.taskExecutionRepository = taskExecutionRepository;
+    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 
-    public void setErrorHandler(ErrorHandler aErrorHandler) {
-        errorHandler = aErrorHandler;
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 
-    public void setTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-        taskCompletionHandler = aTaskCompletionHandler;
+    public void setTaskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
+        this.taskCompletionHandler = taskCompletionHandler;
     }
 
-    public void setJobExecutor(JobExecutor aJobExecutor) {
-        jobExecutor = aJobExecutor;
+    public void setJobExecutor(JobExecutor jobExecutor) {
+        this.jobExecutor = jobExecutor;
     }
 
-    public void setMessageBroker(MessageBroker aMessageBroker) {
-        messageBroker = aMessageBroker;
+    public void setMessageBroker(MessageBroker messageBroker) {
+        this.messageBroker = messageBroker;
     }
 }

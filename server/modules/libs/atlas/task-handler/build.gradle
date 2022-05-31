@@ -20,7 +20,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-time")
         testImplementation project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
-        testImplementation project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")
+        testImplementation project(":modules:libs:atlas:engine:engine-context:engine-context-service")
         testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
         testImplementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-sync")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")

@@ -18,9 +18,9 @@
 
 package com.integri.atlas.engine.coordinator.job.executor;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
 import com.integri.atlas.engine.task.WorkflowTask;
@@ -29,10 +29,10 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.engine.workflow.Workflow;
-import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.workflow.service.WorkflowService;
 import java.util.Date;
 import java.util.List;
 
@@ -43,15 +43,15 @@ import java.util.List;
  */
 public class DefaultJobExecutor implements JobExecutor {
 
-    private WorkflowRepository workflowRepository;
-    private TaskExecutionRepository taskExecutionRepository;
-    private ContextRepository contextRepository;
+    private WorkflowService workflowService;
+    private TaskExecutionService taskExecutionService;
+    private ContextService contextService;
     private TaskDispatcher taskDispatcher;
     private TaskEvaluator taskEvaluator;
 
     @Override
     public void execute(Job job) {
-        Workflow workflow = workflowRepository.findOne(job.getWorkflowId());
+        Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         if (job.getStatus() != JobStatus.STARTED) {
             throw new IllegalStateException("should not be here");
@@ -62,12 +62,12 @@ public class DefaultJobExecutor implements JobExecutor {
         }
     }
 
-    public void setContextRepository(ContextRepository contextRepository) {
-        this.contextRepository = contextRepository;
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 
-    public void setTaskExecutionRepository(TaskExecutionRepository taskExecutionRepository) {
-        this.taskExecutionRepository = taskExecutionRepository;
+    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 
     public void setTaskDispatcher(TaskDispatcher taskDispatcher) {
@@ -78,8 +78,8 @@ public class DefaultJobExecutor implements JobExecutor {
         this.taskEvaluator = taskEvaluator;
     }
 
-    public void setWorkflowRepository(WorkflowRepository workflowRepository) {
-        this.workflowRepository = workflowRepository;
+    public void setWorkflowService(WorkflowService workflowService) {
+        this.workflowService = workflowService;
     }
 
     private boolean hasMoreTasks(Job aJob, Workflow aWorkflow) {
@@ -108,13 +108,13 @@ public class DefaultJobExecutor implements JobExecutor {
 
     private void executeNextTask(Job job, Workflow workflow) {
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
-        Context context = new MapContext(contextRepository.peek(job.getId()));
+        Context context = new MapContext(contextService.peek(job.getId()));
 
-        contextRepository.push(nextTaskExecution.getId(), context);
+        contextService.push(nextTaskExecution.getId(), context);
 
         TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
 
-        taskExecutionRepository.create(evaluatedTaskExecution);
+        taskExecutionService.create(evaluatedTaskExecution);
         taskDispatcher.dispatch(evaluatedTaskExecution);
     }
 }

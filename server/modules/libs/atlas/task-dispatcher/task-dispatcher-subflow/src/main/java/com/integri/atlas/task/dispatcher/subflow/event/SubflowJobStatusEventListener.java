@@ -26,11 +26,11 @@ import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.task.dispatcher.subflow.SubflowTaskDispatcher;
 import java.util.Objects;
 
@@ -46,19 +46,19 @@ import java.util.Objects;
  */
 public class SubflowJobStatusEventListener implements EventListener {
 
-    private final JobRepository jobRepository;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final JobService jobService;
+    private final TaskExecutionService taskExecutionService;
     private final Coordinator coordinator;
     private final TaskEvaluator taskEvaluator;
 
     public SubflowJobStatusEventListener(
-        JobRepository aJobRepository,
-        TaskExecutionRepository aTaskExecutionRepository,
+        JobService jobService,
+        TaskExecutionService taskExecutionService,
         Coordinator aCoordinator,
         TaskEvaluator aTaskEvaluator
     ) {
-        jobRepository = Objects.requireNonNull(aJobRepository);
-        taskExecutionRepository = Objects.requireNonNull(aTaskExecutionRepository);
+        this.jobService = Objects.requireNonNull(jobService);
+        this.taskExecutionService = Objects.requireNonNull(taskExecutionService);
         coordinator = Objects.requireNonNull(aCoordinator);
         taskEvaluator = Objects.requireNonNull(aTaskEvaluator);
     }
@@ -68,7 +68,7 @@ public class SubflowJobStatusEventListener implements EventListener {
         if (aEvent.getType().equals(Events.JOB_STATUS)) {
             String jobId = aEvent.getRequiredString("jobId");
             JobStatus status = JobStatus.valueOf(aEvent.getRequiredString("status"));
-            Job job = jobRepository.getById(jobId);
+            Job job = jobService.getJob(jobId);
 
             if (job.getParentTaskExecutionId() == null) {
                 return; // not a subflow -- nothing to do
@@ -80,14 +80,16 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 case STOPPED:
                     {
-                        TaskExecution subflowTask = taskExecutionRepository.findOne(job.getParentTaskExecutionId());
+                        TaskExecution subflowTask = taskExecutionService.getTaskExecution(
+                            job.getParentTaskExecutionId()
+                        );
                         coordinator.stop(subflowTask.getJobId());
                         break;
                     }
                 case FAILED:
                     {
                         SimpleTaskExecution errorable = SimpleTaskExecution.of(
-                            taskExecutionRepository.findOne(job.getParentTaskExecutionId())
+                            taskExecutionService.getTaskExecution(job.getParentTaskExecutionId())
                         );
                         errorable.setError(new ErrorObject("An error occured with subflow", new String[0]));
                         coordinator.handleError(errorable);
@@ -96,7 +98,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                 case COMPLETED:
                     {
                         SimpleTaskExecution completion = SimpleTaskExecution.of(
-                            taskExecutionRepository.findOne(job.getParentTaskExecutionId())
+                            taskExecutionService.getTaskExecution(job.getParentTaskExecutionId())
                         );
                         Object output = job.getOutputs();
                         if (completion.getOutput() != null) {

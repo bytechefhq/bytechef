@@ -41,13 +41,13 @@ public interface JobRepository {
 
     List<Job> findAll();
 
-    Page<JobSummary> getPage(int aPageNumber);
+    Page<JobSummary> findAllJobSummaries(int pageNumber);
 
-    Job getById(String aId);
+    Job findById(String aId);
 
-    Optional<Job> getLatest();
+    Optional<Job> findLatestJob();
 
-    Job getByTaskId(String aTaskId);
+    Job findByTaskExecutionId(String taskId);
 
-    Job merge(Job aJob);
+    Job merge(Job job);
 }

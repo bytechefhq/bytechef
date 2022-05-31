@@ -25,8 +25,6 @@ import com.integri.atlas.engine.job.JobSummary;
 import com.integri.atlas.engine.job.SimpleJob;
 import com.integri.atlas.engine.job.repository.JobRepository;
 import com.integri.atlas.engine.json.Json;
-import com.integri.atlas.engine.task.execution.TaskExecution;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -46,8 +44,6 @@ public class JdbcJobRepository implements JobRepository {
 
     protected NamedParameterJdbcOperations jdbcOperations;
     protected ObjectMapper objectMapper;
-    // TODO remove to JobService
-    protected TaskExecutionRepository taskExecutionRepository;
 
     public static final int DEFAULT_PAGE_SIZE = 20;
 
@@ -99,73 +95,78 @@ public class JdbcJobRepository implements JobRepository {
     }
 
     @Override
-    public Job getById(String aId) {
+    public Job findById(String aId) {
         List<Job> query = jdbcOperations.query(
             "select * from job where id = :id",
             Collections.singletonMap("id", aId),
             this::jobRowMappper
         );
+
         Assert.isTrue(query.size() == 1, "expected 1 result. got " + query.size());
+
         return query.get(0);
     }
 
     @Override
-    public Optional<Job> getLatest() {
+    public Optional<Job> findLatestJob() {
         List<Job> query = jdbcOperations.query(
             "select * from job order by create_time desc limit 1",
             this::jobRowMappper
         );
+
         if (query.size() == 0) {
             return Optional.empty();
         }
+
         return Optional.of(query.get(0));
     }
 
     @Override
-    public Job getByTaskId(String aTaskId) {
-        Map<String, String> params = Collections.singletonMap("id", aTaskId);
+    public Job findByTaskExecutionId(String taskExecutionId) {
+        Map<String, String> params = Collections.singletonMap("id", taskExecutionId);
+
         List<Job> list = jdbcOperations.query(
             "select * from job j where j.id = (select job_id from task_execution jt where jt.id=:id)",
             params,
             this::jobRowMappper
         );
+
         Assert.isTrue(list.size() < 2, "expecting 1 result, got: " + list.size());
+
         return list.size() == 1 ? list.get(0) : null;
     }
 
     @Override
-    public Page<JobSummary> getPage(int aPageNumber) {
+    public Page<JobSummary> findAllJobSummaries(int pageNumber) {
         Integer totalItems = jdbcOperations
             .getJdbcOperations()
             .queryForObject("select count(*) from job", Integer.class);
-        int offset = (aPageNumber - 1) * DEFAULT_PAGE_SIZE;
+        int offset = (pageNumber - 1) * DEFAULT_PAGE_SIZE;
         int limit = DEFAULT_PAGE_SIZE;
         List<JobSummary> items = jdbcOperations.query(
             String.format("select * from job order by create_time desc limit %s offset %s", limit, offset),
             this::jobSummaryRowMappper
         );
         ResultPage<JobSummary> resultPage = new ResultPage<>(JobSummary.class);
+
         resultPage.setItems(items);
-        resultPage.setNumber(items.size() > 0 ? aPageNumber : 0);
+        resultPage.setNumber(items.size() > 0 ? pageNumber : 0);
         resultPage.setTotalItems(totalItems);
         resultPage.setTotalPages(items.size() > 0 ? totalItems / DEFAULT_PAGE_SIZE + 1 : 0);
+
         return resultPage;
     }
 
     @Override
-    public Job merge(Job aJob) {
-        MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
+    public Job merge(Job job) {
+        MapSqlParameterSource sqlParameterSource = createSqlParameterSource(job);
 
         jdbcOperations.update(
             "update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,workflow_id=:workflowId,label=:label,outputs=:outputs where id = :id ",
             sqlParameterSource
         );
 
-        return aJob;
-    }
-
-    public void setJobTaskExecutionRepository(TaskExecutionRepository taskExecutionRepository) {
-        this.taskExecutionRepository = taskExecutionRepository;
+        return job;
     }
 
     public void setJdbcOperations(NamedParameterJdbcOperations jdbcOperations) {
@@ -176,67 +177,70 @@ public class JdbcJobRepository implements JobRepository {
         this.objectMapper = objectMapper;
     }
 
-    protected MapSqlParameterSource createSqlParameterSource(Job aJob) {
-        SimpleJob job = new SimpleJob(aJob);
-        Assert.notNull(aJob, "job must not be null");
-        Assert.notNull(aJob.getId(), "job status must not be null");
-        Assert.notNull(aJob.getCreateTime(), "job createTime must not be null");
-        Assert.notNull(aJob.getStatus(), "job status must not be null");
+    protected MapSqlParameterSource createSqlParameterSource(Job job) {
+        SimpleJob simpleJob = new SimpleJob(job);
+
+        Assert.notNull(job, "job must not be null");
+        Assert.notNull(job.getId(), "job status must not be null");
+        Assert.notNull(job.getCreateTime(), "job createTime must not be null");
+        Assert.notNull(job.getStatus(), "job status must not be null");
+
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
-        sqlParameterSource.addValue("id", job.getId());
-        sqlParameterSource.addValue("status", job.getStatus().toString());
-        sqlParameterSource.addValue("currentTask", job.getCurrentTask());
-        sqlParameterSource.addValue("workflowId", job.getWorkflowId());
-        sqlParameterSource.addValue("label", job.getLabel());
-        sqlParameterSource.addValue("createTime", job.getCreateTime());
-        sqlParameterSource.addValue("startTime", job.getStartTime());
-        sqlParameterSource.addValue("endTime", job.getEndTime());
-        sqlParameterSource.addValue("priority", job.getPriority());
-        sqlParameterSource.addValue("inputs", Json.serialize(objectMapper, job.getInputs()));
-        sqlParameterSource.addValue("outputs", Json.serialize(objectMapper, job.getOutputs()));
-        sqlParameterSource.addValue("webhooks", Json.serialize(objectMapper, job.getWebhooks()));
-        sqlParameterSource.addValue("parentTaskExecutionId", job.getParentTaskExecutionId());
+
+        sqlParameterSource.addValue("id", simpleJob.getId());
+        sqlParameterSource.addValue("status", simpleJob.getStatus().toString());
+        sqlParameterSource.addValue("currentTask", simpleJob.getCurrentTask());
+        sqlParameterSource.addValue("workflowId", simpleJob.getWorkflowId());
+        sqlParameterSource.addValue("label", simpleJob.getLabel());
+        sqlParameterSource.addValue("createTime", simpleJob.getCreateTime());
+        sqlParameterSource.addValue("startTime", simpleJob.getStartTime());
+        sqlParameterSource.addValue("endTime", simpleJob.getEndTime());
+        sqlParameterSource.addValue("priority", simpleJob.getPriority());
+        sqlParameterSource.addValue("inputs", Json.serialize(objectMapper, simpleJob.getInputs()));
+        sqlParameterSource.addValue("outputs", Json.serialize(objectMapper, simpleJob.getOutputs()));
+        sqlParameterSource.addValue("webhooks", Json.serialize(objectMapper, simpleJob.getWebhooks()));
+        sqlParameterSource.addValue("parentTaskExecutionId", simpleJob.getParentTaskExecutionId());
+
         return sqlParameterSource;
     }
 
-    protected Job jobRowMappper(ResultSet aRs, int aIndex) throws SQLException {
+    protected Job jobRowMappper(ResultSet resultSet, int index) throws SQLException {
         Map<String, Object> map = new HashMap<>();
-        map.put("id", aRs.getString("id"));
-        map.put("status", aRs.getString("status"));
-        map.put("currentTask", aRs.getInt("current_task"));
-        map.put("workflowId", aRs.getString("workflow_id"));
-        map.put("label", aRs.getString("label"));
-        map.put("createTime", aRs.getTimestamp("create_time"));
-        map.put("startTime", aRs.getTimestamp("start_time"));
-        map.put("endTime", aRs.getTimestamp("end_time"));
-        map.put("execution", getExecution(aRs.getString("id")));
-        map.put("priority", aRs.getInt("priority"));
-        map.put("inputs", Json.deserialize(objectMapper, aRs.getString("inputs"), Map.class));
-        map.put("outputs", Json.deserialize(objectMapper, aRs.getString("outputs"), Map.class));
-        map.put("webhooks", Json.deserialize(objectMapper, aRs.getString("webhooks"), List.class));
-        map.put(Constants.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
+
+        map.put("id", resultSet.getString("id"));
+        map.put("status", resultSet.getString("status"));
+        map.put("currentTask", resultSet.getInt("current_task"));
+        map.put("workflowId", resultSet.getString("workflow_id"));
+        map.put("label", resultSet.getString("label"));
+        map.put("createTime", resultSet.getTimestamp("create_time"));
+        map.put("startTime", resultSet.getTimestamp("start_time"));
+        map.put("endTime", resultSet.getTimestamp("end_time"));
+        map.put("priority", resultSet.getInt("priority"));
+        map.put("inputs", Json.deserialize(objectMapper, resultSet.getString("inputs"), Map.class));
+        map.put("outputs", Json.deserialize(objectMapper, resultSet.getString("outputs"), Map.class));
+        map.put("webhooks", Json.deserialize(objectMapper, resultSet.getString("webhooks"), List.class));
+        map.put(Constants.PARENT_TASK_EXECUTION_ID, resultSet.getString("parent_task_execution_id"));
+
         return new SimpleJob(map);
     }
 
-    protected JobSummary jobSummaryRowMappper(ResultSet aRs, int aIndex) throws SQLException {
+    protected JobSummary jobSummaryRowMappper(ResultSet resultSet, int index) throws SQLException {
         Map<String, Object> map = new HashMap<>();
-        map.put("id", aRs.getString("id"));
-        map.put("status", aRs.getString("status"));
-        map.put("currentTask", aRs.getInt("current_task"));
-        map.put("workflowId", aRs.getString("workflow_id"));
-        map.put("label", aRs.getString("label"));
-        map.put("createTime", aRs.getTimestamp("create_time"));
-        map.put("startTime", aRs.getTimestamp("start_time"));
-        map.put("endTime", aRs.getTimestamp("end_time"));
-        map.put("priority", aRs.getInt("priority"));
-        map.put("inputs", Json.deserialize(objectMapper, aRs.getString("inputs"), Map.class));
-        map.put("outputs", Json.deserialize(objectMapper, aRs.getString("outputs"), Map.class));
-        map.put("webhooks", Json.deserialize(objectMapper, aRs.getString("webhooks"), List.class));
-        map.put(Constants.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
-        return new JobSummary(new SimpleJob(map));
-    }
 
-    private List<TaskExecution> getExecution(String aJobId) {
-        return taskExecutionRepository.getExecution(aJobId);
+        map.put("id", resultSet.getString("id"));
+        map.put("status", resultSet.getString("status"));
+        map.put("currentTask", resultSet.getInt("current_task"));
+        map.put("workflowId", resultSet.getString("workflow_id"));
+        map.put("label", resultSet.getString("label"));
+        map.put("createTime", resultSet.getTimestamp("create_time"));
+        map.put("startTime", resultSet.getTimestamp("start_time"));
+        map.put("endTime", resultSet.getTimestamp("end_time"));
+        map.put("priority", resultSet.getInt("priority"));
+        map.put("inputs", Json.deserialize(objectMapper, resultSet.getString("inputs"), Map.class));
+        map.put("outputs", Json.deserialize(objectMapper, resultSet.getString("outputs"), Map.class));
+        map.put("webhooks", Json.deserialize(objectMapper, resultSet.getString("webhooks"), List.class));
+        map.put(Constants.PARENT_TASK_EXECUTION_ID, resultSet.getString("parent_task_execution_id"));
+
+        return new JobSummary(new SimpleJob(map));
     }
 }

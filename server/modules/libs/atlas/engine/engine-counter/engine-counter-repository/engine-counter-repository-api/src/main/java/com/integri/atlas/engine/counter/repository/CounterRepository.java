@@ -19,29 +19,28 @@
 package com.integri.atlas.engine.counter.repository;
 
 /**
- * A repository that can be used to atomically set
- * a counter value.
+ * A repository that can be used to atomically set a counter value.
  *
  * @author Arik Cohen
  */
 public interface CounterRepository {
     /**
      * Set the counter to the give value.
-     * @param aCounterName the name of the counter
-     * @param aValue the value to set the counter to.
+     * @param counterName the name of the counter
+     * @param value the value to set the counter to.
      */
-    void set(String aCounterName, long aValue);
+    void set(String counterName, long value);
 
     /**
      * Decrement the specified counter by 1.
-     * @param aCounterName the name of the counter
+     * @param counterName the name of the counter
      * @return the new value
      */
-    long decrement(String aCounterName);
+    long decrement(String counterName);
 
     /**
      * Delete the specified counter.
-     * @param aCounterName the name of the counter
+     * @param counterName the name of the counter
      */
-    void delete(String aCounterName);
+    void delete(String counterName);
 }

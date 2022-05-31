@@ -34,18 +34,21 @@ import org.springframework.util.Assert;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
-    private final Map<String, TaskExecution> executions = new HashMap<>();
+    private final Map<String, TaskExecution> taskExecutions = new HashMap<>();
 
     @Override
-    public TaskExecution findOne(String aId) {
-        TaskExecution taskExecution = executions.get(aId);
-        Assert.notNull(taskExecution, "unknown task execution: " + aId);
-        return taskExecution;
+    public void create(TaskExecution taskExecution) {
+        Assert.isTrue(
+            taskExecutions.get(taskExecution.getId()) == null,
+            "task execution " + taskExecution.getId() + " already exists"
+        );
+
+        taskExecutions.put(taskExecution.getId(), taskExecution);
     }
 
     @Override
-    public List<TaskExecution> findByJobId(String jobId) {
-        return executions
+    public List<TaskExecution> findAllByJobIdOrderByTaskNumber(String jobId) {
+        return taskExecutions
             .values()
             .stream()
             .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobId))
@@ -53,27 +56,32 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
-    public List<TaskExecution> findByParentId(String aParentId) {
+    public List<TaskExecution> findAllByParentId(String parentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void create(TaskExecution aTaskExecution) {
-        Assert.isTrue(
-            executions.get(aTaskExecution.getId()) == null,
-            "task execution " + aTaskExecution.getId() + " already exists"
-        );
-        executions.put(aTaskExecution.getId(), aTaskExecution);
+    public TaskExecution merge(TaskExecution taskExecution) {
+        taskExecutions.put(taskExecution.getId(), taskExecution);
+        return taskExecution;
     }
 
     @Override
-    public TaskExecution merge(TaskExecution aTaskExecution) {
-        executions.put(aTaskExecution.getId(), aTaskExecution);
-        return aTaskExecution;
+    public List<TaskExecution> findAllByJobIdOrderByCreateTime(String jobId) {
+        return Collections.unmodifiableList(new ArrayList<>(taskExecutions.values()));
     }
 
     @Override
-    public List<TaskExecution> getExecution(String aJobId) {
-        return Collections.unmodifiableList(new ArrayList<>(executions.values()));
+    public List<TaskExecution> findAllByJobIdsOrderByCreateTime(List<String> jobIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TaskExecution findOne(String id) {
+        TaskExecution taskExecution = taskExecutions.get(id);
+
+        Assert.notNull(taskExecution, "unknown task execution: " + id);
+
+        return taskExecution;
     }
 }

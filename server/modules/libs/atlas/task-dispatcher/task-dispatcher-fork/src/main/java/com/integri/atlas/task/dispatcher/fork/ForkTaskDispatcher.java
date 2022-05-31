@@ -18,9 +18,9 @@
 
 package com.integri.atlas.task.dispatcher.fork;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
-import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -30,7 +30,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandler;
 import java.util.Date;
@@ -41,12 +41,9 @@ import org.springframework.util.Assert;
 /**
  * Implements a Fork/Join construct.
  *
- * Fork/Join tasks are expected to have a "branches"
- * property which contains a list of task list.
+ * Fork/Join tasks are expected to have a "branches" property which contains a list of task list.
  *
- * Each branch executes in isolation, in parallel
- * to the other branches in the fork and has its
- * own context namespace.
+ * Each branch executes in isolation, in parallel to the other branches in the fork and has its own context namespace.
  *
  * <pre>
  *   - type: fork
@@ -78,10 +75,10 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     private TaskDispatcher taskDispatcher;
     private TaskEvaluator taskEvaluator;
-    private TaskExecutionRepository taskExecutionRepo;
+    private TaskExecutionService taskExecutionService;
     private MessageBroker messageBroker;
-    private ContextRepository contextRepository;
-    private CounterRepository counterRepository;
+    private ContextService contextService;
+    private CounterService counterService;
 
     @Override
     public void dispatch(TaskExecution aTask) {
@@ -90,9 +87,9 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         SimpleTaskExecution forkTask = SimpleTaskExecution.of(aTask);
         forkTask.setStartTime(new Date());
         forkTask.setStatus(TaskStatus.STARTED);
-        taskExecutionRepo.merge(forkTask);
+        taskExecutionService.merge(forkTask);
         if (branches.size() > 0) {
-            counterRepository.set(aTask.getId(), branches.size());
+            counterService.set(aTask.getId(), branches.size());
             for (int i = 0; i < branches.size(); i++) {
                 List branch = branches.get(i);
                 Assert.isTrue(branch.size() > 0, "branch " + i + " does not contain any tasks");
@@ -106,11 +103,11 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 execution.setJobId(aTask.getJobId());
                 execution.setParentId(aTask.getId());
                 execution.setPriority(aTask.getPriority());
-                MapContext context = new MapContext(contextRepository.peek(aTask.getId()));
-                contextRepository.push(aTask.getId() + "/" + i, context);
-                contextRepository.push(execution.getId(), context);
+                MapContext context = new MapContext(contextService.peek(aTask.getId()));
+                contextService.push(aTask.getId() + "/" + i, context);
+                contextService.push(execution.getId(), context);
                 TaskExecution evaluatedExecution = taskEvaluator.evaluate(execution, context);
-                taskExecutionRepo.create(evaluatedExecution);
+                taskExecutionService.create(evaluatedExecution);
                 taskDispatcher.dispatch(evaluatedExecution);
             }
         } else {
@@ -130,27 +127,27 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         return null;
     }
 
-    public void setContextRepository(ContextRepository aContextRepository) {
-        contextRepository = aContextRepository;
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 
-    public void setCounterRepository(CounterRepository aCounterRepository) {
-        counterRepository = aCounterRepository;
+    public void setCounterService(CounterService counterService) {
+        this.counterService = counterService;
     }
 
-    public void setMessageBroker(MessageBroker aMessageBroker) {
-        messageBroker = aMessageBroker;
+    public void setMessageBroker(MessageBroker messageBroker) {
+        this.messageBroker = messageBroker;
     }
 
-    public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {
-        taskDispatcher = aTaskDispatcher;
+    public void setTaskDispatcher(TaskDispatcher taskDispatcher) {
+        this.taskDispatcher = taskDispatcher;
     }
 
-    public void setTaskEvaluator(TaskEvaluator aTaskEvaluator) {
-        taskEvaluator = aTaskEvaluator;
+    public void setTaskEvaluator(TaskEvaluator taskEvaluator) {
+        this.taskEvaluator = taskEvaluator;
     }
 
-    public void setTaskExecutionRepo(TaskExecutionRepository aTaskExecutionRepo) {
-        taskExecutionRepo = aTaskExecutionRepo;
+    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 }

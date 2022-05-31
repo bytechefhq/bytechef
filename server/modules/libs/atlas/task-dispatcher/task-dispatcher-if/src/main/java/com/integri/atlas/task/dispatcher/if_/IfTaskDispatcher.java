@@ -19,10 +19,10 @@ package com.integri.atlas.task.dispatcher.if_;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_FALSE;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_TRUE;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -32,7 +32,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.if_.util.IfTaskUtil;
 import java.util.Date;
@@ -44,24 +44,24 @@ import java.util.List;
  */
 public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ContextRepository contextRepository;
+    private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
 
     public IfTaskDispatcher(
-        ContextRepository contextRepository,
+        ContextService contextService,
         MessageBroker messageBroker,
         TaskDispatcher taskDispatcher,
         TaskEvaluator taskEvaluator,
-        TaskExecutionRepository taskExecutionRepository
+        TaskExecutionService taskExecutionService
     ) {
-        this.contextRepository = contextRepository;
+        this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskEvaluator = taskEvaluator;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         ifTaskExecution.setStartTime(new Date());
         ifTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionRepository.merge(ifTaskExecution);
+        taskExecutionService.merge(ifTaskExecution);
 
         List<MapObject> subtaskDefinitions;
 
@@ -94,13 +94,13 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
             subTaskExecution.setStatus(TaskStatus.CREATED);
             subTaskExecution.setTaskNumber(1);
 
-            MapContext context = new MapContext(contextRepository.peek(ifTaskExecution.getId()));
+            MapContext context = new MapContext(contextService.peek(ifTaskExecution.getId()));
 
-            contextRepository.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskExecutionService.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         } else {
             SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);

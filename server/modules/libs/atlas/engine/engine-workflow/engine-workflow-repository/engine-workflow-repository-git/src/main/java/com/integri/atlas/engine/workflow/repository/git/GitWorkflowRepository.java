@@ -63,9 +63,9 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     @Override
-    public Workflow findOne(String aId) {
+    public Workflow findOne(String id) {
         synchronized (this) {
-            WorkflowResource resource = git.getFile(aId);
+            WorkflowResource resource = git.getFile(id);
             return workflowMapper.readValue(resource);
         }
     }

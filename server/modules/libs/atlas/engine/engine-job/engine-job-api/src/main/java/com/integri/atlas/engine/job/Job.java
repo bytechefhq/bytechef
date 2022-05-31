@@ -72,7 +72,7 @@ public interface Job extends Errorable, Prioritizable {
      *
      * @return {@link List}
      */
-    List<TaskExecution> getExecution();
+    List<TaskExecution> getExecutions();
 
     /**
      * Return the job's workflow id.

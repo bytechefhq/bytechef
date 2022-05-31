@@ -44,22 +44,22 @@ public class JdbcContextRepository implements ContextRepository {
     }
 
     @Override
-    public void push(String aStackId, Context context) {
+    public void push(String stackId, Context context) {
         jdbc.update(
             "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",
             UUIDGenerator.generate(),
-            aStackId,
+            stackId,
             Json.serialize(objectMapper, context),
             new Date()
         );
     }
 
     @Override
-    public Context peek(String aStackId) {
+    public Context peek(String stackId) {
         try {
             String sql =
                 "select id,serialized_context from context where stack_id = ? order by create_time desc limit 1";
-            return jdbc.queryForObject(sql, new Object[] { aStackId }, this::contextRowMapper);
+            return jdbc.queryForObject(sql, new Object[] { stackId }, this::contextRowMapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -68,6 +68,7 @@ public class JdbcContextRepository implements ContextRepository {
     @SuppressWarnings("unchecked")
     private Context contextRowMapper(ResultSet aResultSet, int aIndex) throws SQLException {
         String serialized = aResultSet.getString(2);
+
         return new MapContext(Json.deserialize(objectMapper, serialized, Map.class));
     }
 

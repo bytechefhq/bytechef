@@ -4,6 +4,8 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-core"
+    implementation "org.springframework:spring-tx"
     implementation project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-api")
+    implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-api")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-api")
 }

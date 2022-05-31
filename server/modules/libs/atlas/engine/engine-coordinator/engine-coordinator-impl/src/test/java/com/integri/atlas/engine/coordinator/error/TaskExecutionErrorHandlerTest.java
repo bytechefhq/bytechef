@@ -27,10 +27,10 @@ import static org.mockito.Mockito.when;
 import com.integri.atlas.engine.error.ErrorObject;
 import com.integri.atlas.engine.event.EventPublisher;
 import com.integri.atlas.engine.job.SimpleJob;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
@@ -39,18 +39,18 @@ import org.junit.jupiter.api.Test;
  */
 public class TaskExecutionErrorHandlerTest {
 
-    private JobRepository jobRepo = mock(JobRepository.class);
-    private TaskExecutionRepository taskRepo = mock(TaskExecutionRepository.class);
+    private JobService jobService = mock(JobService.class);
+    private TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
     private EventPublisher eventPublisher = mock(EventPublisher.class);
 
     @Test
     public void test1() {
-        when(jobRepo.getByTaskId("1234")).thenReturn(new SimpleJob(Collections.singletonMap("id", "4567")));
+        when(jobService.getTaskExecutionJob("1234")).thenReturn(new SimpleJob(Collections.singletonMap("id", "4567")));
         TaskExecutionErrorHandler handler = new TaskExecutionErrorHandler();
         handler.setEventPublisher(eventPublisher);
-        handler.setJobRepository(jobRepo);
-        handler.setJobTaskRepository(taskRepo);
+        handler.setJobService(jobService);
+        handler.setTaskExecutionService(taskExecutionService);
         SimpleTaskExecution errorable = new SimpleTaskExecution();
         errorable.setId("1234");
         errorable.setError(new ErrorObject("something bad happened", new String[0]));
@@ -61,10 +61,10 @@ public class TaskExecutionErrorHandlerTest {
 
     @Test
     public void test2() {
-        when(jobRepo.getByTaskId("1234")).thenReturn(new SimpleJob());
+        when(jobService.getTaskExecutionJob("1234")).thenReturn(new SimpleJob());
         TaskExecutionErrorHandler handler = new TaskExecutionErrorHandler();
-        handler.setJobRepository(jobRepo);
-        handler.setJobTaskRepository(taskRepo);
+        handler.setJobService(jobService);
+        handler.setTaskExecutionService(taskExecutionService);
         handler.setTaskDispatcher(taskDispatcher);
         SimpleTaskExecution errorable = SimpleTaskExecution.of("retry", 1);
         errorable.setId("1234");

@@ -19,7 +19,7 @@ package com.integri.atlas.engine.coordinator.event;
 import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.job.Job;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.io.Print;
 import com.integri.atlas.task.handler.random.RandomInt;
@@ -64,11 +64,8 @@ public class DeleteContextEventListenerIntTest extends BaseTaskIntTest {
     public static class CoordinatorTestConfiguration {
 
         @Bean
-        DeleteContextEventListener deleteContextEventListener(
-            ContextService contextService,
-            JobRepository jobRepository
-        ) {
-            return new DeleteContextEventListener(contextService, jobRepository);
+        DeleteContextEventListener deleteContextEventListener(ContextService contextService, JobService jobService) {
+            return new DeleteContextEventListener(contextService, jobService);
         }
     }
 }

@@ -56,7 +56,7 @@ public class JdbcJobRepositoryIntTest {
 
     @Test
     public void test1() {
-        int pageTotal = jobRepository.getPage(1).getSize();
+        int pageTotal = jobRepository.findAllJobSummaries(1).getSize();
 
         String id = UUIDGenerator.generate();
 
@@ -67,10 +67,10 @@ public class JdbcJobRepositoryIntTest {
         job.setStatus(JobStatus.CREATED);
         jobRepository.create(job);
 
-        Page<JobSummary> all = jobRepository.getPage(1);
+        Page<JobSummary> all = jobRepository.findAllJobSummaries(1);
         Assertions.assertEquals(pageTotal + 1, all.getSize());
 
-        Job one = jobRepository.getById(id);
+        Job one = jobRepository.findById(id);
         Assertions.assertNotNull(one);
     }
 
@@ -85,7 +85,7 @@ public class JdbcJobRepositoryIntTest {
         job.setStatus(JobStatus.CREATED);
         jobRepository.create(job);
 
-        Job one = jobRepository.getById(id);
+        Job one = jobRepository.findById(id);
 
         SimpleJob mjob = new SimpleJob(one);
         mjob.setStatus(JobStatus.FAILED);
@@ -94,7 +94,7 @@ public class JdbcJobRepositoryIntTest {
         Assertions.assertNotEquals(mjob.getStatus().toString(), one.getStatus().toString());
 
         jobRepository.merge(mjob);
-        one = jobRepository.getById(id);
+        one = jobRepository.findById(id);
         Assertions.assertEquals("FAILED", one.getStatus().toString());
     }
 

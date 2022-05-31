@@ -20,11 +20,11 @@ package com.integri.atlas.task.dispatcher.map.completion;
 
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,30 +35,30 @@ import java.util.stream.Collectors;
  */
 public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final TaskExecutionRepository taskExecutionRepo;
+    private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final CounterRepository counterRepository;
+    private final CounterService counterService;
 
     public MapTaskCompletionHandler(
-        TaskExecutionRepository aTaskExecutionRepo,
-        TaskCompletionHandler aTaskCompletionHandler,
-        CounterRepository aCounterRepository
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService
     ) {
-        taskExecutionRepo = aTaskExecutionRepo;
-        taskCompletionHandler = aTaskCompletionHandler;
-        counterRepository = aCounterRepository;
+        this.taskExecutionService = taskExecutionService;
+        this.taskCompletionHandler = taskCompletionHandler;
+        this.counterService = counterService;
     }
 
     @Override
     public void handle(TaskExecution aTaskExecution) {
         SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
         mtask.setStatus(TaskStatus.COMPLETED);
-        taskExecutionRepo.merge(mtask);
-        long subtasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
+        taskExecutionService.merge(mtask);
+        long subtasksLeft = counterService.decrement(aTaskExecution.getParentId());
         if (subtasksLeft == 0) {
-            List<TaskExecution> children = taskExecutionRepo.findByParentId(aTaskExecution.getParentId());
+            List<TaskExecution> children = taskExecutionService.getParentTaskExecutions(aTaskExecution.getParentId());
             SimpleTaskExecution parentExecution = SimpleTaskExecution.of(
-                taskExecutionRepo.findOne(aTaskExecution.getParentId())
+                taskExecutionService.getTaskExecution(aTaskExecution.getParentId())
             );
             parentExecution.setEndTime(new Date());
             parentExecution.setExecutionTime(
@@ -66,7 +66,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
             );
             parentExecution.setOutput(children.stream().map(c -> c.getOutput()).collect(Collectors.toList()));
             taskCompletionHandler.handle(parentExecution);
-            counterRepository.delete(aTaskExecution.getParentId());
+            counterService.delete(aTaskExecution.getParentId());
         }
     }
 
@@ -74,7 +74,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     public boolean canHandle(TaskExecution aTaskExecution) {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
+            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
             return parentExecution.getType().equals(Constants.MAP);
         }
         return false;

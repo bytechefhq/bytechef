@@ -1,0 +1,5 @@
+dependencies {
+    implementation "org.springframework:spring-tx"
+    implementation "org.springframework:spring-context"
+    implementation project(":modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-api")
+}

@@ -36,30 +36,33 @@ public class JdbcCounterRepository implements CounterRepository {
 
     @Override
     @Transactional
-    public void set(String aCounterName, long aValue) {
+    public void set(String counterName, long value) {
         try {
-            jdbc.queryForObject("select value from counter where id = ? for update", Long.class, aCounterName);
-            jdbc.update("update counter set value = ? where id = ?", aValue, aCounterName);
+            jdbc.queryForObject("select value from counter where id = ? for update", Long.class, counterName);
+            jdbc.update("update counter set value = ? where id = ?", value, counterName);
         } catch (EmptyResultDataAccessException e) {
             jdbc.update(
                 "insert into counter (id,value,create_time) values (?,?,current_timestamp)",
-                aCounterName,
-                aValue
+                counterName,
+                value
             );
         }
     }
 
     @Override
     @Transactional
-    public long decrement(String aCounterName) {
-        Long value = jdbc.queryForObject("select value from counter where id = ? for update", Long.class, aCounterName);
+    public long decrement(String counterName) {
+        Long value = jdbc.queryForObject("select value from counter where id = ? for update", Long.class, counterName);
+
         value = value - 1;
-        jdbc.update("update counter set value = ? where id = ?", value, aCounterName);
+
+        jdbc.update("update counter set value = ? where id = ?", value, counterName);
+
         return value;
     }
 
     @Override
-    public void delete(String aCounterName) {
-        jdbc.update("delete from counter where id = ?", aCounterName);
+    public void delete(String counterName) {
+        jdbc.update("delete from counter where id = ?", counterName);
     }
 }

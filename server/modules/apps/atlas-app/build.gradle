@@ -19,6 +19,7 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-context:engine-context-service")
     implementation project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
     implementation project(":modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-jdbc")
+    implementation project(":modules:libs:atlas:engine:engine-counter:engine-counter-service")
     implementation project(":modules:libs:atlas:engine:engine-event:engine-event-impl")
     implementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-amqp")
     implementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-jms")
@@ -26,6 +27,7 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-jdbc")
     implementation project(":modules:libs:atlas:engine:engine-job:engine-job-service")
     implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-jdbc")
+    implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-service")
     implementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
     implementation project(":modules:libs:atlas:engine:engine-rest")
     implementation project(":modules:libs:atlas:file-storage:file-storage-base64")
@@ -63,6 +65,7 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-git")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-jdbc")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")
+    implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-service")
     implementation project(":modules:libs:atlas:task-handler:task-handler-transform-json")
 
     runtimeOnly "org.postgresql:postgresql"

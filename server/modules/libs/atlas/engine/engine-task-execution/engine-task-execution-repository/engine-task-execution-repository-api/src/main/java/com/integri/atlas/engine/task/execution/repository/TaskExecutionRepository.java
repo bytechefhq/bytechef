@@ -26,52 +26,57 @@ import java.util.List;
  */
 public interface TaskExecutionRepository {
     /**
-     * Find a single {@link TaskExecution} instance by its id.
-     *
-     * @param aId
-     * @return TaskExecution
-     */
-    TaskExecution findOne(String aId);
-
-    /**
-     * Returns a collection of {@link TaskExecution} instances which
-     * belong to the job of the given id.
-     *
-     * @param jobId
-     * @return
-     */
-    List<TaskExecution> findByJobId(String jobId);
-
-    /**
-     * Returns a collection of {@link TaskExecution} instances which
-     * are the children of the given parent id.
-     *
-     * @param aParentId
-     * @return
-     */
-    List<TaskExecution> findByParentId(String aParentId);
-
-    /**
      * Creates a new persistent represenation of the given {@link TaskExecution}.
      *
-     * @param aTaskExecution
+     * @param taskExecution
      */
-    void create(TaskExecution aTaskExecution);
-
-    /**
-     * Merges the state of the given {@link TaskExecution} instance
-     * with its persistent representation and returns the merged
-     * version.
-     *
-     * @param aTaskExecution
-     */
-    TaskExecution merge(TaskExecution aTaskExecution);
+    void create(TaskExecution taskExecution);
 
     /**
      * Returns the execution steps of the given job
      *
-     * @param aJobId
+     * @param jobId
      * @return List<TaskExecution>
      */
-    List<TaskExecution> getExecution(String aJobId);
+    List<TaskExecution> findAllByJobIdOrderByCreateTime(String jobId);
+
+    /**
+     * Returns the execution steps of the given jobs
+     *
+     * @param jobIds
+     * @return List<TaskExecution>
+     */
+    List<TaskExecution> findAllByJobIdsOrderByCreateTime(List<String> jobIds);
+
+    /**
+     * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.
+     *
+     * @param jobId
+     * @return
+     */
+    List<TaskExecution> findAllByJobIdOrderByTaskNumber(String jobId);
+
+    /**
+     * Returns a collection of {@link TaskExecution} instances which are the children of the given parent id.
+     *
+     * @param parentId
+     * @return
+     */
+    List<TaskExecution> findAllByParentId(String parentId);
+
+    /**
+     * Find a single {@link TaskExecution} instance by its id.
+     *
+     * @param id
+     * @return TaskExecution
+     */
+    TaskExecution findOne(String id);
+
+    /**
+     * Merges the state of the given {@link TaskExecution} instance with its persistent representation and
+     * returns the merged version.
+     *
+     * @param taskExecution
+     */
+    TaskExecution merge(TaskExecution taskExecution);
 }

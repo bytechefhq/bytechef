@@ -18,11 +18,11 @@
 
 package com.integri.atlas.task.dispatcher.parallel;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
-import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -31,7 +31,7 @@ import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import java.util.Date;
@@ -51,17 +51,17 @@ import org.springframework.util.Assert;
 public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private TaskDispatcher taskDispatcher;
-    private TaskExecutionRepository taskExecutionRepo;
+    private TaskExecutionService taskExecutionService;
     private MessageBroker messageBroker;
-    private ContextRepository contextRepository;
-    private CounterRepository counterRepository;
+    private ContextService contextService;
+    private CounterService counterService;
 
     @Override
     public void dispatch(TaskExecution aTask) {
         List<MapObject> tasks = aTask.getList("tasks", MapObject.class);
         Assert.notNull(tasks, "'tasks' property can't be null");
         if (tasks.size() > 0) {
-            counterRepository.set(aTask.getId(), tasks.size());
+            counterService.set(aTask.getId(), tasks.size());
             for (Map<String, Object> task : tasks) {
                 SimpleTaskExecution parallelTask = SimpleTaskExecution.of(task);
                 parallelTask.setId(UUIDGenerator.generate());
@@ -70,9 +70,9 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                 parallelTask.setJobId(aTask.getJobId());
                 parallelTask.setCreateTime(new Date());
                 parallelTask.setPriority(aTask.getPriority());
-                MapContext context = new MapContext(contextRepository.peek(aTask.getId()));
-                contextRepository.push(parallelTask.getId(), context);
-                taskExecutionRepo.create(parallelTask);
+                MapContext context = new MapContext(contextService.peek(aTask.getId()));
+                contextService.push(parallelTask.getId(), context);
+                taskExecutionService.create(parallelTask);
                 taskDispatcher.dispatch(parallelTask);
             }
         } else {
@@ -92,23 +92,23 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         return null;
     }
 
-    public void setContextRepository(ContextRepository aContextRepository) {
-        contextRepository = aContextRepository;
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 
-    public void setCounterRepository(CounterRepository aCounterRepository) {
-        counterRepository = aCounterRepository;
+    public void setCounterService(CounterService counterService) {
+        this.counterService = counterService;
     }
 
-    public void setMessageBroker(MessageBroker aMessageBroker) {
-        messageBroker = aMessageBroker;
+    public void setMessageBroker(MessageBroker messageBroker) {
+        this.messageBroker = messageBroker;
     }
 
-    public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {
-        taskDispatcher = aTaskDispatcher;
+    public void setTaskDispatcher(TaskDispatcher taskDispatcher) {
+        this.taskDispatcher = taskDispatcher;
     }
 
-    public void setTaskExecutionRepository(TaskExecutionRepository aTaskExecutionRepo) {
-        taskExecutionRepo = aTaskExecutionRepo;
+    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 }

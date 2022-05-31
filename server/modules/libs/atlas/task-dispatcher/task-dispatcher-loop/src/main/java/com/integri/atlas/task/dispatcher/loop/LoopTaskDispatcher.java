@@ -16,9 +16,9 @@
 
 package com.integri.atlas.task.dispatcher.loop;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -28,7 +28,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import java.util.List;
@@ -43,24 +43,24 @@ import org.springframework.util.Assert;
  */
 public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ContextRepository contextRepository;
+    private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
 
     public LoopTaskDispatcher(
-        ContextRepository contextRepository,
+        ContextService contextService,
         MessageBroker messageBroker,
         TaskDispatcher taskDispatcher,
         TaskEvaluator taskEvaluator,
-        TaskExecutionRepository taskExecutionRepository
+        TaskExecutionService taskExecutionService
     ) {
-        this.contextRepository = contextRepository;
+        this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.messageBroker = messageBroker;
         this.taskEvaluator = taskEvaluator;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         loopTaskExecution.setStartTime(new Date());
         loopTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionRepository.merge(loopTaskExecution);
+        taskExecutionService.merge(loopTaskExecution);
 
         if (list == null || list.size() > 0) {
             SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
@@ -88,7 +88,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             subTaskExecution.setStatus(TaskStatus.CREATED);
             subTaskExecution.setTaskNumber(1);
 
-            MapContext context = new MapContext(contextRepository.peek(taskExecution.getId()));
+            MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
 
             if (list != null) {
                 Object item = list.get(0);
@@ -98,11 +98,11 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             context.set(taskExecution.getString("itemIndex", "itemIndex"), 0);
 
-            contextRepository.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskExecutionService.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         } else {
             SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);

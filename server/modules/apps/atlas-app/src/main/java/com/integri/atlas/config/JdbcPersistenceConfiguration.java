@@ -79,7 +79,6 @@ public class JdbcPersistenceConfiguration {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
         jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
-        jdbcJobRepository.setJobTaskExecutionRepository(jdbcJobTaskRepository(aJdbcTemplate, objectMapper));
         jdbcJobRepository.setObjectMapper(objectMapper);
 
         return jdbcJobRepository;

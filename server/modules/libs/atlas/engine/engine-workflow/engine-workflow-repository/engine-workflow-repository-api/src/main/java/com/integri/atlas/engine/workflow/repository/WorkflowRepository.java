@@ -22,13 +22,13 @@ import com.integri.atlas.engine.workflow.Workflow;
 import java.util.List;
 
 /**
- *
  * @author Arik Cohen
  * @author Ivica Cardic
+ *
  * @since Jun 18, 2016
  */
 public interface WorkflowRepository {
-    Workflow findOne(String aId);
+    Workflow findOne(String id);
 
     List<Workflow> findAll();
 

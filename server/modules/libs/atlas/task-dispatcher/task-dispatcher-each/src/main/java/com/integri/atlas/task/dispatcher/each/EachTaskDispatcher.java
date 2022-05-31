@@ -18,10 +18,10 @@
 
 package com.integri.atlas.task.dispatcher.each;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
-import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -31,7 +31,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import java.util.List;
@@ -50,24 +50,24 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
     private final MessageBroker messageBroker;
-    private final ContextRepository contextRepository;
-    private final CounterRepository counterRepository;
+    private final ContextService contextService;
+    private final CounterService counterService;
 
     public EachTaskDispatcher(
         TaskDispatcher taskDispatcher,
-        TaskExecutionRepository taskExecutionRepository,
+        TaskExecutionService taskExecutionService,
         MessageBroker messageBroker,
-        ContextRepository contextRepository,
-        CounterRepository counterRepository,
+        ContextService contextService,
+        CounterService counterService,
         TaskEvaluator taskEvaluator
     ) {
         this.taskDispatcher = taskDispatcher;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
         this.messageBroker = messageBroker;
-        this.contextRepository = contextRepository;
-        this.counterRepository = counterRepository;
+        this.contextService = contextService;
+        this.counterService = counterService;
         this.taskEvaluator = taskEvaluator;
     }
 
@@ -84,10 +84,10 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         eachTaskExecution.setStartTime(new Date());
         eachTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionRepository.merge(eachTaskExecution);
+        taskExecutionService.merge(eachTaskExecution);
 
         if (list.size() > 0) {
-            counterRepository.set(taskExecution.getId(), list.size());
+            counterService.set(taskExecution.getId(), list.size());
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
@@ -101,16 +101,16 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 subTaskExecution.setStatus(TaskStatus.CREATED);
                 subTaskExecution.setTaskNumber(i + 1);
 
-                MapContext context = new MapContext(contextRepository.peek(taskExecution.getId()));
+                MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
 
                 context.set(taskExecution.getString("itemVar", "item"), item);
                 context.set(taskExecution.getString("itemIndex", "itemIndex"), i);
 
-                contextRepository.push(subTaskExecution.getId(), context);
+                contextService.push(subTaskExecution.getId(), context);
 
                 TaskExecution evaluatedSubtaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-                taskExecutionRepository.create(evaluatedSubtaskExecution);
+                taskExecutionService.create(evaluatedSubtaskExecution);
                 taskDispatcher.dispatch(evaluatedSubtaskExecution);
             }
         } else {

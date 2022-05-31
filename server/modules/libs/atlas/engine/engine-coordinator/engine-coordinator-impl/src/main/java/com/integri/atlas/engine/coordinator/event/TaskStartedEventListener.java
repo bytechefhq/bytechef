@@ -22,13 +22,13 @@ import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.task.CancelTask;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,33 +39,33 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskStartedEventListener implements EventListener {
 
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
     private final TaskDispatcher taskDispatcher;
-    private final JobRepository jobRepository;
+    private final JobService jobService;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public TaskStartedEventListener(
-        TaskExecutionRepository aTaskExecutionRepository,
-        TaskDispatcher aTaskDispatcher,
-        JobRepository aJobRepository
+        TaskExecutionService taskExecutionService,
+        TaskDispatcher taskDispatcher,
+        JobService jobService
     ) {
-        taskExecutionRepository = aTaskExecutionRepository;
-        taskDispatcher = aTaskDispatcher;
-        jobRepository = aJobRepository;
+        this.taskExecutionService = taskExecutionService;
+        this.taskDispatcher = taskDispatcher;
+        this.jobService = jobService;
     }
 
     @Override
     public void onApplicationEvent(WorkflowEvent aEvent) {
         if (Events.TASK_STARTED.equals(aEvent.getType())) {
             String taskId = aEvent.getString("taskId");
-            TaskExecution task = taskExecutionRepository.findOne(taskId);
+            TaskExecution task = taskExecutionService.getTaskExecution(taskId);
             if (task == null) {
                 logger.error("Unkown task: {}", taskId);
                 return;
             }
 
-            Job job = jobRepository.getByTaskId(taskId);
+            Job job = jobService.getTaskExecutionJob(taskId);
 
             if (task.getStatus() == TaskStatus.CANCELLED || job.getStatus() != JobStatus.STARTED) {
                 taskDispatcher.dispatch(new CancelTask(task.getJobId(), task.getId()));
@@ -74,7 +74,7 @@ public class TaskStartedEventListener implements EventListener {
                 if (mtask.getStartTime() == null && mtask.getStatus() != TaskStatus.STARTED) {
                     mtask.setStartTime(aEvent.getCreateTime());
                     mtask.setStatus(TaskStatus.STARTED);
-                    taskExecutionRepository.merge(mtask);
+                    taskExecutionService.merge(mtask);
                 }
                 if (mtask.getParentId() != null) {
                     WorkflowEvent pevent = WorkflowEvent.of(Events.TASK_STARTED, "taskId", mtask.getParentId());
