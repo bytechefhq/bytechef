@@ -78,6 +78,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
 /**
@@ -153,6 +154,7 @@ public class CoordinatorConfiguration {
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler();
+
         taskCompletionHandler.setContextService(contextService);
         taskCompletionHandler.setJobExecutor(jobExecutor());
         taskCompletionHandler.setJobService(jobService);
@@ -160,6 +162,7 @@ public class CoordinatorConfiguration {
         taskCompletionHandler.setWorkflowService(workflowService);
         taskCompletionHandler.setEventPublisher(eventPublisher);
         taskCompletionHandler.setTaskEvaluator(taskEvaluator);
+
         return taskCompletionHandler;
     }
 
@@ -186,8 +189,9 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
+    @Primary
     ErrorHandler errorHandler() {
-        return new ErrorHandlerChain(Arrays.asList(jobTaskErrorHandler()));
+        return new ErrorHandlerChain(List.of(jobTaskErrorHandler()));
     }
 
     @Bean
@@ -205,12 +209,14 @@ public class CoordinatorConfiguration {
     @Bean
     ForkTaskDispatcher forkTaskDispatcher(TaskDispatcher taskDispatcher) {
         ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
+
         forkTaskDispatcher.setTaskDispatcher(taskDispatcher);
         forkTaskDispatcher.setTaskEvaluator(taskEvaluator);
         forkTaskDispatcher.setTaskExecutionService(taskExecutionService);
         forkTaskDispatcher.setMessageBroker(messageBroker);
         forkTaskDispatcher.setContextService(contextService);
         forkTaskDispatcher.setCounterService(counterService);
+
         return forkTaskDispatcher;
     }
 
@@ -238,11 +244,13 @@ public class CoordinatorConfiguration {
     @Bean
     DefaultJobExecutor jobExecutor() {
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
+
         jobExecutor.setContextService(contextService);
         jobExecutor.setTaskExecutionService(taskExecutionService);
         jobExecutor.setWorkflowService(workflowService);
         jobExecutor.setTaskDispatcher(taskDispatcher());
         jobExecutor.setTaskEvaluator(taskEvaluator);
+
         return jobExecutor;
     }
 
@@ -254,10 +262,12 @@ public class CoordinatorConfiguration {
     @Bean
     TaskExecutionErrorHandler jobTaskErrorHandler() {
         TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
+
         jobTaskErrorHandler.setJobService(jobService);
         jobTaskErrorHandler.setTaskExecutionService(taskExecutionService);
         jobTaskErrorHandler.setTaskDispatcher(taskDispatcher());
         jobTaskErrorHandler.setEventPublisher(eventPublisher);
+
         return jobTaskErrorHandler;
     }
 
@@ -319,20 +329,24 @@ public class CoordinatorConfiguration {
     @Bean
     ParallelTaskCompletionHandler parallelTaskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
         ParallelTaskCompletionHandler dispatcher = new ParallelTaskCompletionHandler();
+
         dispatcher.setCounterService(counterService);
         dispatcher.setTaskCompletionHandler(taskCompletionHandler);
         dispatcher.setTaskExecutionService(taskExecutionService);
+
         return dispatcher;
     }
 
     @Bean
     ParallelTaskDispatcher parallelTaskDispatcher(TaskDispatcher taskDispatcher) {
         ParallelTaskDispatcher dispatcher = new ParallelTaskDispatcher();
+
         dispatcher.setContextService(contextService);
         dispatcher.setCounterService(counterService);
         dispatcher.setMessageBroker(messageBroker);
         dispatcher.setTaskDispatcher(taskDispatcher);
         dispatcher.setTaskExecutionService(taskExecutionService);
+
         return dispatcher;
     }
 
@@ -396,8 +410,10 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    TaskCompletionHandlerChain taskCompletionHandler() {
+    @Primary
+    TaskCompletionHandler taskCompletionHandler() {
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
+
         taskCompletionHandlerChain.setTaskCompletionHandlers(
             Arrays.asList(
                 eachTaskCompletionHandler(taskCompletionHandlerChain),
@@ -411,12 +427,15 @@ public class CoordinatorConfiguration {
                 defaultTaskCompletionHandler()
             )
         );
+
         return taskCompletionHandlerChain;
     }
 
     @Bean
-    TaskDispatcherChain taskDispatcher() {
+    @Primary
+    TaskDispatcher taskDispatcher() {
         TaskDispatcherChain taskDispatcher = new TaskDispatcherChain();
+
         List<TaskDispatcherResolver> resolvers = Arrays.asList(
             eachTaskDispatcher(taskDispatcher),
             ifTaskDispatcher(taskDispatcher),

@@ -56,7 +56,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals("subflow")) {
+        if (aTask.getType().equals(Constants.SUBFLOW)) {
             return this;
         }
         return null;
