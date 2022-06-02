@@ -19,11 +19,11 @@ package com.integri.atlas.task.handler.http.client;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
-import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
+import com.integri.atlas.task.handler.http.client.header.HttpHeaderFactory;
 import com.integri.atlas.task.handler.http.client.params.HttpQueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
+import com.integri.atlas.task.handler.http.client.util.TestHttpHandler;
 import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
 
         Context context = contextService.peek(job.getId());
 
-        Assertions.assertTrue(true);
+        Assertions.fail();
     }
 
     @Override
@@ -78,48 +78,42 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
             "httpClient/delete",
             new HttpClientDeleteTaskHandler(
                 new HttpBodyFactory(fileStorageService),
-                new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(),
+                new HttpHeaderFactory(),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
                 new HttpQueryParamsFactory()
             ),
             "httpClient/head",
             new HttpClientHeadTaskHandler(
                 new HttpBodyFactory(fileStorageService),
-                new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(),
+                new HttpHeaderFactory(),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
                 new HttpQueryParamsFactory()
             ),
             "httpClient/get",
             new HttpClientHeadTaskHandler(
                 new HttpBodyFactory(fileStorageService),
-                new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(),
+                new HttpHeaderFactory(),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
                 new HttpQueryParamsFactory()
             ),
             "httpClient/patch",
             new HttpClientPatchTaskHandler(
                 new HttpBodyFactory(fileStorageService),
-                new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(),
+                new HttpHeaderFactory(),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
                 new HttpQueryParamsFactory()
             ),
             "httpClient/post",
             new HttpClientPostTaskHandler(
                 new HttpBodyFactory(fileStorageService),
-                new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(),
+                new HttpHeaderFactory(),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
                 new HttpQueryParamsFactory()
             ),
             "httpClient/put",
             new HttpClientPutTaskHandler(
                 new HttpBodyFactory(fileStorageService),
-                new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(),
+                new HttpHeaderFactory(),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
                 new HttpQueryParamsFactory()
             )

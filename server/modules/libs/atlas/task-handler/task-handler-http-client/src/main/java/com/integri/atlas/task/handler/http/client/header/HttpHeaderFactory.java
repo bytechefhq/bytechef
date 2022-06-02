@@ -40,7 +40,7 @@ import org.springframework.util.MimeTypeUtils;
  * @author Matija Petanjek
  */
 @Component
-public class HttpHeadersFactory {
+public class HttpHeaderFactory {
 
     @SuppressWarnings("unchecked")
     public List<HttpHeader> getHttpHeaders(TaskExecution taskExecution) {

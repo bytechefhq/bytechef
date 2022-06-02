@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.http.client.authentication;
+package com.integri.atlas.task.handler.http.client.auth;
+
+import com.integri.atlas.task.auth.TaskAuth;
+import java.net.http.HttpRequest;
 
 /**
- * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public interface HttpAuthentication {
-    public String getAuthorizationHeader() throws Exception;
+public class OAuth2HttpAuth implements HttpAuth {
+
+    @Override
+    public void apply(HttpRequest.Builder httpRequestBuilder, TaskAuth taskAuth) {
+        throw new UnsupportedOperationException();
+    }
 }
