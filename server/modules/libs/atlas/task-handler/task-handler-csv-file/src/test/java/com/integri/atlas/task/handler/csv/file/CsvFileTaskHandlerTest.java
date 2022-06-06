@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.csv.file;
 
+import static com.integri.atlas.task.handler.csv.file.CsvFileTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 

@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.ods.file;
 
+import static com.integri.atlas.task.handler.ods.file.OdsFileTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 

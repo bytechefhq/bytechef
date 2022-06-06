@@ -16,6 +16,8 @@
 
 package com.integri.atlas.task.handler.http.client;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskHandler.*;
+
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
@@ -64,11 +66,36 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
     }
 
     @Test
-    public void testHttpClientTaskHandler() {
-        Job job = startJob("samples/http-client.yaml", Collections.emptyMap());
+    public void testHttpClientDeleteTaskHandler() {
+        Assertions.fail();
+    }
+
+    @Test
+    public void testHttpClientGetTaskHandler() {
+        Job job = startJob("samples/http-client-get.yaml", Collections.emptyMap());
 
         Context context = contextService.peek(job.getId());
 
+        Assertions.fail();
+    }
+
+    @Test
+    public void testHttpClientHeadTaskHandler() {
+        Assertions.fail();
+    }
+
+    @Test
+    public void testHttpClientPatchTaskHandler() {
+        Assertions.fail();
+    }
+
+    @Test
+    public void testHttpClientPostTaskHandler() {
+        Assertions.fail();
+    }
+
+    @Test
+    public void testHttpClientPutTaskHandler() {
         Assertions.fail();
     }
 

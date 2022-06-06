@@ -16,11 +16,13 @@
 
 package com.integri.atlas.task.handler.object_.helpers;
 
+import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.task.commons.json.JsonHelper;
+import com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskHandler.ObjectHelpersParseTaskHandler;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
