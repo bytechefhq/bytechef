@@ -27,7 +27,7 @@ import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.MYSQL;
 import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.VERSION_1_0;
 
 import com.integri.atlas.task.commons.jdbc.JdbcTaskConstants;
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskAuthDefinition;
 import com.integri.atlas.task.definition.model.TaskDefinition;

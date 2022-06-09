@@ -18,7 +18,7 @@ package com.integri.atlas.task.dispatcher.loop;
 
 import static com.integri.atlas.task.dispatcher.loop.LoopBreakTaskConstants.TASK_LOOP_BREAK;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 

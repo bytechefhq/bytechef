@@ -40,7 +40,7 @@ import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VAL
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_2;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.TASK_IF;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 

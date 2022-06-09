@@ -40,7 +40,7 @@ import static com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants.PATH
 import static com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants.SOURCE;
 import static com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants.VERSION_1_0;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 import com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants;

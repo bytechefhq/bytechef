@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.loop;
+package com.integri.atlas.task.definition.handler;
 
-import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
-import com.integri.atlas.task.definition.model.DSL;
-import com.integri.atlas.task.definition.model.TaskDefinition;
+import com.integri.atlas.task.definition.model.TaskAuthDefinition;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class LoopTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
+public abstract class AbstractTaskDefinitionHandler implements TaskDefinitionHandler {
 
-    private static final TaskDefinition TASK_DEFINITION = DSL
-        .createTaskDefinition(LoopTaskConstants.TASK_LOOP)
-        .displayName("Loop")
-        .description("Loops sequentially over list of items.");
-
-    @Override
-    public TaskDefinition getTaskDefinition() {
-        return TASK_DEFINITION;
+    public List<TaskAuthDefinition> getTaskAuthDefinitions() {
+        return List.of();
     }
 }

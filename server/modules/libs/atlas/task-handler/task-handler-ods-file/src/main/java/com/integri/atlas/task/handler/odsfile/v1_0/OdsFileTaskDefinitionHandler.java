@@ -28,7 +28,7 @@ import static com.integri.atlas.task.definition.model.DSL.OPTIONS;
 import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
 import static com.integri.atlas.task.handler.odsfile.OdsFileTaskConstants.*;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 import org.springframework.stereotype.Component;

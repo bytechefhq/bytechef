@@ -28,7 +28,7 @@ import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.VERSION_1_0;
 
 import com.integri.atlas.task.commons.jdbc.JdbcTaskConstants;
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskAuthDefinition;
 import com.integri.atlas.task.definition.model.TaskDefinition;

@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.sequence;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 

@@ -27,7 +27,7 @@ import static com.integri.atlas.task.handler.file.FileTaskConstants.READ;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.VERSION;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.WRITE;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 import org.springframework.stereotype.Component;
