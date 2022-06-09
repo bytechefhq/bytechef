@@ -16,15 +16,15 @@
 
 package com.integri.atlas.task.commons.jdbc;
 
-import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.BOOLEAN_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.DATE_TIME_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.OPERATION;
-import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.DATE_TIME_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.NUMBER_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.OPERATION;
+import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
 
-import com.integri.atlas.task.definition.model.TaskOperation;
+import com.integri.atlas.task.descriptor.model.TaskOperation;
 
 /**
  * @author Ivica Cardic

@@ -39,9 +39,9 @@ import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import com.integri.atlas.task.auth.jdbc.JdbcTaskAuthRepository;
 import com.integri.atlas.task.auth.repository.TaskAuthRepository;
+import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
+import com.integri.atlas.task.descriptor.repository.memory.InMemoryExtTaskDescriptorHandlerRepository;
 import java.util.List;
-import com.integri.atlas.task.definition.repository.ExtTaskDefinitionHandlerRepository;
-import com.integri.atlas.task.definition.repository.memory.InMemoryExtTaskDefinitionHandlerRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -61,8 +61,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 public class PersistenceConfiguration {
 
     @Bean
-    ExtTaskDefinitionHandlerRepository extTaskDefinitionHandlerRepository() {
-        return new InMemoryExtTaskDefinitionHandlerRepository();
+    ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository() {
+        return new InMemoryExtTaskDescriptorHandlerRepository();
     }
 
     @ConditionalOnProperty(name = "atlas.persistence.provider", havingValue = "jdbc")
