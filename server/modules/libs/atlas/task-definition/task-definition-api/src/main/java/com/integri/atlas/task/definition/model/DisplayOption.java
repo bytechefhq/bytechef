@@ -76,37 +76,37 @@ public class DisplayOption {
         }
 
         public DisplayOptionEntry in(Boolean... values) {
-            this.value.values = List.of(values);
+            this.value.values = List.of((Boolean[]) values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Integer... values) {
-            this.value.values = List.of(values);
+            this.value.values = List.of((Integer[]) values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Long... values) {
-            this.value.values = List.of(values);
+            this.value.values = List.of((Long[]) values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Float... values) {
-            this.value.values = List.of(values);
+            this.value.values = List.of((Float[]) values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Double... values) {
-            this.value.values = List.of(values);
+            this.value.values = List.of((Double[]) values);
 
             return this;
         }
 
         public DisplayOptionEntry in(String... values) {
-            this.value.values = List.of(values);
+            this.value.values = List.of((String[]) values);
 
             return this;
         }

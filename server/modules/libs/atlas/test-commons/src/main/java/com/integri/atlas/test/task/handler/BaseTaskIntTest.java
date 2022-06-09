@@ -79,6 +79,9 @@ public abstract class BaseTaskIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
+    protected Map<String, TaskHandler<?>> taskHandlers;
+
+    @Autowired
     protected WorkflowService workflowService;
 
     protected List<TaskCompletionHandler> getTaskCompletionHandlers(
@@ -96,7 +99,7 @@ public abstract class BaseTaskIntTest {
     }
 
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of();
+        return taskHandlers;
     }
 
     protected Job startJob(String workflowId, Map<String, ?> inputs) {

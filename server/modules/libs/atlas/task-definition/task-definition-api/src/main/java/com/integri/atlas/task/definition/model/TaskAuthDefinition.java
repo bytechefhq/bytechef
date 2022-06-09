@@ -31,7 +31,6 @@ public class TaskAuthDefinition {
     private String name;
     private List<TaskProperty<?>> properties;
     private String subtitle;
-    private float version = 1;
 
     TaskAuthDefinition(String name) {
         this.name = name;
@@ -67,12 +66,6 @@ public class TaskAuthDefinition {
         return this;
     }
 
-    public TaskAuthDefinition version(float version) {
-        this.version = version;
-
-        return this;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -95,9 +88,5 @@ public class TaskAuthDefinition {
 
     public String getSubtitle() {
         return subtitle;
-    }
-
-    public float getVersion() {
-        return version;
     }
 }

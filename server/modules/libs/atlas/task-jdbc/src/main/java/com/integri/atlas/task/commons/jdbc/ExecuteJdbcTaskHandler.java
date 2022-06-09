@@ -16,8 +16,8 @@
 
 package com.integri.atlas.task.commons.jdbc;
 
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_EXECUTE;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_PARAMETERS;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.EXECUTE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PARAMETERS;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
@@ -36,8 +36,8 @@ public class ExecuteJdbcTaskHandler extends AbstractJdbcTaskHandler implements T
 
     @Override
     public Map<String, Integer> handle(TaskExecution taskExecution) throws Exception {
-        String executeStatement = taskExecution.getRequiredString(PROPERTY_EXECUTE);
-        Map<String, ?> paramMap = taskExecution.getMap(PROPERTY_PARAMETERS, Map.of());
+        String executeStatement = taskExecution.getRequiredString(EXECUTE);
+        Map<String, ?> paramMap = taskExecution.getMap(PARAMETERS, Map.of());
 
         NamedParameterJdbcTemplate jdbcTemplate = createNamedParameterJdbcTemplate(taskExecution);
 

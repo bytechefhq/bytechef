@@ -16,10 +16,10 @@
 
 package com.integri.atlas.task.commons.jdbc;
 
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_COLUMNS;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_ROWS;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_SCHEMA;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PROPERTY_TABLE;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.COLUMNS;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.ROWS;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.SCHEMA;
+import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.TABLE;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
@@ -41,10 +41,10 @@ public class InsertJdbcTaskHandler extends AbstractJdbcTaskHandler implements Ta
 
     @Override
     public Map<String, Integer> handle(TaskExecution taskExecution) throws Exception {
-        List<String> columns = taskExecution.getList(PROPERTY_COLUMNS, String.class, List.of());
-        List<Map<String, ?>> rows = taskExecution.get(PROPERTY_ROWS, List.class, List.of());
-        String schema = taskExecution.getString(PROPERTY_SCHEMA, "public");
-        String table = taskExecution.getRequiredString(PROPERTY_TABLE);
+        List<String> columns = taskExecution.getList(COLUMNS, String.class, List.of());
+        List<Map<String, ?>> rows = taskExecution.get(ROWS, List.class, List.of());
+        String schema = taskExecution.getString(SCHEMA, "public");
+        String table = taskExecution.getRequiredString(TABLE);
 
         NamedParameterJdbcTemplate jdbcTemplate = createNamedParameterJdbcTemplate(taskExecution);
 

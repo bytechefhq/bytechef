@@ -21,8 +21,11 @@ package com.integri.atlas.task.handler.file;
  */
 public class FileTaskConstants {
 
-    public static final String PROPERTY_CONTENT = "content";
-    public static final String PROPERTY_FILE_ENTRY = "fileEntry";
-    public static final String PROPERTY_FILE_NAME = "fileName";
-    public static final String TASK_FILE = "file";
+    public static final String CONTENT = "content";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILE_NAME = "fileName";
+    public static final String FILE = "file";
+    public static final float VERSION = 1.0f;
+    public static final String READ = "read";
+    public static final String WRITE = "write";
 }

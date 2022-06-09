@@ -32,7 +32,7 @@ public class TaskDefinition {
     private String name;
     private List<TaskOperation> operations;
     private String subtitle;
-    private float version = 1;
+    private float version = 1.0f;
 
     TaskDefinition() {}
 

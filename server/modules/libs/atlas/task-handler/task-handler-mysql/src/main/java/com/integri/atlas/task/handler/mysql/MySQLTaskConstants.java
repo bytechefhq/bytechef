@@ -21,5 +21,6 @@ package com.integri.atlas.task.handler.mysql;
  */
 public class MySQLTaskConstants {
 
-    public static final String TASK_MYSQL = "mysql";
+    public static final String MYSQL = "mysql";
+    public static final float VERSION_1_0 = 1.0f;
 }
