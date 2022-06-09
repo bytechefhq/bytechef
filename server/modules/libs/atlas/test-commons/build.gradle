@@ -14,4 +14,7 @@ dependencies {
     implementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
     implementation project(":modules:libs:atlas:task-commons")
     implementation project(":modules:libs:atlas:task-handler:task-handler-core")
+
+    runtimeOnly "org.postgresql:postgresql"
+    runtimeOnly "org.testcontainers:postgresql"
 }

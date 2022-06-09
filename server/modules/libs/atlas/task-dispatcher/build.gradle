@@ -17,8 +17,5 @@ subprojects {
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-core")
         testImplementation project(":modules:libs:atlas:test-commons")
         testImplementation project(":modules:libs:atlas:engine:engine-service")
-
-        testRuntimeOnly "org.postgresql:postgresql"
-        testRuntimeOnly "org.testcontainers:postgresql"
     }
 }

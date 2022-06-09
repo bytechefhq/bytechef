@@ -9,7 +9,4 @@ dependencies {
 
     testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
     testImplementation project(":modules:libs:atlas:test-commons")
-
-    testRuntimeOnly "org.postgresql:postgresql"
-    testRuntimeOnly "org.testcontainers:postgresql"
 }

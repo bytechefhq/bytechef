@@ -20,5 +20,7 @@ spring:
     time-zone: UTC
 
 atlas:
+  coordinator:
+    enabled: true
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
