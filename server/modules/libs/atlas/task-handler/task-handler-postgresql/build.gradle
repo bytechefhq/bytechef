@@ -2,4 +2,8 @@ dependencies {
     compileOnly project(":modules:libs:atlas:task-jdbc")
 
     runtimeOnly "org.postgresql:postgresql"
+
+    testImplementation "com.zaxxer:HikariCP"
+    testImplementation project(":modules:libs:atlas:task-jdbc")
+    testImplementation project(":modules:libs:atlas:test-commons")
 }
