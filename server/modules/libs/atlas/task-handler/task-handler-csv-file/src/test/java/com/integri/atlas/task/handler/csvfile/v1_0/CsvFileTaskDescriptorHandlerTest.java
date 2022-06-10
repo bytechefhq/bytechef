@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.jsonfile.v1_0;
+package com.integri.atlas.task.handler.csvfile.v1_0;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class JsonFileTaskDescriptorTest {
+public class CsvFileTaskDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,38 +36,20 @@ public class JsonFileTaskDescriptorTest {
     };
 
     @Test
-    public void testJSONFileTaskDescriptor() throws JsonProcessingException {
+    public void testGetCsvFileTaskDescriptor() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-              "description": "Reads and writes data from a JSON file.",
-              "displayName": "JSON File",
-              "name": "jsonFile",
+              "description": "Reads and writes data from a csv file.",
+              "displayName": "CSV File",
+              "name": "csvFile",
               "operations": [
                 {
-                  "description": "Reads data from a JSON file.",
+                  "description": "Reads data from a csv file.",
                   "name": "read",
                   "inputs": [
                     {
-                      "description": "The file type to choose.",
-                      "displayName": "File Type",
-                      "name": "fileType",
-                      "required": true,
-                      "options": [
-                        {
-                          "name": "JSON",
-                          "value": "JSON"
-                        },
-                        {
-                          "name": "JSON Line",
-                          "value": "JSONL"
-                        }
-                      ],
-                      "defaultValue": "JSON",
-                      "type": "STRING"
-                    },
-                    {
-                      "description": "The object property which contains a reference to the JSON file to read from.",
+                      "description": "The object property which contains a reference to the csv file to read from.",
                       "displayName": "File",
                       "name": "fileEntry",
                       "required": true,
@@ -96,60 +78,48 @@ public class JsonFileTaskDescriptorTest {
                       ]
                     },
                     {
-                      "description": "The object input is array?",
-                      "displayName": "Is Array",
-                      "name": "isArray",
-                      "defaultValue": true,
-                      "type": "BOOLEAN"
-                    },
-                    {
                       "displayName": "Options",
                       "placeholder": "Add Option",
                       "options": [
                         {
-                          "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
-                          "displayOption": {
-                            "showWhen": {
-                              "isArray": {
-                                "values": [
-                                  true
-                                ]
-                              }
-                            }
-                          },
-                          "displayName": "Path",
-                          "name": "path",
+                          "description": "Delimiter to use when reading a csv file.",
+                          "displayName": "Delimiter",
+                          "name": "delimiter",
+                          "defaultValue": ",",
                           "type": "STRING"
                         },
                         {
+                          "description": "The first row of the file contains the header names.",
+                          "displayName": "Header Row",
+                          "name": "headerRow",
+                          "defaultValue": true,
+                          "type": "BOOLEAN"
+                        },
+                        {
+                          "description": "When reading from file the empty cells will be filled with an empty string.",
+                          "displayName": "Include Empty Cells",
+                          "name": "includeEmptyCells",
+                          "defaultValue": false,
+                          "type": "BOOLEAN"
+                        },
+                        {
                           "description": "The amount of child elements to return in a page.",
-                          "displayOption": {
-                            "showWhen": {
-                              "isArray": {
-                                "values": [
-                                  true
-                                ]
-                              }
-                            }
-                          },
                           "displayName": "Page Size",
                           "name": "pageSize",
                           "type": "INTEGER"
                         },
                         {
                           "description": "The page number to get.",
-                          "displayOption": {
-                            "showWhen": {
-                              "isArray": {
-                                "values": [
-                                  true
-                                ]
-                              }
-                            }
-                          },
                           "displayName": "Page Number",
                           "name": "pageNumber",
                           "type": "INTEGER"
+                        },
+                        {
+                          "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
+                          "displayName": "Read As String",
+                          "name": "readAsString",
+                          "defaultValue": false,
+                          "type": "BOOLEAN"
                         }
                       ]
                     }
@@ -157,55 +127,53 @@ public class JsonFileTaskDescriptorTest {
                   "outputs": [
                     {
                       "type": "ARRAY"
-                    },
-                    {
-                      "type": "OBJECT"
                     }
                   ],
                   "displayName": "Read from file"
                 },
                 {
-                  "description": "Writes the data to a JSON file.",
+                  "description": "Writes the data to a csv file.",
                   "name": "write",
                   "inputs": [
                     {
-                      "description": "The file type to choose.",
-                      "displayName": "File Type",
-                      "name": "fileType",
+                      "description": "The array of objects to write to the file.",
+                      "displayName": "Rows",
+                      "name": "rows",
                       "required": true,
-                      "options": [
+                      "type": "ARRAY",
+                      "items": [
                         {
-                          "name": "JSON",
-                          "value": "JSON"
-                        },
-                        {
-                          "name": "JSON Line",
-                          "value": "JSONL"
-                        }
-                      ],
-                      "defaultValue": "JSON",
-                      "type": "STRING"
-                    },
-                    {
-                      "description": "The data to write to the file.",
-                      "displayName": "Source",
-                      "name": "source",
-                      "required": true,
-                      "types": [
-                        {
-                          "type": "ARRAY"
-                        },
-                        {
-                          "type": "OBJECT"
+                          "type": "OBJECT",
+                          "additionalProperties": true,
+                          "properties": [
+                            {
+                              "type": "BOOLEAN"
+                            },
+                            {
+                              "type": "DATE_TIME"
+                            },
+                            {
+                              "type": "NUMBER"
+                            },
+                            {
+                              "type": "STRING"
+                            }
+                          ]
                         }
                       ]
                     },
                     {
-                      "description": "File name to set for binary data. By default, \\"file.json\\" will be used.",
-                      "displayName": "File Name",
-                      "name": "fileName",
-                      "defaultValue": "file.json",
-                      "type": "STRING"
+                      "displayName": "Options",
+                      "placeholder": "Add Option",
+                      "options": [
+                        {
+                          "description": "File name to set for binary data. By default, \\"file.csv\\" will be used.",
+                          "displayName": "File Name",
+                          "name": "fileName",
+                          "defaultValue": "",
+                          "type": "STRING"
+                        }
+                      ]
                     }
                   ],
                   "outputs": [
@@ -242,7 +210,7 @@ public class JsonFileTaskDescriptorTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(new JsonFileTaskDescriptorHandler().getTaskDescriptor())
+                objectMapper.writeValueAsString(new CsvFileTaskDescriptorHandler().getTaskDescriptor())
             ),
             true
         );

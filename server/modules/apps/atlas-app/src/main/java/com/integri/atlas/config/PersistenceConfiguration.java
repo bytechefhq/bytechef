@@ -39,7 +39,9 @@ import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import com.integri.atlas.task.auth.jdbc.JdbcTaskAuthRepository;
 import com.integri.atlas.task.auth.repository.TaskAuthRepository;
+import com.integri.atlas.task.descriptor.repository.ExtTaskAuthDescriptorHandlerRepository;
 import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
+import com.integri.atlas.task.descriptor.repository.memory.InMemoryExtTaskAuthDescriptorHandlerRepository;
 import com.integri.atlas.task.descriptor.repository.memory.InMemoryExtTaskDescriptorHandlerRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +61,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  */
 @Configuration
 public class PersistenceConfiguration {
+
+    @Bean
+    ExtTaskAuthDescriptorHandlerRepository extTaskAuthDescriptorHandlerRepository() {
+        return new InMemoryExtTaskAuthDescriptorHandlerRepository();
+    }
 
     @Bean
     ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository() {

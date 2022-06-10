@@ -28,7 +28,7 @@ import static com.integri.atlas.task.descriptor.model.DSL.OPTIONS;
 import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
 import static com.integri.atlas.task.handler.odsfile.OdsFileTaskConstants.*;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class OdsFileTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class OdsFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(ODS_FILE)

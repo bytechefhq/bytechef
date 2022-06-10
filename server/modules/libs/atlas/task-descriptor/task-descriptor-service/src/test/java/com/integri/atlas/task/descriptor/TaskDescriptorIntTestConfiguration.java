@@ -16,11 +16,12 @@
 
 package com.integri.atlas.task.descriptor;
 
+import com.integri.atlas.task.descriptor.handler.TaskAuthDescriptorHandler;
 import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
-import com.integri.atlas.task.descriptor.model.TaskAuthDescriptor;
-import com.integri.atlas.task.descriptor.model.TaskDescriptor;
+import com.integri.atlas.task.descriptor.repository.ExtTaskAuthDescriptorHandlerRepository;
 import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
+import com.integri.atlas.task.descriptor.repository.memory.InMemoryExtTaskAuthDescriptorHandlerRepository;
 import com.integri.atlas.task.descriptor.repository.memory.InMemoryExtTaskDescriptorHandlerRepository;
 import java.util.List;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -30,22 +31,22 @@ import org.springframework.context.annotation.Bean;
 public class TaskDescriptorIntTestConfiguration {
 
     @Bean
+    ExtTaskAuthDescriptorHandlerRepository extTaskAuthDescriptorHandlerRepository() {
+        return new InMemoryExtTaskAuthDescriptorHandlerRepository();
+    }
+
+    @Bean
     ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository() {
         return new InMemoryExtTaskDescriptorHandlerRepository();
     }
 
     @Bean
-    TaskDescriptorHandler memoryTaskDDescriptorHandler() {
-        return new TaskDescriptorHandler() {
-            @Override
-            public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-                return null;
-            }
+    TaskAuthDescriptorHandler memoryTaskAuthDescriptorHandler() {
+        return () -> DSL.createTaskAuthDescriptors("csvFile", List.of(DSL.createTaskAuthDescriptor("auth1")));
+    }
 
-            @Override
-            public TaskDescriptor getTaskDescriptor() {
-                return DSL.createTaskDescriptor("memory");
-            }
-        };
+    @Bean
+    TaskDescriptorHandler memoryTaskDDescriptorHandler() {
+        return () -> DSL.createTaskDescriptor("csvFile");
     }
 }

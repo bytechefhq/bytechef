@@ -16,9 +16,9 @@
 
 package com.integri.atlas.task.descriptor.resolver;
 
-import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
-import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandlerResolver;
-import com.integri.atlas.task.descriptor.model.TaskDescriptor;
+import com.integri.atlas.task.descriptor.handler.TaskAuthDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskAuthDescriptorHandlerResolver;
+import com.integri.atlas.task.descriptor.model.TaskAuthDescriptors;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.core.annotation.Order;
@@ -29,29 +29,29 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(1)
-public class InMemoryTaskDescriptorHandlerResolver implements TaskDescriptorHandlerResolver {
+public class InMemoryTaskAuthDescriptorHandlerResolver implements TaskAuthDescriptorHandlerResolver {
 
     public static final String IN_MEMORY = "IN_MEMORY";
 
-    private final List<TaskDescriptorHandler> taskDescriptorHandlers;
+    private final List<TaskAuthDescriptorHandler> taskAuthDescriptorHandlers;
 
-    public InMemoryTaskDescriptorHandlerResolver(List<TaskDescriptorHandler> taskDescriptorHandlers) {
-        this.taskDescriptorHandlers = taskDescriptorHandlers;
+    public InMemoryTaskAuthDescriptorHandlerResolver(List<TaskAuthDescriptorHandler> taskAuthDescriptorHandlers) {
+        this.taskAuthDescriptorHandlers = taskAuthDescriptorHandlers;
     }
 
     @Override
-    public List<TaskDescriptorHandler> getTaskDescriptorHandlers() {
-        return taskDescriptorHandlers;
+    public List<TaskAuthDescriptorHandler> getTaskAuthDescriptorHandlers() {
+        return taskAuthDescriptorHandlers;
     }
 
     @Override
-    public TaskDescriptorHandler resolve(String name, float version) {
-        return taskDescriptorHandlers
+    public TaskAuthDescriptorHandler resolve(String taskName) {
+        return taskAuthDescriptorHandlers
             .stream()
             .filter(taskDescriptorHandler -> {
-                TaskDescriptor taskDescriptor = taskDescriptorHandler.getTaskDescriptor();
+                TaskAuthDescriptors taskAuthDescriptors = taskDescriptorHandler.getTaskAuthDescriptors();
 
-                return Objects.equals(taskDescriptor.getName(), name);
+                return Objects.equals(taskAuthDescriptors.getTaskName(), taskName);
             })
             .findFirst()
             .orElse(null);

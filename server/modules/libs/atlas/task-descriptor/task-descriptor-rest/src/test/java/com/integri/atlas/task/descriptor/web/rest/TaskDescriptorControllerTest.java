@@ -22,8 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
-import com.integri.atlas.task.descriptor.model.TaskAuthDescriptor;
-import com.integri.atlas.task.descriptor.model.TaskDescriptor;
+import com.integri.atlas.task.descriptor.repository.ExtTaskAuthDescriptorHandlerRepository;
 import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
 import com.integri.atlas.task.descriptor.service.TaskDescriptorHandlerService;
 import java.util.List;
@@ -40,8 +39,11 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * @author Ivica Cardic
  */
-@WebMvcTest
+@WebMvcTest(TaskDescriptorController.class)
 public class TaskDescriptorControllerTest {
+
+    @MockBean
+    private ExtTaskAuthDescriptorHandlerRepository extTaskAuthDescriptorHandlerRepository;
 
     @MockBean
     private ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository;
@@ -59,28 +61,8 @@ public class TaskDescriptorControllerTest {
     private TaskDescriptorHandlerService taskDescriptorHandlerService;
 
     private static final List<TaskDescriptorHandler> TASK_DESCRIPTOR_HANDLERS = List.of(
-        new TaskDescriptorHandler() {
-            @Override
-            public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-                return null;
-            }
-
-            @Override
-            public TaskDescriptor getTaskDescriptor() {
-                return DSL.createTaskDescriptor("task1");
-            }
-        },
-        new TaskDescriptorHandler() {
-            @Override
-            public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-                return null;
-            }
-
-            @Override
-            public TaskDescriptor getTaskDescriptor() {
-                return DSL.createTaskDescriptor("task2");
-            }
-        }
+        () -> DSL.createTaskDescriptor("task1"),
+        () -> DSL.createTaskDescriptor("task2")
     );
 
     @Test
@@ -88,10 +70,10 @@ public class TaskDescriptorControllerTest {
         Mockito
             .doReturn(TASK_DESCRIPTOR_HANDLERS.get(0))
             .when(taskDescriptorHandlerService)
-            .getTaskDescriptorHandler(Mockito.anyString());
+            .getTaskDescriptorHandler(Mockito.anyString(), Mockito.anyFloat());
 
         mockMvc
-            .perform(get("/task-descriptors/task1").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/task-descriptors/task1/1.0").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(
                 content()

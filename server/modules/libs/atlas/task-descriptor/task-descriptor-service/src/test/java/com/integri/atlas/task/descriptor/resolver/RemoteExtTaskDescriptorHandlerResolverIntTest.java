@@ -31,8 +31,8 @@ public class RemoteExtTaskDescriptorHandlerResolverIntTest {
     private RemoteExtTaskDescriptorHandlerResolver remoteTaskDescriptorHandlerAccessor;
 
     @Test
-    public void testGetTaskDescriptorHandler() {
-        Assertions.assertNull(remoteTaskDescriptorHandlerAccessor.resolve("remote"));
+    public void testResolve() {
+        Assertions.assertNull(remoteTaskDescriptorHandlerAccessor.resolve("jsonFile", 1.0f));
     }
 
     @Test

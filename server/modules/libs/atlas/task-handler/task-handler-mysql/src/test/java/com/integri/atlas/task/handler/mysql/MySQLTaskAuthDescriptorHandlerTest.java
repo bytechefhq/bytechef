@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.sequence;
+package com.integri.atlas.task.handler.mysql;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -28,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDescriptorTest {
+public class MySQLTaskAuthDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -37,18 +36,13 @@ public class SequenceTaskDescriptorTest {
     };
 
     @Test
-    public void testSequenceTaskDescriptor() throws JsonProcessingException, JSONException {
+    public void testGetMySQLTaskAuthDescriptors() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
-            {
-                "description":"Executes list of tasks in a sequence",
-                "displayName":"Sequence",
-                "name":"sequence",
-                "version":1.0
-            }
-                """,
+            {"taskName":"mysql","taskAuthDescriptors":[{"displayName":"MySQL","name":"mysql","properties":[{"displayName":"Host","name":"host","required":true,"type":"STRING"},{"displayName":"Port","name":"port","required":true,"type":"INTEGER"},{"displayName":"Username","name":"username","required":true,"type":"STRING"},{"displayName":"Password","name":"password","required":true,"type":"STRING"}]}]}
+            """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(new SequenceTaskDescriptorHandler().getTaskDescriptor())
+                objectMapper.writeValueAsString(new MySQLTaskAuthDescriptorHandler().getTaskAuthDescriptors())
             ),
             true
         );

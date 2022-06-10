@@ -17,13 +17,13 @@
 package com.integri.atlas.task.descriptor.web.rest;
 
 import com.integri.atlas.engine.annotation.ConditionalOnCoordinator;
-import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskAuthDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.TaskAuthDescriptor;
-import com.integri.atlas.task.descriptor.service.TaskDescriptorHandlerService;
+import com.integri.atlas.task.descriptor.model.TaskAuthDescriptors;
+import com.integri.atlas.task.descriptor.service.TaskAuthDescriptorHandlerService;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,37 +36,36 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class TaskAuthDescriptorController {
 
-    private final TaskDescriptorHandlerService taskDescriptorHandlerService;
+    private final TaskAuthDescriptorHandlerService taskAuthDescriptorHandlerService;
 
-    public TaskAuthDescriptorController(TaskDescriptorHandlerService taskDescriptorHandlerService) {
-        this.taskDescriptorHandlerService = taskDescriptorHandlerService;
+    public TaskAuthDescriptorController(TaskAuthDescriptorHandlerService taskAuthDescriptorHandlerService) {
+        this.taskAuthDescriptorHandlerService = taskAuthDescriptorHandlerService;
     }
 
-    @GetMapping(value = "/task-auth-descriptors/{name}/{authName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/task-auth-descriptors/{taskName}/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TaskAuthDescriptor getTaskAuthDescriptor(
-        @PathVariable("name") String name,
-        @PathVariable("authName") String authName
+        @PathVariable("taskName") String taskName,
+        @PathVariable("name") String name
     ) {
-        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler(name);
+        TaskAuthDescriptorHandler taskAuthDescriptorHandler = taskAuthDescriptorHandlerService.getTaskAuthDescriptorHandler(
+            taskName
+        );
 
-        return taskDescriptorHandler
+        return taskAuthDescriptorHandler
+            .getTaskAuthDescriptors()
             .getTaskAuthDescriptors()
             .stream()
-            .filter(taskAuthDescriptor -> Objects.equals(taskAuthDescriptor.getName(), authName))
+            .filter(taskAuthDescriptor -> Objects.equals(taskAuthDescriptor.getName(), name))
             .findFirst()
             .orElse(null);
     }
 
     @GetMapping(value = "/task-auth-descriptors", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-        return taskDescriptorHandlerService
-            .getTaskDescriptorHandlers()
+    public List<TaskAuthDescriptors> getTaskAuthDescriptors() {
+        return taskAuthDescriptorHandlerService
+            .getTaskAuthDescriptorHandlers()
             .stream()
-            .flatMap(taskDescriptorHandler ->
-                taskDescriptorHandler.getTaskAuthDescriptors() == null
-                    ? Stream.of()
-                    : taskDescriptorHandler.getTaskAuthDescriptors().stream()
-            )
+            .map(TaskAuthDescriptorHandler::getTaskAuthDescriptors)
             .collect(Collectors.toList());
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface TaskDescriptorHandlerResolver {
-    TaskDescriptorHandler resolve(String name);
+    TaskDescriptorHandler resolve(String name, float version);
 
     List<TaskDescriptorHandler> getTaskDescriptorHandlers();
 }

@@ -27,7 +27,7 @@ import static com.integri.atlas.task.handler.file.FileTaskConstants.READ;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.VERSION;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.WRITE;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class FileTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class FileTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(FILE)

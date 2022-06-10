@@ -16,41 +16,21 @@
 
 package com.integri.atlas.task.handler.postgresql.v1_0;
 
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.HOST;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PASSWORD;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PORT;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.USERNAME;
-import static com.integri.atlas.task.descriptor.model.DSL.INTEGER_PROPERTY;
-import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.descriptor.model.DSL.createTaskAuthDescriptor;
 import static com.integri.atlas.task.descriptor.model.DSL.option;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.POSTGRESQL;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.VERSION_1_0;
 
 import com.integri.atlas.task.commons.jdbc.JdbcTaskConstants;
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
-import com.integri.atlas.task.descriptor.model.TaskAuthDescriptor;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
-import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class PostgreSQLTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
-
-    private static final List<TaskAuthDescriptor> TASK_AUTH_DESCRIPTORS = List.of(
-        createTaskAuthDescriptor(POSTGRESQL)
-            .displayName("PostgreSQL")
-            .properties(
-                STRING_PROPERTY(HOST).displayName("Host").required(true),
-                INTEGER_PROPERTY(PORT).displayName("Port").required(true),
-                STRING_PROPERTY(USERNAME).displayName("Username").required(true),
-                STRING_PROPERTY(PASSWORD).displayName("Password").required(true)
-            )
-    );
+public class PostgreSQLTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(POSTGRESQL)
@@ -59,11 +39,6 @@ public class PostgreSQLTaskDescriptorHandler extends AbstractTaskDescriptorHandl
         .version(VERSION_1_0)
         .auth(option(POSTGRESQL))
         .operations(JdbcTaskConstants.TASK_OPERATIONS);
-
-    @Override
-    public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-        return TASK_AUTH_DESCRIPTORS;
-    }
 
     @Override
     public TaskDescriptor getTaskDescriptor() {

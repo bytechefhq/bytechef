@@ -16,6 +16,8 @@
 
 package com.integri.atlas.task.descriptor.model;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
@@ -117,6 +119,13 @@ public class DSL {
 
     public static TaskAuthDescriptor createTaskAuthDescriptor(String name) {
         return new TaskAuthDescriptor(name);
+    }
+
+    public static TaskAuthDescriptors createTaskAuthDescriptors(
+        String taskName,
+        List<TaskAuthDescriptor> taskAuthDescriptors
+    ) {
+        return new TaskAuthDescriptors(taskName, taskAuthDescriptors);
     }
 
     public static TaskDescriptor createTaskDescriptor(String name) {

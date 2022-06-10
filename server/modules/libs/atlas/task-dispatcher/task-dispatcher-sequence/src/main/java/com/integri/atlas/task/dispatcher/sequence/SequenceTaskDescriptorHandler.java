@@ -16,14 +16,14 @@
 
 package com.integri.atlas.task.dispatcher.sequence;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class SequenceTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(SequenceTaskConstants.TASK_SEQUENCE)

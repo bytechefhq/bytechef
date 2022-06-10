@@ -16,9 +16,9 @@
 
 package com.integri.atlas.task.descriptor.resolver;
 
-import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
-import com.integri.atlas.task.descriptor.model.TaskDescriptor;
-import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
+import com.integri.atlas.task.descriptor.handler.TaskAuthDescriptorHandler;
+import com.integri.atlas.task.descriptor.model.TaskAuthDescriptors;
+import com.integri.atlas.task.descriptor.repository.ExtTaskAuthDescriptorHandlerRepository;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -27,31 +27,31 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(2)
-public class RemoteExtTaskDescriptorHandlerResolver extends AbstractExtTaskDescriptorHandlerResolver {
+public class RemoteExtTaskAuthDescriptorHandlerResolver extends AbstractExtTaskAuthDescriptorHandlerResolver {
 
     public static final String REMOTE = "REMOTE";
 
-    public RemoteExtTaskDescriptorHandlerResolver(
-        ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository
+    public RemoteExtTaskAuthDescriptorHandlerResolver(
+        ExtTaskAuthDescriptorHandlerRepository extTaskAuthDescriptorHandlerRepository
     ) {
-        super(extTaskDescriptorHandlerRepository, REMOTE);
+        super(extTaskAuthDescriptorHandlerRepository, REMOTE);
     }
 
     @Override
-    protected TaskDescriptorHandler createTaskDescriptorHandler(String name, float version) {
-        return new RemoteExtTaskDescriptorHandlerProxy(name);
+    protected TaskAuthDescriptorHandler createTaskAuthDescriptorHandler(String name) {
+        return new RemoteExtTaskAuthDescriptorHandlerProxy(name);
     }
 
-    private static class RemoteExtTaskDescriptorHandlerProxy implements TaskDescriptorHandler {
+    private static class RemoteExtTaskAuthDescriptorHandlerProxy implements TaskAuthDescriptorHandler {
 
         private final String name;
 
-        private RemoteExtTaskDescriptorHandlerProxy(String name) {
+        private RemoteExtTaskAuthDescriptorHandlerProxy(String name) {
             this.name = name;
         }
 
         @Override
-        public TaskDescriptor getTaskDescriptor() {
+        public TaskAuthDescriptors getTaskAuthDescriptors() {
             throw new UnsupportedOperationException();
         }
     }

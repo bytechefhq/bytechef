@@ -36,11 +36,11 @@ public class TaskDescriptorHandlerResolverChain implements TaskDescriptorHandler
     }
 
     @Override
-    public TaskDescriptorHandler resolve(String name) {
+    public TaskDescriptorHandler resolve(String name, float version) {
         TaskDescriptorHandler taskDescriptorHandler = null;
 
         for (TaskDescriptorHandlerResolver taskDescriptorHandlerResolver : taskDescriptorHandlerResolvers) {
-            taskDescriptorHandler = taskDescriptorHandlerResolver.resolve(name);
+            taskDescriptorHandler = taskDescriptorHandlerResolver.resolve(name, version);
 
             if (taskDescriptorHandler != null) {
                 break;

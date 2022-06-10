@@ -25,18 +25,18 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class InMemoryTaskDescriptorHandlerResolverIntTest {
+public class RemoteExtTaskAuthDescriptorHandlerResolverIntTest {
 
     @Autowired
-    private InMemoryTaskDescriptorHandlerResolver inMemoryTaskDescriptorHandlerAccessor;
+    private RemoteExtTaskAuthDescriptorHandlerResolver remoteExtTaskAuthDescriptorHandlerResolver;
 
     @Test
     public void testResolve() {
-        Assertions.assertNotNull(inMemoryTaskDescriptorHandlerAccessor.resolve("csvFile", 1.0f));
+        Assertions.assertNull(remoteExtTaskAuthDescriptorHandlerResolver.resolve("remote"));
     }
 
     @Test
-    public void testGetTaskDescriptorHandlers() {
-        Assertions.assertEquals(1, inMemoryTaskDescriptorHandlerAccessor.getTaskDescriptorHandlers().size());
+    public void testGetTaskAuthDescriptorHandlers() {
+        Assertions.assertEquals(0, remoteExtTaskAuthDescriptorHandlerResolver.getTaskAuthDescriptorHandlers().size());
     }
 }

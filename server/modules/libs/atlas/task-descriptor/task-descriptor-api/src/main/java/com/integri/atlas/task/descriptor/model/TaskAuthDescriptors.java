@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.objecthelpers.v1_0;
+package com.integri.atlas.task.descriptor.model;
 
-import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
-import com.integri.atlas.task.descriptor.model.TaskDescriptor;
-import com.integri.atlas.task.handler.objecthelpers.ObjectHelpersTaskConstants;
-import org.springframework.stereotype.Component;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class ObjectHelpersTaskDescriptorHandler implements TaskDescriptorHandler {
+public class TaskAuthDescriptors {
 
-    @Override
-    public TaskDescriptor getTaskDescriptor() {
-        return ObjectHelpersTaskConstants.TASK_DESCRIPTOR;
+    private String taskName;
+    private List<TaskAuthDescriptor> taskAuthDescriptors;
+
+    TaskAuthDescriptors(String taskName, List<TaskAuthDescriptor> taskAuthDescriptors) {
+        this.taskName = taskName;
+        this.taskAuthDescriptors = taskAuthDescriptors;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
+        return taskAuthDescriptors;
     }
 }

@@ -25,7 +25,7 @@ import static com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants.
 import static com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants.VERSION_1_0;
 import static com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants.XML_HELPERS;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class XmlHelpersTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class XmlHelpersTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(XML_HELPERS)

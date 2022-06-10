@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelpersTaskDescriptorTest {
+public class ObjectHelpersTaskDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,7 +36,7 @@ public class ObjectHelpersTaskDescriptorTest {
     };
 
     @Test
-    public void testFileTaskDescriptor() throws JsonProcessingException {
+    public void testGetFileTaskDescriptor() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {

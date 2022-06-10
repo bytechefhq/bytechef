@@ -38,11 +38,11 @@ public abstract class AbstractExtTaskDescriptorHandlerResolver implements TaskDe
     }
 
     @Override
-    public TaskDescriptorHandler resolve(String name) {
+    public TaskDescriptorHandler resolve(String name, float version) {
         TaskDescriptorHandler taskDescriptorHandler = null;
 
-        if (extTaskDescriptorHandlerRepository.existByNameAndType(name, type)) {
-            taskDescriptorHandler = createTaskDescriptorHandler(name);
+        if (extTaskDescriptorHandlerRepository.existByNameAndVersionAndType(name, version, type)) {
+            taskDescriptorHandler = createTaskDescriptorHandler(name, version);
         }
 
         return taskDescriptorHandler;
@@ -53,9 +53,14 @@ public abstract class AbstractExtTaskDescriptorHandlerResolver implements TaskDe
         return extTaskDescriptorHandlerRepository
             .findAllNamesByType(type)
             .stream()
-            .map(this::createTaskDescriptorHandler)
+            .flatMap(nameVersions ->
+                nameVersions
+                    .versions()
+                    .stream()
+                    .map(version -> createTaskDescriptorHandler(nameVersions.name(), version))
+            )
             .toList();
     }
 
-    protected abstract TaskDescriptorHandler createTaskDescriptorHandler(String name);
+    protected abstract TaskDescriptorHandler createTaskDescriptorHandler(String name, float version);
 }
