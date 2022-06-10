@@ -17,12 +17,14 @@
 package com.integri.atlas.task.handler.httpclient.auth;
 
 import com.integri.atlas.task.auth.TaskAuth;
-import java.net.http.HttpRequest;
+import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
+import java.util.List;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
 public interface HttpAuth {
-    void apply(HttpRequest.Builder httpRequestBuilder, TaskAuth taskAuth);
+    void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth);
 }

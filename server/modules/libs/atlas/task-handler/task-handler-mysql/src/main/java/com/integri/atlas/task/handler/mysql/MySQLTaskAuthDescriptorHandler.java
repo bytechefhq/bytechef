@@ -16,13 +16,13 @@
 
 package com.integri.atlas.task.handler.mysql;
 
+import static com.integri.atlas.task.descriptor.model.DSL.INTEGER_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.MYSQL;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.HOST;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PASSWORD;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PORT;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.USERNAME;
-import static com.integri.atlas.task.descriptor.model.DSL.INTEGER_PROPERTY;
-import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.MYSQL;
 
 import com.integri.atlas.task.descriptor.handler.TaskAuthDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;

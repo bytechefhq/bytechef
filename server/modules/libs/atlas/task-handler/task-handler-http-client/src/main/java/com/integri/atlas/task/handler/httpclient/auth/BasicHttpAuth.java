@@ -21,9 +21,11 @@ import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.
 
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.task.auth.TaskAuth;
-import java.net.http.HttpRequest;
+import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * @author Matija Petanjek
@@ -32,8 +34,8 @@ import java.util.Base64;
 public class BasicHttpAuth implements HttpAuth {
 
     @Override
-    public void apply(HttpRequest.Builder httpRequestBuilder, TaskAuth taskAuth) {
-        httpRequestBuilder.header("Authorization", getHeaderValue(taskAuth.getProperties()));
+    public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {
+        headers.add(new HttpHeader("Authorization", getHeaderValue(taskAuth.getProperties())));
     }
 
     private String getHeaderValue(Accessor properties) {

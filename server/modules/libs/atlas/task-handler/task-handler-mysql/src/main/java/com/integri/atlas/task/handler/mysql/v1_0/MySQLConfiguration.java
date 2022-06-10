@@ -17,6 +17,8 @@
 package com.integri.atlas.task.handler.mysql.v1_0;
 
 import static com.integri.atlas.engine.Constants.AUTH;
+import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.MYSQL;
+import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.VERSION_1_0;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.DATABASE;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.DELETE;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.EXECUTE;
@@ -27,8 +29,6 @@ import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PORT;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.QUERY;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.UPDATE;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.USERNAME;
-import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.MYSQL;
-import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.VERSION_1_0;
 
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.engine.MapObject;

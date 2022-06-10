@@ -63,6 +63,13 @@ public class SimpleTaskAuth extends MapObject implements TaskAuth {
     }
 
     @Override
+    public <T> T getProperty(String name) {
+        Accessor properties = getProperties();
+
+        return properties.get(name);
+    }
+
+    @Override
     public String getType() {
         return getString(Constants.TYPE);
     }

@@ -18,10 +18,9 @@ package com.integri.atlas.task.commons.jdbc;
 
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.task.jdbc.commons.ExecuteJdbcTaskHandler;
 import java.util.Map;
 import javax.sql.DataSource;
-
-import com.integri.atlas.task.jdbc.commons.ExecuteJdbcTaskHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

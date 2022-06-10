@@ -16,6 +16,8 @@
 
 package com.integri.atlas.task.handler.postgresql.v1_0;
 
+import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.POSTGRESQL;
+import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.VERSION_1_0;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.DATABASE;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.DELETE;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.EXECUTE;
@@ -26,8 +28,6 @@ import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PORT;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.QUERY;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.UPDATE;
 import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.USERNAME;
-import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.POSTGRESQL;
-import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.VERSION_1_0;
 
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.engine.Constants;

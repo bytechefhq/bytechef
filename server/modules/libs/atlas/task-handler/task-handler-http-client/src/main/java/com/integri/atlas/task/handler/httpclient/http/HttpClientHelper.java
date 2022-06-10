@@ -23,11 +23,13 @@ import com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.Request
 import com.integri.atlas.task.handler.httpclient.auth.HttpAuth;
 import com.integri.atlas.task.handler.httpclient.auth.HttpAuthRegistry;
 import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
@@ -52,25 +54,49 @@ public class HttpClientHelper {
         RequestMethod requestMethod,
         String uri,
         List<HttpHeader> headers,
+        List<HttpQueryParam> queryParameters,
         HttpRequest.BodyPublisher bodyPublisher,
         HttpResponse.BodyHandler<?> bodyHandler,
         TaskAuth taskAuth
     ) throws Exception {
-        HttpRequest.Builder httpRequestBuilder = HttpRequest
-            .newBuilder()
-            .method(requestMethod.name(), bodyPublisher)
-            .uri(URI.create(uri));
+        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().method(requestMethod.name(), bodyPublisher);
 
         if (taskAuth != null) {
             HttpAuth httpAuth = HttpAuthRegistry.get(AuthType.valueOf(StringUtils.upperCase(taskAuth.getType())));
 
-            httpAuth.apply(httpRequestBuilder, taskAuth);
+            httpAuth.apply(headers, queryParameters, taskAuth);
         }
 
         for (HttpHeader httpHeader : headers) {
             httpRequestBuilder.header(httpHeader.getName(), httpHeader.getValue());
         }
 
+        httpRequestBuilder.uri(URI.create(resolveURI(uri, queryParameters)));
+
         return httpClient.send(httpRequestBuilder.build(), bodyHandler);
+    }
+
+    private String fromQueryParameters(List<HttpQueryParam> queryParameters) {
+        List<String> queryParameterList = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (HttpQueryParam queryParam : queryParameters) {
+            sb.append(queryParam.getName());
+            sb.append("=");
+            sb.append(queryParam.getValue());
+
+            queryParameterList.add(sb.toString());
+        }
+
+        return StringUtils.join(queryParameterList, "&");
+    }
+
+    private String resolveURI(String uri, List<HttpQueryParam> queryParameters) {
+        if (queryParameters.isEmpty()) {
+            return uri;
+        }
+
+        return uri + '?' + fromQueryParameters(queryParameters);
     }
 }

@@ -31,7 +31,7 @@ public class HttpAuthRegistry {
         {
             put(AuthType.API_KEY, new ApiKeyHttpAuth());
             put(AuthType.BASIC_AUTH, new BasicHttpAuth());
-            put(AuthType.BEARER_TOKEN, new ApiKeyHttpAuth());
+            put(AuthType.BEARER_TOKEN, new BearerHttpAuth());
             put(AuthType.DIGEST_AUTH, new DigestHttpAuth());
             put(AuthType.OAUTH2, new OAuth2HttpAuth());
         }
