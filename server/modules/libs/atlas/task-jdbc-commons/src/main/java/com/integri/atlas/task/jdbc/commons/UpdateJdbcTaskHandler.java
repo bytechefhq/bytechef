@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.commons.jdbc;
+package com.integri.atlas.task.jdbc.commons;
 
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.COLUMNS;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.ROWS;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.SCHEMA;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.TABLE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.COLUMNS;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.ROWS;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.SCHEMA;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.TABLE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.UPDATE_KEY;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
@@ -33,9 +34,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * @author Ivica Cardic
  */
-public class InsertJdbcTaskHandler extends AbstractJdbcTaskHandler implements TaskHandler<Map<String, Integer>> {
+public class UpdateJdbcTaskHandler extends AbstractJdbcTaskHandler implements TaskHandler<Map<String, Integer>> {
 
-    public InsertJdbcTaskHandler(DataSourceFactory dataSourceFactory, PlatformTransactionManager transactionManager) {
+    public UpdateJdbcTaskHandler(DataSourceFactory dataSourceFactory, PlatformTransactionManager transactionManager) {
         super(dataSourceFactory, transactionManager);
     }
 
@@ -44,21 +45,23 @@ public class InsertJdbcTaskHandler extends AbstractJdbcTaskHandler implements Ta
         List<String> columns = taskExecution.getList(COLUMNS, String.class, List.of());
         List<Map<String, ?>> rows = taskExecution.get(ROWS, List.class, List.of());
         String schema = taskExecution.getString(SCHEMA, "public");
-        String table = taskExecution.getRequiredString(TABLE);
+        String table = taskExecution.getString(TABLE);
+        String updateKey = taskExecution.getString(UPDATE_KEY, "id");
 
         NamedParameterJdbcTemplate jdbcTemplate = createNamedParameterJdbcTemplate(taskExecution);
 
         int[] rowsAffected = transactionTemplate.execute(status ->
             jdbcTemplate.batchUpdate(
-                "INSERT INTO " +
+                "UPDATE " +
                 schema +
                 "." +
                 table +
-                " (" +
-                String.join(",", columns) +
-                ") VALUES( " +
-                String.join(",", columns.stream().map(column -> ":" + column).toList()) +
-                ")",
+                " SET " +
+                String.join(" AND ", columns.stream().map(column -> column + "=:" + column).toList()) +
+                " WHERE " +
+                updateKey +
+                "=:" +
+                updateKey,
                 SqlParameterSourceUtils.createBatch(rows.toArray())
             )
         );

@@ -21,6 +21,8 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
+
+import com.integri.atlas.task.jdbc.commons.DeleteJdbcTaskHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +37,13 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class QueryJdbcTaskHandlerIntTest {
+public class DeleteJdbcTaskHandlerIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private QueryJdbcTaskHandler queryJdbcTaskHandler;
+    private DeleteJdbcTaskHandler deleteJdbcTaskHandler;
 
     @BeforeEach
     public void beforeEach() {
@@ -50,7 +52,7 @@ public class QueryJdbcTaskHandlerIntTest {
         jdbcTemplate.execute(
             """
             DROP TABLE IF EXISTS test;
-            CREATE TABLE IF NOT EXISTS test (
+            CREATE TABLE test (
                 id   varchar(256) not null primary key,
                 name varchar(256) not null
             );
@@ -63,27 +65,25 @@ public class QueryJdbcTaskHandlerIntTest {
     }
 
     @Test
-    public void testQuery() throws Exception {
+    public void testDelete() throws Exception {
         TaskExecution taskExecution = new SimpleTaskExecution(
-            Map.of("query", "SELECT count(*) FROM test where id=:id", "parameters", Map.of("id", "id2"))
+            Map.of("table", "test", "rows", List.of(Map.of("id", "id1"), Map.of("id", "id2")))
         );
 
-        queryJdbcTaskHandler.handle(taskExecution);
+        Map<String, Integer> result = deleteJdbcTaskHandler.handle(taskExecution);
 
-        List<Map<String, ?>> result = queryJdbcTaskHandler.handle(taskExecution);
-
-        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(2, result.get("rows"));
     }
 
     @TestConfiguration
-    public static class InsertJdbcTaskHandlerIntTestConfiguration {
+    public static class DeleteJdbcTaskHandlerIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        QueryJdbcTaskHandler queryJdbcTaskHandler(PlatformTransactionManager transactionManager) {
-            return new QueryJdbcTaskHandler(taskExecution -> dataSource, transactionManager);
+        DeleteJdbcTaskHandler deleteJdbcTaskHandler(PlatformTransactionManager transactionManager) {
+            return new DeleteJdbcTaskHandler(taskExecution -> dataSource, transactionManager);
         }
     }
 }

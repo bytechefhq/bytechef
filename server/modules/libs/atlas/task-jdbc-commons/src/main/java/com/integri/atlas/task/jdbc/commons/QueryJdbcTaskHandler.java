@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.commons.jdbc;
+package com.integri.atlas.task.jdbc.commons;
 
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.PARAMETERS;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.QUERY;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.PARAMETERS;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.QUERY;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;

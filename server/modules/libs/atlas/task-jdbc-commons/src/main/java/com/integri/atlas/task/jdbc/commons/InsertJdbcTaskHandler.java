@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.commons.jdbc;
+package com.integri.atlas.task.jdbc.commons;
 
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.DELETE_KEY;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.ROWS;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.SCHEMA;
-import static com.integri.atlas.task.commons.jdbc.JdbcTaskConstants.TABLE;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.COLUMNS;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.ROWS;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.SCHEMA;
+import static com.integri.atlas.task.jdbc.commons.JdbcTaskConstants.TABLE;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -34,36 +33,36 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * @author Ivica Cardic
  */
-public class DeleteJdbcTaskHandler extends AbstractJdbcTaskHandler implements TaskHandler<Map<String, Integer>> {
+public class InsertJdbcTaskHandler extends AbstractJdbcTaskHandler implements TaskHandler<Map<String, Integer>> {
 
-    public DeleteJdbcTaskHandler(DataSourceFactory dataSourceFactory, PlatformTransactionManager transactionManager) {
+    public InsertJdbcTaskHandler(DataSourceFactory dataSourceFactory, PlatformTransactionManager transactionManager) {
         super(dataSourceFactory, transactionManager);
     }
 
     @Override
     public Map<String, Integer> handle(TaskExecution taskExecution) throws Exception {
-        Map<String, Integer> result;
-
-        String deleteKey = taskExecution.getString(DELETE_KEY, "id");
-        List<Map<String, ?>> rows = taskExecution.get(ROWS, List.class, Collections.emptyList());
+        List<String> columns = taskExecution.getList(COLUMNS, String.class, List.of());
+        List<Map<String, ?>> rows = taskExecution.get(ROWS, List.class, List.of());
         String schema = taskExecution.getString(SCHEMA, "public");
         String table = taskExecution.getRequiredString(TABLE);
 
         NamedParameterJdbcTemplate jdbcTemplate = createNamedParameterJdbcTemplate(taskExecution);
 
-        if (rows.isEmpty()) {
-            result = Map.of("rows", 0);
-        } else {
-            int[] rowsAffected = transactionTemplate.execute(status ->
-                jdbcTemplate.batchUpdate(
-                    "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
-                    SqlParameterSourceUtils.createBatch(rows.toArray())
-                )
-            );
+        int[] rowsAffected = transactionTemplate.execute(status ->
+            jdbcTemplate.batchUpdate(
+                "INSERT INTO " +
+                schema +
+                "." +
+                table +
+                " (" +
+                String.join(",", columns) +
+                ") VALUES( " +
+                String.join(",", columns.stream().map(column -> ":" + column).toList()) +
+                ")",
+                SqlParameterSourceUtils.createBatch(rows.toArray())
+            )
+        );
 
-            result = Map.of("rows", Arrays.stream(rowsAffected).sum());
-        }
-
-        return result;
+        return Map.of("rows", Arrays.stream(rowsAffected).sum());
     }
 }
