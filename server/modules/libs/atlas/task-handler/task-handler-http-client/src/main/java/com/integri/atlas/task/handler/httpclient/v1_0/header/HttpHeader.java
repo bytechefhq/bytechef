@@ -14,17 +14,34 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.auth;
+package com.integri.atlas.task.handler.httpclient.v1_0.header;
 
-import com.integri.atlas.task.auth.TaskAuth;
-import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Matija Petanjek
- * @author Ivica Cardic
  */
-public interface HttpAuth {
-    void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth);
+public class HttpHeader {
+
+    public static final String BOUNDARY_TMPL = "[$BOUNDARY]";
+
+    private final String name;
+    private String value;
+
+    public HttpHeader(String name, String... values) {
+        this.name = name;
+        this.value = StringUtils.join(values, ',');
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

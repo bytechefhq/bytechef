@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.response;
+package com.integri.atlas.task.handler.httpclient.v1_0.response;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.FULL_RESPONSE;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.RESPONSE_FORMAT;

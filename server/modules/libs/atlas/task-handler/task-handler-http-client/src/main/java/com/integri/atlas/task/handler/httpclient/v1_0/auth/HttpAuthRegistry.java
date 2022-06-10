@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.auth;
+package com.integri.atlas.task.handler.httpclient.v1_0.auth;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.AuthType;
 

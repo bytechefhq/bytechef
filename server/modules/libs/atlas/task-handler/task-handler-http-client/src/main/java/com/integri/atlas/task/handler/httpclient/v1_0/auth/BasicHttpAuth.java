@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.auth;
+package com.integri.atlas.task.handler.httpclient.v1_0.auth;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PASSWORD;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.USERNAME;
 
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.task.auth.TaskAuth;
-import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
+import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
