@@ -75,38 +75,75 @@ public class DisplayOption {
             this.propertyName = propertyName;
         }
 
+
+        public DisplayOptionEntry eq(Boolean value) {
+            this.value.values = List.of(value);
+
+            return this;
+        }
+
+        public DisplayOptionEntry eq(Integer value) {
+            this.value.values = List.of(value);
+
+            return this;
+        }
+
+        public DisplayOptionEntry eq(Long value) {
+            this.value.values = List.of(value);
+
+            return this;
+        }
+
+        public DisplayOptionEntry eq(Float value) {
+            this.value.values = List.of(value);
+
+            return this;
+        }
+
+        public DisplayOptionEntry eq(Double value) {
+            this.value.values = List.of(value);
+
+            return this;
+        }
+
+        public DisplayOptionEntry eq(String value) {
+            this.value.values = List.of(value);
+
+            return this;
+        }
+
         public DisplayOptionEntry in(Boolean... values) {
-            this.value.values = List.of((Boolean[]) values);
+            this.value.values = List.of(values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Integer... values) {
-            this.value.values = List.of((Integer[]) values);
+            this.value.values = List.of(values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Long... values) {
-            this.value.values = List.of((Long[]) values);
+            this.value.values = List.of(values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Float... values) {
-            this.value.values = List.of((Float[]) values);
+            this.value.values = List.of(values);
 
             return this;
         }
 
         public DisplayOptionEntry in(Double... values) {
-            this.value.values = List.of((Double[]) values);
+            this.value.values = List.of(values);
 
             return this;
         }
 
         public DisplayOptionEntry in(String... values) {
-            this.value.values = List.of((String[]) values);
+            this.value.values = List.of(values);
 
             return this;
         }

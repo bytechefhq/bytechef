@@ -65,12 +65,12 @@ public class IfTaskDescriptorHandler implements TaskDescriptorHandler {
                     STRING_PROPERTY(PROPERTY_CONDITIONS)
                         .displayName("Conditions")
                         .description("The conditions expressed as an expression.")
-                        .displayOption(showWhen(PROPERTY_RAW_CONDITIONS).in(true)),
+                        .displayOption(showWhen(PROPERTY_RAW_CONDITIONS).eq(true)),
                     ARRAY_PROPERTY(PROPERTY_CONDITIONS)
                         .displayName("Conditions")
                         .placeholder("Add Condition")
                         .description("The type of values to compare.")
-                        .displayOption(showWhen(PROPERTY_RAW_CONDITIONS).in(false))
+                        .displayOption(showWhen(PROPERTY_RAW_CONDITIONS).eq(false))
                         .options(
                             option("Boolean", PROPERTY_BOOLEAN),
                             option("Date & Time", PROPERTY_DATE_TIME),
@@ -178,7 +178,7 @@ public class IfTaskDescriptorHandler implements TaskDescriptorHandler {
                                         .description("The regex value to compare with the first one.")
                                         .placeholder("/text/i")
                                         .defaultValue("")
-                                        .displayOption(showWhen(PROPERTY_OPERATION).in(Operation.REGEX.name()))
+                                        .displayOption(showWhen(PROPERTY_OPERATION).eq(Operation.REGEX.name()))
                                 )
                         ),
                     STRING_PROPERTY(PROPERTY_COMBINE_OPERATION)
@@ -189,7 +189,7 @@ public class IfTaskDescriptorHandler implements TaskDescriptorHandler {
                              matches or only if ALL are met.
                             """
                         )
-                        .displayOption(showWhen(PROPERTY_RAW_CONDITIONS).in(false))
+                        .displayOption(showWhen(PROPERTY_RAW_CONDITIONS).eq(false))
                         .options(
                             option(
                                 "All",

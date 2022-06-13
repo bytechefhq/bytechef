@@ -85,15 +85,15 @@ public class JsonFileTaskDescriptorHandler implements TaskDescriptorHandler {
                                 .description(
                                     "The path where the array is e.g 'data'. Leave blank to use the top level object."
                                 )
-                                .displayOption(showWhen(IS_ARRAY).in(true)),
+                                .displayOption(showWhen(IS_ARRAY).eq(true)),
                             INTEGER_PROPERTY(PAGE_SIZE)
                                 .displayName("Page Size")
                                 .description("The amount of child elements to return in a page.")
-                                .displayOption(showWhen(IS_ARRAY).in(true)),
+                                .displayOption(showWhen(IS_ARRAY).eq(true)),
                             INTEGER_PROPERTY(PAGE_NUMBER)
                                 .displayName("Page Number")
                                 .description("The page number to get.")
-                                .displayOption(showWhen(IS_ARRAY).in(true))
+                                .displayOption(showWhen(IS_ARRAY).eq(true))
                         )
                 )
                 .outputs(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
