@@ -5,6 +5,7 @@ plugins {
     id "com.github.spotbugs"
     id "com.integri.java-common-conventions"
     id "org.sonarqube"
+    id "pmd"
 }
 
 allprojects {
@@ -17,6 +18,7 @@ subprojects {
     apply plugin: "com.github.spotbugs"
     apply plugin: "com.integri.java-common-conventions"
     apply plugin: "org.sonarqube"
+    apply plugin: "pmd"
 
     apply from: "${rootDir}/gradle/sonar.gradle"
 
