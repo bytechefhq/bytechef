@@ -51,26 +51,14 @@ public class MultiPartHttpBodyPublisher {
         this.taskExecution = taskExecution;
     }
 
-    private HttpHeader getMultiPartHttpHeader(List<HttpHeader> httpHeaders) {
-        for (HttpHeader httpHeader : httpHeaders) {
-            if (httpHeader.getValue().startsWith("multipart/form-data")) {
-                return httpHeader;
-            }
-        }
-
-        throw new IllegalStateException("Missing multipart/form-data header");
-    }
-
-    private void updateMultipartHttpHeader(List<HttpHeader> httpHeaders, String boundary) {
-        HttpHeader multipartHttpHeader = getMultiPartHttpHeader(httpHeaders);
-
-        multipartHttpHeader.setValue(multipartHttpHeader.getValue().replace(HttpHeader.BOUNDARY_TMPL, boundary));
-    }
-
     public byte[] build() throws IOException {
         updateMultipartHttpHeader(httpHeaders, boundary);
 
         return getHttpBodyPartsBytes(taskExecution);
+    }
+
+    private byte[] getFinalBoundaryBytes() {
+        return ("--" + boundary + "--").getBytes(StandardCharsets.UTF_8);
     }
 
     private byte[] getHttpBodyPartsBytes(TaskExecution taskExecution) throws IOException {
@@ -103,7 +91,19 @@ public class MultiPartHttpBodyPublisher {
         return byteArrayOutputStream.toByteArray();
     }
 
-    private byte[] getFinalBoundaryBytes() {
-        return ("--" + boundary + "--").getBytes(StandardCharsets.UTF_8);
+    private HttpHeader getMultiPartHttpHeader(List<HttpHeader> httpHeaders) {
+        for (HttpHeader httpHeader : httpHeaders) {
+            if (httpHeader.getValue().startsWith("multipart/form-data")) {
+                return httpHeader;
+            }
+        }
+
+        throw new IllegalStateException("Missing multipart/form-data header");
+    }
+
+    private void updateMultipartHttpHeader(List<HttpHeader> httpHeaders, String boundary) {
+        HttpHeader multipartHttpHeader = getMultiPartHttpHeader(httpHeaders);
+
+        multipartHttpHeader.setValue(multipartHttpHeader.getValue().replace(HttpHeader.BOUNDARY_TMPL, boundary));
     }
 }
