@@ -182,6 +182,7 @@ public abstract sealed class TaskProperty<T extends TaskProperty<T>>
 
         protected List<TaskPropertyOption> options;
         protected T defaultValue;
+        protected T exampleValue;
         protected List<String> loadOptionsDependsOn;
         protected String loadOptionsMethod;
         protected Type type;
@@ -215,6 +216,10 @@ public abstract sealed class TaskProperty<T extends TaskProperty<T>>
             return defaultValue;
         }
 
+        public T getExampleValue() {
+            return exampleValue;
+        }
+
         public List<String> getLoadOptionsDependsOn() {
             return loadOptionsDependsOn;
         }
@@ -241,44 +246,86 @@ public abstract sealed class TaskProperty<T extends TaskProperty<T>>
             this.type = Type.ARRAY;
         }
 
-        public ArrayTaskProperty defaultValue(Boolean... values) {
-            this.defaultValue = values;
+        public ArrayTaskProperty exampleValue(Boolean... exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
 
-        public ArrayTaskProperty defaultValue(Integer... values) {
-            this.defaultValue = values;
+        public ArrayTaskProperty exampleValue(Integer... exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
 
-        public ArrayTaskProperty defaultValue(Long... values) {
-            this.defaultValue = values;
+        public ArrayTaskProperty exampleValue(Long... exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
 
-        public ArrayTaskProperty defaultValue(Float... values) {
-            this.defaultValue = values;
+        public ArrayTaskProperty exampleValue(Float... exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
 
-        public ArrayTaskProperty defaultValue(Double... values) {
-            this.defaultValue = values;
+        public ArrayTaskProperty exampleValue(Double... exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
 
-        public ArrayTaskProperty defaultValue(String... values) {
-            this.defaultValue = values;
+        public ArrayTaskProperty exampleValue(String... exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
 
-        public ArrayTaskProperty defaultValue(Map<String, ?>... values) {
-            this.defaultValue = values;
+        public ArrayTaskProperty exampleValue(Map<String, ?>... exampleValue) {
+            this.exampleValue = exampleValue;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Boolean... defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Integer... defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Long... defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Float... defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Double... defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(String... defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Map<String, ?>... defaultValue) {
+            this.defaultValue = defaultValue;
 
             return this;
         }
@@ -310,20 +357,27 @@ public abstract sealed class TaskProperty<T extends TaskProperty<T>>
             return this;
         }
 
-        public ObjectTaskProperty defaultValue(Object value) {
-            this.defaultValue = value;
+        public ObjectTaskProperty defaultValue(Object defaultValue) {
+            this.defaultValue = defaultValue;
 
             return this;
         }
 
-        public Boolean getAdditionalProperties() {
-            return additionalProperties;
+
+        public ObjectTaskProperty exampleValue(Object exampleValue) {
+            this.exampleValue = exampleValue;
+
+            return this;
         }
 
         public ObjectTaskProperty properties(TypeTaskProperty<?>... properties) {
             this.properties = List.of(properties);
 
             return this;
+        }
+
+        public Boolean getAdditionalProperties() {
+            return additionalProperties;
         }
 
         public List<? extends TypeTaskProperty<?>> getProperties() {
@@ -343,6 +397,12 @@ public abstract sealed class TaskProperty<T extends TaskProperty<T>>
 
             return this;
         }
+
+        public BooleanTaskProperty exampleValue(boolean exampleValue) {
+            this.exampleValue = exampleValue;
+
+            return this;
+        }
     }
 
     public static final class DateTimeTaskProperty extends ValueTaskProperty<LocalDateTime, DateTimeTaskProperty> {
@@ -354,6 +414,12 @@ public abstract sealed class TaskProperty<T extends TaskProperty<T>>
 
         public DateTimeTaskProperty defaultValue(LocalDateTime defaultValue) {
             this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public DateTimeTaskProperty exampleValue(LocalDateTime exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
