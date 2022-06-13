@@ -26,6 +26,7 @@ import java.util.List;
 public class TaskDescriptor {
 
     private TaskAuth auth;
+    private String category;
     private String description;
     private String displayName;
     private String icon;
@@ -33,11 +34,18 @@ public class TaskDescriptor {
     private List<TaskOperation> operations;
     private String subtitle;
     private float version = 1.0f;
+    private String[] tags;
 
     TaskDescriptor() {}
 
     public TaskDescriptor auth(TaskPropertyOption... options) {
         this.auth = new TaskAuth().options(options);
+
+        return this;
+    }
+
+    public TaskDescriptor category(String category) {
+        this.category = category;
 
         return this;
     }
@@ -78,6 +86,12 @@ public class TaskDescriptor {
         return this;
     }
 
+    public TaskDescriptor tags(String... tags) {
+        this.tags = tags;
+
+        return this;
+    }
+
     public TaskDescriptor version(float version) {
         this.version = version;
 
@@ -86,6 +100,10 @@ public class TaskDescriptor {
 
     public TaskAuth getAuth() {
         return auth;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
     public String getDescription() {
@@ -110,6 +128,10 @@ public class TaskDescriptor {
 
     public String getSubtitle() {
         return subtitle;
+    }
+
+    public String[] getTags() {
+        return tags;
     }
 
     public float getVersion() {
