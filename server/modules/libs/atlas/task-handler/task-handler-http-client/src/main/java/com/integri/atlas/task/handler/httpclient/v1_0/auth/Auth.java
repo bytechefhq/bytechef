@@ -26,6 +26,6 @@ import java.util.List;
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public interface HttpAuth {
+public interface Auth {
     void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth);
 }

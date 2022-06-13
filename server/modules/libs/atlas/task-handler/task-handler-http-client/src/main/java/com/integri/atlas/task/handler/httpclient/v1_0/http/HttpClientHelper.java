@@ -20,8 +20,8 @@ import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.
 
 import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.RequestMethod;
-import com.integri.atlas.task.handler.httpclient.v1_0.auth.HttpAuth;
-import com.integri.atlas.task.handler.httpclient.v1_0.auth.HttpAuthRegistry;
+import com.integri.atlas.task.handler.httpclient.v1_0.auth.Auth;
+import com.integri.atlas.task.handler.httpclient.v1_0.auth.AuthRegistry;
 import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
 import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
 import java.net.URI;
@@ -63,7 +63,7 @@ public class HttpClientHelper {
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().method(requestMethod.name(), bodyPublisher);
 
         if (taskAuth != null) {
-            HttpAuth httpAuth = HttpAuthRegistry.get(AuthType.valueOf(StringUtils.upperCase(taskAuth.getType())));
+            Auth httpAuth = AuthRegistry.get(AuthType.valueOf(StringUtils.upperCase(taskAuth.getType())));
 
             httpAuth.apply(headers, queryParameters, taskAuth);
         }

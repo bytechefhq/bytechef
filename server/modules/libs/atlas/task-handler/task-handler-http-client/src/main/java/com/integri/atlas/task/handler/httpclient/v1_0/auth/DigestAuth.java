@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class DigestHttpAuth implements HttpAuth {
+public class DigestAuth implements Auth {
 
     @Override
     public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {

@@ -16,29 +16,36 @@
 
 package com.integri.atlas.task.handler.httpclient.v1_0.auth;
 
-import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.*;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PASSWORD;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.USERNAME;
 
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
 import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
+ * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public class ApiKeyHttpAuth implements HttpAuth {
+public class BasicAuth implements Auth {
 
     @Override
     public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {
-        Accessor properties = taskAuth.getProperties();
+        headers.add(new HttpHeader("Authorization", getHeaderValue(taskAuth.getProperties())));
+    }
 
-        if (ApiTokenLocation.valueOf(StringUtils.upperCase(properties.getString(ADD_TO))) == ApiTokenLocation.HEADER) {
-            headers.add(new HttpHeader(properties.getString(KEY), properties.getString(VALUE)));
-        } else {
-            queryParameters.add(new HttpQueryParam(properties.getString(KEY), properties.getString(VALUE)));
-        }
+    private String getHeaderValue(Accessor properties) {
+        String credentials = properties.getRequiredString(USERNAME) + ":" + PASSWORD;
+
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        String base64Credentials = encoder.encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+
+        return "Basic " + base64Credentials;
     }
 }

@@ -16,36 +16,21 @@
 
 package com.integri.atlas.task.handler.httpclient.v1_0.auth;
 
-import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PASSWORD;
-import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.USERNAME;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.TOKEN;
 
-import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
 import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
 /**
- * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public class BasicHttpAuth implements HttpAuth {
+public class BearerTokenAuth implements Auth {
 
     @Override
     public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {
-        headers.add(new HttpHeader("Authorization", getHeaderValue(taskAuth.getProperties())));
-    }
-
-    private String getHeaderValue(Accessor properties) {
-        String credentials = properties.getRequiredString(USERNAME) + ":" + PASSWORD;
-
-        Base64.Encoder encoder = Base64.getEncoder();
-
-        String base64Credentials = encoder.encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-
-        return "Basic " + base64Credentials;
+        headers.add(new HttpHeader("Authorization", "Bearer " + taskAuth.getProperty(TOKEN)));
     }
 }
