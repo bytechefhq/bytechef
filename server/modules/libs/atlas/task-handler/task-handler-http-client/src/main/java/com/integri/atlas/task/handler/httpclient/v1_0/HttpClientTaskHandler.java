@@ -24,21 +24,13 @@ import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PATCH;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.POST;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PUT;
-import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.TIMEOUT;
-import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.URI;
 
-import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.auth.TaskAuth;
-import com.integri.atlas.task.handler.httpclient.v1_0.body.HttpBodyFactory;
-import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeaderFactory;
 import com.integri.atlas.task.handler.httpclient.v1_0.http.HttpClientHelper;
-import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParamsFactory;
 import com.integri.atlas.task.handler.httpclient.v1_0.response.HttpResponseHandler;
 import java.net.http.HttpResponse;
-import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,38 +40,20 @@ public class HttpClientTaskHandler {
 
     public abstract static class HttpClientBaseTaskHandler implements TaskHandler<Object> {
 
-        private final HttpBodyFactory httpBodyFactory;
-        private final HttpHeaderFactory httpHeadersFactory;
-        private final HttpQueryParamsFactory queryParamsFactory;
+        private final HttpClientHelper httpClientHelper;
         private final HttpResponseHandler httpResponseHandler;
 
         public HttpClientBaseTaskHandler(
-            HttpBodyFactory httpBodyFactory,
-            HttpHeaderFactory httpHeadersFactory,
-            HttpResponseHandler httpResponseHandler,
-            HttpQueryParamsFactory queryParamsFactory
+            HttpClientHelper httpClientHelper,
+            HttpResponseHandler httpResponseHandler
         ) {
-            this.httpBodyFactory = httpBodyFactory;
-            this.httpHeadersFactory = httpHeadersFactory;
             this.httpResponseHandler = httpResponseHandler;
-            this.queryParamsFactory = queryParamsFactory;
+            this.httpClientHelper = httpClientHelper;
         }
 
         @Override
         public Object handle(TaskExecution taskExecution) throws Exception {
-            HttpClientHelper httpClientHelper = new HttpClientHelper(taskExecution.getLong(TIMEOUT, 10000));
-
-            List<HttpHeader> httpHeaders = httpHeadersFactory.getHttpHeaders(taskExecution);
-
-            HttpResponse<?> httpResponse = httpClientHelper.send(
-                getRequestMethod(),
-                taskExecution.getRequiredString(URI),
-                httpHeaders,
-                queryParamsFactory.getQueryParams(taskExecution),
-                httpBodyFactory.getBodyPublisher(taskExecution, httpHeaders),
-                httpBodyFactory.getBodyHandler(taskExecution),
-                taskExecution.get(Constants.AUTH, TaskAuth.class)
-            );
+            HttpResponse<?> httpResponse = httpClientHelper.send(taskExecution, getRequestMethod());
 
             return httpResponseHandler.handle(taskExecution, httpResponse);
         }
@@ -91,12 +65,10 @@ public class HttpClientTaskHandler {
     public static class HttpClientDeleteTaskHandler extends HttpClientBaseTaskHandler {
 
         public HttpClientDeleteTaskHandler(
-            HttpBodyFactory httpBodyFactory,
-            HttpHeaderFactory httpHeadersFactory,
-            HttpResponseHandler httpResponseHandler,
-            HttpQueryParamsFactory queryParamsFactory
+            HttpClientHelper httpClientHelper,
+            HttpResponseHandler httpResponseHandler
         ) {
-            super(httpBodyFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
+            super(httpClientHelper, httpResponseHandler);
         }
 
         @Override
@@ -109,12 +81,10 @@ public class HttpClientTaskHandler {
     public static class HttpClientGetTaskHandler extends HttpClientBaseTaskHandler {
 
         public HttpClientGetTaskHandler(
-            HttpBodyFactory httpBodyFactory,
-            HttpHeaderFactory httpHeadersFactory,
-            HttpResponseHandler httpResponseHandler,
-            HttpQueryParamsFactory queryParamsFactory
+            HttpClientHelper httpClientHelper,
+            HttpResponseHandler httpResponseHandler
         ) {
-            super(httpBodyFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
+            super(httpClientHelper, httpResponseHandler);
         }
 
         @Override
@@ -127,12 +97,10 @@ public class HttpClientTaskHandler {
     public static class HttpClientHeadTaskHandler extends HttpClientBaseTaskHandler {
 
         public HttpClientHeadTaskHandler(
-            HttpBodyFactory httpBodyFactory,
-            HttpHeaderFactory httpHeadersFactory,
-            HttpResponseHandler httpResponseHandler,
-            HttpQueryParamsFactory queryParamsFactory
+            HttpClientHelper httpClientHelper,
+            HttpResponseHandler httpResponseHandler
         ) {
-            super(httpBodyFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
+            super(httpClientHelper, httpResponseHandler);
         }
 
         @Override
@@ -145,12 +113,10 @@ public class HttpClientTaskHandler {
     public static class HttpClientPatchTaskHandler extends HttpClientBaseTaskHandler {
 
         public HttpClientPatchTaskHandler(
-            HttpBodyFactory httpBodyFactory,
-            HttpHeaderFactory httpHeadersFactory,
-            HttpResponseHandler httpResponseHandler,
-            HttpQueryParamsFactory queryParamsFactory
+            HttpClientHelper httpClientHelper,
+            HttpResponseHandler httpResponseHandler
         ) {
-            super(httpBodyFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
+            super(httpClientHelper, httpResponseHandler);
         }
 
         @Override
@@ -163,12 +129,10 @@ public class HttpClientTaskHandler {
     public static class HttpClientPostTaskHandler extends HttpClientBaseTaskHandler {
 
         public HttpClientPostTaskHandler(
-            HttpBodyFactory httpBodyFactory,
-            HttpHeaderFactory httpHeadersFactory,
-            HttpResponseHandler httpResponseHandler,
-            HttpQueryParamsFactory queryParamsFactory
+            HttpClientHelper httpClientHelper,
+            HttpResponseHandler httpResponseHandler
         ) {
-            super(httpBodyFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
+            super(httpClientHelper, httpResponseHandler);
         }
 
         @Override
@@ -181,12 +145,10 @@ public class HttpClientTaskHandler {
     public static class HttpClientPutTaskHandler extends HttpClientBaseTaskHandler {
 
         public HttpClientPutTaskHandler(
-            HttpBodyFactory httpBodyFactory,
-            HttpHeaderFactory httpHeadersFactory,
-            HttpResponseHandler httpResponseHandler,
-            HttpQueryParamsFactory queryParamsFactory
+            HttpClientHelper httpClientHelper,
+            HttpResponseHandler httpResponseHandler
         ) {
-            super(httpBodyFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
+            super(httpClientHelper, httpResponseHandler);
         }
 
         @Override

@@ -17,13 +17,29 @@
 package com.integri.atlas.task.handler.httpclient.v1_0.http;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.AuthType;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_ALL_REDIRECTS;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_REDIRECT;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PROXY;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.RESPONSE_FORMAT;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.TIMEOUT;
 
+import com.github.mizosoft.methanol.Methanol;
+import com.integri.atlas.engine.Constants;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.task.auth.TaskAuth;
+import com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants;
+import com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.BodyContentType;
 import com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.RequestMethod;
 import com.integri.atlas.task.handler.httpclient.v1_0.auth.Auth;
 import com.integri.atlas.task.handler.httpclient.v1_0.auth.AuthRegistry;
+import com.integri.atlas.task.handler.httpclient.v1_0.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
+import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeaderFactory;
+import com.integri.atlas.task.handler.httpclient.v1_0.param.HttpQueryParam;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,49 +48,100 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.integri.atlas.task.handler.httpclient.v1_0.param.HttpQueryParamFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
  */
+@Component
 public class HttpClientHelper {
 
-    private final HttpClient httpClient;
+    private final HttpBodyFactory httpBodyFactory;
+    private final HttpHeaderFactory httpHeaderFactory;
+    private final HttpQueryParamFactory queryParamFactory;
 
-    public HttpClientHelper(long timeout) {
-        httpClient =
-            java.net.http.HttpClient
-                .newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .connectTimeout(Duration.ofMillis(timeout))
-                .build();
+    public HttpClientHelper(HttpBodyFactory httpBodyFactory, HttpHeaderFactory httpHeaderFactory, HttpQueryParamFactory queryParamFactory) {
+        this.httpBodyFactory = httpBodyFactory;
+        this.httpHeaderFactory = httpHeaderFactory;
+        this.queryParamFactory = queryParamFactory;
     }
 
-    public HttpResponse<?> send(
-        RequestMethod requestMethod,
-        String uri,
-        List<HttpHeader> headers,
-        List<HttpQueryParam> queryParameters,
-        HttpRequest.BodyPublisher bodyPublisher,
-        HttpResponse.BodyHandler<?> bodyHandler,
-        TaskAuth taskAuth
-    ) throws Exception {
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().method(requestMethod.name(), bodyPublisher);
+    public HttpResponse<?> send(TaskExecution taskExecution, RequestMethod requestMethod) throws Exception {
+        HttpClient httpClient = buildHttpClient(taskExecution);
+
+        List<HttpHeader> httpHeaders = httpHeaderFactory.getHttpHeaders(taskExecution);
+
+        List<HttpQueryParam> queryParameters = queryParamFactory.getQueryParams(taskExecution);
+
+        TaskAuth taskAuth = taskExecution.get(Constants.AUTH, TaskAuth.class);
 
         if (taskAuth != null) {
             Auth httpAuth = AuthRegistry.get(AuthType.valueOf(StringUtils.upperCase(taskAuth.getType())));
 
-            httpAuth.apply(headers, queryParameters, taskAuth);
+            httpAuth.apply(httpHeaders, queryParameters, taskAuth);
         }
 
-        for (HttpHeader httpHeader : headers) {
+        HttpRequest httpRequest = getHttpRequest(taskExecution, requestMethod, httpHeaders, queryParameters);
+
+        return httpClient.send(httpRequest, getBodyHandler(taskExecution));
+    }
+
+    protected HttpClient buildHttpClient(TaskExecution taskExecution) {
+        Methanol.Builder builder = Methanol
+            .newBuilder()
+            .version(HttpClient.Version.HTTP_1_1);
+
+        boolean followRedirect = taskExecution.getBoolean(FOLLOW_REDIRECT, false);
+
+        if (followRedirect) {
+            builder.followRedirects(HttpClient.Redirect.NORMAL);
+        }
+
+        boolean followAllRedirects = taskExecution.getBoolean(FOLLOW_ALL_REDIRECTS, false);
+
+        if (followAllRedirects) {
+            builder.followRedirects(HttpClient.Redirect.ALWAYS);
+        }
+
+        String proxy = taskExecution.getString(PROXY);
+
+        if (proxy != null) {
+            String[] proxyAddress = proxy.split(":");
+
+            builder.proxy(ProxySelector.of(new InetSocketAddress(proxyAddress[0], Integer.parseInt(proxyAddress[1]))));
+        }
+
+        builder.connectTimeout(Duration.ofMillis(taskExecution.getLong(TIMEOUT, 10000)));
+
+        return builder.build();
+    }
+
+    private HttpResponse.BodyHandler<?> getBodyHandler(TaskExecution taskExecution) {
+        if (!taskExecution.containsKey(RESPONSE_FORMAT)) {
+            return HttpResponse.BodyHandlers.discarding();
+        }
+
+        BodyContentType bodyContentType = BodyContentType.valueOf(taskExecution.getString(RESPONSE_FORMAT));
+
+        if (bodyContentType == BodyContentType.BINARY) {
+            return HttpResponse.BodyHandlers.ofInputStream();
+        }
+
+        return HttpResponse.BodyHandlers.ofString();
+    }
+
+    private HttpRequest getHttpRequest(TaskExecution taskExecution, RequestMethod requestMethod, List<HttpHeader> httpHeaders, List<HttpQueryParam> queryParameters) throws IOException {
+        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder().method(requestMethod.name(), httpBodyFactory.getBodyPublisher(taskExecution, httpHeaders));
+
+        for (HttpHeader httpHeader : httpHeaders) {
             httpRequestBuilder.header(httpHeader.getName(), httpHeader.getValue());
         }
 
-        httpRequestBuilder.uri(URI.create(resolveURI(uri, queryParameters)));
+        httpRequestBuilder.uri(resolveURI(taskExecution.getRequiredString(HttpClientTaskConstants.URI), queryParameters));
 
-        return httpClient.send(httpRequestBuilder.build(), bodyHandler);
+        return httpRequestBuilder.build();
     }
 
     private String fromQueryParameters(List<HttpQueryParam> queryParameters) {
@@ -93,11 +160,11 @@ public class HttpClientHelper {
         return StringUtils.join(queryParameterList, "&");
     }
 
-    private String resolveURI(String uri, List<HttpQueryParam> queryParameters) {
+    private URI resolveURI(String uri, List<HttpQueryParam> queryParameters) {
         if (queryParameters.isEmpty()) {
-            return uri;
+            return URI.create(uri);
         }
 
-        return uri + '?' + fromQueryParameters(queryParameters);
+        return URI.create(uri + '?' + fromQueryParameters(queryParameters));
     }
 }
