@@ -3,7 +3,7 @@ plugins {
     id "com.diffplug.spotless"
     id "com.github.ben-manes.versions"
     id "com.github.spotbugs"
-    id "com.integri.java-common-conventions"
+    id "com.bytechef.java-common-conventions"
     id "org.sonarqube"
     id "pmd"
 }
@@ -16,21 +16,11 @@ subprojects {
     apply plugin: "checkstyle"
     apply plugin: "com.diffplug.spotless"
     apply plugin: "com.github.spotbugs"
-    apply plugin: "com.integri.java-common-conventions"
+    apply plugin: "com.bytechef.java-common-conventions"
     apply plugin: "org.sonarqube"
     apply plugin: "pmd"
 
     apply from: "${rootDir}/gradle/sonar.gradle"
-
-    eclipse {
-        sourceSets {
-            main {
-                java {
-                    srcDirs += ["build/generated/sources/annotationProcessor/java/main"]
-                }
-            }
-        }
-    }
 
     idea {
         module {
@@ -51,7 +41,7 @@ subprojects {
     spotless {
         format "misc", {
             // define the files to apply `misc` to
-            target "*.gradle", "src/*/java/**/*.java", "*.md", ".gitignore"
+            target "*.gradle", "*.md", ".gitignore"
 
             trimTrailingWhitespace()
             indentWithSpaces(4)
@@ -60,8 +50,6 @@ subprojects {
         java {
             target "src/*/java/**/*.java"
 
-            removeUnusedImports()
-            importOrder()
             licenseHeader(
                 '''
                 /*
@@ -108,16 +96,21 @@ subprojects {
             ).onlyIfContentMatches(
                 "author\\sArik\\sCohen"
             )
-            prettier(["prettier": "2.6.2", "prettier-plugin-java": "1.6.1"]).config(["parser": "java", "printWidth": 120, "tabWidth": 4, "useTabs": false])
+            palantirJavaFormat()
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+//            prettier(["prettier": "2.7.1", "prettier-plugin-java": "1.6.2"]).config(["parser": "java", "printWidth": 120, "tabWidth": 4, "useTabs": false])
         }
-        format "styling", {
-            target "**/*.json", "**/*.yaml", "**/*.yml"
-
-            prettier()
-        }
+//        format "styling", {
+//            target "**/*.json", "**/*.yaml", "**/*.yml"
+//
+//            prettier()
+//        }
     }
 
-    check.dependsOn 'spotlessApply'
+    check.dependsOn 'spotlessCheck'
 
     test {
         useJUnitPlatform()

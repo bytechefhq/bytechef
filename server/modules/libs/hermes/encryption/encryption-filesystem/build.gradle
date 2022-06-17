@@ -1,0 +1,5 @@
+dependencies {
+    api project(":modules:libs:hermes:encryption:encryption-api")
+
+    implementation "org.springframework:spring-context"
+}

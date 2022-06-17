@@ -1,0 +1,15 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-worker:atlas-worker-api")
+
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation project(":modules:libs:atlas:atlas-api")
+    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+
+    testImplementation "commons-io:commons-io"
+    testImplementation "org.apache.commons:commons-lang3"
+    testImplementation "org.springframework:spring-jdbc"
+    testImplementation "org.springframework.security:spring-security-core"
+    testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
+}

@@ -1,9 +1,0 @@
-dependencies {
-    compileOnly project(":modules:libs:atlas:task-jdbc-commons")
-
-    runtimeOnly "org.postgresql:postgresql"
-
-    testImplementation "com.zaxxer:HikariCP"
-    testImplementation project(":modules:libs:atlas:task-jdbc-commons")
-    testImplementation project(":modules:libs:atlas:test-commons")
-}

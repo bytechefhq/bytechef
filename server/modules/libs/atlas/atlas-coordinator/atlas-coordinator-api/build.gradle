@@ -1,0 +1,8 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-api")
+    api project(":modules:libs:atlas:atlas-event:atlas-event-api")
+
+    implementation "commons-io:commons-io"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+}

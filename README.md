@@ -1,12 +1,12 @@
 # Introduction
 
-Integri Atlas is an open-source, extendable automated workflow engine built on Spring Boot, designed to be dead simple. 
+Bytechef Atlas is an open-source, extendable automated workflow engine built on Spring Boot, designed to be dead simple. 
 
-Integri Atlas can run on one or a thousand machines depending on your scaling needs. 
+Bytechef Atlas can run on one or a thousand machines depending on your scaling needs. 
 
-In Integri Atlas, work to be done is defined as a set of tasks called a Workflow. Workflows can be sourced from many locations but typically they live on a Git repository where they can be versioned and tracked.
+In Bytechef Atlas, work to be done is defined as a set of tasks called a Workflow. Workflows can be sourced from many locations but typically they live on a Git repository where they can be versioned and tracked.
 
-Integri Atlas was originally built to support the need to transcode massive amounts of video in parallel. Since transcoding video is a CPU and time instensive process I had to scale horizontally. Moreover, I needed a way to monitor these long running jobs, auto-retry them and otherwise control their execution. 
+Bytechef Atlas was originally built to support the need to transcode massive amounts of video in parallel. Since transcoding video is a CPU and time instensive process I had to scale horizontally. Moreover, I needed a way to monitor these long running jobs, auto-retry them and otherwise control their execution. 
 
 # Tasks
 
@@ -35,7 +35,7 @@ The `TaskHandler` is then responsible for executing the task using this input an
 
 # Workflows
 
-Integri Atlas workflows are authored in YAML, a JSON superset. 
+Bytechef Atlas workflows are authored in YAML, a JSON superset. 
 
 Here is an example of a basic workflow definition.
 
@@ -92,11 +92,11 @@ All other key-value pairs are task-specific and may or may not be required depen
 
 # Architecture
 
-Integri Atlas is composed of the following components: 
+Bytechef Atlas is composed of the following components: 
 
-**Coordinator**: The Coordinator is the like the central nervous system of Integri Atlas. It keeps tracks of jobs, dishes out work to be done by Worker machines, keeps track of failures, retries and other job-level details. Unlike Worker nodes, it does not execute actual work but delegate all task activities to Worker instances. 
+**Coordinator**: The Coordinator is the like the central nervous system of Bytechef Atlas. It keeps tracks of jobs, dishes out work to be done by Worker machines, keeps track of failures, retries and other job-level details. Unlike Worker nodes, it does not execute actual work but delegate all task activities to Worker instances. 
 
-**Worker**: Workers are the work horses of Integri Atlas. These are the Integri Atlas nodes that actually execute tasks requested to be done by the Coordinator machine. Unlike the Coordinator, the workers are stateless, which by that is meant that they do not interact with a database or keep any state in memory about the job or anything else. This makes it very easy to scale up and down the number of workers in the system without fear of losing application state. 
+**Worker**: Workers are the work horses of ByteChef Atlas. These are the Bytechef Atlas nodes that actually execute tasks requested to be done by the Coordinator machine. Unlike the Coordinator, the workers are stateless, which by that is meant that they do not interact with a database or keep any state in memory about the job or anything else. This makes it very easy to scale up and down the number of workers in the system without fear of losing application state. 
 
 **Message Broker**:  All communication between the Coordinator and the Worker nodes is done through a messaging broker. This has many advantages: 
   1. if all workers are busy the message broker will simply queue the message until they can handle it. 
@@ -110,7 +110,7 @@ Integri Atlas is composed of the following components:
 
 # Control Flow
 
-Integri Atlas support the following constructs to control the flow of execution:
+ByteChef Atlas support the following constructs to control the flow of execution:
 
 ## Each
 
@@ -274,7 +274,7 @@ execution (`finalize`).
 
 ## Webhooks
 
-Integri Atlas provide the ability to register HTTP webhooks to receieve notifications for certain events. 
+ByteChef Atlas provide the ability to register HTTP webhooks to receieve notifications for certain events. 
 
 Registering webhooks is done when creating the job. E.g.:
 
@@ -297,14 +297,14 @@ Registering webhooks is done when creating the job. E.g.:
 }
 ```
 
-`type` is the type of event you would like to be notified on and `url` is the URL that Integri Atlas would be calling when the event occurs. 
+`type` is the type of event you would like to be notified on and `url` is the URL that ByteChef Atlas would be calling when the event occurs. 
 
 Supported types are `job.status` and `task.started`.
 
 # Task Handlers
 
 
-[core/var](src/main/java/com/integri/atlas/task/handler/core/Var.java)
+[core/var](src/main/java/com/ByteChef/atlas/task/handler/core/Var.java)
 
 ```
   name: pi
@@ -312,14 +312,14 @@ Supported types are `job.status` and `task.started`.
   value: 3.14159
 ```
 
-[io/createTempDir](src/main/java/com/integri/atlas/task/handler/io/CreateTempDir.java)
+[io/createTempDir](src/main/java/com/ByteChef/atlas/task/handler/io/CreateTempDir.java)
 
 ```
   name: tempDir
   type: io/create-temp-dir
 ```
 
-[io/filepath](src/main/java/com/integri/atlas/task/handler/io/FilePath.java)
+[io/filepath](src/main/java/com/ByteChef/atlas/task/handler/io/FilePath.java)
 
 ```
   name: myFilePath
@@ -327,7 +327,7 @@ Supported types are `job.status` and `task.started`.
   filename: /path/to/my/file.txt
 ```
 
-[io/ls](src/main/java/com/integri/atlas/task/handler/io/Ls.java)
+[io/ls](src/main/java/com/ByteChef/atlas/task/handler/io/Ls.java)
 
 ```
   name: listOfFiles
@@ -336,28 +336,28 @@ Supported types are `job.status` and `task.started`.
   path: /path/to/directory
 ```
 
-[io/mkdir](src/main/java/com/integri/atlas/task/handler/io/Mkdir.java)
+[io/mkdir](src/main/java/com/ByteChef/atlas/task/handler/io/Mkdir.java)
 
 ```
   type: io/mkdir
   path: /path/to/directory
 ```
 
-[io/print](src/main/java/com/integri/atlas/task/handler/io/Print.java)
+[io/print](src/main/java/com/ByteChef/atlas/task/handler/io/Print.java)
 
 ```
   type: io/print
   text: hello world
 ```
 
-[io/rm](src/main/java/com/integri/atlas/task/handler/io/Rm.java)
+[io/rm](src/main/java/com/ByteChef/atlas/task/handler/io/Rm.java)
 
 ```
   type: io/rm
   path: /some/directory
 ```
 
-[media/dar](src/main/java/com/integri/atlas/task/handler/media/Dar.java)
+[media/dar](src/main/java/com/ByteChef/atlas/task/handler/media/Dar.java)
 
 ```
   name: myDar
@@ -365,7 +365,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/video/mp4
 ```
 
-[media/ffmpeg](src/main/java/com/integri/atlas/task/handler/media/Ffmpeg.java)
+[media/ffmpeg](src/main/java/com/ByteChef/atlas/task/handler/media/Ffmpeg.java)
 
 ```
   type: media/ffmpeg
@@ -384,7 +384,7 @@ Supported types are `job.status` and `task.started`.
   ]
 ```
 
-[media/ffprobe](src/main/java/com/integri/atlas/task/handler/media/Ffprobe.java)
+[media/ffprobe](src/main/java/com/ByteChef/atlas/task/handler/media/Ffprobe.java)
 
 ```
   name: ffprobeResults
@@ -392,7 +392,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/media/file.mov
 ```
 
-[media/framerate](src/main/java/com/integri/atlas/task/handler/media/Framerate.java)
+[media/framerate](src/main/java/com/ByteChef/atlas/task/handler/media/Framerate.java)
 
 ```
   name: framerate
@@ -400,7 +400,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/video/file.mov
 ```
 
-[media/mediainfo](src/main/java/com/integri/atlas/task/handler/media/Mediainfo.java)
+[media/mediainfo](src/main/java/com/ByteChef/atlas/task/handler/media/Mediainfo.java)
 
 ```
   name: mediainfoResult
@@ -408,7 +408,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/media/file.mov
 ```
 
-[media/vduration](src/main/java/com/integri/atlas/task/handler/media/Vduration.java)
+[media/vduration](src/main/java/com/ByteChef/atlas/task/handler/media/Vduration.java)
 
 ```
   name: duration
@@ -416,7 +416,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/video/file.mov
 ```
 
-[media/vsplit](src/main/java/com/integri/atlas/task/handler/media/Vsplit.java)
+[media/vsplit](src/main/java/com/ByteChef/atlas/task/handler/media/Vsplit.java)
 
 ```
   name: chunks
@@ -425,7 +425,7 @@ Supported types are `job.status` and `task.started`.
   chunkSize: 30s
 ```
 
-[media/vstitch](src/main/java/com/integri/atlas/task/handler/media/Vstitch.java)
+[media/vstitch](src/main/java/com/ByteChef/atlas/task/handler/media/Vstitch.java)
 
 ```
   type: media/vstitch
@@ -438,7 +438,7 @@ Supported types are `job.status` and `task.started`.
 ```
 
 
-[random/int](src/main/java/com/integri/atlas/task/handler/random/RandomInt.java)
+[random/int](src/main/java/com/ByteChef/atlas/task/handler/random/RandomInt.java)
 
 ```
   name: someRandomNumber
@@ -447,14 +447,14 @@ Supported types are `job.status` and `task.started`.
   endInclusive: 9999 # default 100
 ```
 
-[random/rogue](src/main/java/com/integri/atlas/task/handler/random/Rogue.java)
+[random/rogue](src/main/java/com/ByteChef/atlas/task/handler/random/Rogue.java)
 
 ```
   type: random/rogue
   probabilty: 0.25 # default 0.5
 ```
 
-[s3/getObject](src/main/java/com/integri/atlas/task/handler/s3/S3GetObject.java)
+[s3/getObject](src/main/java/com/ByteChef/atlas/task/handler/s3/S3GetObject.java)
 
 ```
   type: s3/getObject
@@ -462,7 +462,7 @@ Supported types are `job.status` and `task.started`.
   filepath: /path/to/my/file.mp4
 ```
 
-[s3/listObjects](src/main/java/com/integri/atlas/task/handler/s3/S3ListObjects.java)
+[s3/listObjects](src/main/java/com/ByteChef/atlas/task/handler/s3/S3ListObjects.java)
 
 ```
   type: s3/listObjects
@@ -470,14 +470,14 @@ Supported types are `job.status` and `task.started`.
   prefix: some/path/
 ```
 
-[s3/getUrl](src/main/java/com/integri/atlas/task/handler/s3/S3GetUrl.java)
+[s3/getUrl](src/main/java/com/ByteChef/atlas/task/handler/s3/S3GetUrl.java)
 
 ```
   type: s3/getUrl
   uri: s3://my-bucket/path/to/file.mp4
 ```
 
-[s3/presignGetObject](src/main/java/com/integri/atlas/task/handler/s3/S3PresignedGetObject.java)
+[s3/presignGetObject](src/main/java/com/ByteChef/atlas/task/handler/s3/S3PresignedGetObject.java)
 
 ```
   name: url
@@ -486,7 +486,7 @@ Supported types are `job.status` and `task.started`.
   signatureDuration: 60s
 ```
 
-[s3/putObject](src/main/java/com/integri/atlas/task/handler/s3/S3PutObject.java)
+[s3/putObject](src/main/java/com/ByteChef/atlas/task/handler/s3/S3PutObject.java)
 
 ```
   type: s3/putObject
@@ -494,7 +494,7 @@ Supported types are `job.status` and `task.started`.
   filepath: /path/to/my/file.mp4
 ```
 
-[shell/bash](src/main/java/com/integri/atlas/task/handler/shell/Bash.java)
+[shell/bash](src/main/java/com/ByteChef/atlas/task/handler/shell/Bash.java)
 
 ```
   name: listOfFiles
@@ -506,7 +506,7 @@ Supported types are `job.status` and `task.started`.
         done
 ```
 
-[time/sleep](src/main/java/com/integri/atlas/task/handler/time/Sleep.java)
+[time/sleep](src/main/java/com/ByteChef/atlas/task/handler/time/Sleep.java)
 
 ```
   type: time/sleep
@@ -515,112 +515,112 @@ Supported types are `job.status` and `task.started`.
 
 # Expression Functions
 
-[boolean](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[boolean](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${boolean('false')}"
 ```
 
-[byte](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[byte](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${byte('42')}"
 ```
 
-[char](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[char](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${char('1')}"
 ```
 
-[short](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[short](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${short('42')}"
 ```
 
-[int](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[int](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${int('42')}"
 ```
 
-[long](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[long](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${long('42')}"
 ```
 
-[float](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[float](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${float('4.2')}"
 ```
 
-[double](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
+[double](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${float('4.2')}"
 ```
 
-[systemProperty](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/SystemProperty.java)
+[systemProperty](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/SystemProperty.java)
 
 ```
   type: core/var
   value: "${systemProperty('java.home')}"
 ```
 
-[range](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Range.java)
+[range](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Range.java)
 
 ```
   type: core/var
   value: "${range(0,100)}" # [0,1,...,100]
 ```
 
-[join](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Join.java)
+[join](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Join.java)
 
 ```
   type: core/var
   value: "${join('A','B','C')}" # ABC
 ```
 
-[concat](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Concat.java)
+[concat](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Concat.java)
 
 ```
   type: core/var
   value: ${concat(['A','B'],['C'])} # ['A','B','C']
 ```
 
-[flatten](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Flatten.java)
+[flatten](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Flatten.java)
 
 ```
   type: core/var
   value: ${flatten([['A'],['B']])} # ['A','B']
 ```
 
-[sort](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Sort.java)
+[sort](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Sort.java)
 
 ```
   type: core/var
   value: ${sort([3,1,2])} # [1,2,3]
 ```
 
-[tempDir](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/TempDir.java)
+[tempDir](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/TempDir.java)
 
 ```
   type: core/var
   value: "${tempDir()}"  # e.g. /tmp
 ```
 
-[uuid](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Uuid.java)
+[uuid](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Uuid.java)
 
 ```
   name: workDir
@@ -628,52 +628,52 @@ Supported types are `job.status` and `task.started`.
   value: "${tempDir()}/${uuid()}"
 ```
 
-[stringf](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/StringFormat.java)
+[stringf](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/StringFormat.java)
 
 ```
   type: core/var
   value: "${stringf('%03d',5)}"  # 005
 ```
 
-[now](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Now.java)
+[now](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Now.java)
 
 ```
   type: core/var
   value: "${dateFormat(now(),'yyyy')}"  # e.g. 2020
 ```
 
-[timestamp](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Timestamp.java)
+[timestamp](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Timestamp.java)
 
 ```
   type: core/var
   value: "${timestamp()}"  # e.g. 1583268621423
 ```
 
-[dateFormat](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/DateFormat.java)
+[dateFormat](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/DateFormat.java)
 
 ```
   type: core/var
   value: "${dateFormat(now(),'yyyy')}"  # e.g. 2020
 ```
 
-[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Config.java)
+[config](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/Config.java)
 
 ```
   type: core/var
   value: "${config('some.config.property')}"
 ```
 
-[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/ReadJSON.java)
+[config](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/ReadJSON.java)
 
-[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/WriteJSON.java)
+[config](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/WriteJSON.java)
 
-[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/ReadXML.java)
+[config](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/ReadXML.java)
 
-[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/WriteJSON.java)
+[config](src/main/java/com/ByteChef/atlas/engine/core/task/evaluator/spel/WriteJSON.java)
 
-[config](src/main/java/com/integri/atlas/file/storage/task/evaluator/spel/ReadFileContent.java)
+[config](src/main/java/com/ByteChef/atlas/file/storage/task/evaluator/spel/ReadFileContent.java)
 
-[config](src/main/java/com/integri/atlas/file/storage/task/evaluator/spel/StoreFileContent.java)
+[config](src/main/java/com/ByteChef/atlas/file/storage/task/evaluator/spel/StoreFileContent.java)
 
 # Tutorials
 
@@ -691,13 +691,13 @@ Start a local RabbitMQ instance:
 ./scripts/rabbit.sh
 ``` 
 
-Build Integri Atlas:
+Build ByteChef Atlas:
 
 ```
 ./scripts/build.sh
 ```
 
-Start Integri Atlas:
+Start ByteChef Atlas:
 
 ```
 ./scripts/development.sh
@@ -717,7 +717,7 @@ Which should give you something like:
 }
 ```
 
-The `/jobs` endpoint lists all jobs that are either running or were previously run on Integri Atlas.
+The `/jobs` endpoint lists all jobs that are either running or were previously run on ByteChef Atlas.
 
 Start a demo job:
 
@@ -750,7 +750,7 @@ Which should give you something like this as a response:
 
 If you'll refresh your browser page now you should see the executing job. 
 
-In case you are wondering, the `samples/hello.json` workflow is located at <a href="https://github.com/integri/atlas/blob/master/server/modules/apps/atlas-app/src/main/resources/workflow/samples/hello.yaml" target="_blank">here</a>
+In case you are wondering, the `samples/hello.json` workflow is located at <a href="https://github.com/ByteChef/atlas/blob/master/server/modules/apps/atlas-app/src/main/resources/workflow/samples/hello.yaml" target="_blank">here</a>
 
 
 ## Writing your first workflow
@@ -786,9 +786,9 @@ curl -s -X POST -H Content-Type:application/json -d '{"workflowId":"myworkflow",
 
 You can make changes to your workflow and execute the `./scripts/clear.sh` to clear the cache to reload the workflow.
 
-## Scaling Integri Atlas
+## Scaling ByteChef Atlas
 
-Depending on your workload you will probably exhaust the ability to run Integri Atlas on a single node fairly quickly. Good, because that's where the fun begins. 
+Depending on your workload you will probably exhaust the ability to run ByteChef Atlas on a single node fairly quickly. Good, because that's where the fun begins. 
 
 Start RabbitMQ: 
 
@@ -846,17 +846,17 @@ curl -s \
 
 ## Transcoding a Video (Split & Stitch)
 
-See [Transcoding video at scale with Integri Atlas](https://medium.com/@arik.c.mail/transcoding-video-at-scale-with-piper-dca23eb26fd2)
+See [Transcoding video at scale with ByteChef Atlas](https://medium.com/@arik.c.mail/transcoding-video-at-scale-with-piper-dca23eb26fd2)
 
 ## Adaptive Streaming
 
-See [Adaptive Streaming with Integri Atlas](https://medium.com/@arik.c.mail/adaptive-streaming-with-piper-b37e55d95466)
+See [Adaptive Streaming with ByteChef Atlas](https://medium.com/@arik.c.mail/adaptive-streaming-with-piper-b37e55d95466)
 
 # Using Git as a Workflow Repository backend
 
 Rather than storing the workflows in your local file system you can use Git to store them for you. This has great advantages, not the least of which is workflow versioning, Pull Requests and everything else Git has to offer.
 
-To enable Git as a workflow repository set the `atlas.workflow-repository.git.enabled` flag to `true` in `./scripts/development.sh` and restart Integri Atlas. By default, Integri Atlas will use the demo repository [atlas-workflows](https://github.com/integrihq/integri-workflows).
+To enable Git as a workflow repository set the `atlas.workflow-repository.git.enabled` flag to `true` in `./scripts/development.sh` and restart ByteChef Atlas. By default, ByteChef Atlas will use the demo repository [atlas-workflows](https://github.com/ByteChefhq/ByteChef-workflows).
 
 You can change it by using the `atlas.workflow-repository.git.url` and `atlas.workflow-repository.git.search-paths` configuration parameters.  
 
@@ -873,7 +873,7 @@ atlas.worker.enabled=true
 # you may also route workflow tasks to other arbitrarilty named task queues by specifying the "node"
 # property on any give task. 
 # E.g. node: captions will route to the captions queue which a worker would subscribe to with atlas.worker.subscriptions.captions
-# note: queue must be created before tasks can be routed to it. Integri Atlas will create the queue if it isn't already there when the worker
+# note: queue must be created before tasks can be routed to it. ByteChef Atlas will create the queue if it isn't already there when the worker
 # bootstraps.
 atlas.worker.subscriptions.tasks=5 
 # enable a git-based workflow repository
@@ -898,7 +898,7 @@ spring.datasource.initialization-mode=never # change to always when bootstrappin
 ```
 
 # Docker
-[integri/atlas](https://hub.docker.com/r/integri/atlas)
+[ByteChef/atlas](https://hub.docker.com/r/ByteChef/atlas)
 Hello World in Docker:
 
 Start a local Postgres database:
@@ -950,7 +950,7 @@ curl -s \
      http://localhost:8080/jobs
 ```
 # License
-Integri Atlas is released under version 2.0 of the [Apache License](LICENSE). 
+ByteChef Atlas is released under version 2.0 of the [Apache License](LICENSE). 
 
 # Useful gradle tasks
 1. gw spotlessApply - run source formatting

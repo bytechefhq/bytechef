@@ -1,0 +1,10 @@
+dependencies {
+    compileOnly project(":modules:libs:task:task-jdbc")
+
+    runtimeOnly "mysql:mysql-connector-java:8.0.29"
+
+    testImplementation "com.zaxxer:HikariCP"
+    testImplementation project(":modules:libs:task:task-jdbc")
+    testImplementation project(":modules:libs:test-support")
+
+}
