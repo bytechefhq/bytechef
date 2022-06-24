@@ -16,18 +16,25 @@
 
 package com.bytechef.task.handler.httpclient.v1_0.auth;
 
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.TOKEN;
+
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.task.handler.httpclient.v1_0.header.HTTPHeader;
-import com.bytechef.task.handler.httpclient.v1_0.param.HTTPQueryParam;
+import com.github.mizosoft.methanol.Methanol;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class OAuth2Auth implements Auth {
+public class BearerTokenAuthResolver implements AuthResolver {
 
     @Override
-    public void apply(List<HTTPHeader> headers, List<HTTPQueryParam> queryParameters, Authentication taskAuth) {
-        throw new UnsupportedOperationException();
+    public void apply(
+            Methanol.Builder builder,
+            Map<String, List<String>> headers,
+            Map<String, List<String>> queryParams,
+            Authentication authentication) {
+
+        headers.put("Authorization", List.of("Bearer " + authentication.getProperty(TOKEN)));
     }
 }

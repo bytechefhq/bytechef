@@ -14,34 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.httpclient.v1_0.header;
+package com.bytechef.task.handler.httpclient.v1_0.auth;
 
-import org.apache.commons.lang3.StringUtils;
+import com.bytechef.hermes.auth.domain.Authentication;
+import com.github.mizosoft.methanol.Methanol;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public class HTTPHeader {
+public class OAuth2AuthResolver implements AuthResolver {
 
-    public static final String BOUNDARY_TMPL = "[$BOUNDARY]";
-
-    private final String name;
-    private String value;
-
-    public HTTPHeader(String name, String... values) {
-        this.name = name;
-        this.value = StringUtils.join(values, ',');
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    @Override
+    public void apply(
+            Methanol.Builder builder,
+            Map<String, List<String>> headers,
+            Map<String, List<String>> queryParams,
+            Authentication authentication) {
+        throw new UnsupportedOperationException();
     }
 }

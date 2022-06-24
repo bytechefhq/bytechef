@@ -25,19 +25,19 @@ import java.util.Map;
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public class AuthRegistry {
+public class AuthResolverRegistry {
 
-    private static final Map<AuthType, Auth> HTTP_AUTH_MAP = new HashMap<>() {
+    private static final Map<AuthType, AuthResolver> HTTP_AUTH_MAP = new HashMap<>() {
         {
-            put(AuthType.API_KEY, new ApiKeyAuth());
-            put(AuthType.BASIC_AUTH, new BasicAuth());
-            put(AuthType.BEARER_TOKEN, new BearerTokenAuth());
-            put(AuthType.DIGEST_AUTH, new DigestAuth());
-            put(AuthType.OAUTH2, new OAuth2Auth());
+            put(AuthType.API_KEY, new ApiKeyAuthResolver());
+            put(AuthType.BASIC_AUTH, new BasicAuthResolver());
+            put(AuthType.BEARER_TOKEN, new BearerTokenAuthResolver());
+            put(AuthType.DIGEST_AUTH, new DigestAuthResolver());
+            put(AuthType.OAUTH2, new OAuth2AuthResolver());
         }
     };
 
-    public static Auth get(AuthType authType) {
+    public static AuthResolver get(AuthType authType) {
         return HTTP_AUTH_MAP.get(authType);
     }
 }

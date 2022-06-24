@@ -16,9 +16,10 @@
 
 package com.bytechef.task.handler.httpclient.v1_0;
 
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.*;
+
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.task.handler.httpclient.HTTPClientTaskConstants;
 import com.bytechef.task.handler.httpclient.v1_0.http.HTTPClientHelper;
 import org.springframework.stereotype.Component;
 
@@ -40,11 +41,10 @@ public class HTTPClientTaskHandler {
             return httpClientHelper.send(taskExecution, getRequestMethod());
         }
 
-        protected abstract HTTPClientTaskConstants.RequestMethod getRequestMethod();
+        protected abstract RequestMethod getRequestMethod();
     }
 
-    @Component(HTTPClientTaskConstants.HTTP_CLIENT + "/" + HTTPClientTaskConstants.VERSION_1_0 + "/"
-            + HTTPClientTaskConstants.DELETE)
+    @Component(HTTP_CLIENT + "/" + VERSION_1_0 + "/" + DELETE)
     public static class HTTPClientDeleteTaskHandler extends AbstractHTTPClientTaskHandler {
 
         public HTTPClientDeleteTaskHandler(HTTPClientHelper httpClientHelper) {
@@ -52,13 +52,12 @@ public class HTTPClientTaskHandler {
         }
 
         @Override
-        protected HTTPClientTaskConstants.RequestMethod getRequestMethod() {
-            return HTTPClientTaskConstants.RequestMethod.DELETE;
+        protected RequestMethod getRequestMethod() {
+            return RequestMethod.DELETE;
         }
     }
 
-    @Component(HTTPClientTaskConstants.HTTP_CLIENT + "/" + HTTPClientTaskConstants.VERSION_1_0 + "/"
-            + HTTPClientTaskConstants.GET)
+    @Component(HTTP_CLIENT + "/" + VERSION_1_0 + "/" + GET)
     public static class HTTPClientGetTaskHandler extends AbstractHTTPClientTaskHandler {
 
         public HTTPClientGetTaskHandler(HTTPClientHelper httpClientHelper) {
@@ -66,13 +65,12 @@ public class HTTPClientTaskHandler {
         }
 
         @Override
-        protected HTTPClientTaskConstants.RequestMethod getRequestMethod() {
-            return HTTPClientTaskConstants.RequestMethod.GET;
+        protected RequestMethod getRequestMethod() {
+            return RequestMethod.GET;
         }
     }
 
-    @Component(HTTPClientTaskConstants.HTTP_CLIENT + "/" + HTTPClientTaskConstants.VERSION_1_0 + "/"
-            + HTTPClientTaskConstants.HEAD)
+    @Component(HTTP_CLIENT + "/" + VERSION_1_0 + "/" + HEAD)
     public static class HTTPClientHeadTaskHandler extends AbstractHTTPClientTaskHandler {
 
         public HTTPClientHeadTaskHandler(HTTPClientHelper httpClientHelper) {
@@ -80,13 +78,12 @@ public class HTTPClientTaskHandler {
         }
 
         @Override
-        protected HTTPClientTaskConstants.RequestMethod getRequestMethod() {
-            return HTTPClientTaskConstants.RequestMethod.HEAD;
+        protected RequestMethod getRequestMethod() {
+            return RequestMethod.HEAD;
         }
     }
 
-    @Component(HTTPClientTaskConstants.HTTP_CLIENT + "/" + HTTPClientTaskConstants.VERSION_1_0 + "/"
-            + HTTPClientTaskConstants.PATCH)
+    @Component(HTTP_CLIENT + "/" + VERSION_1_0 + "/" + PATCH)
     public static class HTTPClientPatchTaskHandler extends AbstractHTTPClientTaskHandler {
 
         public HTTPClientPatchTaskHandler(HTTPClientHelper httpClientHelper) {
@@ -94,13 +91,12 @@ public class HTTPClientTaskHandler {
         }
 
         @Override
-        protected HTTPClientTaskConstants.RequestMethod getRequestMethod() {
-            return HTTPClientTaskConstants.RequestMethod.PATCH;
+        protected RequestMethod getRequestMethod() {
+            return RequestMethod.PATCH;
         }
     }
 
-    @Component(HTTPClientTaskConstants.HTTP_CLIENT + "/" + HTTPClientTaskConstants.VERSION_1_0 + "/"
-            + HTTPClientTaskConstants.POST)
+    @Component(HTTP_CLIENT + "/" + VERSION_1_0 + "/" + POST)
     public static class HTTPClientPostTaskHandler extends AbstractHTTPClientTaskHandler {
 
         public HTTPClientPostTaskHandler(HTTPClientHelper httpClientHelper) {
@@ -108,13 +104,12 @@ public class HTTPClientTaskHandler {
         }
 
         @Override
-        protected HTTPClientTaskConstants.RequestMethod getRequestMethod() {
-            return HTTPClientTaskConstants.RequestMethod.POST;
+        protected RequestMethod getRequestMethod() {
+            return RequestMethod.POST;
         }
     }
 
-    @Component(HTTPClientTaskConstants.HTTP_CLIENT + "/" + HTTPClientTaskConstants.VERSION_1_0 + "/"
-            + HTTPClientTaskConstants.PUT)
+    @Component(HTTP_CLIENT + "/" + VERSION_1_0 + "/" + PUT)
     public static class HTTPClientPutTaskHandler extends AbstractHTTPClientTaskHandler {
 
         public HTTPClientPutTaskHandler(HTTPClientHelper httpClientHelper) {
@@ -122,8 +117,8 @@ public class HTTPClientTaskHandler {
         }
 
         @Override
-        protected HTTPClientTaskConstants.RequestMethod getRequestMethod() {
-            return HTTPClientTaskConstants.RequestMethod.PUT;
+        protected RequestMethod getRequestMethod() {
+            return RequestMethod.PUT;
         }
     }
 }

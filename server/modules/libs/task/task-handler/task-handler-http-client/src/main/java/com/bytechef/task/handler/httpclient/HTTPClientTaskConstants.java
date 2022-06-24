@@ -37,7 +37,7 @@ public class HTTPClientTaskConstants {
     public static final String PARAMETER = "parameter";
     public static final String KEY = "key";
     public static final String VALUE = "value";
-    public static final String PROPERTY_QUERY_PARAMETERS = "queryParameters";
+    public static final String QUERY_PARAMETERS = "queryParameters";
     public static final String BODY_PARAMETERS = "bodyParameters";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String USERNAME = "username";
@@ -51,6 +51,7 @@ public class HTTPClientTaskConstants {
     public static final String PATCH = "patch";
     public static final String DELETE = "delete";
     public static final String HEAD = "head";
+    public static final String SEND_FILE = "sendFile";
     public static final float VERSION_1_0 = 1.0f;
 
     public enum ApiTokenLocation {
@@ -67,26 +68,27 @@ public class HTTPClientTaskConstants {
     }
 
     public enum BodyContentType {
-        JSON,
-        RAW,
+        BINARY,
         FORM_DATA,
         FORM_URLENCODED,
-        BINARY,
+        JSON,
+        RAW,
+        XML
     }
 
     public enum ResponseFormat {
-        JSON,
-        XML,
-        TEXT,
         FILE,
+        JSON,
+        TEXT,
+        XML,
     }
 
     public enum RequestMethod {
+        DELETE,
+        GET,
+        HEAD,
         PATCH,
         POST,
         PUT,
-        GET,
-        HEAD,
-        DELETE,
     }
 }
