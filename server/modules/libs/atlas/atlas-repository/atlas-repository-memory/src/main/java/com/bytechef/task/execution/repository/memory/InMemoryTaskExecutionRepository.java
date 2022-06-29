@@ -19,7 +19,7 @@
 package com.bytechef.task.execution.repository.memory;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.task.execution.repository.TaskExecutionRepository;
+import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

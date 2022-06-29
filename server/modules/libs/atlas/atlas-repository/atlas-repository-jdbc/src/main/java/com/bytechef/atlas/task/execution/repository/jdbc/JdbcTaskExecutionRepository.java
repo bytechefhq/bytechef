@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.execution.repository.jdbc;
+package com.bytechef.atlas.task.execution.repository.jdbc;
 
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.util.JSONUtils;
-import com.bytechef.task.execution.repository.TaskExecutionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;

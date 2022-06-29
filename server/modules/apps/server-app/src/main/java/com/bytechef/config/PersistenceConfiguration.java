@@ -24,6 +24,8 @@ import com.bytechef.atlas.counter.repository.CounterRepository;
 import com.bytechef.atlas.counter.repository.jdbc.JdbcCounterRepository;
 import com.bytechef.atlas.job.repository.JobRepository;
 import com.bytechef.atlas.job.repository.jdbc.JdbcJobRepository;
+import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
+import com.bytechef.atlas.task.execution.repository.jdbc.JdbcTaskExecutionRepository;
 import com.bytechef.atlas.workflow.repository.WorkflowRepository;
 import com.bytechef.atlas.workflow.repository.WorkflowRepositoryChain;
 import com.bytechef.atlas.workflow.repository.git.GitWorkflowRepository;
@@ -37,8 +39,6 @@ import com.bytechef.hermes.descriptor.repository.ExtAuthenticationDescriptorHand
 import com.bytechef.hermes.descriptor.repository.ExtTaskDescriptorHandlerRepository;
 import com.bytechef.hermes.descriptor.repository.memory.InMemoryExtAuthenticationDescriptorHandlerRepository;
 import com.bytechef.hermes.descriptor.repository.memory.InMemoryExtTaskDescriptorHandlerRepository;
-import com.bytechef.task.execution.repository.TaskExecutionRepository;
-import com.bytechef.task.execution.repository.jdbc.JdbcTaskExecutionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
