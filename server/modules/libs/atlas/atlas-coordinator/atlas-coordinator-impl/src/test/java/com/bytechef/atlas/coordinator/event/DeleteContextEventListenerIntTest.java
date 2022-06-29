@@ -18,12 +18,10 @@ package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.context.repository.ContextRepository;
 import com.bytechef.atlas.context.service.ContextService;
+import com.bytechef.atlas.coordinator.util.TestConfigurator;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.atlas.job.service.JobService;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.test.support.task.BaseTaskIntTest;
-import java.util.HashMap;
-import java.util.Map;
+import com.bytechef.atlas.workflow.repository.mapper.JSONWorkflowMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,27 +33,19 @@ import org.springframework.context.annotation.Bean;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class DeleteContextEventListenerIntTest extends BaseTaskIntTest {
+public class DeleteContextEventListenerIntTest {
 
     @Autowired
     private ContextRepository contextRepository;
 
+    @Autowired
+    private TestConfigurator testConfigurator;
+
     @Test
     public void testJobStatusEventHandler() {
-        Job job = startJob("samples/hello.json", Map.of("yourName", "me"));
+        Job job = testConfigurator.startJob("samples/hello.json", new JSONWorkflowMapper());
 
         Assertions.assertNull(contextRepository.peek(job.getId()));
-    }
-
-    @Override
-    protected Map<String, TaskHandler<?>> getTaskHandlerMap() {
-        Map<String, TaskHandler<?>> taskHandlerMap = new HashMap<>();
-
-        taskHandlerMap.put("io/print", taskExecution -> null);
-        taskHandlerMap.put("random/int", taskExecution -> null);
-        taskHandlerMap.put("time/sleep", taskExecution -> null);
-
-        return taskHandlerMap;
     }
 
     @TestConfiguration

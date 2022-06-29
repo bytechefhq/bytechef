@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.test.support.json;
+package com.bytechef.test.json;
 
 import java.util.Collection;
 import java.util.List;

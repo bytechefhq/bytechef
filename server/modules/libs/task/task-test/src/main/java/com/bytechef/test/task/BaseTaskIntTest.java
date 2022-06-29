@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.test.support.task;
+package com.bytechef.test.task;
 
 import com.bytechef.atlas.MapObject;
 import com.bytechef.atlas.context.service.ContextService;
