@@ -31,6 +31,31 @@ pluginManagement {
 
 rootProject.name = "bytechef"
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            library('java-jq', 'com.arakelian:java-jq:1.1.0')
+            library('jackson-dataformat-xml', 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2')
+            library('jackson-dataformat-yaml', 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.2')
+            library('sods', 'com.github.miachm.sods:SODS:1.4.0')
+            library('json-path', 'com.jayway.jsonpath:json-path:2.7.0')
+            library('commons-io', 'commons-io:commons-io:2.11.0')
+            library('commons-exec', 'org.apache.commons:commons-exec:1.3')
+            library('tika-core', 'org.apache.tika:tika-core:2.1.0')
+            library('poi-ooxml', 'org.apache.poi:poi-ooxml:4.1.2')
+            library('jgit', 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r')
+            library('json', 'org.json:json:20210307')
+            library('jobrunr', 'org.jobrunr:jobrunr:5.1.4')
+            library('jobrunr-spring-boot-starter', 'org.jobrunr:jobrunr-spring-boot-starter:5.1.4')
+            library('zt-exec', 'org.zeroturnaround:zt-exec:1.12')
+            library('awssdk-s3', 'software.amazon.awssdk:s3:2.17.46')
+            library('testcontainers', 'org.testcontainers:testcontainers:1.17.2')
+            library('testcontainers-postgresql', 'org.testcontainers:postgresql:1.17.2')
+            library('testcontainers-junit-jupiter', 'org.testcontainers:junit-jupiter:1.17.2')
+        }
+    }
+}
+
 include("modules:apps:cli-app")
 include("modules:apps:server-app")
 include("modules:libs:hermes:auth:auth-api")

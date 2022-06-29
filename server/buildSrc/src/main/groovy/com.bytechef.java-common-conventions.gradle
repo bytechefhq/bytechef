@@ -27,26 +27,25 @@ repositories {
 
 dependencies {
     constraints {
-        implementation "com.arakelian:java-jq:1.1.0"
-        implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2"
-        implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.2"
-        implementation "com.github.miachm.sods:SODS:1.4.0"
-        implementation "com.jayway.jsonpath:json-path:2.7.0"
-        implementation "commons-io:commons-io:2.11.0"
-        implementation "javax.jms:javax.jms-api:2.0.1"
-        implementation "org.apache.commons:commons-exec:1.3"
-        implementation "org.apache.tika:tika-core:2.1.0"
-        implementation "org.apache.poi:poi-ooxml:4.1.2"
-        implementation "org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r"
-        implementation "org.json:json:20210307"
-        implementation "org.jobrunr:jobrunr:5.1.4"
-        implementation "org.jobrunr:jobrunr-spring-boot-starter:5.1.4"
-        implementation "org.zeroturnaround:zt-exec:1.12"
-        implementation "software.amazon.awssdk:s3:2.17.46"
+        implementation libs.java.jq
+        implementation libs.jackson.dataformat.xml
+        implementation libs.jackson.dataformat.yaml
+        implementation libs.sods
+        implementation libs.json.path
+        implementation libs.commons.io
+        implementation libs.commons.exec
+        implementation libs.tika.core
+        implementation libs.poi.ooxml
+        implementation libs.jgit
+        implementation libs.json
+        implementation libs.jobrunr
+        implementation libs.jobrunr.spring.boot.starter
+        implementation libs.zt.exec
+        implementation libs.awssdk.s3
 
-        runtimeOnly "org.testcontainers:postgresql:1.16.2"
+        runtimeOnly libs.testcontainers.postgresql
 
-        testRuntimeOnly "org.testcontainers:postgresql:1.16.2"
+        testRuntimeOnly libs.testcontainers.postgresql
     }
 }
 
