@@ -16,6 +16,6 @@ subprojects {
         testImplementation project(":modules:libs:hermes:descriptor:descriptor-api")
         testImplementation project(":modules:libs:task:task-handler:task-handler-core")
         testImplementation project(":modules:libs:atlas:atlas-service")
-        testImplementation project(":modules:libs:test-support")
+        testImplementation project(":modules:libs:task:task-test")
     }
 }

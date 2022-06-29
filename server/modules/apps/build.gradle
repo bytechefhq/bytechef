@@ -2,14 +2,12 @@ plugins {
     id "com.bytechef.java-application-conventions"
     id "com.google.cloud.tools.jib"
     id "com.gorylenko.gradle-git-properties"
-    id "org.springframework.boot"
 }
 
 subprojects {
     apply plugin: "com.bytechef.java-application-conventions"
     apply plugin: "com.google.cloud.tools.jib"
     apply plugin: "com.gorylenko.gradle-git-properties"
-    apply plugin: "org.springframework.boot"
 
     gitProperties {
         failOnNoGitDirectory = false

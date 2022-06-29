@@ -6,6 +6,4 @@ dependencies {
     implementation "org.springframework:spring-webmvc"
     implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-api")
     implementation project(":modules:libs:atlas:atlas-service")
-
-    testImplementation project(":modules:libs:test-support")
 }

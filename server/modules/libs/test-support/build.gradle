@@ -1,16 +1,9 @@
 dependencies {
-    api "org.json:json"
-
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation project(":modules:libs:task:task-commons:")
-    implementation project(":modules:libs:atlas:atlas-event:atlas-event-impl")
     implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
-    implementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
-    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-resource")
-    implementation project(":modules:libs:atlas:atlas-service")
     implementation project(":modules:libs:hermes:auth:auth-repository:auth-repository-jdbc")
     implementation project(":modules:libs:hermes:encryption:encryption-api")
     implementation project(":modules:libs:hermes:file-storage:file-storage-base64")

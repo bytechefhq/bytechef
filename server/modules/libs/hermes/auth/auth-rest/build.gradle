@@ -10,5 +10,4 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-web"
     testImplementation project(":modules:libs:hermes:encryption:encryption-api")
     testImplementation project(":modules:libs:hermes:auth:auth-repository:auth-repository-api")
-    testImplementation project(":modules:libs:test-support")
 }

@@ -1,4 +1,8 @@
-group = "com.bp.bytechef"
+plugins {
+    id "org.springframework.boot"
+}
+
+group = "com.bytechef"
 description = ""
 
 apply from: "gradle/docker.gradle"
@@ -30,7 +34,7 @@ dependencies {
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":modules:libs:hermes:auth:auth-repository:auth-repository-jdbc")
     implementation project(":modules:libs:hermes:auth:auth-rest")
-    implementation project(":modules:libs:task:task-commons:")
+    implementation project(":modules:libs:task:task-commons")
     implementation project(":modules:libs:hermes:encryption:encryption-filesystem")
     implementation project(":modules:libs:hermes:file-storage:file-storage-base64")
     implementation project(":modules:libs:hermes:file-storage:file-storage-filesystem")

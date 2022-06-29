@@ -29,7 +29,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "server"
+rootProject.name = "bytechef"
 
 include("modules:apps:cli-app")
 include("modules:apps:server-app")
@@ -67,7 +67,7 @@ include("modules:libs:hermes:descriptor:descriptor-repository:descriptor-reposit
 include("modules:libs:hermes:descriptor:descriptor-repository:descriptor-repository-memory")
 include("modules:libs:hermes:descriptor:descriptor-rest")
 include("modules:libs:hermes:descriptor:descriptor-service")
-include("modules:libs:task:task-commons:")
+include("modules:libs:task:task-commons")
 include("modules:libs:task:task-dispatcher:task-dispatcher-each")
 include("modules:libs:task:task-dispatcher:task-dispatcher-fork")
 include("modules:libs:task:task-dispatcher:task-dispatcher-if")
