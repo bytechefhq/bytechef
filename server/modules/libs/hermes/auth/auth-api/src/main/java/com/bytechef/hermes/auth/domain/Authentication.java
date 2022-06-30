@@ -45,6 +45,9 @@ public interface Authentication {
     /** Return the task auth property value. */
     <T> T getProperty(String name);
 
+    /** Return the task auth property value. */
+    <T> T getProperty(String name, T defaultValue);
+
     /** Return the type of the task auth. */
     String getType();
 

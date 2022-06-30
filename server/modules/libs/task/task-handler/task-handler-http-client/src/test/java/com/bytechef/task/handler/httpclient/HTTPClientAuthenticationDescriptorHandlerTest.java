@@ -128,7 +128,21 @@ public class HTTPClientAuthenticationDescriptorHandlerTest {
                     {
                         "displayName":"OAuth2",
                         "name":"oauth2",
-                        "properties":[]
+                        "properties":[
+                            {
+                                "displayName":"Access Token",
+                                "name":"accessToken",
+                                "required":true,
+                                "type":"STRING"
+                            },
+                            {
+                                "displayName":"Header Prefix",
+                                "name":"headerPrefix",
+                                "required":true,
+                                "type":"STRING",
+                                "defaultValue": "Bearer"
+                            }
+                        ]
                     }
                     ]
                 }

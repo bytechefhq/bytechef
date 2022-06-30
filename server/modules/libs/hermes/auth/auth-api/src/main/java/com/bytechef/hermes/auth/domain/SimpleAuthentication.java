@@ -70,6 +70,19 @@ public class SimpleAuthentication extends MapObject implements Authentication {
     }
 
     @Override
+    public <T> T getProperty(String name, T defaultValue) {
+        Accessor properties = getProperties();
+
+        T value = properties.get(name);
+
+        if (value == null) {
+            value = defaultValue;
+        }
+
+        return value;
+    }
+
+    @Override
     public String getType() {
         return getString(Constants.TYPE);
     }

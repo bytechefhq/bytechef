@@ -52,6 +52,8 @@ public class HTTPClientTaskConstants {
     public static final String DELETE = "delete";
     public static final String HEAD = "head";
     public static final String SEND_FILE = "sendFile";
+    public static final String ACCESS_TOKEN = "accessToken";
+    public static final String HEADER_PREFIX = "headerPrefix";
     public static final float VERSION_1_0 = 1.0f;
 
     public enum ApiTokenLocation {
