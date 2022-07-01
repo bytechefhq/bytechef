@@ -4,9 +4,9 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-resource")
-    implementation project(":modules:libs:hermes:auth:auth-repository:auth-repository-jdbc")
-    implementation project(":modules:libs:hermes:encryption:encryption-api")
-    implementation project(":modules:libs:hermes:file-storage:file-storage-base64")
+    implementation project(":modules:libs:hermes:hermes-auth:hermes-auth-repository:hermes-auth-repository-jdbc")
+    implementation project(":modules:libs:hermes:hermes-encryption:hermes-encryption-api")
+    implementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
 
     runtimeOnly "org.postgresql:postgresql"
     runtimeOnly "org.testcontainers:postgresql"

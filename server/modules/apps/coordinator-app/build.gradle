@@ -39,7 +39,7 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":modules:libs:atlas:atlas-service")
-    implementation project(":modules:libs:hermes:descriptor:descriptor-api")
+    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":modules:libs:task:task-dispatcher:task-dispatcher-each")
     implementation project(":modules:libs:task:task-dispatcher:task-dispatcher-fork")

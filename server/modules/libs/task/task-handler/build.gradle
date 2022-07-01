@@ -11,9 +11,9 @@ subprojects {
         compileOnly project(":modules:libs:atlas:atlas-api")
         compileOnly project(":modules:libs:atlas:atlas-worker:atlas-worker-api")
         compileOnly project(":modules:libs:task:task-commons")
-        compileOnly project(":modules:libs:hermes:descriptor:descriptor-api")
-        compileOnly project(":modules:libs:hermes:auth:auth-service")
-        compileOnly project(":modules:libs:hermes:file-storage:file-storage-api")
+        compileOnly project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
+        compileOnly project(":modules:libs:hermes:hermes-auth:hermes-auth-service")
+        compileOnly project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
         testImplementation "com.fasterxml.jackson.core:jackson-annotations"
         testImplementation "com.fasterxml.jackson.core:jackson-databind"
@@ -24,11 +24,11 @@ subprojects {
         testImplementation project(":modules:libs:atlas:atlas-service")
         testImplementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
         testImplementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
-        testImplementation project(":modules:libs:hermes:descriptor:descriptor-api")
+        testImplementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
         testImplementation project(":modules:libs:task:task-commons")
-        testImplementation project(":modules:libs:hermes:auth:auth-service")
-        testImplementation project(":modules:libs:hermes:file-storage:file-storage-base64")
-        testImplementation project(":modules:libs:hermes:file-storage:file-storage-filesystem")
+        testImplementation project(":modules:libs:hermes:hermes-auth:hermes-auth-service")
+        testImplementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+        testImplementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
         testImplementation project(":modules:libs:task:task-handler:task-handler-io")
         testImplementation project(":modules:libs:task:task-handler:task-handler-random")
         testImplementation project(":modules:libs:task:task-handler:task-handler-time")
