@@ -16,7 +16,7 @@
 
 package com.bytechef.task.handler.httpclient.v1_0.auth;
 
-import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.AuthType;
+import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.AuthType;
 
 import java.util.HashMap;
 import java.util.Map;

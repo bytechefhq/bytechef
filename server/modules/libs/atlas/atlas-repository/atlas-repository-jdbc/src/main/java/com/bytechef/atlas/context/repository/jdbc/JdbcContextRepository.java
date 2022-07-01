@@ -19,7 +19,7 @@ package com.bytechef.atlas.context.repository.jdbc;
 import com.bytechef.atlas.context.domain.Context;
 import com.bytechef.atlas.context.domain.MapContext;
 import com.bytechef.atlas.context.repository.ContextRepository;
-import com.bytechef.atlas.util.JSONUtils;
+import com.bytechef.atlas.util.JsonUtils;
 import com.bytechef.atlas.uuid.UUIDGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.ResultSet;
@@ -49,7 +49,7 @@ public class JdbcContextRepository implements ContextRepository {
                 "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",
                 UUIDGenerator.generate(),
                 stackId,
-                JSONUtils.serialize(objectMapper, context),
+                JsonUtils.serialize(objectMapper, context),
                 new Date());
     }
 
@@ -68,7 +68,7 @@ public class JdbcContextRepository implements ContextRepository {
     private Context contextRowMapper(ResultSet aResultSet, int aIndex) throws SQLException {
         String serialized = aResultSet.getString(2);
 
-        return new MapContext(JSONUtils.deserialize(objectMapper, serialized, Map.class));
+        return new MapContext(JsonUtils.deserialize(objectMapper, serialized, Map.class));
     }
 
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {

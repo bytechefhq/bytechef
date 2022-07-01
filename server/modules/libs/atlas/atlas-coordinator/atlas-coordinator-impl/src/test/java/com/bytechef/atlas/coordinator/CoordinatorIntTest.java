@@ -24,8 +24,8 @@ import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.atlas.job.service.JobService;
 import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
-import com.bytechef.atlas.workflow.repository.mapper.JSONWorkflowMapper;
-import com.bytechef.atlas.workflow.repository.mapper.YAMLWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.JsonWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.YamlWorkflowMapper;
 import com.bytechef.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
@@ -48,14 +48,14 @@ public class CoordinatorIntTest {
 
     @Test
     public void testStartJob_JSON() {
-        Job completedJob = testConfigurator.startJob("samples/hello.json", new JSONWorkflowMapper());
+        Job completedJob = testConfigurator.startJob("samples/hello.json", new JsonWorkflowMapper());
 
         Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
     }
 
     @Test
     public void testStartJob_YAML() {
-        Job completedJob = testConfigurator.startJob("samples/hello.yaml", new YAMLWorkflowMapper());
+        Job completedJob = testConfigurator.startJob("samples/hello.yaml", new YamlWorkflowMapper());
 
         Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
     }
@@ -66,7 +66,7 @@ public class CoordinatorIntTest {
             CoordinatorImpl coordinator = new CoordinatorImpl();
 
             coordinator.setJobService(new JobService(
-                    null, taskExecutionRepository, new ResourceBasedWorkflowRepository(new JSONWorkflowMapper())));
+                    null, taskExecutionRepository, new ResourceBasedWorkflowRepository(new JsonWorkflowMapper())));
 
             coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello.json")));
         });

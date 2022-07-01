@@ -23,8 +23,8 @@ import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
-import com.bytechef.test.json.JSONArrayUtils;
-import com.bytechef.test.json.JSONObjectUtils;
+import com.bytechef.test.json.JsonArrayUtils;
+import com.bytechef.test.json.JsonObjectUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -61,11 +61,11 @@ public class XLSXFileTaskHandlerTest {
     @Test
     public void testWriteXLSX() throws Exception {
         FileEntry fileEntry = xlsxFileWriteTaskHandler.handle(getWriteSimpleTaskExecution(
-                JSONArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+                JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
 
         assertEquals(
-                JSONArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(
+                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, true, null, null, false, fileEntry))),
                 true);
 
@@ -202,7 +202,7 @@ public class XLSXFileTaskHandlerTest {
             String sumKey,
             Object sumValue)
             throws JSONException {
-        JSONObject jsonObject = JSONObjectUtils.of(
+        JSONObject jsonObject = JsonObjectUtils.of(
                 idKey,
                 idValue,
                 nameKey,
@@ -279,72 +279,72 @@ public class XLSXFileTaskHandlerTest {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(false, false)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         true, false, null, null, false, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(true, false)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, false)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         true, true, null, null, false, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(false, true)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, true)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         true, false, null, null, true, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(true, true)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, true)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         true, true, null, null, true, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(false, false)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, false)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         false, false, null, null, false, getFile("sample_no_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(false, true)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, true)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         false, false, null, null, true, getFile("sample_no_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(true, false)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, false)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         false, true, null, null, false, getFile("sample_no_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(true, true)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, true)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
                         false, true, null, null, true, getFile("sample_no_header." + extension)))),
                 true);
 
         // paging
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-                JSONArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
+                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header." + extension)))),
                 true);
     }

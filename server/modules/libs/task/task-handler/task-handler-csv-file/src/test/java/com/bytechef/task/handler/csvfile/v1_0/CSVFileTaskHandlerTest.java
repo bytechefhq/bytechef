@@ -23,8 +23,8 @@ import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
-import com.bytechef.test.json.JSONArrayUtils;
-import com.bytechef.test.json.JSONObjectUtils;
+import com.bytechef.test.json.JsonArrayUtils;
+import com.bytechef.test.json.JsonObjectUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -53,72 +53,72 @@ public class CSVFileTaskHandlerTest {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(false, false)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, false, null, null, false, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(true, false)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, false)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, true, null, null, false, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(false, true)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, true)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, false, null, null, true, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(true, true)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, true)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, true, null, null, true, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(false, false)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, false)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(false, false, null, null, false, getFile("sample_no_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(false, true)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, true)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(false, false, null, null, true, getFile("sample_no_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(true, false)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, false)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(false, true, null, null, false, getFile("sample_no_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                JSONArrayUtils.of(getJSONArrayWithoutNamedColumns(true, true)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, true)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(false, true, null, null, true, getFile("sample_no_header.csv")))),
                 true);
 
         // paging
 
         assertEquals(
-                JSONArrayUtils.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header.csv")))),
                 true);
     }
@@ -126,11 +126,11 @@ public class CSVFileTaskHandlerTest {
     @Test
     public void testWriteCSV() throws Exception {
         FileEntry fileEntry = csvFileWriteTaskHandler.handle(getWriteSimpleTaskExecution(
-                JSONArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+                JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
 
         assertEquals(
-                JSONArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JSONArrayUtils.of(csvFileReadTaskHandler.handle(
+                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
+                JsonArrayUtils.of(csvFileReadTaskHandler.handle(
                         getReadSimpleTaskExecution(true, true, null, null, false, fileEntry))),
                 true);
 
@@ -267,7 +267,7 @@ public class CSVFileTaskHandlerTest {
             String sumKey,
             Object sumValue)
             throws JSONException {
-        JSONObject jsonObject = JSONObjectUtils.of(
+        JSONObject jsonObject = JsonObjectUtils.of(
                 idKey,
                 idValue,
                 nameKey,

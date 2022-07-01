@@ -23,7 +23,7 @@ import com.bytechef.atlas.job.JobSummary;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.atlas.job.domain.SimpleJob;
 import com.bytechef.atlas.job.repository.JobRepository;
-import com.bytechef.atlas.util.JSONUtils;
+import com.bytechef.atlas.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -178,9 +178,9 @@ public class JdbcJobRepository implements JobRepository {
         sqlParameterSource.addValue("startTime", simpleJob.getStartTime());
         sqlParameterSource.addValue("endTime", simpleJob.getEndTime());
         sqlParameterSource.addValue("priority", simpleJob.getPriority());
-        sqlParameterSource.addValue("inputs", JSONUtils.serialize(objectMapper, simpleJob.getInputs()));
-        sqlParameterSource.addValue("outputs", JSONUtils.serialize(objectMapper, simpleJob.getOutputs()));
-        sqlParameterSource.addValue("webhooks", JSONUtils.serialize(objectMapper, simpleJob.getWebhooks()));
+        sqlParameterSource.addValue("inputs", JsonUtils.serialize(objectMapper, simpleJob.getInputs()));
+        sqlParameterSource.addValue("outputs", JsonUtils.serialize(objectMapper, simpleJob.getOutputs()));
+        sqlParameterSource.addValue("webhooks", JsonUtils.serialize(objectMapper, simpleJob.getWebhooks()));
         sqlParameterSource.addValue("parentTaskExecutionId", simpleJob.getParentTaskExecutionId());
 
         return sqlParameterSource;
@@ -198,9 +198,9 @@ public class JdbcJobRepository implements JobRepository {
         map.put("startTime", resultSet.getTimestamp("start_time"));
         map.put("endTime", resultSet.getTimestamp("end_time"));
         map.put("priority", resultSet.getInt("priority"));
-        map.put("inputs", JSONUtils.deserialize(objectMapper, resultSet.getString("inputs"), Map.class));
-        map.put("outputs", JSONUtils.deserialize(objectMapper, resultSet.getString("outputs"), Map.class));
-        map.put("webhooks", JSONUtils.deserialize(objectMapper, resultSet.getString("webhooks"), List.class));
+        map.put("inputs", JsonUtils.deserialize(objectMapper, resultSet.getString("inputs"), Map.class));
+        map.put("outputs", JsonUtils.deserialize(objectMapper, resultSet.getString("outputs"), Map.class));
+        map.put("webhooks", JsonUtils.deserialize(objectMapper, resultSet.getString("webhooks"), List.class));
         map.put(Constants.PARENT_TASK_EXECUTION_ID, resultSet.getString("parent_task_execution_id"));
 
         return new SimpleJob(map);
@@ -218,9 +218,9 @@ public class JdbcJobRepository implements JobRepository {
         map.put("startTime", resultSet.getTimestamp("start_time"));
         map.put("endTime", resultSet.getTimestamp("end_time"));
         map.put("priority", resultSet.getInt("priority"));
-        map.put("inputs", JSONUtils.deserialize(objectMapper, resultSet.getString("inputs"), Map.class));
-        map.put("outputs", JSONUtils.deserialize(objectMapper, resultSet.getString("outputs"), Map.class));
-        map.put("webhooks", JSONUtils.deserialize(objectMapper, resultSet.getString("webhooks"), List.class));
+        map.put("inputs", JsonUtils.deserialize(objectMapper, resultSet.getString("inputs"), Map.class));
+        map.put("outputs", JsonUtils.deserialize(objectMapper, resultSet.getString("outputs"), Map.class));
+        map.put("webhooks", JsonUtils.deserialize(objectMapper, resultSet.getString("webhooks"), List.class));
         map.put(Constants.PARENT_TASK_EXECUTION_ID, resultSet.getString("parent_task_execution_id"));
 
         return new JobSummary(new SimpleJob(map));

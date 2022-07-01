@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.xlsxfile.v1_0;
+package com.bytechef.task.handler.jsonfile.v1_0;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
@@ -27,7 +27,6 @@ import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.test.json.JsonArrayUtils;
 import com.bytechef.test.task.BaseTaskIntTest;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -43,61 +42,63 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class XLSXFileTaskHandlerIntTest extends BaseTaskIntTest {
+public class JsonFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Autowired
     private FileStorageService fileStorageService;
 
     @Test
     public void testRead() throws IOException {
-        File sampleFile = getFile("sample_header.xlsx");
+        File sampleFile = getFile("sample_array.json");
 
         Job job = startJob(
-                "samples/v1_0/xlsxFile_READ.json",
+                "samples/v1_0/jsonFile_READ.json",
                 Map.of(
                         "fileEntry",
                         fileStorageService.storeFileContent(
-                                sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))));
+                                sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Accessor outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readXlsxFile")),
+                JsonArrayUtils.of(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset())),
+                JsonArrayUtils.of((List<?>) outputs.get("readJSONFile")),
                 true);
     }
 
     @Test
     public void testWrite() throws IOException {
         Job job = startJob(
-                "samples/v1_0/xlsxFile_WRITE.json",
+                "samples/v1_0/jsonFile_WRITE.json",
                 Map.of(
-                        "rows",
-                        JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+                        "source",
+                        JsonArrayUtils.toList(
+                                Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Accessor outputs = job.getOutputs();
 
-        FileEntry fileEntry = outputs.get("writeXlsxFile", FileEntry.class);
-        File sampleFile = getFile("sample_header.xlsx");
+        FileEntry fileEntry = outputs.get("writeJSONFile", FileEntry.class);
+        File sampleFile = getFile("sample_array.json");
 
         job = startJob(
-                "samples/v1_0/xlsxFile_READ.json",
+                "samples/v1_0/jsonFile_READ.json",
                 Map.of(
                         "fileEntry",
-                        fileStorageService.storeFileContent(sampleFile.getName(), new FileInputStream(sampleFile))));
+                        fileStorageService.storeFileContent(
+                                sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
 
         outputs = job.getOutputs();
 
         assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readXlsxFile")),
+                JsonArrayUtils.of(Files.contentOf(sampleFile, Charset.defaultCharset())),
+                JsonArrayUtils.of((List<?>) outputs.get("readJSONFile")),
                 true);
 
-        assertThat(fileEntry.getName()).isEqualTo("file.xlsx");
+        assertThat(fileEntry.getName()).isEqualTo("file.json");
     }
 
     private File getFile(String fileName) throws IOException {

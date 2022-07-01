@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.xlsxfile.v1_0;
+package com.bytechef.task.handler.xmlfile.v1_0;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.Accessor;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
-import com.bytechef.test.json.JsonArrayUtils;
+import com.bytechef.task.commons.xml.XmlHelper;
 import com.bytechef.test.task.BaseTaskIntTest;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -43,61 +40,61 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class XLSXFileTaskHandlerIntTest extends BaseTaskIntTest {
+public class XmlFileTaskHandlerIntTest extends BaseTaskIntTest {
+
+    private static final XmlHelper xmlHelper = new XmlHelper();
 
     @Autowired
     private FileStorageService fileStorageService;
 
     @Test
     public void testRead() throws IOException {
-        File sampleFile = getFile("sample_header.xlsx");
+        File sampleFile = getFile("sample.xml");
 
         Job job = startJob(
-                "samples/v1_0/xlsxFile_READ.json",
+                "samples/v1_0/xmlFile_READ.json",
                 Map.of(
                         "fileEntry",
                         fileStorageService.storeFileContent(
-                                sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))));
+                                sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Accessor outputs = job.getOutputs();
 
-        JSONAssert.assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readXlsxFile")),
-                true);
+        assertThat((List<?>) outputs.get("readXMLFile"))
+                .isEqualTo(
+                        xmlHelper.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class));
     }
 
     @Test
     public void testWrite() throws IOException {
         Job job = startJob(
-                "samples/v1_0/xlsxFile_WRITE.json",
+                "samples/v1_0/xmlFile_WRITE.json",
                 Map.of(
-                        "rows",
-                        JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+                        "source",
+                        xmlHelper.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Accessor outputs = job.getOutputs();
 
-        FileEntry fileEntry = outputs.get("writeXlsxFile", FileEntry.class);
-        File sampleFile = getFile("sample_header.xlsx");
+        FileEntry fileEntry = outputs.get("writeXMLFile", FileEntry.class);
+        File sampleFile = getFile("sample.xml");
 
         job = startJob(
-                "samples/v1_0/xlsxFile_READ.json",
+                "samples/v1_0/xmlFile_READ.json",
                 Map.of(
                         "fileEntry",
-                        fileStorageService.storeFileContent(sampleFile.getName(), new FileInputStream(sampleFile))));
+                        fileStorageService.storeFileContent(
+                                sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
 
         outputs = job.getOutputs();
 
-        assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readXlsxFile")),
-                true);
+        assertThat((List<?>) outputs.get("readXMLFile"))
+                .isEqualTo(xmlHelper.read(Files.contentOf(sampleFile, Charset.defaultCharset()), List.class));
 
-        assertThat(fileEntry.getName()).isEqualTo("file.xlsx");
+        assertThat(fileEntry.getName()).isEqualTo("file.xml");
     }
 
     private File getFile(String fileName) throws IOException {

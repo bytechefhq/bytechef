@@ -30,10 +30,10 @@ import com.bytechef.atlas.workflow.repository.WorkflowRepository;
 import com.bytechef.atlas.workflow.repository.WorkflowRepositoryChain;
 import com.bytechef.atlas.workflow.repository.git.GitWorkflowRepository;
 import com.bytechef.atlas.workflow.repository.jdbc.JdbcWorkflowRepository;
-import com.bytechef.atlas.workflow.repository.mapper.JSONWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.JsonWorkflowMapper;
 import com.bytechef.atlas.workflow.repository.mapper.WorkflowMapper;
 import com.bytechef.atlas.workflow.repository.mapper.WorkflowMapperChain;
-import com.bytechef.atlas.workflow.repository.mapper.YAMLWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.YamlWorkflowMapper;
 import com.bytechef.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import com.bytechef.hermes.descriptor.repository.ExtAuthenticationDescriptorHandlerRepository;
 import com.bytechef.hermes.descriptor.repository.ExtTaskDescriptorHandlerRepository;
@@ -170,13 +170,13 @@ public class PersistenceConfiguration {
         }
 
         @Bean
-        JSONWorkflowMapper jsonWorkflowMapper() {
-            return new JSONWorkflowMapper();
+        JsonWorkflowMapper jsonWorkflowMapper() {
+            return new JsonWorkflowMapper();
         }
 
         @Bean
-        YAMLWorkflowMapper yamlWorkflowMapper() {
-            return new YAMLWorkflowMapper();
+        YamlWorkflowMapper yamlWorkflowMapper() {
+            return new YamlWorkflowMapper();
         }
     }
 }

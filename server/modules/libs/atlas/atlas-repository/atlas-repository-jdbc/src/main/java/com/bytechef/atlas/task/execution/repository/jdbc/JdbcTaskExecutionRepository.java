@@ -20,7 +20,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
-import com.bytechef.atlas.util.JSONUtils;
+import com.bytechef.atlas.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -143,7 +143,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         sqlParameterSource.addValue("createTime", aTaskExecution.getCreateTime());
         sqlParameterSource.addValue("startTime", aTaskExecution.getStartTime());
         sqlParameterSource.addValue("endTime", aTaskExecution.getEndTime());
-        sqlParameterSource.addValue("serializedExecution", JSONUtils.serialize(objectMapper, aTaskExecution));
+        sqlParameterSource.addValue("serializedExecution", JsonUtils.serialize(objectMapper, aTaskExecution));
         sqlParameterSource.addValue("priority", aTaskExecution.getPriority());
         sqlParameterSource.addValue("taskNumber", aTaskExecution.getTaskNumber());
 
@@ -153,6 +153,6 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
     @SuppressWarnings("unchecked")
     private TaskExecution jobTaskRowMapper(ResultSet aRs, int aIndex) throws SQLException {
         return SimpleTaskExecution.of(
-                JSONUtils.deserialize(objectMapper, aRs.getString("serialized_execution"), Map.class));
+                JsonUtils.deserialize(objectMapper, aRs.getString("serialized_execution"), Map.class));
     }
 }
