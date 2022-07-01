@@ -1,0 +1,74 @@
+plugins {
+    id "org.springframework.boot"
+}
+
+group = "com.bytechef.coordinator"
+description = ""
+
+apply from: "gradle/docker.gradle"
+
+if (project.hasProperty("prod")) {
+    apply from: "gradle/profile_prod.gradle"
+} else {
+    apply from: "gradle/profile_dev.gradle"
+}
+
+compileJava.dependsOn processResources
+processResources.dependsOn bootBuildInfo
+
+defaultTasks "bootRun"
+
+springBoot {
+    mainClassName = "com.bytechef.WorkerApp"
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-activemq"
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.kafka:spring-kafka"
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    implementation project(":modules:libs:atlas:atlas-event:atlas-event-impl")
+    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
+    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
+    implementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
+    implementation project(":modules:libs:hermes:auth:auth-repository:auth-repository-jdbc")
+    implementation project(":modules:libs:hermes:auth:auth-service")
+    implementation project(":modules:libs:hermes:encryption:encryption-filesystem")
+    implementation project(":modules:libs:hermes:file-storage:file-storage-base64")
+    implementation project(":modules:libs:hermes:file-storage:file-storage-filesystem")
+    implementation project(":modules:libs:task:task-commons")
+    implementation project(":modules:libs:task:task-dispatcher:task-dispatcher-map")
+    implementation project(":modules:libs:task:task-handler:task-handler-bento4")
+    implementation project(":modules:libs:task:task-handler:task-handler-core")
+    implementation project(":modules:libs:task:task-handler:task-handler-csv-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-http-client")
+    implementation project(":modules:libs:task:task-handler:task-handler-io")
+    implementation project(":modules:libs:task:task-handler:task-handler-json-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-local-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-map")
+    implementation project(":modules:libs:task:task-handler:task-handler-media")
+    implementation project(":modules:libs:task:task-handler:task-handler-mysql")
+    implementation project(":modules:libs:task:task-handler:task-handler-object-helpers")
+    implementation project(":modules:libs:task:task-handler:task-handler-ods-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-postgresql")
+    implementation project(":modules:libs:task:task-handler:task-handler-random")
+    implementation project(":modules:libs:task:task-handler:task-handler-s3")
+    implementation project(":modules:libs:task:task-handler:task-handler-shell")
+    implementation project(":modules:libs:task:task-handler:task-handler-time")
+    implementation project(":modules:libs:task:task-handler:task-handler-transform-json")
+    implementation project(":modules:libs:task:task-handler:task-handler-xlsx-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-xml-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-xml-helpers")
+    implementation project(":modules:libs:task:task-jdbc")
+
+    runtimeOnly "org.postgresql:postgresql"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+    testRuntimeOnly "org.postgresql:postgresql"
+    testRuntimeOnly "org.testcontainers:postgresql"
+}

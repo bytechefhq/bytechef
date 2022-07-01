@@ -1,7 +1,7 @@
 logging:
   level:
     ROOT: INFO
-    com.bytechef.atlas: DEBUG
+    com.bytechef: DEBUG
 
 management:
   endpoints:
@@ -33,4 +33,4 @@ spring:
       mode: always
 
 server:
-  port: 9777
+  port: 9555

@@ -1,0 +1,4 @@
+dependencies {
+    implementation "org.jobrunr:jobrunr-spring-boot-starter"
+    implementation project(":modules:libs:hermes:file-storage:file-storage-api")
+}

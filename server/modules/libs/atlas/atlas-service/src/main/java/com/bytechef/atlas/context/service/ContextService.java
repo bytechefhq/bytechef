@@ -21,10 +21,8 @@ import com.bytechef.atlas.context.repository.ContextRepository;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
 import java.util.List;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @Transactional
 public class ContextService {
 

@@ -17,13 +17,11 @@
 package com.bytechef.atlas.counter.service;
 
 import com.bytechef.atlas.counter.repository.CounterRepository;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
-@Service
 @Transactional
 public class CounterService {
 

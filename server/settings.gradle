@@ -57,7 +57,10 @@ dependencyResolutionManagement {
 }
 
 include("modules:apps:cli-app")
+include("modules:apps:coordinator-app")
+include("modules:apps:rest-app")
 include("modules:apps:server-app")
+include("modules:apps:worker-app")
 include("modules:libs:hermes:auth:auth-api")
 include("modules:libs:hermes:auth:auth-repository:auth-repository-api")
 include("modules:libs:hermes:auth:auth-repository:auth-repository-jdbc")
@@ -87,6 +90,7 @@ include("modules:libs:hermes:encryption:encryption-filesystem")
 include("modules:libs:hermes:file-storage:file-storage-api")
 include("modules:libs:hermes:file-storage:file-storage-base64")
 include("modules:libs:hermes:file-storage:file-storage-filesystem")
+include("modules:libs:hermes:file-storage:file-storage-listener")
 include("modules:libs:hermes:descriptor:descriptor-api")
 include("modules:libs:hermes:descriptor:descriptor-repository:descriptor-repository-api")
 include("modules:libs:hermes:descriptor:descriptor-repository:descriptor-repository-memory")

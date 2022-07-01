@@ -19,6 +19,7 @@
 package com.bytechef.config;
 
 import com.bytechef.atlas.annotation.ConditionalOnCoordinator;
+import com.bytechef.atlas.context.repository.ContextRepository;
 import com.bytechef.atlas.context.service.ContextService;
 import com.bytechef.atlas.coordinator.Coordinator;
 import com.bytechef.atlas.coordinator.CoordinatorImpl;
@@ -37,15 +38,19 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
+import com.bytechef.atlas.counter.repository.CounterRepository;
 import com.bytechef.atlas.counter.service.CounterService;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.job.repository.JobRepository;
 import com.bytechef.atlas.job.service.JobService;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
+import com.bytechef.atlas.workflow.repository.WorkflowRepository;
 import com.bytechef.atlas.workflow.service.WorkflowService;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
@@ -421,5 +426,38 @@ public class CoordinatorConfiguration {
     @Bean
     TaskStartedWebhookEventListener taskStartedWebhookEventListener() {
         return new TaskStartedWebhookEventListener(jobService);
+    }
+
+    @Configuration
+    public static class ServiceCoordinatorConfiguration {
+
+        @Bean
+        public ContextService contextService(
+                ContextRepository contextRepository, TaskExecutionRepository taskExecutionRepository) {
+            return new ContextService(contextRepository, taskExecutionRepository);
+        }
+
+        @Bean
+        public CounterService counterService(CounterRepository counterRepository) {
+            return new CounterService(counterRepository);
+        }
+
+        @Bean
+        public JobService jobService(
+                JobRepository jobRepository,
+                TaskExecutionRepository taskExecutionRepository,
+                WorkflowRepository workflowRepository) {
+            return new JobService(jobRepository, taskExecutionRepository, workflowRepository);
+        }
+
+        @Bean
+        public TaskExecutionService taskExecutionService(TaskExecutionRepository taskExecutionRepository) {
+            return new TaskExecutionService(taskExecutionRepository);
+        }
+
+        @Bean
+        public WorkflowService workflowService(WorkflowRepository workflowRepository) {
+            return new WorkflowService(workflowRepository);
+        }
     }
 }

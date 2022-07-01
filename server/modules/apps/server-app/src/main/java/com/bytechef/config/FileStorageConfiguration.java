@@ -17,13 +17,16 @@
 package com.bytechef.config;
 
 import com.bytechef.atlas.MapObject;
+import com.bytechef.atlas.config.AtlasProperties;
+import com.bytechef.atlas.config.StorageProperties;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.converter.FileEntryConverter;
+import com.bytechef.hermes.file.storage.event.FileStorageFileRetentionCheckJobListener;
 import com.bytechef.hermes.file.storage.filesystem.FileSystemFileStorageService;
-import com.bytechef.hermes.file.storage.job.FileStorageFileRetentionCheckJobListener;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import javax.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@EnableConfigurationProperties(AtlasProperties.class)
 public class FileStorageConfiguration {
 
     @PostConstruct
