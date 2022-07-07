@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.localfile;
+package com.bytechef.hermes.file.storage;
 
 /**
  * @author Ivica Cardic
  */
-public class LocalFileTaskConstants {
+public class FileStorageConstants {
 
-    public static final String LOCAL_FILE = "localFile";
-    public static final float VERSION_1_0 = 1.0f;
-    public static final String READ = "read";
-    public static final String WRITE = "write";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILE_NAME = "fileName";
 }

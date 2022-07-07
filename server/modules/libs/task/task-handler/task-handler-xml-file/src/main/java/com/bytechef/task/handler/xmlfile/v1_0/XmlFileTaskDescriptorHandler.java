@@ -26,11 +26,21 @@ import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
 import static com.bytechef.hermes.descriptor.model.DSL.OPTIONS;
 import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
 import static com.bytechef.hermes.descriptor.model.DSL.showWhen;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.IS_ARRAY;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.PAGE_NUMBER;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.PATH;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.READ;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.SOURCE;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.VERSION_1_0;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.WRITE;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.XML_FILE;
 
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
 import com.bytechef.hermes.descriptor.model.DSL;
 import com.bytechef.hermes.descriptor.model.TaskDescriptor;
-import com.bytechef.task.handler.xmlfile.XmlFileTaskConstants;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,21 +49,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class XmlFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
-    private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(XmlFileTaskConstants.XML_FILE)
+    private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(XML_FILE)
             .displayName("XML File")
             .description("Reads and writes data from a XML file.")
-            .version(XmlFileTaskConstants.VERSION_1_0)
+            .version(VERSION_1_0)
             .operations(
-                    OPERATION(XmlFileTaskConstants.READ)
+                    OPERATION(READ)
                             .displayName("Read from file")
                             .description("Reads data from a XML file.")
                             .inputs(
-                                    FILE_ENTRY_PROPERTY(XmlFileTaskConstants.FILE_ENTRY)
+                                    FILE_ENTRY_PROPERTY(FILE_ENTRY)
                                             .displayName("File")
                                             .description(
                                                     "The object property which contains a reference to the XML file to read from.")
                                             .required(true),
-                                    BOOLEAN_PROPERTY(XmlFileTaskConstants.IS_ARRAY)
+                                    BOOLEAN_PROPERTY(IS_ARRAY)
                                             .displayName("Is Array")
                                             .description("The object input is array?")
                                             .defaultValue(true),
@@ -61,34 +71,34 @@ public class XmlFileTaskDescriptorHandler implements TaskDescriptorHandler {
                                             .displayName("Options")
                                             .placeholder("Add Option")
                                             .options(
-                                                    STRING_PROPERTY(XmlFileTaskConstants.PATH)
+                                                    STRING_PROPERTY(PATH)
                                                             .displayName("Path")
                                                             .description(
                                                                     "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                                                            .displayOption(showWhen(XmlFileTaskConstants.IS_ARRAY)
+                                                            .displayOption(showWhen(IS_ARRAY)
                                                                     .eq(true)),
-                                                    INTEGER_PROPERTY(XmlFileTaskConstants.PAGE_SIZE)
+                                                    INTEGER_PROPERTY(PAGE_SIZE)
                                                             .displayName("Page Size")
                                                             .description(
                                                                     "The amount of child elements to return in a page.")
-                                                            .displayOption(showWhen(XmlFileTaskConstants.IS_ARRAY)
+                                                            .displayOption(showWhen(IS_ARRAY)
                                                                     .eq(true)),
-                                                    INTEGER_PROPERTY(XmlFileTaskConstants.PAGE_NUMBER)
+                                                    INTEGER_PROPERTY(PAGE_NUMBER)
                                                             .displayName("Page Number")
                                                             .description("The page number to get.")
-                                                            .displayOption(showWhen(XmlFileTaskConstants.IS_ARRAY)
+                                                            .displayOption(showWhen(IS_ARRAY)
                                                                     .eq(true))))
                             .outputs(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
-                    OPERATION(XmlFileTaskConstants.WRITE)
+                    OPERATION(WRITE)
                             .displayName("Write to file")
                             .description("Writes the data to a XML file.")
                             .inputs(
-                                    ANY_PROPERTY(XmlFileTaskConstants.SOURCE)
+                                    ANY_PROPERTY(SOURCE)
                                             .displayName("Source")
                                             .description("The data to write to the file.")
                                             .required(true)
                                             .types(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
-                                    STRING_PROPERTY(XmlFileTaskConstants.FILE_NAME)
+                                    STRING_PROPERTY(FILE_NAME)
                                             .displayName("File Name")
                                             .description(
                                                     "File name to set for binary data. By default, \"file.xml\" will be used.")

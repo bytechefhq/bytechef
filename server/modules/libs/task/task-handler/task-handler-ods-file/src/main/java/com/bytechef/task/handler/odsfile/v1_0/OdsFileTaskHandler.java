@@ -16,12 +16,13 @@
 
 package com.bytechef.task.handler.odsfile.v1_0;
 
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
 import static com.bytechef.task.handler.odsfile.OdsFileTaskConstants.*;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.util.MapUtils;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
@@ -47,15 +48,14 @@ public class OdsFileTaskHandler {
     @Component(ODS_FILE + "/" + VERSION_1_0 + "/" + READ)
     public static class OdsFileReadTaskHandler implements TaskHandler<List<Map<String, ?>>> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public OdsFileReadTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public OdsFileReadTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
         public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
-            FileEntry fileEntry = taskExecution.getRequired(FILE_ENTRY, FileEntry.class);
             boolean headerRow = taskExecution.getBoolean(HEADER_ROW, true);
             boolean includeEmptyCells = taskExecution.getBoolean(INCLUDE_EMPTY_CELLS, false);
             Integer pageSize = taskExecution.getInteger(PAGE_SIZE);
@@ -63,7 +63,7 @@ public class OdsFileTaskHandler {
             boolean readAsString = taskExecution.getBoolean(READ_AS_STRING, false);
             String sheetName = taskExecution.get(SHEET_NAME, null);
 
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageHelper.getFileContentStream(taskExecution)) {
                 Integer rangeStartRow = null;
                 Integer rangeEndRow = null;
 
@@ -195,20 +195,20 @@ public class OdsFileTaskHandler {
     @Component(ODS_FILE + "/" + VERSION_1_0 + "/" + WRITE)
     public static class OdsFileWriteTaskHandler implements TaskHandler<FileEntry> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public OdsFileWriteTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public OdsFileWriteTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
         public FileEntry handle(TaskExecution taskExecution) throws Exception {
-            String fileName = taskExecution.get(FILE_NAME, String.class, "file.ods");
+            String fileName = taskExecution.getString(FILE_NAME, "file.ods");
             List<Map<String, ?>> rows = taskExecution.getRequired(ROWS);
 
             String sheetName = taskExecution.get(SHEET_NAME, String.class, "Sheet");
 
-            return fileStorageService.storeFileContent(
+            return fileStorageHelper.storeFileContent(
                     fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
         }
 

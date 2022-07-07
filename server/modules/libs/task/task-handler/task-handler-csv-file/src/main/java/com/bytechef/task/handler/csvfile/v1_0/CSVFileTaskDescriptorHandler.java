@@ -26,6 +26,16 @@ import static com.bytechef.hermes.descriptor.model.DSL.OBJECT_PROPERTY;
 import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
 import static com.bytechef.hermes.descriptor.model.DSL.OPTIONS;
 import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.AGE_NUMBER;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.CSV_FILE;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.DELIMITER;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.HEADER_ROW;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.READ_AS_STRING;
+import static com.bytechef.task.handler.csvfile.CSVFileTaskConstants.ROWS;
 
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
 import com.bytechef.hermes.descriptor.model.DSL;
@@ -39,7 +49,7 @@ import org.springframework.stereotype.Component;
 @Component
 class CSVFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
-    private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(CSVFileTaskConstants.CSV_FILE)
+    private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(CSV_FILE)
             .displayName("CSV File")
             .description("Reads and writes data from a csv file.")
             .version(CSVFileTaskConstants.VERSION)
@@ -48,7 +58,7 @@ class CSVFileTaskDescriptorHandler implements TaskDescriptorHandler {
                             .displayName("Read from file")
                             .description("Reads data from a csv file.")
                             .inputs(
-                                    FILE_ENTRY_PROPERTY(CSVFileTaskConstants.FILE_ENTRY)
+                                    FILE_ENTRY_PROPERTY(FILE_ENTRY)
                                             .displayName("File")
                                             .description(
                                                     "The object property which contains a reference to the csv file to read from.")
@@ -57,28 +67,28 @@ class CSVFileTaskDescriptorHandler implements TaskDescriptorHandler {
                                             .displayName("Options")
                                             .placeholder("Add Option")
                                             .options(
-                                                    STRING_PROPERTY(CSVFileTaskConstants.DELIMITER)
+                                                    STRING_PROPERTY(DELIMITER)
                                                             .displayName("Delimiter")
                                                             .description("Delimiter to use when reading a csv file.")
                                                             .defaultValue(","),
-                                                    BOOLEAN_PROPERTY(CSVFileTaskConstants.HEADER_ROW)
+                                                    BOOLEAN_PROPERTY(HEADER_ROW)
                                                             .displayName("Header Row")
                                                             .description(
                                                                     "The first row of the file contains the header names.")
                                                             .defaultValue(true),
-                                                    BOOLEAN_PROPERTY(CSVFileTaskConstants.INCLUDE_EMPTY_CELLS)
+                                                    BOOLEAN_PROPERTY(INCLUDE_EMPTY_CELLS)
                                                             .displayName("Include Empty Cells")
                                                             .description(
                                                                     "When reading from file the empty cells will be filled with an empty string.")
                                                             .defaultValue(false),
-                                                    INTEGER_PROPERTY(CSVFileTaskConstants.PAGE_SIZE)
+                                                    INTEGER_PROPERTY(PAGE_SIZE)
                                                             .displayName("Page Size")
                                                             .description(
                                                                     "The amount of child elements to return in a page."),
-                                                    INTEGER_PROPERTY(CSVFileTaskConstants.AGE_NUMBER)
+                                                    INTEGER_PROPERTY(AGE_NUMBER)
                                                             .displayName("Page Number")
                                                             .description("The page number to get."),
-                                                    BOOLEAN_PROPERTY(CSVFileTaskConstants.READ_AS_STRING)
+                                                    BOOLEAN_PROPERTY(READ_AS_STRING)
                                                             .displayName("Read As String")
                                                             .description(
                                                                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
@@ -88,7 +98,7 @@ class CSVFileTaskDescriptorHandler implements TaskDescriptorHandler {
                             .displayName("Write to file")
                             .description("Writes the data to a csv file.")
                             .inputs(
-                                    ARRAY_PROPERTY(CSVFileTaskConstants.ROWS)
+                                    ARRAY_PROPERTY(ROWS)
                                             .displayName("Rows")
                                             .description("The array of objects to write to the file.")
                                             .required(true)
@@ -102,7 +112,7 @@ class CSVFileTaskDescriptorHandler implements TaskDescriptorHandler {
                                     OPTIONS()
                                             .displayName("Options")
                                             .placeholder("Add Option")
-                                            .options(STRING_PROPERTY(CSVFileTaskConstants.FILE_NAME)
+                                            .options(STRING_PROPERTY(FILE_NAME)
                                                     .displayName("File Name")
                                                     .description(
                                                             "File name to set for binary data. By default, \"file.csv\" will be used.")

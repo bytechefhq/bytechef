@@ -23,7 +23,7 @@ import com.bytechef.atlas.Accessor;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.test.json.JsonArrayUtils;
 import com.bytechef.test.task.BaseTaskIntTest;
 import java.io.File;
@@ -45,7 +45,7 @@ import org.springframework.core.io.ClassPathResource;
 public class JsonFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private FileStorageHelper fileStorageHelper;
 
     @Test
     public void testRead() throws IOException {
@@ -55,7 +55,7 @@ public class JsonFileTaskHandlerIntTest extends BaseTaskIntTest {
                 "samples/v1_0/jsonFile_READ.json",
                 Map.of(
                         "fileEntry",
-                        fileStorageService.storeFileContent(
+                        fileStorageHelper.storeFileContent(
                                 sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
@@ -88,7 +88,7 @@ public class JsonFileTaskHandlerIntTest extends BaseTaskIntTest {
                 "samples/v1_0/jsonFile_READ.json",
                 Map.of(
                         "fileEntry",
-                        fileStorageService.storeFileContent(
+                        fileStorageHelper.storeFileContent(
                                 sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
 
         outputs = job.getOutputs();

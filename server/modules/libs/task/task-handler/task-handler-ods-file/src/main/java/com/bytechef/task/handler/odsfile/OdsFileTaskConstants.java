@@ -21,9 +21,7 @@ package com.bytechef.task.handler.odsfile;
  */
 public class OdsFileTaskConstants {
 
-    public static final String FILE_ENTRY = "fileEntry";
     public static final String ROWS = "rows";
-    public static final String FILE_NAME = "fileName";
     public static final String HEADER_ROW = "headerRow";
     public static final String PAGE_SIZE = "pageSize";
     public static final String PAGE_NUMBER = "pageNumber";

@@ -16,10 +16,20 @@
 
 package com.bytechef.task.handler.xlsxfile.v1_0;
 
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
+import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.PAGE_NUMBER;
+import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.PROPERTY_HEADER_ROW;
+import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.READ_AS_STRING;
+import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.ROWS;
+import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.SHEET_NAME;
+
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.util.MapUtils;
 import com.bytechef.task.commons.util.ValueUtils;
 import com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants;
@@ -60,23 +70,23 @@ public class XLSXFileTaskHandler {
             XLSX,
         }
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public XLSXFileReadTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public XLSXFileReadTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
         public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
-            FileEntry fileEntry = taskExecution.getRequired(XLSXFileTaskConstants.FILE_ENTRY, FileEntry.class);
-            boolean headerRow = taskExecution.getBoolean(XLSXFileTaskConstants.PROPERTY_HEADER_ROW, true);
-            boolean includeEmptyCells = taskExecution.getBoolean(XLSXFileTaskConstants.INCLUDE_EMPTY_CELLS, false);
-            Integer pageSize = taskExecution.getInteger(XLSXFileTaskConstants.PAGE_SIZE);
-            Integer pageNumber = taskExecution.getInteger(XLSXFileTaskConstants.PAGE_NUMBER);
-            boolean readAsString = taskExecution.getBoolean(XLSXFileTaskConstants.READ_AS_STRING, false);
-            String sheetName = taskExecution.get(XLSXFileTaskConstants.SHEET_NAME, null);
+            FileEntry fileEntry = taskExecution.getRequired(FILE_ENTRY, FileEntry.class);
+            boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
+            boolean includeEmptyCells = taskExecution.getBoolean(INCLUDE_EMPTY_CELLS, false);
+            Integer pageSize = taskExecution.getInteger(PAGE_SIZE);
+            Integer pageNumber = taskExecution.getInteger(PAGE_NUMBER);
+            boolean readAsString = taskExecution.getBoolean(READ_AS_STRING, false);
+            String sheetName = taskExecution.get(SHEET_NAME, null);
 
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageHelper.getFileContentStream(fileEntry)) {
                 String extension = fileEntry.getExtension();
 
                 FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());
@@ -251,20 +261,20 @@ public class XLSXFileTaskHandler {
             XLSX,
         }
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public XLSXFileWriteTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public XLSXFileWriteTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
         public FileEntry handle(TaskExecution taskExecution) throws Exception {
-            String fileName = taskExecution.get(XLSXFileTaskConstants.FILE_NAME, String.class, getaDefaultFileName());
-            List<Map<String, ?>> rows = taskExecution.getRequired(XLSXFileTaskConstants.ROWS);
+            String fileName = taskExecution.getString(FILE_NAME, getaDefaultFileName());
+            List<Map<String, ?>> rows = taskExecution.getRequired(ROWS);
 
-            String sheetName = taskExecution.get(XLSXFileTaskConstants.SHEET_NAME, String.class, "Sheet");
+            String sheetName = taskExecution.get(SHEET_NAME, String.class, "Sheet");
 
-            return fileStorageService.storeFileContent(
+            return fileStorageHelper.storeFileContent(
                     fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
         }
 
@@ -274,47 +284,6 @@ public class XLSXFileTaskHandler {
 
         private Workbook getWorkbook() {
             return new XSSFWorkbook();
-        }
-
-        private Workbook getWorkbook(FileFormat fileFormat, InputStream inputStream) throws IOException {
-            return fileFormat == FileFormat.XLS ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream);
-        }
-
-        private Object processValue(Cell cell, boolean includeEmptyCells, boolean readAsString) {
-            Object value = null;
-
-            if (cell != null) {
-                value = switch (cell.getCellType()) {
-                    case BOOLEAN -> cell.getBooleanCellValue();
-                    case FORMULA -> cell.getCellFormula();
-                    case NUMERIC -> {
-                        Object numericValue;
-
-                        if (DateUtil.isCellDateFormatted(cell)) {
-                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
-                            numericValue = formatter.format(cell.getDateCellValue());
-                        } else {
-                            numericValue = ValueUtils.valueOF(NumberToTextConverter.toText(cell.getNumericCellValue()));
-                        }
-
-                        yield numericValue;
-                    }
-                    case STRING -> cell.getStringCellValue();
-                    default -> throw new IllegalStateException("Unexpected value: " + cell.getCellType());};
-            }
-
-            if (ObjectUtils.isEmpty(value)) {
-                if (includeEmptyCells) {
-                    value = "";
-                }
-            } else {
-                if (readAsString) {
-                    value = String.valueOf(value);
-                }
-            }
-
-            return value;
         }
 
         private byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {

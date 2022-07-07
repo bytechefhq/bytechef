@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,11 +35,11 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class FileTaskHandlerTest {
 
-    private static final FileStorageService fileStorageService = new Base64FileStorageService();
+    private static final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
     private static final FileTaskHandler.FileReadTaskHandler fileFileReadTaskHandler =
-            new FileTaskHandler.FileReadTaskHandler(fileStorageService);
+            new FileTaskHandler.FileReadTaskHandler(fileStorageHelper);
     private static final FileTaskHandler.FileWriteTaskHandler fileWriteTaskHandler =
-            new FileTaskHandler.FileWriteTaskHandler(fileStorageService);
+            new FileTaskHandler.FileWriteTaskHandler(fileStorageHelper);
 
     @Test
     public void testRead() throws Exception {
@@ -47,7 +47,7 @@ public class FileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
 
         assertThat(fileFileReadTaskHandler.handle(taskExecution))
@@ -65,7 +65,7 @@ public class FileTaskHandlerTest {
 
         FileEntry fileEntry = fileWriteTaskHandler.handle(taskExecution);
 
-        assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
+        assertThat(fileStorageHelper.readFileContent(fileEntry))
                 .isEqualTo(Files.contentOf(file, Charset.defaultCharset()));
 
         assertThat(fileEntry.getName()).isEqualTo("file.txt");

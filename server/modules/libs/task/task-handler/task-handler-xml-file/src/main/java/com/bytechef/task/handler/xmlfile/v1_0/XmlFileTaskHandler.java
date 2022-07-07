@@ -16,10 +16,20 @@
 
 package com.bytechef.task.handler.xmlfile.v1_0;
 
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.IS_ARRAY;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.PAGE_NUMBER;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.PATH;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.SOURCE;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.VERSION_1_0;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.WRITE;
+import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.XML_FILE;
+
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.xml.XmlHelper;
 import com.bytechef.task.handler.xmlfile.XmlFileTaskConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -37,41 +47,40 @@ import org.springframework.stereotype.Component;
  */
 public class XmlFileTaskHandler {
 
-    @Component(XmlFileTaskConstants.XML_FILE + "/" + XmlFileTaskConstants.VERSION_1_0 + "/" + XmlFileTaskConstants.READ)
+    @Component(XML_FILE + "/" + VERSION_1_0 + "/" + XmlFileTaskConstants.READ)
     public static class XmlFileReadTaskHandler implements TaskHandler<Object> {
 
+        private final FileStorageHelper fileStorageHelper;
         private final XmlHelper xmlHelper;
 
-        public XmlFileReadTaskHandler(FileStorageService fileStorageService, XmlHelper xmlHelper) {
-            this.fileStorageService = fileStorageService;
+        public XmlFileReadTaskHandler(FileStorageHelper fileStorageHelper, XmlHelper xmlHelper) {
+            this.fileStorageHelper = fileStorageHelper;
             this.xmlHelper = xmlHelper;
         }
 
-        private final FileStorageService fileStorageService;
-
         @Override
-        public Object handle(TaskExecution taskExecution) throws Exception {
+        public Object handle(TaskExecution taskExecution) {
             Object result;
 
-            boolean isArray = taskExecution.get(XmlFileTaskConstants.IS_ARRAY, Boolean.class, true);
-            FileEntry fileEntry = taskExecution.getRequired(XmlFileTaskConstants.FILE_ENTRY, FileEntry.class);
+            boolean isArray = taskExecution.get(IS_ARRAY, Boolean.class, true);
+            FileEntry fileEntry = taskExecution.getRequired(FILE_ENTRY, FileEntry.class);
 
             if (isArray) {
-                String path = taskExecution.get(XmlFileTaskConstants.PATH);
-                InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
+                String path = taskExecution.get(PATH);
+                InputStream inputStream = fileStorageHelper.getFileContentStream(fileEntry);
                 List<Map<String, ?>> items;
 
                 if (path == null) {
                     try (Stream<Map<String, ?>> stream =
-                            xmlHelper.stream(fileStorageService.getFileContentStream(fileEntry.getUrl()))) {
+                            xmlHelper.stream(fileStorageHelper.getFileContentStream(fileEntry))) {
                         items = stream.toList();
                     }
                 } else {
                     items = xmlHelper.read(inputStream, path, new TypeReference<>() {});
                 }
 
-                Integer pageSize = taskExecution.getInteger(XmlFileTaskConstants.PAGE_SIZE);
-                Integer pageNumber = taskExecution.getInteger(XmlFileTaskConstants.PAGE_NUMBER);
+                Integer pageSize = taskExecution.getInteger(PAGE_SIZE);
+                Integer pageNumber = taskExecution.getInteger(PAGE_NUMBER);
                 Integer rangeStartIndex = null;
                 Integer rangeEndIndex = null;
 
@@ -88,30 +97,27 @@ public class XmlFileTaskHandler {
 
                 result = items;
             } else {
-                result = xmlHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
+                result = xmlHelper.read(fileStorageHelper.readFileContent(fileEntry), Map.class);
             }
 
             return result;
         }
     }
 
-    @Component(
-            XmlFileTaskConstants.XML_FILE + "/" + XmlFileTaskConstants.VERSION_1_0 + "/" + XmlFileTaskConstants.WRITE)
+    @Component(XML_FILE + "/" + VERSION_1_0 + "/" + WRITE)
     public static class XmlFileWriteTaskHandler implements TaskHandler<FileEntry> {
 
+        private final FileStorageHelper fileStorageHelper;
         private final XmlHelper xmlHelper;
 
-        public XmlFileWriteTaskHandler(FileStorageService fileStorageService, XmlHelper xmlHelper) {
-            this.fileStorageService = fileStorageService;
+        public XmlFileWriteTaskHandler(FileStorageHelper fileStorageHelper, XmlHelper xmlHelper) {
+            this.fileStorageHelper = fileStorageHelper;
             this.xmlHelper = xmlHelper;
         }
 
-        private final FileStorageService fileStorageService;
-
         @Override
         public FileEntry handle(TaskExecution taskExecution) throws Exception {
-            String fileName = taskExecution.get(XmlFileTaskConstants.FILE_NAME, String.class, "file.xml");
-            Object source = taskExecution.getRequired(XmlFileTaskConstants.SOURCE);
+            Object source = taskExecution.getRequired(SOURCE);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -120,7 +126,7 @@ public class XmlFileTaskHandler {
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                return fileStorageService.storeFileContent(fileName, inputStream);
+                return fileStorageHelper.storeFileContent(taskExecution, "file.xml", inputStream);
             }
         }
     }

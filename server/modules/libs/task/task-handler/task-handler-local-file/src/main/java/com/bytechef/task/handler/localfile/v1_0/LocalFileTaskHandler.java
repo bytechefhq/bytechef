@@ -16,8 +16,7 @@
 
 package com.bytechef.task.handler.localfile.v1_0;
 
-import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.FILE_ENTRY;
-import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.FILE_NAME;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
 import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.LOCAL_FILE;
 import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.READ;
 import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.VERSION_1_0;
@@ -26,7 +25,7 @@ import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.WRITE;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -43,18 +42,16 @@ public class LocalFileTaskHandler {
     @Component(LOCAL_FILE + "/" + VERSION_1_0 + "/" + READ)
     public static class LocalFileReadTaskHandler implements TaskHandler<FileEntry> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public LocalFileReadTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public LocalFileReadTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
         public FileEntry handle(TaskExecution taskExecution) throws Exception {
-            String fileName = taskExecution.getRequired(FILE_NAME);
-
-            try (InputStream inputStream = new FileInputStream(fileName)) {
-                return fileStorageService.storeFileContent(fileName, inputStream);
+            try (InputStream inputStream = new FileInputStream(taskExecution.getRequiredString(FILE_NAME))) {
+                return fileStorageHelper.storeFileContent(taskExecution, inputStream);
             }
         }
     }
@@ -62,19 +59,17 @@ public class LocalFileTaskHandler {
     @Component(LOCAL_FILE + "/" + VERSION_1_0 + "/" + WRITE)
     public static class LocalFileWriteTaskHandler implements TaskHandler<Map<String, Long>> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public LocalFileWriteTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public LocalFileWriteTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
         public Map<String, Long> handle(TaskExecution taskExecution) throws Exception {
             String fileName = taskExecution.getRequired(FILE_NAME);
 
-            FileEntry fileEntry = taskExecution.getRequired(FILE_ENTRY, FileEntry.class);
-
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageHelper.getFileContentStream(taskExecution)) {
                 return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
             }
         }

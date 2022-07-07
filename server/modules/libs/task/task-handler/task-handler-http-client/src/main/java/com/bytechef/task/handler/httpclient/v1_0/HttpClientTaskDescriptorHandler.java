@@ -28,6 +28,7 @@ import static com.bytechef.hermes.descriptor.model.DSL.createTaskDescriptor;
 import static com.bytechef.hermes.descriptor.model.DSL.hideWhen;
 import static com.bytechef.hermes.descriptor.model.DSL.option;
 import static com.bytechef.hermes.descriptor.model.DSL.showWhen;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.*;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ALLOW_UNAUTHORIZED_CERTS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.AuthType.API_KEY;
@@ -38,7 +39,6 @@ import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.AuthT
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BODY_CONTENT_TYPE;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BODY_PARAMETERS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BodyContentType;
-import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FILE_ENTRY;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_REDIRECT;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FULL_RESPONSE;
@@ -145,7 +145,7 @@ public class HttpClientTaskDescriptorHandler implements TaskDescriptorHandler {
                                         .defaultValue(""))),
     };
 
-    private static final TaskProperty[] BODY_CONTENT_PROPERTIES = {
+    private static final TaskProperty[] BODY_CONTENT_PROPERTIES = new TaskProperty[] {
         BOOLEAN_PROPERTY(SEND_FILE)
                 .displayName("Send File")
                 .description("Send file instead of body parameters.")

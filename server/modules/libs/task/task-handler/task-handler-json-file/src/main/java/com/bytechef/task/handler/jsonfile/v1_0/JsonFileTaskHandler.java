@@ -16,12 +16,25 @@
 
 package com.bytechef.task.handler.jsonfile.v1_0;
 
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.FILE_TYPE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.FileType;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.IS_ARRAY;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.JSON_FILE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.PAGE_NUMBER;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.PATH;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.READ;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.SOURCE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.VERSION_1_0;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.WRITE;
+
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.json.JsonHelper;
-import com.bytechef.task.handler.jsonfile.JsonFileTaskConstants;
+import com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.FileType;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,18 +53,14 @@ import org.springframework.stereotype.Component;
  */
 public class JsonFileTaskHandler {
 
-    @Component(JsonFileTaskConstants.JSON_FILE
-            + "/"
-            + JsonFileTaskConstants.VERSION_1_0
-            + "/"
-            + JsonFileTaskConstants.READ)
+    @Component(JSON_FILE + "/" + VERSION_1_0 + "/" + READ)
     public static class JsonFileReadTaskHandler implements TaskHandler<Object> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
         private final JsonHelper jsonHelper;
 
-        public JsonFileReadTaskHandler(FileStorageService fileStorageService, JsonHelper jsonHelper) {
-            this.fileStorageService = fileStorageService;
+        public JsonFileReadTaskHandler(FileStorageHelper fileStorageHelper, JsonHelper jsonHelper) {
+            this.fileStorageHelper = fileStorageHelper;
             this.jsonHelper = jsonHelper;
         }
 
@@ -60,20 +69,16 @@ public class JsonFileTaskHandler {
         public Object handle(TaskExecution taskExecution) throws Exception {
             Object result;
 
-            JsonFileTaskConstants.FileType fileType =
-                    JsonFileTaskConstants.FileType.valueOf(StringUtils.upperCase(taskExecution.get(
-                            JsonFileTaskConstants.FILE_TYPE,
-                            String.class,
-                            JsonFileTaskConstants.FileType.JSON.name())));
-            boolean isArray = taskExecution.get(JsonFileTaskConstants.IS_ARRAY, Boolean.class, true);
-            FileEntry fileEntry = taskExecution.getRequired(JsonFileTaskConstants.FILE_ENTRY, FileEntry.class);
+            FileType fileType = getFileType(taskExecution);
+            boolean isArray = taskExecution.get(IS_ARRAY, Boolean.class, true);
+            FileEntry fileEntry = taskExecution.getRequired(FILE_ENTRY, FileEntry.class);
 
             if (isArray) {
-                String path = taskExecution.get(JsonFileTaskConstants.PATH);
-                InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
+                String path = taskExecution.get(PATH);
+                InputStream inputStream = fileStorageHelper.getFileContentStream(fileEntry);
                 List<Map<String, ?>> items;
 
-                if (fileType == JsonFileTaskConstants.FileType.JSON) {
+                if (fileType == FileType.JSON) {
                     if (path == null) {
                         try (Stream<Map<String, ?>> stream = jsonHelper.stream(inputStream)) {
                             items = stream.toList();
@@ -90,8 +95,8 @@ public class JsonFileTaskHandler {
                     }
                 }
 
-                Integer pageSize = taskExecution.getInteger(JsonFileTaskConstants.PAGE_SIZE);
-                Integer pageNumber = taskExecution.getInteger(JsonFileTaskConstants.PAGE_NUMBER);
+                Integer pageSize = taskExecution.getInteger(PAGE_SIZE);
+                Integer pageNumber = taskExecution.getInteger(PAGE_NUMBER);
                 Integer rangeStartIndex = null;
                 Integer rangeEndIndex = null;
 
@@ -108,43 +113,33 @@ public class JsonFileTaskHandler {
 
                 result = items;
             } else {
-                result = jsonHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
+                result = jsonHelper.read(fileStorageHelper.readFileContent(fileEntry), Map.class);
             }
 
             return result;
         }
     }
 
-    @Component(JsonFileTaskConstants.JSON_FILE
-            + "/"
-            + JsonFileTaskConstants.VERSION_1_0
-            + "/"
-            + JsonFileTaskConstants.WRITE)
+    @Component(JSON_FILE + "/" + VERSION_1_0 + "/" + WRITE)
     public static class JsonFileWriteTaskHandler implements TaskHandler<FileEntry> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
         private final JsonHelper jsonHelper;
 
-        public JsonFileWriteTaskHandler(FileStorageService fileStorageService, JsonHelper jsonHelper) {
-            this.fileStorageService = fileStorageService;
+        public JsonFileWriteTaskHandler(FileStorageHelper fileStorageHelper, JsonHelper jsonHelper) {
+            this.fileStorageHelper = fileStorageHelper;
             this.jsonHelper = jsonHelper;
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public FileEntry handle(TaskExecution taskExecution) throws Exception {
-            JsonFileTaskConstants.FileType fileType =
-                    JsonFileTaskConstants.FileType.valueOf(StringUtils.upperCase(taskExecution.get(
-                            JsonFileTaskConstants.FILE_TYPE,
-                            String.class,
-                            JsonFileTaskConstants.FileType.JSON.name())));
-            String fileName =
-                    taskExecution.get(JsonFileTaskConstants.FILE_NAME, String.class, getDefaultFileName(fileType));
-            Object source = taskExecution.getRequired(JsonFileTaskConstants.SOURCE);
+            FileType fileType = getFileType(taskExecution);
+            Object source = taskExecution.getRequired(SOURCE);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-            if (fileType == JsonFileTaskConstants.FileType.JSON) {
+            if (fileType == FileType.JSON) {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
                     printWriter.println(jsonHelper.write(source));
                 }
@@ -157,12 +152,17 @@ public class JsonFileTaskHandler {
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                return fileStorageService.storeFileContent(fileName, inputStream);
+                return fileStorageHelper.storeFileContent(taskExecution, getDefaultFileName(fileType), inputStream);
             }
         }
 
-        private String getDefaultFileName(JsonFileTaskConstants.FileType fileType) {
-            return "file." + (fileType == JsonFileTaskConstants.FileType.JSON ? "json" : "jsonl");
+        private String getDefaultFileName(FileType fileType) {
+            return "file." + (fileType == FileType.JSON ? "json" : "jsonl");
         }
+    }
+
+    private static FileType getFileType(TaskExecution taskExecution) {
+        return FileType.valueOf(
+                StringUtils.upperCase(taskExecution.get(FILE_TYPE, String.class, FileType.JSON.name())));
     }
 }

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.xml.XmlHelper;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,12 +38,12 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class XmlFileTaskHandlerTest {
 
-    private static final FileStorageService fileStorageService = new Base64FileStorageService();
+    private static final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
     private static final XmlHelper xmlHelper = new XmlHelper();
     private static final XmlFileTaskHandler.XmlFileReadTaskHandler xmlFileReadTaskHandler =
-            new XmlFileTaskHandler.XmlFileReadTaskHandler(fileStorageService, xmlHelper);
+            new XmlFileTaskHandler.XmlFileReadTaskHandler(fileStorageHelper, xmlHelper);
     private static final XmlFileTaskHandler.XmlFileWriteTaskHandler xmlFileWriteTaskHandler =
-            new XmlFileTaskHandler.XmlFileWriteTaskHandler(fileStorageService, xmlHelper);
+            new XmlFileTaskHandler.XmlFileWriteTaskHandler(fileStorageHelper, xmlHelper);
 
     @Test
     @SuppressWarnings("unchecked")
@@ -52,7 +52,7 @@ public class XmlFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("isArray", false);
         taskExecution.put("operation", "READ");
 
@@ -66,7 +66,7 @@ public class XmlFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
 
         assertThat((List<?>) xmlFileReadTaskHandler.handle(taskExecution))
@@ -74,7 +74,7 @@ public class XmlFileTaskHandlerTest {
 
         taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+        taskExecution.put("fileEntry", fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
         taskExecution.put("pageNumber", 1);
         taskExecution.put("pageSize", 2);
@@ -94,7 +94,7 @@ public class XmlFileTaskHandlerTest {
 
         FileEntry fileEntry = (FileEntry) xmlFileWriteTaskHandler.handle(taskExecution);
 
-        assertThat(xmlHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), List.class))
+        assertThat(xmlHelper.read(fileStorageHelper.readFileContent(fileEntry), List.class))
                 .isEqualTo(xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
 
         assertThat(fileEntry.getName()).isEqualTo("file.xml");
@@ -117,9 +117,9 @@ public class XmlFileTaskHandlerTest {
         taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
         taskExecution.put("operation", "WRITE");
 
-        FileEntry fileEntry = (FileEntry) xmlFileWriteTaskHandler.handle(taskExecution);
+        FileEntry fileEntry = xmlFileWriteTaskHandler.handle(taskExecution);
 
-        assertThat(xmlHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), List.class))
+        assertThat(xmlHelper.read(fileStorageHelper.readFileContent(fileEntry), List.class))
                 .isEqualTo(xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
 
         assertThat(fileEntry.getName()).isEqualTo("file.xml");

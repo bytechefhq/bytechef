@@ -8,12 +8,9 @@ subprojects {
         compileOnly "org.springframework:spring-context"
         compileOnly "org.springframework:spring-jdbc"
         compileOnly "org.springframework.boot:spring-boot"
-        compileOnly project(":modules:libs:atlas:atlas-api")
         compileOnly project(":modules:libs:atlas:atlas-worker:atlas-worker-api")
         compileOnly project(":modules:libs:task:task-commons")
         compileOnly project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
-        compileOnly project(":modules:libs:hermes:hermes-auth:hermes-auth-service")
-        compileOnly project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
         testImplementation "com.fasterxml.jackson.core:jackson-annotations"
         testImplementation "com.fasterxml.jackson.core:jackson-databind"

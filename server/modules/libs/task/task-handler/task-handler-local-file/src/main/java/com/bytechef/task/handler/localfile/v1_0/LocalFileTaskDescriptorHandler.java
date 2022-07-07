@@ -21,8 +21,8 @@ import static com.bytechef.hermes.descriptor.model.DSL.INTEGER_PROPERTY;
 import static com.bytechef.hermes.descriptor.model.DSL.OBJECT_PROPERTY;
 import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
 import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
-import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.FILE_ENTRY;
-import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.FILE_NAME;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
 import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.LOCAL_FILE;
 import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.VERSION_1_0;
 

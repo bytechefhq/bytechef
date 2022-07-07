@@ -21,9 +21,7 @@ package com.bytechef.task.handler.xmlfile;
  */
 public class XmlFileTaskConstants {
 
-    public static final String FILE_ENTRY = "fileEntry";
     public static final String IS_ARRAY = "isArray";
-    public static final String FILE_NAME = "fileName";
     public static final String PATH = "path";
     public static final String PAGE_SIZE = "pageSize";
     public static final String PAGE_NUMBER = "pageNumber";
