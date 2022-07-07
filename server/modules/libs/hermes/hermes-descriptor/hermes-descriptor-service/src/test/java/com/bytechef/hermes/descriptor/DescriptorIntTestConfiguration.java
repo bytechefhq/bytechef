@@ -16,29 +16,15 @@
 
 package com.bytechef.hermes.descriptor;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
 import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandler;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
-import com.bytechef.hermes.descriptor.repository.ExtAuthenticationDescriptorHandlerRepository;
-import com.bytechef.hermes.descriptor.repository.ExtTaskDescriptorHandlerRepository;
-import com.bytechef.hermes.descriptor.repository.memory.InMemoryExtAuthenticationDescriptorHandlerRepository;
-import com.bytechef.hermes.descriptor.repository.memory.InMemoryExtTaskDescriptorHandlerRepository;
+import com.bytechef.hermes.descriptor.model.DSL;
 import java.util.List;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class DescriptorIntTestConfiguration {
-
-    @Bean
-    ExtAuthenticationDescriptorHandlerRepository memoryExtAuthenticationDescriptorHandlerRepository() {
-        return new InMemoryExtAuthenticationDescriptorHandlerRepository();
-    }
-
-    @Bean
-    ExtTaskDescriptorHandlerRepository memoryExtTaskDescriptorHandlerRepository() {
-        return new InMemoryExtTaskDescriptorHandlerRepository();
-    }
 
     @Bean
     AuthenticationDescriptorHandler memoryAuthenticationDescriptorHandler() {

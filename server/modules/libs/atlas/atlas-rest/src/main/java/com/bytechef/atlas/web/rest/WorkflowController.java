@@ -18,9 +18,8 @@
 
 package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.annotation.ConditionalOnCoordinator;
+import com.bytechef.atlas.service.workflow.WorkflowService;
 import com.bytechef.atlas.workflow.domain.Workflow;
-import com.bytechef.atlas.workflow.service.WorkflowService;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -39,7 +38,6 @@ import org.springframework.web.servlet.HandlerMapping;
  * @author Arik Cohen
  */
 @RestController
-@ConditionalOnCoordinator
 public class WorkflowController {
 
     private final WorkflowService workflowService;

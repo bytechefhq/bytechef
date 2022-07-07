@@ -19,10 +19,8 @@ package com.bytechef.task.handler.mysql;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -39,10 +37,44 @@ public class MySQLAuthenticationDescriptorHandlerTest {
     public void testGetMySQLAuthenticationDescriptors() throws JsonProcessingException {
         JSONAssert.assertEquals(
                 """
-            {"taskName":"mysql","authenticationDescriptors":[{"displayName":"MySQL","name":"mysql","properties":[{"displayName":"Host","name":"host","required":true,"type":"STRING"},{"displayName":"Port","name":"port","required":true,"type":"INTEGER"},{"displayName":"Username","name":"username","required":true,"type":"STRING"},{"displayName":"Password","name":"password","required":true,"type":"STRING"}]}]}
+            {
+              "name": "mysql",
+              "authenticationDescriptors": [
+                {
+                  "displayName": "MySQL",
+                  "name": "mysql",
+                  "properties": [
+                    {
+                      "displayName": "Host",
+                      "name": "host",
+                      "required": true,
+                      "type": "STRING"
+                    },
+                    {
+                      "displayName": "Port",
+                      "name": "port",
+                      "required": true,
+                      "type": "INTEGER"
+                    },
+                    {
+                      "displayName": "Username",
+                      "name": "username",
+                      "required": true,
+                      "type": "STRING"
+                    },
+                    {
+                      "displayName": "Password",
+                      "name": "password",
+                      "required": true,
+                      "type": "STRING"
+                    }
+                  ]
+                }
+              ]
+            }
             """,
-                (JSONObject) JSONParser.parseJSON(objectMapper.writeValueAsString(
-                        new MySQLAuthenticationDescriptorHandler().getAuthenticationDescriptors())),
+                objectMapper.writeValueAsString(
+                        new MySQLAuthenticationDescriptorHandler().getAuthenticationDescriptors()),
                 true);
     }
 }

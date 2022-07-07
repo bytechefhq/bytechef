@@ -1,6 +1,0 @@
-dependencies {
-    api project(":modules:libs:hermes:hermes-auth:hermes-auth-repository:hermes-auth-repository-api")
-
-    implementation "org.springframework:spring-jdbc"
-    implementation project(":modules:libs:hermes:hermes-encryption:hermes-encryption-api")
-}

@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.descriptor.handler;
 
-import com.bytechef.hermes.descriptor.domain.AuthenticationDescriptors;
+import com.bytechef.hermes.descriptor.model.AuthenticationDescriptors;
 
 /**
  * @author Ivica Cardic

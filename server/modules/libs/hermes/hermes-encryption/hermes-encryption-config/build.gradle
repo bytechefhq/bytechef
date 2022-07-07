@@ -1,0 +1,5 @@
+dependencies {
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation project(":modules:libs:hermes:hermes-encryption:hermes-encryption-filesystem")
+}

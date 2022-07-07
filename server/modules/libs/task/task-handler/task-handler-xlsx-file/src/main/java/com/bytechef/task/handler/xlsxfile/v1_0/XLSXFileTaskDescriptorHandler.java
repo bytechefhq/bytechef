@@ -16,8 +16,8 @@
 
 package com.bytechef.task.handler.xlsxfile.v1_0;
 
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 import com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants;
 import org.springframework.stereotype.Component;
 

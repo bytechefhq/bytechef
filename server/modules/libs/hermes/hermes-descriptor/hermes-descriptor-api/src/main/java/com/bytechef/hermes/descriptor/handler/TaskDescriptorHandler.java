@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.descriptor.handler;
 
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 
 /**
  * @author Ivica Cardic

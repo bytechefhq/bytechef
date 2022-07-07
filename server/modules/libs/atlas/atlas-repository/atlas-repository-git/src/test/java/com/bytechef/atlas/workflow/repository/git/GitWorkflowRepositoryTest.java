@@ -18,10 +18,12 @@
 
 package com.bytechef.atlas.workflow.repository.git;
 
+import com.bytechef.atlas.repository.git.workflow.GitOperations;
+import com.bytechef.atlas.repository.git.workflow.GitWorkflowRepository;
+import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
 import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.atlas.workflow.WorkflowResource;
 import com.bytechef.atlas.workflow.domain.Workflow;
-import com.bytechef.atlas.workflow.repository.mapper.YamlWorkflowMapper;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;

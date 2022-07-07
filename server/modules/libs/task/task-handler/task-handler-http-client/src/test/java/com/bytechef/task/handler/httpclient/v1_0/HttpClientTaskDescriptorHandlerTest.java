@@ -19,10 +19,8 @@ package com.bytechef.task.handler.httpclient.v1_0;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -72,21 +70,22 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "URI",
                           "name": "uri",
                           "placeholder": "https://example.com/index.html",
+                          "type": "STRING",
                           "required": true,
-                          "defaultValue": "",
-                          "type": "STRING"
+                          "defaultValue": ""
                         },
                         {
                           "description": "Download the response even if SSL certificate validation is not possible.",
                           "displayName": "Allow Unauthorized Certs",
                           "name": "allowUnauthorizedCerts",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "The format in which the data gets returned from the URL.",
                           "displayName": "Response Format",
                           "name": "responseFormat",
+                          "type": "STRING",
                           "options": [
                             {
                               "description": "The response is automatically converted to object/array.",
@@ -109,8 +108,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "value": "FILE"
                             }
                           ],
-                          "defaultValue": "JSON",
-                          "type": "STRING"
+                          "defaultValue": "JSON"
                         },
                         {
                           "description": "The name of the file if the response is returned as a file object.",
@@ -132,10 +130,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Header Parameters",
                           "name": "headerParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -146,15 +144,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -165,10 +163,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Query Parameters",
                           "name": "queryParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -179,15 +177,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -206,6 +204,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               }
                             }
                           },
+                          "type": "ANY",
                           "types": [
                             {
                               "type": "ARRAY"
@@ -241,23 +240,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         }
@@ -273,21 +272,22 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "URI",
                           "name": "uri",
                           "placeholder": "https://example.com/index.html",
+                          "type": "STRING",
                           "required": true,
-                          "defaultValue": "",
-                          "type": "STRING"
+                          "defaultValue": ""
                         },
                         {
                           "description": "Download the response even if SSL certificate validation is not possible.",
                           "displayName": "Allow Unauthorized Certs",
                           "name": "allowUnauthorizedCerts",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "The format in which the data gets returned from the URL.",
                           "displayName": "Response Format",
                           "name": "responseFormat",
+                          "type": "STRING",
                           "options": [
                             {
                               "description": "The response is automatically converted to object/array.",
@@ -310,8 +310,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "value": "FILE"
                             }
                           ],
-                          "defaultValue": "JSON",
-                          "type": "STRING"
+                          "defaultValue": "JSON"
                         },
                         {
                           "description": "The name of the file if the response is returned as a file object.",
@@ -333,10 +332,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Header Parameters",
                           "name": "headerParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -347,15 +346,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -366,10 +365,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Query Parameters",
                           "name": "queryParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -380,15 +379,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -409,8 +408,8 @@ public class HttpClientTaskDescriptorHandlerTest {
                           },
                           "displayName": "Send File",
                           "name": "sendFile",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "Body parameters to send.",
@@ -443,10 +442,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Body Parameters",
                           "name": "bodyParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -457,15 +456,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -485,10 +484,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Body Parameters",
                           "name": "bodyParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -499,13 +498,14 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
+                                  "type": "ANY",
                                   "types": [
                                     {
                                       "type": "STRING"
@@ -515,23 +515,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                                       "properties": [
                                         {
                                           "name": "extension",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "mimeType",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "name",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "url",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         }
                                       ]
                                     }
@@ -583,34 +583,36 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         },
                         {
                           "displayName": "Options",
                           "placeholder": "Add Option",
+                          "type": "OPTION",
                           "options": [
                             {
                               "description": "Content-Type to use when sending body parameters.",
                               "displayName": "Body Content Type",
                               "name": "bodyContentType",
+                              "type": "STRING",
                               "options": [
                                 {
                                   "name": "JSON",
@@ -637,8 +639,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "value": "XML"
                                 }
                               ],
-                              "defaultValue": "JSON",
-                              "type": "STRING"
+                              "defaultValue": "JSON"
                             },
                             {
                               "description": "Mime-Type to use when sending raw body content.",
@@ -660,44 +661,44 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "description": "Returns the full response data instead of only the body.",
                               "displayName": "Full Response",
                               "name": "fullResponse",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow non-GET HTTP 3xx redirects.",
                               "displayName": "Follow All Redirects",
                               "name": "followAllRedirects",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow GET HTTP 3xx redirects.",
                               "displayName": "Follow GET Redirect",
                               "name": "followRedirect",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Succeeds also when the status code is not 2xx.",
                               "displayName": "Ignore Response Code",
                               "name": "ignoreResponseCode",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "HTTP proxy to use.",
                               "displayName": "Proxy",
                               "name": "proxy",
                               "placeholder": "https://myproxy:3128",
-                              "defaultValue": "",
-                              "type": "STRING"
+                              "type": "STRING",
+                              "defaultValue": ""
                             },
                             {
                               "description": "Time in ms to wait for the server to send a response before aborting the request.",
                               "displayName": "Timeout",
                               "name": "timeout",
-                              "defaultValue": 1000,
                               "type": "INTEGER",
+                              "defaultValue": 1000,
                               "minValue": 1
                             }
                           ]
@@ -715,6 +716,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               }
                             }
                           },
+                          "type": "ANY",
                           "types": [
                             {
                               "type": "ARRAY"
@@ -750,23 +752,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         }
@@ -782,21 +784,22 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "URI",
                           "name": "uri",
                           "placeholder": "https://example.com/index.html",
+                          "type": "STRING",
                           "required": true,
-                          "defaultValue": "",
-                          "type": "STRING"
+                          "defaultValue": ""
                         },
                         {
                           "description": "Download the response even if SSL certificate validation is not possible.",
                           "displayName": "Allow Unauthorized Certs",
                           "name": "allowUnauthorizedCerts",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "The format in which the data gets returned from the URL.",
                           "displayName": "Response Format",
                           "name": "responseFormat",
+                          "type": "STRING",
                           "options": [
                             {
                               "description": "The response is automatically converted to object/array.",
@@ -819,8 +822,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "value": "FILE"
                             }
                           ],
-                          "defaultValue": "JSON",
-                          "type": "STRING"
+                          "defaultValue": "JSON"
                         },
                         {
                           "description": "The name of the file if the response is returned as a file object.",
@@ -842,10 +844,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Header Parameters",
                           "name": "headerParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -856,15 +858,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -875,10 +877,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Query Parameters",
                           "name": "queryParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -889,15 +891,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -918,8 +920,8 @@ public class HttpClientTaskDescriptorHandlerTest {
                           },
                           "displayName": "Send File",
                           "name": "sendFile",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "Body parameters to send.",
@@ -952,10 +954,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Body Parameters",
                           "name": "bodyParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -966,15 +968,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -994,10 +996,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Body Parameters",
                           "name": "bodyParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -1008,13 +1010,14 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
+                                  "type": "ANY",
                                   "types": [
                                     {
                                       "type": "STRING"
@@ -1024,23 +1027,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                                       "properties": [
                                         {
                                           "name": "extension",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "mimeType",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "name",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "url",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         }
                                       ]
                                     }
@@ -1092,34 +1095,36 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         },
                         {
                           "displayName": "Options",
                           "placeholder": "Add Option",
+                          "type": "OPTION",
                           "options": [
                             {
                               "description": "Content-Type to use when sending body parameters.",
                               "displayName": "Body Content Type",
                               "name": "bodyContentType",
+                              "type": "STRING",
                               "options": [
                                 {
                                   "name": "JSON",
@@ -1146,8 +1151,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "value": "XML"
                                 }
                               ],
-                              "defaultValue": "JSON",
-                              "type": "STRING"
+                              "defaultValue": "JSON"
                             },
                             {
                               "description": "Mime-Type to use when sending raw body content.",
@@ -1169,44 +1173,44 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "description": "Returns the full response data instead of only the body.",
                               "displayName": "Full Response",
                               "name": "fullResponse",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow non-GET HTTP 3xx redirects.",
                               "displayName": "Follow All Redirects",
                               "name": "followAllRedirects",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow GET HTTP 3xx redirects.",
                               "displayName": "Follow GET Redirect",
                               "name": "followRedirect",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Succeeds also when the status code is not 2xx.",
                               "displayName": "Ignore Response Code",
                               "name": "ignoreResponseCode",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "HTTP proxy to use.",
                               "displayName": "Proxy",
                               "name": "proxy",
                               "placeholder": "https://myproxy:3128",
-                              "defaultValue": "",
-                              "type": "STRING"
+                              "type": "STRING",
+                              "defaultValue": ""
                             },
                             {
                               "description": "Time in ms to wait for the server to send a response before aborting the request.",
                               "displayName": "Timeout",
                               "name": "timeout",
-                              "defaultValue": 1000,
                               "type": "INTEGER",
+                              "defaultValue": 1000,
                               "minValue": 1
                             }
                           ]
@@ -1225,6 +1229,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                             }
                           },
                           "name": "",
+                          "type": "ANY",
                           "types": [
                             {
                               "type": "ARRAY"
@@ -1260,23 +1265,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         }
@@ -1292,21 +1297,22 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "URI",
                           "name": "uri",
                           "placeholder": "https://example.com/index.html",
+                          "type": "STRING",
                           "required": true,
-                          "defaultValue": "",
-                          "type": "STRING"
+                          "defaultValue": ""
                         },
                         {
                           "description": "Download the response even if SSL certificate validation is not possible.",
                           "displayName": "Allow Unauthorized Certs",
                           "name": "allowUnauthorizedCerts",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "The format in which the data gets returned from the URL.",
                           "displayName": "Response Format",
                           "name": "responseFormat",
+                          "type": "STRING",
                           "options": [
                             {
                               "description": "The response is automatically converted to object/array.",
@@ -1329,8 +1335,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "value": "FILE"
                             }
                           ],
-                          "defaultValue": "JSON",
-                          "type": "STRING"
+                          "defaultValue": "JSON"
                         },
                         {
                           "description": "The name of the file if the response is returned as a file object.",
@@ -1352,10 +1357,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Header Parameters",
                           "name": "headerParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -1366,15 +1371,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -1385,10 +1390,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Query Parameters",
                           "name": "queryParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -1399,15 +1404,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -1428,8 +1433,8 @@ public class HttpClientTaskDescriptorHandlerTest {
                           },
                           "displayName": "Send File",
                           "name": "sendFile",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "Body parameters to send.",
@@ -1462,10 +1467,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Body Parameters",
                           "name": "bodyParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -1476,15 +1481,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -1504,10 +1509,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Body Parameters",
                           "name": "bodyParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -1518,13 +1523,14 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
+                                  "type": "ANY",
                                   "types": [
                                     {
                                       "type": "STRING"
@@ -1534,23 +1540,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                                       "properties": [
                                         {
                                           "name": "extension",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "mimeType",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "name",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         },
                                         {
                                           "name": "url",
-                                          "required": true,
-                                          "type": "STRING"
+                                          "type": "STRING",
+                                          "required": true
                                         }
                                       ]
                                     }
@@ -1602,34 +1608,36 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         },
                         {
                           "displayName": "Options",
                           "placeholder": "Add Option",
+                          "type": "OPTION",
                           "options": [
                             {
                               "description": "Content-Type to use when sending body parameters.",
                               "displayName": "Body Content Type",
                               "name": "bodyContentType",
+                              "type": "STRING",
                               "options": [
                                 {
                                   "name": "JSON",
@@ -1656,8 +1664,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "value": "XML"
                                 }
                               ],
-                              "defaultValue": "JSON",
-                              "type": "STRING"
+                              "defaultValue": "JSON"
                             },
                             {
                               "description": "Mime-Type to use when sending raw body content.",
@@ -1679,44 +1686,44 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "description": "Returns the full response data instead of only the body.",
                               "displayName": "Full Response",
                               "name": "fullResponse",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow non-GET HTTP 3xx redirects.",
                               "displayName": "Follow All Redirects",
                               "name": "followAllRedirects",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow GET HTTP 3xx redirects.",
                               "displayName": "Follow GET Redirect",
                               "name": "followRedirect",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Succeeds also when the status code is not 2xx.",
                               "displayName": "Ignore Response Code",
                               "name": "ignoreResponseCode",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "HTTP proxy to use.",
                               "displayName": "Proxy",
                               "name": "proxy",
                               "placeholder": "https://myproxy:3128",
-                              "defaultValue": "",
-                              "type": "STRING"
+                              "type": "STRING",
+                              "defaultValue": ""
                             },
                             {
                               "description": "Time in ms to wait for the server to send a response before aborting the request.",
                               "displayName": "Timeout",
                               "name": "timeout",
-                              "defaultValue": 1000,
                               "type": "INTEGER",
+                              "defaultValue": 1000,
                               "minValue": 1
                             }
                           ]
@@ -1735,6 +1742,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                             }
                           },
                           "name": "",
+                          "type": "ANY",
                           "types": [
                             {
                               "type": "ARRAY"
@@ -1770,23 +1778,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         }
@@ -1802,21 +1810,22 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "URI",
                           "name": "uri",
                           "placeholder": "https://example.com/index.html",
+                          "type": "STRING",
                           "required": true,
-                          "defaultValue": "",
-                          "type": "STRING"
+                          "defaultValue": ""
                         },
                         {
                           "description": "Download the response even if SSL certificate validation is not possible.",
                           "displayName": "Allow Unauthorized Certs",
                           "name": "allowUnauthorizedCerts",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "The format in which the data gets returned from the URL.",
                           "displayName": "Response Format",
                           "name": "responseFormat",
+                          "type": "STRING",
                           "options": [
                             {
                               "description": "The response is automatically converted to object/array.",
@@ -1839,8 +1848,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "value": "FILE"
                             }
                           ],
-                          "defaultValue": "JSON",
-                          "type": "STRING"
+                          "defaultValue": "JSON"
                         },
                         {
                           "description": "The name of the file if the response is returned as a file object.",
@@ -1862,10 +1870,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Header Parameters",
                           "name": "headerParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -1876,15 +1884,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -1895,10 +1903,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Query Parameters",
                           "name": "queryParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -1909,15 +1917,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -1926,49 +1934,50 @@ public class HttpClientTaskDescriptorHandlerTest {
                         {
                           "displayName": "Options",
                           "placeholder": "Add Option",
+                          "type": "OPTION",
                           "options": [
                             {
                               "description": "Returns the full response data instead of only the body.",
                               "displayName": "Full Response",
                               "name": "fullResponse",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow non-GET HTTP 3xx redirects.",
                               "displayName": "Follow All Redirects",
                               "name": "followAllRedirects",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow GET HTTP 3xx redirects.",
                               "displayName": "Follow GET Redirect",
                               "name": "followRedirect",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Succeeds also when the status code is not 2xx.",
                               "displayName": "Ignore Response Code",
                               "name": "ignoreResponseCode",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "HTTP proxy to use.",
                               "displayName": "Proxy",
                               "name": "proxy",
                               "placeholder": "https://myproxy:3128",
-                              "defaultValue": "",
-                              "type": "STRING"
+                              "type": "STRING",
+                              "defaultValue": ""
                             },
                             {
                               "description": "Time in ms to wait for the server to send a response before aborting the request.",
                               "displayName": "Timeout",
                               "name": "timeout",
-                              "defaultValue": 1000,
                               "type": "INTEGER",
+                              "defaultValue": 1000,
                               "minValue": 1
                             }
                           ]
@@ -1987,6 +1996,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                             }
                           },
                           "name": "",
+                          "type": "ANY",
                           "types": [
                             {
                               "type": "ARRAY"
@@ -2022,23 +2032,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         }
@@ -2054,21 +2064,22 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "URI",
                           "name": "uri",
                           "placeholder": "https://example.com/index.html",
+                          "type": "STRING",
                           "required": true,
-                          "defaultValue": "",
-                          "type": "STRING"
+                          "defaultValue": ""
                         },
                         {
                           "description": "Download the response even if SSL certificate validation is not possible.",
                           "displayName": "Allow Unauthorized Certs",
                           "name": "allowUnauthorizedCerts",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
+                          "type": "BOOLEAN",
+                          "defaultValue": false
                         },
                         {
                           "description": "The format in which the data gets returned from the URL.",
                           "displayName": "Response Format",
                           "name": "responseFormat",
+                          "type": "STRING",
                           "options": [
                             {
                               "description": "The response is automatically converted to object/array.",
@@ -2091,8 +2102,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                               "value": "FILE"
                             }
                           ],
-                          "defaultValue": "JSON",
-                          "type": "STRING"
+                          "defaultValue": "JSON"
                         },
                         {
                           "description": "The name of the file if the response is returned as a file object.",
@@ -2114,10 +2124,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Header Parameters",
                           "name": "headerParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -2128,15 +2138,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -2147,10 +2157,10 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "displayName": "Query Parameters",
                           "name": "queryParameters",
                           "placeholder": "Add Parameter",
+                          "type": "ARRAY",
                           "defaultValue": [
                             ""
                           ],
-                          "type": "ARRAY",
                           "items": [
                             {
                               "displayName": "Parameter",
@@ -2161,15 +2171,15 @@ public class HttpClientTaskDescriptorHandlerTest {
                                   "description": "The key of the parameter.",
                                   "displayName": "Key",
                                   "name": "key",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 },
                                 {
                                   "description": "The value of the parameter.",
                                   "displayName": "Value",
                                   "name": "value",
-                                  "defaultValue": "",
-                                  "type": "STRING"
+                                  "type": "STRING",
+                                  "defaultValue": ""
                                 }
                               ]
                             }
@@ -2178,49 +2188,50 @@ public class HttpClientTaskDescriptorHandlerTest {
                         {
                           "displayName": "Options",
                           "placeholder": "Add Option",
+                          "type": "OPTION",
                           "options": [
                             {
                               "description": "Returns the full response data instead of only the body.",
                               "displayName": "Full Response",
                               "name": "fullResponse",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow non-GET HTTP 3xx redirects.",
                               "displayName": "Follow All Redirects",
                               "name": "followAllRedirects",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Follow GET HTTP 3xx redirects.",
                               "displayName": "Follow GET Redirect",
                               "name": "followRedirect",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "Succeeds also when the status code is not 2xx.",
                               "displayName": "Ignore Response Code",
                               "name": "ignoreResponseCode",
-                              "defaultValue": false,
-                              "type": "BOOLEAN"
+                              "type": "BOOLEAN",
+                              "defaultValue": false
                             },
                             {
                               "description": "HTTP proxy to use.",
                               "displayName": "Proxy",
                               "name": "proxy",
                               "placeholder": "https://myproxy:3128",
-                              "defaultValue": "",
-                              "type": "STRING"
+                              "type": "STRING",
+                              "defaultValue": ""
                             },
                             {
                               "description": "Time in ms to wait for the server to send a response before aborting the request.",
                               "displayName": "Timeout",
                               "name": "timeout",
-                              "defaultValue": 1000,
                               "type": "INTEGER",
+                              "defaultValue": 1000,
                               "minValue": 1
                             }
                           ]
@@ -2239,6 +2250,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                             }
                           },
                           "name": "",
+                          "type": "ANY",
                           "types": [
                             {
                               "type": "ARRAY"
@@ -2274,23 +2286,23 @@ public class HttpClientTaskDescriptorHandlerTest {
                           "properties": [
                             {
                               "name": "extension",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "mimeType",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "name",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             },
                             {
                               "name": "url",
-                              "required": true,
-                              "type": "STRING"
+                              "type": "STRING",
+                              "required": true
                             }
                           ]
                         }
@@ -2301,8 +2313,7 @@ public class HttpClientTaskDescriptorHandlerTest {
                   "version": 1
                 }
                 """,
-                (JSONObject) JSONParser.parseJSON(
-                        objectMapper.writeValueAsString(new HttpClientTaskDescriptorHandler().getTaskDescriptor())),
+                objectMapper.writeValueAsString(new HttpClientTaskDescriptorHandler().getTaskDescriptor()),
                 true);
     }
 }

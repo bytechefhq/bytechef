@@ -20,9 +20,11 @@ package com.bytechef.atlas.coordinator.job.executor;
 
 import com.bytechef.atlas.context.domain.Context;
 import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.context.service.ContextService;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
+import com.bytechef.atlas.service.context.ContextService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.workflow.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
@@ -31,8 +33,6 @@ import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
 import com.bytechef.atlas.uuid.UUIDGenerator;
 import com.bytechef.atlas.workflow.domain.Workflow;
-import com.bytechef.atlas.workflow.service.WorkflowService;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.Date;
 import java.util.List;
 

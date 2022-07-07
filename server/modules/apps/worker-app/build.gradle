@@ -23,7 +23,6 @@ springBoot {
 }
 
 dependencies {
-    implementation "org.springframework.boot:spring-boot-starter-activemq"
     implementation "org.springframework.boot:spring-boot-starter-amqp"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
@@ -33,14 +32,14 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-event:atlas-event-impl")
     implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
     implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
-    implementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
-    implementation project(":modules:libs:hermes:hermes-auth:hermes-auth-repository:hermes-auth-repository-jdbc")
+    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-worker")
+    implementation project(":modules:libs:atlas:atlas-worker:atlas-worker-config")
     implementation project(":modules:libs:hermes:hermes-auth:hermes-auth-service")
-    implementation project(":modules:libs:hermes:hermes-encryption:hermes-encryption-filesystem")
-    implementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
-    implementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
+    implementation project(":modules:libs:hermes:hermes-encryption:hermes-encryption-config")
+    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-rest")
+    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-ext:hermes-descriptor-ext-client")
+    implementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-config")
     implementation project(":modules:libs:task:task-commons")
-    implementation project(":modules:libs:task:task-dispatcher:task-dispatcher-map")
     implementation project(":modules:libs:task:task-handler:task-handler-bento4")
     implementation project(":modules:libs:task:task-handler:task-handler-core")
     implementation project(":modules:libs:task:task-handler:task-handler-csv-file")

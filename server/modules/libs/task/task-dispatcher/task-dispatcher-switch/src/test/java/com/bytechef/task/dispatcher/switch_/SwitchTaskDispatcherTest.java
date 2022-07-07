@@ -25,13 +25,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.context.service.ContextService;
 import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.atlas.service.context.ContextService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;

@@ -69,11 +69,10 @@ spring:
   output:
     ansi:
       console-available: true
-  spring:
-    rabbitmq:
-      listener:
-        direct:
-          prefetch: 1
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 1
   task:
     execution:
       thread-name-prefix: server-application-task-
@@ -90,21 +89,15 @@ atlas:
   context:
     delete-listener:
       enabled: false
-  coordinator:
-    enabled: true
   message-broker:
-    provider: jms
+    provider: amqp
   persistence:
     provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-  storage:
-    provider: file
-    fileStorageDir: /tmp/bytechef/files
   worker:
-    enabled: true
     subscriptions:
-      tasks: "5"
+      tasks: "10"
   workflow-repository:
     database:
       enabled: true
@@ -114,6 +107,11 @@ atlas:
       enabled: false
       url: https://github.com/bytechef/bytechef-workflows.git
       search-paths: demo/
+
+hermes:
+  storage:
+    provider: file
+    fileStorageDir: /tmp/bytechef/files
 
 org:
   jobrunr:

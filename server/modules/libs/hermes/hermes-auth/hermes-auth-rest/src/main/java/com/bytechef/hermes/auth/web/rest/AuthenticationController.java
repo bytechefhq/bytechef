@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.auth.web.rest;
 
-import com.bytechef.atlas.annotation.ConditionalOnCoordinator;
 import com.bytechef.hermes.auth.domain.Authentication;
 import com.bytechef.hermes.auth.service.AuthenticationService;
 import java.io.IOException;
@@ -39,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnCoordinator
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -50,7 +48,7 @@ public class AuthenticationController {
 
     @DeleteMapping(value = "/authentications/{id}")
     public ResponseEntity<?> deleteAuthentication(@PathVariable("id") String id) {
-        authenticationService.delete(id);
+        authenticationService.remove(id);
 
         return ResponseEntity.ok().build();
     }
@@ -67,7 +65,7 @@ public class AuthenticationController {
 
     @PostMapping(value = "/authentications", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Authentication postAuthentication(@RequestBody AuthenticationCreateDTO authenticationCreateDTO) {
-        return authenticationService.create(
+        return authenticationService.add(
                 authenticationCreateDTO.name, authenticationCreateDTO.type, authenticationCreateDTO.properties);
     }
 

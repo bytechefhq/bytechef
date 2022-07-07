@@ -19,10 +19,8 @@ package com.bytechef.task.handler.postgresql;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -39,10 +37,44 @@ public class PostgreSQLAuthenticationDescriptorHandlerTest {
     public void testGetPostgreSQLAuthenticationDescriptors() throws JsonProcessingException {
         JSONAssert.assertEquals(
                 """
-            {"taskName":"postgresql","authenticationDescriptors":[{"displayName":"PostgreSQL","name":"postgresql","properties":[{"displayName":"Host","name":"host","required":true,"type":"STRING"},{"displayName":"Port","name":"port","required":true,"type":"INTEGER"},{"displayName":"Username","name":"username","required":true,"type":"STRING"},{"displayName":"Password","name":"password","required":true,"type":"STRING"}]}]}
+            {
+              "name": "postgresql",
+              "authenticationDescriptors": [
+                {
+                  "displayName": "PostgreSQL",
+                  "name": "postgresql",
+                  "properties": [
+                    {
+                      "displayName": "Host",
+                      "name": "host",
+                      "required": true,
+                      "type": "STRING"
+                    },
+                    {
+                      "displayName": "Port",
+                      "name": "port",
+                      "required": true,
+                      "type": "INTEGER"
+                    },
+                    {
+                      "displayName": "Username",
+                      "name": "username",
+                      "required": true,
+                      "type": "STRING"
+                    },
+                    {
+                      "displayName": "Password",
+                      "name": "password",
+                      "required": true,
+                      "type": "STRING"
+                    }
+                  ]
+                }
+              ]
+            }
             """,
-                (JSONObject) JSONParser.parseJSON(objectMapper.writeValueAsString(
-                        new PostgreSQLAuthenticationDescriptorHandler().getAuthenticationDescriptors())),
+                objectMapper.writeValueAsString(
+                        new PostgreSQLAuthenticationDescriptorHandler().getAuthenticationDescriptors()),
                 true);
     }
 }

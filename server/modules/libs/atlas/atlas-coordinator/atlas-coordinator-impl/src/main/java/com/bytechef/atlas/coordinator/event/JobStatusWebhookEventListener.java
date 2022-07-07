@@ -24,7 +24,7 @@ import com.bytechef.atlas.MapObject;
 import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.atlas.job.service.JobService;
+import com.bytechef.atlas.service.job.JobService;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

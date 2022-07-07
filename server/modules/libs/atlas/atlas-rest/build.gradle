@@ -4,6 +4,6 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-web"
     implementation "org.springframework:spring-webmvc"
-    implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-api")
+    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-api")
     implementation project(":modules:libs:atlas:atlas-service")
 }

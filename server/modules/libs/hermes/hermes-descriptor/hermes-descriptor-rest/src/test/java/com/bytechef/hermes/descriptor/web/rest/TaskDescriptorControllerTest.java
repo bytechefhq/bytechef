@@ -20,11 +20,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
-import com.bytechef.hermes.descriptor.repository.ExtAuthenticationDescriptorHandlerRepository;
-import com.bytechef.hermes.descriptor.repository.ExtTaskDescriptorHandlerRepository;
-import com.bytechef.hermes.descriptor.service.TaskDescriptorHandlerService;
+import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandlerResolver;
+import com.bytechef.hermes.descriptor.model.DSL;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,22 +41,16 @@ import org.springframework.test.web.servlet.MockMvc;
 public class TaskDescriptorControllerTest {
 
     @MockBean
-    private ExtAuthenticationDescriptorHandlerRepository extAuthenticationDescriptorHandlerRepository;
-
-    @MockBean
-    private ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private JdbcTemplate jdbcTemplate;
-
-    @MockBean
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @MockBean
-    private TaskDescriptorHandlerService taskDescriptorHandlerService;
+    private TaskDescriptorHandlerResolver taskDescriptorHandlerResolver;
 
     private static final List<TaskDescriptorHandler> TASK_DESCRIPTOR_HANDLERS =
             List.of(() -> DSL.createTaskDescriptor("task1"), () -> DSL.createTaskDescriptor("task2"));
@@ -66,8 +58,8 @@ public class TaskDescriptorControllerTest {
     @Test
     public void testGetTaskDescriptor() throws Exception {
         Mockito.doReturn(TASK_DESCRIPTOR_HANDLERS.get(0))
-                .when(taskDescriptorHandlerService)
-                .getTaskDescriptorHandler(Mockito.anyString(), Mockito.anyFloat());
+                .when(taskDescriptorHandlerResolver)
+                .resolve(Mockito.anyString(), Mockito.anyFloat());
 
         mockMvc.perform(get("/task-descriptors/task1/1.0").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -85,7 +77,7 @@ public class TaskDescriptorControllerTest {
     @Test
     public void testGetTaskDescriptors() throws Exception {
         Mockito.doReturn(TASK_DESCRIPTOR_HANDLERS)
-                .when(taskDescriptorHandlerService)
+                .when(taskDescriptorHandlerResolver)
                 .getTaskDescriptorHandlers();
 
         mockMvc.perform(get("/task-descriptors").accept(MediaType.APPLICATION_JSON))

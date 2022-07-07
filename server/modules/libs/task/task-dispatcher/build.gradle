@@ -1,5 +1,6 @@
 subprojects {
     dependencies {
+        compileOnly "org.springframework:spring-context"
         compileOnly "org.springframework:spring-core"
         compileOnly "org.springframework:spring-expression"
         compileOnly project(":modules:libs:atlas:atlas-api")
@@ -10,9 +11,9 @@ subprojects {
 
         testImplementation "com.fasterxml.jackson.core:jackson-annotations"
         testImplementation "com.fasterxml.jackson.core:jackson-databind"
-        testImplementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
-        testImplementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
-        testImplementation project(":modules:libs:atlas:atlas-api")
+        testImplementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-api")
+        testImplementation project(":modules:libs:atlas:atlas-worker:atlas-worker-api")
+        testImplementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-api")
         testImplementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
         testImplementation project(":modules:libs:task:task-handler:task-handler-core")
         testImplementation project(":modules:libs:atlas:atlas-service")

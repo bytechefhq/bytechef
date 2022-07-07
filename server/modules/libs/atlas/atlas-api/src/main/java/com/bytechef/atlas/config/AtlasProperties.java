@@ -30,7 +30,6 @@ public class AtlasProperties {
     private MessageBrokerProperties messageBroker;
     private PersistenceProperties persistence;
     private SerializationProperties serialization;
-    private StorageProperties storage;
     private WorkflowRepositoryProperties workflowRepository;
     private WorkerProperties worker = new WorkerProperties();
 
@@ -64,14 +63,6 @@ public class AtlasProperties {
 
     public void setSerialization(SerializationProperties serialization) {
         this.serialization = serialization;
-    }
-
-    public StorageProperties getStorage() {
-        return storage;
-    }
-
-    public void setStorage(StorageProperties storage) {
-        this.storage = storage;
     }
 
     public WorkflowRepositoryProperties getWorkflowRepository() {

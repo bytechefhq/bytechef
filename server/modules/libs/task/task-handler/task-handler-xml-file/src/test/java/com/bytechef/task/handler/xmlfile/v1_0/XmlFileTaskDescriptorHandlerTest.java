@@ -19,10 +19,8 @@ package com.bytechef.task.handler.xmlfile.v1_0;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -87,6 +85,7 @@ public class XmlFileTaskDescriptorHandlerTest {
                     {
                       "displayName": "Options",
                       "placeholder": "Add Option",
+                      "type": "OPTION",
                       "options": [
                         {
                           "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
@@ -155,6 +154,7 @@ public class XmlFileTaskDescriptorHandlerTest {
                       "displayName": "Source",
                       "name": "source",
                       "required": true,
+                      "type": "ANY",
                       "types": [
                         {
                           "type": "ARRAY"
@@ -205,8 +205,7 @@ public class XmlFileTaskDescriptorHandlerTest {
               "version": 1
             }
             """,
-                (JSONObject) JSONParser.parseJSON(
-                        objectMapper.writeValueAsString(new XmlFileTaskDescriptorHandler().getTaskDescriptor())),
+                objectMapper.writeValueAsString(new XmlFileTaskDescriptorHandler().getTaskDescriptor()),
                 true);
     }
 }

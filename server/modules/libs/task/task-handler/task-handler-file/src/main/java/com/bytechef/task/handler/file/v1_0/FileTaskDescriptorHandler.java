@@ -16,9 +16,9 @@
 
 package com.bytechef.task.handler.file.v1_0;
 
-import static com.bytechef.hermes.descriptor.domain.DSL.FILE_ENTRY_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.OPERATION;
-import static com.bytechef.hermes.descriptor.domain.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
+import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
 import static com.bytechef.task.handler.file.FileTaskConstants.CONTENT;
 import static com.bytechef.task.handler.file.FileTaskConstants.FILE;
 import static com.bytechef.task.handler.file.FileTaskConstants.FILE_ENTRY;
@@ -27,9 +27,9 @@ import static com.bytechef.task.handler.file.FileTaskConstants.READ;
 import static com.bytechef.task.handler.file.FileTaskConstants.VERSION;
 import static com.bytechef.task.handler.file.FileTaskConstants.WRITE;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.DSL;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 import org.springframework.stereotype.Component;
 
 /**

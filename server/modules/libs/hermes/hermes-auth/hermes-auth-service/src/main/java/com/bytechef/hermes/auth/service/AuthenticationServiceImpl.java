@@ -18,18 +18,15 @@ package com.bytechef.hermes.auth.service;
 
 import com.bytechef.atlas.uuid.UUIDGenerator;
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.hermes.auth.domain.SimpleAuthentication;
 import com.bytechef.hermes.auth.repository.AuthenticationRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
-@Service
 @Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -40,24 +37,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public Authentication create(String name, String type, Map<String, Object> properties) {
-        SimpleAuthentication simpleAuthentication = new SimpleAuthentication();
+    public Authentication add(String name, String type, Map<String, Object> properties) {
+        Authentication authentication = new Authentication();
 
-        simpleAuthentication.setCreateTime(new Date());
-        simpleAuthentication.setId(UUIDGenerator.generate());
-        simpleAuthentication.setName(name);
-        simpleAuthentication.setProperties(properties);
-        simpleAuthentication.setType(type);
-        simpleAuthentication.setUpdateTime(new Date());
+        authentication.setCreateTime(new Date());
+        authentication.setId(UUIDGenerator.generate());
+        authentication.setName(name);
+        authentication.setProperties(properties);
+        authentication.setType(type);
+        authentication.setUpdateTime(new Date());
 
-        authenticationRepository.create(simpleAuthentication);
+        authenticationRepository.create(authentication);
 
-        return simpleAuthentication;
-    }
-
-    @Override
-    public void delete(String id) {
-        authenticationRepository.delete(id);
+        return authentication;
     }
 
     @Override
@@ -73,12 +65,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public void remove(String id) {
+        authenticationRepository.delete(id);
+    }
+
+    @Override
     public Authentication update(String id, String name) {
-        SimpleAuthentication simpleAuthentication = new SimpleAuthentication(authenticationRepository.findById(id));
+        Authentication authentication = authenticationRepository.findById(id);
 
-        simpleAuthentication.setName(name);
-        simpleAuthentication.setUpdateTime(new Date());
+        authentication.setName(name);
+        authentication.setUpdateTime(new Date());
 
-        return authenticationRepository.update(simpleAuthentication);
+        return authenticationRepository.update(authentication);
     }
 }

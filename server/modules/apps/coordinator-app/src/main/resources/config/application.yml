@@ -69,6 +69,10 @@ spring:
   output:
     ansi:
       console-available: true
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 1
   task:
     execution:
       thread-name-prefix: coordinator-application-task-
@@ -88,3 +92,13 @@ atlas:
     provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  workflow-repository:
+    database:
+      enabled: true
+    classpath:
+      enabled: true
+
+hermes:
+  controller:
+    host: localhost
+    port: 9666

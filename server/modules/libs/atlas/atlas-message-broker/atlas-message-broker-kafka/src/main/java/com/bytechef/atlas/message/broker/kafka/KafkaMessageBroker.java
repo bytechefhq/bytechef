@@ -34,16 +34,16 @@ public class KafkaMessageBroker implements MessageBroker {
     private KafkaTemplate<Integer, Object> kafkaTemplate;
 
     @Override
-    public void send(String aRoutingKey, Object aMessage) {
-        Assert.notNull(aRoutingKey, "routing key can't be null");
-        if (aMessage instanceof Retryable) {
-            Retryable r = (Retryable) aMessage;
+    public void send(String routingKey, Object message) {
+        Assert.notNull(routingKey, "routing key can't be null");
+        if (message instanceof Retryable) {
+            Retryable r = (Retryable) message;
             delay(r.getRetryDelayMillis());
         }
 
-        kafkaTemplate.send(MessageBuilder.withPayload(aMessage)
-                .setHeader(KafkaHeaders.TOPIC, aRoutingKey)
-                .setHeader("_type", aMessage.getClass().getName())
+        kafkaTemplate.send(MessageBuilder.withPayload(message)
+                .setHeader(KafkaHeaders.TOPIC, routingKey)
+                .setHeader("_type", message.getClass().getName())
                 .build());
     }
 

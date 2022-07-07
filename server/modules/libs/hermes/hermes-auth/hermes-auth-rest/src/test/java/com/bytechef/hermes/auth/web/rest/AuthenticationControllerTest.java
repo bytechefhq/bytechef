@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.atlas.uuid.UUIDGenerator;
-import com.bytechef.hermes.auth.domain.SimpleAuthentication;
+import com.bytechef.hermes.auth.domain.Authentication;
 import com.bytechef.hermes.auth.repository.AuthenticationRepository;
 import com.bytechef.hermes.auth.service.AuthenticationService;
 import com.bytechef.hermes.encryption.EncryptionKey;
@@ -43,7 +43,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -54,6 +53,9 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @WebMvcTest(AuthenticationController.class)
 public class AuthenticationControllerTest {
+
+    @MockBean
+    private AuthenticationService authenticationService;
 
     @MockBean
     private EncryptionKey encryptionKey;
@@ -73,49 +75,46 @@ public class AuthenticationControllerTest {
     @MockBean
     private AuthenticationRepository authenticationRepository;
 
-    @SpyBean
-    private AuthenticationService authenticationService;
-
     @Test
     public void testDeleteAuthentication() throws Exception {
         this.mockMvc.perform(delete("/authentications/1")).andExpect(status().isOk());
 
         ArgumentCaptor<String> argument = forClass(String.class);
 
-        verify(authenticationService).delete(argument.capture());
+        verify(authenticationService).remove(argument.capture());
 
         Assertions.assertEquals("1", argument.getValue());
     }
 
     @Test
     public void testGetAuthentication() throws Exception {
-        SimpleAuthentication simpleAuthentication = getSimpleAuthentication();
+        Authentication authentication = getSimpleAuthentication();
 
-        doReturn(simpleAuthentication).when(authenticationService).fetchAuthentication(anyString());
+        doReturn(authentication).when(authenticationService).fetchAuthentication(anyString());
 
         this.mockMvc
                 .perform(get("/authentications/1"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(simpleAuthentication)));
+                .andExpect(content().json(objectMapper.writeValueAsString(authentication)));
     }
 
     @Test
     public void testGetAuthentications() throws Exception {
-        SimpleAuthentication simpleAuthentication = getSimpleAuthentication();
+        Authentication authentication = getSimpleAuthentication();
 
-        doReturn(List.of(simpleAuthentication)).when(authenticationService).getAuthentications();
+        doReturn(List.of(authentication)).when(authenticationService).getAuthentications();
 
         this.mockMvc
                 .perform(get("/authentications"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(List.of(simpleAuthentication))));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(authentication))));
     }
 
     @Test
     public void testPostAuthentication() throws Exception {
-        SimpleAuthentication authentication = getSimpleAuthentication();
+        Authentication authentication = getSimpleAuthentication();
 
-        doReturn(authentication).when(authenticationService).create(anyString(), anyString(), any());
+        doReturn(authentication).when(authenticationService).add(anyString(), anyString(), any());
 
         this.mockMvc
                 .perform(post("/authentications")
@@ -130,7 +129,7 @@ public class AuthenticationControllerTest {
 
     @Test
     public void putAuthentication() throws Exception {
-        SimpleAuthentication authentication = getSimpleAuthentication();
+        Authentication authentication = getSimpleAuthentication();
 
         authentication.setName("name2");
 
@@ -151,8 +150,8 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.name", is("name2")));
     }
 
-    private static SimpleAuthentication getSimpleAuthentication() {
-        SimpleAuthentication authentication = new SimpleAuthentication();
+    private static Authentication getSimpleAuthentication() {
+        Authentication authentication = new Authentication();
 
         authentication.setName("name");
         authentication.setId(UUIDGenerator.generate());

@@ -16,19 +16,19 @@
 
 package com.bytechef.task.handler.xlsxfile;
 
-import static com.bytechef.hermes.descriptor.domain.DSL.ARRAY_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.BOOLEAN_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.DATE_TIME_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.FILE_ENTRY_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.INTEGER_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.NUMBER_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.OBJECT_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.OPERATION;
-import static com.bytechef.hermes.descriptor.domain.DSL.OPTIONS;
-import static com.bytechef.hermes.descriptor.domain.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.ARRAY_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.BOOLEAN_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.DATE_TIME_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.INTEGER_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.NUMBER_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.OBJECT_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
+import static com.bytechef.hermes.descriptor.model.DSL.OPTIONS;
+import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
+import com.bytechef.hermes.descriptor.model.DSL;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 
 /**
  * @author Ivica Cardic

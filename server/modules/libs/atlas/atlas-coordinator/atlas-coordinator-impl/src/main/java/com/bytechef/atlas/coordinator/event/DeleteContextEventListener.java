@@ -17,12 +17,12 @@
 package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.context.service.ContextService;
 import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.atlas.job.service.JobService;
+import com.bytechef.atlas.service.context.ContextService;
+import com.bytechef.atlas.service.job.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

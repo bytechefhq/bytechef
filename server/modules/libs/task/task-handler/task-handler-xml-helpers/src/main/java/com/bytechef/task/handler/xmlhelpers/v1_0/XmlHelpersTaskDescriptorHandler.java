@@ -16,15 +16,15 @@
 
 package com.bytechef.task.handler.xmlhelpers.v1_0;
 
-import static com.bytechef.hermes.descriptor.domain.DSL.ANY_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.ARRAY_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.OBJECT_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.OPERATION;
-import static com.bytechef.hermes.descriptor.domain.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.ANY_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.ARRAY_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.OBJECT_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
+import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.DSL;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 import com.bytechef.task.handler.xmlhelpers.XmlHelpersTaskConstants;
 import org.springframework.stereotype.Component;
 

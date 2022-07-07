@@ -19,10 +19,8 @@ package com.bytechef.task.handler.xmlhelpers.v1_0;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -49,11 +47,11 @@ public class XmlHelpersTaskDescriptorHandlerTest {
                   "name": "xmlParse",
                   "inputs": [
                     {
+                      "type": "STRING",
                       "description": "The XML string to convert to the data.",
                       "displayName": "Source",
                       "name": "source",
-                      "required": true,
-                      "type": "STRING"
+                      "required": true
                     }
                   ],
                   "outputs": [
@@ -68,6 +66,7 @@ public class XmlHelpersTaskDescriptorHandlerTest {
                   "name": "xmlStringify",
                   "inputs": [
                     {
+                      "type": "ANY",
                       "description": "The data to convert to XML string.",
                       "displayName": "Source",
                       "name": "source",
@@ -93,8 +92,7 @@ public class XmlHelpersTaskDescriptorHandlerTest {
               "version": 1
             }
             """,
-                (JSONObject) JSONParser.parseJSON(
-                        objectMapper.writeValueAsString(new XmlHelpersTaskDescriptorHandler().getTaskDescriptor())),
+                objectMapper.writeValueAsString(new XmlHelpersTaskDescriptorHandler().getTaskDescriptor()),
                 true);
     }
 }

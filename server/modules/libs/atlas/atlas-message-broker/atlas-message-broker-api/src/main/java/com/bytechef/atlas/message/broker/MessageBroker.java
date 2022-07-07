@@ -27,9 +27,9 @@ package com.bytechef.atlas.message.broker;
  */
 public interface MessageBroker {
     /**
-     * @param aRoutingKey a string representaiton used for routing the message to the appropriate
+     * @param routingKey a string representaiton used for routing the message to the appropriate
      *     destination.
-     * @param aMessage The message to send.
+     * @param message The message to send.
      */
-    void send(String aRoutingKey, Object aMessage);
+    void send(String routingKey, Object message);
 }

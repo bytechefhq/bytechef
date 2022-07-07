@@ -23,7 +23,6 @@ springBoot {
 }
 
 dependencies {
-    implementation "org.springframework.boot:spring-boot-starter-activemq"
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-amqp"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
@@ -31,15 +30,14 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.kafka:spring-kafka"
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
+    implementation project(":modules:libs:atlas:atlas-config")
+    implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-config")
     implementation project(":modules:libs:atlas:atlas-event:atlas-event-impl")
     implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
+    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-coordinator")
     implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
-    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-git")
-    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-jdbc")
-    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-resource")
-    implementation project(":modules:libs:atlas:atlas-service")
-    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
+    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-rest")
+    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-ext:hermes-descriptor-ext-client")
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":modules:libs:task:task-dispatcher:task-dispatcher-each")
     implementation project(":modules:libs:task:task-dispatcher:task-dispatcher-fork")
