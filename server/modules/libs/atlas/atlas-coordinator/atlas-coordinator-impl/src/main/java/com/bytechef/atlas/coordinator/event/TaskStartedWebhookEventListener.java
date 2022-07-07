@@ -21,6 +21,7 @@ package com.bytechef.atlas.coordinator.event;
 import com.bytechef.atlas.Accessor;
 import com.bytechef.atlas.Constants;
 import com.bytechef.atlas.MapObject;
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.job.domain.Job;
@@ -64,9 +65,9 @@ public class TaskStartedWebhookEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent aEvent) {
-        if (aEvent.getType().equals(Events.TASK_STARTED)) {
-            handleEvent(aEvent);
+    public void onApplicationEvent(WorkflowEvent workflowEvent) {
+        if (workflowEvent.getType().equals(Events.TASK_STARTED)) {
+            handleEvent(workflowEvent);
         }
     }
 }

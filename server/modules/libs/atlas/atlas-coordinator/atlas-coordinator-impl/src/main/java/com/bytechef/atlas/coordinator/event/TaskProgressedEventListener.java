@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.service.task.execution.TaskExecutionService;
@@ -41,10 +42,10 @@ public class TaskProgressedEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent aEvent) {
-        if (Events.TASK_PROGRESSED.equals(aEvent.getType())) {
-            String taskId = aEvent.getString("taskId");
-            int progress = aEvent.getInteger("progress", 0);
+    public void onApplicationEvent(WorkflowEvent workflowEvent) {
+        if (Events.TASK_PROGRESSED.equals(workflowEvent.getType())) {
+            String taskId = workflowEvent.getString("taskId");
+            int progress = workflowEvent.getInteger("progress", 0);
 
             TaskExecution task = taskExecutionService.getTaskExecution(taskId);
 

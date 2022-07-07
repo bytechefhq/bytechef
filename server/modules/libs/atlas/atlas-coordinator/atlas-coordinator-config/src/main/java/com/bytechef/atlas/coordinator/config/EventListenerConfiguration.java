@@ -18,9 +18,9 @@
 
 package com.bytechef.atlas.coordinator.config;
 
-import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.coordinator.event.EventListenerChain;
 import com.bytechef.atlas.coordinator.event.LogEventListener;
+import com.bytechef.atlas.event.EventListener;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

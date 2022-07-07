@@ -19,7 +19,7 @@ package com.bytechef.atlas.message.broker.coordinator.config;
 import com.bytechef.atlas.config.AtlasProperties;
 import com.bytechef.atlas.config.CoordinatorProperties;
 import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.coordinator.event.EventListener;
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import org.springframework.beans.BeansException;

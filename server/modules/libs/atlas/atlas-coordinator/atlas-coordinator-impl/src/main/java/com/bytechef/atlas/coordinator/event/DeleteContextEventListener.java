@@ -17,6 +17,7 @@
 package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.Constants;
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.job.JobStatus;

@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.WorkflowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class LogEventListener implements EventListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void onApplicationEvent(WorkflowEvent aEvent) {
-        logger.debug("{}", aEvent);
+    public void onApplicationEvent(WorkflowEvent workflowEvent) {
+        logger.debug("{}", workflowEvent);
     }
 }

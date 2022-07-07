@@ -17,8 +17,8 @@
 package com.bytechef;
 
 import com.bytechef.atlas.MapObject;
-import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.coordinator.event.EventListenerChain;
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;

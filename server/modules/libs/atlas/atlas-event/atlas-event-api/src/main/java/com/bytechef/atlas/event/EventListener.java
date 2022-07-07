@@ -16,14 +16,12 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.coordinator.event;
-
-import com.bytechef.atlas.event.WorkflowEvent;
+package com.bytechef.atlas.event;
 
 /**
  * @author Arik Cohen
  * @since Jun 9, 2017
  */
 public interface EventListener {
-    void onApplicationEvent(WorkflowEvent aEvent);
+    void onApplicationEvent(WorkflowEvent workflowEvent);
 }
