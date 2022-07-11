@@ -17,6 +17,7 @@
 package com.bytechef.task.handler.file.v1_0;
 
 import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
+import static com.bytechef.task.handler.file.FileTaskConstants.*;
 import static com.bytechef.task.handler.file.FileTaskConstants.CONTENT;
 import static com.bytechef.task.handler.file.FileTaskConstants.FILE;
 import static com.bytechef.task.handler.file.FileTaskConstants.READ;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 public class FileTaskHandler {
 
-    @Component(FILE + "/" + READ + "/" + FileTaskConstants.VERSION)
+    @Component(FILE + "/" + READ + "/" + VERSION)
     public static class FileReadTaskHandler implements TaskHandler<String> {
 
         private final FileStorageHelper fileStorageHelper;
@@ -49,7 +50,7 @@ public class FileTaskHandler {
         }
     }
 
-    @Component(FILE + "/" + WRITE + "/" + FileTaskConstants.VERSION)
+    @Component(FILE + "/" + WRITE + "/" + VERSION)
     public static class FileWriteTaskHandler implements TaskHandler<Object> {
 
         private final FileStorageHelper fileStorageHelper;
