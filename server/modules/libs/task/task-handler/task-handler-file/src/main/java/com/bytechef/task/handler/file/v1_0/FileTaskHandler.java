@@ -27,7 +27,6 @@ import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.task.commons.file.storage.FileStorageHelper;
-import com.bytechef.task.handler.file.FileTaskConstants;
 import org.springframework.stereotype.Component;
 
 /**
