@@ -33,7 +33,7 @@ class Cast<T> implements MethodExecutor {
 
     private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
 
-    private final Class<T> type;
+    private final transient Class<T> type;
 
     Cast(Class<T> aType) {
         type = aType;

@@ -52,14 +52,14 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  */
 public class SpelTaskEvaluator implements TaskEvaluator {
 
-    private final ExpressionParser parser = new SpelExpressionParser();
+    private final transient ExpressionParser parser = new SpelExpressionParser();
 
     private static final String PREFIX = "${";
     private static final String SUFFIX = "}";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final transient Logger logger = LoggerFactory.getLogger(SpelTaskEvaluator.class);
 
-    private final Map<String, MethodExecutor> methodExecutors;
+    private final transient Map<String, MethodExecutor> methodExecutors;
 
     private SpelTaskEvaluator(Builder aBuilder) {
         Map<String, MethodExecutor> map = new HashMap<>();
@@ -83,7 +83,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         map.put("timestamp", new Timestamp());
         map.put("now", new Now());
         map.put("dateFormat", new DateFormat());
-        map.put("config", new Config(aBuilder.environment));
+        map.put("config", new Config(aBuilder.aEnvironment));
         map.putAll(aBuilder.methodExecutors);
         methodExecutors = Collections.unmodifiableMap(map);
     }
@@ -103,27 +103,31 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         return newMap;
     }
 
+    private String evaluate(CompositeStringExpression compositeStringExpression, Context aContext) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Expression[] subExpressions = compositeStringExpression.getExpressions();
+        for (Expression subExpression : subExpressions) {
+            if (subExpression instanceof LiteralExpression) {
+                stringBuilder.append(subExpression.getValue());
+                continue;
+            } else if (subExpression instanceof SpelExpression) {
+                stringBuilder.append(evaluate(PREFIX + subExpression.getExpressionString() + SUFFIX, aContext));
+                continue;
+            }
+            throw new IllegalArgumentException(
+                    "unknown expression type: " + subExpression.getClass().getName());
+        }
+        return stringBuilder.toString();
+    }
+
     private Object evaluate(Object aValue, Context aContext) {
-        StandardEvaluationContext context = createEvaluationContext(aContext);
         if (aValue instanceof String) {
             Expression expr = parser.parseExpression((String) aValue, new TemplateParserContext(PREFIX, SUFFIX));
             if (expr instanceof CompositeStringExpression) { // attempt partial evaluation
-                StringBuilder value = new StringBuilder();
-                Expression[] subExpressions = ((CompositeStringExpression) expr).getExpressions();
-                for (Expression subExpression : subExpressions) {
-                    if (subExpression instanceof LiteralExpression) {
-                        value.append(subExpression.getValue());
-                    } else if (subExpression instanceof SpelExpression) {
-                        value.append(evaluate(PREFIX + subExpression.getExpressionString() + SUFFIX, aContext));
-                    } else {
-                        throw new IllegalArgumentException("unknown expression type: "
-                                + subExpression.getClass().getName());
-                    }
-                }
-                return value.toString();
+                return evaluate((CompositeStringExpression) expr, aContext);
             } else {
                 try {
-                    return (expr.getValue(context));
+                    return (expr.getValue(createEvaluationContext(aContext)));
                 } catch (SpelEvaluationException e) {
                     if (logger.isTraceEnabled()) {
                         logger.trace(e.getMessage());
@@ -169,11 +173,11 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
     public static class Builder {
 
-        private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
-        private Environment environment = new EmptyEnvironment();
+        private final transient Map<String, MethodExecutor> methodExecutors = new HashMap<>();
+        private transient Environment aEnvironment;
 
         public Builder environment(Environment aEnvironment) {
-            environment = aEnvironment;
+            this.aEnvironment = aEnvironment;
             return this;
         }
 

@@ -32,7 +32,7 @@ import org.springframework.core.io.Resource;
 public class WorkflowResource implements Resource {
 
     private final String id;
-    private final Resource resource;
+    private final transient Resource resource;
     private final WorkflowFormat workflowFormat;
 
     public WorkflowResource(String id, Resource resource, WorkflowFormat workflowFormat) {
