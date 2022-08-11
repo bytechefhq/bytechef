@@ -20,6 +20,7 @@ package com.bytechef.atlas.task.execution.evaluator.spel;
 
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Arik Cohen
@@ -33,43 +34,45 @@ class EmptyEnvironment implements Environment {
     }
 
     @Override
+    @Nullable
     public String getProperty(String aKey) {
         return null;
     }
 
     @Override
     public String getProperty(String aKey, String aDefaultValue) {
-        return null;
+        return aDefaultValue;
     }
 
     @Override
+    @Nullable
     public <T> T getProperty(String aKey, Class<T> aTargetType) {
         return null;
     }
 
     @Override
     public <T> T getProperty(String aKey, Class<T> aTargetType, T aDefaultValue) {
-        return null;
+        throw new UnsupportedOperationException("Unsupported call for " + getClass());
     }
 
     @Override
     public String getRequiredProperty(String aKey) throws IllegalStateException {
-        return null;
+        throw new UnsupportedOperationException("Unsupported call for " + getClass());
     }
 
     @Override
     public <T> T getRequiredProperty(String aKey, Class<T> aTargetType) throws IllegalStateException {
-        return null;
+        throw new UnsupportedOperationException("Unsupported call for " + getClass());
     }
 
     @Override
     public String resolvePlaceholders(String aText) {
-        return null;
+        throw new UnsupportedOperationException("Unsupported call for " + getClass());
     }
 
     @Override
     public String resolveRequiredPlaceholders(String aText) throws IllegalArgumentException {
-        return null;
+        throw new UnsupportedOperationException("Unsupported call for " + getClass());
     }
 
     @Override

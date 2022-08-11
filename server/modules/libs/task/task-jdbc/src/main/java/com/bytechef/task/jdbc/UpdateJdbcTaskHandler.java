@@ -30,6 +30,7 @@ import java.util.Map;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionException;
 
 /**
  * @author Ivica Cardic
@@ -41,7 +42,7 @@ public class UpdateJdbcTaskHandler extends AbstractJdbcTaskHandler implements Ta
     }
 
     @Override
-    public Map<String, Integer> handle(TaskExecution taskExecution) throws Exception {
+    public Map<String, Integer> handle(TaskExecution taskExecution) throws TransactionException {
         List<String> columns = taskExecution.getList(COLUMNS, String.class, List.of());
         List<Map<String, ?>> rows = taskExecution.get(ROWS, List.class, List.of());
         String schema = taskExecution.getString(SCHEMA, "public");

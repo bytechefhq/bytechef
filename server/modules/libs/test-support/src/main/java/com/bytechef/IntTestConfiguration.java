@@ -53,7 +53,7 @@ public class IntTestConfiguration {
     @EnableCaching
     @EnableConfigurationProperties(CacheProperties.class)
     @TestConfiguration
-    public class CacheConfiguration {}
+    public static class CacheConfiguration {}
 
     @TestConfiguration
     public static class EncryptionKeyConfiguration {
