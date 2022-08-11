@@ -30,6 +30,7 @@ import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.VERSION_1
 import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.WRITE;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.task.commons.file.storage.FileStorageHelper;
@@ -38,6 +39,7 @@ import com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.FileType;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -66,7 +68,7 @@ public class JsonFileTaskHandler {
 
         @Override
         @SuppressWarnings("unchecked")
-        public Object handle(TaskExecution taskExecution) throws Exception {
+        public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
             Object result;
 
             FileType fileType = getFileType(taskExecution);
@@ -92,6 +94,8 @@ public class JsonFileTaskHandler {
                                 .lines()
                                 .map(line -> (Map<String, ?>) jsonHelper.read(line, Map.class))
                                 .collect(Collectors.toList());
+                    } catch (IOException ioException) {
+                        throw new TaskExecutionException("Unable to open json file " + taskExecution, ioException);
                     }
                 }
 
@@ -133,7 +137,7 @@ public class JsonFileTaskHandler {
 
         @Override
         @SuppressWarnings("unchecked")
-        public FileEntry handle(TaskExecution taskExecution) throws Exception {
+        public FileEntry handle(TaskExecution taskExecution) throws TaskExecutionException {
             FileType fileType = getFileType(taskExecution);
             Object source = taskExecution.getRequired(SOURCE);
 
@@ -153,6 +157,8 @@ public class JsonFileTaskHandler {
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
                 return fileStorageHelper.storeFileContent(taskExecution, getDefaultFileName(fileType), inputStream);
+            } catch (IOException ioException) {
+                throw new TaskExecutionException("Unable to create json file", ioException);
             }
         }
 

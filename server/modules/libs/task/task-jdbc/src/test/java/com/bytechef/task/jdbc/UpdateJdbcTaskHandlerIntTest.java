@@ -64,7 +64,7 @@ public class UpdateJdbcTaskHandlerIntTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    public void testUpdate() {
         TaskExecution taskExecution = new SimpleTaskExecution(Map.of(
                 "table", "test", "columns", List.of("name"), "rows", List.of(Map.of("id", "id2", "name", "name3"))));
 

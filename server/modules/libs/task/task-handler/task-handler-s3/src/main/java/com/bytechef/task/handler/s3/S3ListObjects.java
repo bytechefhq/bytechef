@@ -38,7 +38,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 class S3ListObjects implements TaskHandler<List<S3ObjectDescription>> {
 
     @Override
-    public List<S3ObjectDescription> handle(TaskExecution aTask) throws Exception {
+    public List<S3ObjectDescription> handle(TaskExecution aTask) {
         S3Client s3 = S3Client.builder().build();
 
         ListObjectsResponse response = s3.listObjects(ListObjectsRequest.builder()

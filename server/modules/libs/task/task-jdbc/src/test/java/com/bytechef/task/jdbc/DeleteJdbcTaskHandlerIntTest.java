@@ -62,7 +62,7 @@ public class DeleteJdbcTaskHandlerIntTest {
     }
 
     @Test
-    public void testDelete() throws Exception {
+    public void testDelete() {
         TaskExecution taskExecution = new SimpleTaskExecution(
                 Map.of("table", "test", "rows", List.of(Map.of("id", "id1"), Map.of("id", "id2"))));
 

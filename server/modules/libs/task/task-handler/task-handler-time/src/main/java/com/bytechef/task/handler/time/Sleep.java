@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.time;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Component;
@@ -30,13 +31,17 @@ import org.springframework.stereotype.Component;
 public class Sleep implements TaskHandler<Object> {
 
     @Override
-    public Object handle(TaskExecution aTask) throws InterruptedException {
-        if (aTask.containsKey("millis")) {
-            Thread.sleep(aTask.getLong("millis"));
-        } else if (aTask.containsKey("duration")) {
-            Thread.sleep(aTask.getDuration("duration").toMillis());
-        } else {
-            TimeUnit.SECONDS.sleep(1);
+    public Object handle(TaskExecution aTask) throws TaskExecutionException {
+        try {
+            if (aTask.containsKey("millis")) {
+                Thread.sleep(aTask.getLong("millis"));
+            } else if (aTask.containsKey("duration")) {
+                Thread.sleep(aTask.getDuration("duration").toMillis());
+            } else {
+                TimeUnit.SECONDS.sleep(1);
+            }
+        } catch (InterruptedException interruptedException) {
+            throw new TaskExecutionException("Unable to handle task " + aTask, interruptedException);
         }
         return null;
     }

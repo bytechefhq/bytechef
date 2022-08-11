@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.media;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ class Vsplit implements TaskHandler<List<Map<String, Object>>> {
     private static final int MIN_CHUNK_SIZE = 5;
 
     @Override
-    public List<Map<String, Object>> handle(TaskExecution aTask) throws Exception {
+    public List<Map<String, Object>> handle(TaskExecution aTask) throws TaskExecutionException {
         List<Map<String, Object>> chunks = new ArrayList<>();
         Double duration = vduration.handle(aTask);
         Double frate = framerate.handle(aTask);

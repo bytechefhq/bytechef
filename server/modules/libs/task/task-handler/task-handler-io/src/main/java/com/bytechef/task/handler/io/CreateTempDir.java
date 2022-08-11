@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.io;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.io.File;
 import java.io.IOException;
@@ -34,11 +35,15 @@ import org.springframework.stereotype.Component;
 class CreateTempDir implements TaskHandler<String> {
 
     @Override
-    public String handle(TaskExecution aTask) throws IOException {
-        Path path = Files.createTempDirectory("createTempDir_");
+    public String handle(TaskExecution aTask) throws TaskExecutionException {
+        try {
+            Path path = Files.createTempDirectory("createTempDir_");
 
-        File file = path.toFile();
+            File file = path.toFile();
 
-        return file.getAbsolutePath();
+            return file.getAbsolutePath();
+        } catch (IOException ioException) {
+            throw new TaskExecutionException("Unable to create temorary directory " + aTask, ioException);
+        }
     }
 }

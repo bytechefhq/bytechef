@@ -21,7 +21,6 @@ package com.bytechef.task.handler.io;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.io.File;
-import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -39,7 +38,7 @@ import org.springframework.util.Assert;
 class Rm implements TaskHandler<Object> {
 
     @Override
-    public Object handle(TaskExecution aTask) throws IOException {
+    public Object handle(TaskExecution aTask) {
         File file = new File(aTask.getRequiredString("path"));
         if (!file.exists()) {
             return null;

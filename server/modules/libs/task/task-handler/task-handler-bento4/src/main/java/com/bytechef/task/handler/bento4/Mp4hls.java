@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.bento4;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.util.List;
 import org.apache.commons.exec.CommandLine;
@@ -38,14 +39,20 @@ class Mp4hls implements TaskHandler<Object> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public Object handle(TaskExecution aTask) throws Exception {
+    public Object handle(TaskExecution aTask) throws TaskExecutionException {
         List<String> options = aTask.getList("options", String.class);
         CommandLine cmd = new CommandLine("mp4hls");
         options.forEach(o -> cmd.addArgument(o));
         logger.debug("{}", cmd);
         DefaultExecutor exec = new DefaultExecutor();
-        int exitValue = exec.execute(cmd);
-        Assert.isTrue(exitValue == 0, "exit value: " + exitValue);
+
+        try {
+            int exitValue = exec.execute(cmd);
+            Assert.isTrue(exitValue == 0, "exit value: " + exitValue);
+        } catch (Exception exception) {
+            throw new TaskExecutionException("Unable to execute " + aTask, exception);
+        }
+
         return null;
     }
 }

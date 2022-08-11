@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.shell;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.io.File;
 import java.io.PrintStream;
@@ -43,28 +44,32 @@ class Bash implements TaskHandler<String> {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String handle(TaskExecution aTask) throws Exception {
-        File scriptFile = File.createTempFile("_script", ".sh");
-        File logFile = File.createTempFile("log", null);
-        FileUtils.writeStringToFile(scriptFile, aTask.getRequiredString("script"));
-        try (PrintStream stream = new PrintStream(logFile); ) {
-            Process chmod = Runtime.getRuntime().exec(String.format("chmod u+x %s", scriptFile.getAbsolutePath()));
-            int chmodRetCode = chmod.waitFor();
-            if (chmodRetCode != 0) {
-                throw new ExecuteException("Failed to chmod", chmodRetCode);
+    public String handle(TaskExecution aTask) throws TaskExecutionException {
+        try {
+            File scriptFile = File.createTempFile("_script", ".sh");
+            File logFile = File.createTempFile("log", null);
+            FileUtils.writeStringToFile(scriptFile, aTask.getRequiredString("script"));
+            try (PrintStream stream = new PrintStream(logFile); ) {
+                Process chmod = Runtime.getRuntime().exec(String.format("chmod u+x %s", scriptFile.getAbsolutePath()));
+                int chmodRetCode = chmod.waitFor();
+                if (chmodRetCode != 0) {
+                    throw new ExecuteException("Failed to chmod", chmodRetCode);
+                }
+                CommandLine cmd = new CommandLine(scriptFile.getAbsolutePath());
+                logger.debug("{}", cmd);
+                DefaultExecutor exec = new DefaultExecutor();
+                exec.setStreamHandler(new PumpStreamHandler(stream));
+                exec.execute(cmd);
+                return FileUtils.readFileToString(logFile);
+            } catch (ExecuteException e) {
+                throw new ExecuteException(
+                        e.getMessage(), e.getExitValue(), new RuntimeException(FileUtils.readFileToString(logFile)));
+            } finally {
+                FileUtils.deleteQuietly(logFile);
+                FileUtils.deleteQuietly(scriptFile);
             }
-            CommandLine cmd = new CommandLine(scriptFile.getAbsolutePath());
-            logger.debug("{}", cmd);
-            DefaultExecutor exec = new DefaultExecutor();
-            exec.setStreamHandler(new PumpStreamHandler(stream));
-            exec.execute(cmd);
-            return FileUtils.readFileToString(logFile);
-        } catch (ExecuteException e) {
-            throw new ExecuteException(
-                    e.getMessage(), e.getExitValue(), new RuntimeException(FileUtils.readFileToString(logFile)));
-        } finally {
-            FileUtils.deleteQuietly(logFile);
-            FileUtils.deleteQuietly(scriptFile);
+        } catch (Exception exception) {
+            throw new TaskExecutionException("Unable to handle task " + aTask, exception);
         }
     }
 }

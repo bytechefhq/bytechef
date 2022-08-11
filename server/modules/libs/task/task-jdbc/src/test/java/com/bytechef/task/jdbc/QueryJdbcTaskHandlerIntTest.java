@@ -62,7 +62,7 @@ public class QueryJdbcTaskHandlerIntTest {
     }
 
     @Test
-    public void testQuery() throws Exception {
+    public void testQuery() {
         TaskExecution taskExecution = new SimpleTaskExecution(
                 Map.of("query", "SELECT count(*) FROM test where id=:id", "parameters", Map.of("id", "id2")));
 

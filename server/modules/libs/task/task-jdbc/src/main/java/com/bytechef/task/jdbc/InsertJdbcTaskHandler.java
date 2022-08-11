@@ -35,7 +35,7 @@ public class InsertJdbcTaskHandler extends AbstractJdbcTaskHandler implements Ta
     }
 
     @Override
-    public Map<String, Integer> handle(TaskExecution taskExecution) throws Exception {
+    public Map<String, Integer> handle(TaskExecution taskExecution) {
         List<String> columns = taskExecution.getList(JdbcTaskConstants.COLUMNS, String.class, List.of());
         List<Map<String, ?>> rows = taskExecution.get(JdbcTaskConstants.ROWS, List.class, List.of());
         String schema = taskExecution.getString(JdbcTaskConstants.SCHEMA, "public");

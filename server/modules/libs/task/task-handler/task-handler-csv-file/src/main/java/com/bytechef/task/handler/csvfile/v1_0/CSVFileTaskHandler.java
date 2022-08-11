@@ -17,6 +17,7 @@
 package com.bytechef.task.handler.csvfile.v1_0;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.task.commons.file.storage.FileStorageHelper;
@@ -56,9 +57,7 @@ class CSVFileTaskHandler {
         }
 
         @Override
-        public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
-            List<Map<String, ?>> result;
-
+        public List<Map<String, ?>> handle(TaskExecution taskExecution) throws TaskExecutionException {
             String delimiter = taskExecution.getString(CSVFileTaskConstants.DELIMITER, ",");
             boolean headerRow = taskExecution.getBoolean(CSVFileTaskConstants.HEADER_ROW, true);
             boolean includeEmptyCells = taskExecution.getBoolean(CSVFileTaskConstants.INCLUDE_EMPTY_CELLS, false);
@@ -76,7 +75,7 @@ class CSVFileTaskHandler {
                     rangeEndRow = rangeStartRow + pageSize;
                 }
 
-                result = read(
+                return read(
                         inputStream,
                         new ReadConfiguration(
                                 delimiter,
@@ -85,9 +84,9 @@ class CSVFileTaskHandler {
                                 rangeStartRow == null ? 0 : rangeStartRow,
                                 rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
                                 readAsString));
+            } catch (IOException ioException) {
+                throw new TaskExecutionException("Unable to stream CSV file", ioException);
             }
-
-            return result;
         }
 
         private List<Map<String, ?>> read(InputStream inputStream, ReadConfiguration configuration) throws IOException {

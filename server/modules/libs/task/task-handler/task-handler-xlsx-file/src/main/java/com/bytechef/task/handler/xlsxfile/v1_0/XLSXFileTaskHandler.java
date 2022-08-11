@@ -27,6 +27,7 @@ import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.ROWS;
 import static com.bytechef.task.handler.xlsxfile.XLSXFileTaskConstants.SHEET_NAME;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.task.commons.file.storage.FileStorageHelper;
@@ -77,7 +78,7 @@ public class XLSXFileTaskHandler {
         }
 
         @Override
-        public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
+        public List<Map<String, ?>> handle(TaskExecution taskExecution) throws TaskExecutionException {
             FileEntry fileEntry = taskExecution.getRequired(FILE_ENTRY, FileEntry.class);
             boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
             boolean includeEmptyCells = taskExecution.getBoolean(INCLUDE_EMPTY_CELLS, false);
@@ -110,6 +111,8 @@ public class XLSXFileTaskHandler {
                                 rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
                                 readAsString,
                                 sheetName));
+            } catch (IOException ioException) {
+                throw new TaskExecutionException("Unable to handle task " + taskExecution, ioException);
             }
         }
 
@@ -268,14 +271,18 @@ public class XLSXFileTaskHandler {
         }
 
         @Override
-        public FileEntry handle(TaskExecution taskExecution) throws Exception {
+        public FileEntry handle(TaskExecution taskExecution) throws TaskExecutionException {
             String fileName = taskExecution.getString(FILE_NAME, getaDefaultFileName());
             List<Map<String, ?>> rows = taskExecution.getRequired(ROWS);
 
             String sheetName = taskExecution.get(SHEET_NAME, String.class, "Sheet");
 
-            return fileStorageHelper.storeFileContent(
-                    fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
+            try {
+                return fileStorageHelper.storeFileContent(
+                        fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
+            } catch (IOException ioException) {
+                throw new TaskExecutionException("Unable to handle task " + taskExecution, ioException);
+            }
         }
 
         private String getaDefaultFileName() {

@@ -58,7 +58,7 @@ public class InsertJdbcTaskHandlerIntTest {
     }
 
     @Test
-    public void testInsert() throws Exception {
+    public void testInsert() {
         TaskExecution taskExecution = new SimpleTaskExecution(Map.of(
                 "table",
                 "test",

@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas;
 
+import com.bytechef.atlas.exception.ProcessingException;
 import com.bytechef.atlas.task.SimpleWorkflowTask;
 import com.bytechef.atlas.task.WorkflowTask;
 import java.lang.reflect.Array;
@@ -235,8 +236,8 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
         if (value instanceof String) {
             try {
                 return DateUtils.parseDate((String) value, TIMESTAMP_FORMAT);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
+            } catch (ParseException parseException) {
+                throw new ProcessingException("Unable to read date property " + aKey, parseException);
             }
         }
         return (Date) value;

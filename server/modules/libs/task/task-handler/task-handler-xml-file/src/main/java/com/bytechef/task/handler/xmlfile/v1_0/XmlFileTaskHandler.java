@@ -27,6 +27,7 @@ import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.WRITE;
 import static com.bytechef.task.handler.xmlfile.XmlFileTaskConstants.XML_FILE;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.task.commons.file.storage.FileStorageHelper;
@@ -35,6 +36,7 @@ import com.bytechef.task.handler.xmlfile.XmlFileTaskConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
@@ -116,7 +118,7 @@ public class XmlFileTaskHandler {
         }
 
         @Override
-        public FileEntry handle(TaskExecution taskExecution) throws Exception {
+        public FileEntry handle(TaskExecution taskExecution) throws TaskExecutionException {
             Object source = taskExecution.getRequired(SOURCE);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -127,6 +129,8 @@ public class XmlFileTaskHandler {
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
                 return fileStorageHelper.storeFileContent(taskExecution, "file.xml", inputStream);
+            } catch (IOException ioException) {
+                throw new TaskExecutionException("Unable to handle task " + taskExecution, ioException);
             }
         }
     }

@@ -59,7 +59,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     }
 
     @Override
-    public List<?> handle(TaskExecution aTask) throws Exception {
+    public List<?> handle(TaskExecution aTask) {
         List<Object> result = new ArrayList<>();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();

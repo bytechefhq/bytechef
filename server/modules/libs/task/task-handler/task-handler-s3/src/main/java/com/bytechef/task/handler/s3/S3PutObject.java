@@ -36,7 +36,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 class S3PutObject implements TaskHandler<Object> {
 
     @Override
-    public Object handle(TaskExecution aTask) throws Exception {
+    public Object handle(TaskExecution aTask) {
         AmazonS3URI s3Uri = new AmazonS3URI(aTask.getRequiredString("uri"));
 
         String bucketName = s3Uri.getBucket();

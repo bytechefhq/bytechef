@@ -32,7 +32,7 @@ public class ExecuteJdbcTaskHandler extends AbstractJdbcTaskHandler implements T
     }
 
     @Override
-    public Map<String, Integer> handle(TaskExecution taskExecution) throws Exception {
+    public Map<String, Integer> handle(TaskExecution taskExecution) {
         String executeStatement = taskExecution.getRequiredString(JdbcTaskConstants.EXECUTE);
         Map<String, ?> paramMap = taskExecution.getMap(JdbcTaskConstants.PARAMETERS, Map.of());
 

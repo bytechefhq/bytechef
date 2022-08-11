@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.media;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -48,7 +49,7 @@ class Ffprobe implements TaskHandler<Map<String, Object>> {
     private final ObjectMapper json = new ObjectMapper();
 
     @Override
-    public Map<String, Object> handle(TaskExecution aTask) throws Exception {
+    public Map<String, Object> handle(TaskExecution aTask) throws TaskExecutionException {
         CommandLine cmd = new CommandLine("ffprobe");
         cmd.addArgument("-v")
                 .addArgument("quiet")
@@ -60,16 +61,27 @@ class Ffprobe implements TaskHandler<Map<String, Object>> {
                 .addArgument(aTask.getRequiredString("input"));
         log.debug("{}", cmd);
         DefaultExecutor exec = new DefaultExecutor();
-        File tempFile = File.createTempFile("log", null);
-        try (PrintStream stream = new PrintStream(tempFile); ) {
-            exec.setStreamHandler(new PumpStreamHandler(stream));
-            exec.execute(cmd);
-            return parse(FileUtils.readFileToString(tempFile));
-        } catch (ExecuteException e) {
-            throw new ExecuteException(
-                    e.getMessage(), e.getExitValue(), new RuntimeException(FileUtils.readFileToString(tempFile)));
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("log", null);
+            try (PrintStream stream = new PrintStream(tempFile); ) {
+                exec.setStreamHandler(new PumpStreamHandler(stream));
+                exec.execute(cmd);
+                return parse(FileUtils.readFileToString(tempFile));
+            } catch (ExecuteException e) {
+                throw new TaskExecutionException(
+                        "Unable to execute task " + aTask,
+                        new ExecuteException(
+                                e.getMessage(),
+                                e.getExitValue(),
+                                new RuntimeException(FileUtils.readFileToString(tempFile))));
+            }
+        } catch (Exception exception) {
+            throw new TaskExecutionException("Unable to handle task " + aTask, exception);
         } finally {
-            FileUtils.deleteQuietly(tempFile);
+            if (tempFile != null) {
+                FileUtils.deleteQuietly(tempFile);
+            }
         }
     }
 

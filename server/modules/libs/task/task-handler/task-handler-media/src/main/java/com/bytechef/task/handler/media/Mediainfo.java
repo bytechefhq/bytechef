@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.media;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -40,15 +41,19 @@ class Mediainfo implements TaskHandler<Map<?, ?>> {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public Map<?, ?> handle(TaskExecution aTask) throws Exception {
-        String output = new ProcessExecutor()
-                .command(List.of("mediainfo", "--Output=JSON", aTask.getRequiredString("input")))
-                .readOutput(true)
-                .execute()
-                .outputUTF8();
+    public Map<?, ?> handle(TaskExecution aTask) throws TaskExecutionException {
+        try {
+            String output = new ProcessExecutor()
+                    .command(List.of("mediainfo", "--Output=JSON", aTask.getRequiredString("input")))
+                    .readOutput(true)
+                    .execute()
+                    .outputUTF8();
 
-        log.debug("{}", output);
+            log.debug("{}", output);
 
-        return mapper.readValue(output, Map.class);
+            return mapper.readValue(output, Map.class);
+        } catch (Exception exception) {
+            throw new TaskExecutionException("Unable to handle " + aTask, exception);
+        }
     }
 }

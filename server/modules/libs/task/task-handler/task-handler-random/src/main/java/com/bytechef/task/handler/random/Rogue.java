@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
 class Rogue implements TaskHandler<Object> {
 
     @Override
-    public Object handle(TaskExecution aTask) throws Exception {
+    public Object handle(TaskExecution aTask) {
         float nextFloat = RandomUtils.nextFloat(0, 1);
         float probability = aTask.getFloat("probability", 0.5f);
         Assert.isTrue(probability >= 0 && probability <= 1, "probability must be a value between 0 and 1");

@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.io;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,8 +38,13 @@ import org.springframework.stereotype.Component;
 class Mkdir implements TaskHandler<Object> {
 
     @Override
-    public Object handle(TaskExecution aTask) throws IOException {
-        Files.createDirectories(Paths.get(aTask.getRequiredString("path")));
+    public Object handle(TaskExecution aTask) throws TaskExecutionException {
+        try {
+            Files.createDirectories(Paths.get(aTask.getRequiredString("path")));
+        } catch (IOException ioException) {
+            throw new TaskExecutionException("Unable to create directories " + aTask, ioException);
+        }
+
         return null;
     }
 }
