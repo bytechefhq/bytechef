@@ -111,6 +111,12 @@ subprojects {
 //        }
     }
 
+    pmd {
+        description = "Ignore PMD source code validation"
+
+        ignoreFailures = true
+    }
+
     check.dependsOn 'spotlessCheck'
 
     test {
