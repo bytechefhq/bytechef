@@ -83,7 +83,6 @@ public class JobService {
 
         MapObject inputs = MapObject.of(jobParams.getMap(Constants.INPUTS, Collections.EMPTY_MAP));
         List<Accessor> webhooks = jobParams.getList(Constants.WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
-        List<String> tags = (List<String>) jobParams.get(TAGS);
 
         SimpleJob job = new SimpleJob();
 

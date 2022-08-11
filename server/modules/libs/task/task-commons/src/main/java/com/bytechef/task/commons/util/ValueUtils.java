@@ -27,11 +27,7 @@ public class ValueUtils {
     private static final Logger logger = LoggerFactory.getLogger(ValueUtils.class);
 
     public static Boolean booleanOf(String string) {
-        if (string.equalsIgnoreCase("true") || string.equalsIgnoreCase("false")) {
-            return Boolean.parseBoolean(string);
-        }
-
-        return null;
+        return Boolean.parseBoolean(string);
     }
 
     public static Double doubleOf(String string) {

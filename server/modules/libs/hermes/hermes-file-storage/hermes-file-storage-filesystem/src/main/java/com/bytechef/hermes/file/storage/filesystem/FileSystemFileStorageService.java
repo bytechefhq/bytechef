@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -61,7 +62,9 @@ public class FileSystemFileStorageService implements FileStorageService {
         try (Stream<Path> stream = Files.walk(path)) {
             stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(file -> {
                 if ((System.currentTimeMillis() - file.lastModified()) >= retentionTime) {
-                    file.delete();
+                    if (!file.delete()) {
+                        throw new FileStorageException("Unable to delete file " + file.getAbsolutePath());
+                    }
                 }
             });
         } catch (IOException ioe) {
@@ -78,6 +81,9 @@ public class FileSystemFileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(String fileName, String content) throws FileStorageException {
+        Objects.requireNonNull(fileName, "File name is required");
+        Objects.requireNonNull(content, "Content is required");
+
         return storeFileContent(fileName, new ByteArrayInputStream(content.getBytes()));
     }
 

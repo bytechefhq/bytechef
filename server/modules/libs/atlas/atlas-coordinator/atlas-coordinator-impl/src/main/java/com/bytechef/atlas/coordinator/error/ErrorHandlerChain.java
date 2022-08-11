@@ -22,6 +22,8 @@ import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.Errorable;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
@@ -30,6 +32,8 @@ import org.springframework.util.Assert;
  * @since Apr 10, 2017
  */
 public class ErrorHandlerChain implements ErrorHandler<Errorable> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ErrorHandlerChain.class);
 
     private final List<ErrorHandler> handlers;
 
@@ -43,6 +47,12 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
     public void handle(Errorable errorable) {
         for (ErrorHandler handler : handlers) {
             Method method = BeanUtils.findDeclaredMethodWithMinimalParameters(handler.getClass(), "handle");
+
+            if (method == null) {
+                logger.error("Unable to locate handle method for " + handler.getClass());
+
+                return;
+            }
 
             if (method.getParameters()[0].getType().isAssignableFrom(errorable.getClass())) {
                 handler.handle(errorable);
