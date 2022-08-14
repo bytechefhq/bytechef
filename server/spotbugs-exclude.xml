@@ -198,4 +198,12 @@
             <Method name="resolve" params="java.lang.String, float" />
         </And>
     </Match>
+
+    <Match>
+        <Bug code="THROWS" />
+        <And>
+            <Class name="com.bytechef.atlas.coordinator.CoordinatorIntTest" />
+            <Method name="testRequiredParams" />
+        </And>
+    </Match>
 </FindBugsFilter>
