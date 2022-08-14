@@ -24,6 +24,7 @@ import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.uuid.UUIDGenerator;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -202,9 +203,12 @@ public class WorkerTest {
 
         WorkerImpl worker = (WorkerImpl) WorkerImpl.builder()
                 .withTaskHandlerResolver(jt -> t -> {
-                    System.out.println("sleeping...");
-                    TimeUnit.SECONDS.sleep(5);
-                    System.out.println("woke up!");
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException interruptedException) {
+                        throw new TaskExecutionException("Unable to sleep due interruption");
+                    }
+
                     return null;
                 })
                 .withMessageBroker(messageBroker)
@@ -234,9 +238,12 @@ public class WorkerTest {
 
         WorkerImpl worker = (WorkerImpl) WorkerImpl.builder()
                 .withTaskHandlerResolver(jt -> t -> {
-                    System.out.println("sleeping...");
-                    TimeUnit.SECONDS.sleep(5);
-                    System.out.println("woke up!");
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException interruptedException) {
+                        throw new TaskExecutionException("Unable to sleep due interruption");
+                    }
+
                     return null;
                 })
                 .withMessageBroker(messageBroker)
@@ -273,9 +280,12 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         WorkerImpl worker = (WorkerImpl) WorkerImpl.builder()
                 .withTaskHandlerResolver(jt -> t -> {
-                    System.out.println("sleeping...");
-                    TimeUnit.SECONDS.sleep(5);
-                    System.out.println("woke up!");
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException interruptedException) {
+                        throw new TaskExecutionException("Unable to sleep due interruption");
+                    }
+
                     return null;
                 })
                 .withMessageBroker(messageBroker)

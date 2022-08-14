@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.time;
 
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.Test;
 public class SleepTest {
 
     @Test
-    public void test1() throws InterruptedException {
+    public void test1() throws TaskExecutionException {
         Sleep sleep = new Sleep();
         long now = System.currentTimeMillis();
         sleep.handle(SimpleTaskExecution.of("duration", "1s"));
@@ -37,7 +38,7 @@ public class SleepTest {
     }
 
     @Test
-    public void test2() throws InterruptedException {
+    public void test2() throws TaskExecutionException {
         Sleep sleep = new Sleep();
         long now = System.currentTimeMillis();
         sleep.handle(SimpleTaskExecution.of("millis", 500));
@@ -46,7 +47,7 @@ public class SleepTest {
     }
 
     @Test
-    public void test3() throws InterruptedException {
+    public void test3() throws TaskExecutionException {
         Sleep sleep = new Sleep();
         long now = System.currentTimeMillis();
         sleep.handle(new SimpleTaskExecution());
