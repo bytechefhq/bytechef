@@ -55,7 +55,7 @@ public abstract class AbstractTaskDescriptorExtHandlerResolver implements TaskDe
 
         if (extDescriptorHandlerOptional.isPresent()) {
             DescriptorExtHandler descriptorExtHandler = extDescriptorHandlerOptional.get();
-
+            // zasto je version float?? Double ocekujemo u kolekciji??
             if (descriptorExtHandler.getVersions().contains(version)
                     && Objects.equals(descriptorExtHandler.getType(), type)) {
                 taskDescriptorHandler = createTaskDescriptorHandler(descriptorExtHandler, version);

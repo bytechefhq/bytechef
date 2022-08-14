@@ -65,6 +65,10 @@ public class OdsFileTaskHandler {
             String sheetName = taskExecution.get(SHEET_NAME, null);
 
             try (InputStream inputStream = fileStorageHelper.getFileContentStream(taskExecution)) {
+                if (inputStream == null) {
+                    throw new TaskExecutionException("Unable to get file content from task " + taskExecution);
+                }
+
                 Integer rangeStartRow = null;
                 Integer rangeEndRow = null;
 
