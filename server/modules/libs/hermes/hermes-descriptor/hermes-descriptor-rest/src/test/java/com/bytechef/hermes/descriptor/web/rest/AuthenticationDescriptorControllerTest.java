@@ -24,6 +24,7 @@ import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandler;
 import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandlerResolver;
 import com.bytechef.hermes.descriptor.model.DSL;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,37 +58,45 @@ public class AuthenticationDescriptorControllerTest {
             () -> DSL.createAuthenticationDescriptors("task2", List.of(DSL.createAuthenticationDescriptor("auth2"))));
 
     @Test
-    public void testGetAuthenticationDescriptor() throws Exception {
+    public void testGetAuthenticationDescriptor() {
         Mockito.doReturn(AUTHENTICATION_DESCRIPTOR_HANDLERS.get(0))
                 .when(authenticationDescriptorHandlerResolver)
                 .resolve(Mockito.anyString());
 
-        mockMvc.perform(get("/authentication-descriptors/task1").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(
-                        content()
-                                .json(
-                                        """
+        try {
+            mockMvc.perform(get("/authentication-descriptors/task1").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(
+                            content()
+                                    .json(
+                                            """
                                        {"name":"task1","authenticationDescriptors":[{"name":"auth1"}]}
                         """));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 
     @Test
-    public void testGetAuthenticationDescriptors() throws Exception {
+    public void testGetAuthenticationDescriptors() {
         Mockito.doReturn(AUTHENTICATION_DESCRIPTOR_HANDLERS)
                 .when(authenticationDescriptorHandlerResolver)
                 .getAuthenticationDescriptorHandlers();
 
-        mockMvc.perform(get("/authentication-descriptors").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(
-                        content()
-                                .json(
-                                        """
+        try {
+            mockMvc.perform(get("/authentication-descriptors").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(
+                            content()
+                                    .json(
+                                            """
                         [
                             {"name":"task1","authenticationDescriptors":[{"name":"auth1"}]},
                             {"name":"task2","authenticationDescriptors":[{"name":"auth2"}]}
                         ]
                         """));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 }

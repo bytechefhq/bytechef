@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 /**
  * @author Arik Cohen
@@ -50,10 +51,13 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void test1() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            EachTaskDispatcher dispatcher =
-                    new EachTaskDispatcher(null, null, null, null, null, SpelTaskEvaluator.create());
-            dispatcher.dispatch(new SimpleTaskExecution());
+        Assertions.assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() {
+                EachTaskDispatcher dispatcher =
+                        new EachTaskDispatcher(null, null, null, null, null, SpelTaskEvaluator.create());
+                dispatcher.dispatch(new SimpleTaskExecution());
+            }
         });
     }
 

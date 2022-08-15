@@ -24,6 +24,7 @@ import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandlerResolver;
 import com.bytechef.hermes.descriptor.model.DSL;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,36 +57,41 @@ public class TaskDescriptorControllerTest {
             List.of(() -> DSL.createTaskDescriptor("task1"), () -> DSL.createTaskDescriptor("task2"));
 
     @Test
-    public void testGetTaskDescriptor() throws Exception {
+    public void testGetTaskDescriptor() {
         Mockito.doReturn(TASK_DESCRIPTOR_HANDLERS.get(0))
                 .when(taskDescriptorHandlerResolver)
                 .resolve(Mockito.anyString(), Mockito.anyFloat());
 
-        mockMvc.perform(get("/task-descriptors/task1/1.0").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(
-                        content()
-                                .json(
-                                        """
+        try {
+            mockMvc.perform(get("/task-descriptors/task1/1.0").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(
+                            content()
+                                    .json(
+                                            """
                         {
                             "name":"task1",
                             "version":1.0
                         }
                         """));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 
     @Test
-    public void testGetTaskDescriptors() throws Exception {
+    public void testGetTaskDescriptors() {
         Mockito.doReturn(TASK_DESCRIPTOR_HANDLERS)
                 .when(taskDescriptorHandlerResolver)
                 .getTaskDescriptorHandlers();
 
-        mockMvc.perform(get("/task-descriptors").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(
-                        content()
-                                .json(
-                                        """
+        try {
+            mockMvc.perform(get("/task-descriptors").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(
+                            content()
+                                    .json(
+                                            """
                         [
                             {
                                 "name":"task1",
@@ -97,5 +103,8 @@ public class TaskDescriptorControllerTest {
                             }
                         ]
                         """));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 }

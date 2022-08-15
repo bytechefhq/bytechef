@@ -20,6 +20,7 @@ import com.bytechef.hermes.file.storage.dto.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,25 +36,26 @@ public class Base64StorageServiceTest {
 
     @Test
     public void testOpenInputStream() throws IOException {
-        InputStream inputStream =
-                base64StorageService.getFileContentStream(Base64.getEncoder().encodeToString(string.getBytes()));
+        InputStream inputStream = base64StorageService.getFileContentStream(
+                Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset())));
 
-        Assertions.assertThat(new String(inputStream.readAllBytes())).isEqualTo(string);
+        Assertions.assertThat(new String(inputStream.readAllBytes(), Charset.defaultCharset()))
+                .isEqualTo(string);
     }
 
     @Test
     public void testRead() {
-        Assertions.assertThat(
-                        base64StorageService.readFileContent(Base64.getEncoder().encodeToString(string.getBytes())))
+        Assertions.assertThat(base64StorageService.readFileContent(
+                        Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset()))))
                 .isEqualTo(string);
     }
 
     @Test
     public void testWrite() {
-        FileEntry fileEntry =
-                base64StorageService.storeFileContent("fileEntry", new ByteArrayInputStream(string.getBytes()));
+        FileEntry fileEntry = base64StorageService.storeFileContent(
+                "fileEntry", new ByteArrayInputStream(string.getBytes(Charset.defaultCharset())));
 
         Assertions.assertThat(fileEntry.getUrl())
-                .isEqualTo("base64:" + Base64.getEncoder().encodeToString(string.getBytes()));
+                .isEqualTo("base64:" + Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset())));
     }
 }
