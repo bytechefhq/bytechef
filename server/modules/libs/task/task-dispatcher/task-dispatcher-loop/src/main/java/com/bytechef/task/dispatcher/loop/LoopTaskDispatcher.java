@@ -76,34 +76,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
         taskExecutionService.merge(loopTaskExecution);
 
-        if (list == null || list.size() > 0) {
-            SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
-
-            subTaskExecution.setCreateTime(new Date());
-            subTaskExecution.setId(UUIDGenerator.generate());
-            subTaskExecution.setJobId(taskExecution.getJobId());
-            subTaskExecution.setParentId(taskExecution.getId());
-            subTaskExecution.setPriority(taskExecution.getPriority());
-            subTaskExecution.setStatus(TaskStatus.CREATED);
-            subTaskExecution.setTaskNumber(1);
-
-            MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
-
-            if (list != null) {
-                Object item = list.get(0);
-
-                context.set(taskExecution.getString("itemVar", "item"), item);
-            }
-
-            context.set(taskExecution.getString("itemIndex", "itemIndex"), 0);
-
-            contextService.push(subTaskExecution.getId(), context);
-
-            TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
-
-            taskExecutionService.create(evaluatedSubTaskExecution);
-            taskDispatcher.dispatch(evaluatedSubTaskExecution);
-        } else {
+        if (list.size() == 1) {
             SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
 
             completionTaskExecution.setStartTime(new Date());
@@ -111,7 +84,34 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             completionTaskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+
+            return;
         }
+
+        SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
+
+        subTaskExecution.setCreateTime(new Date());
+        subTaskExecution.setId(UUIDGenerator.generate());
+        subTaskExecution.setJobId(taskExecution.getJobId());
+        subTaskExecution.setParentId(taskExecution.getId());
+        subTaskExecution.setPriority(taskExecution.getPriority());
+        subTaskExecution.setStatus(TaskStatus.CREATED);
+        subTaskExecution.setTaskNumber(1);
+
+        MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
+
+        if (!list.isEmpty()) {
+            context.set(taskExecution.getString("itemVar", "item"), list.get(0));
+        }
+
+        context.set(taskExecution.getString("itemIndex", "itemIndex"), 0);
+
+        contextService.push(subTaskExecution.getId(), context);
+
+        TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+
+        taskExecutionService.create(evaluatedSubTaskExecution);
+        taskDispatcher.dispatch(evaluatedSubTaskExecution);
     }
 
     @Override
