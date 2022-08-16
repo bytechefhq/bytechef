@@ -270,7 +270,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
     @Override
     public Map<String, Object> asMap() {
-        return Map.copyOf(map);
+        return Collections.unmodifiableMap((Map<String, Object>) map.clone());
     }
 
     @Override
