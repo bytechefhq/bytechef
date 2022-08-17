@@ -30,6 +30,7 @@ import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
 import com.bytechef.atlas.uuid.UUIDGenerator;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +65,9 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
+        boolean endlessLoop = taskExecution.getBoolean("endlessLoop", false);
         Map<String, Object> iteratee = taskExecution.getMap("iteratee");
-        List<Object> list = taskExecution.getList("list", Object.class);
+        List<Object> list = taskExecution.getList("list", Object.class, Collections.emptyList());
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
 
@@ -76,7 +78,32 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
         taskExecutionService.merge(loopTaskExecution);
 
-        if (list.size() == 1) {
+        if (endlessLoop || !list.isEmpty()) {
+            SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
+
+            subTaskExecution.setCreateTime(new Date());
+            subTaskExecution.setId(UUIDGenerator.generate());
+            subTaskExecution.setJobId(taskExecution.getJobId());
+            subTaskExecution.setParentId(taskExecution.getId());
+            subTaskExecution.setPriority(taskExecution.getPriority());
+            subTaskExecution.setStatus(TaskStatus.CREATED);
+            subTaskExecution.setTaskNumber(1);
+
+            MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
+
+            if (!list.isEmpty()) {
+                context.set(taskExecution.getString("itemVar", "item"), list.get(0));
+            }
+
+            context.set(taskExecution.getString("itemIndex", "itemIndex"), 0);
+
+            contextService.push(subTaskExecution.getId(), context);
+
+            TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+
+            taskExecutionService.create(evaluatedSubTaskExecution);
+            taskDispatcher.dispatch(evaluatedSubTaskExecution);
+        } else {
             SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
 
             completionTaskExecution.setStartTime(new Date());
@@ -84,34 +111,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             completionTaskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
-
-            return;
         }
-
-        SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
-
-        subTaskExecution.setCreateTime(new Date());
-        subTaskExecution.setId(UUIDGenerator.generate());
-        subTaskExecution.setJobId(taskExecution.getJobId());
-        subTaskExecution.setParentId(taskExecution.getId());
-        subTaskExecution.setPriority(taskExecution.getPriority());
-        subTaskExecution.setStatus(TaskStatus.CREATED);
-        subTaskExecution.setTaskNumber(1);
-
-        MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
-
-        if (!list.isEmpty()) {
-            context.set(taskExecution.getString("itemVar", "item"), list.get(0));
-        }
-
-        context.set(taskExecution.getString("itemIndex", "itemIndex"), 0);
-
-        contextService.push(subTaskExecution.getId(), context);
-
-        TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
-
-        taskExecutionService.create(evaluatedSubTaskExecution);
-        taskDispatcher.dispatch(evaluatedSubTaskExecution);
     }
 
     @Override

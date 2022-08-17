@@ -27,6 +27,7 @@ import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
 import com.bytechef.atlas.uuid.UUIDGenerator;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -79,10 +80,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         SimpleTaskExecution loopTaskExecution =
                 SimpleTaskExecution.of(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
+        boolean endlessLoop = loopTaskExecution.getBoolean("endlessLoop", false);
         Map<String, Object> iteratee = loopTaskExecution.getMap("iteratee");
-        List<Object> list = loopTaskExecution.getList("list", Object.class);
+        List<Object> list = loopTaskExecution.getList("list", Object.class, Collections.emptyList());
 
-        if (list == null || taskExecution.getTaskNumber() < list.size()) {
+        if (endlessLoop || taskExecution.getTaskNumber() < list.size()) {
             SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
 
             subTaskExecution.setCreateTime(new Date());
@@ -95,10 +97,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             MapContext context = new MapContext(contextService.peek(loopTaskExecution.getId()));
 
-            if (list != null) {
-                Object item = list.get(taskExecution.getTaskNumber());
-
-                context.set(loopTaskExecution.getString("itemVar", "item"), item);
+            if (!list.isEmpty()) {
+                context.set(loopTaskExecution.getString("itemVar", "item"), list.get(taskExecution.getTaskNumber()));
             }
 
             context.set(loopTaskExecution.getString("itemIndex", "itemIndex"), taskExecution.getTaskNumber());
