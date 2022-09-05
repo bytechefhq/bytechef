@@ -45,17 +45,15 @@ public class MessageBrokerWorkerConfiguration implements ApplicationContextAware
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             WorkerProperties workerProperties = atlasProperties.getWorker();
 
-            if (workerProperties.isEnabled()) {
-                Worker worker = applicationContext.getBean(Worker.class);
+            Worker worker = applicationContext.getBean(Worker.class);
 
-                Map<String, Object> subscriptions = workerProperties.getSubscriptions();
+            Map<String, Object> subscriptions = workerProperties.getSubscriptions();
 
-                subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                        listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
+            subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
 
-                messageBrokerListenerRegistrar.registerListenerEndpoint(
-                        listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
-            }
+            messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
         };
     }
 
