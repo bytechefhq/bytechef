@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -237,7 +236,7 @@ public class OdsFileTaskHandler {
 
             int idx = 0;
 
-            for (Object value : values) {
+            for (Object value : names) {
                 values[idx++] = value;
             }
 
@@ -255,12 +254,8 @@ public class OdsFileTaskHandler {
             for (int i = 0; i < rows.size(); i++) {
                 Map<String, ?> row = rows.get(i);
 
-                Collection<?> rowValues = row.values();
-
-                int column = 0;
-
-                for (Object rowValue : rowValues) {
-                    values[i + 1][column++] = rowValue;
+                for (int j = 0; j < headerValues.length; j++) {
+                    values[i + 1][j] = row.get(headerValues[j]);
                 }
             }
 
