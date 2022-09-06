@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest an idea to improve ByteChef
+title: "[Feature]: "
+labels: [enhancement]
+assignees:
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to request a feature for ByteChef!
+  - type: textarea
+    attributes:
+      label: Tell us about the problem you're trying to solve
+      description: What are you trying to do, and why is it hard? A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the solution you’d like
+      description: A clear and concise description of what you want to see happen, or the change you would like to see.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the alternative you’ve considered or used
+      description: A clear and concise description of any alternative solutions or features you've considered or are using today.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false
