@@ -35,7 +35,14 @@ subprojects {
         checkstyleTest.enabled = false
     }
 
+    pmd {
+        toolVersion = "6.48.0"
+        ruleSetFiles = files("${rootDir}/pmd-ruleset.xml")
+        ruleSets = []
+    }
+
     spotbugs {
+        toolVersion = '4.7.1'
         excludeFilter = file("${rootDir}/spotbugs-exclude.xml")
     }
 
