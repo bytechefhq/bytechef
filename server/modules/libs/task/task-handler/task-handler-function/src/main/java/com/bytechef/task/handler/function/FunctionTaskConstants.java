@@ -26,4 +26,7 @@ public class FunctionTaskConstants {
     public static final String JS = "js";
     public static final String PYTHON = "python";
     public static final float VERSION_1_0 = 1.0f;
+    public static final String CONTEXT = "context";
+    public static final String SOURCE = "source";
+    public static final String PARAMETER = "parameter";
 }
