@@ -18,13 +18,13 @@
 
 package com.bytechef.atlas.message.broker.amqp.config;
 
-import com.bytechef.atlas.config.AtlasProperties;
 import com.bytechef.atlas.message.broker.Exchanges;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.amqp.AmqpMessageBroker;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,6 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -56,8 +55,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Arik Cohen
  */
 @Configuration
-@EnableConfigurationProperties(AtlasProperties.class)
-@ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "amqp")
+@ConditionalOnProperty(name = "workflow.message-broker.provider", havingValue = "amqp")
 public class AmqpMessageBrokerConfiguration
         implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
 
@@ -67,8 +65,8 @@ public class AmqpMessageBrokerConfiguration
     @Autowired
     private ConnectionFactory connectionFactory;
 
-    @Autowired
-    private List<MessageBrokerConfigurer> messageBrokerConfigurers;
+    @Autowired(required = false)
+    private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
 
     @Autowired
     private RabbitProperties rabbitProperties;
@@ -113,8 +111,10 @@ public class AmqpMessageBrokerConfiguration
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<RabbitListenerEndpointRegistrar> messageBrokerConfigurer :
+                messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }

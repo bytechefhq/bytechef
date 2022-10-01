@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 public class AmqpMessageBroker implements MessageBroker {
 
@@ -35,32 +36,39 @@ public class AmqpMessageBroker implements MessageBroker {
     @Override
     public void send(String routingKey, Object message) {
         Assert.notNull(routingKey, "routing key can't be null");
+
         amqpTemplate.convertAndSend(determineExchange(routingKey), determineRoutingKey(routingKey), message, m -> {
             if (message instanceof Retryable) {
                 Retryable r = (Retryable) message;
+
                 m.getMessageProperties().setDelay((int) r.getRetryDelayMillis());
             }
+
             if (message instanceof Prioritizable) {
                 Prioritizable p = (Prioritizable) message;
+
                 m.getMessageProperties().setPriority(p.getPriority());
             }
+
             return m;
         });
     }
 
-    private String determineExchange(String aRoutingKey) {
-        String[] routingKey = aRoutingKey.split("/");
-        Assert.isTrue(routingKey.length <= 2, "Invalid routing key: " + aRoutingKey);
-        return routingKey.length == 2 ? routingKey[0] : Exchanges.TASKS;
+    private String determineExchange(String routingKey) {
+        String[] routingKeyItems = routingKey.split("/");
+
+        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + routingKey);
+
+        return routingKeyItems.length == 2 ? routingKeyItems[0] : Exchanges.TASKS;
     }
 
-    private String determineRoutingKey(String aRoutingKey) {
-        String[] routingKey = aRoutingKey.split("/");
-        Assert.isTrue(routingKey.length <= 2, "Invalid routing key: " + aRoutingKey);
-        return routingKey.length == 2 ? routingKey[1] : aRoutingKey;
+    private String determineRoutingKey(String routingKey) {
+        String[] routingKeyItems = routingKey.split("/");
+        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + routingKey);
+        return routingKeyItems.length == 2 ? routingKeyItems[1] : routingKey;
     }
 
-    public void setAmqpTemplate(AmqpTemplate aAmqpTemplate) {
-        amqpTemplate = aAmqpTemplate;
+    public void setAmqpTemplate(AmqpTemplate amqpTemplate) {
+        this.amqpTemplate = amqpTemplate;
     }
 }
