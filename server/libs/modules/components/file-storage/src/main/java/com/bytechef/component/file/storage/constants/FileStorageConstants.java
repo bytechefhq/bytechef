@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.file;
+package com.bytechef.component.file.storage.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class FileTaskConstants {
+public class FileStorageConstants {
 
     public static final String CONTENT = "content";
-    public static final String FILE = "file";
-    public static final float VERSION = 1.0f;
+    public static final String FILE_STORAGE = "fileStorage";
     public static final String READ = "read";
     public static final String WRITE = "write";
+    public static final String DOWNLOAD = "download";
+    public static final String URL = "url";
 }
