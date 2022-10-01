@@ -16,10 +16,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.memory.context;
+package com.bytechef.atlas.repository.memory;
 
-import com.bytechef.atlas.context.domain.Context;
-import com.bytechef.atlas.repository.context.ContextRepository;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.repository.ContextRepository;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,29 +32,40 @@ import org.springframework.util.Assert;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
-    private final Map<String, Deque<Context>> contexts = new HashMap<>();
+    private final Map<String, Deque<Map<String, Object>>> contexts = new HashMap<>();
 
     @Override
-    public void delete(String stackId) {
-        contexts.remove(stackId);
+    public void deleteById(String id) {
+        contexts.remove(id);
     }
 
     @Override
-    public void push(String stackId, Context context) {
-        Deque<Context> stack = contexts.get(stackId);
+    public Iterable<Context> findAll() {
+        return contexts.values().stream()
+                .flatMap(deque -> deque.stream().map(Context::new))
+                .toList();
+    }
+
+    @Override
+    public Context findTop1ByStackIdOrderByCreatedDateDesc(String stackId) {
+        Deque<Map<String, Object>> linkedList = contexts.get(stackId);
+        Assert.notNull(linkedList, "unknown stack: " + stackId);
+
+        return new Context(linkedList.peek());
+    }
+
+    @Override
+    public Context save(Context context) {
+        Deque<Map<String, Object>> stack = contexts.get(context.getStackId());
+
         if (stack == null) {
             stack = new LinkedList<>();
 
-            contexts.put(stackId, stack);
+            contexts.put(context.getStackId(), stack);
         }
-        stack.push(context);
-    }
 
-    @Override
-    public Context peek(String stackId) {
-        Deque<Context> linkedList = contexts.get(stackId);
-        Assert.notNull(linkedList, "unknown stack: " + stackId);
+        stack.push(context.getValue());
 
-        return linkedList.peek();
+        return context;
     }
 }
