@@ -18,7 +18,6 @@
 
 package com.bytechef.atlas.message.broker.kafka.config;
 
-import com.bytechef.atlas.config.AtlasProperties;
 import com.bytechef.atlas.message.broker.Exchanges;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
@@ -28,6 +27,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,7 +40,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListenerConfigurer;
@@ -63,16 +62,15 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
  * @author Arik Cohen
  */
 @Configuration
-@EnableConfigurationProperties(AtlasProperties.class)
-@ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "kafka")
+@ConditionalOnProperty(name = "workflow.message-broker.provider", havingValue = "kafka")
 public class KafkaMessageBrokerConfiguration
         implements KafkaListenerConfigurer, MessageBrokerListenerRegistrar<KafkaListenerEndpointRegistrar> {
 
     @Autowired
     private BeanFactory beanFactory;
 
-    @Autowired
-    private List<MessageBrokerConfigurer> messageBrokerConfigurers;
+    @Autowired(required = false)
+    private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
 
     @Autowired
     MessageHandlerMethodFactory messageHandlerMethodFactory;
@@ -178,56 +176,12 @@ public class KafkaMessageBrokerConfiguration
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void configureKafkaListeners(KafkaListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<KafkaListenerEndpointRegistrar> messageBrokerConfigurer :
+                messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
-
-        //        CoordinatorProperties coordinatorProperties = properties.getCoordinator();
-        //        WorkerProperties workerProperties = properties.getWorker();
-        //
-        //        if (coordinatorProperties.isEnabled()) {
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.COMPLETIONS,
-        //                    coordinatorProperties.getSubscriptions().getCompletions(),
-        //                    coordinator,
-        //                    "complete");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.ERRORS,
-        //                    coordinatorProperties.getSubscriptions().getErrors(),
-        //                    coordinator,
-        //                    "handleError");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.EVENTS,
-        //                    coordinatorProperties.getSubscriptions().getEvents(),
-        //                    eventListener,
-        //                    "onApplicationEvent");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.JOBS,
-        //                    coordinatorProperties.getSubscriptions().getJobs(),
-        //                    coordinator,
-        //                    "start");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.SUBFLOWS,
-        //                    coordinatorProperties.getSubscriptions().getSubflows(),
-        //                    coordinator,
-        //                    "create");
-        //        }
-        //
-        //        if (workerProperties.isEnabled()) {
-        //            Map<String, Object> subscriptions = workerProperties.getSubscriptions();
-        //
-        //            subscriptions.forEach(
-        //                    (k, v) -> registerListenerEndpoint(listenerEndpointRegistrar, k, Integer.valueOf((String)
-        // v), worker, "handle"));
-        //
-        //            registerListenerEndpoint(listenerEndpointRegistrar, Exchanges.CONTROL, 1, worker, "handle");
-        //        }
     }
 
     @Override
