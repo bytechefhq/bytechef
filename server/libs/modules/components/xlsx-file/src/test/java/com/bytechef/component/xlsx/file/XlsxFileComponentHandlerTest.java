@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.xlsxfile.v1_0;
+package com.bytechef.component.xlsx.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.task.commons.file.storage.FileStorageHelper;
-import com.bytechef.test.json.JsonArrayUtils;
-import com.bytechef.test.json.JsonObjectUtils;
+import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.test.MockContext;
+import com.bytechef.hermes.component.test.MockExecutionParameters;
+import com.bytechef.hermes.component.test.json.JsonArrayUtils;
+import com.bytechef.hermes.component.test.json.JsonObjectUtils;
+import com.bytechef.hermes.test.definition.DefinitionAssert;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,33 +41,37 @@ import org.springframework.core.io.ClassPathResource;
 /**
  * @author Ivica Cardic
  */
-public class XLSXFileTaskHandlerTest {
+public class XlsxFileComponentHandlerTest {
 
-    private static final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
-    private static final XLSXFileTaskHandler.XLSXFileReadTaskHandler xlsxFileReadTaskHandler =
-            new XLSXFileTaskHandler.XLSXFileReadTaskHandler(fileStorageHelper);
-    private static final XLSXFileTaskHandler.XLSXFileWriteTaskHandler xlsxFileWriteTaskHandler =
-            new XLSXFileTaskHandler.XLSXFileWriteTaskHandler(fileStorageHelper);
+    private static final MockContext context = new MockContext();
+    private static final XlsxFileComponentHandler xlsxFileComponentHandler = new XlsxFileComponentHandler();
 
     @Test
-    public void testReadXLS() throws Exception {
+    public void testGetComponentDefinition() {
+        DefinitionAssert.assertEquals("definition/xlsx-file_v1.json", new XlsxFileComponentHandler().getDefinition());
+    }
+
+    @Test
+    public void testPerformReadXLS() throws IOException, JSONException {
         readFile("xls");
     }
 
     @Test
-    public void testReadXLSX() throws Exception {
+    public void testPerformReadXLSX() throws IOException, JSONException {
         readFile("xlsx");
     }
 
     @Test
-    public void testWriteXLSX() throws Exception {
-        FileEntry fileEntry = xlsxFileWriteTaskHandler.handle(getWriteSimpleTaskExecution(
-                JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+    public void testPerformWriteXLSX() throws IOException, JSONException {
+        FileEntry fileEntry = (FileEntry) xlsxFileComponentHandler.performWrite(
+                context,
+                getWriteParameters(
+                        JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
 
         assertEquals(
                 JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, true, null, null, false, fileEntry))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context, getReadParameters(true, true, null, null, false, fileEntry))),
                 true);
 
         assertThat(fileEntry.getName()).isEqualTo("file.xlsx");
@@ -229,7 +234,7 @@ public class XLSXFileTaskHandlerTest {
         return classPathResource.getFile();
     }
 
-    private SimpleTaskExecution getReadSimpleTaskExecution(
+    private ExecutionParameters getReadParameters(
             boolean headerRow,
             boolean includeEmptyCells,
             Integer pageNumber,
@@ -237,115 +242,116 @@ public class XLSXFileTaskHandlerTest {
             boolean readAsString,
             File file)
             throws FileNotFoundException {
-        return getReadSimpleTaskExecution(
-                headerRow,
-                includeEmptyCells,
-                pageNumber,
-                pageSize,
-                readAsString,
-                file == null ? null : fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
+        return getReadParameters(headerRow, includeEmptyCells, pageNumber, pageSize, readAsString, (FileEntry)
+                (file == null ? null : context.storeFileContent(file.getName(), new FileInputStream(file))));
     }
 
-    private SimpleTaskExecution getReadSimpleTaskExecution(
+    private ExecutionParameters getReadParameters(
             boolean headerRow,
             boolean includeEmptyCells,
             Integer pageNumber,
             Integer pageSize,
             boolean readAsString,
             FileEntry fileEntry) {
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+        MockExecutionParameters parameters = new MockExecutionParameters();
 
-        taskExecution.put("fileEntry", fileEntry);
-        taskExecution.put("headerRow", headerRow);
-        taskExecution.put("includeEmptyCells", includeEmptyCells);
-        taskExecution.put("operation", "READ");
-        taskExecution.put("pageNumber", pageNumber);
-        taskExecution.put("pageSize", pageSize);
-        taskExecution.put("readAsString", readAsString);
+        parameters.set("fileEntry", fileEntry.toMap());
+        parameters.set("headerRow", headerRow);
+        parameters.set("includeEmptyCells", includeEmptyCells);
+        parameters.set("pageNumber", pageNumber);
+        parameters.set("pageSize", pageSize);
+        parameters.set("readAsString", readAsString);
 
-        return taskExecution;
+        return parameters;
     }
 
-    private SimpleTaskExecution getWriteSimpleTaskExecution(List<Object> items) {
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+    private ExecutionParameters getWriteParameters(List<Object> items) {
+        MockExecutionParameters parameters = new MockExecutionParameters();
 
-        taskExecution.put("rows", items);
-        taskExecution.put("operation", "WRITE");
+        parameters.set("rows", items);
 
-        return taskExecution;
+        return parameters;
     }
 
-    private void readFile(String extension) throws Exception {
+    private void readFile(String extension) throws IOException, JSONException {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        true, false, null, null, false, getFile("sample_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(true, false, null, null, false, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, false)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        true, true, null, null, false, getFile("sample_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(true, true, null, null, false, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, true)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        true, false, null, null, true, getFile("sample_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(true, false, null, null, true, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, true)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        true, true, null, null, true, getFile("sample_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(true, true, null, null, true, getFile("sample_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, false)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        false, false, null, null, false, getFile("sample_no_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(false, false, null, null, false, getFile("sample_no_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, true)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        false, false, null, null, true, getFile("sample_no_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(false, false, null, null, true, getFile("sample_no_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, false)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        false, true, null, null, false, getFile("sample_no_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(false, true, null, null, false, getFile("sample_no_header." + extension)))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, true)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(getReadSimpleTaskExecution(
-                        false, true, null, null, true, getFile("sample_no_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context,
+                        getReadParameters(false, true, null, null, true, getFile("sample_no_header." + extension)))),
                 true);
 
         // paging
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-                JsonArrayUtils.of((List<?>) xlsxFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header." + extension)))),
+                JsonArrayUtils.of((List<?>) xlsxFileComponentHandler.performRead(
+                        context, getReadParameters(true, false, 1, 3, false, getFile("sample_header." + extension)))),
                 true);
     }
 }

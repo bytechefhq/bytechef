@@ -18,7 +18,7 @@
     {
       "name": "writeXlsxFile",
       "label": "Write to the XLSX file",
-      "type": "xlsxFile/1.0/write",
+      "type": "xlsxFile/v1/write",
       "rows": "${rows}"
     }
   ]
