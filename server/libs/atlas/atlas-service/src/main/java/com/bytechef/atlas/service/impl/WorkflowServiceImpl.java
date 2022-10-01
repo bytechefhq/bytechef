@@ -14,40 +14,56 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service.workflow;
+package com.bytechef.atlas.service.impl;
 
-import com.bytechef.atlas.repository.workflow.WorkflowRepository;
-import com.bytechef.atlas.workflow.domain.Workflow;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.service.WorkflowService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.stream.StreamSupport;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
 @Transactional
-public class WorkflowService {
+public class WorkflowServiceImpl implements WorkflowService {
 
     private final WorkflowRepository workflowRepository;
 
-    public WorkflowService(WorkflowRepository workflowRepository) {
+    @SuppressFBWarnings("EI2")
+    public WorkflowServiceImpl(WorkflowRepository workflowRepository) {
         this.workflowRepository = workflowRepository;
     }
 
+    @Override
+    public Workflow add(Workflow workflow) {
+        workflow.setId(null);
+
+        return workflowRepository.save(workflow);
+    }
+
+    @Override
+    public void delete(String id) {
+        workflowRepository.deleteById(id);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Workflow getWorkflow(String id) {
-        return workflowRepository.findOne(id);
+        return workflowRepository.findById(id).orElseThrow();
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<Workflow> getWorkflows() {
-        return workflowRepository.findAll();
+        return StreamSupport.stream(workflowRepository.findAll().spliterator(), false)
+                .toList();
     }
 
-    public Workflow create(String content, String format) {
-        return workflowRepository.create(content, format);
-    }
-
-    public Workflow update(String id, String content, String format) {
-        return workflowRepository.update(id, content, format);
+    @Override
+    public Workflow update(Workflow workflow) {
+        return workflowRepository.save(workflow);
     }
 }
