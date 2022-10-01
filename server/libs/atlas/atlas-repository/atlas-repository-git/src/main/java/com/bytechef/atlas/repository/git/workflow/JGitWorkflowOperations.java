@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
 /**
  * @author Arik Cohen
  */
-public class JGitTemplate implements GitOperations {
+public class JGitWorkflowOperations implements GitWorkflowOperations {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -62,7 +62,8 @@ public class JGitTemplate implements GitOperations {
     private final String username;
     private final String password;
 
-    public JGitTemplate(String aUrl, String aBranch, String[] aSearchPaths, String aUsername, String aPassword) {
+    public JGitWorkflowOperations(
+            String aUrl, String aBranch, String[] aSearchPaths, String aUsername, String aPassword) {
         url = aUrl;
         branch = aBranch;
         searchPaths = aSearchPaths;

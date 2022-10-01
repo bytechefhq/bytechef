@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author Arik Cohen
  */
-public interface GitOperations {
+public interface GitWorkflowOperations {
     List<WorkflowResource> getHeadFiles();
 
     WorkflowResource getFile(String aFileId);

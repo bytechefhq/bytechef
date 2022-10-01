@@ -16,13 +16,16 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.git.workflow;
+package com.bytechef.atlas.repository.git;
 
-import com.bytechef.atlas.repository.workflow.WorkflowRepository;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.repository.git.workflow.GitWorkflowOperations;
+import com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.workflow.WorkflowResource;
-import com.bytechef.atlas.workflow.domain.Workflow;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -30,11 +33,11 @@ import java.util.stream.Collectors;
  */
 public class GitWorkflowRepository implements WorkflowRepository {
 
-    private final GitOperations git;
+    private final GitWorkflowOperations gitWorkflowOperations;
     private final WorkflowMapper workflowMapper;
 
-    public GitWorkflowRepository(GitOperations aGitOperations, WorkflowMapper workflowMapper) {
-        git = aGitOperations;
+    public GitWorkflowRepository(GitWorkflowOperations aGitWorkflowOperations, WorkflowMapper workflowMapper) {
+        gitWorkflowOperations = aGitWorkflowOperations;
         this.workflowMapper = workflowMapper;
     }
 
@@ -45,14 +48,14 @@ public class GitWorkflowRepository implements WorkflowRepository {
             String username,
             String password,
             WorkflowMapper workflowMapper) {
-        git = new JGitTemplate(url, branch, searchPaths, username, password);
+        gitWorkflowOperations = new JGitWorkflowOperations(url, branch, searchPaths, username, password);
         this.workflowMapper = workflowMapper;
     }
 
     @Override
-    public List<Workflow> findAll() {
+    public Iterable<Workflow> findAll() {
         synchronized (this) {
-            List<WorkflowResource> resources = git.getHeadFiles();
+            List<WorkflowResource> resources = gitWorkflowOperations.getHeadFiles();
             List<Workflow> workflows =
                     resources.stream().map(r -> workflowMapper.readValue(r)).collect(Collectors.toList());
             return workflows;
@@ -60,10 +63,11 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     @Override
-    public Workflow findOne(String id) {
+    public Optional<Workflow> findById(String id) {
         synchronized (this) {
-            WorkflowResource resource = git.getFile(id);
-            return workflowMapper.readValue(resource);
+            WorkflowResource resource = gitWorkflowOperations.getFile(id);
+
+            return Optional.of(workflowMapper.readValue(resource));
         }
     }
 }

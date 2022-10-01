@@ -18,13 +18,12 @@
 
 package com.bytechef.atlas.workflow.repository.git;
 
-import com.bytechef.atlas.repository.git.workflow.GitOperations;
-import com.bytechef.atlas.repository.git.workflow.GitWorkflowRepository;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.repository.git.GitWorkflowRepository;
+import com.bytechef.atlas.repository.git.workflow.GitWorkflowOperations;
 import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
 import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.atlas.workflow.WorkflowResource;
-import com.bytechef.atlas.workflow.domain.Workflow;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,32 +32,34 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 public class GitWorkflowRepositoryTest {
 
     @Test
     public void test1() {
-        GitWorkflowRepository r = new GitWorkflowRepository(new DummyGitOperations(), new YamlWorkflowMapper());
-        List<Workflow> findAll = r.findAll();
-        Assertions.assertEquals("samples/hello/123", findAll.iterator().next().getId());
+        GitWorkflowRepository workflowRepository =
+                new GitWorkflowRepository(new DummyGitWorkflowOperations(), new YamlWorkflowMapper());
+
+        Iterable<Workflow> findAll = workflowRepository.findAll();
+
+        Assertions.assertEquals("hello/123", findAll.iterator().next().getId());
     }
 
-    private static class DummyGitOperations implements GitOperations {
+    private static class DummyGitWorkflowOperations implements GitWorkflowOperations {
 
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
         @Override
         public List<WorkflowResource> getHeadFiles() {
-            return Arrays.asList(new WorkflowResource(
-                    "samples/hello/123",
-                    resolver.getResource("file:workflow/samples/hello.yaml"),
-                    WorkflowFormat.YAML));
+            return List.of(new WorkflowResource(
+                    "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML));
         }
 
         @Override
         public WorkflowResource getFile(String aFileId) {
             return new WorkflowResource(
-                    "samples/hello/123", resolver.getResource("file:workflow/samples/hello.yaml"), WorkflowFormat.YAML);
+                    "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML);
         }
     }
 }
