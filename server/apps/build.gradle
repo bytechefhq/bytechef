@@ -1,0 +1,32 @@
+plugins {
+    id "com.bytechef.java-application-conventions" apply false
+    id "com.google.cloud.tools.jib" apply false
+    id "com.gorylenko.gradle-git-properties" apply false
+    id "io.spring.dependency-management" apply false
+    id "org.springframework.boot" apply false
+    id "org.springframework.experimental.aot" apply false
+}
+
+subprojects {
+    apply plugin: "com.bytechef.java-application-conventions"
+    apply plugin: "com.google.cloud.tools.jib"
+    apply plugin: "com.gorylenko.gradle-git-properties"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: "org.springframework.boot"
+
+    defaultTasks "bootRun"
+
+    bootJar {
+        classifier = "application"
+    }
+
+    gitProperties {
+        failOnNoGitDirectory = false
+        keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
+    }
+
+    dependencies {
+        runtimeOnly "org.postgresql:postgresql"
+        runtimeOnly "com.zaxxer:HikariCP"
+    }
+}
