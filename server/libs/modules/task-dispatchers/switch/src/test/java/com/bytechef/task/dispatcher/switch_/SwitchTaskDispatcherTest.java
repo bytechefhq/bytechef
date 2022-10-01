@@ -24,16 +24,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.atlas.context.domain.MapContext;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,21 +45,24 @@ import org.mockito.ArgumentCaptor;
  */
 public class SwitchTaskDispatcherTest {
 
-    private ContextService contextService = mock(ContextService.class);
-    private MessageBroker messageBroker = mock(MessageBroker.class);
-    private TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
+    private final ContextService contextService = mock(ContextService.class);
+    private final MessageBroker messageBroker = mock(MessageBroker.class);
+    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+    private final TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
 
     @Test
     public void test1() {
-        when(contextService.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+        TaskExecution taskExecution = new TaskExecution(Map.of(
+                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1"));
 
-        taskExecution.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
-        taskExecution.set("expression", "k1");
+        taskExecution.setId("id");
+        taskExecution.setJobId("jobId");
+
+        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(Map.of("type", "print")));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -71,14 +74,12 @@ public class SwitchTaskDispatcherTest {
 
     @Test
     public void test2() {
-        when(contextService.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
-
-        taskExecution.set("cases", Arrays.asList(Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print")))));
-        taskExecution.set("expression", "k2");
+        TaskExecution taskExecution = new TaskExecution(Map.of(
+                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2"));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -87,18 +88,22 @@ public class SwitchTaskDispatcherTest {
 
     @Test
     public void test3() {
-        when(contextService.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
-
-        taskExecution.set(
+        TaskExecution taskExecution = new TaskExecution(Map.of(
                 "cases",
                 Arrays.asList(
-                        Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print"))),
-                        Map.of("key", "k2", "tasks", Arrays.asList(Map.of("type", "sleep")))));
-        taskExecution.set("expression", "k2");
+                        Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
+                        Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
+                "expression",
+                "k2"));
+
+        taskExecution.setId("id");
+        taskExecution.setJobId("jobId");
+
+        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(Map.of("type", "sleep")));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -110,19 +115,19 @@ public class SwitchTaskDispatcherTest {
 
     @Test
     public void test4() {
-        when(contextService.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
-
-        taskExecution.set(
+        TaskExecution taskExecution = new TaskExecution(Map.of(
                 "cases",
                 Arrays.asList(
-                        Map.of("key", "k1", "tasks", Arrays.asList(Map.of("type", "print"))),
-                        Map.of("key", "k2", "tasks", Arrays.asList(Map.of("type", "sleep")))));
-        taskExecution.set("default", Collections.singletonMap("value", "1234"));
-        taskExecution.set("expression", "k99");
+                        Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
+                        Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
+                "default",
+                Collections.singletonMap("value", "1234"),
+                "expression",
+                "k99"));
 
         switchTaskDispatcher.dispatch(taskExecution);
 

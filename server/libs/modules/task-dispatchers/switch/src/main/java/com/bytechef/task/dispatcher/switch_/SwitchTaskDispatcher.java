@@ -18,33 +18,33 @@
 
 package com.bytechef.task.dispatcher.switch_;
 
-import com.bytechef.atlas.Accessor;
-import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.MapObject;
-import com.bytechef.atlas.context.domain.MapContext;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
+
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
-import com.bytechef.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler;
+import com.bytechef.commons.collection.MapUtils;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  * @since Jun 3, 2017
- * @see SwitchTaskCompletionHandler
+ * @see com.bytechef.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler
  */
 public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
@@ -69,53 +69,54 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        SimpleTaskExecution switchTaskExecution = SimpleTaskExecution.of(taskExecution);
+        TaskExecution switchTaskExecution = new TaskExecution(taskExecution);
 
-        switchTaskExecution.setStartTime(new Date());
+        switchTaskExecution.setStartTime(LocalDateTime.now());
         switchTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionService.merge(switchTaskExecution);
+        taskExecutionService.update(switchTaskExecution);
 
-        Accessor selectedCase = resolveCase(taskExecution);
+        Map<String, Object> selectedCase = resolveCase(taskExecution);
 
         if (selectedCase.containsKey("tasks")) {
-            List<MapObject> tasks = selectedCase.getList("tasks", MapObject.class, Collections.emptyList());
+            List<WorkflowTask> subWorkflowTasks =
+                    MapUtils.getList(selectedCase, "tasks", Map.class, Collections.emptyList()).stream()
+                            .map(WorkflowTask::new)
+                            .toList();
 
-            if (tasks.size() > 0) {
-                MapObject taskDefinition = tasks.get(0);
+            if (subWorkflowTasks.size() > 0) {
+                WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-                SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(taskDefinition);
+                TaskExecution subTaskExecution = TaskExecution.of(
+                        subWorkflowTask,
+                        switchTaskExecution.getJobId(),
+                        switchTaskExecution.getId(),
+                        switchTaskExecution.getPriority(),
+                        1);
 
-                subTaskExecution.setId(UUIDGenerator.generate());
-                subTaskExecution.setStatus(TaskStatus.CREATED);
-                subTaskExecution.setCreateTime(new Date());
-                subTaskExecution.setTaskNumber(1);
-                subTaskExecution.setJobId(switchTaskExecution.getJobId());
-                subTaskExecution.setParentId(switchTaskExecution.getId());
-                subTaskExecution.setPriority(switchTaskExecution.getPriority());
-
-                MapContext context = new MapContext(contextService.peek(switchTaskExecution.getId()));
+                Context context = new Context(contextService.peek(switchTaskExecution.getId()));
 
                 contextService.push(subTaskExecution.getId(), context);
 
-                TaskExecution evaluatedExecution = taskEvaluator.evaluate(subTaskExecution, context);
+                TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-                taskExecutionService.create(evaluatedExecution);
-                taskDispatcher.dispatch(evaluatedExecution);
+                evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+
+                taskDispatcher.dispatch(evaluatedTaskExecution);
             } else {
-                SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
+                TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
 
-                completionTaskExecution.setStartTime(new Date());
-                completionTaskExecution.setEndTime(new Date());
+                completionTaskExecution.setStartTime(LocalDateTime.now());
+                completionTaskExecution.setEndTime(LocalDateTime.now());
                 completionTaskExecution.setExecutionTime(0);
 
                 messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
             }
         } else {
-            SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
+            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
 
-            completionTaskExecution.setStartTime(new Date());
-            completionTaskExecution.setEndTime(new Date());
+            completionTaskExecution.setStartTime(LocalDateTime.now());
+            completionTaskExecution.setEndTime(LocalDateTime.now());
             completionTaskExecution.setExecutionTime(0);
             completionTaskExecution.setOutput(selectedCase.get("value"));
 
@@ -125,25 +126,27 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(Constants.SWITCH)) {
+        if (task.getType().equals(SWITCH + "/v" + VERSION_1)) {
             return this;
         }
+
         return null;
     }
 
-    private Accessor resolveCase(TaskExecution taskExecution) {
+    private Map<String, Object> resolveCase(TaskExecution taskExecution) {
         Object expression = taskExecution.getRequired("expression");
-        List<MapObject> cases = taskExecution.getList("cases", MapObject.class);
+        List<Map<String, Object>> cases = (List) taskExecution.getList("cases", Map.class);
 
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
 
-        for (MapObject oneCase : cases) {
-            Object key = oneCase.getRequired("key");
+        for (Map<String, Object> oneCase : cases) {
+            Object key = MapUtils.getRequired(oneCase, "key");
+
             if (key.equals(expression)) {
                 return oneCase;
             }
         }
 
-        return new MapObject(taskExecution.getMap("default", Collections.emptyMap()));
+        return taskExecution.getMap("default", Collections.emptyMap());
     }
 }
