@@ -1,0 +1,325 @@
+---
+"$schema": https://json-schema.org/draft-07/schema#
+"$id": https://github.com/bytechefhq/bytechef/blob/master/server/modules/libs/atlas/task-specification/src/main/resources/task_declaration.yaml
+title: TaskDeclaration
+type: object
+description: Task declaration structs.
+properties:
+  specification:
+    "$ref": "#/definitions/TaskSpecification"
+definitions:
+  BooleanTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type: boolean
+      type:
+        const: BOOLEAN
+  CollectionTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      options:
+        type: array
+        items:
+          $ref: "#/definitions/TaskProperty"
+      type:
+        const: COLLECTION
+  ColorTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type: string
+      type:
+        const: COLOR
+  DateTimeTaskProperty:
+    type: object
+    allOf:
+      - $ref: "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type: string
+        format: date-time
+      type:
+        const: DATE_TIME
+  GroupTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/TaskProperty"
+      type:
+        const: GROUP
+  IntegerTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type: integer
+      type:
+        const: INTEGER
+  JSONTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        oneOf:
+          - type: object
+            additionalProperties:
+              $ref: "#/definitions/TaskParameter"
+          - type: array
+            items:
+              $ref: "#/definitions/TaskParameter"
+      type:
+        const: JSON
+  MultiSelectTaskProperty:
+    type: object
+    allOf:
+      - $ref: "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type: array
+        items:
+          - integer
+          - string
+      options:
+        $ref: "#/definitions/TaskPropertyOption"
+      type:
+        const: MULTI_SELECT
+  NumberTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type:
+          - integer
+          - number
+      type:
+        const: NUMBER
+  SelectTaskProperty:
+    type: object
+    allOf:
+      - $ref: "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type:
+          - integer
+          - string
+      options:
+        $ref: "#/definitions/TaskPropertyOption"
+      type:
+        const: MULTI_SELECT
+  StringTaskProperty:
+    type: object
+    allOf:
+      - "$ref": "#/definitions/TaskProperty"
+    properties:
+      defaultValue:
+        type: string
+      type:
+        const: STRING
+  DisplayOption:
+    type: object
+    properties:
+      hide:
+        type: object
+        additionalProperties:
+          type: array
+          nullable: true
+          items:
+            oneOf:
+              - type: boolean
+              - type: integer
+              - type: string
+      show:
+        type: object
+        additionalProperties:
+          type: array
+          nullable: true
+          items:
+            oneOf:
+              - type: boolean
+              - type: integer
+              - type: string
+  TaskCredential:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        description: "The name of credential type."
+        type: string
+      required:
+        description: "Is it required or not when selected."
+        type: boolean
+      displayOption:
+        description: "Is the credential type visible or hidden in UI depending on properties defined by display option."
+        $ref: "#/definitions/DisplayOption"
+  TaskParameter:
+    oneOf:
+      - type: boolean
+      - type: integer
+      - type: string
+      - type: object
+        additionalProperties:
+          - $ref: "#/definitions/TaskParameter"
+      - $ref: "#/definitions/TaskParameter"
+      - type: array
+        items:
+          oneOf:
+            - type: boolean
+            - type: integer
+            - type: string
+      - type: array
+        items:
+          $ref: "#/definitions/TaskParameter"
+  TaskProperty:
+    type: object
+    required:
+      - name
+      - displayName
+      - type
+    properties:
+      defaultValue:
+        nullable: true
+        oneOf:
+          - type: boolean
+          - type: integer
+          - type: string
+          - $ref: "#/definitions/TaskParameter"
+          - type: array
+            items:
+              oneOf:
+                - type: boolean
+                - type: integer
+                - type: string
+          - type: array
+            items:
+              $ref: "#/definitions/TaskParameter"
+      description:
+        description: "The task property description."
+        type: string
+      displayName:
+        description: "The display name visible in the UI editor."
+        type: string
+      displayOption:
+        description: "The display option that defines if the property is visible or not in the UI editor."
+        $ref: "#/definitions/DisplayOption"
+      name:
+        description: "The task property name."
+        type: string
+      required:
+        description: "If the property task is required or not."
+        type: boolean
+      type:
+        description: "The task type"
+        type: string
+        enum:
+          - BOOLEAN
+          - COLLECTION
+          - COLOR
+          - DATE_TIME
+          - GROUP
+          - JSON
+          - MULTI_SELECT
+          - NUMBER
+          - SELECT
+          - STRING
+      typeOption:
+        description: "The optional task options."
+        $ref: "#/definitions/TaskPropertyTypeOption"
+    TaskPropertyTypeOption:
+      type: object
+      properties:
+        loadOptionsDependsOn:
+          description: "The list of property tasks 'loadOptionsMethod' depends on."
+          type: array
+          items:
+            type: string
+        loadOptionsMethod:
+          description: "The name of method defined in TaskSpecification implementation that is used for dynamic load of option values."
+          type: string
+        maxValue:
+          description: "Defines max value for the number task property."
+          type: number
+          format: double
+        minValue:
+          description: "Defines min value for the number task property."
+          type: number
+          format: double
+        multipleValues:
+          description: "Defines if it is allowed to define multiple values for the task property."
+          type: boolean
+        multipleValueButtonText:
+          description: ""
+          type: string
+        numberPrecision:
+          description: "Defines number precision for the task property of type number."
+          type: integer
+  TaskPropertyOption:
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      value:
+        type:
+          - integer
+          - string
+  TaskSpecification:
+    type: object
+    required:
+      - name
+      - displayName
+      - icon
+    properties:
+      connection:
+        credentials:
+          description: "The list of supported credentials."
+          type: array
+          items:
+            $ref: "#/definitions/TaskCredential"
+        properties:
+          description: "The optional properties ussed to build selectors in the case of multiple credentials."
+          type: array
+          items:
+            $ref: "#/definitions/TaskProperty"
+      description:
+        description: "The task description"
+        type: string
+      displayName:
+        description: "The name visible in UI editor."
+        type: string
+      name:
+        description: "The task name"
+        type: string
+      icon:
+        description: "The icon that represents the task."
+        type: string
+      properties:
+        description: "The list of available task properties."
+        type: array
+        items:
+          $ref: "#/definitions/TaskProperty"
+      subtitle:
+        description: "Additional short description visible in UI editor."
+        type: string
+      version:
+        description: "The task version"
+        type: integer
+        default: 1
