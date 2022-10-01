@@ -18,11 +18,11 @@ package com.bytechef.task.dispatcher.each.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +50,13 @@ public class EachTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
-    @Bean("eachTaskCompletionHandlerFactory")
+    @Bean("eachTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory eachTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) ->
                 new EachTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService);
     }
 
-    @Bean("eachTaskDispatcherFactory")
+    @Bean("eachTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory eachTaskDispatcherFactory() {
         return (taskDispatcher) -> new EachTaskDispatcher(
                 taskDispatcher, taskExecutionService, messageBroker, contextService, counterService, taskEvaluator);
