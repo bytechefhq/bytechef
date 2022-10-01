@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 <your company/name>.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,13 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.message.broker.config;
+package com.bytechef.atlas.message.broker;
 
 /**
- * @author Ivica Cardic
+ * @author Arik Cohen
  */
-public interface MessageBrokerConfigurer {
-    void configure(Object listenerEndpointRegistrar, MessageBrokerListenerRegistrar messageBrokerListenerRegistrar);
+public interface Exchanges {
+    String TASKS = "workflow.tasks";
+    String CONTROL = "workflow.control";
 }
