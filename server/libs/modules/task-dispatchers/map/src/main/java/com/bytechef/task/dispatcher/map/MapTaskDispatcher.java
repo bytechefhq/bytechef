@@ -18,24 +18,24 @@
 
 package com.bytechef.task.dispatcher.map;
 
-import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.context.domain.MapContext;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.MAP;
+
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
@@ -63,50 +63,44 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     @Override
     public void dispatch(TaskExecution taskExecution) {
         List<Object> list = taskExecution.getList("list", Object.class);
-        Map<String, Object> iteratee = taskExecution.getMap("iteratee");
+        WorkflowTask iteratee = taskExecution.getWorkflowTask("iteratee");
 
         Assert.notNull(list, "'list' property can't be null");
         Assert.notNull(iteratee, "'iteratee' property can't be null");
 
-        SimpleTaskExecution parentMapTask = SimpleTaskExecution.of(taskExecution);
+        TaskExecution mapTaskExecution = new TaskExecution(taskExecution);
 
-        parentMapTask.setStartTime(new Date());
-        parentMapTask.setStatus(TaskStatus.STARTED);
+        mapTaskExecution.setStartTime(LocalDateTime.now());
+        mapTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionService.merge(parentMapTask);
+        taskExecutionService.update(mapTaskExecution);
 
         if (list.size() > 0) {
             counterService.set(taskExecution.getId(), list.size());
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
-                SimpleTaskExecution mapTask = SimpleTaskExecution.of(iteratee);
+                TaskExecution iterateeTaskExecution = TaskExecution.of(
+                        iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
 
-                mapTask.setId(UUIDGenerator.generate());
-                mapTask.setParentId(taskExecution.getId());
-                mapTask.setStatus(TaskStatus.CREATED);
-                mapTask.setJobId(taskExecution.getJobId());
-                mapTask.setCreateTime(new Date());
-                mapTask.setPriority(taskExecution.getPriority());
-                mapTask.setTaskNumber(i + 1);
+                Context context = new Context(contextService.peek(taskExecution.getId()));
 
-                MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
+                context.put(taskExecution.getString("itemVar", "item"), item);
+                context.put(taskExecution.getString("itemIndex", "itemIndex"), i);
 
-                context.set(taskExecution.getString("itemVar", "item"), item);
-                context.set(taskExecution.getString("itemIndex", "itemIndex"), i);
+                contextService.push(iterateeTaskExecution.getId(), context);
 
-                contextService.push(mapTask.getId(), context);
+                TaskExecution evaluatedEachTask = taskEvaluator.evaluate(iterateeTaskExecution, context);
 
-                TaskExecution evaluatedEachTask = taskEvaluator.evaluate(mapTask, context);
+                evaluatedEachTask = taskExecutionService.add(evaluatedEachTask);
 
-                taskExecutionService.create(evaluatedEachTask);
                 taskDispatcher.dispatch(evaluatedEachTask);
             }
         } else {
-            SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
+            TaskExecution completion = new TaskExecution(taskExecution);
 
-            completion.setStartTime(new Date());
-            completion.setEndTime(new Date());
+            completion.setStartTime(LocalDateTime.now());
+            completion.setEndTime(LocalDateTime.now());
             completion.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, completion);
@@ -115,7 +109,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
     @Override
     public TaskDispatcher<?> resolve(Task task) {
-        if (task.getType().equals(Constants.MAP)) {
+        if (task.getType().equals(MAP + "/v" + VERSION_1)) {
             return this;
         }
 
