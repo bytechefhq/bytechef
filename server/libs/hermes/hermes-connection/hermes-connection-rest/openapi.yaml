@@ -1,0 +1,131 @@
+openapi: 3.0.1
+info:
+  title:  OpenAPI definition
+  version: v1
+servers:
+  - url: http://localhost:5173/api
+paths:
+  /connections:
+    get:
+      tags:
+        - ConnectionController
+      operationId: getConnections
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Connection'
+    post:
+      tags:
+        - ConnectionController
+      operationId: postConnection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Connection'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Connection'
+  /connections/{id}:
+    delete:
+      tags:
+        - ConnectionController
+      operationId: deleteConnection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    get:
+      tags:
+        - ConnectionController
+      operationId: getConnection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Connection'
+    put:
+      tags:
+        - ConnectionController
+      operationId: putConnection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionUpdate'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Connection'
+components:
+  schemas:
+    Connection:
+      type: object
+      properties:
+        componentName:
+          type: string
+        componentVersion:
+          type: string
+        createdBy:
+          type: string
+          readOnly: true
+        createdDate:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+        id:
+          type: string
+          readOnly: true
+        label:
+          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+        lastModifiedBy:
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          type: string
+          format: date-time
+          readOnly: true
+    ConnectionUpdate:
+      type: object
+      properties:
+        name:
+          type: string
