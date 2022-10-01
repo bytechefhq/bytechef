@@ -30,12 +30,12 @@ public class DistributedEventPublisher implements EventPublisher {
 
     private final MessageBroker messageBroker;
 
-    public DistributedEventPublisher(MessageBroker aMessageBroker) {
-        messageBroker = Objects.requireNonNull(aMessageBroker);
+    public DistributedEventPublisher(MessageBroker messageBroker) {
+        this.messageBroker = Objects.requireNonNull(messageBroker);
     }
 
     @Override
-    public void publishEvent(WorkflowEvent aEvent) {
-        messageBroker.send(Queues.EVENTS, aEvent);
+    public void publishEvent(WorkflowEvent workflowEvent) {
+        messageBroker.send(Queues.EVENTS, workflowEvent);
     }
 }
