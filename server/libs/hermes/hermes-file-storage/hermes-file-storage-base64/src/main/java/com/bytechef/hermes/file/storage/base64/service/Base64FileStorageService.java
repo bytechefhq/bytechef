@@ -16,13 +16,14 @@
 
 package com.bytechef.hermes.file.storage.base64.service;
 
-import com.bytechef.hermes.file.storage.dto.FileEntry;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.exception.FileStorageException;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
@@ -31,21 +32,15 @@ import java.util.Base64;
 public class Base64FileStorageService implements FileStorageService {
 
     @Override
-    public void deleteFile(String url) throws FileStorageException {}
-
-    @Override
-    public void deleteFiles(long retentionTime) throws FileStorageException {}
-
-    @Override
-    public boolean fileExists(String url) throws FileStorageException {
+    public boolean fileExists(FileEntry fileEntry) throws FileStorageException {
         return true;
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String content) throws FileStorageException {
+    public FileEntry storeFileContent(String fileName, String data) throws FileStorageException {
         Base64.Encoder encoder = Base64.getEncoder();
 
-        return FileEntry.of(fileName, "base64:" + encoder.encodeToString(content.getBytes()));
+        return FileEntry.of(fileName, "base64:" + encoder.encodeToString(data.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
@@ -60,15 +55,17 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public String readFileContent(String url) throws FileStorageException {
+    public String readFileToString(FileEntry fileEntry) throws FileStorageException {
         Base64.Decoder decoder = Base64.getDecoder();
+        String url = fileEntry.getUrl();
 
-        return new String(decoder.decode(url.replace("base64:", "")));
+        return new String(decoder.decode(url.replace("base64:", "")), StandardCharsets.UTF_8);
     }
 
     @Override
-    public InputStream getFileContentStream(String url) {
+    public InputStream getFileStream(FileEntry fileEntry) {
         Base64.Decoder decoder = Base64.getDecoder();
+        String url = fileEntry.getUrl();
 
         return new ByteArrayInputStream(decoder.decode(url.replace("base64:", "")));
     }
