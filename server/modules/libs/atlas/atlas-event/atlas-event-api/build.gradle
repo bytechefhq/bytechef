@@ -1,5 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:atlas-api")
-
-    implementation "org.springframework:spring-core"
-}

@@ -18,10 +18,32 @@
 
 package com.bytechef.atlas.event;
 
+import java.time.LocalDateTime;
+
 /**
  * @author Arik Cohen
- * @since Jun 9, 2017
+ * @author Ivica Cardic
+ * @since Apr 8, 2017
  */
-public interface EventListener {
-    void onApplicationEvent(WorkflowEvent workflowEvent);
+public abstract class WorkflowEvent {
+
+    private final LocalDateTime createdDate;
+    protected String type;
+
+    protected WorkflowEvent() {
+        this.createdDate = LocalDateTime.now();
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return "WorkflowEvent{" + "createTime=" + createdDate + ", type='" + type + '\'' + '}';
+    }
 }
