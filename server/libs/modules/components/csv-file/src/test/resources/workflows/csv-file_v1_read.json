@@ -18,7 +18,7 @@
     {
       "name": "readCsvFile",
       "label": "Read from the csv file",
-      "type": "csvFile/1.0/read",
+      "type": "csvFile/v1/read",
       "fileEntry": "${fileEntry}",
       "includeEmptyCells": true
     }

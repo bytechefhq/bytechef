@@ -18,7 +18,7 @@
     {
       "name": "writeCsvFile",
       "label": "Write to the csv file",
-      "type": "csvFile/1.0/write",
+      "type": "csvFile/v1/write",
       "rows": "${rows}"
     }
   ]
