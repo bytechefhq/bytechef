@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.file.storage.filesystem;
+package com.bytechef.hermes.file.storage.filesystem.service;
 
-import com.bytechef.atlas.uuid.UUIDGenerator;
-import com.bytechef.hermes.file.storage.dto.FileEntry;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.exception.FileStorageException;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.ByteArrayInputStream;
@@ -29,69 +28,48 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.UUID;
 
 /**
  * @author Ivica Cardic
  */
-public class FileSystemFileStorageService implements FileStorageService {
+public class FilesystemFileStorageService implements FileStorageService {
 
     private final Path rootLocation;
 
-    public FileSystemFileStorageService(String fileStorageDir) {
+    public FilesystemFileStorageService(String fileStorageDir) {
         this.rootLocation = Paths.get(fileStorageDir);
     }
 
-    @Override
-    public void deleteFile(String url) throws FileStorageException {
+    public void deleteFile(FileEntry fileEntry) {
         Path path = resolveDirectory();
+        String url = fileEntry.getUrl();
 
-        try {
-            Files.delete(path.resolve(url.replace("file:", "")));
-        } catch (IOException ioe) {
-            throw new FileStorageException("Failed to delete file " + url, ioe);
-        }
+        path.resolve(url.replace("file:", "")).toFile().delete();
     }
 
     @Override
-    public void deleteFiles(long retentionTime) throws FileStorageException {
+    public boolean fileExists(FileEntry fileEntry) throws FileStorageException {
         Path path = resolveDirectory();
-
-        try (Stream<Path> stream = Files.walk(path)) {
-            stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(file -> {
-                if ((System.currentTimeMillis() - file.lastModified()) >= retentionTime) {
-                    if (!file.delete()) {
-                        throw new FileStorageException("Unable to delete file " + file.getAbsolutePath());
-                    }
-                }
-            });
-        } catch (IOException ioe) {
-            throw new FileStorageException("Failed to delete file " + path, ioe);
-        }
-    }
-
-    @Override
-    public boolean fileExists(String url) throws FileStorageException {
-        Path path = resolveDirectory();
+        String url = fileEntry.getUrl();
 
         return path.resolve(url.replace("file:", "")).toFile().exists();
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String content) throws FileStorageException {
-        Objects.requireNonNull(fileName, "File name is required");
-        Objects.requireNonNull(content, "Content is required");
+    public FileEntry storeFileContent(String fileName, String data) throws FileStorageException {
+        Objects.requireNonNull(fileName, "Filename is required");
+        Objects.requireNonNull(data, "Content is required");
 
-        return storeFileContent(fileName, new ByteArrayInputStream(content.getBytes()));
+        return storeFileContent(fileName, new ByteArrayInputStream(data.getBytes()));
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, InputStream inputStream) throws FileStorageException {
         Path path = resolveDirectory();
 
-        path = path.resolve(UUIDGenerator.generate());
+        path = path.resolve(generate());
 
         try {
             Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
@@ -109,24 +87,26 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public String readFileContent(String url) throws FileStorageException {
+    public String readFileToString(FileEntry fileEntry) throws FileStorageException {
         Path path = resolveDirectory();
+        String url = fileEntry.getUrl();
 
         try {
             return Files.readString(path.resolve(url.replace("file:", "")));
         } catch (IOException ioe) {
-            throw new FileStorageException("Failed to open file " + url, ioe);
+            throw new FileStorageException("Failed to open file " + fileEntry, ioe);
         }
     }
 
     @Override
-    public InputStream getFileContentStream(String url) {
+    public InputStream getFileStream(FileEntry fileEntry) {
         Path path = resolveDirectory();
+        String url = fileEntry.getUrl();
 
         try {
             return Files.newInputStream(path.resolve(url.replace("file:", "")), StandardOpenOption.READ);
         } catch (IOException ioe) {
-            throw new FileStorageException("Failed to open file " + url, ioe);
+            throw new FileStorageException("Failed to open file " + fileEntry, ioe);
         }
     }
 
@@ -136,5 +116,9 @@ public class FileSystemFileStorageService implements FileStorageService {
         } catch (IOException ioe) {
             throw new FileStorageException("Could not initialize storage", ioe);
         }
+    }
+
+    private String generate() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
     }
 }

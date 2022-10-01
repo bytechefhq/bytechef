@@ -16,14 +16,12 @@
 
 package com.bytechef.hermes.file.storage.filesystem.service;
 
-import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.filesystem.FileSystemFileStorageService;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
@@ -31,39 +29,23 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class FileSystemFileStorageServiceTest {
+public class FilesystemFileStorageServiceTest {
 
     private static final String TEST_STRING = "test string";
 
-    private static final FileSystemFileStorageService fileStorageService =
-            new FileSystemFileStorageService("/tmp/test/bytechef/files");
+    private static final FilesystemFileStorageService fileStorageService =
+            new FilesystemFileStorageService("/tmp/test/bytechef/files");
 
     @Test
     public void testDeleteFile() {
         FileEntry fileEntry = fileStorageService.storeFileContent(
                 "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
-        Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
-                .isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileStorageService.readFileToString(fileEntry)).isEqualTo(TEST_STRING);
 
-        fileStorageService.deleteFile(fileEntry.getUrl());
+        fileStorageService.deleteFile(fileEntry);
 
-        Assertions.assertThat(fileStorageService.fileExists(fileEntry.getUrl())).isFalse();
-    }
-
-    @Test
-    public void testDeleteFiles() throws InterruptedException {
-        FileEntry fileEntry = fileStorageService.storeFileContent(
-                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
-
-        Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
-                .isEqualTo(TEST_STRING);
-
-        TimeUnit.SECONDS.sleep(2);
-
-        fileStorageService.deleteFiles(TimeUnit.SECONDS.toMillis(1));
-
-        Assertions.assertThat(fileStorageService.fileExists(fileEntry.getUrl())).isFalse();
+        Assertions.assertThat(fileStorageService.fileExists(fileEntry)).isFalse();
     }
 
     @Test
@@ -71,7 +53,7 @@ public class FileSystemFileStorageServiceTest {
         FileEntry fileEntry = fileStorageService.storeFileContent(
                 "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
-        InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
+        InputStream inputStream = fileStorageService.getFileStream(fileEntry);
 
         Assertions.assertThat(new String(inputStream.readAllBytes(), Charset.defaultCharset()))
                 .isEqualTo(TEST_STRING);
@@ -82,8 +64,7 @@ public class FileSystemFileStorageServiceTest {
         FileEntry fileEntry = fileStorageService.storeFileContent(
                 "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
-        Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
-                .isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileStorageService.readFileToString(fileEntry)).isEqualTo(TEST_STRING);
     }
 
     @Test
