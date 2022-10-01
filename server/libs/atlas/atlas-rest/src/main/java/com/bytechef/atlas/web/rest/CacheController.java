@@ -18,23 +18,25 @@
 
 package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.cache.Clearable;
+import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.commons.cache.Clearable;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
 @RestController
-public class CacheController {
+@ConditionalOnApi
+public class CacheController implements CacheControllerApi {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheController.class);
 
@@ -44,16 +46,14 @@ public class CacheController {
         this.clearables = clearables == null ? Collections.emptyList() : clearables;
     }
 
-    @RequestMapping(
-            value = "/caches/clear",
-            method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<Void> clear() {
+    @Override
+    public Mono<ResponseEntity<Void>> clearCache(ServerWebExchange exchange) {
         for (Clearable clearable : clearables) {
             logger.info("Clearing: {}", clearable.getClass().getName());
 
             clearable.clear();
         }
 
-        return ResponseEntity.ok().build();
+        return Mono.empty();
     }
 }
