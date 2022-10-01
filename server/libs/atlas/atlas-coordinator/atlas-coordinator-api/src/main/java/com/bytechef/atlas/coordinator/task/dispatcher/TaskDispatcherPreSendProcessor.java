@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.coordinator;
+package com.bytechef.atlas.coordinator.task.dispatcher;
 
-import com.bytechef.atlas.error.Errorable;
-import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import java.util.Map;
+import com.bytechef.atlas.domain.TaskExecution;
 
 /**
  * @author Ivica Cardic
  */
-public interface Coordinator {
-    void complete(TaskExecution completion);
-
-    Job create(Map<String, Object> jobParamsMap);
-
-    void handleError(Errorable errorable);
-
-    Job resume(String jobId);
-
-    void start(Job job);
-
-    Job stop(String jobId);
+public interface TaskDispatcherPreSendProcessor {
+    TaskExecution process(TaskExecution taskExecution);
 }

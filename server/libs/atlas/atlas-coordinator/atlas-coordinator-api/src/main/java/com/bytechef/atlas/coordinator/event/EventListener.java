@@ -16,14 +16,14 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.coordinator.job.executor;
+package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.job.domain.Job;
+import com.bytechef.atlas.event.WorkflowEvent;
 
 /**
  * @author Arik Cohen
- * @since Apr 24, 2017
+ * @since Jun 9, 2017
  */
-public interface JobExecutor {
-    void execute(Job aJob);
+public interface EventListener {
+    void onApplicationEvent(WorkflowEvent workflowEvent);
 }

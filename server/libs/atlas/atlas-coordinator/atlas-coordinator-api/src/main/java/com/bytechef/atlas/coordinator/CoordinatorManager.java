@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,22 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.coordinator.task.completion;
+package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.error.Errorable;
 
 /**
- * A strategy interface for handling {@link TaskExecution} completions.
- *
- * @author Arik Cohen
- * @since Apr 23, 2017
+ * @author Ivica Cardic
  */
-public interface TaskCompletionHandler {
-    void handle(TaskExecution taskExecution);
+public interface CoordinatorManager {
+    void complete(TaskExecution taskExecution);
 
-    boolean canHandle(TaskExecution taskExecution);
+    void handleError(Errorable errorable);
+
+    Job stop(String jobId);
 }
