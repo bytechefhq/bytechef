@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
  */
 public class SyncMessageBroker implements MessageBroker {
 
-    private Map<String, List<Receiver>> listeners = new HashMap<>();
+    private final Map<String, List<Receiver>> listeners = new HashMap<>();
 
     @Override
     public void send(String routingKey, Object message) {
@@ -54,7 +54,7 @@ public class SyncMessageBroker implements MessageBroker {
         list.add(aReceiver);
     }
 
-    public static interface Receiver {
+    public interface Receiver {
         void receive(Object aMessage);
     }
 }
