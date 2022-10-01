@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.test.json;
+package com.bytechef.hermes.component.test.json;
 
 import java.util.Collection;
 import java.util.List;

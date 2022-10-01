@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.test.json;
+package com.bytechef.hermes.component.test.json;
 
 import java.util.Collection;
 import java.util.List;
@@ -202,19 +202,19 @@ public class JsonObjectUtils {
     }
 
     public static <T> JSONObject of(Map<String, T> map, Function<T, ?> valueProcessor) {
-        JSONObject JSONObject;
+        JSONObject jsonObject;
 
         if (valueProcessor == null) {
-            JSONObject = of(map);
+            jsonObject = of(map);
         } else {
-            JSONObject = new JSONObject();
+            jsonObject = new JSONObject();
 
             for (Map.Entry<String, T> entry : map.entrySet()) {
-                JSONObject.put(entry.getKey(), valueProcessor.apply(entry.getValue()));
+                jsonObject.put(entry.getKey(), valueProcessor.apply(entry.getValue()));
             }
         }
 
-        return JSONObject;
+        return jsonObject;
     }
 
     public static <T> JSONObject of(List<T> values) {
