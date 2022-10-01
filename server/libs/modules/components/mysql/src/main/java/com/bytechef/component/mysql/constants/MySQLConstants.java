@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.mysql;
+package com.bytechef.component.mysql.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class MySQLTaskConstants {
+public class MySQLConstants {
 
     public static final String MYSQL = "mysql";
-    public static final float VERSION_1_0 = 1.0f;
 }
