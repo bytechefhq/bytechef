@@ -16,10 +16,11 @@
 
 package com.bytechef.task.dispatcher.subflow.configuration;
 
-import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.service.job.JobService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
+import com.bytechef.atlas.coordinator.CoordinatorManager;
+import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
+import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,10 +30,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnCoordinator
 public class SubflowJobStatusEventListenerConfiguration {
 
     @Autowired
-    private Coordinator coordinator;
+    private CoordinatorManager coordinatorManager;
 
     @Autowired
     private JobService jobService;
@@ -45,6 +47,6 @@ public class SubflowJobStatusEventListenerConfiguration {
 
     @Bean
     SubflowJobStatusEventListener subflowJobStatusEventListener() {
-        return new SubflowJobStatusEventListener(jobService, taskExecutionService, coordinator, taskEvaluator);
+        return new SubflowJobStatusEventListener(jobService, taskExecutionService, coordinatorManager, taskEvaluator);
     }
 }
