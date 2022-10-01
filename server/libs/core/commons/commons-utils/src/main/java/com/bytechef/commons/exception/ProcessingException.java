@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.date;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+package com.bytechef.commons.exception;
 
 /**
- * @author Ivica Cardic
+ * @author Igor Beslic
  */
-public class LocalDateTimeUtils {
+public class ProcessingException extends RuntimeException {
 
-    public static long getTime(LocalDateTime localDateTime) {
-        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    public ProcessingException(String message) {
+        super(message);
+    }
+
+    public ProcessingException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
