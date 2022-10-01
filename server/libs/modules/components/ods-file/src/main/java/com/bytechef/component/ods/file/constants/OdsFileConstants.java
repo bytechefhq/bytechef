@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.odsfile;
+package com.bytechef.component.ods.file.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class OdsFileTaskConstants {
+public class OdsFileConstants {
 
     public static final String ROWS = "rows";
     public static final String HEADER_ROW = "headerRow";
@@ -29,7 +29,6 @@ public class OdsFileTaskConstants {
     public static final String SHEET_NAME = "sheetName";
     public static final String INCLUDE_EMPTY_CELLS = "includeEmptyCells";
     public static final String ODS_FILE = "odsFile";
-    public static final float VERSION_1_0 = 1.0f;
     public static final String READ = "read";
     public static final String WRITE = "write";
 }

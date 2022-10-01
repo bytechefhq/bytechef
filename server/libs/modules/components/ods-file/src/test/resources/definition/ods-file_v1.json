@@ -1,0 +1,185 @@
+{
+  "display": {
+    "description": "Reads and writes data from a ODS file.",
+    "label": "ODS File"
+  },
+  "name": "odsFile",
+  "actions": [
+    {
+      "display": {
+        "description": "Reads data from a ODS file.",
+        "label": "Read from file"
+      },
+      "name": "read",
+      "inputs": [
+        {
+          "description": "The object property which contains a reference to the ODS file to read from.",
+          "label": "File",
+          "name": "fileEntry",
+          "type": "OBJECT",
+          "required": true,
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        },
+        {
+          "label": "Options",
+          "placeholder": "Add Option",
+          "type": "OPTION",
+          "options": [
+            {
+              "description": "The first row of the file contains the header names.",
+              "label": "Header Row",
+              "name": "headerRow",
+              "type": "BOOLEAN",
+              "defaultValue": true
+            },
+            {
+              "description": "When reading from file the empty cells will be filled with an empty string.",
+              "label": "Include Empty Cells",
+              "name": "includeEmptyCells",
+              "type": "BOOLEAN",
+              "defaultValue": false
+            },
+            {
+              "description": "The amount of child elements to return in a page.",
+              "label": "Page Size",
+              "name": "pageSize",
+              "type": "INTEGER"
+            },
+            {
+              "description": "The page number to get.",
+              "label": "Page Number",
+              "name": "pageNumber",
+              "type": "INTEGER"
+            },
+            {
+              "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
+              "label": "Read As String",
+              "name": "readAsString",
+              "type": "BOOLEAN",
+              "defaultValue": false
+            },
+            {
+              "description": "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.",
+              "label": "Sheet Name",
+              "name": "sheetName",
+              "type": "STRING",
+              "defaultValue": "Sheet"
+            }
+          ]
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ARRAY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Writes the data to a ODS file.",
+        "label": "Write to file"
+      },
+      "name": "write",
+      "inputs": [
+        {
+          "description": "The array of objects to write to the file.",
+          "label": "Rows",
+          "name": "rows",
+          "type": "ARRAY",
+          "required": true,
+          "items": [
+            {
+              "type": "OBJECT",
+              "additionalProperties": true,
+              "properties": [
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Options",
+          "placeholder": "Add Option",
+          "type": "OPTION",
+          "options": [
+            {
+              "description": "Filename to set for binary data. By default, \"file.ods\" will be used.",
+              "label": "Filename",
+              "name": "filename",
+              "type": "STRING",
+              "required": true,
+              "defaultValue": "file.ods"
+            },
+            {
+              "description": "The name of the sheet to create in the spreadsheet.",
+              "label": "Sheet Name",
+              "name": "sheetName",
+              "type": "STRING",
+              "defaultValue": "Sheet"
+            }
+          ]
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
