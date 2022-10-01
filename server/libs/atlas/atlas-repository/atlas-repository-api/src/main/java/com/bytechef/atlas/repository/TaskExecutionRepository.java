@@ -16,46 +16,42 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.task.execution;
+package com.bytechef.atlas.repository;
 
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 /**
  * @author Arik Cohen
  */
 public interface TaskExecutionRepository {
     /**
-     * Creates a new persistent represenation of the given {@link TaskExecution}.
-     *
-     * @param taskExecution
-     */
-    void create(TaskExecution taskExecution);
-
-    /**
      * Returns the execution steps of the given job
      *
-     * @param jobId
+     * @param job
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobIdOrderByCreateTime(String jobId);
+    List<TaskExecution> findAllByJobOrderByCreatedDate(AggregateReference<Job, String> job);
 
     /**
      * Returns the execution steps of the given jobs
      *
-     * @param jobIds
+     * @param jobs
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobIdsOrderByCreateTime(List<String> jobIds);
+    List<TaskExecution> findAllByJobInOrderByCreatedDate(List<AggregateReference<Job, String>> jobs);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which belong to the job of the given
      * id.
      *
-     * @param jobId
+     * @param job
      * @return
      */
-    List<TaskExecution> findAllByJobIdOrderByTaskNumber(String jobId);
+    List<TaskExecution> findAllByJobOrderByTaskNumber(AggregateReference<Job, String> job);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which are the children of the given
@@ -64,7 +60,7 @@ public interface TaskExecutionRepository {
      * @param parentId
      * @return
      */
-    List<TaskExecution> findAllByParentId(String parentId);
+    List<TaskExecution> findAllByParent(AggregateReference<TaskExecution, String> parentId);
 
     /**
      * Find a single {@link TaskExecution} instance by its id.
@@ -72,13 +68,14 @@ public interface TaskExecutionRepository {
      * @param id
      * @return TaskExecution
      */
-    TaskExecution findOne(String id);
+    Optional<TaskExecution> findById(String id);
+
+    Optional<TaskExecution> findByIdForUpdate(String id);
 
     /**
-     * Merges the state of the given {@link TaskExecution} instance with its persistent
-     * representation and returns the merged version.
+     * Creates a new persistent represenation of the given {@link TaskExecution}.
      *
      * @param taskExecution
      */
-    TaskExecution merge(TaskExecution taskExecution);
+    TaskExecution save(TaskExecution taskExecution);
 }

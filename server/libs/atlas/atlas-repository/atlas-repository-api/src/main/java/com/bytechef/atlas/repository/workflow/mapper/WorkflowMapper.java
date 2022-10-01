@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.exception;
+package com.bytechef.atlas.repository.workflow.mapper;
+
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.workflow.WorkflowResource;
 
 /**
- * @author Igor Beslic
+ * @author Ivica Cardic
  */
-public class RepositoryException extends RuntimeException {
-
-    public RepositoryException(String message) {
-        super(message);
-    }
-
-    public RepositoryException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface WorkflowMapper {
+    Workflow readValue(WorkflowResource workflowResource);
 }

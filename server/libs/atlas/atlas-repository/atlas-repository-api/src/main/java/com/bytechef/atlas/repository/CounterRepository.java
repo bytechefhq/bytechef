@@ -16,38 +16,36 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.job;
+package com.bytechef.atlas.repository;
 
-import com.bytechef.atlas.data.Page;
-import com.bytechef.atlas.job.JobSummary;
-import com.bytechef.atlas.job.domain.Job;
-import java.util.List;
-import java.util.Optional;
+import com.bytechef.atlas.domain.Counter;
 
 /**
+ * A repository that can be used to update a counter value.
+ *
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public interface JobRepository {
-    int countCompletedJobsToday();
+public interface CounterRepository {
 
-    int countCompletedJobsYesterday();
+    /**
+     * Delete the specified counter.
+     *
+     * @param id the id of the counter
+     */
+    void deleteById(String id);
 
-    int countRunningJobs();
+    Iterable<Counter> findAll();
 
-    void create(Job aJob);
+    Long findValueByIdForUpdate(String id);
 
-    void delete(String id);
+    Counter save(Counter counter);
 
-    List<Job> findAll();
-
-    Page<JobSummary> findAllJobSummaries(int pageNumber);
-
-    Job findById(String aId);
-
-    Optional<Job> findLatestJob();
-
-    Job findByTaskExecutionId(String taskId);
-
-    Job merge(Job job);
+    /**
+     * Set the counter to the give value.
+     *
+     * @param id the id of the counter
+     * @param value the value to set the counter to.
+     */
+    void update(String id, long value);
 }

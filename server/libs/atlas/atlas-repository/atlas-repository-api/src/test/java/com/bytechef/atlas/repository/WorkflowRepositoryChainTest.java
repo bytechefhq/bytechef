@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,26 +12,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.context;
+package com.bytechef.atlas.repository;
 
-import com.bytechef.atlas.context.domain.Context;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
- * Stores context information for a job or task objects.
- *
- * <p>{@link Context} instances are used to evaluate workflow tasks before they are executed.
- *
- * @author Arik Cohen
- * @since Mar 2017
+ * @author Ivica Cardic
  */
-public interface ContextRepository {
-    void delete(String stackId);
+public class WorkflowRepositoryChainTest {
 
-    void push(String stackId, Context context);
+    @Disabled
+    @Test
+    public void testFindById() {
+        // TODO
+    }
 
-    Context peek(String stackId);
+    @Disabled
+    @Test
+    public void testFindAll() {
+        // TODO
+    }
 }

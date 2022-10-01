@@ -16,16 +16,14 @@
 
 package com.bytechef.atlas.repository.workflow.mapper;
 
-import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.error.ErrorObject;
-import com.bytechef.atlas.task.SimpleWorkflowTask;
-import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.workflow.WorkflowResource;
-import com.bytechef.atlas.workflow.domain.SimpleWorkflow;
-import com.bytechef.atlas.workflow.domain.Workflow;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,37 +37,50 @@ import org.springframework.util.Assert;
 /**
  * @author Matija Petanjek
  */
-public abstract class BaseWorkflowMapper implements WorkflowMapper {
+public abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
-    public Workflow readValue(WorkflowResource aWorkflowResource, ObjectMapper objectMapper) {
+    public Workflow readValue(WorkflowResource workflowResource, ObjectMapper objectMapper) {
         try {
-            Map<String, Object> jsonMap = parse(aWorkflowResource, objectMapper);
-            jsonMap.put(Constants.ID, aWorkflowResource.getId());
-            return new SimpleWorkflow(jsonMap);
+            Map<String, Object> jsonMap = parse(workflowResource, objectMapper);
+
+            jsonMap.put(WorkflowConstants.ID, workflowResource.getId());
+
+            return new Workflow(jsonMap);
         } catch (Exception e) {
-            SimpleWorkflow workflow =
-                    new SimpleWorkflow(Collections.singletonMap(Constants.ID, aWorkflowResource.getId()));
-            workflow.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
+            Workflow workflow = new Workflow(Collections.singletonMap(WorkflowConstants.ID, workflowResource.getId()));
+
+            workflow.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+
             return workflow;
         }
     }
 
-    protected Map<String, Object> parse(Resource aResource, ObjectMapper objectMapper) {
-        try (InputStream in = aResource.getInputStream()) {
-            String workflow = IOUtils.toString(in);
+    private Map<String, Object> parse(Resource resource, ObjectMapper objectMapper) {
+        try (InputStream in = resource.getInputStream()) {
+            String workflow = IOUtils.toString(in, StandardCharsets.UTF_8);
+            @SuppressWarnings("unchecked")
             Map<String, Object> workflowMap = objectMapper.readValue(workflow, Map.class);
+
             validate(workflowMap);
-            List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(Constants.TASKS);
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(WorkflowConstants.TASKS);
+
             Assert.notNull(rawTasks, "no tasks found");
             Assert.notEmpty(rawTasks, "no tasks found");
-            List<Task> tasks = new ArrayList<>();
+
+            List<Map<String, Object>> tasks = new ArrayList<>();
+
             for (int i = 0; i < rawTasks.size(); i++) {
-                Map<String, Object> rt = rawTasks.get(i);
-                SimpleWorkflowTask mutableTask = new SimpleWorkflowTask(rt);
-                mutableTask.setTaskNumber(i + 1);
-                tasks.add(mutableTask);
+                Map<String, Object> rawTask = rawTasks.get(i);
+
+                rawTask.put(WorkflowConstants.TASK_NUMBER, i + 1);
+
+                tasks.add(rawTask);
             }
-            workflowMap.put(Constants.TASKS, tasks);
+
+            workflowMap.put(WorkflowConstants.TASKS, tasks);
+
             return workflowMap;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -81,24 +92,32 @@ public abstract class BaseWorkflowMapper implements WorkflowMapper {
         validateOutputs(aMap);
     }
 
-    private void validateOutputs(Map<String, Object> aWorkflow) {
-        List<Map<String, Object>> outputs = (List<Map<String, Object>>) aWorkflow.get(Constants.OUTPUTS);
+    @SuppressWarnings("unchecked")
+    private void validateOutputs(Map<String, Object> workflow) {
+        List<Map<String, Object>> outputs = (List<Map<String, Object>>) workflow.get(WorkflowConstants.OUTPUTS);
+
         for (int i = 0; outputs != null && i < outputs.size(); i++) {
             Map<String, Object> output = outputs.get(i);
-            Assert.notNull(output.get(Constants.NAME), "output definition must specify a 'name'");
-            Assert.notNull(output.get(Constants.VALUE), "output definition must specify a 'value'");
+
+            Assert.notNull(output.get(WorkflowConstants.NAME), "output definition must specify a 'name'");
+            Assert.notNull(output.get(WorkflowConstants.VALUE), "output definition must specify a 'value'");
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void validateReservedWords(Map<String, Object> aWorkflow) {
-        List<String> reservedWords = Arrays.asList(Constants.RESERVED_WORDS);
+        List<String> reservedWords = Arrays.asList(WorkflowConstants.RESERVED_WORDS);
+
         for (Map.Entry<String, Object> entry : aWorkflow.entrySet()) {
             String k = entry.getKey();
             Object v = entry.getValue();
+
             Assert.isTrue(!reservedWords.contains(k), "reserved word: " + k);
+
             if (v instanceof Map) {
                 validate((Map<String, Object>) v);
             }
+
             if (v instanceof List) {
                 List<Object> items = (List<Object>) v;
                 for (Object item : items) {
