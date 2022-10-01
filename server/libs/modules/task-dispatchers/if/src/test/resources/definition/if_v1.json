@@ -1,0 +1,272 @@
+{
+  "display": {
+    "label": "Boolean Condition"
+  },
+  "name": "if",
+  "inputs": [
+    {
+      "description": "The type of values to compare.",
+      "label": "Conditions",
+      "name": "conditions",
+      "placeholder": "Add Condition",
+      "type": "ARRAY",
+      "items": [
+        {
+          "label": "Boolean",
+          "name": "boolean",
+          "type": "OBJECT",
+          "properties": [
+            {
+              "description": "The boolean value to compare with the second one.",
+              "label": "Value 1",
+              "name": "value1",
+              "type": "BOOLEAN",
+              "defaultValue": false
+            },
+            {
+              "description": "Compare operation to decide where to map data.",
+              "label": "Operation",
+              "name": "operation",
+              "type": "STRING",
+              "defaultValue": "EQUALS",
+              "options": [
+                {
+                  "name": "Equals",
+                  "value": "EQUALS"
+                },
+                {
+                  "name": "Not Equals",
+                  "value": "NOT_EQUALS"
+                }
+              ]
+            },
+            {
+              "description": "The boolean value to compare with the first one.",
+              "label": "Value 2",
+              "name": "value2",
+              "type": "BOOLEAN",
+              "defaultValue": false
+            }
+          ]
+        },
+        {
+          "label": "Date & Time",
+          "name": "dateTime",
+          "type": "OBJECT",
+          "properties": [
+            {
+              "description": "The date & time value to compare with the second one.",
+              "label": "Value 1",
+              "name": "value1",
+              "type": "DATE_TIME"
+            },
+            {
+              "description": "Compare operation to decide where to map data.",
+              "label": "Operation",
+              "name": "operation",
+              "type": "STRING",
+              "defaultValue": "AFTER",
+              "options": [
+                {
+                  "name": "After",
+                  "value": "AFTER"
+                },
+                {
+                  "name": "Before",
+                  "value": "BEFORE"
+                }
+              ]
+            },
+            {
+              "description": "The date & time value to compare with the first one.",
+              "label": "Value 2",
+              "name": "value2",
+              "type": "DATE_TIME"
+            }
+          ]
+        },
+        {
+          "label": "Number",
+          "name": "number",
+          "type": "OBJECT",
+          "properties": [
+            {
+              "description": "The number value to compare with the second one.",
+              "label": "Value 1",
+              "name": "value1",
+              "type": "NUMBER",
+              "defaultValue": 0.0
+            },
+            {
+              "description": "Compare operation to decide where to map data.",
+              "label": "Operation",
+              "name": "operation",
+              "type": "STRING",
+              "defaultValue": "LESS",
+              "options": [
+                {
+                  "name": "Less",
+                  "value": "LESS"
+                },
+                {
+                  "name": "Less or Equals",
+                  "value": "LESS_EQUALS"
+                },
+                {
+                  "name": "Equals",
+                  "value": "EQUALS"
+                },
+                {
+                  "name": "Not Equals",
+                  "value": "NOT_EQUALS"
+                },
+                {
+                  "name": "Greater",
+                  "value": "GREATER"
+                },
+                {
+                  "name": "Greater or Equals",
+                  "value": "GREATER_EQUALS"
+                },
+                {
+                  "name": "Empty",
+                  "value": "EMPTY"
+                }
+              ]
+            },
+            {
+              "description": "The number value to compare with the first one.",
+              "displayOption": {
+                "hideWhen": {
+                  "operation": {}
+                }
+              },
+              "label": "Value 2",
+              "name": "value2",
+              "type": "NUMBER",
+              "defaultValue": 0.0
+            }
+          ]
+        },
+        {
+          "label": "String",
+          "name": "string",
+          "type": "OBJECT",
+          "properties": [
+            {
+              "description": "The string value to compare with the second one.",
+              "label": "Value 1",
+              "name": "value1",
+              "type": "STRING",
+              "defaultValue": ""
+            },
+            {
+              "description": "Compare operation to decide where to map data.",
+              "label": "Operation",
+              "name": "operation",
+              "type": "STRING",
+              "defaultValue": "EQUALS",
+              "options": [
+                {
+                  "name": "Equals",
+                  "value": "EQUALS"
+                },
+                {
+                  "name": "Not Equals",
+                  "value": "NOT_EQUALS"
+                },
+                {
+                  "name": "Contains",
+                  "value": "CONTAINS"
+                },
+                {
+                  "name": "Not Contains",
+                  "value": "NOT_CONTAINS"
+                },
+                {
+                  "name": "Starts With",
+                  "value": "STARTS_WITH"
+                },
+                {
+                  "name": "Ends With",
+                  "value": "ENDS_WITH"
+                },
+                {
+                  "name": "Regex",
+                  "value": "REGEX"
+                },
+                {
+                  "name": "Empty",
+                  "value": "EMPTY"
+                }
+              ]
+            },
+            {
+              "description": "The string value to compare with the first one.",
+              "displayOption": {
+                "hideWhen": {
+                  "operation": {
+                    "values": [
+                      "EMPTY",
+                      "REGEX"
+                    ]
+                  }
+                }
+              },
+              "label": "Value 2",
+              "name": "value2",
+              "type": "STRING",
+              "defaultValue": ""
+            },
+            {
+              "description": "The regex value to compare with the first one.",
+              "displayOption": {
+                "showWhen": {
+                  "operation": {
+                    "values": [
+                      "REGEX"
+                    ]
+                  }
+                }
+              },
+              "label": "Regex",
+              "name": "value2",
+              "placeholder": "/text/i",
+              "type": "STRING",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "If multiple conditions are set, this setting decides if it is true as soon as ANY condition\n matches or only if ALL are met.\n",
+      "displayOption": {
+        "showWhen": {
+          "rawConditions": {
+            "values": [
+              false
+            ]
+          }
+        }
+      },
+      "label": "Combine",
+      "name": "combineOperation",
+      "type": "STRING",
+      "defaultValue": "ALL",
+      "options": [
+        {
+          "description": "Only if all conditions are met, the workflow goes into \"true\" branch.",
+          "name": "All",
+          "value": "ALL"
+        },
+        {
+          "description": "If any condition is met, the workflow goes into \"true\" branch.",
+          "name": "Any",
+          "value": "ANY"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
