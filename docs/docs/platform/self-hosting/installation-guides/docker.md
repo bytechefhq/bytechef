@@ -41,11 +41,11 @@ docker run \
   -it \
   -e spring.datasource.url=jdbc:postgresql://postgres:5432/atlas \
   -e spring.datasource.initialization-mode=always \
-  -e atlas.worker.enabled=true \
-  -e atlas.coordinator.enabled=true \
-  -e atlas.worker.subscriptions.tasks=1 \
-  -e atlas.workflow-repository.filesystem.enabled=true \
-  -e atlas.workflow-repository.filesystem.location-pattern=/workflows/**/*.yaml \
+  -e workflow.worker.enabled=true \
+  -e workflow.coordinator.enabled=true \
+  -e workflow.worker.subscriptions.tasks=1 \
+  -e workflow.workflow-repository.filesystem.enabled=true \
+  -e workflow.workflow-repository.filesystem.location-pattern=/workflows/**/*.yaml \
   -v $PWD:/workflows \
   -p 8080:8080 \
   creactiviti/atlas
