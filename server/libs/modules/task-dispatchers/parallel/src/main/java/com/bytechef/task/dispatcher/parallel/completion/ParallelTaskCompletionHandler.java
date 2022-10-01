@@ -18,14 +18,14 @@
 
 package com.bytechef.task.dispatcher.parallel.completion;
 
-import com.bytechef.atlas.Constants;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
+
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 
 /**
  * A {@link TaskCompletionHandler} implementation which handles completions of parallel construct
@@ -36,19 +36,28 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
  *
  * @author Arik Cohen
  * @since May 12, 2017
- * @see ParallelTaskDispatcher
+ * @see com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher
  */
 public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
 
-    private TaskExecutionService taskExecutionService;
-    private TaskCompletionHandler taskCompletionHandler;
-    private CounterService counterService;
+    private final CounterService counterService;
+    private final TaskCompletionHandler taskCompletionHandler;
+    private final TaskExecutionService taskExecutionService;
+
+    public ParallelTaskCompletionHandler(
+            CounterService counterService,
+            TaskCompletionHandler taskCompletionHandler,
+            TaskExecutionService taskExecutionService) {
+        this.counterService = counterService;
+        this.taskCompletionHandler = taskCompletionHandler;
+        this.taskExecutionService = taskExecutionService;
+    }
 
     @Override
     public void handle(TaskExecution aTaskExecution) {
-        SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
+        TaskExecution mtask = new TaskExecution(aTaskExecution);
         mtask.setStatus(TaskStatus.COMPLETED);
-        taskExecutionService.merge(mtask);
+        taskExecutionService.update(mtask);
         long tasksLeft = counterService.decrement(aTaskExecution.getParentId());
         if (tasksLeft == 0) {
             taskCompletionHandler.handle(taskExecutionService.getTaskExecution(aTaskExecution.getParentId()));
@@ -61,20 +70,8 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
-            return parentExecution.getType().equals(Constants.PARALLEL);
+            return parentExecution.getType().equals(PARALLEL + "/v" + VERSION_1);
         }
         return false;
-    }
-
-    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
-        this.taskExecutionService = taskExecutionService;
-    }
-
-    public void setTaskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
-        this.taskCompletionHandler = taskCompletionHandler;
-    }
-
-    public void setCounterService(CounterService counterService) {
-        this.counterService = counterService;
     }
 }
