@@ -18,13 +18,13 @@
 
 package com.bytechef.atlas.message.broker.jms.config;
 
-import com.bytechef.atlas.config.AtlasProperties;
 import com.bytechef.atlas.message.broker.Exchanges;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.atlas.message.broker.jms.JmsMessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import javax.jms.ConnectionFactory;
@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListenerConfigurer;
@@ -53,19 +52,18 @@ import org.springframework.jms.support.converter.MessageType;
  * @author Arik Cohen
  */
 @Configuration
-@EnableConfigurationProperties(AtlasProperties.class)
-@ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "jms")
+@ConditionalOnProperty(name = "workflow.message-broker.provider", havingValue = "jms")
 public class JmsMessageBrokerConfiguration
         implements JmsListenerConfigurer, MessageBrokerListenerRegistrar<JmsListenerEndpointRegistrar> {
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private ConnectionFactory connectionFactory;
 
     @Autowired
-    private List<MessageBrokerConfigurer> messageBrokerConfigurers;
+    private ObjectMapper objectMapper;
+
+    @Autowired(required = false)
+    private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -94,61 +92,11 @@ public class JmsMessageBrokerConfiguration
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void configureJmsListeners(JmsListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<JmsListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
-
-        //        CoordinatorProperties coordinatorProperties = properties.getCoordinator();
-        //        WorkerProperties workerProperties = properties.getWorker();
-
-        //        if (coordinatorProperties.isEnabled()) {
-        //            Coordinator coordinator = applicationContext.getBean(Coordinator.class);
-        //
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.COMPLETIONS,
-        //                    coordinatorProperties.getSubscriptions().getCompletions(),
-        //                    coordinator,
-        //                    "complete");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.ERRORS,
-        //                    coordinatorProperties.getSubscriptions().getErrors(),
-        //                    coordinator,
-        //                    "handleError");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.EVENTS,
-        //                    coordinatorProperties.getSubscriptions().getEvents(),
-        //                    applicationContext.getBean(EventListener.class),
-        //                    "onApplicationEvent");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.JOBS,
-        //                    coordinatorProperties.getSubscriptions().getJobs(),
-        //                    coordinator,
-        //                    "start");
-        //            registerListenerEndpoint(
-        //                    listenerEndpointRegistrar,
-        //                    Queues.SUBFLOWS,
-        //                    coordinatorProperties.getSubscriptions().getSubflows(),
-        //                    coordinator,
-        //                    "create");
-        //        }
-        //
-        //        if (workerProperties.isEnabled()) {
-        //            Worker worker = applicationContext.getBean(Worker.class);
-        //
-        //            Map<String, Object> subscriptions = workerProperties.getSubscriptions();
-        //
-        //            subscriptions.forEach(
-        //                    (k, v) -> registerListenerEndpoint(listenerEndpointRegistrar, k, Integer.valueOf((String)
-        // v), worker, "handle"));
-        //
-        //            registerListenerEndpoint(listenerEndpointRegistrar, Exchanges.CONTROL + "/" + Exchanges.CONTROL,
-        // 1, worker, "handle");
-        //        }
     }
 
     @Override
