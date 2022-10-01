@@ -12,8 +12,6 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:///bytechef
+    url: jdbc:tc:postgresql:14:///bytechef
     username: postgres
     password:
-    hikari:
-      poolName: Hikari
