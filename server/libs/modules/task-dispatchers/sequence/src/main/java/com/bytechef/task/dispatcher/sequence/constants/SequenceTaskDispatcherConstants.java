@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.sequence;
+package com.bytechef.task.dispatcher.sequence.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskConstants {
+public class SequenceTaskDispatcherConstants {
 
-    public static final String TASK_SEQUENCE = "sequence";
+    public static final String SEQUENCE = "sequence";
 }

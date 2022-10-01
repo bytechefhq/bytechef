@@ -16,20 +16,20 @@
 
 package com.bytechef.task.dispatcher.sequence.completion;
 
-import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.MapObject;
-import com.bytechef.atlas.context.domain.Context;
-import com.bytechef.atlas.context.domain.MapContext;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
+
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
-import java.util.Date;
+import com.bytechef.commons.date.LocalDateTimeUtils;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -64,7 +64,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentTaskExecution.getType().equals(Constants.SEQUENCE);
+            return parentTaskExecution.getType().equals(SEQUENCE + "/v" + VERSION_1);
         }
 
         return false;
@@ -72,53 +72,50 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        SimpleTaskExecution completedSubtaskExecution = SimpleTaskExecution.of(taskExecution);
+        TaskExecution completedSubtaskExecution = new TaskExecution(taskExecution);
 
         completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.merge(completedSubtaskExecution);
+        taskExecutionService.update(completedSubtaskExecution);
 
-        SimpleTaskExecution sequenceTaskExecution =
-                SimpleTaskExecution.of(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution sequenceTaskExecution =
+                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(sequenceTaskExecution.getId());
 
-            MapContext newContext = new MapContext(context.asMap());
+            Context newContext = new Context(context);
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
             contextService.push(sequenceTaskExecution.getId(), newContext);
         }
 
-        List<MapObject> subtaskDefinitions = sequenceTaskExecution.getList("tasks", MapObject.class);
+        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks("tasks");
 
-        if (taskExecution.getTaskNumber() < subtaskDefinitions.size()) {
-            MapObject subtaskDefinition = subtaskDefinitions.get(taskExecution.getTaskNumber());
+        if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
+            WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(subtaskDefinition);
+            TaskExecution subTaskExecution = TaskExecution.of(
+                    subWorkflowTask,
+                    sequenceTaskExecution.getJobId(),
+                    sequenceTaskExecution.getId(),
+                    sequenceTaskExecution.getPriority(),
+                    taskExecution.getTaskNumber() + 1);
 
-            subTaskExecution.setCreateTime(new Date());
-            subTaskExecution.setId(UUIDGenerator.generate());
-            subTaskExecution.setJobId(sequenceTaskExecution.getJobId());
-            subTaskExecution.setParentId(sequenceTaskExecution.getId());
-            subTaskExecution.setPriority(sequenceTaskExecution.getPriority());
-            subTaskExecution.setStatus(TaskStatus.CREATED);
-            subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
-
-            MapContext context = new MapContext(contextService.peek(sequenceTaskExecution.getId()));
+            Context context = new Context(contextService.peek(sequenceTaskExecution.getId()));
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionService.create(evaluatedSubTaskExecution);
-            taskDispatcher.dispatch(evaluatedSubTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+
+            taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
-            sequenceTaskExecution.setEndTime(new Date());
-            sequenceTaskExecution.setExecutionTime(
-                    sequenceTaskExecution.getEndTime().getTime()
-                            - sequenceTaskExecution.getStartTime().getTime());
+            sequenceTaskExecution.setEndTime(LocalDateTime.now());
+            sequenceTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(sequenceTaskExecution.getEndTime())
+                    - LocalDateTimeUtils.getTime(sequenceTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(sequenceTaskExecution);
         }

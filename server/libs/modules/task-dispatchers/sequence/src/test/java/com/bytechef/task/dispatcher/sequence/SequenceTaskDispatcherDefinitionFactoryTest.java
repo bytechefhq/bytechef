@@ -16,23 +16,17 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
-import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
-import com.bytechef.hermes.descriptor.model.DSL;
-import com.bytechef.hermes.descriptor.model.TaskDescriptor;
-import org.springframework.stereotype.Component;
+import com.bytechef.hermes.test.definition.DefinitionAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class SequenceTaskDescriptorHandler implements TaskDescriptorHandler {
+public class SequenceTaskDispatcherDefinitionFactoryTest {
 
-    private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(SequenceTaskConstants.TASK_SEQUENCE)
-            .displayName("Sequence")
-            .description("Executes list of tasks in a sequence");
-
-    @Override
-    public TaskDescriptor getTaskDescriptor() {
-        return TASK_DESCRIPTOR;
+    @Test
+    public void testGetTaskDispatcherDefinition() {
+        DefinitionAssert.assertEquals(
+                "definition/sequence_v1.json", new SequenceTaskDispatcherDefinitionFactory().getDefinition());
     }
 }
