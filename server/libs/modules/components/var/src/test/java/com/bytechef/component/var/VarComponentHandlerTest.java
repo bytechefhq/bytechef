@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,25 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.task.handler.core;
+package com.bytechef.component.var;
 
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import org.springframework.stereotype.Component;
+import com.bytechef.hermes.test.definition.DefinitionAssert;
+import java.io.IOException;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
- * @author Arik Cohen
- * @since May 11, 2017
+ * @author Ivica Cardic
  */
-@Component("core/var")
-public class Var implements TaskHandler<Object> {
+public class VarComponentHandlerTest {
 
-    @Override
-    public Object handle(TaskExecution aTask) {
-        return aTask.getRequired("value");
+    @Test
+    public void testGetComponentDefinition() throws IOException {
+        DefinitionAssert.assertEquals("definition/var_v1.json", new VarComponentHandler().getDefinition());
     }
+
+    @Disabled
+    @Test
+    public void performSetValue() {}
 }
