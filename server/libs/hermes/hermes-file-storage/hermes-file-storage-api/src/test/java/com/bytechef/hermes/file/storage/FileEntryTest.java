@@ -18,11 +18,10 @@ package com.bytechef.hermes.file.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
-import com.bytechef.hermes.file.storage.dto.FileEntry;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import java.util.Collections;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -53,11 +52,11 @@ public class FileEntryTest {
     @Test
     public void testSpelEvaluation() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution taskExecution = SimpleTaskExecution.of("result", "${fileEntry.name} ${fileEntry.url}");
+        TaskExecution taskExecution = TaskExecution.of("result", "${fileEntry.name} ${fileEntry.url}");
 
         TaskExecution evaluated = evaluator.evaluate(
                 taskExecution,
-                new MapContext(Collections.singletonMap("fileEntry", FileEntry.of("sample.txt", "/tmp/fileName.txt"))));
+                new Context(Collections.singletonMap("fileEntry", FileEntry.of("sample.txt", "/tmp/fileName.txt"))));
 
         assertEquals("sample.txt /tmp/fileName.txt", evaluated.getString("result"));
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.file.storage.dto;
+package com.bytechef.hermes.file.storage.domain;
 
 import java.util.Map;
 import java.util.Objects;
@@ -31,18 +31,7 @@ public class FileEntry {
     private String name;
     private String url;
 
-    private FileEntry() {}
-
-    public static boolean isFileEntry(Map<String, String> map) {
-        if (!map.containsKey("extension")
-                || !map.containsKey("mimeType")
-                || !map.containsKey("name")
-                || !map.containsKey("url")) {
-            return false;
-        }
-
-        return true;
-    }
+    public FileEntry() {}
 
     public static FileEntry of(Map<String, String> map) {
         FileEntry fileEntry = new FileEntry();
@@ -61,6 +50,21 @@ public class FileEntry {
 
     public static FileEntry of(String fileName, String url) {
         return getFileEntry(fileName, url);
+    }
+
+    public static FileEntry getFileEntry(String fileName, String url) {
+        FileEntry fileEntry = new FileEntry();
+
+        fileEntry.setExtension(FilenameUtils.getExtension(fileName));
+
+        Tika tika = new Tika();
+
+        fileEntry.setMimeType(tika.detect(fileName));
+
+        fileEntry.setName(FilenameUtils.getName(fileName));
+        fileEntry.setUrl(url);
+
+        return fileEntry;
     }
 
     public String getExtension() {
@@ -95,22 +99,6 @@ public class FileEntry {
         this.url = url;
     }
 
-    private static FileEntry getFileEntry(String fileName, String url) {
-        FileEntry fileEntry = new FileEntry();
-
-        fileEntry.setExtension(FilenameUtils.getExtension(fileName));
-
-        Tika tika = new Tika();
-
-        fileEntry.setMimeType(tika.detect(fileName));
-
-        fileEntry.setName(FilenameUtils.getName(fileName));
-        fileEntry.setUrl(url);
-
-        return fileEntry;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
