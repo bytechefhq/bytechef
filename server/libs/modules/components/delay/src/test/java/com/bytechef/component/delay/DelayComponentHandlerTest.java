@@ -16,44 +16,64 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.task.handler.time;
+package com.bytechef.component.delay;
 
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
+import static com.bytechef.hermes.component.definition.Action.ACTION;
+
+import com.bytechef.hermes.component.test.MockContext;
+import com.bytechef.hermes.component.test.MockExecutionParameters;
+import com.bytechef.hermes.test.definition.DefinitionAssert;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Arik Cohen
  */
-public class SleepTest {
+public class DelayComponentHandlerTest {
+
+    private static final MockContext context = new MockContext();
 
     @Test
-    public void test1() throws TaskExecutionException {
-        Sleep sleep = new Sleep();
+    public void testGetComponentDefinition() {
+        DefinitionAssert.assertEquals("definition/delay_v1.json", new DelayComponentHandler().getDefinition());
+    }
+
+    @Test
+    public void test1() {
         long now = System.currentTimeMillis();
-        sleep.handle(SimpleTaskExecution.of("duration", "1.5s"));
+        DelayComponentHandler sleepComponentAccessor = new DelayComponentHandler();
+
+        sleepComponentAccessor.sleep(context, new MockExecutionParameters(Map.of("duration", "1.5s", ACTION, "sleep")));
+
         long delta = System.currentTimeMillis() - now;
+
         Assertions.assertTrue(
                 delta >= 1500 && delta < 1900, String.format("Period %dms does not meet range [1500,1900>", delta));
     }
 
     @Test
-    public void test2() throws TaskExecutionException {
-        Sleep sleep = new Sleep();
+    public void test2() {
         long now = System.currentTimeMillis();
-        sleep.handle(SimpleTaskExecution.of("millis", 500));
+        DelayComponentHandler sleepComponentAccessor = new DelayComponentHandler();
+
+        sleepComponentAccessor.sleep(context, new MockExecutionParameters(Map.of("millis", 500, ACTION, "sleep")));
+
         long delta = System.currentTimeMillis() - now;
+
         Assertions.assertTrue(
                 delta >= 500 && delta < 600, String.format("Period %dms does not meet range [500,600>", delta));
     }
 
     @Test
-    public void test3() throws TaskExecutionException {
-        Sleep sleep = new Sleep();
+    public void test3() {
         long now = System.currentTimeMillis();
-        sleep.handle(new SimpleTaskExecution());
+        DelayComponentHandler sleepComponentAccessor = new DelayComponentHandler();
+
+        sleepComponentAccessor.sleep(context, new MockExecutionParameters(Map.of(ACTION, "sleep")));
+
         long delta = System.currentTimeMillis() - now;
+
         Assertions.assertTrue(
                 delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
     }
