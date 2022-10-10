@@ -18,25 +18,25 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.error.ErrorObject;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.event.Events;
-import com.bytechef.atlas.event.WorkflowEvent;
+import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.ControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
  * @author Arik Cohen
  * @since Jun 12, 2016
  */
-public class WorkerImpl implements Worker {
+public class Worker {
 
     private final Map<String, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
     private final TaskEvaluator taskEvaluator;
@@ -80,12 +80,12 @@ public class WorkerImpl implements Worker {
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
-    private WorkerImpl(BuilderImpl aBuilder) {
-        taskHandlerResolver = Objects.requireNonNull(aBuilder.taskHandlerResolver);
-        messageBroker = Objects.requireNonNull(aBuilder.messageBroker);
-        eventPublisher = Objects.requireNonNull(aBuilder.eventPublisher);
-        executors = Objects.requireNonNull(aBuilder.executors);
-        taskEvaluator = Objects.requireNonNull(aBuilder.taskEvaluator);
+    private Worker(Builder builder) {
+        taskHandlerResolver = Objects.requireNonNull(builder.taskHandlerResolver);
+        messageBroker = Objects.requireNonNull(builder.messageBroker);
+        eventPublisher = Objects.requireNonNull(builder.eventPublisher);
+        executors = Objects.requireNonNull(builder.executors);
+        taskEvaluator = Objects.requireNonNull(builder.taskEvaluator);
     }
 
     /**
@@ -95,19 +95,23 @@ public class WorkerImpl implements Worker {
      * @param taskExecution The task to execute.
      * @throws InterruptedException
      */
-    @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         CountDownLatch latch = new CountDownLatch(1);
+
         Future<?> future = executors.submit(() -> {
             try {
-                eventPublisher.publishEvent(WorkflowEvent.of(
-                        Events.TASK_STARTED, "taskId", taskExecution.getId(), "jobId", taskExecution.getJobId()));
-                SimpleTaskExecution completion = doExecuteTask(taskExecution);
-                messageBroker.send(Queues.COMPLETIONS, completion);
+                eventPublisher.publishEvent(
+                        new TaskStartedWorkflowEvent(taskExecution.getJobId(), taskExecution.getId()));
+
+                TaskExecution completionTaskExecution = doExecuteTask(taskExecution);
+
+                messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
                 TaskExecutionFuture<?> myFuture = taskExecutions.get(taskExecution.getId());
+
                 if (myFuture == null || !myFuture.isCancelled()) {
                     handleException(taskExecution, e);
                 }
@@ -136,17 +140,19 @@ public class WorkerImpl implements Worker {
 
     /**
      * Handle control tasks. Control tasks are used by the Coordinator to control Worker instances.
-     * For example to stop an ongoing task or to adjust something on a worker outside the context of
-     * a job.
+     * For example, to stop an ongoing task or to adjust something on a worker outside the context of a job.
      */
-    public void handle(ControlTask aControlTask) {
-        logger.debug("received control task: {}", aControlTask);
-        if (ControlTask.TYPE_CANCEL.equals(aControlTask.getType())) {
-            String jobId = aControlTask.getRequiredString("jobId");
-            for (TaskExecutionFuture<?> tef : taskExecutions.values()) {
-                if (tef.taskExecution.getJobId().equals(jobId)) {
-                    logger.info("Cancelling task {}->{}", jobId, tef.taskExecution.getId());
-                    tef.cancel(true);
+    public void handle(ControlTask controlTask) {
+        logger.debug("received control task: {}", controlTask);
+
+        if (CancelControlTask.TYPE_CANCEL.equals(controlTask.getType())) {
+            String jobId = ((CancelControlTask) controlTask).getJobId();
+
+            for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutions.values()) {
+                if (Objects.equals(taskExecutionFuture.taskExecution.getJobId(), jobId)) {
+                    logger.info("Cancelling task {}->{}", jobId, taskExecutionFuture.taskExecution.getId());
+
+                    taskExecutionFuture.cancel(true);
                 }
             }
         }
@@ -156,58 +162,68 @@ public class WorkerImpl implements Worker {
         return Collections.unmodifiableMap(taskExecutions);
     }
 
-    private SimpleTaskExecution doExecuteTask(TaskExecution aTask) throws Exception {
-        MapContext context = new MapContext();
+    private TaskExecution doExecuteTask(TaskExecution taskExecution) throws Exception {
+        Context context = new Context();
+
         try {
             long startTime = System.currentTimeMillis();
-            logger.debug("Recived task: {}", aTask);
+
+            logger.debug("Received task: {}", taskExecution);
 
             // pre tasks
-            executeSubTasks(aTask, aTask.getPre(), context);
+            executeSubTasks(taskExecution, taskExecution.getPre(), context);
 
-            TaskExecution evaluatedTask = taskEvaluator.evaluate(aTask, context);
+            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(taskExecution, context);
 
-            TaskHandler<?> taskHandler = taskHandlerResolver.resolve(evaluatedTask);
-            Object output = taskHandler.handle(evaluatedTask);
-            SimpleTaskExecution completion = SimpleTaskExecution.of(evaluatedTask);
+            TaskHandler<?> taskHandler = taskHandlerResolver.resolve(evaluatedTaskExecution);
+
+            Object output = taskHandler.handle(evaluatedTaskExecution);
+            TaskExecution completionTaskExecution = new TaskExecution(evaluatedTaskExecution);
+
             if (output != null) {
-                completion.setOutput(output);
+                completionTaskExecution.setOutput(output);
             }
-            completion.setStatus(TaskStatus.COMPLETED);
-            completion.setProgress(100);
-            completion.setEndTime(new Date());
-            completion.setExecutionTime(System.currentTimeMillis() - startTime);
+
+            completionTaskExecution.setStatus(TaskStatus.COMPLETED);
+            completionTaskExecution.setProgress(100);
+            completionTaskExecution.setEndTime(LocalDateTime.now());
+            completionTaskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
 
             // post tasks
-            executeSubTasks(aTask, aTask.getPost(), context);
+            executeSubTasks(taskExecution, taskExecution.getPost(), context);
 
-            return completion;
+            return completionTaskExecution;
         } finally {
             // finalize tasks
-            executeSubTasks(aTask, aTask.getFinalize(), context);
+            executeSubTasks(taskExecution, taskExecution.getFinalize(), context);
         }
     }
 
-    private void executeSubTasks(TaskExecution aTask, List<WorkflowTask> aSubTasks, MapContext aContext)
+    private void executeSubTasks(TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Context context)
             throws Exception {
-        for (WorkflowTask subTask : aSubTasks) {
-            SimpleTaskExecution subTaskExecution = new SimpleTaskExecution(subTask.asMap());
-            subTaskExecution.setId(UUIDGenerator.generate());
-            subTaskExecution.setJobId(aTask.getJobId());
-            TaskExecution evaluatedTask = taskEvaluator.evaluate(subTaskExecution, aContext);
-            SimpleTaskExecution completion = doExecuteTask(evaluatedTask);
-            if (completion.getName() != null) {
-                aContext.set(completion.getName(), completion.getOutput());
+        for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
+            TaskExecution subTaskExecution = TaskExecution.of(subWorkflowTask, taskExecution.getJobId());
+
+            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+
+            TaskExecution completionTaskExecution = doExecuteTask(evaluatedTaskExecution);
+
+            if (completionTaskExecution.getName() != null) {
+                context.put(completionTaskExecution.getName(), completionTaskExecution.getOutput());
             }
         }
     }
 
-    private void handleException(TaskExecution aTask, Exception aException) {
-        logger.error(aException.getMessage(), aException);
-        SimpleTaskExecution task = SimpleTaskExecution.of(aTask);
-        task.setError(new ErrorObject(aException.getMessage(), ExceptionUtils.getStackFrames(aException)));
-        task.setStatus(TaskStatus.FAILED);
-        messageBroker.send(Queues.ERRORS, task);
+    private void handleException(TaskExecution taskExecution, Exception exception) {
+        logger.error(exception.getMessage(), exception);
+
+        TaskExecution updatedTaskExecution = new TaskExecution(taskExecution);
+
+        updatedTaskExecution.setError(
+                new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+        updatedTaskExecution.setStatus(TaskStatus.FAILED);
+
+        messageBroker.send(Queues.ERRORS, updatedTaskExecution);
     }
 
     private long calculateTimeout(TaskExecution aTask) {
@@ -218,10 +234,10 @@ public class WorkerImpl implements Worker {
     }
 
     public static Builder builder() {
-        return new BuilderImpl();
+        return new Builder();
     }
 
-    public static class BuilderImpl implements Worker.Builder {
+    public static class Builder {
 
         private TaskHandlerResolver taskHandlerResolver;
         private MessageBroker messageBroker;
@@ -254,8 +270,8 @@ public class WorkerImpl implements Worker {
             return this;
         }
 
-        public WorkerImpl build() {
-            return new WorkerImpl(this);
+        public Worker build() {
+            return new Worker(this);
         }
     }
 

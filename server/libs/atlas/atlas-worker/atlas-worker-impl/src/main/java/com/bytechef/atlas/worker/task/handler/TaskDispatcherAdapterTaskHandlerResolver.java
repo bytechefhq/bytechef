@@ -17,8 +17,7 @@
 package com.bytechef.atlas.worker.task.handler;
 
 import com.bytechef.atlas.task.Task;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.WorkerImpl;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,8 +36,8 @@ public class TaskDispatcherAdapterTaskHandlerResolver implements TaskHandlerReso
         taskHandlers = taskDispatcherAdapterTaskHandlerFactories.stream()
                 .collect(Collectors.toMap(
                         TaskDispatcherAdapterFactory::getName,
-                        taskDispatcherAdapterFactory -> taskDispatcherAdapterFactory.create(
-                                taskHandlerResolver, taskEvaluator, WorkerImpl.builder())));
+                        taskDispatcherAdapterFactory ->
+                                taskDispatcherAdapterFactory.create(taskHandlerResolver, taskEvaluator)));
     }
 
     @Override
