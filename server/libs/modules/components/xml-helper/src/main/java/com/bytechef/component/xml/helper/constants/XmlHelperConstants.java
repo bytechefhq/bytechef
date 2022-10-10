@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.xmlhelpers;
+package com.bytechef.component.xml.helper.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class XmlHelpersTaskConstants {
+public class XmlHelperConstants {
 
     public static final String SOURCE = "source";
-    public static final String XML_HELPERS = "xmlHelpers";
-    public static final float VERSION_1_0 = 1.0f;
+    public static final String XML_HELPER = "xmlHelper";
     public static final String XML_PARSE = "xmlParse";
     public static final String XML_STRINGIFY = "xmlStringify";
 }
