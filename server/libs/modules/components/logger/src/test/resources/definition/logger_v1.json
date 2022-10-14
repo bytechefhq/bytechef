@@ -1,0 +1,58 @@
+{
+  "display": {
+    "description": "Logs a value to the system log.",
+    "label": "Logger"
+  },
+  "name": "logger",
+  "actions": [
+    {
+      "display": {
+        "label": "Debug"
+      },
+      "name": "debug",
+      "inputs": [
+        {
+          "name": "text",
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "label": "Error"
+      },
+      "name": "error",
+      "inputs": [
+        {
+          "name": "text",
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "label": "Info"
+      },
+      "name": "info",
+      "inputs": [
+        {
+          "name": "text",
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "label": "Warn"
+      },
+      "name": "warn",
+      "inputs": [
+        {
+          "name": "text",
+          "type": "ANY"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
