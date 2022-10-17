@@ -19,15 +19,18 @@
 package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.coordinator.CoordinatorImpl;
+import com.bytechef.atlas.coordinator.CoordinatorManager;
+import com.bytechef.atlas.coordinator.CoordinatorManagerImpl;
 import com.bytechef.atlas.coordinator.error.ErrorHandlerChain;
 import com.bytechef.atlas.coordinator.error.TaskExecutionErrorHandler;
-import com.bytechef.atlas.coordinator.event.DeleteContextEventListener;
+import com.bytechef.atlas.coordinator.event.EventListener;
+import com.bytechef.atlas.coordinator.event.EventListenerChain;
 import com.bytechef.atlas.coordinator.event.JobStatusWebhookEventListener;
+import com.bytechef.atlas.coordinator.event.LogEventListener;
 import com.bytechef.atlas.coordinator.event.TaskProgressedEventListener;
 import com.bytechef.atlas.coordinator.event.TaskStartedEventListener;
 import com.bytechef.atlas.coordinator.event.TaskStartedWebhookEventListener;
-import com.bytechef.atlas.coordinator.job.executor.DefaultJobExecutor;
+import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain;
@@ -36,32 +39,36 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.job.JobService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
-import com.bytechef.atlas.service.workflow.WorkflowService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
+import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnCoordinator
+@EnableConfigurationProperties(CoordinatorProperties.class)
 public class CoordinatorConfiguration {
 
     @Autowired
@@ -69,9 +76,6 @@ public class CoordinatorConfiguration {
 
     @Autowired
     private EventPublisher eventPublisher;
-
-    @Autowired
-    private Environment environment;
 
     @Autowired
     private JobService jobService;
@@ -98,46 +102,39 @@ public class CoordinatorConfiguration {
     private WorkflowService workflowService;
 
     @Bean
-    @ConditionalOnProperty(name = "atlas.context.delete-listener.enabled", havingValue = "true")
-    DeleteContextEventListener deleteContextEventListener(ContextService contextService) {
-        return new DeleteContextEventListener(contextService, jobService);
-    }
-
-    @Bean
     ControlTaskDispatcher controlTaskDispatcher() {
         return new ControlTaskDispatcher(messageBroker);
     }
 
     @Bean
     Coordinator coordinator() {
-        CoordinatorImpl coordinator = new CoordinatorImpl();
+        return new Coordinator(
+                contextService,
+                errorHandler(),
+                eventPublisher,
+                jobExecutor(),
+                jobService,
+                messageBroker,
+                taskCompletionHandler(),
+                taskDispatcher(),
+                taskExecutionService);
+    }
 
-        coordinator.setContextService(contextService);
-        coordinator.setErrorHandler(errorHandler());
-        coordinator.setEventPublisher(eventPublisher);
-        coordinator.setJobService(jobService);
-        coordinator.setJobExecutor(jobExecutor());
-        coordinator.setMessageBroker(messageBroker);
-        coordinator.setTaskDispatcher(taskDispatcher());
-        coordinator.setTaskExecutionService(taskExecutionService);
-        coordinator.setTaskCompletionHandler(taskCompletionHandler());
-
-        return coordinator;
+    @Bean
+    CoordinatorManager coordinatorManager(Coordinator coordinator) {
+        return new CoordinatorManagerImpl(coordinator);
     }
 
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
-        DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler();
-
-        taskCompletionHandler.setContextService(contextService);
-        taskCompletionHandler.setJobExecutor(jobExecutor());
-        taskCompletionHandler.setJobService(jobService);
-        taskCompletionHandler.setTaskExecutionService(taskExecutionService);
-        taskCompletionHandler.setWorkflowService(workflowService);
-        taskCompletionHandler.setEventPublisher(eventPublisher);
-        taskCompletionHandler.setTaskEvaluator(taskEvaluator);
-
-        return taskCompletionHandler;
+        return new DefaultTaskCompletionHandler(
+                contextService,
+                eventPublisher,
+                jobExecutor(),
+                jobService,
+                taskEvaluator,
+                taskExecutionService,
+                workflowService);
     }
 
     @Bean
@@ -148,20 +145,23 @@ public class CoordinatorConfiguration {
     @Bean
     @Primary
     ErrorHandler<?> errorHandler() {
-        return new ErrorHandlerChain(List.of(jobTaskErrorHandler()));
+        return new ErrorHandlerChain(List.of(taskExecutionErrorHandler()));
     }
 
     @Bean
-    DefaultJobExecutor jobExecutor() {
-        DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
+    @Primary
+    EventListener eventListener(List<EventListener> eventListeners) {
+        return new EventListenerChain(eventListeners);
+    }
 
-        jobExecutor.setContextService(contextService);
-        jobExecutor.setTaskExecutionService(taskExecutionService);
-        jobExecutor.setWorkflowService(workflowService);
-        jobExecutor.setTaskDispatcher(taskDispatcher());
-        jobExecutor.setTaskEvaluator(taskEvaluator);
+    @Bean
+    LogEventListener logEventListener() {
+        return new LogEventListener();
+    }
 
-        return jobExecutor;
+    @Bean
+    JobExecutor jobExecutor() {
+        return new JobExecutor(contextService, taskDispatcher(), taskExecutionService, taskEvaluator, workflowService);
     }
 
     @Bean
@@ -170,15 +170,10 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    TaskExecutionErrorHandler jobTaskErrorHandler() {
-        TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
-
-        jobTaskErrorHandler.setJobService(jobService);
-        jobTaskErrorHandler.setTaskExecutionService(taskExecutionService);
-        jobTaskErrorHandler.setTaskDispatcher(taskDispatcher());
-        jobTaskErrorHandler.setEventPublisher(eventPublisher);
-
-        return jobTaskErrorHandler;
+    @SuppressWarnings("unchecked")
+    TaskExecutionErrorHandler taskExecutionErrorHandler() {
+        return new TaskExecutionErrorHandler(
+                eventPublisher, jobService, (TaskDispatcher<TaskExecution>) taskDispatcher(), taskExecutionService);
     }
 
     @Bean
@@ -199,7 +194,7 @@ public class CoordinatorConfiguration {
 
     @Bean
     @Primary
-    TaskDispatcher<?> taskDispatcher() {
+    TaskDispatcher<? extends Task> taskDispatcher() {
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
         List<TaskDispatcherResolver> resolvers = Stream.concat(
