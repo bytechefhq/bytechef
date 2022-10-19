@@ -48,6 +48,10 @@ import java.util.stream.Stream;
 public abstract sealed class Property<P extends Property<P>>
         permits Property.NullProperty, Property.OptionProperty, Property.TypeProperty {
 
+    public enum EditorType {
+        CODE
+    }
+
     public enum Type {
         ANY,
         ARRAY,
@@ -603,6 +607,8 @@ public abstract sealed class Property<P extends Property<P>>
     @JsonTypeName("STRING")
     public static final class StringProperty extends PrimitiveValueProperty<String, StringProperty> {
 
+        EditorType editorType;
+
         private StringProperty() {}
 
         public StringProperty(String name) {
@@ -614,6 +620,16 @@ public abstract sealed class Property<P extends Property<P>>
             this.defaultValue = value;
 
             return this;
+        }
+
+        public StringProperty editorType(EditorType editorType) {
+            this.editorType = editorType;
+
+            return this;
+        }
+
+        public EditorType getEditorType() {
+            return editorType;
         }
     }
 }
