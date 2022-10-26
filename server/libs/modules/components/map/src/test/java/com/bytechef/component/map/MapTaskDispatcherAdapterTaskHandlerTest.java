@@ -16,15 +16,15 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.task.handler.map;
+package com.bytechef.component.map;
 
+import static com.bytechef.hermes.component.definition.Action.ACTION;
+
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
-import com.bytechef.atlas.worker.WorkerImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import java.util.Arrays;
 import java.util.List;
@@ -38,49 +38,65 @@ import org.junit.jupiter.api.Test;
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
-    public void test1() throws Exception {
+    public void test1() {
         TaskHandlerResolver resolver = task -> t -> t.get("value");
-        MapTaskDispatcherAdapterTaskHandler adapter =
-                new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create(), WorkerImpl.builder());
-        SimpleTaskExecution task = new SimpleTaskExecution();
-        task.setId("1234");
-        task.setJobId("4567");
-        task.set("list", List.of(1, 2, 3));
-        task.set("iteratee", Map.of("type", "var", "value", "${item}"));
-        List<?> results = adapter.handle(task);
+        MapTaskDispatcherAdapterTaskHandler taskHandler =
+                new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
+
+        TaskExecution taskExecution = new TaskExecution(
+                Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"), ACTION, "map"));
+
+        taskExecution.setId("1234");
+        taskExecution.setJobId("4567");
+
+        List<?> results = taskHandler.handle(taskExecution);
+
         Assertions.assertEquals(List.of(1, 2, 3), results);
     }
 
     @Test
-    public void test2() throws Exception {
+    public void test2() {
         Assertions.assertThrows(RuntimeException.class, () -> {
             TaskHandlerResolver resolver = task -> t -> {
                 throw new IllegalArgumentException("i'm rogue");
             };
-            MapTaskDispatcherAdapterTaskHandler adapter =
-                    new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create(), WorkerImpl.builder());
-            SimpleTaskExecution task = new SimpleTaskExecution();
-            task.setId("1234");
-            task.setJobId("4567");
-            task.set("list", List.of(1, 2, 3));
-            task.set("iteratee", Map.of("type", "rogue"));
-            adapter.handle(task);
+            MapTaskDispatcherAdapterTaskHandler taskHandler =
+                    new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
+
+            TaskExecution taskExecution = new TaskExecution(Map.of(
+                    "list", List.of(1, 2, 3),
+                    "iteratee", Map.of("type", "rogue")));
+
+            taskExecution.setId("1234");
+            taskExecution.setJobId("4567");
+
+            taskHandler.handle(taskExecution);
         });
     }
 
     @Test
     public void test3() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
+
         messageBroker.receive(Queues.COMPLETIONS, t -> {
-            TaskExecution te = (TaskExecution) t;
-            Assertions.assertNull(te.getOutput());
+            TaskExecution taskExecution = (TaskExecution) t;
+
+            Assertions.assertNull(taskExecution.getOutput());
         });
+
+        messageBroker.receive(Queues.ERRORS, t -> {
+            TaskExecution taskExecution = (TaskExecution) t;
+
+            Assertions.assertNull(taskExecution.getError());
+        });
+
         messageBroker.receive(Queues.EVENTS, t -> {});
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];
 
-        TaskHandlerResolver thr = t1 -> {
+        TaskHandlerResolver taskHandlerResolver = t1 -> {
             String type = t1.getType();
+
             if ("var".equals(type)) {
                 return t2 -> t2.getRequired("value");
             }
@@ -94,45 +110,17 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             }
         };
 
-        Worker worker = WorkerImpl.builder()
-                .withTaskHandlerResolver(thr)
+        Worker worker = Worker.builder()
+                .withTaskHandlerResolver(taskHandlerResolver)
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
         mapAdapterTaskHandlerRefs[0] =
-                new MapTaskDispatcherAdapterTaskHandler(thr, SpelTaskEvaluator.create(), WorkerImpl.builder());
+                new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, SpelTaskEvaluator.create());
 
-        SimpleTaskExecution task = new SimpleTaskExecution();
-
-        task.setId("1234");
-        task.setJobId("4567");
-        task.set("type", "pass");
-
-        task.set(
-                "pre",
-                List.of(Map.of(
-                        "name",
-                        "output",
-                        "type",
-                        "map",
-                        "list",
-                        Arrays.asList(1, 2, 3),
-                        "iteratee",
-                        Map.of("type", "var", "value", "${item}"))));
-        task.set(
-                "post",
-                List.of(Map.of(
-                        "name",
-                        "output",
-                        "type",
-                        "map",
-                        "list",
-                        Arrays.asList(1, 2, 3),
-                        "iteratee",
-                        Map.of("type", "var", "value", "${item}"))));
-        task.set(
+        TaskExecution taskExecution = new TaskExecution(Map.of(
                 "finalize",
                 List.of(Map.of(
                         "name",
@@ -142,8 +130,39 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                         "list",
                         Arrays.asList(1, 2, 3),
                         "iteratee",
-                        Map.of("type", "var", "value", "${item}"))));
+                        Map.of("type", "var", "value", "${item}"),
+                        ACTION,
+                        "map")),
+                "post",
+                List.of(Map.of(
+                        "name",
+                        "output",
+                        "type",
+                        "map",
+                        "list",
+                        Arrays.asList(1, 2, 3),
+                        "iteratee",
+                        Map.of("type", "var", "value", "${item}"),
+                        ACTION,
+                        "map")),
+                "pre",
+                List.of(Map.of(
+                        "name",
+                        "output",
+                        "type",
+                        "map",
+                        "list",
+                        Arrays.asList(1, 2, 3),
+                        "iteratee",
+                        Map.of("type", "var", "value", "${item}"),
+                        ACTION,
+                        "map")),
+                "type",
+                "pass"));
 
-        worker.handle(task);
+        taskExecution.setId("1234");
+        taskExecution.setJobId("4567");
+
+        worker.handle(taskExecution);
     }
 }

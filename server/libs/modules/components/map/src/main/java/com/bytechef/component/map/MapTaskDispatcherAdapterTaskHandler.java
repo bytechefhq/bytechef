@@ -16,27 +16,27 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.task.handler.map;
+package com.bytechef.component.map;
 
-import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.error.Error;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.memory.context.InMemoryContextRepository;
-import com.bytechef.atlas.repository.memory.counter.InMemoryCounterRepository;
-import com.bytechef.atlas.repository.memory.task.execution.InMemoryTaskExecutionRepository;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
+import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
+import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
+import com.bytechef.atlas.repository.memory.InMemoryTaskExecutionRepository;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.impl.ContextServiceImpl;
+import com.bytechef.atlas.service.impl.CounterServiceImpl;
+import com.bytechef.atlas.service.impl.TaskExecutionServiceImpl;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
-import com.bytechef.atlas.worker.concurrency.CurrentThreadExecutorService;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
+import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -49,65 +49,64 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
     private final TaskHandlerResolver taskHandlerResolver;
     private final TaskEvaluator taskEvaluator;
-    private final Worker.Builder builder;
 
-    public MapTaskDispatcherAdapterTaskHandler(
-            TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator, Worker.Builder builder) {
+    public MapTaskDispatcherAdapterTaskHandler(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator) {
         this.taskHandlerResolver = Objects.requireNonNull(taskHandlerResolver);
         this.taskEvaluator = Objects.requireNonNull(taskEvaluator);
-        this.builder = builder;
     }
 
     @Override
-    public List<?> handle(TaskExecution aTask) {
+    public List<?> handle(TaskExecution taskExecution) {
         List<Object> result = new ArrayList<>();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(Queues.COMPLETIONS, message -> {
-            TaskExecution completion = (TaskExecution) message;
+            TaskExecution completionTaskExecution = (TaskExecution) message;
 
-            result.add(completion.getOutput());
+            result.add(completionTaskExecution.getOutput());
         });
 
-        List<Error> errors = Collections.synchronizedList(new ArrayList<>());
+        List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
 
         messageBroker.receive(Queues.ERRORS, message -> {
-            TaskExecution erringTask = (TaskExecution) message;
+            TaskExecution errorTaskExecution = (TaskExecution) message;
 
-            Error err = erringTask.getError();
+            ExecutionError error = errorTaskExecution.getError();
 
-            errors.add(err);
+            errors.add(error);
         });
 
-        Worker worker = builder.withTaskHandlerResolver(taskHandlerResolver)
+        Worker worker = Worker.builder()
+                .withTaskHandlerResolver(taskHandlerResolver)
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
                 .withExecutors(new CurrentThreadExecutorService())
                 .withTaskEvaluator(taskEvaluator)
                 .build();
 
-        ContextService contextService = new ContextService(new InMemoryContextRepository(), null);
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
-        contextService.push(aTask.getId(), new MapContext());
+        contextService.push(taskExecution.getId(), new Context());
 
         MapTaskDispatcher dispatcher = MapTaskDispatcher.builder()
                 .contextService(contextService)
-                .counterService(new CounterService(new InMemoryCounterRepository()))
+                .counterService(new CounterServiceImpl(new InMemoryCounterRepository()))
                 .messageBroker(messageBroker)
                 .taskDispatcher(worker::handle)
-                .taskExecutionService(new TaskExecutionService(new InMemoryTaskExecutionRepository()))
+                .taskExecutionService(new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository()))
                 .taskEvaluator(taskEvaluator)
                 .build();
 
-        dispatcher.dispatch(aTask);
+        dispatcher.dispatch(taskExecution);
 
         if (errors.size() > 0) {
             StringBuilder errorMessage = new StringBuilder();
 
-            for (Error e : errors) {
+            for (ExecutionError error : errors) {
                 if (errorMessage.length() > 3000) {
                     errorMessage.append("\n").append("...");
+
                     break;
                 }
 
@@ -115,10 +114,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                     errorMessage.append("\n");
                 }
 
-                errorMessage
-                        .append(e.getMessage())
-                        .append("\n")
-                        .append(String.join("\n", Arrays.asList(e.getStackTrace())));
+                errorMessage.append(error.getMessage()).append("\n").append(String.join("\n", error.getStackTrace()));
             }
 
             throw new RuntimeException(errorMessage.toString());

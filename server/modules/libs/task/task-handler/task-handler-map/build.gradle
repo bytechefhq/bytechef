@@ -1,7 +1,0 @@
-dependencies {
-    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-memory")
-    implementation project(":modules:libs:atlas:atlas-service")
-    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-memory")
-    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
-    implementation project(":modules:libs:task:task-dispatcher:task-dispatcher-map")
-}
