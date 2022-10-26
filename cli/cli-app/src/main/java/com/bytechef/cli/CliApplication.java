@@ -18,7 +18,7 @@ package com.bytechef.cli;
 
 import static picocli.CommandLine.Command;
 
-import com.bytechef.cli.cmd.component.ComponentCommand;
+import com.bytechef.cli.command.component.ComponentCommand;
 import picocli.CommandLine;
 
 /**
@@ -26,19 +26,19 @@ import picocli.CommandLine;
  */
 @Command(
         name = "bytechef",
-        description = "Executes various bytechef related commands.",
+        description = "Executes various ByteChef related commands.",
         mixinStandardHelpOptions = true,
-        version = "bytechef 1.0",
-        subcommands = {ComponentCommand.class})
-public class CLIApp implements Runnable {
+        version = "1.0",
+        subcommands = {CommandLine.HelpCommand.class, ComponentCommand.class})
+public class CliApplication implements Runnable {
 
-    public CLIApp() {}
+    public CliApplication() {}
 
     @Override
     public void run() {}
 
     public static void main(String... args) {
-        int exitCode = new CommandLine(new CLIApp()).execute(args);
+        int exitCode = new CommandLine(new CliApplication()).execute(args);
 
         System.exit(exitCode);
     }
