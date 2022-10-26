@@ -1,0 +1,14 @@
+apply plugin: "org.springframework.experimental.aot"
+
+bootBuildImage {
+    builder = "paketobuildpacks/builder:tiny"
+    environment = [
+        "BP_NATIVE_IMAGE" : "true"
+    ]
+}
+
+graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
+}

@@ -18,6 +18,7 @@ subprojects {
     apply plugin: "com.diffplug.spotless"
     apply plugin: "com.github.spotbugs"
     apply plugin: "com.bytechef.java-common-conventions"
+    apply plugin: "io.spring.dependency-management"
     apply plugin: "org.sonarqube"
     apply plugin: "pmd"
 
@@ -31,19 +32,18 @@ subprojects {
 
     checkstyle {
         toolVersion "${checkstyleVersion}"
-        configFile file("${rootDir}/checkstyle.xml")
-        checkstyleTest.enabled = false
+        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
     }
 
     pmd {
-        toolVersion = "6.48.0"
-        ruleSetFiles = files("${rootDir}/pmd-ruleset.xml")
+        toolVersion = "${pmdVersion}"
+        ruleSetFiles = files("${rootDir}/config/pmd/pmd-ruleset.xml")
         ruleSets = []
     }
 
     spotbugs {
-        toolVersion = '4.7.1'
-        excludeFilter = file("${rootDir}/spotbugs-exclude.xml")
+        toolVersion = "${spotbugsVersion}"
+        excludeFilter = file("${rootDir}/config/spotbugs/spotbugs-exclude.xml")
     }
 
     spotless {
@@ -118,12 +118,6 @@ subprojects {
 //        }
     }
 
-    pmd {
-        description = "Ignore PMD source code validation"
-
-        ignoreFailures = true
-    }
-
     check.dependsOn 'spotlessCheck'
 
     test {
@@ -150,8 +144,10 @@ subprojects {
         }
         jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
 
-        if (project.hasProperty("testcontainers")) {
+        if (!project.hasProperty("no-testcontainers")) {
             environment "spring.profiles.active", "testcontainers"
+        } else {
+            environment "spring.profiles.active", "test"
         }
 
         // uncomment if the tests reports are not generated
@@ -184,11 +180,26 @@ subprojects {
         }
     }
 
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
     dependencies {
+        compileOnly "org.graalvm.sdk:graal-sdk:${graalSDKVersion}"
+
+        implementation libs.spotbugs.annotations
         implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+        testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+        testRuntimeOnly "com.zaxxer:HikariCP"
+        testRuntimeOnly "org.postgresql:postgresql"
+        testRuntimeOnly libs.testcontainers.postgresql
     }
 }
 
 wrapper {
-    gradleVersion = "7.4.0"
+    gradleVersion = "7.5.1"
 }
