@@ -37,4 +37,7 @@ dependencies {
     implementation project(":server:libs:modules:task-dispatchers:sequence")
     implementation project(":server:libs:modules:task-dispatchers:subflow")
     implementation project(":server:libs:modules:task-dispatchers:switch")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-activemq"
+    testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
 }

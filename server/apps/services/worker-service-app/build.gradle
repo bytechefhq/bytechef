@@ -51,4 +51,7 @@ dependencies {
     implementation project(":server:libs:modules:components:xlsx-file")
     implementation project(":server:libs:modules:components:xml-file")
     implementation project(":server:libs:modules:components:xml-helper")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-activemq"
+    testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
 }
