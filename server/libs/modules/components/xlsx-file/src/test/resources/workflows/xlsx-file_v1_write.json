@@ -1,0 +1,25 @@
+{
+  "label": "XLSX File - WRITE operation",
+  "inputs": [
+    {
+      "name": "rows",
+      "label": "Array of objects",
+      "type": "ARRAY",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "writeXlsxFile",
+      "value": "${writeXlsxFile}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "writeXlsxFile",
+      "label": "Write to the XLSX file",
+      "type": "xlsxFile/v1/write",
+      "rows": "${rows}"
+    }
+  ]
+}

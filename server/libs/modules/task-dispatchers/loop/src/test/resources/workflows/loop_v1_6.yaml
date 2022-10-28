@@ -1,0 +1,24 @@
+label: Loop 6
+
+tasks:
+  - type: loop/v1
+    loopForever: true
+    iteratee:
+      type: sequence/v1
+      tasks:
+        - name: sumVar1
+          type: var
+          value: ${1 + itemIndex}
+        - type: if/v1
+          conditions:
+            - number:
+                value1: ${itemIndex}
+                operation: GREATER
+                value2: 5
+          combineOperation: ANY
+          caseTrue:
+            - type: loop-break/v1
+          caseFalse:
+            - name: sumVar2
+              type: var
+              value: ${sumVar1 + 2}

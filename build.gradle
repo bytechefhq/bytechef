@@ -1,0 +1,205 @@
+plugins {
+    id "checkstyle"
+    id "com.diffplug.spotless"
+    id "com.github.ben-manes.versions"
+    id "com.github.spotbugs"
+    id "com.bytechef.java-common-conventions"
+    id "org.sonarqube"
+    id "org.springframework.boot" version "${springBootVersion}" apply false
+    id "pmd"
+}
+
+allprojects {
+    apply plugin: "com.github.ben-manes.versions"
+}
+
+subprojects {
+    apply plugin: "checkstyle"
+    apply plugin: "com.diffplug.spotless"
+    apply plugin: "com.github.spotbugs"
+    apply plugin: "com.bytechef.java-common-conventions"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: "org.sonarqube"
+    apply plugin: "pmd"
+
+    apply from: "${rootDir}/gradle/sonar.gradle"
+
+    idea {
+        module {
+            excludeDirs += files("node_modules")
+        }
+    }
+
+    checkstyle {
+        toolVersion "${checkstyleVersion}"
+        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
+    }
+
+    pmd {
+        toolVersion = "${pmdVersion}"
+        ruleSetFiles = files("${rootDir}/config/pmd/pmd-ruleset.xml")
+        ruleSets = []
+    }
+
+    spotbugs {
+        toolVersion = "${spotbugsVersion}"
+        excludeFilter = file("${rootDir}/config/spotbugs/spotbugs-exclude.xml")
+    }
+
+    spotless {
+        format "misc", {
+            // define the files to apply `misc` to
+            target "*.gradle", "*.md", ".gitignore"
+
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+        }
+        java {
+            target "src/*/java/**/*.java"
+
+            licenseHeader(
+                '''
+                /*
+                 * Copyright 2021 <your company/name>.
+                 *
+                 * Licensed under the Apache License, Version 2.0 (the "License");
+                 * you may not use this file except in compliance with the License.
+                 * You may obtain a copy of the License at
+                 *
+                 *      https://www.apache.org/licenses/LICENSE-2.0
+                 *
+                 * Unless required by applicable law or agreed to in writing, software
+                 * distributed under the License is distributed on an "AS IS" BASIS,
+                 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                 * See the License for the specific language governing permissions and
+                 * limitations under the License.
+                 */
+                '''
+            ).named(
+                "standard"
+            )
+            licenseHeader(
+                '''
+                /*
+                 * Copyright 2016-2018 the original author or authors.
+                 *
+                 * Licensed under the Apache License, Version 2.0 (the "License");
+                 * you may not use this file except in compliance with the License.
+                 * You may obtain a copy of the License at
+                 *
+                 *      https://www.apache.org/licenses/LICENSE-2.0
+                 *
+                 * Unless required by applicable law or agreed to in writing, software
+                 * distributed under the License is distributed on an "AS IS" BASIS,
+                 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                 * See the License for the specific language governing permissions and
+                 * limitations under the License.
+                 *
+                 * Modifications copyright (C) 2021 <your company/name>
+                 */
+                '''
+            ).named(
+                "original"
+            ).onlyIfContentMatches(
+                "author\\sArik\\sCohen"
+            )
+            palantirJavaFormat()
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+//            prettier(["prettier": "2.7.1", "prettier-plugin-java": "1.6.2"]).config(["parser": "java", "printWidth": 120, "tabWidth": 4, "useTabs": false])
+        }
+//        format "styling", {
+//            target "**/*.json", "**/*.yaml", "**/*.yml"
+//
+//            prettier()
+//        }
+    }
+
+    check.dependsOn 'spotlessCheck'
+
+    test {
+        useJUnitPlatform()
+        exclude "**/*IntTest*"
+        testLogging {
+            events "FAILED", "SKIPPED"
+            exceptionFormat "full"
+        }
+        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
+        // uncomment if the tests reports are not generated
+        // ignoreFailures true
+        reports.html.enabled = false
+    }
+
+    task testIntegration(type: Test) {
+        useJUnitPlatform()
+        description = "Execute integration tests."
+        group = "verification"
+        include "**/*IntTest*"
+        testLogging {
+            events "FAILED", "SKIPPED"
+            exceptionFormat "full"
+        }
+        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
+
+        if (!project.hasProperty("no-testcontainers")) {
+            environment "spring.profiles.active", "testcontainers"
+        } else {
+            environment "spring.profiles.active", "test"
+        }
+
+        // uncomment if the tests reports are not generated
+        // ignoreFailures true
+        reports.html.enabled = false
+    }
+
+    check.dependsOn testIntegration
+
+    task testReport(type: TestReport) {
+        destinationDir = file("$buildDir/reports/tests")
+        reportOn test
+    }
+
+    task testIntegrationReport(type: TestReport) {
+        destinationDir = file("$buildDir/reports/tests")
+        reportOn testIntegration
+    }
+
+    task cleanResources(type: Delete) {
+        delete "build/resources"
+    }
+
+    configurations {
+        all {
+            // https://github.com/testcontainers/testcontainers-java/issues/970
+            /* exclude junit 4 dependencies */
+            // exclude group: 'junit', module: 'junit'
+            // exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    dependencies {
+        compileOnly "org.graalvm.sdk:graal-sdk:${graalSDKVersion}"
+
+        implementation libs.spotbugs.annotations
+        implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+        testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+        testRuntimeOnly "com.zaxxer:HikariCP"
+        testRuntimeOnly "org.postgresql:postgresql"
+        testRuntimeOnly libs.testcontainers.postgresql
+    }
+}
+
+wrapper {
+    gradleVersion = "7.5.1"
+}

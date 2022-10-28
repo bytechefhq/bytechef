@@ -1,0 +1,128 @@
+# Conditionally disable springdoc on missing api-docs profile
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+springdoc:
+  api-docs:
+    enabled: false
+---
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          '*'
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+  health:
+    mail:
+      enabled: false # When using the MailService, configure an SMTP server and set this to true
+  metrics:
+    export:
+      # Prometheus is the default metrics backend
+      prometheus:
+        enabled: true
+        step: 60
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+
+openapi:
+  openAPIDefinition:
+    base-path: /api
+
+spring:
+  application:
+    name: coordinator-service-app
+  cache:
+    type: simple
+  cloud:
+    consul:
+      discovery:
+        instanceId: ${spring.application.name}:${random.value}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+      write-null-map-values: false
+    date-format: ${workflow.serialization.date-format}
+    time-zone: UTC
+  jmx:
+    enabled: false
+#  main:
+#    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      console-available: true
+  profiles:
+    active: #spring.profiles.active#
+    group:
+      dev:
+        - dev
+        - api-docs
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 1
+  task:
+    execution:
+      thread-name-prefix: coordinator-service-app-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: coordinator-service-app-scheduling-
+      pool:
+        size: 2
+
+#####
+
+discovery-client:
+  provider: property
+
+workflow:
+  context-repository:
+    provider: jdbc
+  # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
+  message-broker:
+    provider: amqp
+  persistence:
+    provider: jdbc
+  serialization:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  workflow-repository:
+    database:
+      enabled: true
+    classpath:
+      enabled: true

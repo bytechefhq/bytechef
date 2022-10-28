@@ -1,0 +1,21 @@
+label: Hello Timeout
+
+inputs:
+  - name: yourName
+    label: Your Name
+    type: string
+    required: true
+
+tasks:
+  - label: Print a greeting
+    type: io/print
+    text: Hello ${yourName}
+
+  - label: Sleep a lot
+    type: delay/v1/delay
+    timeout: 5s
+    millis: 60000
+
+  - label: Print a farewell
+    type: io/print
+    text: Goodbye ${yourName}

@@ -1,0 +1,15 @@
+label: Loop 3
+
+tasks:
+  - type: loop/v1
+    list: "${range(1,10)}"
+    itemVar: item1
+    iteratee:
+      type: sequence/v1
+      tasks:
+        - name: sumVar1
+          type: var
+          value: ${1 + item1}
+        - name: sumVar2
+          type: var
+          value: ${sumVar1 + 2}

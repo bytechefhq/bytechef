@@ -1,0 +1,160 @@
+{
+  "display": {
+    "description": "Reads or writes a binary file from/to disk",
+    "label": "Local File"
+  },
+  "name": "filesystem",
+  "actions": [
+    {
+      "display": {
+        "label": "Read to file"
+      },
+      "name": "readFile",
+      "inputs": [
+        {
+          "description": "The path of the file to read.",
+          "label": "Filename",
+          "name": "filename",
+          "placeholder": "/data/your_file.pdf",
+          "type": "STRING",
+          "required": true
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "display": {
+        "label": "Write from file"
+      },
+      "name": "writeFile",
+      "inputs": [
+        {
+          "description": "The object property which contains a reference to the file to be written.",
+          "label": "File",
+          "name": "fileEntry",
+          "type": "OBJECT",
+          "required": true,
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        },
+        {
+          "description": "The path to which the file should be written.",
+          "label": "Filename",
+          "name": "filename",
+          "placeholder": "/data/your_file.pdf",
+          "type": "STRING",
+          "required": true
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "bytes",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Creates a temporary directory oon the filesystem.",
+        "label": "Create Temp Directory"
+      },
+      "name": "createTempDir"
+    },
+    {
+      "display": {
+        "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
+        "label": "File Path"
+      },
+      "name": "getFilePath",
+      "inputs": [
+        {
+          "description": "The path to full filename.",
+          "label": "Filename",
+          "name": "filename",
+          "placeholder": "/data/your_file.pdf",
+          "type": "STRING",
+          "required": true
+        }
+      ],
+      "exampleOutput": "/data",
+      "outputSchema": [
+        {
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "",
+        "label": "Lists a content of directory for the given path."
+      },
+      "name": "ls"
+    },
+    {
+      "display": {
+        "description": "Creates a directory.",
+        "label": "Create"
+      },
+      "name": "mkdir"
+    },
+    {
+      "display": {
+        "description": "Removes the content of a directory.",
+        "label": "Remove"
+      },
+      "name": "rm"
+    }
+  ],
+  "version": 1
+}
