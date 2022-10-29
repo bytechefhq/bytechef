@@ -3,8 +3,6 @@ import { Half2Icon, MoonIcon, SunIcon } from '@radix-ui/react-icons'
 import cx from 'classnames'
 import React, { useEffect, useState } from 'react'
 
-interface Props {}
-
 const themes = [
   {
     key: 'light',
@@ -24,19 +22,21 @@ const themes = [
   }
 ]
 
-const ThemeSwitcher = (props: Props) => {
+const ThemeSwitcher = () => {
   const [preferredTheme, setPreferredTheme] = useState<null | string>(null)
 
   useEffect(() => {
     try {
-      let found = localStorage.getItem('theme')
+      const found = localStorage.getItem('theme')
       setPreferredTheme(found)
-    } catch (error) {}
+    } catch (error) {
+      // ignore
+    }
   }, [])
 
   useEffect(() => {
     const prefersDarkQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const updateTheme = (_e: MediaQueryListEvent) => {
+    const updateTheme = () => {
       setPreferredTheme('system')
     }
     prefersDarkQuery.addEventListener('change', updateTheme)
@@ -104,6 +104,7 @@ const ThemeSwitcher = (props: Props) => {
                     'text-gray-500 focus:bg-gray-200 dark:text-gray-400 dark:focus:bg-gray-800'
                   )}
                   onClick={() => {
+                    /* eslint-disable  @typescript-eslint/no-explicit-any */
                     ;(window as any).__setPreferredTheme(key)
                     setPreferredTheme(key)
                   }}
@@ -111,7 +112,7 @@ const ThemeSwitcher = (props: Props) => {
                   {React.cloneElement(icon, {
                     className: 'w-5 h-5 mr-2 text-gray-700 dark:text-gray-300'
                   })}
-                  <span className="flex-grow text-gray-700 dark:text-gray-300">
+                  <span className="grow text-gray-700 dark:text-gray-300">
                     {label}
                   </span>
                 </DropdownMenuPrimitive.Item>

@@ -34,7 +34,7 @@ export function MobileSidebar({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
+          <div className="fixed inset-0 bg-gray-600" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-40 flex">
@@ -72,7 +72,7 @@ export function MobileSidebar({
                 </div>
               </Transition.Child>
               <div className="pt-5 pb-4">
-                <div className="flex flex-shrink-0 items-center px-4">
+                <div className="flex shrink-0 items-center px-4">
                   <img className="h-8 w-auto" src={reactLogo} alt="ByteChef" />
                 </div>
                 <nav aria-label="Sidebar" className="mt-5">
@@ -93,8 +93,8 @@ export function MobileSidebar({
                   </div>
                 </nav>
               </div>
-              <div className="flex flex-shrink-0 border-t border-gray-200 p-4">
-                <a href="#" className="group block flex-shrink-0">
+              <div className="flex shrink-0 border-t border-gray-200 p-4">
+                <a href="#" className="group block shrink-0">
                   <div className="flex items-center">
                     <div>
                       <img
@@ -116,7 +116,7 @@ export function MobileSidebar({
               </div>
             </Dialog.Panel>
           </Transition.Child>
-          <div className="w-14 flex-shrink-0" aria-hidden="true">
+          <div className="w-14 shrink-0" aria-hidden="true">
             {/* Force sidebar to shrink to fit close icon */}
           </div>
         </div>

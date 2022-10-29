@@ -1,6 +1,7 @@
 import { useRouteError } from 'react-router-dom'
 
 export default function ErrorPage() {
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
   const error: any = useRouteError()
 
   return (

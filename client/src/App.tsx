@@ -4,7 +4,6 @@ import { DesktopSidebar } from './components/Sidebar/DesktopSidebar'
 import { MobileTopNavigation } from './components/Sidebar/MobileTopNavigation'
 import { MobileSidebar } from './components/Sidebar/MobileSidebar'
 import { Outlet } from 'react-router-dom'
-import IntegrationList from './pages/integrations/IntegrationList'
 
 const user = {
   name: 'Emily Selman',
@@ -31,7 +30,7 @@ function App() {
         />
 
         {/* Static sidebar for desktop */}
-        <DesktopSidebar user={user} navigation={navigation} />
+        <DesktopSidebar navigation={navigation} />
 
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {/* Mobile top navigation */}
