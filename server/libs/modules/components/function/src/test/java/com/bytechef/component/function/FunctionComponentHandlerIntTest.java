@@ -52,7 +52,6 @@ public class FunctionComponentHandlerIntTest {
         // TODO
     }
 
-    @Disabled
     @Test
     public void testPerformJavaScript() {
         Job job = workflowExecutor.execute(
@@ -65,7 +64,6 @@ public class FunctionComponentHandlerIntTest {
         Assertions.assertEquals(6000, outputs.get("result"));
     }
 
-    @Disabled
     @Test
     public void testPerformPython() {
         Job job = workflowExecutor.execute(
@@ -78,7 +76,6 @@ public class FunctionComponentHandlerIntTest {
         Assertions.assertEquals(6000, outputs.get("result"));
     }
 
-    @Disabled
     @Test
     public void testPerformR() {
         Job job = workflowExecutor.execute(
@@ -91,7 +88,6 @@ public class FunctionComponentHandlerIntTest {
         Assertions.assertEquals(6000, outputs.get("result"));
     }
 
-    @Disabled
     @Test
     public void testPerformRuby() {
         Job job = workflowExecutor.execute(

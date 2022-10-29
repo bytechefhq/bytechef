@@ -7,7 +7,7 @@ export const IntegrationList: React.FC<PropsWithChildren> = () => {
 
   if (isLoading) return <div>Loading...</div>
 
-  if (error) return <div>An error has occurred: ' + {error.message}</div>
+  if (error) return <div>An error has occurred: + {error.message}</div>
 
   return (
     <div className="overflow-hidden bg-gray-50 dark:bg-gray-800 sm:rounded-md">
