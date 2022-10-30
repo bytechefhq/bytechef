@@ -4,7 +4,6 @@ plugins {
     id "com.github.ben-manes.versions"
     id "com.github.spotbugs"
     id "com.bytechef.java-common-conventions"
-    id "org.springframework.boot" version "${springBootVersion}" apply false
     id "pmd"
 }
 
@@ -17,7 +16,6 @@ subprojects {
     apply plugin: "com.diffplug.spotless"
     apply plugin: "com.github.spotbugs"
     apply plugin: "com.bytechef.java-common-conventions"
-    apply plugin: "io.spring.dependency-management"
     apply plugin: "pmd"
 
     idea {
@@ -176,23 +174,10 @@ subprojects {
         }
     }
 
-    dependencyManagement {
-        imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-        }
-    }
-
     dependencies {
         compileOnly "org.graalvm.sdk:graal-sdk:${graalSDKVersion}"
 
         implementation libs.spotbugs.annotations
-        implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-
-        testImplementation "org.springframework.boot:spring-boot-starter-test"
-
-        testRuntimeOnly "com.zaxxer:HikariCP"
-        testRuntimeOnly "org.postgresql:postgresql"
-        testRuntimeOnly libs.testcontainers.postgresql
     }
 }
 
