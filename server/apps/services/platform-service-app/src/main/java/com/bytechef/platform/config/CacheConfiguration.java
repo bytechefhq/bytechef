@@ -21,7 +21,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching;
 // import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 /**
  * @author Ivica Cardic
@@ -29,10 +28,4 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)
-public class CacheConfiguration {
-
-    //    @Bean
-    //    public LettuceConnectionFactory redisConnectionFactory() {
-    //        return new LettuceConnectionFactory();
-    //    }
-}
+public class CacheConfiguration {}
