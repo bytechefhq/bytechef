@@ -4,8 +4,6 @@ plugins {
     id "com.github.ben-manes.versions"
     id "com.github.spotbugs"
     id "com.bytechef.java-common-conventions"
-    id "org.sonarqube"
-    id "org.springframework.boot" version "${springBootVersion}" apply false
     id "pmd"
 }
 
@@ -18,11 +16,7 @@ subprojects {
     apply plugin: "com.diffplug.spotless"
     apply plugin: "com.github.spotbugs"
     apply plugin: "com.bytechef.java-common-conventions"
-    apply plugin: "io.spring.dependency-management"
-    apply plugin: "org.sonarqube"
     apply plugin: "pmd"
-
-    apply from: "${rootDir}/gradle/sonar.gradle"
 
     idea {
         module {
@@ -180,23 +174,28 @@ subprojects {
         }
     }
 
-    dependencyManagement {
-        imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-        }
-    }
-
     dependencies {
         compileOnly "org.graalvm.sdk:graal-sdk:${graalSDKVersion}"
 
         implementation libs.spotbugs.annotations
-        implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    }
+}
 
-        testImplementation "org.springframework.boot:spring-boot-starter-test"
+def publishedProjects = subprojects.findAll()
 
-        testRuntimeOnly "com.zaxxer:HikariCP"
-        testRuntimeOnly "org.postgresql:postgresql"
-        testRuntimeOnly libs.testcontainers.postgresql
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    description = 'Generates an aggregate report from all subprojects'
+
+    dependsOn(publishedProjects.test)
+
+    getAdditionalSourceDirs().setFrom(files(publishedProjects.sourceSets.main.allSource.srcDirs))
+    getSourceDirectories().setFrom(files(publishedProjects.sourceSets.main.allSource.srcDirs))
+    getClassDirectories().setFrom(files(publishedProjects.sourceSets.main.output))
+    getExecutionData().setFrom(files(publishedProjects.jacocoTestReport.executionData))
+
+    reports {
+        html.enabled = true // human readable
+        xml.enabled = true // required by codecov
     }
 }
 

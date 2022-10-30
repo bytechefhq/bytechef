@@ -14,5 +14,6 @@ dependencies {
     implementation libs.springdoc.openapi.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:core:autoconfigure:autoconfigure-consul")
+    implementation project(":server:libs:core:autoconfigure:autoconfigure-property")
     implementation project(":server:libs:core:commons:commons-utils")
 }
