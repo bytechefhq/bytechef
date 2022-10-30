@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.worker.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;

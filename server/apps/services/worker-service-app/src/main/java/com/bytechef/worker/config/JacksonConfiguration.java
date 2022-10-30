@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.worker.config;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
