@@ -200,6 +200,24 @@ subprojects {
     }
 }
 
+def publishedProjects = subprojects.findAll()
+
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    description = 'Generates an aggregate report from all subprojects'
+
+    dependsOn(publishedProjects.test)
+
+    getAdditionalSourceDirs().setFrom(files(publishedProjects.sourceSets.main.allSource.srcDirs))
+    getSourceDirectories().setFrom(files(publishedProjects.sourceSets.main.allSource.srcDirs))
+    getClassDirectories().setFrom(files(publishedProjects.sourceSets.main.output))
+    getExecutionData().setFrom(files(publishedProjects.jacocoTestReport.executionData))
+
+    reports {
+        html.enabled = true // human readable
+        xml.enabled = true // required by codecov
+    }
+}
+
 wrapper {
     gradleVersion = "7.5.1"
 }
