@@ -31,7 +31,7 @@ task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plug
     ]
 }
 
-tasks.register('generateOpenAPI') {
+tasks.register("generateOpenAPI") {
     dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
 }
 
