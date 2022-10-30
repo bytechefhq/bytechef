@@ -1,0 +1,22 @@
+plugins {
+    id "org.sonarqube"
+}
+
+file("${projectDir}/sonar-project.properties").withReader {
+    Properties sonarProperties = new Properties()
+    sonarProperties.load(it)
+
+    sonarProperties.each { key, value ->
+        sonar {
+            properties {
+                property key, value
+            }
+        }
+    }
+}
+
+subprojects {
+    apply plugin: "org.sonarqube"
+
+    apply from: "${rootDir}/gradle/sonar.gradle"
+}

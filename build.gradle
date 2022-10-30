@@ -4,30 +4,8 @@ plugins {
     id "com.github.ben-manes.versions"
     id "com.github.spotbugs"
     id "com.bytechef.java-common-conventions"
-    id "org.sonarqube"
     id "org.springframework.boot" version "${springBootVersion}" apply false
     id "pmd"
-}
-
-sonar {
-    properties {
-        property "sonar.projectKey", "bytechefhq_bytechef"
-        property "sonar.organization", "bytechef"
-        property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-file("${rootDir}/config/sonar/sonar-project.properties").withReader {
-    Properties sonarProperties = new Properties()
-    sonarProperties.load(it)
-
-    sonarProperties.each { key, value ->
-        sonar {
-            properties {
-                property key, value
-            }
-        }
-    }
 }
 
 allprojects {
@@ -40,10 +18,7 @@ subprojects {
     apply plugin: "com.github.spotbugs"
     apply plugin: "com.bytechef.java-common-conventions"
     apply plugin: "io.spring.dependency-management"
-    apply plugin: "org.sonarqube"
     apply plugin: "pmd"
-
-    apply from: "${rootDir}/gradle/sonar.gradle"
 
     idea {
         module {
