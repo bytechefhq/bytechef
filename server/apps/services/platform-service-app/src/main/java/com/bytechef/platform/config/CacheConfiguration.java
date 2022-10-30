@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.platform.config;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
+// import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+// import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-public class JacksonConfiguration {
+@EnableCaching
+@EnableConfigurationProperties(CacheProperties.class)
+public class CacheConfiguration {
 
-    @Bean
-    JavaTimeModule javaTimeModule() {
-        return new JavaTimeModule();
-    }
+    //    @Bean
+    //    public LettuceConnectionFactory redisConnectionFactory() {
+    //        return new LettuceConnectionFactory();
+    //    }
 }
