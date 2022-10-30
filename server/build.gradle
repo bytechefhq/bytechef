@@ -17,8 +17,8 @@ file("${projectDir}/sonar-project.properties").withReader {
 }
 
 subprojects {
-    apply plugin: "io.spring.dependency-management"
     apply plugin: "org.sonarqube"
+    apply plugin: "io.spring.dependency-management"
 
     apply from: "${rootDir}/gradle/sonar.gradle"
 
