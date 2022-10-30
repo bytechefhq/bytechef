@@ -1,0 +1,8 @@
+dependencies {
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation project(":backend:libs:atlas:atlas-worker:atlas-worker-impl")
+    implementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+    implementation project(":backend:libs:core:autoconfigure:autoconfigure-annotations")
+}

@@ -1,0 +1,26 @@
+dependencies {
+    api project(":backend:libs:atlas:atlas-coordinator:atlas-coordinator-api")
+    api project(":backend:libs:atlas:atlas-event:atlas-event-api")
+
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-beans"
+    implementation "org.springframework:spring-core"
+    implementation "org.springframework:spring-web"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.retry:spring-retry"
+    implementation project(":backend:libs:atlas:atlas-api")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-api")
+    implementation project(":backend:libs:core:commons:commons-utils")
+
+    testImplementation project(":backend:libs:atlas:atlas-config")
+    testImplementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    testImplementation project(":backend:libs:atlas:atlas-repository:atlas-repository-jdbc")
+    testImplementation project(":backend:libs:atlas:atlas-repository:atlas-repository-resource")
+    testImplementation project(":backend:libs:atlas:atlas-service")
+    testImplementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+    testImplementation project(":backend:libs:atlas:atlas-upgrade")
+    testImplementation project(":backend:libs:atlas:atlas-worker:atlas-worker-impl")
+    testImplementation project(":backend:libs:core:commons:commons-utils")
+    testImplementation project(":backend:libs:test-support")
+}

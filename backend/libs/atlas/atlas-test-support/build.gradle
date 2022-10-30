@@ -1,0 +1,20 @@
+dependencies {
+    api project(":backend:libs:atlas:atlas-api")
+    api project(":backend:libs:atlas:atlas-worker:atlas-worker-api")
+
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.boot:spring-boot-test"
+    implementation project(":backend:libs:atlas:atlas-config")
+    implementation project(":backend:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
+    implementation project(":backend:libs:atlas:atlas-event:atlas-event-api")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":backend:libs:atlas:atlas-repository:atlas-repository-jdbc")
+    implementation project(":backend:libs:atlas:atlas-api")
+    implementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+    implementation project(":backend:libs:atlas:atlas-worker:atlas-worker-impl")
+    implementation project(":backend:libs:atlas:atlas-repository:atlas-repository-jdbc")
+    implementation project(":backend:libs:atlas:atlas-repository:atlas-repository-resource")
+    implementation project(":backend:libs:core:commons:commons-utils")
+    implementation project(":backend:libs:test-support")
+}

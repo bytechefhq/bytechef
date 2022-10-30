@@ -1,0 +1,6 @@
+version="1.0"
+
+dependencies {
+    testImplementation project(":backend:libs:modules:task-dispatchers:if")
+    testImplementation project(":backend:libs:modules:task-dispatchers:sequence")
+}

@@ -1,0 +1,4 @@
+dependencies {
+    api project(":backend:libs:hermes:hermes-api")
+    api project(":backend:libs:hermes:hermes-component:hermes-component-api")
+}

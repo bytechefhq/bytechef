@@ -1,0 +1,4 @@
+dependencies {
+    implementation "org.springframework:spring-core"
+    implementation project(":backend:libs:core:commons:commons-utils")
+}

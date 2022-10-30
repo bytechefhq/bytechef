@@ -1,0 +1,58 @@
+group = "com.bytechef.worker"
+description = ""
+
+springBoot {
+    mainClassName = "com.bytechef.WorkerApplication"
+}
+
+dependencies {
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-rsocket"
+    implementation "org.springframework.boot:spring-boot-starter-webflux"
+    implementation "org.springframework.kafka:spring-kafka"
+    implementation libs.springdoc.openapi.native
+    implementation libs.springdoc.openapi.ui
+    implementation libs.springdoc.openapi.webflux.ui
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    implementation project(":backend:libs:atlas:atlas-event:atlas-event-impl")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
+    implementation project(":backend:libs:atlas:atlas-worker:atlas-worker-config")
+    implementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+    implementation project(":backend:libs:core:autoconfigure:autoconfigure-consul")
+    implementation project(":backend:libs:core:autoconfigure:autoconfigure-property")
+    implementation project(":backend:libs:core:commons:commons-utils")
+    implementation project(":backend:libs:core:encryption:encryption-filesystem")
+    implementation project(":backend:libs:core:rest:rest-impl")
+    implementation project(":backend:libs:hermes:hermes-connection:hermes-connection-rsocket-client")
+    implementation project(":backend:libs:hermes:hermes-component:hermes-component-impl")
+    implementation project(":backend:libs:hermes:hermes-component:hermes-component-rest")
+    implementation project(":backend:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+    implementation project(":backend:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
+    implementation project(":backend:libs:modules:components:aws:aws-s3")
+    implementation project(":backend:libs:modules:components:bash")
+    implementation project(":backend:libs:modules:components:csv-file")
+    implementation project(":backend:libs:modules:components:delay")
+    implementation project(":backend:libs:modules:components:file-storage")
+    implementation project(":backend:libs:modules:components:http-client")
+    implementation project(":backend:libs:modules:components:json-file")
+    implementation project(":backend:libs:modules:components:logger")
+    implementation project(":backend:libs:modules:components:filesystem")
+    implementation project(":backend:libs:modules:components:function")
+    implementation project(":backend:libs:modules:components:map")
+    implementation project(":backend:libs:modules:components:mysql")
+    implementation project(":backend:libs:modules:components:object-helper")
+    implementation project(":backend:libs:modules:components:ods-file")
+    implementation project(":backend:libs:modules:components:postgresql")
+    implementation project(":backend:libs:modules:components:random-helper")
+    implementation project(":backend:libs:modules:components:var")
+    implementation project(":backend:libs:modules:components:xlsx-file")
+    implementation project(":backend:libs:modules:components:xml-file")
+    implementation project(":backend:libs:modules:components:xml-helper")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-activemq"
+    testImplementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
+}

@@ -1,7 +1,0 @@
-dependencies {
-    api project(":server:libs:atlas:atlas-api")
-    api project(":server:libs:atlas:atlas-event:atlas-event-api")
-    api project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
-
-    implementation "org.springframework.boot:spring-boot-autoconfigure"
-}

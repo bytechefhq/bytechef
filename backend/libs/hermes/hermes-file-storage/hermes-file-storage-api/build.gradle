@@ -1,0 +1,9 @@
+dependencies {
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation libs.tika.core
+
+    testImplementation project(":backend:libs:atlas:atlas-api")
+    testImplementation project(":backend:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+    testImplementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+    testImplementation project(":backend:libs:core:commons:commons-utils")
+}

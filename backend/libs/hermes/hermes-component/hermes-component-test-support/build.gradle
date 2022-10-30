@@ -1,0 +1,10 @@
+dependencies {
+    api project(":backend:libs:hermes:hermes-connection:hermes-connection-api")
+    api project(":backend:libs:hermes:hermes-file-storage:hermes-file-storage-api")
+    api project(":backend:libs:hermes:hermes-test-support")
+
+    implementation libs.json
+    implementation project(":backend:libs:hermes:hermes-connection:hermes-connection-service")
+    implementation project(":backend:libs:hermes:hermes-component:hermes-component-impl")
+    implementation project(":backend:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+}

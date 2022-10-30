@@ -1,0 +1,19 @@
+version="1.0"
+
+dependencies {
+    api project(":backend:libs:atlas:atlas-api")
+    api project(":backend:libs:hermes:hermes-component:hermes-component-api")
+
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation project(":backend:libs:atlas:atlas-service")
+    implementation project(":backend:libs:atlas:atlas-repository:atlas-repository-memory")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":backend:libs:atlas:atlas-worker:atlas-worker-impl")
+    implementation project(":backend:libs:modules:task-dispatchers:map")
+
+    testImplementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+    testImplementation project(":backend:libs:atlas:atlas-test-support")
+    testImplementation project(":backend:libs:atlas:atlas-upgrade")
+    testImplementation project(":backend:libs:hermes:hermes-component:hermes-component-test-support")
+}

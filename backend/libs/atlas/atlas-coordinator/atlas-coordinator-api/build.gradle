@@ -1,0 +1,6 @@
+dependencies {
+    api project(":backend:libs:atlas:atlas-api")
+    api project(":backend:libs:atlas:atlas-event:atlas-event-api")
+
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+}

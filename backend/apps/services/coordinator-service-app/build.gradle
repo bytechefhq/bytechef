@@ -1,0 +1,44 @@
+group = "com.bytechef.coordinator"
+description = ""
+
+springBoot {
+    mainClassName = "com.bytechef.CoordinatorApplication"
+}
+
+dependencies {
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+//    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.boot:spring-boot-starter-rsocket"
+    implementation "org.springframework.kafka:spring-kafka"
+    implementation libs.springdoc.openapi.native
+    implementation libs.springdoc.openapi.ui
+    implementation libs.springdoc.openapi.webflux.ui
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    implementation project(":backend:libs:atlas:atlas-coordinator:atlas-coordinator-config")
+    implementation project(":backend:libs:atlas:atlas-event:atlas-event-impl")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
+    implementation project(":backend:libs:atlas:atlas-rsocket-client")
+    implementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+    implementation project(":backend:libs:core:autoconfigure:autoconfigure-consul")
+    implementation project(":backend:libs:core:autoconfigure:autoconfigure-property")
+    implementation project(":backend:libs:core:commons:commons-utils")
+    implementation project(":backend:libs:core:encryption:encryption-filesystem")
+    implementation project(":backend:libs:core:rest:rest-impl")
+    implementation project(":backend:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-rest")
+    implementation project(":backend:libs:modules:task-dispatchers:each")
+    implementation project(":backend:libs:modules:task-dispatchers:fork")
+    implementation project(":backend:libs:modules:task-dispatchers:if")
+    implementation project(":backend:libs:modules:task-dispatchers:loop")
+    implementation project(":backend:libs:modules:task-dispatchers:map")
+    implementation project(":backend:libs:modules:task-dispatchers:parallel")
+    implementation project(":backend:libs:modules:task-dispatchers:sequence")
+    implementation project(":backend:libs:modules:task-dispatchers:subflow")
+    implementation project(":backend:libs:modules:task-dispatchers:switch")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-activemq"
+    testImplementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
+}

@@ -1,0 +1,68 @@
+plugins {
+    id "org.openapi.generator"
+}
+
+task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    apiPackage = "com.bytechef.atlas.web.rest"
+    configOptions = [
+        "dateLibrary": "java8-localdatetime",
+        "interfaceOnly": "true",
+        "reactive": "true",
+        "useTags": "true"
+    ]
+    generatorName = "spring"
+    importMappings = [
+        "Page": "org.springframework.data.domain.Page",
+    ]
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    modelPackage = "com.bytechef.atlas.web.rest.model"
+    outputDir = "$projectDir/generated".toString()
+    typeMappings = [
+        "Page": "org.springframework.data.domain.Page",
+    ]
+}
+
+sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
+
+task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    configOptions = [
+        "useTags": "true"
+    ]
+    generatorName = "typescript-fetch"
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    outputDir = "$rootDir/frontend/src/_generated/data-access/workflow".toString()
+    typeMappings = [
+        DateTime: "Date"
+    ]
+}
+
+tasks.register('generateOpenAPI') {
+    dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
+}
+
+dependencies {
+    annotationProcessor libs.mapstruct.processor
+    annotationProcessor libs.mapstruct.spring.extensions
+
+    api "org.springframework.data:spring-data-commons"
+    api project(":backend:libs:atlas:atlas-api")
+
+    implementation libs.jackson.databind.nullable
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "javax.validation:validation-api"
+    implementation libs.mapstruct
+    implementation libs.mapstruct.spring.annotations
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-webflux"
+
+    implementation libs.swagger.annotations
+    implementation project(":backend:libs:atlas:atlas-message-broker:atlas-message-broker-api")
+    implementation project(":backend:libs:core:autoconfigure:autoconfigure-annotations")
+    implementation project(":backend:libs:core:commons:commons-cache")
+    implementation project(":backend:libs:core:commons:commons-utils")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+    testImplementation project(":backend:libs:test-support")
+}

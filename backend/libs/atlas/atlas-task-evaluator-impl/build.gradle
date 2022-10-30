@@ -1,0 +1,8 @@
+dependencies {
+    api project(":backend:libs:atlas:atlas-api")
+
+    implementation libs.commons.io
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-expression"
+    implementation project(":backend:libs:core:commons:commons-utils")
+}

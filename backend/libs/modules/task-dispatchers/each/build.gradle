@@ -1,0 +1,5 @@
+version="1.0"
+
+dependencies {
+    testImplementation project(":backend:libs:atlas:atlas-task-evaluator-impl")
+}

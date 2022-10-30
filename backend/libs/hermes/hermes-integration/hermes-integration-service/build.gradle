@@ -1,0 +1,16 @@
+dependencies {
+    api project(":backend:libs:hermes:hermes-integration:hermes-integration-api")
+
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-tx"
+    implementation "org.springframework.data:spring-data-jdbc"
+    implementation project(":backend:libs:atlas:atlas-api")
+    implementation project(":backend:libs:core:commons:commons-data")
+    implementation project(":backend:libs:core:commons:commons-utils")
+
+    testImplementation project(":backend:libs:atlas:atlas-config")
+    testImplementation project(":backend:libs:atlas:atlas-repository:atlas-repository-jdbc")
+    testImplementation project(":backend:libs:atlas:atlas-upgrade")
+    testImplementation project(":backend:libs:hermes:hermes-integration:hermes-integration-upgrade")
+    testImplementation project(":backend:libs:test-support")
+}

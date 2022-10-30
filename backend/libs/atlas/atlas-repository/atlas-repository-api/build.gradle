@@ -1,0 +1,12 @@
+dependencies {
+    api "org.springframework.data:spring-data-commons"
+    api project(":backend:libs:atlas:atlas-api")
+    api project(":backend:libs:core:commons:commons-cache")
+
+    implementation libs.commons.io
+    implementation "org.apache.commons:commons-lang3"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-core"
+}

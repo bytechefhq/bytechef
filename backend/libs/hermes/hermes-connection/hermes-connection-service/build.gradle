@@ -1,0 +1,12 @@
+dependencies {
+    api project(":backend:libs:hermes:hermes-connection:hermes-connection-api")
+
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.data:spring-data-jdbc"
+    implementation project(":backend:libs:core:commons:commons-data")
+    implementation project(":backend:libs:core:commons:commons-utils")
+    implementation project(":backend:libs:core:encryption:encryption-api")
+
+    testImplementation project(":backend:libs:hermes:hermes-connection:hermes-connection-upgrade")
+    testImplementation project(":backend:libs:hermes:hermes-test-support")
+}

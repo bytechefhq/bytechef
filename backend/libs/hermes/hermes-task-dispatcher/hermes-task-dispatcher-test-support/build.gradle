@@ -1,0 +1,4 @@
+dependencies {
+    api project(":backend:libs:atlas:atlas-worker:atlas-worker-api")
+    api project(":backend:libs:hermes:hermes-test-support")
+}

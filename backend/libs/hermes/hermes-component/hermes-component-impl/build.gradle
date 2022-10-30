@@ -1,0 +1,12 @@
+dependencies {
+    api project(":backend:libs:hermes:hermes-component:hermes-component-api")
+
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.boot:spring-boot"
+    implementation project(":backend:libs:atlas:atlas-worker:atlas-worker-api")
+    implementation project(":backend:libs:core:commons:commons-utils")
+    implementation project(":backend:libs:hermes:hermes-connection:hermes-connection-api")
+    implementation project(":backend:libs:hermes:hermes-file-storage:hermes-file-storage-api")
+
+    testImplementation project(":backend:libs:hermes:hermes-component:hermes-component-test-support")
+}
