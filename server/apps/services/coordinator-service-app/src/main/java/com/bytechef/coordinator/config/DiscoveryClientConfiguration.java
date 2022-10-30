@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.coordinator.config;
 
 import java.util.List;
 import java.util.Map;
