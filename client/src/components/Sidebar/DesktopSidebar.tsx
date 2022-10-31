@@ -22,13 +22,13 @@ export function DesktopSidebar({
             </div>
             <nav
               aria-label="Sidebar"
-              className="flex flex-col items-center space-y-2 py-3"
+              className="flex flex-col items-center py-3"
             >
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="flex items-center rounded-lg p-4 hover:text-blue-600"
+                  className="flex items-center rounded-lg p-4 hover:text-blue-600 dark:text-gray-400 dark:hover:text-sky-500"
                 >
                   <item.icon className="h-7 w-7" aria-hidden="true" />
                   <span className="sr-only">{item.name}</span>
