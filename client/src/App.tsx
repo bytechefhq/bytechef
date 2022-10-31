@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LockClosedIcon, Square3Stack3DIcon } from '@heroicons/react/24/outline'
+import { LinkIcon, Square3Stack3DIcon } from '@heroicons/react/24/outline'
 import { DesktopSidebar } from './components/Sidebar/DesktopSidebar'
 import { MobileTopNavigation } from './components/Sidebar/MobileTopNavigation'
 import { MobileSidebar } from './components/Sidebar/MobileSidebar'
@@ -13,7 +13,7 @@ const user = {
 }
 const navigation = [
   { name: 'Integrations', href: '/integrations', icon: Square3Stack3DIcon },
-  { name: 'Connections', href: '/connections', icon: LockClosedIcon }
+  { name: 'Connections', href: '/connections', icon: LinkIcon }
 ]
 
 function App() {
