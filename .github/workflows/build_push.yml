@@ -10,40 +10,12 @@ name: CI Build
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
 
 permissions:
   contents: read
 
 jobs:
-  # JOB to run change detection
-  changes:
-    runs-on: ubuntu-latest
-    # Required permissions
-    permissions:
-      pull-requests: read
-    # Set job outputs to values from the filter step
-    outputs:
-      cli: ${{ steps.filter.outputs.cli }}
-      client: ${{ steps.filter.outputs.client }}
-      server: ${{ steps.filter.outputs.server }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            cli:
-            - 'cli/**'
-            client:
-              - 'client/**'
-            server:
-              - 'server/**'
-
   cli:
-    needs: changes
-    if: ${{ needs.changes.outputs.cli == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -76,8 +48,6 @@ jobs:
         run: ../gradlew build jacocoTestReport sonar --info
 
   client:
-    needs: changes
-    if: ${{ needs.changes.outputs.client == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -103,8 +73,6 @@ jobs:
           projectBaseDir: client/
 
   server:
-    needs: changes
-    if: ${{ needs.changes.outputs.server == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
