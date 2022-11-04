@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.csv.file;
+package com.bytechef.component.csvfile;
 
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.AGE_NUMBER;
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.CSV_FILE;
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.INCLUDE_EMPTY_CELLS;
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.PAGE_SIZE;
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.READ;
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.READ_AS_STRING;
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.ROWS;
-import static com.bytechef.component.csv.file.constants.CsvFileConstants.WRITE;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.AGE_NUMBER;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.CSV_FILE;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.DELIMITER;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.HEADER_ROW;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.PAGE_SIZE;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.READ;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.READ_AS_STRING;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.ROWS;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.WRITE;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.array;
 import static com.bytechef.hermes.component.ComponentDSL.bool;
+import static com.bytechef.hermes.component.ComponentDSL.createComponent;
+import static com.bytechef.hermes.component.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.ComponentDSL.display;
 import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.options;
+import static com.bytechef.hermes.component.ComponentDSL.number;
 import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 
 import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.commons.lang.ValueUtils;
-import com.bytechef.component.csv.file.constants.CsvFileConstants;
 import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -67,73 +71,57 @@ public class CsvFileComponentHandler implements ComponentHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvFileComponentHandler.class);
 
-    public final ComponentDefinition componentDefinition = ComponentDSL.createComponent(CSV_FILE)
-            .display(ComponentDSL.display("CSV File").description("Reads and writes data from a csv file."))
+    public final ComponentDefinition componentDefinition = createComponent(CSV_FILE)
+            .display(display("CSV File").description("Reads and writes data from a csv file."))
             .actions(
                     action(READ)
-                            .display(ComponentDSL.display("Read from file").description("Reads data from a csv file."))
-                            .inputs(
+                            .display(display("Read from file").description("Reads data from a csv file."))
+                            .properties(
                                     fileEntry(FILE_ENTRY)
                                             .label("File")
                                             .description(
                                                     "The object property which contains a reference to the csv file to read from.")
                                             .required(true),
-                                    options()
-                                            .label("Options")
-                                            .placeholder("Add Option")
-                                            .options(
-                                                    string(CsvFileConstants.DELIMITER)
-                                                            .label("Delimiter")
-                                                            .description("Delimiter to use when reading a csv file.")
-                                                            .defaultValue(","),
-                                                    bool(CsvFileConstants.HEADER_ROW)
-                                                            .label("Header Row")
-                                                            .description(
-                                                                    "The first row of the file contains the header names.")
-                                                            .defaultValue(true),
-                                                    bool(INCLUDE_EMPTY_CELLS)
-                                                            .label("Include Empty Cells")
-                                                            .description(
-                                                                    "When reading from file the empty cells will be filled with an empty string.")
-                                                            .defaultValue(false),
-                                                    integer(PAGE_SIZE)
-                                                            .label("Page Size")
-                                                            .description(
-                                                                    "The amount of child elements to return in a page."),
-                                                    integer(AGE_NUMBER)
-                                                            .label("Page Number")
-                                                            .description("The page number to get."),
-                                                    bool(READ_AS_STRING)
-                                                            .label("Read As String")
-                                                            .description(
-                                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                                            .defaultValue(false)))
-                            .outputSchema(ComponentDSL.array())
+                                    string(DELIMITER)
+                                            .label("Delimiter")
+                                            .description("Delimiter to use when reading a csv file.")
+                                            .defaultValue(","),
+                                    bool(HEADER_ROW)
+                                            .label("Header Row")
+                                            .description("The first row of the file contains the header names.")
+                                            .defaultValue(true),
+                                    bool(INCLUDE_EMPTY_CELLS)
+                                            .label("Include Empty Cells")
+                                            .description(
+                                                    "When reading from file the empty cells will be filled with an empty string.")
+                                            .defaultValue(false),
+                                    integer(PAGE_SIZE)
+                                            .label("Page Size")
+                                            .description("The amount of child elements to return in a page."),
+                                    integer(AGE_NUMBER).label("Page Number").description("The page number to get."),
+                                    bool(READ_AS_STRING)
+                                            .label("Read As String")
+                                            .description(
+                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                                            .defaultValue(false))
+                            .output(array())
                             .performFunction(this::performRead),
                     action(WRITE)
-                            .display(
-                                    ComponentDSL.display("Write to file").description("Writes the data to a csv file."))
-                            .inputs(
+                            .display(display("Write to file").description("Writes the data to a csv file."))
+                            .properties(
                                     array(ROWS)
                                             .label("Rows")
                                             .description("The array of objects to write to the file.")
                                             .required(true)
                                             .items(ComponentDSL.object()
                                                     .additionalProperties(true)
-                                                    .properties(
-                                                            ComponentDSL.bool(),
-                                                            ComponentDSL.dateTime(),
-                                                            ComponentDSL.number(),
-                                                            ComponentDSL.string())),
-                                    options()
-                                            .label("Options")
-                                            .placeholder("Add Option")
-                                            .options(string(FILENAME)
-                                                    .label("Filename")
-                                                    .description(
-                                                            "Filename to set for binary data. By default, \"file.csv\" will be used.")
-                                                    .defaultValue("")))
-                            .outputSchema(ComponentDSL.fileEntry())
+                                                    .properties(bool(), dateTime(), number(), string())),
+                                    string(FILENAME)
+                                            .label("Filename")
+                                            .description(
+                                                    "Filename to set for binary data. By default, \"file.csv\" will be used.")
+                                            .defaultValue(""))
+                            .output(fileEntry())
                             .performFunction(this::performWrite));
 
     @Override
@@ -142,8 +130,8 @@ public class CsvFileComponentHandler implements ComponentHandler {
     }
 
     protected List<Map<String, Object>> performRead(Context context, ExecutionParameters executionParameters) {
-        String delimiter = executionParameters.getString(CsvFileConstants.DELIMITER, ",");
-        boolean headerRow = executionParameters.getBoolean(CsvFileConstants.HEADER_ROW, true);
+        String delimiter = executionParameters.getString(DELIMITER, ",");
+        boolean headerRow = executionParameters.getBoolean(HEADER_ROW, true);
         boolean includeEmptyCells = executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
         Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
         Integer pageNumber = executionParameters.getInteger(AGE_NUMBER);

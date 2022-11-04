@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.csv.file.constants;
+package com.bytechef.component.csvfile.constants;
 
 /**
  * @author Ivica Cardic
