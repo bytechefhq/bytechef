@@ -20,11 +20,12 @@ import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * IntegrationModel
+ * TODO
  */
 
+@Schema(name = "Integration", description = "TODO")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-26T08:25:02.347465+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:58:11.789560+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("createdBy")
@@ -60,11 +61,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get createdBy
+   * TODO
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -79,11 +80,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get createdDate
+   * TODO
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -98,11 +99,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get id
+   * TODO
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public String getId() {
     return id;
   }
@@ -117,11 +118,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get name
+   * TODO
    * @return name
   */
   
-  @Schema(name = "name", required = false)
+  @Schema(name = "name", description = "TODO", required = false)
   public String getName() {
     return name;
   }
@@ -136,11 +137,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get description
+   * TODO
    * @return description
   */
   
-  @Schema(name = "description", required = false)
+  @Schema(name = "description", description = "TODO", required = false)
   public String getDescription() {
     return description;
   }
@@ -155,11 +156,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get lastModifiedBy
+   * TODO
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -174,11 +175,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get lastModifiedDate
+   * TODO
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -201,11 +202,11 @@ public class IntegrationModel {
   }
 
   /**
-   * Get workflowIds
+   * TODO
    * @return workflowIds
   */
   
-  @Schema(name = "workflowIds", required = false)
+  @Schema(name = "workflowIds", description = "TODO", required = false)
   public List<String> getWorkflowIds() {
     return workflowIds;
   }
