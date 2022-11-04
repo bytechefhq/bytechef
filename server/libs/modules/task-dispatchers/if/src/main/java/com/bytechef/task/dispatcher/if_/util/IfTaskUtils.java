@@ -16,6 +16,10 @@
 
 package com.bytechef.task.dispatcher.if_.util;
 
+import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.COMBINE_OPERATION;
+import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.EXPRESSION;
+import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.RAW_EXPRESSION;
+
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants;
@@ -35,23 +39,25 @@ public class IfTaskUtils {
     private static final ExpressionParser expressionParser = new SpelExpressionParser();
 
     public static boolean resolveCase(TaskExecution ifTaskExecution) {
-        boolean rawConditions = ifTaskExecution.getBoolean(IfTaskDispatcherConstants.RAW_CONDITIONS, false);
+        Boolean result;
 
-        if (rawConditions) {
-            return ifTaskExecution.getBoolean(IfTaskDispatcherConstants.CONDITIONS);
+        if (ifTaskExecution.getBoolean(RAW_EXPRESSION, false)) {
+            result = expressionParser
+                    .parseExpression(ifTaskExecution.getString(EXPRESSION))
+                    .getValue(Boolean.class);
         } else {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> conditions = (List)
                     ifTaskExecution.getList(IfTaskDispatcherConstants.CONDITIONS, Map.class, Collections.emptyList());
-            String combineOperation = ifTaskExecution.getRequiredString(IfTaskDispatcherConstants.COMBINE_OPERATION);
+            String combineOperation = ifTaskExecution.getRequiredString(COMBINE_OPERATION);
 
-            Boolean result = expressionParser
+            result = expressionParser
                     .parseExpression(
                             String.join(getBooleanOperator(combineOperation), getConditionExpressions(conditions)))
                     .getValue(Boolean.class);
-
-            return result != null && result;
         }
+
+        return result != null && result;
     }
 
     private static List<String> getConditionExpressions(List<Map<String, Object>> conditions) {

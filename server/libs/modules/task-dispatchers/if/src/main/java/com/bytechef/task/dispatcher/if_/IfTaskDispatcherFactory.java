@@ -27,21 +27,24 @@ import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.object;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.option;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.showWhen;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.BOOLEAN;
+import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_FALSE;
+import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.COMBINE_OPERATION;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CONDITIONS;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.DATE_TIME;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.IF;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.NUMBER;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.OPERATION;
-import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.RAW_CONDITIONS;
+import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.RAW_EXPRESSION;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.STRING;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.VALUE_1;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.VALUE_2;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
-import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants;
+import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CombineOperation;
 import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.Operation;
 import org.springframework.stereotype.Component;
 
@@ -49,12 +52,12 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+public class IfTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(IF)
             .display(display("If").description("Directs a stream based on true/false results of comparisons."))
             .display(display("Boolean Condition"))
-            .inputs(
+            .properties(
                     array(CONDITIONS)
                             .label("Conditions")
                             .placeholder("Add Condition")
@@ -132,7 +135,8 @@ public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefiniti
                                                             .description(
                                                                     "The number value to compare with the first one.")
                                                             .defaultValue(0)
-                                                            .displayOption(hideWhen(OPERATION))),
+                                                            .displayOption(hideWhen(OPERATION)
+                                                                    .eq(Operation.EMPTY.name()))),
                                     object(STRING)
                                             .label("String")
                                             .properties(
@@ -181,17 +185,26 @@ public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefiniti
                             If multiple conditions are set, this setting decides if it is true as soon as ANY condition
                              matches or only if ALL are met.
                             """)
-                            .displayOption(showWhen(RAW_CONDITIONS).eq(false))
+                            .displayOption(showWhen(RAW_EXPRESSION).eq(false))
                             .options(
                                     option(
                                             "All",
-                                            IfTaskDispatcherConstants.CombineOperation.ALL.name(),
+                                            CombineOperation.ALL.name(),
                                             "Only if all conditions are met, the workflow goes into \"true\" branch."),
                                     option(
                                             "Any",
-                                            IfTaskDispatcherConstants.CombineOperation.ANY.name(),
+                                            CombineOperation.ANY.name(),
                                             "If any condition is met, the workflow goes into \"true\" branch."))
-                            .defaultValue(IfTaskDispatcherConstants.CombineOperation.ALL.name()));
+                            .defaultValue(CombineOperation.ALL.name()))
+            .taskProperties(
+                    array(CASE_TRUE)
+                            .description(
+                                    "The list of tasks to execute sequentially if the result of evaluating expression is true.")
+                            .items(task()),
+                    array(CASE_FALSE)
+                            .description(
+                                    "The list of tasks to execute sequentially if the result of evaluating expression is false.")
+                            .items(task()));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

@@ -16,16 +16,16 @@
 
 package com.bytechef.task.dispatcher.if_;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDispatcherDefinitionFactoryTest {
+public class IfTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals("definition/if_v1.json", new IfTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/if_v1.json", new IfTaskDispatcherFactory().getDefinition());
     }
 }
