@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.web.rest.mapper;
+package com.bytechef.hermes.integration.web.rest.mapper;
 
+import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.hermes.integration.domain.IntegrationWorkflow;
+import com.bytechef.hermes.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
-import com.bytechef.integration.domain.Integration;
-import com.bytechef.integration.domain.IntegrationWorkflow;
-import com.bytechef.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.web.rest.mapper.config;
+package com.bytechef.hermes.integration.web.rest.mapper.config;
 
 import com.bytechef.hermes.integration.web.rest.adapter.IntegrationConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
