@@ -17,13 +17,20 @@
 package com.bytechef.hermes.component.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.web.rest.model.ComponentDefinitionModel;
+import com.bytechef.hermes.component.ComponentFactory;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -34,24 +41,45 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @SuppressFBWarnings("EI")
-public class ComponentDefinitionController implements ComponentDefinitionControllerApi {
+@Tag(name = "component-definitions")
+public class ComponentDefinitionController {
 
-    private final ConversionService conversionService;
-    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
+    private final List<ComponentFactory> componentFactories;
 
-    public ComponentDefinitionController(
-            ConversionService conversionService, List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        this.conversionService = conversionService;
-        this.componentDefinitionFactories = componentDefinitionFactories;
+    public ComponentDefinitionController(List<ComponentFactory> componentFactories) {
+        this.componentFactories = componentFactories;
     }
 
-    @Override
-    public Mono<ResponseEntity<Flux<ComponentDefinitionModel>>> getComponentDefinitions(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
-                .map(componentDefinition ->
-                        conversionService.convert(componentDefinition, ComponentDefinitionModel.class))
-                .collect(Collectors.toList()))));
+    /**
+     * GET /definitions/components
+     * Returns all component definitions
+     *
+     * @return OK (status code 200)
+     */
+    @Operation(
+            description = "Returns all component definitions.",
+            operationId = "getComponentDefinitions",
+            summary = "Returns all component definitions.",
+            tags = {"component-definitions"},
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ComponentDefinition.class))
+                        })
+            })
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/definitions/components",
+            produces = {"application/json"})
+    public Mono<ResponseEntity<Flux<ComponentDefinition>>> getComponentDefinitions(
+            @Parameter(hidden = true) final ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(
+                componentFactories.stream().map(ComponentFactory::getDefinition).collect(Collectors.toList()))));
     }
 }

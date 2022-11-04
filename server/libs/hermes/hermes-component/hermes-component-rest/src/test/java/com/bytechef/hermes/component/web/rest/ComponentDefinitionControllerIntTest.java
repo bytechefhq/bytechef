@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component;
+package com.bytechef.hermes.component.web.rest;
 
-import com.bytechef.hermes.component.web.rest.ComponentDefinitionController;
+import com.bytechef.hermes.component.ComponentDSL;
+import com.bytechef.hermes.component.ComponentFactory;
+import com.bytechef.hermes.component.web.rest.config.ComponentDefinitionRestTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,15 +27,17 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = ComponentDefinitionRestTestConfiguration.class)
 @WebFluxTest(ComponentDefinitionController.class)
-public class ComponentDefinitionControllerTest {
+public class ComponentDefinitionControllerIntTest {
 
-    private static final List<ComponentDefinitionFactory> COMPONENT_DEFINITION_FACTORIES =
+    private static final List<ComponentFactory> COMPONENT_FACTORIES =
             List.of(() -> ComponentDSL.createComponent("component1"), () -> ComponentDSL.createComponent("component2"));
 
     @Autowired
@@ -52,28 +56,28 @@ public class ComponentDefinitionControllerTest {
                     .expectBody()
                     .json(
                             """
-                                            [
-                                                {
-                                                    "name":"component1",
-                                                    "version":1.0
-                                                },
-                                                {
-                                                    "name":"component2",
-                                                    "version":1.0
-                                                }
-                                            ]
-                                            """);
+                            [
+                                {
+                                    "name":"component1",
+                                    "version":1.0
+                                },
+                                {
+                                    "name":"component2",
+                                    "version":1.0
+                                }
+                            ]
+                            """);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
     }
 
     @TestConfiguration
-    static class ComponentDefinitionFactoryConfiguration {
+    static class ComponentFactoryConfiguration {
 
         @Bean
-        public List<ComponentDefinitionFactory> componentDefinitionFactories() {
-            return COMPONENT_DEFINITION_FACTORIES;
+        public List<ComponentFactory> componentFactories() {
+            return COMPONENT_FACTORIES;
         }
     }
 }

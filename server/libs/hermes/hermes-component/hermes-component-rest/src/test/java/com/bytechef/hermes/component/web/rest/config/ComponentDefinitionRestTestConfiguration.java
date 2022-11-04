@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component;
+package com.bytechef.hermes.component.web.rest.config;
 
-import com.bytechef.hermes.component.web.rest.ConnectionDefinitionController;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
-/**
- * @author Ivica Cardic
- */
-@WebFluxTest(ConnectionDefinitionController.class)
-public class ConnectionDefinitionControllerTest {
-
-    @Disabled
-    @Test
-    public void testGetConnectionDefinitions() {
-        // TODO
-    }
-}
+@ComponentScan(basePackages = "com.bytechef.hermes.component.web.rest")
+@SpringBootConfiguration
+public class ComponentDefinitionRestTestConfiguration {}
