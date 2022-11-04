@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.file.storage.constants;
+package com.bytechef.component.filestorage.constants;
 
 /**
  * @author Ivica Cardic

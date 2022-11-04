@@ -11,40 +11,41 @@
         "label": "Read from file"
       },
       "name": "read",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "The object property which contains a reference to the file to read from.",
           "label": "File",
           "name": "fileEntry",
-          "type": "OBJECT",
           "required": true,
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
           "properties": [
             {
               "name": "extension",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "mimeType",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "name",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "url",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             }
           ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "STRING"
         }
       ]
     },
@@ -54,13 +55,41 @@
         "label": "Write to file"
       },
       "name": "write",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "String to write to the file.",
           "label": "Content",
           "name": "content",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "Filename to set for data. By default, \"file.txt\" will be used.",
@@ -68,33 +97,6 @@
           "name": "filename",
           "type": "STRING",
           "defaultValue": "file.txt"
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
         }
       ]
     },
@@ -104,13 +106,41 @@
         "label": "Download file"
       },
       "name": "download",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The URL to download the file from.",
           "label": "URL",
           "name": "url",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "Filename to set for data. By default, \"file.txt\" will be used.",
@@ -118,33 +148,6 @@
           "name": "filename",
           "type": "STRING",
           "defaultValue": "file.txt"
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
         }
       ]
     }
