@@ -72,14 +72,18 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: platform-connections-endpoint
-          uri: lb://platform-service-app/
-          predicates:
-            - Path=/api/connections/**
         - id: platform-caches-endpoint
           uri: lb://platform-service-app/
           predicates:
             - Path=/api/caches/**
+        - id: platform-connections-endpoint
+          uri: lb://platform-service-app/
+          predicates:
+            - Path=/api/connections/**
+        - id: platform-integrations-endpoint
+          uri: lb://platform-service-app/
+          predicates:
+            - Path=/api/integrations/**
         - id: platform-jobs-endpoint
           uri: lb://platform-service-app/
           predicates:
@@ -125,9 +129,9 @@ spring:
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
-            - Path=/service/v3/api-docs/**
+            - Path=/v3/api-docs/**
           filters:
-            - RewritePath=/service/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
     loadbalancer:
       ribbon:
         enabled: false
@@ -139,7 +143,7 @@ spring:
     serialization:
       write-dates-as-timestamps: false
       write-null-map-values: false
-    date-format: ${workflow.serialization.date-format}
+    date-format: ${bytechef.workflow.serialization.date-format}
     time-zone: UTC
   jmx:
     enabled: false
@@ -172,29 +176,20 @@ server:
       cookie:
         http-only: true
 
-springdoc:
-  swagger-ui:
-    urls:
-      - name: coordinator
-        url: /service/v3/api-docs/coordinator
-      - name: platform
-        url: /service/v3/api-docs/platform
-      - name: worker
-        url: /service/v3/api-docs/worker
-
 #####
 
-discovery-client:
-  provider: property
+bytechef:
+  discovery-service:
+    provider: redis
 
-storage:
-  provider: file
-  fileStorageDir: /tmp/bytechef/files
+  storage:
+    provider: file
+    fileStorageDir: /tmp/bytechef/files
 
-workflow:
-  message-broker:
-    provider: amqp
-  persistence:
-    provider: jdbc
-  serialization:
-    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  workflow:
+    message-broker:
+      provider: amqp
+    persistence:
+      provider: jdbc
+    serialization:
+      date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
