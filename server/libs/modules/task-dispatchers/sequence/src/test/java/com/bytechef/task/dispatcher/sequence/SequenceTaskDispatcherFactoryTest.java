@@ -16,17 +16,16 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDispatcherDefinitionFactoryTest {
+public class SequenceTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/sequence_v1.json", new SequenceTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/sequence_v1.json", new SequenceTaskDispatcherFactory().getDefinition());
     }
 }
