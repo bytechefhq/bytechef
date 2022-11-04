@@ -7,12 +7,13 @@ servers:
 paths:
   /connections:
     get:
+      description: TODO
       tags:
-        - ConnectionController
+        - connections
       operationId: getConnections
       responses:
         "200":
-          description: OK
+          description: TODO
           content:
             application/json:
               schema:
@@ -20,8 +21,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/Connection'
     post:
+      description: TODO
       tags:
-        - ConnectionController
+        - connections
       operationId: postConnection
       requestBody:
         content:
@@ -31,48 +33,54 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: TODO OK
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Connection'
   /connections/{id}:
     delete:
+      description: TODO
       tags:
-        - ConnectionController
+        - connections
       operationId: deleteConnection
       parameters:
         - name: id
+          description: TODO
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: OK
+          description: TODO OK
     get:
+      description: TODO
       tags:
-        - ConnectionController
+        - connections
       operationId: getConnection
       parameters:
         - name: id
+          description: TODO
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: OK
+          description: TODO
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Connection'
     put:
+      description: TODO
       tags:
-        - ConnectionController
+        - connections
       operationId: putConnection
       parameters:
         - name: id
+          description: TODO
           in: path
           required: true
           schema:
@@ -85,7 +93,7 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: TODO
           content:
             '*/*':
               schema:
@@ -93,34 +101,45 @@ paths:
 components:
   schemas:
     Connection:
+      description: TODO
       type: object
       properties:
         componentName:
+          description: TODO
           type: string
         componentVersion:
+          description: TODO
           type: string
         createdBy:
+          description: TODO
           type: string
           readOnly: true
         createdDate:
+          description: TODO
           type: string
           format: date-time
           readOnly: true
         name:
+          description: TODO
           type: string
         id:
+          description: TODO
           type: string
           readOnly: true
         label:
+          description: TODO
           type: string
         parameters:
+          description: TODO
           type: object
           additionalProperties:
             type: object
         lastModifiedBy:
+          description: TODO
           type: string
           readOnly: true
         lastModifiedDate:
+          description: TODO
           type: string
           format: date-time
           readOnly: true
@@ -128,4 +147,5 @@ components:
       type: object
       properties:
         name:
+          description: TODO
           type: string
