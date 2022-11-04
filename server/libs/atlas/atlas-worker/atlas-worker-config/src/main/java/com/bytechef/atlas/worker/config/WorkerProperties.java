@@ -25,7 +25,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Arik Cohen
  */
-@ConfigurationProperties(prefix = "workflow.worker")
+@ConfigurationProperties(prefix = "bytechef.workflow.worker")
 public class WorkerProperties {
 
     private Map<String, Object> subscriptions = new HashMap<>();
