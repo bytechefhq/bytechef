@@ -16,8 +16,8 @@
 
 package com.bytechef.component.postgresql;
 
-import com.bytechef.hermes.component.jdbc.JdbcComponentHandler;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.registrar.jdbc.JdbcComponentTaskHandler;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,10 +27,9 @@ public class PostgreSQLComponentDefinitionTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals(
+        AssertUtils.assertEquals(
                 "definition/postgresql_v1.json",
-                new JdbcComponentHandler(
-                                null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
+                new JdbcComponentTaskHandler(null, new PostgreSQLJdbcComponentFactory().getJdbcComponentDefinition())
                         .getDefinition());
     }
 }
