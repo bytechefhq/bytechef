@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xml.file;
+package com.bytechef.component.xmlfile;
 
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
@@ -22,11 +22,11 @@ import static com.bytechef.hermes.component.definition.Action.ACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.commons.xml.XmlUtils;
-import com.bytechef.component.xml.file.constants.XmlFileConstants;
+import com.bytechef.component.xmlfile.constants.XmlFileConstants;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class XmlFileComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals("definition/xml-file_v1.json", new XmlFileComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/xmlfile_v1.json", new XmlFileComponentHandler().getDefinition());
     }
 
     @Test
@@ -62,11 +62,12 @@ public class XmlFileComponentHandlerTest {
 
         MockExecutionParameters parameters = new MockExecutionParameters();
 
-        parameters.set(
-                FILE_ENTRY,
-                context.storeFileContent(file.getName(), new FileInputStream(file))
-                        .toMap());
-        parameters.set(XmlFileConstants.IS_ARRAY, false);
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            parameters.set(
+                    FILE_ENTRY,
+                    context.storeFileContent(file.getName(), fileInputStream).toMap());
+            parameters.set(XmlFileConstants.IS_ARRAY, false);
+        }
 
         assertThat((Map<String, ?>) xmlFileComponentHandler.performRead(context, parameters))
                 .isEqualTo(XmlUtils.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
@@ -78,10 +79,11 @@ public class XmlFileComponentHandlerTest {
 
         MockExecutionParameters parameters = new MockExecutionParameters();
 
-        parameters.set(
-                FILE_ENTRY,
-                context.storeFileContent(file.getName(), new FileInputStream(file))
-                        .toMap());
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            parameters.set(
+                    FILE_ENTRY,
+                    context.storeFileContent(file.getName(), fileInputStream).toMap());
+        }
 
         assertThat((List<?>) xmlFileComponentHandler.performRead(context, parameters))
                 .isEqualTo(XmlUtils.read(Files.contentOf(file, Charset.defaultCharset()), List.class));

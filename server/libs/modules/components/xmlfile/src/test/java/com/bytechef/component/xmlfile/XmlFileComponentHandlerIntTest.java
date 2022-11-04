@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xml.file;
+package com.bytechef.component.xmlfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.commons.xml.XmlUtils;
-import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockFileEntry;
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
@@ -33,13 +34,12 @@ import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class XmlFileComponentHandlerIntTest {
 
     @Autowired
@@ -53,7 +53,7 @@ public class XmlFileComponentHandlerIntTest {
         File sampleFile = getFile("sample.xml");
 
         Job job = workflowExecutor.execute(
-                "xml-file_v1_read",
+                "xmlfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -73,7 +73,7 @@ public class XmlFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws IOException {
         Job job = workflowExecutor.execute(
-                "xml-file_v1_write",
+                "xmlfile_v1_write",
                 Map.of(
                         "source",
                         XmlUtils.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)));
@@ -82,11 +82,13 @@ public class XmlFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry = new MockFileEntry(outputs, "writeXMLFile");
+        assertThat(MapUtils.getMapKey(outputs, "writeXMLFile", WorkflowConstants.NAME))
+                .isEqualTo("file.xml");
+
         File sampleFile = getFile("sample.xml");
 
         job = workflowExecutor.execute(
-                "xml-file_v1_read",
+                "xmlfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -98,8 +100,6 @@ public class XmlFileComponentHandlerIntTest {
 
         assertThat((List<?>) outputs.get("readXMLFile"))
                 .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, Charset.defaultCharset()), List.class));
-
-        assertThat(fileEntry.getName()).isEqualTo("file.xml");
     }
 
     private File getFile(String fileName) throws IOException {
