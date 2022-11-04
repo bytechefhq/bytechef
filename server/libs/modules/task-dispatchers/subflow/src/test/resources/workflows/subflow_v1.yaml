@@ -7,7 +7,7 @@ outputs:
 tasks:
   - name: subflowOutput
     type: subflow/v1
-    pipelineId: demo/random_int
+    workflowId: demo/random_int
 
   - name: output
     type: var

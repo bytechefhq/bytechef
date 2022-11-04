@@ -16,17 +16,16 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class SubflowTaskDispatcherDefinitionFactoryTest {
+public class SubflowTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/subflow_v1.json", new SubflowTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/subflow_v1.json", new SubflowTaskDispatcherFactory().getDefinition());
     }
 }
