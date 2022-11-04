@@ -16,14 +16,12 @@
 
 package com.bytechef.hermes.task.dispatcher;
 
-import com.bytechef.hermes.definition.DefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskDispatcherDefinitionFactory extends DefinitionFactory<TaskDispatcherDefinition> {
+public interface TaskDispatcherFactory {
 
-    @Override
     TaskDispatcherDefinition getDefinition();
 }

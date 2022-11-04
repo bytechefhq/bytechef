@@ -49,6 +49,18 @@ public class TaskDispatcherDSL {
         return new Property.BooleanProperty(name);
     }
 
+    public static TaskDispatcherDefinition create(String name) {
+        return new TaskDispatcherDefinition(name);
+    }
+
+    public static Property.DateProperty date() {
+        return new Property.DateProperty(null);
+    }
+
+    public static Property.DateProperty date(String name) {
+        return new Property.DateProperty(name);
+    }
+
     public static Property.DateTimeProperty dateTime() {
         return new Property.DateTimeProperty(null);
     }
@@ -59,19 +71,6 @@ public class TaskDispatcherDSL {
 
     public static Display display(String label) {
         return new Display(label);
-    }
-
-    public static Property.ObjectProperty fileEntry() {
-        return fileEntry(null);
-    }
-
-    public static Property.ObjectProperty fileEntry(String name) {
-        return new Property.ObjectProperty(name)
-                .properties(
-                        string("extension").required(true),
-                        string("mimeType").required(true),
-                        string("name").required(true),
-                        string("url").required(true));
     }
 
     public static Property.IntegerProperty integer() {
@@ -106,10 +105,6 @@ public class TaskDispatcherDSL {
         return new Property.ObjectProperty(name);
     }
 
-    public static Property.OptionProperty options() {
-        return new Property.OptionProperty();
-    }
-
     public static Resources resources() {
         return new Resources();
     }
@@ -122,8 +117,8 @@ public class TaskDispatcherDSL {
         return new Property.StringProperty(name);
     }
 
-    public static DisplayOption.DisplayOptionEntry hideWhen(String propertyName) {
-        return new DisplayOption.HideDisplayOptionEntry(propertyName);
+    public static DisplayOption.DisplayOptionProperty hideWhen(String propertyName) {
+        return new DisplayOption.DisplayOptionProperty(new DisplayOption.HideDisplayOptionCondition(propertyName));
     }
 
     public static PropertyOption option(String value) {
@@ -146,11 +141,17 @@ public class TaskDispatcherDSL {
         return new PropertyOption(name, value, description);
     }
 
-    public static DisplayOption.DisplayOptionEntry showWhen(String propertyName) {
-        return new DisplayOption.ShowDisplayOptionEntry(propertyName);
+    public static DisplayOption.DisplayOptionProperty showWhen(String propertyName) {
+        return new DisplayOption.DisplayOptionProperty(new DisplayOption.ShowDisplayOptionCondition(propertyName));
     }
 
-    public static TaskDispatcherDefinition create(String name) {
-        return new TaskDispatcherDefinition(name);
+    public static Property.ObjectProperty task() {
+        return task(null);
+    }
+
+    public static Property.ObjectProperty task(String name) {
+        return new Property.ObjectProperty(name)
+                .description("The task or task dispatcher to use.")
+                .objectType("TASK");
     }
 }
