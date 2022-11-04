@@ -54,7 +54,7 @@ public class RSocketConfiguration {
 
     @Bean
     public Flux<List<LoadbalanceTarget>> loadBalancedTargets(DiscoveryClient discoveryClient) {
-        return Mono.fromSupplier(() -> discoveryClient.getInstances(DiscoveryClientConfiguration.PLATFORM_SERVICE_APP))
+        return Mono.fromSupplier(() -> discoveryClient.getInstances("platform-service-app"))
                 .repeatWhen(longFlux -> longFlux.delayElements(Duration.ofSeconds(2)))
                 .map(this::toLoadBalanceTarget);
     }
