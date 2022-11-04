@@ -24,16 +24,31 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
  * @author Ivica Cardic
  */
 @Disabled
-@WebFluxTest(TaskExecutionController.class)
-public class TaskExecutionControllerTest {
+@WebFluxTest(JobController.class)
+public class JobControllerIntTest {
 
     @Test
-    public void testGetTaskExecution() {
+    public void testGetJob() {
         // TODO
     }
 
     @Test
-    public void testGetTaskExecutions() {
+    public void testGetLatestJob() {
+        // TODO
+    }
+
+    @Test
+    public void testPostJob() {
+        // TODO
+    }
+
+    @Test
+    public void testRestartJob() {
+        // TODO
+    }
+
+    @Test
+    public void testStopJob() {
         // TODO
     }
 }

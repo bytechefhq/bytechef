@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.web.rest;
+package com.bytechef.atlas.web.rest.mapper;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.web.rest.mapper.config.WorkflowMapperSpringConfig;
+import com.bytechef.atlas.web.rest.model.JobParametersModel;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Disabled
-@WebFluxTest(CacheController.class)
-public class CacheControllerTest {
+@Mapper(config = WorkflowMapperSpringConfig.class)
+public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParametersDTO> {
 
-    @Test
-    public void testClearCache() {
-        // TODO
-    }
+    @Mapping(target = "jobId", ignore = true)
+    JobParametersDTO convert(JobParametersModel jobParametersModel);
 }
