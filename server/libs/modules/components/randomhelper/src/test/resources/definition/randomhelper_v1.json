@@ -11,19 +11,19 @@
         "label": "Int"
       },
       "name": "randomInt",
-      "inputs": [
+      "properties": [
         {
           "description": "The minimum possible generated value.",
           "name": "startInclusive",
-          "type": "INTEGER",
           "required": true,
+          "type": "INTEGER",
           "defaultValue": 0
         },
         {
           "description": "The maximum possible generated value.",
           "name": "endInclusive",
-          "type": "INTEGER",
           "required": true,
+          "type": "INTEGER",
           "defaultValue": 100
         }
       ]

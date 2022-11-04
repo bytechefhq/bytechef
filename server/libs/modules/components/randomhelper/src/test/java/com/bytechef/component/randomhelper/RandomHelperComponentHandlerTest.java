@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.random.helper;
+package com.bytechef.component.randomhelper;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +27,7 @@ public class RandomHelperComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/random-helper_v1.json", new RandomHelperComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/randomhelper_v1.json", new RandomHelperComponentHandler().getDefinition());
     }
 
     @Disabled

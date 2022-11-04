@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.random.helper;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+package com.bytechef.component.randomhelper.constants;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
-public class RandomHelperComponentHandlerIntTest {
-
-    @Disabled
-    @Test
-    public void testRandomFloat() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testRandomInt() {
-        // TODO
-    }
+public class RandomHelperConstants {
+    public static final String RANDOM_HELPER = "randomHelper";
+    public static final String RANDOM_INT = "randomInt";
+    public static final String RANDOM_FLOAT = "randomFloat";
+    public static final String START_INCLUSIVE = "startInclusive";
+    public static final String END_INCLUSIVE = "endInclusive";
 }

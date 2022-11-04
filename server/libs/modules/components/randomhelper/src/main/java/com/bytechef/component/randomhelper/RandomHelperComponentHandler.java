@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.random.helper;
+package com.bytechef.component.randomhelper;
 
-import static com.bytechef.component.random.helper.constants.RandomHelperConstants.END_INCLUSIVE;
-import static com.bytechef.component.random.helper.constants.RandomHelperConstants.RANDOM_FLOAT;
-import static com.bytechef.component.random.helper.constants.RandomHelperConstants.RANDOM_HELPER;
-import static com.bytechef.component.random.helper.constants.RandomHelperConstants.RANDOM_INT;
-import static com.bytechef.component.random.helper.constants.RandomHelperConstants.START_INCLUSIVE;
+import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.END_INCLUSIVE;
+import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.RANDOM_FLOAT;
+import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.RANDOM_HELPER;
+import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.RANDOM_INT;
+import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.START_INCLUSIVE;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.createComponent;
 import static com.bytechef.hermes.component.ComponentDSL.display;
@@ -42,7 +42,7 @@ public class RandomHelperComponentHandler implements ComponentHandler {
             .actions(
                     action(RANDOM_INT)
                             .display(display("Int").description("Generates a random integer value."))
-                            .inputs(
+                            .properties(
                                     integer(START_INCLUSIVE)
                                             .description("The minimum possible generated value.")
                                             .required(true)
