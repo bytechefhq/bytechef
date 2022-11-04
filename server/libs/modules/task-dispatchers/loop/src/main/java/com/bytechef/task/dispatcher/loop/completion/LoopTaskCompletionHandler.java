@@ -78,11 +78,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubtaskExecution = new TaskExecution(taskExecution);
+        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
 
-        completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
+        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.update(completedSubtaskExecution);
+        taskExecutionService.update(completedSubTaskExecution);
 
         TaskExecution loopTaskExecution =
                 new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
