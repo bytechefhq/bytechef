@@ -17,7 +17,8 @@
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL;
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.web.rest.config.TaskDispatcherDefinitionRestTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,15 +27,17 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = TaskDispatcherDefinitionRestTestConfiguration.class)
 @WebFluxTest(TaskDispatcherDefinitionController.class)
-public class TaskDispatcherDefinitionControllerTest {
+public class TaskDispatcherDefinitionControllerIntTest {
 
-    private static final List<TaskDispatcherDefinitionFactory> TASK_DISPATCHER_DEFINITION_FACTORIES = List.of(
+    private static final List<TaskDispatcherFactory> TASK_DISPATCHER_FACTORIES = List.of(
             () -> TaskDispatcherDSL.create("task-dispatcher1"), () -> TaskDispatcherDSL.create("task-dispatcher2"));
 
     @Autowired
@@ -53,28 +56,28 @@ public class TaskDispatcherDefinitionControllerTest {
                     .expectBody()
                     .json(
                             """
-                                            [
-                                                {
-                                                    "name":"task-dispatcher1",
-                                                    "version":1.0
-                                                },
-                                                {
-                                                    "name":"task-dispatcher2",
-                                                    "version":1.0
-                                                }
-                                            ]
-                                            """);
+                            [
+                                {
+                                    "name":"task-dispatcher1",
+                                    "version":1.0
+                                },
+                                {
+                                    "name":"task-dispatcher2",
+                                    "version":1.0
+                                }
+                            ]
+                            """);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
     }
 
     @TestConfiguration
-    static class TaskDispatcherDefinitionFactoryConfiguration {
+    static class TaskDispatcherFactoryConfiguration {
 
         @Bean
-        public List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories() {
-            return TASK_DISPATCHER_DEFINITION_FACTORIES;
+        public List<TaskDispatcherFactory> taskDispatcherFactories() {
+            return TASK_DISPATCHER_FACTORIES;
         }
     }
 }
