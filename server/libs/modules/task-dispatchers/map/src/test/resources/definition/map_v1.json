@@ -4,27 +4,35 @@
     "label": "Map"
   },
   "name": "map",
-  "inputs": [
+  "properties": [
     {
+      "type": "ARRAY",
       "description": "List of items to iterate over.",
       "label": "List of items",
-      "name": "list",
-      "type": "ARRAY"
+      "name": "list"
     },
     {
+      "type": "STRING",
       "description": "The name of the item variable.",
       "label": "Item Var",
       "name": "itemVar",
-      "type": "STRING",
       "defaultValue": "item"
     },
     {
+      "type": "STRING",
       "description": "The name of the index variable.",
       "label": "Item Index",
       "name": "itemIndex",
-      "type": "STRING",
       "defaultValue": "itemIndex"
     }
   ],
-  "version": 1
+  "version": 1,
+  "taskProperties": [
+    {
+      "description": "The task or task dispatcher to use.",
+      "name": "iteratee",
+      "objectType": "TASK",
+      "type": "OBJECT"
+    }
+  ]
 }
