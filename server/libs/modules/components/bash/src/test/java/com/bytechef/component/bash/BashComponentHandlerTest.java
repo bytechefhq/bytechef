@@ -20,9 +20,9 @@ package com.bytechef.component.bash;
 
 import com.bytechef.component.bash.constants.BashConstants;
 import com.bytechef.hermes.component.definition.Action;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -39,7 +39,7 @@ public class BashComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals("definition/bash_v1.json", new BashComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/bash_v1.json", new BashComponentHandler().getDefinition());
     }
 
     @Test
