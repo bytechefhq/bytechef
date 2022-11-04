@@ -10,7 +10,7 @@
         "label": "Set value"
       },
       "name": "set",
-      "inputs": [
+      "properties": [
         {
           "description": "Value of any type to set.",
           "label": "Value",
