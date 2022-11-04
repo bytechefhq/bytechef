@@ -11,18 +11,18 @@
         "label": "Convert from XML string"
       },
       "name": "xmlParse",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT"
+        }
+      ],
+      "properties": [
         {
           "description": "The XML string to convert to the data.",
           "label": "Source",
           "name": "source",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "OBJECT"
+          "required": true,
+          "type": "STRING"
         }
       ]
     },
@@ -32,13 +32,18 @@
         "label": "Convert to XML string"
       },
       "name": "xmlStringify",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "The data to convert to XML string.",
           "label": "Source",
           "name": "source",
-          "type": "ANY",
           "required": true,
+          "type": "ANY",
           "types": [
             {
               "type": "ARRAY"
@@ -47,11 +52,6 @@
               "type": "OBJECT"
             }
           ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "STRING"
         }
       ]
     }
