@@ -16,18 +16,23 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
  */
+@Schema(name = "Property", description = "A base property.")
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -39,14 +44,11 @@ import java.util.stream.Stream;
     @JsonSubTypes.Type(value = Property.BooleanProperty.class, name = "BOOLEAN"),
     @JsonSubTypes.Type(value = Property.DateTimeProperty.class, name = "DATE_TIME"),
     @JsonSubTypes.Type(value = Property.IntegerProperty.class, name = "INTEGER"),
-    @JsonSubTypes.Type(value = Property.NullProperty.class, name = "NULL"),
     @JsonSubTypes.Type(value = Property.NumberProperty.class, name = "NUMBER"),
     @JsonSubTypes.Type(value = Property.ObjectProperty.class, name = "OBJECT"),
-    @JsonSubTypes.Type(value = Property.OptionProperty.class, name = "OPTION"),
-    @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING"),
+    @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
 })
-public abstract sealed class Property<P extends Property<P>>
-        permits Property.NullProperty, Property.OptionProperty, Property.TypeProperty {
+public abstract sealed class Property<P> permits Property.AnyProperty, Property.ValueProperty {
 
     public enum EditorType {
         CODE
@@ -56,31 +58,39 @@ public abstract sealed class Property<P extends Property<P>>
         ANY,
         ARRAY,
         BOOLEAN,
+        DATE,
         DATE_TIME,
         INTEGER,
         NULL,
         NUMBER,
         OBJECT,
-        OPTION,
-        STRING,
+        STRING
     }
 
-    protected String description;
-    protected DisplayOption displayOption;
-    protected String label;
-    protected String name;
-    protected String placeholder;
-    protected Type type;
+    private String description;
+    private DisplayOption displayOption;
+    private String label;
+    private Map<String, Object> metadata;
+    private final String name;
+    private String placeholder;
+    private Boolean required;
+    private final Type type;
 
-    private Property() {}
-
-    private Property(String name) {
+    private Property(String name, Type type) {
         this.name = name;
+        this.type = type;
     }
 
     @SuppressWarnings("unchecked")
     public P description(String description) {
         this.description = description;
+
+        return (P) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public P displayOption(DisplayOption.DisplayOptionCondition... displayOptionConditions) {
+        this.displayOption = DisplayOption.build(List.of(displayOptionConditions));
 
         return (P) this;
     }
@@ -93,8 +103,20 @@ public abstract sealed class Property<P extends Property<P>>
     }
 
     @SuppressWarnings("unchecked")
-    public P displayOption(DisplayOption.DisplayOptionEntry... displayOptionEntries) {
-        this.displayOption = DisplayOption.build(List.of(displayOptionEntries));
+    public P metadata(String key, String value) {
+        if (metadata == null) {
+            metadata = new HashMap<>();
+        }
+
+        this.metadata.put(key, value);
+
+        return (P) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @SuppressFBWarnings("EI2")
+    public P metadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
 
         return (P) this;
     }
@@ -106,126 +128,96 @@ public abstract sealed class Property<P extends Property<P>>
         return (P) this;
     }
 
+    @SuppressWarnings("unchecked")
+    public P required(Boolean required) {
+        this.required = required;
+
+        return (P) this;
+    }
+
+    @Schema(name = "description", description = "The property description.")
     public String getDescription() {
         return description;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
+    @Schema(name = "description", description = "The property description.")
     public DisplayOption getDisplayOption() {
         return displayOption;
     }
 
+    @Schema(name = "label", description = "The property label.")
+    public String getLabel() {
+        return label;
+    }
+
+    @Schema(name = "metadata", description = "Additional data that can be used during processing.")
+    public Map<String, Object> getMetadata() {
+        return metadata == null ? null : new HashMap<>(metadata);
+    }
+
+    @Schema(name = "name", description = "The property name.")
     public String getName() {
         return name;
     }
 
+    @Schema(name = "placeholder", description = "The property placeholder.")
     public String getPlaceholder() {
         return placeholder;
     }
 
+    @Schema(name = "required", description = "If the property is required or not.")
+    public Boolean getRequired() {
+        return required;
+    }
+
+    @Schema(name = "type", description = "The property type.")
     public Type getType() {
         return type;
     }
 
-    @JsonTypeName("OPTION")
-    public static final class OptionProperty extends Property<OptionProperty> {
-
-        private Boolean multipleValues;
-        private List<Property<?>> options;
-
-        public OptionProperty() {
-            super(null);
-
-            this.type = Type.OPTION;
-        }
-
-        public OptionProperty multipleValues(Boolean multipleValues) {
-            this.multipleValues = multipleValues;
-
-            return this;
-        }
-
-        public OptionProperty options(Property<?>... options) {
-            this.options = Stream.of(options).filter(Objects::nonNull).toList();
-
-            return this;
-        }
-
-        public Boolean getMultipleValues() {
-            return multipleValues;
-        }
-
-        public List<Property<?>> getOptions() {
-            return options;
-        }
-    }
-
-    public static sealed class TypeProperty<P extends TypeProperty<P>> extends Property<P>
-            permits AnyProperty, ValueProperty {
-
-        protected Boolean required;
-
-        TypeProperty(String name) {
-            super(name);
-        }
-
-        @SuppressWarnings("unchecked")
-        public P required(Boolean required) {
-            this.required = required;
-
-            return (P) this;
-        }
-
-        public Boolean getRequired() {
-            return required;
-        }
-    }
-
+    @Schema(name = "AnyProperty", description = "An any property type.")
     @JsonTypeName("ANY")
-    public static final class AnyProperty extends TypeProperty<AnyProperty> {
+    public static final class AnyProperty extends Property<AnyProperty> {
 
-        private List<? extends TypeProperty<?>> types;
+        private List<? extends Property<?>> types;
 
         private AnyProperty() {
-            super(null);
-
-            this.type = Type.ANY;
+            super(null, Type.ANY);
         }
 
         public AnyProperty(String name) {
-            super(name);
-
-            this.type = Type.ANY;
+            super(name, Type.ANY);
         }
 
-        public AnyProperty types(TypeProperty<?>... properties) {
+        public AnyProperty types(Property<?>... properties) {
             this.types = List.of(properties);
 
             return this;
         }
 
-        public List<? extends TypeProperty<?>> getTypes() {
+        @Schema(name = "types", description = "Possible types of properties that can be used.")
+        public List<? extends Property<?>> getTypes() {
             return types;
         }
     }
 
-    public static sealed class ValueProperty<V, P extends ValueProperty<V, P>> extends TypeProperty<P>
-            permits ArrayProperty, ObjectProperty, PrimitiveValueProperty {
+    @Schema(name = "ValueProperty", description = "A base property for all value based properties.")
+    public abstract static sealed class ValueProperty<V, P extends ValueProperty<V, P>> extends Property<P>
+            permits ArrayProperty, ObjectProperty, SingleValueProperty {
 
         protected V defaultValue;
         protected V exampleValue;
-        protected List<String> loadOptionsDependsOn;
-        protected String loadOptionsMethod;
+        private List<String> loadOptionsDependsOn;
 
-        private ValueProperty() {
-            super(null);
+        @JsonIgnore
+        private Function<Object, Object> loadOptionsFunction;
+
+        private ValueProperty(Type type) {
+            this(null, type);
         }
 
-        public ValueProperty(String name) {
-            super(name);
+        public ValueProperty(String name, Type type) {
+            super(name, type);
         }
 
         @SuppressWarnings("unchecked")
@@ -236,65 +228,80 @@ public abstract sealed class Property<P extends Property<P>>
         }
 
         @SuppressWarnings("unchecked")
-        public P loadOptionsMethod(String loadOptionsMethod) {
-            this.loadOptionsMethod = loadOptionsMethod;
+        public P loadOptionsMethod(Function<Object, Object> loadOptionsFunction) {
+            this.loadOptionsFunction = loadOptionsFunction;
 
             return (P) this;
         }
 
+        @Schema(name = "defaultValue", description = "The property default value.")
         public V getDefaultValue() {
             return defaultValue;
         }
 
+        @Schema(name = "exampleValue", description = "The property example value.")
         public V getExampleValue() {
             return exampleValue;
         }
 
+        @Schema(
+                name = "",
+                description =
+                        "The list of property names on which value change the property options should load/reload.")
         public List<String> getLoadOptionsDependsOn() {
             return loadOptionsDependsOn;
         }
 
-        public String getLoadOptionsMethod() {
-            return loadOptionsMethod;
+        public Function<Object, Object> getLoadOptionsFunction() {
+            return loadOptionsFunction;
         }
     }
 
-    public static sealed class PrimitiveValueProperty<V, P extends PrimitiveValueProperty<V, P>>
-            extends ValueProperty<V, P>
-            permits BooleanProperty, DateTimeProperty, IntegerProperty, NumberProperty, StringProperty {
+    @Schema(name = "SingleValueProperty", description = "A base property for all single value properties.")
+    public static sealed class SingleValueProperty<V, P extends SingleValueProperty<V, P>> extends ValueProperty<V, P>
+            permits BooleanProperty,
+                    DateProperty,
+                    DateTimeProperty,
+                    IntegerProperty,
+                    NullProperty,
+                    NumberProperty,
+                    StringProperty {
 
-        protected List<PropertyOption> propertyOptions;
+        protected List<PropertyOption> options;
 
-        private PrimitiveValueProperty() {
-            super(null);
+        private SingleValueProperty(Type type) {
+            this(null, type);
         }
 
-        public PrimitiveValueProperty(String name) {
-            super(name);
+        public SingleValueProperty(String name, Type type) {
+            super(name, type);
         }
 
         @SuppressWarnings("unchecked")
-        public P options(PropertyOption... propertyOptions) {
-            this.propertyOptions = List.of(propertyOptions);
+        public P options(PropertyOption... options) {
+            this.options = List.of(options);
 
             return (P) this;
         }
 
+        @Schema(name = "options", description = "The list of valid property options.")
         public List<PropertyOption> getOptions() {
-            return propertyOptions;
+            return options;
         }
     }
 
     @JsonTypeName("ARRAY")
+    @Schema(name = "ArrayProperty", description = "An array property type.")
     public static final class ArrayProperty extends ValueProperty<Object[], ArrayProperty> {
 
-        private List<? extends TypeProperty<?>> items;
+        private List<? extends Property> items;
 
-        private ArrayProperty() {}
+        private ArrayProperty() {
+            super(Type.ARRAY);
+        }
 
         public ArrayProperty(String name) {
-            super(name);
-            this.type = Type.ARRAY;
+            super(name, Type.ARRAY);
         }
 
         public ArrayProperty exampleValue(Boolean... exampleValue) {
@@ -381,71 +388,28 @@ public abstract sealed class Property<P extends Property<P>>
             return this;
         }
 
-        public ArrayProperty items(TypeProperty<?>... items) {
+        public ArrayProperty items(Property... items) {
             this.items = List.of(items);
 
             return this;
         }
 
-        public List<? extends TypeProperty<?>> getItems() {
+        @Schema(name = "items", description = "An array property type.")
+        public List<? extends Property> getItems() {
             return items;
         }
     }
 
-    @JsonTypeName("OBJECT")
-    public static final class ObjectProperty extends ValueProperty<Object, ObjectProperty> {
-
-        private Boolean additionalProperties;
-        private List<? extends TypeProperty<?>> properties;
-
-        private ObjectProperty() {}
-
-        public ObjectProperty(String name) {
-            super(name);
-            this.type = Type.OBJECT;
-        }
-
-        public ObjectProperty additionalProperties(boolean additionalProperties) {
-            this.additionalProperties = additionalProperties;
-
-            return this;
-        }
-
-        public ObjectProperty defaultValue(Object defaultValue) {
-            this.defaultValue = defaultValue;
-
-            return this;
-        }
-
-        public ObjectProperty exampleValue(Object exampleValue) {
-            this.exampleValue = exampleValue;
-
-            return this;
-        }
-
-        public ObjectProperty properties(TypeProperty<?>... properties) {
-            this.properties = List.of(properties);
-
-            return this;
-        }
-
-        public Boolean getAdditionalProperties() {
-            return additionalProperties;
-        }
-
-        public List<? extends TypeProperty<?>> getProperties() {
-            return properties;
-        }
-    }
-
     @JsonTypeName("BOOLEAN")
-    public static final class BooleanProperty extends PrimitiveValueProperty<Boolean, BooleanProperty> {
+    @Schema(name = "BooleanProperty", description = "A boolean property type.")
+    public static final class BooleanProperty extends SingleValueProperty<Boolean, BooleanProperty> {
 
-        private BooleanProperty() {}
+        private BooleanProperty() {
+            super(Type.BOOLEAN);
+        }
 
         public BooleanProperty(String name) {
-            super(name);
-            this.type = Type.BOOLEAN;
+            super(name, Type.BOOLEAN);
         }
 
         public BooleanProperty defaultValue(boolean defaultValue) {
@@ -461,14 +425,41 @@ public abstract sealed class Property<P extends Property<P>>
         }
     }
 
-    @JsonTypeName("DATE_TIME")
-    public static final class DateTimeProperty extends PrimitiveValueProperty<LocalDateTime, DateTimeProperty> {
+    @JsonTypeName("DATE")
+    @Schema(name = "DateProperty", description = "A date property type.")
+    public static final class DateProperty extends SingleValueProperty<LocalDate, DateProperty> {
 
-        private DateTimeProperty() {}
+        private DateProperty() {
+            super(Type.DATE);
+        }
+
+        public DateProperty(String name) {
+            super(name, Type.DATE);
+        }
+
+        public DateProperty defaultValue(LocalDate defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public DateProperty exampleValue(LocalDate exampleValue) {
+            this.exampleValue = exampleValue;
+
+            return this;
+        }
+    }
+
+    @JsonTypeName("DATE_TIME")
+    @Schema(name = "DateTimeProperty", description = "A date-time property type.")
+    public static final class DateTimeProperty extends SingleValueProperty<LocalDateTime, DateTimeProperty> {
+
+        private DateTimeProperty() {
+            super(Type.DATE_TIME);
+        }
 
         public DateTimeProperty(String name) {
-            super(name);
-            this.type = Type.DATE_TIME;
+            super(name, Type.DATE_TIME);
         }
 
         public DateTimeProperty defaultValue(LocalDateTime defaultValue) {
@@ -485,28 +476,32 @@ public abstract sealed class Property<P extends Property<P>>
     }
 
     @JsonTypeName("NULL")
-    public static final class NullProperty extends Property<NullProperty> {
+    @Schema(name = "NullProperty", description = "A null property type.")
+    public static final class NullProperty extends SingleValueProperty<Integer, NullProperty> {
 
-        private NullProperty() {}
+        private NullProperty() {
+            super(Type.NULL);
+        }
 
         public NullProperty(String name) {
-            super(name);
-            this.type = Type.NULL;
+            super(name, Type.NULL);
         }
     }
 
     @JsonTypeName("NUMBER")
-    public static final class NumberProperty extends PrimitiveValueProperty<Double, NumberProperty> {
+    @Schema(name = "NumberProperty", description = "A number property type.")
+    public static final class NumberProperty extends SingleValueProperty<Double, NumberProperty> {
 
         private Integer maxValue;
         private Integer minValue;
         private Integer numberPrecision;
 
-        private NumberProperty() {}
+        private NumberProperty() {
+            super(Type.NUMBER);
+        }
 
         public NumberProperty(String name) {
-            super(name);
-            this.type = Type.NUMBER;
+            super(name, Type.NUMBER);
         }
 
         public NumberProperty defaultValue(int value) {
@@ -551,30 +546,35 @@ public abstract sealed class Property<P extends Property<P>>
             return this;
         }
 
+        @Schema(name = "maxValue", description = "The maximum property value.")
         public Integer getMaxValue() {
             return maxValue;
         }
 
+        @Schema(name = "minValue", description = "The minimum property value.")
         public Integer getMinValue() {
             return minValue;
         }
 
+        @Schema(name = "numberPrecision", description = "The number value precision.")
         public Integer getNumberPrecision() {
             return numberPrecision;
         }
     }
 
     @JsonTypeName("INTEGER")
-    public static final class IntegerProperty extends PrimitiveValueProperty<Integer, IntegerProperty> {
+    @Schema(name = "IntegerProperty", description = "An integer property type.")
+    public static final class IntegerProperty extends SingleValueProperty<Integer, IntegerProperty> {
 
         private Integer maxValue;
         private Integer minValue;
 
-        private IntegerProperty() {}
+        private IntegerProperty() {
+            super(Type.INTEGER);
+        }
 
         public IntegerProperty(String name) {
-            super(name);
-            this.type = Type.INTEGER;
+            super(name, Type.INTEGER);
         }
 
         public IntegerProperty defaultValue(Integer value) {
@@ -595,25 +595,91 @@ public abstract sealed class Property<P extends Property<P>>
             return this;
         }
 
+        @Schema(name = "maxValue", description = "The maximum property value.")
         public Integer getMaxValue() {
             return maxValue;
         }
 
+        @Schema(name = "minValue", description = "The minimum property value.")
         public Integer getMinValue() {
             return minValue;
         }
     }
 
+    @JsonTypeName("OBJECT")
+    @Schema(name = "ObjectProperty", description = "An object property type.")
+    public static final class ObjectProperty extends ValueProperty<Object, ObjectProperty> {
+
+        private Boolean additionalProperties;
+        private String objectType;
+        private List<? extends Property<?>> properties;
+
+        private ObjectProperty() {
+            super(Type.OBJECT);
+        }
+
+        public ObjectProperty(String name) {
+            super(name, Type.OBJECT);
+        }
+
+        public ObjectProperty additionalProperties(boolean additionalProperties) {
+            this.additionalProperties = additionalProperties;
+
+            return this;
+        }
+
+        public ObjectProperty defaultValue(Map<String, Object> defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public ObjectProperty exampleValue(Map<String, Object> exampleValue) {
+            this.exampleValue = exampleValue;
+
+            return this;
+        }
+
+        public ObjectProperty objectType(String objectType) {
+            this.objectType = objectType;
+
+            return this;
+        }
+
+        public ObjectProperty properties(Property<?>... properties) {
+            this.properties = List.of(properties);
+
+            return this;
+        }
+
+        @Schema(name = "additionalProperties", description = "The object can contain dynamically defined properties.")
+        public Boolean getAdditionalProperties() {
+            return additionalProperties;
+        }
+
+        @Schema(name = "objectType", description = "The object type.")
+        public String getObjectType() {
+            return objectType;
+        }
+
+        @Schema(name = "properties", description = "The list of valid object property types.")
+        public List<? extends Property<?>> getProperties() {
+            return properties;
+        }
+    }
+
     @JsonTypeName("STRING")
-    public static final class StringProperty extends PrimitiveValueProperty<String, StringProperty> {
+    @Schema(name = "StringProperty", description = "A string property.")
+    public static final class StringProperty extends SingleValueProperty<String, StringProperty> {
 
         EditorType editorType;
 
-        private StringProperty() {}
+        private StringProperty() {
+            super(Type.STRING);
+        }
 
         public StringProperty(String name) {
-            super(name);
-            this.type = Type.STRING;
+            super(name, Type.STRING);
         }
 
         public StringProperty defaultValue(String value) {

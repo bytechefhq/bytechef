@@ -16,9 +16,12 @@
 
 package com.bytechef.hermes.definition;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * @author Ivica Cardic
  */
+@Schema(name = "Display", description = "Info about the component.")
 public class Display {
 
     protected String description;
@@ -41,14 +44,17 @@ public class Display {
         return this;
     }
 
+    @Schema(name = "description", description = "The component description.")
     public String getDescription() {
         return description;
     }
 
+    @Schema(name = "icon", description = " The component icon.")
     public String getIcon() {
         return icon;
     }
 
+    @Schema(name = "label", description = " The component label.")
     public String getLabel() {
         return label;
     }
