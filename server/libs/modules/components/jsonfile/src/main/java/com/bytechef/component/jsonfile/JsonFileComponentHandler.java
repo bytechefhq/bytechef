@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.json.file;
+package com.bytechef.component.jsonfile;
 
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.FILE_TYPE;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.IS_ARRAY;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.JSON_FILE;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.PAGE_NUMBER;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.PAGE_SIZE;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.PATH;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.READ;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.SOURCE;
-import static com.bytechef.component.json.file.constants.JsonFileTaskConstants.WRITE;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.IS_ARRAY;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.JSON_FILE;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.PAGE_NUMBER;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.PATH;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.READ;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.SOURCE;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.WRITE;
 import static com.bytechef.hermes.component.ComponentDSL.any;
 import static com.bytechef.hermes.component.ComponentDSL.array;
 import static com.bytechef.hermes.component.ComponentDSL.bool;
@@ -34,14 +34,13 @@ import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.ComponentDSL.integer;
 import static com.bytechef.hermes.component.ComponentDSL.object;
 import static com.bytechef.hermes.component.ComponentDSL.option;
-import static com.bytechef.hermes.component.ComponentDSL.options;
 import static com.bytechef.hermes.component.ComponentDSL.showWhen;
 import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 
 import com.bytechef.commons.json.JsonUtils;
-import com.bytechef.component.json.file.constants.JsonFileTaskConstants.FileType;
+import com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -73,7 +72,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
             .actions(
                     ComponentDSL.action(READ)
                             .display(display("Read from file").description("Reads data from a JSON file."))
-                            .inputs(
+                            .properties(
                                     string(FILE_TYPE)
                                             .label("File Type")
                                             .description("The file type to choose.")
@@ -91,32 +90,28 @@ public class JsonFileComponentHandler implements ComponentHandler {
                                             .label("Is Array")
                                             .description("The object input is array?")
                                             .defaultValue(true),
-                                    options()
-                                            .label("Options")
-                                            .placeholder("Add Option")
-                                            .options(
-                                                    string(PATH)
-                                                            .label("Path")
-                                                            .description(
-                                                                    "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                                                            .displayOption(showWhen(IS_ARRAY)
-                                                                    .eq(true)),
-                                                    integer(PAGE_SIZE)
-                                                            .label("Page Size")
-                                                            .description(
-                                                                    "The amount of child elements to return in a page.")
-                                                            .displayOption(showWhen(IS_ARRAY)
-                                                                    .eq(true)),
-                                                    integer(PAGE_NUMBER)
-                                                            .label("Page Number")
-                                                            .description("The page number to get.")
-                                                            .displayOption(showWhen(IS_ARRAY)
-                                                                    .eq(true))))
-                            .outputSchema(array(), object())
+                                    string(PATH)
+                                            .label("Path")
+                                            .description(
+                                                    "The path where the array is e.g 'data'. Leave blank to use the top level object.")
+                                            .displayOption(showWhen(IS_ARRAY).eq(true)),
+                                    integer(PAGE_SIZE)
+                                            .label("Page Size")
+                                            .description("The amount of child elements to return in a page.")
+                                            .displayOption(showWhen(IS_ARRAY).eq(true)),
+                                    integer(PAGE_NUMBER)
+                                            .label("Page Number")
+                                            .description("The page number to get.")
+                                            .displayOption(showWhen(IS_ARRAY).eq(true)))
+                            .output(any().types(
+                                            array().displayOption(
+                                                            showWhen(IS_ARRAY).eq(true)),
+                                            object().displayOption(
+                                                            showWhen(IS_ARRAY).eq(false))))
                             .performFunction(this::performRead),
                     ComponentDSL.action(WRITE)
                             .display(display("Write to file").description("Writes the data to a JSON file."))
-                            .inputs(
+                            .properties(
                                     string(FILE_TYPE)
                                             .label("File Type")
                                             .description("The file type to choose.")
@@ -136,7 +131,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
                                                     "Filename to set for binary data. By default, \"file.json\" will be used.")
                                             .required(true)
                                             .defaultValue("file.json"))
-                            .outputSchema(fileEntry())
+                            .output(fileEntry())
                             .performFunction(this::performWrite));
 
     @Override
@@ -189,8 +184,8 @@ public class JsonFileComponentHandler implements ComponentHandler {
                 rangeEndIndex = rangeStartIndex + pageSize;
             }
 
-            if ((rangeStartIndex != null && rangeStartIndex > 0)
-                    || (rangeEndIndex != null && rangeEndIndex < items.size())) {
+            if (rangeStartIndex != null && rangeStartIndex > 0
+                    || rangeEndIndex != null && rangeEndIndex < items.size()) {
                 items = items.subList(rangeStartIndex, rangeEndIndex);
             }
 
@@ -231,7 +226,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
     }
 
     private String getDefaultFileName(FileType fileType, String defaultFilename) {
-        return defaultFilename == null ? ("file." + (fileType == FileType.JSON ? "json" : "jsonl")) : defaultFilename;
+        return defaultFilename == null ? "file." + (fileType == FileType.JSON ? "json" : "jsonl") : defaultFilename;
     }
 
     private FileType getFileType(ExecutionParameters executionParameters) {

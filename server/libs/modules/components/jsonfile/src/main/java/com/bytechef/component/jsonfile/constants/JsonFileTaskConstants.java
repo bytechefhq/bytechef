@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.json.file.constants;
+package com.bytechef.component.jsonfile.constants;
 
 /**
  * @author Ivica Cardic

@@ -11,13 +11,40 @@
         "label": "Read from file"
       },
       "name": "read",
-      "inputs": [
+      "output": [
+        {
+          "type": "ANY",
+          "types": [
+            {
+              "displayOption": {
+                "showWhen": {
+                  "isArray": [
+                    true
+                  ]
+                }
+              },
+              "type": "ARRAY"
+            },
+            {
+              "displayOption": {
+                "showWhen": {
+                  "isArray": [
+                    false
+                  ]
+                }
+              },
+              "type": "OBJECT"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The file type to choose.",
           "label": "File Type",
           "name": "fileType",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "JSON",
           "options": [
             {
@@ -34,28 +61,29 @@
           "description": "The object property which contains a reference to the JSON file to read from.",
           "label": "File",
           "name": "fileEntry",
-          "type": "OBJECT",
           "required": true,
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
           "properties": [
             {
               "name": "extension",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "mimeType",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "name",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "url",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             }
           ]
         },
@@ -67,64 +95,43 @@
           "defaultValue": true
         },
         {
-          "label": "Options",
-          "placeholder": "Add Option",
-          "type": "OPTION",
-          "options": [
-            {
-              "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
-              "displayOption": {
-                "showWhen": {
-                  "isArray": {
-                    "values": [
-                      true
-                    ]
-                  }
-                }
-              },
-              "label": "Path",
-              "name": "path",
-              "type": "STRING"
-            },
-            {
-              "description": "The amount of child elements to return in a page.",
-              "displayOption": {
-                "showWhen": {
-                  "isArray": {
-                    "values": [
-                      true
-                    ]
-                  }
-                }
-              },
-              "label": "Page Size",
-              "name": "pageSize",
-              "type": "INTEGER"
-            },
-            {
-              "description": "The page number to get.",
-              "displayOption": {
-                "showWhen": {
-                  "isArray": {
-                    "values": [
-                      true
-                    ]
-                  }
-                }
-              },
-              "label": "Page Number",
-              "name": "pageNumber",
-              "type": "INTEGER"
+          "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
+          "displayOption": {
+            "showWhen": {
+              "isArray": [
+                true
+              ]
             }
-          ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "ARRAY"
+          },
+          "label": "Path",
+          "name": "path",
+          "type": "STRING"
         },
         {
-          "type": "OBJECT"
+          "description": "The amount of child elements to return in a page.",
+          "displayOption": {
+            "showWhen": {
+              "isArray": [
+                true
+              ]
+            }
+          },
+          "label": "Page Size",
+          "name": "pageSize",
+          "type": "INTEGER"
+        },
+        {
+          "description": "The page number to get.",
+          "displayOption": {
+            "showWhen": {
+              "isArray": [
+                true
+              ]
+            }
+          },
+          "label": "Page Number",
+          "name": "pageNumber",
+          "type": "INTEGER"
         }
       ]
     },
@@ -134,13 +141,41 @@
         "label": "Write to file"
       },
       "name": "write",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The file type to choose.",
           "label": "File Type",
           "name": "fileType",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "JSON",
           "options": [
             {
@@ -157,8 +192,8 @@
           "description": "The data to write to the file.",
           "label": "Source",
           "name": "source",
-          "type": "ANY",
           "required": true,
+          "type": "ANY",
           "types": [
             {
               "type": "ARRAY"
@@ -172,36 +207,9 @@
           "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
           "label": "Filename",
           "name": "filename",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "file.json"
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
         }
       ]
     }
