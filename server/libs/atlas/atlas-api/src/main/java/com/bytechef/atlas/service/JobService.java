@@ -17,8 +17,8 @@
 package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
@@ -26,7 +26,7 @@ import org.springframework.data.domain.Page;
  * @author Ivica Cardic
  */
 public interface JobService {
-    Job add(Map<String, Object> jobParams);
+    Job add(JobParametersDTO jobParametersDTO);
 
     List<Job> getJobs();
 

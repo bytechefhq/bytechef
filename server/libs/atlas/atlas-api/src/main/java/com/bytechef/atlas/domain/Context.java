@@ -144,4 +144,14 @@ public final class Context implements Persistable<String> {
     public void setValue(Map<String, Object> value) {
         this.value = new MapWrapper(value);
     }
+
+    @Override
+    public String toString() {
+        return "Context{" + "createdBy='"
+                + createdBy + '\'' + ", createdDate="
+                + createdDate + ", id='"
+                + id + '\'' + ", stackId='"
+                + stackId + '\'' + ", value="
+                + value + '}';
+    }
 }
