@@ -18,11 +18,12 @@ import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * ExecutionErrorModel
+ * Contains information about an error that happened during execution.
  */
 
+@Schema(name = "ExecutionError", description = "Contains information about an error that happened during execution.")
 @JsonTypeName("ExecutionError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-27T10:08:31.057495+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
 public class ExecutionErrorModel {
 
   @JsonProperty("message")
@@ -38,11 +39,11 @@ public class ExecutionErrorModel {
   }
 
   /**
-   * Get message
+   * The error message.
    * @return message
   */
   
-  @Schema(name = "message", required = false)
+  @Schema(name = "message", description = "The error message.", required = false)
   public String getMessage() {
     return message;
   }
@@ -65,11 +66,11 @@ public class ExecutionErrorModel {
   }
 
   /**
-   * Get stackTrace
+   * The error stacktrace.
    * @return stackTrace
   */
   
-  @Schema(name = "stackTrace", required = false)
+  @Schema(name = "stackTrace", description = "The error stacktrace.", required = false)
   public List<String> getStackTrace() {
     return stackTrace;
   }
