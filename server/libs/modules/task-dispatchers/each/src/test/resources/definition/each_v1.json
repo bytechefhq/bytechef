@@ -4,32 +4,50 @@
     "label": "Each"
   },
   "name": "each",
-    "inputs": [
-      {
-        "description": "List of items to iterate over.",
-        "label": "List of items",
-        "name": "list",
-        "type": "ARRAY",
-        "items": [
-          {
-            "type": "ANY"
-          }
-        ]
-      },
-      {
-        "description": "The name of the item variable.",
-        "label": "Item Var",
-        "name": "itemVar",
-        "type": "STRING",
-        "defaultValue": "item"
-      },
-      {
-        "description": "The name of the index variable.",
-        "label": "Item Index",
-        "name": "itemIndex",
-        "type": "STRING",
-        "defaultValue": "itemIndex"
-      }
+  "output": [
+    {
+      "name": "item",
+      "type": "ANY"
+    },
+    {
+      "name": "itemIndex",
+      "type": "INTEGER"
+    }
   ],
-  "version": 1
+  "properties": [
+    {
+      "description": "List of items to iterate over.",
+      "label": "List of items",
+      "name": "list",
+      "type": "ARRAY",
+      "items": [
+        {
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "description": "The name of the item variable.",
+      "label": "Item Var",
+      "name": "itemVar",
+      "type": "STRING",
+      "defaultValue": "item"
+    },
+    {
+      "description": "The name of the index variable.",
+      "label": "Item Index",
+      "name": "itemIndex",
+      "type": "STRING",
+      "defaultValue": "itemIndex"
+    }
+  ],
+  "version": 1,
+  "taskProperties": [
+    {
+      "description": "The task or task dispatcher to use.",
+      "name": "iteratee",
+      "type": "OBJECT",
+      "objectType": "TASK"
+    }
+  ]
 }
