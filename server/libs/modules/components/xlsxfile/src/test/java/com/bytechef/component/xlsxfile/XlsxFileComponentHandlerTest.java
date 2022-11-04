@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xlsx.file;
+package com.bytechef.component.xlsxfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.component.test.json.JsonObjectUtils;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,7 +48,7 @@ public class XlsxFileComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals("definition/xlsx-file_v1.json", new XlsxFileComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/xlsxfile_v1.json", new XlsxFileComponentHandler().getDefinition());
     }
 
     @Test
