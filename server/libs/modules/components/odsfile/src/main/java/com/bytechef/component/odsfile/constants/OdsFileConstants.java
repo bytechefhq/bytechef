@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ods.file.constants;
+package com.bytechef.component.odsfile.constants;
 
 /**
  * @author Ivica Cardic
