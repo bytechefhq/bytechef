@@ -10,7 +10,7 @@
         "label": "Debug"
       },
       "name": "debug",
-      "inputs": [
+      "properties": [
         {
           "name": "text",
           "type": "ANY"
@@ -22,7 +22,7 @@
         "label": "Error"
       },
       "name": "error",
-      "inputs": [
+      "properties": [
         {
           "name": "text",
           "type": "ANY"
@@ -34,7 +34,7 @@
         "label": "Info"
       },
       "name": "info",
-      "inputs": [
+      "properties": [
         {
           "name": "text",
           "type": "ANY"
@@ -46,7 +46,7 @@
         "label": "Warn"
       },
       "name": "warn",
-      "inputs": [
+      "properties": [
         {
           "name": "text",
           "type": "ANY"
