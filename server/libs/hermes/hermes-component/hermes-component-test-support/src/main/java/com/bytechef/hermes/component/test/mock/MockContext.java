@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.test;
+package com.bytechef.hermes.component.test.mock;
 
 import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.impl.FileEntryImpl;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.InputStream;
@@ -61,11 +60,11 @@ public class MockContext implements Context {
 
     @Override
     public FileEntry storeFileContent(String fileName, String data) {
-        return new FileEntryImpl(fileStorageService.storeFileContent(fileName, data));
+        return new MockFileEntry(fileStorageService.storeFileContent(fileName, data));
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, InputStream inputStream) {
-        return new FileEntryImpl(fileStorageService.storeFileContent(fileName, inputStream));
+        return new MockFileEntry(fileStorageService.storeFileContent(fileName, inputStream));
     }
 }
