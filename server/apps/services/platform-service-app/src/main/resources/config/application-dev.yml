@@ -7,9 +7,6 @@ server:
   port: 7222
 
 spring:
-  devtools:
-    restart:
-      enabled: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://localhost:5432/bytechef
@@ -17,9 +14,20 @@ spring:
     password: postgres
     hikari:
       poolName: Hikari
+  devtools:
+    restart:
+      enabled: true
   h2:
     console:
       enabled: false
   jackson:
     serialization:
       indent-output: true
+
+#####
+
+bytechef:
+  workflow:
+    workflow-repository:
+      cache:
+        provider: no-op

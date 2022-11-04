@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef;
+package com.bytechef.platform;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -31,7 +31,7 @@ import org.springframework.core.env.Environment;
 /**
  * @author Ivica Cardic
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.bytechef")
 public class PlatformApplication {
     private static final Logger log = LoggerFactory.getLogger(PlatformApplication.class);
 

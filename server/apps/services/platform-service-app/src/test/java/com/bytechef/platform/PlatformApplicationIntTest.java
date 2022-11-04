@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef;
+package com.bytechef.platform;
 
+import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.extension.RedisTestContainerExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith({PostgresTestContainerExtension.class, RedisTestContainerExtension.class})
 @SpringBootTest
 public class PlatformApplicationIntTest {
 
