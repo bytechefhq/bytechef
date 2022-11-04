@@ -18,18 +18,17 @@
 
 package com.bytechef.task.dispatcher.switch_;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class SwitchTaskDispatcherDefinitionFactoryTest {
+public class SwitchTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/switch_v1.json", new SwitchTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/switch_v1.json", new SwitchTaskDispatcherFactory().getDefinition());
     }
 }
