@@ -16,17 +16,16 @@
 
 package com.bytechef.task.dispatcher.parallel;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class ParallelTaskDispatcherDefinitionFactoryTest {
+public class ParallelTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/parallel_v1.json", new ParallelTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/parallel_v1.json", new ParallelTaskDispatcherFactory().getDefinition());
     }
 }
