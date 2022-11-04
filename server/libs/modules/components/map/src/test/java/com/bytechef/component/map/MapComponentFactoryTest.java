@@ -16,16 +16,16 @@
 
 package com.bytechef.component.map;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class MapComponentDefinitionFactoryTest {
+public class MapComponentFactoryTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals("definition/map_v1.json", new MapComponentDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/map_v1.json", new MapComponentFactory().getDefinition());
     }
 }
