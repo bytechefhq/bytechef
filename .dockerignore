@@ -1,0 +1,9 @@
+**/build
+.editorconfig
+.git
+.github
+.gradle
+.server_hash
+client
+docs
+static
