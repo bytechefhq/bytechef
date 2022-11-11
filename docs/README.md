@@ -71,7 +71,7 @@ The two suggested workflows are:
 ## Local setup
 
 ### Requirements
-Rely to the latest LTS Node.js version 16 and its minors. Use nvm or other tool to setup or upgrade your OS environment. One may use [nvm](https://github.com/nvm-sh/nvm) to manage versions.
+Rely to the latest LTS Node.js version 16 and its minors. One may use [nvm](https://github.com/nvm-sh/nvm) or other tool to setup or upgrade Node version for OS environment used to host application.
 
 ### Installation
 Position to ../docs directory and install local instance of documentation manager
