@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.event;
+package com.bytechef.hermes.integration.repository.event;
 
 import com.bytechef.commons.uuid.UUIDGenerator;
-import com.bytechef.integration.domain.Integration;
+import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.hermes.integration.domain.IntegrationWorkflow;
 import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
@@ -39,7 +40,7 @@ public class IntegrationCallback implements BeforeConvertCallback<Integration> {
             integration.setId(UUIDGenerator.generate());
         }
 
-        integration.getIntegrationWorkflows().forEach(integrationWorkflow -> {
+        for (IntegrationWorkflow integrationWorkflow : integration.getIntegrationWorkflows()) {
             if (integrationWorkflow.isNew()) {
                 integrationWorkflow.setCreatedBy("system");
                 integrationWorkflow.setCreatedDate(LocalDateTime.now());
@@ -48,7 +49,7 @@ public class IntegrationCallback implements BeforeConvertCallback<Integration> {
 
             integrationWorkflow.setLastModifiedBy("system");
             integrationWorkflow.setLastModifiedDate(LocalDateTime.now());
-        });
+        }
 
         return integration;
     }

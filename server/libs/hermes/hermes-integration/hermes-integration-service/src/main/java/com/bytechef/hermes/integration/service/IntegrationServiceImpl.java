@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.service;
+package com.bytechef.hermes.integration.service;
 
-import com.bytechef.integration.domain.Integration;
-import com.bytechef.integration.repository.IntegrationRepository;
+import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.hermes.integration.repository.IntegrationRepository;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import org.springframework.stereotype.Service;
