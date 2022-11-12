@@ -23,7 +23,7 @@ import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.git.workflow.GitWorkflowOperations;
 import com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
-import com.bytechef.atlas.workflow.WorkflowResource;
+import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
