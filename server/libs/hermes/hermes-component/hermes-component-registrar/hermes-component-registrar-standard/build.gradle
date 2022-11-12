@@ -1,0 +1,6 @@
+dependencies {
+    api project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-api")
+
+    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
+}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component;
+package com.bytechef.hermes.component.registrar.standard;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ComponentTaskHandlerRegistrarTest {
+public class StandardComponentTaskHandlerTest {
 
     @Disabled
     @Test
-    public void testAfterPropertiesSet() {
+    public void testHandle() {
         // TODO
     }
 }
