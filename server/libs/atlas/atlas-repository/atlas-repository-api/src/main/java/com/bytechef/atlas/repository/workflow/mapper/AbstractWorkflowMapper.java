@@ -105,10 +105,10 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private void validateReservedWords(Map<String, Object> aWorkflow) {
+    private void validateReservedWords(Map<String, Object> workflowMap) {
         List<String> reservedWords = Arrays.asList(WorkflowConstants.RESERVED_WORDS);
 
-        for (Map.Entry<String, Object> entry : aWorkflow.entrySet()) {
+        for (Map.Entry<String, Object> entry : workflowMap.entrySet()) {
             String k = entry.getKey();
             Object v = entry.getValue();
 
