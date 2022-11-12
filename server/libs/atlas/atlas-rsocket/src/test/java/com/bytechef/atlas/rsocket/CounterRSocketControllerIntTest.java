@@ -22,29 +22,23 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class TaskExecutionRSocketControllerTest {
+public class CounterRSocketControllerIntTest {
 
     @Disabled
     @Test
-    void testCreate() {
+    public void testDelete() {
         // TODO
     }
 
     @Disabled
     @Test
-    void testGetTaskExecution() {
+    public void testDecrement() {
         // TODO
     }
 
     @Disabled
     @Test
-    void testGetParentTaskExecutions() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    void testUpdate() {
+    public void testSet() {
         // TODO
     }
 }

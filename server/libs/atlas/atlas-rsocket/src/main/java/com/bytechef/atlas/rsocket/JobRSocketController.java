@@ -17,10 +17,10 @@
 package com.bytechef.atlas.rsocket;
 
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -40,8 +40,8 @@ public class JobRSocketController {
     }
 
     @MessageMapping("createJob")
-    public Mono<Job> createJob(Map<String, Object> jobParams) {
-        return Mono.create(sink -> sink.success(jobService.add(jobParams)));
+    public Mono<Job> createJob(JobParametersDTO workflowParameters) {
+        return Mono.create(sink -> sink.success(jobService.add(workflowParameters)));
     }
 
     @MessageMapping("getJob")

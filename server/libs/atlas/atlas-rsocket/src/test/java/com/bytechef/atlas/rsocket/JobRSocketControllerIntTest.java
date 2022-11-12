@@ -22,23 +22,59 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class CounterRSocketControllerTest {
+public class JobRSocketControllerIntTest {
 
     @Disabled
     @Test
-    public void testDelete() {
+    void testCreate() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testDecrement() {
+    void testGetJob() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testSet() {
+    void testGetJobs() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testGetLatestJob() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testGetTaskExecutionJob() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testResume() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testStart() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testStop() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testUpdate() {
         // TODO
     }
 }

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class JobRSocketControllerTest {
+public class TaskExecutionRSocketControllerIntTest {
 
     @Disabled
     @Test
@@ -32,43 +32,13 @@ public class JobRSocketControllerTest {
 
     @Disabled
     @Test
-    void testGetJob() {
+    void testGetTaskExecution() {
         // TODO
     }
 
     @Disabled
     @Test
-    void testGetJobs() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    void testGetLatestJob() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    void testGetTaskExecutionJob() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    void testResume() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    void testStart() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    void testStop() {
+    void testGetParentTaskExecutions() {
         // TODO
     }
 
