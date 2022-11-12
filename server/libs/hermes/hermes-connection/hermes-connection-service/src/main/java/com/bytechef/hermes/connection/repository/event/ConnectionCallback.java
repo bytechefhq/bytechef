@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.event;
+package com.bytechef.hermes.connection.repository.event;
 
 import com.bytechef.commons.uuid.UUIDGenerator;
 import com.bytechef.hermes.connection.domain.Connection;
