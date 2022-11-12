@@ -52,7 +52,7 @@ import org.springframework.jms.support.converter.MessageType;
  * @author Arik Cohen
  */
 @Configuration
-@ConditionalOnProperty(name = "workflow.message-broker.provider", havingValue = "jms")
+@ConditionalOnProperty(prefix = "bytechef.workflow", name = "message-broker.provider", havingValue = "jms")
 public class JmsMessageBrokerConfiguration
         implements JmsListenerConfigurer, MessageBrokerListenerRegistrar<JmsListenerEndpointRegistrar> {
 
