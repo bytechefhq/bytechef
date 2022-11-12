@@ -26,7 +26,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-@ConditionalOnProperty(name = "workflow.context-repository.provider", havingValue = "jdbc")
+@ConditionalOnProperty(prefix = "bytechef.workflow", name = "context-repository.provider", havingValue = "jdbc")
 public interface JdbcContextRepository extends PagingAndSortingRepository<Context, String>, ContextRepository {
 
     @Override

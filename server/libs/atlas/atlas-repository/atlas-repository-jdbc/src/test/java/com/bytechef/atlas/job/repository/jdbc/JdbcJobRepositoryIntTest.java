@@ -22,13 +22,15 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
+import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.JobRepository;
+import com.bytechef.test.extension.PostgresTestContainerExtension;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -38,18 +40,14 @@ import org.springframework.data.domain.PageRequest;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ExtendWith(PostgresTestContainerExtension.class)
+@SpringBootTest(
+        classes = WorkflowRepositoryIntTestConfiguration.class,
+        properties = "bytechef.workflow.persistence.provider=jdbc")
 public class JdbcJobRepositoryIntTest {
 
     @Autowired
     private JobRepository jobRepository;
-
-    @BeforeEach
-    public void beforeEach() {
-        for (Job job : jobRepository.findAll()) {
-            jobRepository.deleteById(job.getId());
-        }
-    }
 
     @Test
     public void test1FindAll() {
