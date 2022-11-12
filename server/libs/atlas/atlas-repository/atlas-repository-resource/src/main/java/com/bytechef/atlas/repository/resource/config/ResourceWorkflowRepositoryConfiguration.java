@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.classpath.config;
+package com.bytechef.atlas.repository.resource.config;
 
-import com.bytechef.atlas.repository.classpath.AbstractResourceWorkflowRepository;
-import com.bytechef.atlas.repository.classpath.ClassPathResourceWorkflowRepository;
-import com.bytechef.atlas.repository.classpath.FilesystemResourceWorkflowRepository;
+import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.repository.resource.ClassPathResourceWorkflowRepository;
+import com.bytechef.atlas.repository.resource.FilesystemResourceWorkflowRepository;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,16 +31,22 @@ public class ResourceWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(1)
-    @ConditionalOnProperty(name = "workflow.workflow-repository.classpath.enabled", havingValue = "true")
-    AbstractResourceWorkflowRepository classpathBasedWorkflowRepository(WorkflowMapper workflowMapper) {
+    @ConditionalOnProperty(
+            prefix = "bytechef.workflow",
+            name = "workflow-repository.classpath.enabled",
+            havingValue = "true")
+    WorkflowRepository classpathBasedWorkflowRepository(WorkflowMapper workflowMapper) {
         return new ClassPathResourceWorkflowRepository(workflowMapper);
     }
 
     @Bean
     @Order(2)
-    @ConditionalOnProperty(name = "workflow.workflow-repository.filesystem.enabled", havingValue = "true")
-    AbstractResourceWorkflowRepository filesystemBasedWorkflowRepository(
-            @Value("${workflow.workflow-repository.filesystem.location-pattern}") String locationPattern,
+    @ConditionalOnProperty(
+            prefix = "bytechef.workflow",
+            name = "workflow-repository.filesystem.enabled",
+            havingValue = "true")
+    WorkflowRepository filesystemBasedWorkflowRepository(
+            @Value("${bytechef.workflow.workflow-repository.filesystem.location-pattern}") String locationPattern,
             WorkflowMapper workflowMapper) {
         return new FilesystemResourceWorkflowRepository(locationPattern, workflowMapper);
     }

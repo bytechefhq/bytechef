@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.classpath;
+package com.bytechef.atlas.repository.resource;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
+import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import com.bytechef.atlas.workflow.WorkflowFormat;
-import com.bytechef.atlas.workflow.WorkflowResource;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
