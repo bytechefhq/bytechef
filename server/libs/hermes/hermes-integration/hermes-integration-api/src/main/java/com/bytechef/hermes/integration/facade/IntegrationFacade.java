@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.domain.annotation;
+package com.bytechef.hermes.integration.facade;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.bytechef.hermes.integration.domain.Integration;
 
-@Target(ElementType.CONSTRUCTOR)
-@Retention(RetentionPolicy.CLASS)
-public @interface Default {}
+/**
+ * @author Ivica Cardic
+ */
+public interface IntegrationFacade {
+
+    Integration add(Integration integration);
+}

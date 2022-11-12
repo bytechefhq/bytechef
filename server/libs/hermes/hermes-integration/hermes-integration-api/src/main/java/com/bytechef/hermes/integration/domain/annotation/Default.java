@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.service;
+package com.bytechef.hermes.integration.domain.annotation;
 
-import com.bytechef.integration.domain.Integration;
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * @author Ivica Cardic
- */
-public interface IntegrationService {
-    Integration add(Integration integration);
-
-    void delete(String id);
-
-    Integration getIntegration(String id);
-
-    List<Integration> getIntegrations();
-
-    Integration update(Integration integration);
-}
+@Target(ElementType.CONSTRUCTOR)
+@Retention(RetentionPolicy.CLASS)
+public @interface Default {}
