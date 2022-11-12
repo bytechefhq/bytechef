@@ -16,14 +16,14 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.definition.DefinitionFactory;
+import com.bytechef.hermes.component.definition.Action;
 
 /**
  * @author Ivica Cardic
  */
-public interface ComponentDefinitionFactory extends DefinitionFactory<ComponentDefinition> {
+public interface OpenApiComponentHandler extends ComponentFactory {
 
-    @Override
-    ComponentDefinition getDefinition();
+    default Object postExecute(Action action, Object result) {
+        return result;
+    }
 }
