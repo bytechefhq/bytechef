@@ -46,6 +46,7 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
     private final List<WorkflowRepository> workflowRepositories;
 
     public WorkflowRepositoryChain(CacheManager cacheManager, List<WorkflowRepository> workflowRepositories) {
+
         Assert.notNull(cacheManager, "'cacheManager' can not be null");
         Assert.notNull(workflowRepositories, "'workflowRepositories' can not be null");
 
@@ -174,10 +175,6 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
             try {
                 workflow = workflowRepository.save(workflow);
 
-                Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
-
-                cacheOne.put(Objects.requireNonNull(workflow.getId()), workflow);
-
                 return workflow;
             } catch (UnsupportedOperationException e) {
                 logger.debug("Repository {} doesn't support create operation", workflowRepository);
@@ -185,17 +182,13 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
         }
 
         throw new RuntimeException(
-                "Set atlas.workflow-repository.database.enabled=true property to create new workflow");
+                "Set bytechef.workflow.workflow-repository.jdbc.enabled=true property to create new workflow");
     }
 
     private Workflow update(Workflow workflow) {
         for (WorkflowRepository repository : workflowRepositories) {
             try {
                 workflow = repository.save(workflow);
-
-                Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
-
-                cacheOne.put(Objects.requireNonNull(workflow.getId()), workflow);
 
                 return workflow;
             } catch (UnsupportedOperationException e) {

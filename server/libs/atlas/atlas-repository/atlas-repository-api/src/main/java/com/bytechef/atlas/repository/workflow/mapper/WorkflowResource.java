@@ -16,8 +16,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.workflow;
+package com.bytechef.atlas.repository.workflow.mapper;
 
+import com.bytechef.atlas.workflow.WorkflowFormat;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
