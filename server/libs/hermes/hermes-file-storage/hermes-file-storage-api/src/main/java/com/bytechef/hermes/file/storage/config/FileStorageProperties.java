@@ -21,7 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Ivica Cardic
  */
-@ConfigurationProperties(prefix = "file.storage")
+@ConfigurationProperties(prefix = "bytechef.file-storage")
 public class FileStorageProperties {
 
     private String fileStorageDir;
