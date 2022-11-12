@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.config;
+package com.bytechef.test.config;
 
+import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,12 @@ import org.springframework.context.annotation.Bean;
  * @author Ivica Cardic
  */
 @TestConfiguration
-public class EncryptionKeyConfiguration {
+public class EncryptionIntTestConfiguration {
+
+    @Bean
+    Encryption encryption(EncryptionKey encryptionKey) {
+        return new Encryption(encryptionKey);
+    }
 
     @Bean
     EncryptionKey encryptionKey() {
