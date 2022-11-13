@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.cli.command.component;
+package com.bytechef.cli;
 
-import static picocli.CommandLine.Command;
+import java.io.File;
+import org.junit.jupiter.api.Test;
 
-import com.bytechef.cli.command.component.subcommand.InitSubcommand;
-import picocli.CommandLine;
+public class CliApplicationTest {
 
-/**
- * @author Ivica Cardic
- */
-@Command(
-        name = "component",
-        description = "Manage, create, and publish a component",
-        subcommands = {CommandLine.HelpCommand.class, InitSubcommand.class})
-public class ComponentCommand {}
+    @Test
+    public void testComponentInit() {
+        CliApplication.main(new String[] {
+            "component",
+            "init",
+            "--open-api-path",
+            CliApplicationTest.class.getResource("/dependencies/petstore.yml").getFile(),
+            "--output",
+            new File("build/test/generated").getAbsolutePath(),
+            "petstore"
+        });
+    }
+}
