@@ -162,12 +162,12 @@ public class Coordinator {
         try {
             taskCompletionHandler.handle(taskExecution);
         } catch (Exception e) {
-            TaskExecution errorTaskExecution = new TaskExecution(taskExecution);
+            TaskExecution erroredTaskExecution = new TaskExecution(taskExecution);
 
-            errorTaskExecution.setError(
+            erroredTaskExecution.setError(
                     new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            handleError(errorTaskExecution);
+            handleError(erroredTaskExecution);
         }
     }
 
