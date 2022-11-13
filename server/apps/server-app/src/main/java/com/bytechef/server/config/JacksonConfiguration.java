@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.server.config;
 
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.annotation.EnableCaching;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@EnableCaching
-@EnableConfigurationProperties(CacheProperties.class)
-public class CacheConfiguration {}
+public class JacksonConfiguration {
+
+    @Bean
+    JavaTimeModule javaTimeModule() {
+        return new JavaTimeModule();
+    }
+}

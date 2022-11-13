@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.server.config;
 
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
