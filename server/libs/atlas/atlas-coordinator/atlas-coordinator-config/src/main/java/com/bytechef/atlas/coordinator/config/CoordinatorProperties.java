@@ -23,7 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Arik Cohen
  */
-@ConfigurationProperties(prefix = "workflow.coordinator")
+@ConfigurationProperties(prefix = "bytechef.workflow.coordinator")
 public class CoordinatorProperties {
 
     private CoordinatorSubscriptions subscriptions = new CoordinatorSubscriptions();
