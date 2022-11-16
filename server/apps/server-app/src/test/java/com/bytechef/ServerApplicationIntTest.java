@@ -26,7 +26,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ServerApplicationIntTest {
 
     @Test
-    void testContextLoads() {
-	}
-
+    void testContextLoads() {}
 }
