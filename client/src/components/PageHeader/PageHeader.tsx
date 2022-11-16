@@ -3,6 +3,7 @@ import './styles.css'
 
 export const PageHeader = () => {
   const onClickHandler = () => {
+    // some comment
     console.log('inside onClickHandler')
   }
 
