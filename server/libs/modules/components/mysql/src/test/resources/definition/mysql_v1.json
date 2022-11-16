@@ -10,32 +10,32 @@
         {
           "label": "Host",
           "name": "host",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "label": "Port",
           "name": "port",
-          "type": "INTEGER",
-          "required": true
+          "required": true,
+          "type": "INTEGER"
         },
         {
           "label": "Database",
           "name": "database",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "label": "Username",
           "name": "username",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "label": "Password",
           "name": "password",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         }
       ],
       "version": 1
@@ -52,14 +52,29 @@
         "label": "Query"
       },
       "name": "query",
-      "inputs": [
+      "output": [
+        {
+          "type": "ARRAY",
+          "items": [
+            {
+              "type": "OBJECT",
+              "properties": [
+                {
+                  "type": "INTEGER"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
           "label": "Query",
           "name": "query",
           "placeholder": "SELECT id, name FROM customer WHERE age > :age AND height <= :height",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "The list of properties which should be used as query parameters.",
@@ -81,8 +96,7 @@
             }
           ]
         }
-      ],
-      "outputSchema": []
+      ]
     },
     {
       "display": {
@@ -90,21 +104,31 @@
         "label": "Insert"
       },
       "name": "insert",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "Name of the schema the table belongs to.",
           "label": "Schema",
           "name": "schema",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "public"
         },
         {
           "description": "Name of the table in which to insert data to.",
           "label": "Table",
           "name": "table",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "The list of the properties which should used as columns for the new rows.",
@@ -125,12 +149,16 @@
           "items": [
             {
               "type": "OBJECT",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "properties": [
+                {
+                  "type": "ANY"
+                }
+              ]
             }
           ]
         }
-      ],
-      "outputSchema": []
+      ]
     },
     {
       "display": {
@@ -138,21 +166,31 @@
         "label": "Update"
       },
       "name": "update",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "Name of the schema the table belongs to.",
           "label": "Schema",
           "name": "schema",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "public"
         },
         {
           "description": "Name of the table in which to update data in.",
           "label": "Table",
           "name": "table",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "The list of the properties which should used as columns for the updated rows.",
@@ -180,12 +218,16 @@
           "items": [
             {
               "type": "OBJECT",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "properties": [
+                {
+                  "type": "ANY"
+                }
+              ]
             }
           ]
         }
-      ],
-      "outputSchema": []
+      ]
     },
     {
       "display": {
@@ -193,21 +235,31 @@
         "label": "Delete"
       },
       "name": "delete",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "Name of the schema the table belongs to.",
           "label": "Schema",
           "name": "schema",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "public"
         },
         {
           "description": "Name of the table in which to update data in.",
           "label": "Table",
           "name": "table",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "Name of the property which decides which rows in the database should be deleted.",
@@ -224,12 +276,16 @@
           "items": [
             {
               "type": "OBJECT",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "properties": [
+                {
+                  "type": "ANY"
+                }
+              ]
             }
           ]
         }
-      ],
-      "outputSchema": []
+      ]
     },
     {
       "display": {
@@ -237,14 +293,24 @@
         "label": "Execute"
       },
       "name": "execute",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
           "label": "Execute",
           "name": "execute",
           "placeholder": "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "List of rows.",
@@ -254,7 +320,12 @@
           "items": [
             {
               "type": "OBJECT",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "properties": [
+                {
+                  "type": "ANY"
+                }
+              ]
             }
           ]
         },
@@ -278,8 +349,7 @@
             }
           ]
         }
-      ],
-      "outputSchema": []
+      ]
     }
   ],
   "version": 1

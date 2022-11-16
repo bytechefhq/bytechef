@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -50,25 +51,12 @@ public class ComponentDefinitionTest {
     @Test
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testDisplayOption() throws JSONException, JsonProcessingException {
-        DisplayOption displayOption = DisplayOption.build(List.of(ComponentDSL.hideWhen("name")));
-
-        jsonAssertEquals(
-                """
-            {
-                "hideWhen":{"name":{}}
-            }
-            """, displayOption);
-
-        displayOption =
+        DisplayOption displayOption =
                 DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(true, false)));
 
-        jsonAssertEquals(
-                """
-        {
-            "hideWhen":{"name":{"values": [true, false]}}
-        }
-        """,
-                displayOption);
+        jsonAssertEquals("""
+                {"hideWhen":{"name":[true,false]}}
+                """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(1, 2)));
@@ -76,7 +64,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
             {
-                "hideWhen":{"name":{"values": [1,2]}}
+                "hideWhen":{"name":[1,2]}
             }
             """,
                 displayOption);
@@ -87,7 +75,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
             {
-                "hideWhen":{"name":{"values": [1,2]}}
+                "hideWhen":{"name":[1,2]}
             }
             """,
                 displayOption);
@@ -95,24 +83,20 @@ public class ComponentDefinitionTest {
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(1F, 2F)));
 
-        jsonAssertEquals(
-                """
+        jsonAssertEquals("""
         {
-            "hideWhen":{"name":{"values": [1.0,2.0]}}
+            "hideWhen":{"name":[1.0,2.0]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(1D, 2D)));
 
-        jsonAssertEquals(
-                """
+        jsonAssertEquals("""
         {
-            "hideWhen":{"name":{"values": [1.0,2.0]}}
+            "hideWhen":{"name":[1.0,2.0]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in("value1", "value2")));
@@ -120,18 +104,16 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
         {
-            "hideWhen":{"name":{"values": ["value1","value2"]}}
+            "hideWhen":{"name":["value1","value2"]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.hideWhen("name1").eq(1)));
 
-        jsonAssertEquals(
-                """
+        jsonAssertEquals("""
         {
-         "hideWhen":{"name1":{"values": [1]}}
+         "hideWhen":{"name1":[1]}
         }
         """, displayOption);
 
@@ -142,10 +124,9 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
         {
-            "hideWhen":{"name1":{"values": [1]},"name2":{"values": [2]}}
+            "hideWhen":{"name1":[1],"name2":[2]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(true, false)));
@@ -153,10 +134,9 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
         {
-            "showWhen":{"name":{"values": [true, false]}}
+            "showWhen":{"name":[true, false]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(1, 2)));
@@ -164,7 +144,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
             {
-                "showWhen":{"name":{"values": [1,2]}}
+                "showWhen":{"name": [1,2]}
             }
             """,
                 displayOption);
@@ -175,7 +155,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
             {
-                "showWhen":{"name":{"values": [1,2]}}
+                "showWhen":{"name":[1,2]}
             }
             """,
                 displayOption);
@@ -183,24 +163,20 @@ public class ComponentDefinitionTest {
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(1F, 2F)));
 
-        jsonAssertEquals(
-                """
+        jsonAssertEquals("""
         {
-            "showWhen":{"name":{"values": [1.0,2.0]}}
+            "showWhen":{"name":[1.0,2.0]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(1D, 2D)));
 
-        jsonAssertEquals(
-                """
+        jsonAssertEquals("""
         {
-            "showWhen":{"name":{"values": [1.0,2.0]}}
+            "showWhen":{"name":[1.0,2.0]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.showWhen("name").in("value1", "value2")));
@@ -208,18 +184,16 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
         {
-            "showWhen":{"name":{"values": ["value1","value2"]}}
+            "showWhen":{"name":["value1","value2"]}
         }
-        """,
-                displayOption);
+        """, displayOption);
 
         displayOption =
                 DisplayOption.build(List.of(ComponentDSL.showWhen("name1").eq(1)));
 
-        jsonAssertEquals(
-                """
+        jsonAssertEquals("""
         {
-         "showWhen":{"name1":{"values": [1]}}
+         "showWhen":{"name1":[1]}
         }
         """, displayOption);
 
@@ -230,15 +204,14 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
         {
-            "showWhen":{"name1":{"values": [1]},"name2":{"values": [2]}}
+            "showWhen":{"name1":[1],"name2":[2]}
         }
-        """,
-                displayOption);
+        """, displayOption);
     }
 
     @Test
-    public void testAnyTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.any("name")
+    public void testAnyProperty() throws JSONException, JsonProcessingException {
+        Property<Property.AnyProperty> property = ComponentDSL.any("name")
                 .description("description")
                 .label("label")
                 .placeholder("placeholder")
@@ -261,8 +234,8 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testArrayTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.array("name")
+    public void testArrayProperty() throws JSONException, JsonProcessingException {
+        Property<Property.ArrayProperty> property = ComponentDSL.array("name")
                 .defaultValue(1, 2)
                 .description("description")
                 .label("label")
@@ -287,8 +260,8 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testBooleanTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.bool("name")
+    public void testBooleanProperty() throws JSONException, JsonProcessingException {
+        Property<Property.BooleanProperty> property = ComponentDSL.bool("name")
                 .defaultValue(true)
                 .description("description")
                 .label("label")
@@ -311,8 +284,32 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testDateTimeTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.dateTime("name")
+    public void testDateProperty() throws JSONException, JsonProcessingException {
+        Property<Property.DateProperty> property = ComponentDSL.date("name")
+                .defaultValue(LocalDate.MIN)
+                .description("description")
+                .label("label")
+                .placeholder("placeholder")
+                .required(true);
+
+        jsonAssertEquals(
+                """
+        {
+            "defaultValue":[-999999999,1,1],
+            "description":"description",
+            "label":"label",
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"DATE"
+        }
+        """,
+                property);
+    }
+
+    @Test
+    public void testDateTimeProperty() throws JSONException, JsonProcessingException {
+        Property<Property.DateTimeProperty> property = ComponentDSL.dateTime("name")
                 .defaultValue(LocalDateTime.MIN)
                 .description("description")
                 .label("label")
@@ -335,8 +332,8 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testIntegerTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.integer("name")
+    public void testIntegerProperty() throws JSONException, JsonProcessingException {
+        Property<Property.IntegerProperty> property = ComponentDSL.integer("name")
                 .defaultValue(2)
                 .description("description")
                 .label("label")
@@ -359,28 +356,8 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testNullTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.nullable("name")
-                .description("description")
-                .label("label")
-                .placeholder("placeholder");
-
-        jsonAssertEquals(
-                """
-            {
-                "description":"description",
-                "label":"label",
-                "name":"name",
-                "placeholder":"placeholder",
-                "type":"NULL"
-            }
-            """,
-                property);
-    }
-
-    @Test
-    public void testNumberTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.number("name")
+    public void testNumberProperty() throws JSONException, JsonProcessingException {
+        Property<Property.NumberProperty> property = ComponentDSL.number("name")
                 .defaultValue(2)
                 .description("description")
                 .label("label")
@@ -414,9 +391,9 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testObjectTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.object("name")
-                .defaultValue(List.of(Map.of("key", Map.of("key1", "value1"))))
+    public void testObjectProperty() throws JSONException, JsonProcessingException {
+        Property<Property.ObjectProperty> property = ComponentDSL.object("name")
+                .defaultValue(Map.of("key", Map.of("key1", "value1")))
                 .description("description")
                 .label("label")
                 .placeholder("placeholder")
@@ -425,7 +402,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
                 """
             {
-                "defaultValue":[{"key":{"key1":"value1"}}],
+                "defaultValue":{"key":{"key1":"value1"}},
                 "description":"description",
                 "label":"label",
                 "name":"name",
@@ -449,34 +426,8 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testOptionTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.options()
-                .description("description")
-                .label("label")
-                .options(ComponentDSL.string("stringProperty"))
-                .placeholder("placeholder");
-
-        jsonAssertEquals(
-                """
-                {
-                    "description":"description",
-                    "label":"label",
-                    "options": [
-                        {
-                            "name":"stringProperty",
-                            "type":"STRING"
-                        }
-                    ],
-                    "placeholder":"placeholder",
-                    "type": "OPTION"
-                }
-                """,
-                property);
-    }
-
-    @Test
-    public void testStringTaskProperty() throws JSONException, JsonProcessingException {
-        Property<?> property = ComponentDSL.string("name")
+    public void testStringProperty() throws JSONException, JsonProcessingException {
+        Property<Property.StringProperty> property = ComponentDSL.string("name")
                 .defaultValue("defaultValue")
                 .description("description")
                 .label("label")
@@ -517,7 +468,7 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testTaskPropertyOption() throws JSONException, JsonProcessingException {
+    public void testPropertyOption() throws JSONException, JsonProcessingException {
         PropertyOption propertyOption = ComponentDSL.option("name", 1);
 
         jsonAssertEquals(

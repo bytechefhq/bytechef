@@ -138,11 +138,7 @@ subprojects {
         }
         jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
 
-        if (!project.hasProperty("no-testcontainers")) {
-            environment "spring.profiles.active", "testcontainers"
-        } else {
-            environment "spring.profiles.active", "test"
-        }
+        environment "spring.profiles.active", "testint"
 
         // uncomment if the tests reports are not generated
         // ignoreFailures true

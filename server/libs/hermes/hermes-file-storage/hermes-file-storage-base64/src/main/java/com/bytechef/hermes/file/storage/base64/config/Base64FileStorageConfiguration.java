@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(FileStorageProperties.class)
-@ConditionalOnProperty(name = "file.storage.provider", havingValue = "base64")
+@ConditionalOnProperty(prefix = "bytechef.file-storage", name = "provider", havingValue = "base64")
 public class Base64FileStorageConfiguration {
 
     @Bean

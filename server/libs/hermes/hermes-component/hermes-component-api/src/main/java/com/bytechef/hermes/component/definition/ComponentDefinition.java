@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.constants.Versions;
 import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Resources;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
@@ -26,12 +27,16 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
+@Schema(
+        name = "ComponentDefinition",
+        description =
+                "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
 public final class ComponentDefinition implements Definition {
 
     private List<ConnectionDefinition> connections;
     private ComponentDisplay display;
     private String name;
-    private List<ComponentAction> actions;
+    private List<Action> actions;
     private Resources resources;
     private int version = Versions.VERSION_1;
 
@@ -41,7 +46,7 @@ public final class ComponentDefinition implements Definition {
         this.name = name;
     }
 
-    public ComponentDefinition actions(ComponentAction... actions) {
+    public ComponentDefinition actions(Action... actions) {
         this.actions = List.of(actions);
 
         return this;
@@ -72,11 +77,13 @@ public final class ComponentDefinition implements Definition {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ComponentAction> getActions() {
+    @Schema(name = "actions", description = "The list of all available actions the component can perform.")
+    public List<Action> getActions() {
         return actions;
     }
 
     @SuppressWarnings("unchecked")
+    @Schema(name = "connections", description = " The list of possible connections to an outside service.")
     public List<ConnectionDefinition> getConnections() {
         return connections;
     }
@@ -87,6 +94,7 @@ public final class ComponentDefinition implements Definition {
     }
 
     @Override
+    @Schema(name = "name", description = "The connection name.")
     public String getName() {
         return name;
     }

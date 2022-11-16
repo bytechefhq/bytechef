@@ -13,35 +13,8 @@ spring:
   jackson:
     serialization:
       indent-output: true
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/bytechef
-    username: postgres
-    password: postgres
-    hikari:
-      poolName: Hikari
   h2:
     console:
       enabled: false
   messages:
     cache-duration: PT1S
-#  sql:
-#    init:
-#      mode: always
-
-#####
-
-discovery-client:
-  property:
-    coordinator-service-app:
-      instances:
-        - host: localhost
-          port: 7333
-    platform-service-app:
-      instances:
-        - host: localhost
-          port: 7222
-    worker-service-app:
-      instances:
-        - host: localhost
-          port: 7444

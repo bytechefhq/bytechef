@@ -25,6 +25,7 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -36,7 +37,8 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-public class WorkflowController implements WorkflowControllerApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class WorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;
     private final WorkflowService workflowService;

@@ -18,8 +18,8 @@
 
 package com.bytechef.atlas.repository.git.workflow;
 
+import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import com.bytechef.atlas.workflow.WorkflowFormat;
-import com.bytechef.atlas.workflow.WorkflowResource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

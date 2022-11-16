@@ -20,6 +20,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.CancelControlTask;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.commons.uuid.UUIDGenerator;
@@ -105,10 +106,10 @@ public class WorkerTest {
                 .withEventPublisher(e -> {})
                 .build();
 
-        TaskExecution task = new TaskExecution(Map.of(
+        TaskExecution task = TaskExecution.of(new WorkflowTask(Map.of(
                 "pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")),
                 "type", "var",
-                "value", "${myVar}"));
+                "value", "${myVar}")));
 
         task.setId("1234");
         task.setJobId("4567");
@@ -148,10 +149,10 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        TaskExecution taskExecution = new TaskExecution(Map.of(
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
                 "post", List.of(Map.of("type", "rm", "path", tempDir)),
                 "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
-                "type", "pass"));
+                "type", "pass")));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");
@@ -193,10 +194,10 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        TaskExecution taskExecution = new TaskExecution(Map.of(
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
                 "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
                 "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
-                "type", "rogue"));
+                "type", "rogue")));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");

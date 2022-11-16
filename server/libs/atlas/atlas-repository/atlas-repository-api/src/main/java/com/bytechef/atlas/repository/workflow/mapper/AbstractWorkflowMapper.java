@@ -19,7 +19,6 @@ package com.bytechef.atlas.repository.workflow.mapper;
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.workflow.WorkflowResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,10 +104,10 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private void validateReservedWords(Map<String, Object> aWorkflow) {
+    private void validateReservedWords(Map<String, Object> workflowMap) {
         List<String> reservedWords = Arrays.asList(WorkflowConstants.RESERVED_WORDS);
 
-        for (Map.Entry<String, Object> entry : aWorkflow.entrySet()) {
+        for (Map.Entry<String, Object> entry : workflowMap.entrySet()) {
             String k = entry.getKey();
             Object v = entry.getValue();
 

@@ -1,6 +1,3 @@
-README.md
-pom.xml
 src/main/java/com/bytechef/hermes/integration/web/rest/ApiUtil.java
-src/main/java/com/bytechef/hermes/integration/web/rest/IntegrationControllerApi.java
-src/main/java/com/bytechef/hermes/integration/web/rest/model/IntegrationCreateModel.java
+src/main/java/com/bytechef/hermes/integration/web/rest/IntegrationsApi.java
 src/main/java/com/bytechef/hermes/integration/web/rest/model/IntegrationModel.java

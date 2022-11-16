@@ -1,11 +1,18 @@
 package com.bytechef.hermes.connection.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import javax.annotation.Generated;
 
 /**
@@ -13,7 +20,7 @@ import javax.annotation.Generated;
  */
 
 @JsonTypeName("ConnectionUpdate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-26T10:02:10.743027+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:15:34.685557+01:00[Europe/Zagreb]")
 public class ConnectionUpdateModel {
 
   @JsonProperty("name")
@@ -25,11 +32,11 @@ public class ConnectionUpdateModel {
   }
 
   /**
-   * Get name
+   * TODO
    * @return name
   */
-
-  @Schema(name = "name", required = false)
+  
+  @Schema(name = "name", description = "TODO", required = false)
   public String getName() {
     return name;
   }

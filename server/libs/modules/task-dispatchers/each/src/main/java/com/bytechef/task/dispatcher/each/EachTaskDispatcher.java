@@ -19,6 +19,11 @@
 package com.bytechef.task.dispatcher.each;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_INDEX;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITERATEE;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -71,8 +76,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        WorkflowTask iteratee = taskExecution.getWorkflowTask("iteratee");
-        List<Object> list = taskExecution.getList("list", Object.class);
+        WorkflowTask iteratee = taskExecution.getWorkflowTask(ITERATEE);
+        List<Object> list = taskExecution.getList(LIST, Object.class);
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
         Assert.notNull(list, "'list' property can't be null");
@@ -84,7 +89,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
         taskExecutionService.update(eachTaskExecution);
 
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             counterService.set(taskExecution.getId(), list.size());
 
             for (int i = 0; i < list.size(); i++) {
@@ -94,8 +99,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
-                context.put(taskExecution.getString("itemVar", "item"), item);
-                context.put(taskExecution.getString("itemIndex", "itemIndex"), i);
+                context.put(taskExecution.getString(ITEM_VAR, ITEM), item);
+                context.put(taskExecution.getString(ITEM_INDEX, ITEM_INDEX), i);
 
                 contextService.push(iterateeTaskExecution.getId(), context);
 

@@ -17,39 +17,33 @@
 package com.bytechef.atlas.job.repository.jdbc;
 
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
-import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
 import com.bytechef.atlas.workflow.WorkflowFormat;
+import com.bytechef.test.extension.PostgresTestContainerExtension;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ExtendWith(PostgresTestContainerExtension.class)
+@SpringBootTest(
+        classes = WorkflowRepositoryIntTestConfiguration.class,
+        properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
 public class JdbcWorkflowRepositoryIntTest {
 
     @Autowired
     private WorkflowRepository workflowRepository;
 
-    @BeforeEach
-    public void beforeEach() {
-        for (Workflow workflow : workflowRepository.findAll()) {
-            workflowRepository.deleteById(workflow.getId());
-        }
-    }
-
     @Test
     public void testFindById() {
         Workflow workflow = new Workflow();
 
-        workflow.setContent(
+        workflow.setDefinition(
                 """
             label: My Label
 
@@ -67,14 +61,5 @@ public class JdbcWorkflowRepositoryIntTest {
 
         Assertions.assertEquals("My Label", resultWorkflow.getLabel());
         Assertions.assertEquals(1, resultWorkflow.getTasks().size());
-    }
-
-    @TestConfiguration
-    static class JdbcWorkflowRepositoryIntTestConfiguration {
-
-        @Bean
-        WorkflowMapper workflowMapper() {
-            return new YamlWorkflowMapper();
-        }
     }
 }

@@ -52,7 +52,7 @@ public class FunctionComponentHandler implements ComponentHandler {
             .actions(
                     action(JAVA)
                             .display(display("Java").description("Executes custom Java code."))
-                            .inputs(
+                            .properties(
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
@@ -63,11 +63,11 @@ public class FunctionComponentHandler implements ComponentHandler {
                                             .label("Java code")
                                             .description("Add your Java custom logic here.")
                                             .editorType(Property.EditorType.CODE))
-                            .outputSchema(any())
+                            .output(any())
                             .performFunction(this::performJava),
                     action(JAVASCRIPT)
                             .display(display("JavaScript").description("Executes custom JavaScript code."))
-                            .inputs(
+                            .properties(
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
@@ -77,11 +77,11 @@ public class FunctionComponentHandler implements ComponentHandler {
                                             .label("JavaScript code")
                                             .description("Add your JavaScript custom logic here.")
                                             .editorType(Property.EditorType.CODE))
-                            .outputSchema(any())
+                            .output(any())
                             .performFunction(this::performJavaScript),
                     action(PYTHON)
                             .display(display("Python").description("Executes custom Python code."))
-                            .inputs(
+                            .properties(
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
@@ -91,11 +91,11 @@ public class FunctionComponentHandler implements ComponentHandler {
                                             .label("Python code")
                                             .description("Add your Python custom logic here.")
                                             .editorType(Property.EditorType.CODE))
-                            .outputSchema(any())
+                            .output(any())
                             .performFunction(this::performPython),
                     action(R)
                             .display(display("R").description("Executes custom R code."))
-                            .inputs(
+                            .properties(
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
@@ -105,11 +105,11 @@ public class FunctionComponentHandler implements ComponentHandler {
                                             .label("R code")
                                             .description("Add your R custom logic here.")
                                             .editorType(Property.EditorType.CODE))
-                            .outputSchema(any())
+                            .output(any())
                             .performFunction(this::performR),
                     action(FunctionConstants.RUBY)
                             .display(display("Ruby").description("Executes custom Ruby code."))
-                            .inputs(
+                            .properties(
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
@@ -119,7 +119,7 @@ public class FunctionComponentHandler implements ComponentHandler {
                                             .label("Ruby code")
                                             .description("Add your Ruby custom logic here.")
                                             .editorType(Property.EditorType.CODE))
-                            .outputSchema(any())
+                            .output(any())
                             .performFunction(this::performRuby));
 
     @Override

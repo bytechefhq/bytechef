@@ -17,29 +17,30 @@
 package com.bytechef.atlas.job.repository.jdbc;
 
 import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.ContextRepository;
+import com.bytechef.test.extension.PostgresTestContainerExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ExtendWith(PostgresTestContainerExtension.class)
+@SpringBootTest(
+        classes = WorkflowRepositoryIntTestConfiguration.class,
+        properties = {
+            "bytechef.workflow.context-repository.provider=jdbc",
+            "bytechef.workflow.persistence.provider=jdbc"
+        })
 public class JdbcContextRepositoryIntTest {
 
     @Autowired
     private ContextRepository contextRepository;
-
-    @BeforeEach
-    public void beforeEach() {
-        for (Context context : contextRepository.findAll()) {
-            contextRepository.deleteById(context.getId());
-        }
-    }
 
     @Test
     public void testFindByStackId() {

@@ -88,12 +88,12 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 case FAILED: {
-                    TaskExecution errorTaskExecution =
+                    TaskExecution erroredTaskExecution =
                             new TaskExecution(taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
 
-                    errorTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
+                    erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
-                    coordinatorManager.handleError(errorTaskExecution);
+                    coordinatorManager.handleError(erroredTaskExecution);
 
                     break;
                 }
@@ -103,6 +103,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     Object output = job.getOutputs();
 
                     if (completionTaskExecution.getOutput() != null) {
+                        // TODO check, it seems wrong
                         TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
                                 completionTaskExecution, new Context("execution", new Context("output", output)));
 

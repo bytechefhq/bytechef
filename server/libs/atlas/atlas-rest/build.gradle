@@ -7,8 +7,7 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
-        "reactive": "true",
-        "useTags": "true"
+        "reactive": "true"
     ]
     generatorName = "spring"
     importMappings = [
@@ -26,12 +25,9 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
 sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
 
 task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    configOptions = [
-        "useTags": "true"
-    ]
     generatorName = "typescript-fetch"
     inputSpec = "$projectDir/openapi.yaml".toString()
-    outputDir = "$rootDir/client/src/_generated/data-access/workflow".toString()
+    outputDir = "$rootDir/client/src/data-access/workflow".toString()
     typeMappings = [
         DateTime: "Date"
     ]
@@ -59,10 +55,9 @@ dependencies {
 
     implementation libs.swagger.annotations
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
-    implementation project(":server:libs:core:autoconfigure:autoconfigure-annotations")
+    implementation project(":server:libs:core:autoconfigure-annotations")
     implementation project(":server:libs:core:commons:commons-cache")
     implementation project(":server:libs:core:commons:commons-utils")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
-    testImplementation project(":server:libs:test-support")
 }

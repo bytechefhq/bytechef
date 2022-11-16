@@ -92,7 +92,7 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <nav className="flex h-full flex-col border-gray-200 bg-gray-50 px-4 dark:bg-gray-700">
           <div className="mb-6 flex shrink-0 items-center py-4 ">
-            <h1 className="text-3xl tracking-tight text-gray-900 dark:text-gray-200">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-200">
               {title}
             </h1>
           </div>
@@ -116,7 +116,7 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
 
           <div className="mb-6 flex justify-center py-4">
             <div className="flex w-full items-center justify-between">
-              <h2 className="text-2xl tracking-tight text-gray-900 dark:text-gray-200">
+              <h2 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-200">
                 {subTitle}
               </h2>
 

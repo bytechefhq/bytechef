@@ -30,7 +30,7 @@ export default defineConfig({
     setupFiles: '.vitest/setup.ts',
     coverage: {
       reporter: ['html', 'lcov', 'text'],
-      exclude: ['node_modules/', '.vitest/', '**/*.test.tsx']
+      exclude: ['.vitest/', 'node_modules/', 'src/data-access', '**/*.test.tsx']
     }
   }
 })

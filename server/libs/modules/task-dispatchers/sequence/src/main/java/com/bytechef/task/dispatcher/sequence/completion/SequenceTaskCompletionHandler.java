@@ -17,6 +17,7 @@
 package com.bytechef.task.dispatcher.sequence.completion;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
 import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -72,11 +73,11 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubtaskExecution = new TaskExecution(taskExecution);
+        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
 
-        completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
+        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.update(completedSubtaskExecution);
+        taskExecutionService.update(completedSubTaskExecution);
 
         TaskExecution sequenceTaskExecution =
                 new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
@@ -91,7 +92,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             contextService.push(sequenceTaskExecution.getId(), newContext);
         }
 
-        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks("tasks");
+        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks(TASKS);
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());

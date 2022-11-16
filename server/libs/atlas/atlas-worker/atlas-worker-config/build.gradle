@@ -4,5 +4,5 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
     implementation project(":server:libs:atlas:atlas-task-evaluator-impl")
-    implementation project(":server:libs:core:autoconfigure:autoconfigure-annotations")
+    implementation project(":server:libs:core:autoconfigure-annotations")
 }

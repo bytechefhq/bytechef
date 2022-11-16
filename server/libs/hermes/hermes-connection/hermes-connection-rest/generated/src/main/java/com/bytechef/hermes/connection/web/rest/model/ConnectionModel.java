@@ -1,26 +1,31 @@
 package com.bytechef.hermes.connection.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import javax.validation.Valid;
-
+import javax.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * ConnectionModel
+ * TODO
  */
 
+@Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-26T10:02:10.743027+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:15:34.685557+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("componentName")
@@ -62,11 +67,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get componentName
+   * TODO
    * @return componentName
   */
-
-  @Schema(name = "componentName", required = false)
+  
+  @Schema(name = "componentName", description = "TODO", required = false)
   public String getComponentName() {
     return componentName;
   }
@@ -81,11 +86,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get componentVersion
+   * TODO
    * @return componentVersion
   */
-
-  @Schema(name = "componentVersion", required = false)
+  
+  @Schema(name = "componentVersion", description = "TODO", required = false)
   public String getComponentVersion() {
     return componentVersion;
   }
@@ -100,11 +105,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get createdBy
+   * TODO
    * @return createdBy
   */
-
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -119,11 +124,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get createdDate
+   * TODO
    * @return createdDate
   */
-  @Valid
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Valid 
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -138,11 +143,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get name
+   * TODO
    * @return name
   */
-
-  @Schema(name = "name", required = false)
+  
+  @Schema(name = "name", description = "TODO", required = false)
   public String getName() {
     return name;
   }
@@ -157,11 +162,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get id
+   * TODO
    * @return id
   */
-
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public String getId() {
     return id;
   }
@@ -176,11 +181,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get label
+   * TODO
    * @return label
   */
-
-  @Schema(name = "label", required = false)
+  
+  @Schema(name = "label", description = "TODO", required = false)
   public String getLabel() {
     return label;
   }
@@ -203,11 +208,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get parameters
+   * TODO
    * @return parameters
   */
-
-  @Schema(name = "parameters", required = false)
+  
+  @Schema(name = "parameters", description = "TODO", required = false)
   public Map<String, Object> getParameters() {
     return parameters;
   }
@@ -222,11 +227,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get lastModifiedBy
+   * TODO
    * @return lastModifiedBy
   */
-
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -241,11 +246,11 @@ public class ConnectionModel {
   }
 
   /**
-   * Get lastModifiedDate
+   * TODO
    * @return lastModifiedDate
   */
-  @Valid
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Valid 
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }

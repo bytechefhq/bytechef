@@ -39,7 +39,7 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(name = "workflow.persistence.provider", havingValue = "jdbc")
+@ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
 public class WorkflowJdbcPersistenceConfiguration extends AbstractJdbcConfiguration {
 
     private final ObjectMapper objectMapper;

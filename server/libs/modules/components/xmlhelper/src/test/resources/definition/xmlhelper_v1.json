@@ -1,0 +1,60 @@
+{
+  "display": {
+    "description": "Converts between XML string and object/array.",
+    "label": "XML Helper"
+  },
+  "name": "xmlHelper",
+  "actions": [
+    {
+      "display": {
+        "description": "Converts the XML string to object/array.",
+        "label": "Convert from XML string"
+      },
+      "name": "xmlParse",
+      "output": [
+        {
+          "type": "OBJECT"
+        }
+      ],
+      "properties": [
+        {
+          "description": "The XML string to convert to the data.",
+          "label": "Source",
+          "name": "source",
+          "required": true,
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Writes the object/array to a XML string.",
+        "label": "Convert to XML string"
+      },
+      "name": "xmlStringify",
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
+        {
+          "description": "The data to convert to XML string.",
+          "label": "Source",
+          "name": "source",
+          "required": true,
+          "type": "ANY",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "OBJECT"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

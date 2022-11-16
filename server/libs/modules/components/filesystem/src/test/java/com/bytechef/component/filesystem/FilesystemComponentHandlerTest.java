@@ -24,9 +24,9 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -53,8 +53,7 @@ public class FilesystemComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/filesystem_v1.json", new FilesystemComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/filesystem_v1.json", new FilesystemComponentHandler().getDefinition());
     }
 
     @Disabled
