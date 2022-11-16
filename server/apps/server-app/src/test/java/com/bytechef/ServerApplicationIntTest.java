@@ -23,8 +23,10 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class ServerApplicationIntTest {
+class ServerApplicationIntTest {
 
     @Test
-    public void testContextLoads() {}
+    void testContextLoads() {
+	}
+
 }

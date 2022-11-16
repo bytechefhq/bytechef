@@ -19,9 +19,7 @@ package com.bytechef.config;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
-// import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 /**
  * @author Ivica Cardic
@@ -31,8 +29,4 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(CacheProperties.class)
 public class CacheConfiguration {
 
-    //    @Bean
-    //    public LettuceConnectionFactory redisConnectionFactory() {
-    //        return new LettuceConnectionFactory();
-    //    }
 }

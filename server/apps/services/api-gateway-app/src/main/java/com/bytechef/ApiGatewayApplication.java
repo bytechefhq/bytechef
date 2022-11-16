@@ -36,8 +36,6 @@ public class ApiGatewayApplication {
 
     private static final Logger log = LoggerFactory.getLogger(ApiGatewayApplication.class);
 
-    public ApiGatewayApplication() {}
-
     /**
      * Main method, used to run the application.
      *
@@ -73,7 +71,7 @@ public class ApiGatewayApplication {
 
         log.info(
                 """
-                    \n----------------------------------------------------------
+                    ----------------------------------------------------------
                     \tApplication '{}' is running! Access URLs:
                     \tLocal: \t\t{}://localhost:{}{}
                     \tExternal: \t{}://{}:{}{}
