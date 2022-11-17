@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform;
+package com.bytechef.test.annotation;
 
-import com.bytechef.test.annotation.EmbeddedRedis;
-import com.bytechef.test.annotation.EmbeddedSql;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedRedis
-@EmbeddedSql
-@SpringBootTest
-public class PlatformApplicationIntTest {
-
-    @Test
-    void testContextLoads() {}
-}
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface EmbeddedRedis {}
