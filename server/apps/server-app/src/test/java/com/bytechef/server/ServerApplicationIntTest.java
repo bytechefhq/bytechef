@@ -16,15 +16,14 @@
 
 package com.bytechef.server;
 
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest
 class ServerApplicationIntTest {
 

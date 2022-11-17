@@ -19,19 +19,18 @@ package com.bytechef.atlas.job.repository.jdbc;
 import com.bytechef.atlas.domain.Counter;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.CounterRepository;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest(
         classes = WorkflowRepositoryIntTestConfiguration.class,
         properties = "bytechef.workflow.persistence.provider=jdbc")
