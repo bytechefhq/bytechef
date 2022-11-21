@@ -54,13 +54,13 @@ public class RSocketConfiguration {
 
     @Bean
     public Flux<List<LoadbalanceTarget>> loadBalancedTargets(DiscoveryClient discoveryClient) {
-        return Mono.fromSupplier(() -> discoveryClient.getInstances(DiscoveryClientConfiguration.PLATFORM_SERVICE_APP))
+        return Mono.fromSupplier(() -> discoveryClient.getInstances("platform-service-app"))
                 .repeatWhen(longFlux -> longFlux.delayElements(Duration.ofSeconds(2)))
                 .map(this::toLoadBalanceTarget);
     }
 
-    private List<LoadbalanceTarget> toLoadBalanceTarget(List<ServiceInstance> rSocketServers) {
-        return rSocketServers.stream()
+    private List<LoadbalanceTarget> toLoadBalanceTarget(List<ServiceInstance> serviceInstances) {
+        return serviceInstances.stream()
                 .map(serviceInstance -> LoadbalanceTarget.from(
                         serviceInstance.getHost() + serviceInstance.getPort(),
                         WebsocketClientTransport.create(

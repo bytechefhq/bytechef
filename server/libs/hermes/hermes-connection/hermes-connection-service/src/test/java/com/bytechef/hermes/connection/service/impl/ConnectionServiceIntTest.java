@@ -16,9 +16,11 @@
 
 package com.bytechef.hermes.connection.service.impl;
 
+import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@EmbeddedSql
+@SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 public class ConnectionServiceIntTest {
 
     @Autowired

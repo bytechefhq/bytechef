@@ -32,6 +32,7 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
+import com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.util.Assert;
@@ -67,7 +68,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks = taskExecution.getWorkflowTasks("tasks");
+        List<WorkflowTask> workflowTasks = taskExecution.getWorkflowTasks(ParallelTaskDispatcherConstants.TASKS);
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 

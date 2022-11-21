@@ -19,7 +19,12 @@
 package com.bytechef.task.dispatcher.switch_.completion;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.CASES;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.DEFAULT;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.EXPRESSION;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.KEY;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.TASKS;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
@@ -127,20 +132,20 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
-        Object expression = taskExecution.getRequired("expression");
-        List<WorkflowTask> caseWorkflowTasks = taskExecution.getWorkflowTasks("cases");
+        Object expression = taskExecution.getRequired(EXPRESSION);
+        List<WorkflowTask> caseWorkflowTasks = taskExecution.getWorkflowTasks(CASES);
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a switch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
-            Object key = caseWorkflowTask.getRequired("key");
-            List<WorkflowTask> subWorkflowTasks = caseWorkflowTask.getWorkflowTasks("tasks");
+            Object key = caseWorkflowTask.getRequired(KEY);
+            List<WorkflowTask> subWorkflowTasks = caseWorkflowTask.getWorkflowTasks(TASKS);
 
             if (key.equals(expression)) {
                 return subWorkflowTasks;
             }
         }
 
-        return taskExecution.getWorkflowTasks("default");
+        return taskExecution.getWorkflowTasks(DEFAULT);
     }
 }

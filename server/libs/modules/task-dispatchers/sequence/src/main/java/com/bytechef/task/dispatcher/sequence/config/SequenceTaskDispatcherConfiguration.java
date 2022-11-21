@@ -53,7 +53,7 @@ public class SequenceTaskDispatcherConfiguration {
     }
 
     @Bean
-    TaskDispatcherResolverFactory sequenceTaskDispatcherFactory() {
+    TaskDispatcherResolverFactory sequenceTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SequenceTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
     }

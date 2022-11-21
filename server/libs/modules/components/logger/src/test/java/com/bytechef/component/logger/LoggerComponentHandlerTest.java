@@ -16,7 +16,7 @@
 
 package com.bytechef.component.logger;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ public class LoggerComponentHandlerTest {
 
     @Test
     public void testGetDefinition() {
-        DefinitionAssert.assertEquals("definition/logger_v1.json", new LoggerComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/logger_v1.json", new LoggerComponentHandler().getDefinition());
     }
 
     @Disabled

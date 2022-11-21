@@ -1,0 +1,54 @@
+info:
+  title: Task Dispatcher Definition Specification
+  description: Task Dispatcher Definition structs.
+  version: v1
+schemas:
+  TaskDispatcherDefinition:
+    description: A task dispatcher defines a strategy for dispatching tasks to be executed.
+    type: object
+    properties:
+      display:
+        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
+      name:
+        description: The connection name.
+        type: string
+      output:
+        description: The output schema of a task dispatching result.
+        type: array
+        items:
+          oneOf:
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/AnyProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
+      properties:
+        description: The list of task dispatcher properties.
+        type: array
+        items:
+          oneOf:
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/AnyProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NullProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
+            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
+      resources:
+        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Resources'
+      version:
+        type: integer
+        format: int32
+        description:
+      taskProperties:
+        description: Properties used to define tasks to be dispatched.
+        type: array
+        items:
+          $ref: '../../hermes-api/definition_spec.yaml#/schemas/Property'

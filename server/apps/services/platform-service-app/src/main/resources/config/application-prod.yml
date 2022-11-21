@@ -18,11 +18,6 @@ server:
     min-response-size: 1024
 
 spring:
-  devtools:
-    restart:
-      enabled: false
-    livereload:
-      enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://localhost:5432/bytechef
@@ -30,3 +25,8 @@ spring:
     password:
     hikari:
       poolName: Hikari
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false

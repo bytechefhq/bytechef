@@ -51,13 +51,13 @@ public class TaskExecutionErrorHandlerTest {
         TaskExecutionErrorHandler taskExecutionErrorHandler =
                 new TaskExecutionErrorHandler(eventPublisher, jobService, taskDispatcher, taskExecutionService);
 
-        TaskExecution errorTaskExecution = new TaskExecution();
+        TaskExecution erroredTaskExecution = new TaskExecution();
 
-        errorTaskExecution.setId("1234");
-        errorTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
+        erroredTaskExecution.setId("1234");
+        erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
 
-        taskExecutionErrorHandler.handle(errorTaskExecution);
-        taskExecutionErrorHandler.handle(errorTaskExecution);
+        taskExecutionErrorHandler.handle(erroredTaskExecution);
+        taskExecutionErrorHandler.handle(erroredTaskExecution);
 
         verify(taskDispatcher, times(0)).dispatch(any());
     }
@@ -69,12 +69,13 @@ public class TaskExecutionErrorHandlerTest {
         TaskExecutionErrorHandler taskExecutionErrorHandler =
                 new TaskExecutionErrorHandler(eventPublisher, jobService, taskDispatcher, taskExecutionService);
 
-        TaskExecution errorable = TaskExecution.of("retry", 1);
+        TaskExecution erroredTaskExecution = new TaskExecution();
 
-        errorable.setId("1234");
-        errorable.setError(new ExecutionError("something bad happened", List.of()));
+        erroredTaskExecution.setId("1234");
+        erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
+        erroredTaskExecution.setRetry(1);
 
-        taskExecutionErrorHandler.handle(errorable);
+        taskExecutionErrorHandler.handle(erroredTaskExecution);
 
         verify(taskDispatcher, times(1)).dispatch(any());
     }

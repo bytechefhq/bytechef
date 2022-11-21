@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.definition;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,165 +27,162 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
+@Schema(name = "DisplayOption", description = "Defines rules when a property should be shown or hidden.")
 public class DisplayOption {
 
-    private Map<String, DisplayOptionEntryValue> hideWhen;
-    private Map<String, DisplayOptionEntryValue> showWhen;
+    private Map<String, List<Object>> hideWhen;
+    private Map<String, List<Object>> showWhen;
 
     private DisplayOption() {}
 
-    public Map<String, DisplayOptionEntryValue> getHideWhen() {
+    @Schema(
+            name = "hideWhen",
+            description =
+                    "The map of property names and list of values to check against if the property should be hidden.")
+    public Map<String, List<Object>> getHideWhen() {
         return hideWhen;
     }
 
-    public Map<String, DisplayOptionEntryValue> getShowWhen() {
+    @Schema(
+            name = "showWhen",
+            description =
+                    "The map of property names and list of values to check against if the property should be shown.")
+    public Map<String, List<Object>> getShowWhen() {
         return showWhen;
     }
 
-    public static DisplayOption build(List<DisplayOptionEntry> displayOptionEntries) {
+    public static DisplayOption build(List<DisplayOptionCondition> displayOptionConditions) {
         DisplayOption displayOption = new DisplayOption();
 
-        for (DisplayOptionEntry displayOptionEntry : displayOptionEntries) {
-            if (displayOptionEntry instanceof HideDisplayOptionEntry hideDisplayOptionEntry) {
+        for (DisplayOptionCondition displayOptionCondition : displayOptionConditions) {
+            if (displayOptionCondition instanceof HideDisplayOptionCondition hideDisplayOptionCondition) {
                 if (displayOption.hideWhen == null) {
                     displayOption.hideWhen = new HashMap<>();
                 }
 
                 displayOption.hideWhen.computeIfAbsent(
-                        hideDisplayOptionEntry.propertyName, key -> displayOptionEntry.value);
-            } else if (displayOptionEntry instanceof ShowDisplayOptionEntry showDisplayOptionEntry) {
+                        hideDisplayOptionCondition.propertyName, key -> displayOptionCondition.values);
+            } else if (displayOptionCondition instanceof ShowDisplayOptionCondition showDisplayOptionCondition) {
                 if (displayOption.showWhen == null) {
                     displayOption.showWhen = new HashMap<>();
                 }
 
                 displayOption.showWhen.computeIfAbsent(
-                        showDisplayOptionEntry.propertyName, key -> displayOptionEntry.value);
+                        showDisplayOptionCondition.propertyName, key -> displayOptionCondition.values);
             }
         }
 
         return displayOption;
     }
 
-    public abstract static class DisplayOptionEntry {
+    public static class DisplayOptionProperty {
+        private DisplayOptionCondition displayOptionCondition;
+
+        public DisplayOptionProperty(DisplayOptionCondition displayOptionCondition) {
+            this.displayOptionCondition = displayOptionCondition;
+        }
+
+        public DisplayOptionCondition eq(Boolean value) {
+            displayOptionCondition.values = List.of(value);
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition eq(Integer value) {
+            displayOptionCondition.values = List.of(value);
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition eq(Long value) {
+            displayOptionCondition.values = List.of(value);
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition eq(Float value) {
+            displayOptionCondition.values = List.of(value);
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition eq(Double value) {
+            displayOptionCondition.values = List.of(value);
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition eq(String value) {
+            displayOptionCondition.values = List.of(value);
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition in(Boolean... values) {
+            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition in(Integer... values) {
+            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition in(Long... values) {
+            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition in(Float... values) {
+            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition in(Double... values) {
+            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
+
+            return displayOptionCondition;
+        }
+
+        public DisplayOptionCondition in(String... values) {
+            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
+
+            return displayOptionCondition;
+        }
+    }
+
+    public abstract static class DisplayOptionCondition {
 
         protected final String propertyName;
-        protected final DisplayOptionEntryValue value = new DisplayOptionEntryValue();
+        protected List<Object> values = List.of();
 
-        public DisplayOptionEntry(String propertyName) {
+        public DisplayOptionCondition(String propertyName) {
             this.propertyName = propertyName;
-        }
-
-        public DisplayOptionEntry eq(Boolean value) {
-            this.value.values = List.of(value);
-
-            return this;
-        }
-
-        public DisplayOptionEntry eq(Integer value) {
-            this.value.values = List.of(value);
-
-            return this;
-        }
-
-        public DisplayOptionEntry eq(Long value) {
-            this.value.values = List.of(value);
-
-            return this;
-        }
-
-        public DisplayOptionEntry eq(Float value) {
-            this.value.values = List.of(value);
-
-            return this;
-        }
-
-        public DisplayOptionEntry eq(Double value) {
-            this.value.values = List.of(value);
-
-            return this;
-        }
-
-        public DisplayOptionEntry eq(String value) {
-            this.value.values = List.of(value);
-
-            return this;
-        }
-
-        public DisplayOptionEntry in(Boolean... values) {
-            this.value.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return this;
-        }
-
-        public DisplayOptionEntry in(Integer... values) {
-            this.value.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return this;
-        }
-
-        public DisplayOptionEntry in(Long... values) {
-            this.value.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return this;
-        }
-
-        public DisplayOptionEntry in(Float... values) {
-            this.value.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return this;
-        }
-
-        public DisplayOptionEntry in(Double... values) {
-            this.value.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return this;
-        }
-
-        public DisplayOptionEntry in(String... values) {
-            this.value.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return this;
-        }
-
-        public DisplayOptionEntry of(Property.Type type) {
-            this.value.type = type;
-
-            return this;
         }
 
         public String getPropertyName() {
             return propertyName;
         }
 
-        public DisplayOptionEntryValue getValue() {
-            return value;
+        public List<Object> getValues() {
+            return new ArrayList<>(values);
         }
     }
 
-    public static class DisplayOptionEntryValue {
+    public static class HideDisplayOptionCondition extends DisplayOptionCondition {
 
-        private Property.Type type;
-        private List<Object> values;
-
-        public Property.Type getType() {
-            return type;
-        }
-
-        public List<?> getValues() {
-            return values;
-        }
-    }
-
-    public static class HideDisplayOptionEntry extends DisplayOptionEntry {
-
-        public HideDisplayOptionEntry(String propertyName) {
+        public HideDisplayOptionCondition(String propertyName) {
             super(propertyName);
         }
     }
 
-    public static class ShowDisplayOptionEntry extends DisplayOptionEntry {
+    public static class ShowDisplayOptionCondition extends DisplayOptionCondition {
 
-        public ShowDisplayOptionEntry(String propertyName) {
+        public ShowDisplayOptionCondition(String propertyName) {
             super(propertyName);
         }
     }

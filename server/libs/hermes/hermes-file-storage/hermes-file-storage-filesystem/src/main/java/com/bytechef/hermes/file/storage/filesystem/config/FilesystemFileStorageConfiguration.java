@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(FileStorageProperties.class)
-@ConditionalOnProperty(name = "file.storage.provider", havingValue = "filesystem")
+@ConditionalOnProperty(prefix = "bytechef.file-storage", name = "provider", havingValue = "filesystem")
 public class FilesystemFileStorageConfiguration {
 
     @Bean

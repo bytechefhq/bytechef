@@ -18,31 +18,30 @@
 
 package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.config.WorkflowConfiguration;
+import com.bytechef.atlas.coordinator.config.CoordinatorIntTestConfiguration;
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.JobRepository;
-import com.bytechef.atlas.repository.classpath.ClassPathResourceWorkflowRepository;
-import com.bytechef.atlas.repository.workflow.mapper.JsonWorkflowMapper;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
-import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
+import com.bytechef.atlas.repository.config.WorkflowRepositoryConfig;
+import com.bytechef.atlas.repository.jdbc.config.WorkflowJdbcPersistenceConfiguration;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.service.impl.JobServiceImpl;
 import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
+import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -54,12 +53,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@SpringBootTest
+@EmbeddedSql
+@SpringBootTest(
+        classes = CoordinatorIntTestConfiguration.class,
+        properties = {
+            "bytechef.workflow.context-repository.provider=jdbc",
+            "bytechef.workflow.persistence.provider=jdbc",
+            "bytechef.workflow.workflow-repository.classpath.enabled=true"
+        })
 public class CoordinatorIntTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorIntTest.class);
@@ -68,7 +77,7 @@ public class CoordinatorIntTest {
     private ContextService contextService;
 
     @Autowired
-    private JobRepository jobRepository;
+    private JobService jobService;
 
     @Autowired
     private TaskExecutionService taskExecutionService;
@@ -78,14 +87,14 @@ public class CoordinatorIntTest {
 
     @Test
     public void testExecuteWorkflowJson() {
-        Job completedJob = executeWorkflow("hello", new JsonWorkflowMapper());
+        Job completedJob = executeWorkflow("hello1");
 
         Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
     }
 
     @Test
     public void testExecuteWorkflowYaml() {
-        Job completedJob = executeWorkflow("hello", new YamlWorkflowMapper());
+        Job completedJob = executeWorkflow("hello2");
 
         Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
     }
@@ -94,28 +103,23 @@ public class CoordinatorIntTest {
     public void testRequiredParameters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Coordinator coordinator = new Coordinator(
-                    contextService,
-                    null,
-                    null,
-                    null,
-                    new JobServiceImpl(
-                            jobRepository, new ClassPathResourceWorkflowRepository(new JsonWorkflowMapper())),
-                    null,
-                    null,
-                    null,
-                    taskExecutionService);
+                    contextService, null, null, null, jobService, null, null, null, taskExecutionService);
 
-            coordinator.create(Collections.singletonMap("workflowId", "hello"));
+            JobParametersDTO jobParametersDTO = new JobParametersDTO();
+
+            jobParametersDTO.setWorkflowId("hello1");
+
+            coordinator.create(jobParametersDTO);
         });
     }
 
-    public Job executeWorkflow(String workflowId, WorkflowMapper workflowMapper) {
+    public Job executeWorkflow(String workflowId) {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(Queues.ERRORS, message -> {
-            TaskExecution erringTask = (TaskExecution) message;
+            TaskExecution erroredTaskExecution = (TaskExecution) message;
 
-            ExecutionError error = erringTask.getError();
+            ExecutionError error = erroredTaskExecution.getError();
 
             logger.error(error.getMessage());
         });
@@ -124,7 +128,9 @@ public class CoordinatorIntTest {
 
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
-        TaskHandlerResolver taskHandlerResolver = new DefaultTaskHandlerResolver(taskHandlerMap);
+        TaskHandlerResolverChain taskHandlerResolver = new TaskHandlerResolverChain();
+
+        taskHandlerResolver.setTaskHandlerResolvers(List.of(new DefaultTaskHandlerResolver(taskHandlerMap)));
 
         Worker worker = Worker.builder()
                 .withTaskHandlerResolver(taskHandlerResolver)
@@ -141,9 +147,6 @@ public class CoordinatorIntTest {
 
         JobExecutor jobExecutor = new JobExecutor(
                 contextService, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create(), workflowService);
-
-        JobService jobService =
-                new JobServiceImpl(jobRepository, new ClassPathResourceWorkflowRepository(workflowMapper));
 
         DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler(
                 contextService,
@@ -170,14 +173,20 @@ public class CoordinatorIntTest {
 
         String jobId = UUID.randomUUID().toString().replaceAll("-", "");
 
-        coordinator.create(Map.of(
-                WorkflowConstants.ID,
-                jobId,
-                "workflowId",
-                workflowId,
-                "inputs",
-                Collections.singletonMap("yourName", "me")));
+        JobParametersDTO jobParametersDTO = new JobParametersDTO();
+
+        jobParametersDTO.setJobId(jobId);
+        jobParametersDTO.setInputs(Collections.singletonMap("yourName", "me"));
+        jobParametersDTO.setWorkflowId(workflowId);
+
+        coordinator.create(jobParametersDTO);
 
         return jobService.getJob(jobId);
     }
+
+    @Import({WorkflowConfiguration.class, WorkflowJdbcPersistenceConfiguration.class, WorkflowRepositoryConfig.class})
+    @ComponentScan(
+            basePackages = {"com.bytechef.atlas.repository.resource", "com.bytechef.atlas.repository.jdbc.event"})
+    @TestConfiguration
+    static class CoordinatorIntTestConfiguration {}
 }

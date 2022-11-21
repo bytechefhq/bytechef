@@ -44,10 +44,16 @@ public class LoggerComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition = ComponentDSL.createComponent(LOGGER)
             .display(display("Logger").description("Logs a value to the system log."))
             .actions(
-                    action(DEBUG).display(display("Debug")).inputs(any(TEXT)).performFunction(this::performDebug),
-                    action(ERROR).display(display("Error")).inputs(any(TEXT)).performFunction(this::performError),
-                    action(INFO).display(display("Info")).inputs(any(TEXT)).performFunction(this::performInfo),
-                    action(WARN).display(display("Warn")).inputs(any(TEXT)).performFunction(this::performWarn));
+                    action(DEBUG)
+                            .display(display("Debug"))
+                            .properties(any(TEXT))
+                            .performFunction(this::performDebug),
+                    action(ERROR)
+                            .display(display("Error"))
+                            .properties(any(TEXT))
+                            .performFunction(this::performError),
+                    action(INFO).display(display("Info")).properties(any(TEXT)).performFunction(this::performInfo),
+                    action(WARN).display(display("Warn")).properties(any(TEXT)).performFunction(this::performWarn));
 
     @Override
     public ComponentDefinition getDefinition() {

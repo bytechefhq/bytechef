@@ -20,6 +20,7 @@ package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.task.WorkflowTask;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +42,7 @@ public class DefaultTaskDispatcherTest {
 
     @Test
     public void test2() {
-        TaskExecution taskExecution = TaskExecution.of("node", "encoder");
+        TaskExecution taskExecution = TaskExecution.of(WorkflowTask.of("node", "encoder"));
 
         DefaultTaskDispatcher defaultTaskDispatcher =
                 new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder", k), List.of());
@@ -51,7 +52,7 @@ public class DefaultTaskDispatcherTest {
 
     @Test
     public void test3() {
-        TaskExecution taskExecution = new TaskExecution(Map.of("node", "encoder.xlarge"));
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of("node", "encoder.xlarge")));
 
         DefaultTaskDispatcher defaultTaskDispatcher =
                 new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder.xlarge", k), List.of());

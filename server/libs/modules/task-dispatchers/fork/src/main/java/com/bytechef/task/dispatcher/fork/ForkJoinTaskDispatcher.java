@@ -19,6 +19,7 @@
 package com.bytechef.task.dispatcher.fork;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
 import com.bytechef.atlas.domain.Context;
@@ -102,7 +103,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     public void dispatch(TaskExecution taskExecution) {
         @SuppressWarnings("unchecked")
-        List<List<WorkflowTask>> branchesWorkflowTasks = taskExecution.getList("branches", List.class).stream()
+        List<List<WorkflowTask>> branchesWorkflowTasks = taskExecution.getList(BRANCHES, List.class).stream()
                 .map(curList -> ((List<Map<String, Object>>) curList)
                         .stream().map(WorkflowTask::new).toList())
                 .toList();

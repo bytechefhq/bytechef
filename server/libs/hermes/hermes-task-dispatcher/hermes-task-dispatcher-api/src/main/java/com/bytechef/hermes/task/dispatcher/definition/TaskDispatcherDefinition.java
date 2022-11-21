@@ -23,6 +23,7 @@ import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
@@ -31,13 +32,18 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
+@Schema(
+        name = "TaskDispatcherDefinition",
+        description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 public final class TaskDispatcherDefinition implements Definition {
 
     private Display display;
     private String name;
-    protected List<Property<?>> inputs;
+    private List<Property<? extends Property<?>>> output;
+    protected List<Property<?>> properties;
     private Resources resources;
     private int version = VERSION_1;
+    protected List<Property<?>> taskProperties;
 
     private TaskDispatcherDefinition() {}
 
@@ -57,8 +63,14 @@ public final class TaskDispatcherDefinition implements Definition {
         return this;
     }
 
-    public TaskDispatcherDefinition inputs(Property<?>... inputs) {
-        this.inputs = List.of(inputs);
+    public TaskDispatcherDefinition output(Property... output) {
+        this.output = List.of(output);
+
+        return this;
+    }
+
+    public TaskDispatcherDefinition properties(Property<?>... properties) {
+        this.properties = List.of(properties);
 
         return this;
     }
@@ -69,18 +81,31 @@ public final class TaskDispatcherDefinition implements Definition {
         return this;
     }
 
+    public TaskDispatcherDefinition taskProperties(Property<?>... taskProperties) {
+        this.taskProperties = List.of(taskProperties);
+
+        return this;
+    }
+
     @Override
     public Display getDisplay() {
         return display;
     }
 
-    public List<Property<?>> getInputs() {
-        return inputs;
-    }
-
     @Override
+    @Schema(name = "name", description = "The connection name.")
     public String getName() {
         return name;
+    }
+
+    @Schema(name = "output", description = "The output schema of a task dispatching result.")
+    public List<Property<? extends Property<?>>> getOutput() {
+        return output;
+    }
+
+    @Schema(name = "properties", description = "Properties of the connection.")
+    public List<Property<?>> getProperties() {
+        return properties;
     }
 
     @Override
@@ -91,5 +116,10 @@ public final class TaskDispatcherDefinition implements Definition {
     @Override
     public int getVersion() {
         return version;
+    }
+
+    @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.")
+    public List<Property<?>> getTaskProperties() {
+        return taskProperties;
     }
 }

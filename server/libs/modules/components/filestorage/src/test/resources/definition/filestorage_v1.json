@@ -1,0 +1,156 @@
+{
+  "display": {
+    "description": "Reads and writes data from a file",
+    "label": "File Storage"
+  },
+  "name": "fileStorage",
+  "actions": [
+    {
+      "display": {
+        "description": "Reads data from the file.",
+        "label": "Read from file"
+      },
+      "name": "read",
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
+        {
+          "description": "The object property which contains a reference to the file to read from.",
+          "label": "File",
+          "name": "fileEntry",
+          "required": true,
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Writes the data to the file.",
+        "label": "Write to file"
+      },
+      "name": "write",
+      "output": [
+        {
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "String to write to the file.",
+          "label": "Content",
+          "name": "content",
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "description": "Filename to set for data. By default, \"file.txt\" will be used.",
+          "label": "Filename",
+          "name": "filename",
+          "type": "STRING",
+          "defaultValue": "file.txt"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Download thr file from the URL.",
+        "label": "Download file"
+      },
+      "name": "download",
+      "output": [
+        {
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "The URL to download the file from.",
+          "label": "URL",
+          "name": "url",
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "description": "Filename to set for data. By default, \"file.txt\" will be used.",
+          "label": "Filename",
+          "name": "filename",
+          "type": "STRING",
+          "defaultValue": "file.txt"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

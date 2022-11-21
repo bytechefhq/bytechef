@@ -23,6 +23,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
@@ -39,7 +40,6 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 
@@ -86,13 +86,13 @@ public class Coordinator {
     /**
      * Starts a job instance.
      *
-     * @param jobParamsMap The Key-Value map representing the job parameters
+     * @param jobParametersDTO The Key-Value map representing the workflow parameters
      * @return The instance of the Job
      */
-    public void create(Map<String, Object> jobParamsMap) {
-        Assert.notNull(jobParamsMap, "request can't be null");
+    public void create(JobParametersDTO jobParametersDTO) {
+        Assert.notNull(jobParametersDTO, "request can't be null");
 
-        Job job = jobService.add(jobParamsMap);
+        Job job = jobService.add(jobParametersDTO);
 
         Context context = new Context(job.getInputs());
 
@@ -162,12 +162,12 @@ public class Coordinator {
         try {
             taskCompletionHandler.handle(taskExecution);
         } catch (Exception e) {
-            TaskExecution errorTaskExecution = new TaskExecution(taskExecution);
+            TaskExecution erroredTaskExecution = new TaskExecution(taskExecution);
 
-            errorTaskExecution.setError(
+            erroredTaskExecution.setError(
                     new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            handleError(errorTaskExecution);
+            handleError(erroredTaskExecution);
         }
     }
 

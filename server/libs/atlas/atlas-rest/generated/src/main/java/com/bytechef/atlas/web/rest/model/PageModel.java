@@ -18,12 +18,12 @@ import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * minimal Page response without content property
+ * A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.
  */
 
-@Schema(name = "Page", description = "minimal Page response without content property")
+@Schema(name = "Page", description = "A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.")
 @JsonTypeName("Page")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-27T10:08:31.057495+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
 public class PageModel {
 
   @JsonProperty("number")
@@ -51,11 +51,11 @@ public class PageModel {
   }
 
   /**
-   * Get number
+   * The current page.
    * @return number
   */
   
-  @Schema(name = "number", required = false)
+  @Schema(name = "number", description = "The current page.", required = false)
   public Integer getNumber() {
     return number;
   }
@@ -70,11 +70,11 @@ public class PageModel {
   }
 
   /**
-   * Get size
+   * The size of the page.
    * @return size
   */
   
-  @Schema(name = "size", required = false)
+  @Schema(name = "size", description = "The size of the page.", required = false)
   public Integer getSize() {
     return size;
   }
@@ -89,11 +89,11 @@ public class PageModel {
   }
 
   /**
-   * Get numberOfElements
+   * Number of elements.
    * @return numberOfElements
   */
   
-  @Schema(name = "numberOfElements", required = false)
+  @Schema(name = "numberOfElements", description = "Number of elements.", required = false)
   public Integer getNumberOfElements() {
     return numberOfElements;
   }
@@ -108,11 +108,11 @@ public class PageModel {
   }
 
   /**
-   * Get totalPages
+   * Total number of pages.
    * @return totalPages
   */
   
-  @Schema(name = "totalPages", required = false)
+  @Schema(name = "totalPages", description = "Total number of pages.", required = false)
   public Integer getTotalPages() {
     return totalPages;
   }
@@ -127,11 +127,11 @@ public class PageModel {
   }
 
   /**
-   * Get totalElements
+   * Total number of elements.
    * @return totalElements
   */
   
-  @Schema(name = "totalElements", required = false)
+  @Schema(name = "totalElements", description = "Total number of elements.", required = false)
   public Integer getTotalElements() {
     return totalElements;
   }
@@ -154,11 +154,11 @@ public class PageModel {
   }
 
   /**
-   * Get content
+   * List of elements.
    * @return content
   */
   
-  @Schema(name = "content", required = false)
+  @Schema(name = "content", description = "List of elements.", required = false)
   public List<Object> getContent() {
     return content;
   }

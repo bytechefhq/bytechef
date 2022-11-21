@@ -39,7 +39,7 @@ public class DelayComponentHandler implements ComponentHandler {
             .display(display("Delay").description("Sets a value which can then be referenced in other tasks."))
             .actions(action(DELAY)
                     .display(display("Delay"))
-                    .inputs(integer(DelayConstants.MILLIS)
+                    .properties(integer(DelayConstants.MILLIS)
                             .label("Millis")
                             .description("Time in milliseconds.")
                             .required(true)

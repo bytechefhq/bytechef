@@ -75,7 +75,7 @@ spring:
     serialization:
       write-dates-as-timestamps: false
       write-null-map-values: false
-    date-format: ${workflow.serialization.date-format}
+    date-format: ${bytechef.workflow.serialization.date-format}
     time-zone: UTC
   profiles:
     active: #spring.profiles.active#
@@ -115,48 +115,50 @@ springdoc:
 
 #####
 
-workflow:
-  context-repository:
-    provider: jdbc
-  # Messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
-  message-broker:
-    provider: jms
-  persistence:
-    provider: jdbc
-  serialization:
-    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-  # When worker is enabled, subscribe to the default "tasks" queue with 5 concurrent consumers.
-  # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
-  # property on any given task.
-  # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
-  # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
-  # bootstraps.
-  worker:
-    subscriptions:
-      tasks: "10"
-  workflow-repository:
-    # Enable classpath based workflow repository
-    classpath:
-      enabled: true
-    # Enable file system based workflow repository
-    filesystem:
-      enabled: true
-      # Location of workflows on the file system
-      location-pattern: $HOME/bytechef/**/*.yaml
-    # Enable a git-based workflow repository
-    git:
-      enabled: false
-      # The URL to the Git Repo
-      url: https://github.com/bytechefhq/bytechef-workflows.git
-      branch: master
-      username:
-      password:
-      # Folders within the git repo that are scanned for workflows
-      search-paths:
-    jdbc:
-      enabled: true
+bytechef:
+  workflow:
+    context-repository:
+      provider: jdbc
+    # Messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
+    message-broker:
+      provider: jms
+    persistence:
+      provider: jdbc
+    serialization:
+      date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+    # When worker is enabled, subscribe to the default "tasks" queue with 5 concurrent consumers.
+    # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
+    # property on any given task.
+    # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
+    # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
+    # bootstraps.
+    worker:
+      subscriptions:
+        tasks: "10"
+    workflow-repository:
+      cache:
+        provider:
+      # Enable classpath based workflow repository
+      classpath:
+        enabled: true
+      # Enable file system based workflow repository
+      filesystem:
+        enabled: true
+        # Location of workflows on the file system
+        location-pattern: ${user.home}/bytechef/**/*.yaml
+      # Enable a git-based workflow repository
+      git:
+        enabled: false
+        # The URL to the Git Repo
+        url: https://github.com/bytechefhq/bytechef-workflows.git
+        branch: master
+        username:
+        password:
+        # Folders within the git repo that are scanned for workflows
+        search-paths:
+      jdbc:
+        enabled: true
 
-file:
-  storage:
+  file-storage:
     provider: filesystem
     file-storage-dir: /tmp/bytechef/files

@@ -25,6 +25,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.commons.collection.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -49,10 +50,10 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Table
-public final class Workflow implements Errorable, Persistable<String> {
+public final class Workflow implements Errorable, Persistable<String>, Serializable {
 
     @Column
-    private String content;
+    private String definition;
 
     @CreatedBy
     @Column("created_by")
@@ -138,8 +139,8 @@ public final class Workflow implements Errorable, Persistable<String> {
         return getClass().hashCode();
     }
 
-    public String getContent() {
-        return content;
+    public String getDefinition() {
+        return definition;
     }
 
     public String getCreatedBy() {
@@ -188,7 +189,7 @@ public final class Workflow implements Errorable, Persistable<String> {
     }
 
     /**
-     * Defines the maximum number of times that this message may be retries.
+     * Defines the maximum number of times a task may retry.
      *
      * @return int the maximum number of retries.
      */
@@ -206,8 +207,8 @@ public final class Workflow implements Errorable, Persistable<String> {
         return id == null;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setDefinition(String definition) {
+        this.definition = definition;
     }
 
     public void setCreatedBy(String createdBy) {
@@ -241,7 +242,7 @@ public final class Workflow implements Errorable, Persistable<String> {
     @Override
     public String toString() {
         return "Workflow{" + "content='"
-                + content + '\'' + ", createdBy='"
+                + definition + '\'' + ", createdBy='"
                 + createdBy + '\'' + ", createdDate="
                 + createdDate + ", error="
                 + error + ", format="

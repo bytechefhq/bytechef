@@ -31,3 +31,6 @@ processResources {
 }
 
 bootJar.dependsOn processResources
+compileJava.dependsOn processResources
+
+processResources.dependsOn bootBuildInfo

@@ -1,6 +1,4 @@
-README.md
-pom.xml
-src/main/java/com/bytechef/hermes/auth/web/rest/ApiUtil.java
-src/main/java/com/bytechef/hermes/auth/web/rest/ConnectionControllerApi.java
-src/main/java/com/bytechef/hermes/auth/web/rest/model/ConnectionModel.java
-src/main/java/com/bytechef/hermes/auth/web/rest/model/ConnectionUpdateModel.java
+src/main/java/com/bytechef/hermes/connection/web/rest/ApiUtil.java
+src/main/java/com/bytechef/hermes/connection/web/rest/ConnectionsApi.java
+src/main/java/com/bytechef/hermes/connection/web/rest/model/ConnectionModel.java
+src/main/java/com/bytechef/hermes/connection/web/rest/model/ConnectionUpdateModel.java

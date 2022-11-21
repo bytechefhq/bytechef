@@ -3,29 +3,25 @@ plugins {
 }
 
 task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    apiPackage = "com.bytechef.hermes.auth.web.rest"
+    apiPackage = "com.bytechef.hermes.connection.web.rest"
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
-        "reactive": "true",
-        "useTags": "true"
+        "reactive": "true"
     ]
     generatorName = "spring"
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    modelPackage = "com.bytechef.hermes.auth.web.rest.model"
+    modelPackage = "com.bytechef.hermes.connection.web.rest.model"
     outputDir = "$projectDir/generated".toString()
 }
 
 sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
 
 task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    configOptions = [
-        "useTags": "true"
-    ]
     generatorName = "typescript-fetch"
     inputSpec = "$projectDir/openapi.yaml".toString()
-    outputDir = "$rootDir/client/src/_generated/data-access/connection".toString()
+    outputDir = "$rootDir/client/src/data-access/connection".toString()
     typeMappings = [
         DateTime: "Date"
     ]
@@ -50,10 +46,9 @@ dependencies {
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-webflux"
     implementation libs.swagger.annotations
-    implementation project(":server:libs:core:autoconfigure:autoconfigure-annotations")
+    implementation project(":server:libs:core:autoconfigure-annotations")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
     testImplementation project(":server:libs:core:commons:commons-utils")
     testImplementation project(":server:libs:core:encryption:encryption-api")
-    testImplementation project(":server:libs:test-support")
 }

@@ -20,6 +20,7 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -27,5 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(config = WorkflowMapperSpringConfig.class)
 public interface WorkflowModelMapper extends Converter<WorkflowModel, Workflow> {
+
+    @Mapping(target = "error", ignore = true)
     Workflow convert(WorkflowModel workflowModel);
 }

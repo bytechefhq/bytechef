@@ -18,7 +18,7 @@ package com.bytechef.cli.command.component;
 
 import static picocli.CommandLine.Command;
 
-import com.bytechef.cli.command.component.subcomand.InitSubcommand;
+import com.bytechef.cli.command.component.subcommand.InitSubcommand;
 import picocli.CommandLine;
 
 /**

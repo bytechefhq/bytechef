@@ -16,9 +16,12 @@
 
 package com.bytechef.hermes.definition;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * @author Ivica Cardic
  */
+@Schema(name = "Resources", description = "A set of available resources.")
 public final class Resources {
 
     private String documentationUrl;
@@ -29,6 +32,7 @@ public final class Resources {
         return this;
     }
 
+    @Schema(name = "documentationUrl", description = "The url of available documentation.")
     public String getDocumentationUrl() {
         return documentationUrl;
     }

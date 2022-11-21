@@ -72,7 +72,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
             .actions(
                     action(GET_OBJECT)
                             .display(display("Get Object").description("Get the AWS S3 object."))
-                            .inputs(
+                            .properties(
                                     string(URI)
                                             .label("URI")
                                             .description("The AWS S3 uri.")
@@ -82,19 +82,19 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                             .description("Filename to set for binary data.")
                                             .required(true)
                                             .defaultValue("file.xml"))
-                            .outputSchema(fileEntry())
+                            .output(fileEntry())
                             .performFunction(this::performGetObject),
                     action(GET_URL)
                             .display(display("Get URL").description("Get the url of an AWS S3 object."))
-                            .inputs(string(URI)
+                            .properties(string(URI)
                                     .label("URI")
                                     .description("The AWS S3 uri.")
                                     .required(true))
-                            .outputSchema(string())
+                            .output(string())
                             .performFunction(this::performGetUrl),
                     action(LIST_OBJECTS)
                             .display(display("List Objects").description("Get the list AWS S3 objects."))
-                            .inputs(
+                            .properties(
                                     string(BUCKET)
                                             .label("Bucket")
                                             .description("The bucket to list AWS S3 objects from.")
@@ -103,21 +103,20 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                             .label("Prefix")
                                             .description("The prefix of an AWS S3 objects.")
                                             .required(true))
-                            .outputSchema(
-                                    array().items(object().properties(string("key"), string("suffix"), string("uri"))))
+                            .output(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
                             .performFunction(this::performListObjects),
                     action(PRESIGN_GET_OBJECT)
                             .display(display("Get Pre-signed Object")
                                     .description("Get the url of an pre-signed AWS S3 object."))
-                            .inputs(string(URI)
+                            .properties(string(URI)
                                     .label("URI")
                                     .description("The AWS S3 uri.")
                                     .required(true))
-                            .outputSchema(string())
+                            .output(string())
                             .performFunction(this::performGetPresignedObject),
                     action(PUT_OBJECT)
                             .display(display("Put Object").description("Store an object to AWS S3."))
-                            .inputs(
+                            .properties(
                                     string(URI)
                                             .label("URI")
                                             .description("The AWS S3 uri.")
@@ -128,7 +127,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                                     "The object property which contains a reference to the file that needs to be written to AWS S3.")
                                             .required(true),
                                     string(ACL).label("ACL").description("The canned ACL to apply to the object."))
-                            .outputSchema(string())
+                            .output(string())
                             .performFunction(this::performPutObject));
 
     @Override

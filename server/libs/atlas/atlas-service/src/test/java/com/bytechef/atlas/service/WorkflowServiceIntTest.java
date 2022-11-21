@@ -18,7 +18,9 @@ package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.service.config.WorkflowServiceIntTestConfiguration;
 import com.bytechef.atlas.workflow.WorkflowFormat;
+import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@EmbeddedSql
+@SpringBootTest(
+        classes = WorkflowServiceIntTestConfiguration.class,
+        properties = {
+            "bytechef.workflow.context-repository.provider=jdbc",
+            "bytechef.workflow.persistence.provider=jdbc",
+            "bytechef.workflow.workflow-repository.jdbc.enabled=true"
+        })
 public class WorkflowServiceIntTest {
 
     @Autowired
@@ -75,7 +84,7 @@ public class WorkflowServiceIntTest {
     public void testUpdate() {
         Workflow workflow = workflowRepository.save(getWorkflow());
 
-        workflow.setContent(
+        workflow.setDefinition(
                 """
             {
                  "label": "Label,
@@ -89,7 +98,7 @@ public class WorkflowServiceIntTest {
     private static Workflow getWorkflow() {
         Workflow workflow = new Workflow();
 
-        workflow.setContent("""
+        workflow.setDefinition("""
             {
                 "tasks": []
             }

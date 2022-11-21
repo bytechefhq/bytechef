@@ -20,11 +20,12 @@ import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * WorkflowTaskModel
+ * Represents a definition of the task.
  */
 
+@Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-27T10:08:31.057495+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @JsonProperty("finalize")
@@ -72,11 +73,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get finalize
+   * The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.
    * @return finalize
   */
   @Valid 
-  @Schema(name = "finalize", required = false)
+  @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.", required = false)
   public List<WorkflowTaskModel> getFinalize() {
     return finalize;
   }
@@ -91,11 +92,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get label
+   * The human-readable description of the task.
    * @return label
   */
   
-  @Schema(name = "label", required = false)
+  @Schema(name = "label", description = "The human-readable description of the task.", required = false)
   public String getLabel() {
     return label;
   }
@@ -110,11 +111,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get name
+   * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
    * @return name
   */
   
-  @Schema(name = "name", required = false)
+  @Schema(name = "name", description = "The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.", required = false)
   public String getName() {
     return name;
   }
@@ -129,11 +130,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get node
+   * Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.
    * @return node
   */
   
-  @Schema(name = "node", required = false)
+  @Schema(name = "node", description = "Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.", required = false)
   public String getNode() {
     return node;
   }
@@ -156,11 +157,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get parameters
+   * The key-value map of task parameters.
    * @return parameters
   */
   
-  @Schema(name = "parameters", required = false)
+  @Schema(name = "parameters", description = "The key-value map of task parameters.", required = false)
   public Map<String, Object> getParameters() {
     return parameters;
   }
@@ -183,11 +184,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get post
+   * The (optional) list of tasks that are to be executed after the succesful execution of this task.
    * @return post
   */
   @Valid 
-  @Schema(name = "post", required = false)
+  @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the succesful execution of this task.", required = false)
   public List<WorkflowTaskModel> getPost() {
     return post;
   }
@@ -210,11 +211,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get pre
+   * The (optional) list of tasks that are to be executed prior to this task.
    * @return pre
   */
   @Valid 
-  @Schema(name = "pre", required = false)
+  @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to this task.", required = false)
   public List<WorkflowTaskModel> getPre() {
     return pre;
   }
@@ -229,11 +230,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get timeout
+   * The timeout expression which describes when this task should be deemed as timed-out.
    * @return timeout
   */
   
-  @Schema(name = "timeout", required = false)
+  @Schema(name = "timeout", description = "The timeout expression which describes when this task should be deemed as timed-out.", required = false)
   public String getTimeout() {
     return timeout;
   }
@@ -248,11 +249,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * Get type
+   * The type of the task.
    * @return type
   */
   
-  @Schema(name = "type", required = false)
+  @Schema(name = "type", description = "The type of the task.", required = false)
   public String getType() {
     return type;
   }

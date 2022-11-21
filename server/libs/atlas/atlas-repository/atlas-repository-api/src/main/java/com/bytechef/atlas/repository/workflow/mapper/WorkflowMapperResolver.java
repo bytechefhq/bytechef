@@ -16,8 +16,6 @@
 
 package com.bytechef.atlas.repository.workflow.mapper;
 
-import com.bytechef.atlas.workflow.WorkflowResource;
-
 /**
  * @author Ivica Cardic
  */

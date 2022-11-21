@@ -70,9 +70,9 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
 
         messageBroker.receive(Queues.ERRORS, message -> {
-            TaskExecution errorTaskExecution = (TaskExecution) message;
+            TaskExecution erroredTaskExecution = (TaskExecution) message;
 
-            ExecutionError error = errorTaskExecution.getError();
+            ExecutionError error = erroredTaskExecution.getError();
 
             errors.add(error);
         });

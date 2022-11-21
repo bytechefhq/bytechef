@@ -6,6 +6,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation project(":server:libs:core:commons:commons-utils")
 
+    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     testImplementation project(":server:libs:atlas:atlas-upgrade")
     testImplementation project(":server:libs:test-support")
 }

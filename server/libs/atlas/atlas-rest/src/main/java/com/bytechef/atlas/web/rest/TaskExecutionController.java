@@ -25,10 +25,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -37,7 +35,8 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-public class TaskExecutionController implements TaskExecutionControllerApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class TaskExecutionController implements TaskExecutionsApi {
 
     private final ConversionService conversionService;
     private final TaskExecutionService taskExecutionService;
@@ -48,23 +47,9 @@ public class TaskExecutionController implements TaskExecutionControllerApi {
         this.taskExecutionService = taskExecutionService;
     }
 
-    @RequestMapping(
-            method = RequestMethod.GET,
-            value = "/task-executions/{id}",
-            produces = {"application/json"})
+    @Override
     public Mono<ResponseEntity<TaskExecutionModel>> getTaskExecution(String id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
                 conversionService.convert(taskExecutionService.getTaskExecution(id), TaskExecutionModel.class)));
-    }
-
-    @RequestMapping(
-            method = RequestMethod.GET,
-            value = "/jobs/{jobId}/task-executions/",
-            produces = {"application/json"})
-    public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
-            String jobId, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId).stream()
-                .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
-                .toList())));
     }
 }

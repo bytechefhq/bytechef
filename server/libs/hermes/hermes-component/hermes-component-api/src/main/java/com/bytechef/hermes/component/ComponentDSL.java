@@ -16,10 +16,11 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.ComponentAction;
+import com.bytechef.hermes.component.definition.Action;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDisplay;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.definition.DisplayOption;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.PropertyOption;
@@ -54,6 +55,14 @@ public final class ComponentDSL {
         return new Property.BooleanProperty(name);
     }
 
+    public static Property.DateProperty date() {
+        return new Property.DateProperty(null);
+    }
+
+    public static Property.DateProperty date(String name) {
+        return new Property.DateProperty(name);
+    }
+
     public static Property.DateTimeProperty dateTime() {
         return new Property.DateTimeProperty(null);
     }
@@ -72,6 +81,7 @@ public final class ComponentDSL {
 
     public static Property.ObjectProperty fileEntry(String name) {
         return new Property.ObjectProperty(name)
+                .objectType("FILE_ENTRY")
                 .properties(
                         string("extension").required(true),
                         string("mimeType").required(true),
@@ -111,12 +121,8 @@ public final class ComponentDSL {
         return new Property.ObjectProperty(name);
     }
 
-    public static ComponentAction action(String name) {
-        return new ComponentAction(name);
-    }
-
-    public static Property.OptionProperty options() {
-        return new Property.OptionProperty();
+    public static Action action(String name) {
+        return new Action(name);
     }
 
     public static Resources resources() {
@@ -139,8 +145,12 @@ public final class ComponentDSL {
         return new ConnectionDefinition(name);
     }
 
-    public static DisplayOption.DisplayOptionEntry hideWhen(String propertyName) {
-        return new DisplayOption.HideDisplayOptionEntry(propertyName);
+    public static JdbcComponentDefinition createJdbcComponent(String name) {
+        return new JdbcComponentDefinition(name);
+    }
+
+    public static DisplayOption.DisplayOptionProperty hideWhen(String propertyName) {
+        return new DisplayOption.DisplayOptionProperty(new DisplayOption.HideDisplayOptionCondition(propertyName));
     }
 
     public static PropertyOption option(String value) {
@@ -163,7 +173,7 @@ public final class ComponentDSL {
         return new PropertyOption(name, value, description);
     }
 
-    public static DisplayOption.DisplayOptionEntry showWhen(String propertyName) {
-        return new DisplayOption.ShowDisplayOptionEntry(propertyName);
+    public static DisplayOption.DisplayOptionProperty showWhen(String propertyName) {
+        return new DisplayOption.DisplayOptionProperty(new DisplayOption.ShowDisplayOptionCondition(propertyName));
     }
 }

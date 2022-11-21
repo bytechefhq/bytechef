@@ -53,7 +53,7 @@ public class SwitchTaskDispatcherConfiguration {
     }
 
     @Bean
-    TaskDispatcherResolverFactory switchTaskDispatcherFactory() {
+    TaskDispatcherResolverFactory switchTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, taskEvaluator);
     }

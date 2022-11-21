@@ -7,8 +7,9 @@ servers:
 paths:
   /definitions/task-dispatchers:
     get:
+      description: Returns all task dispatcher definitions.
       tags:
-        - TaskDispatcherDefinitionController
+        - task-dispatcher-definitions
       operationId: getTaskDispatcherDefinitions
       responses:
         "200":
@@ -21,43 +22,5 @@ paths:
                    $ref: '#/components/schemas/TaskDispatcherDefinition'
 components:
   schemas:
-    AnyProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/AnyProperty'
-    ArrayProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/ArrayProperty'
-    BooleanProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/BooleanProperty'
-    DateTimeProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/DateTimeProperty'
-    Display:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/Display'
-    DisplayOption:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/DisplayOption'
-    DisplayOptionEntryValue:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/DisplayOptionEntryValue'
-    IntegerProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/IntegerProperty'
-    NullProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/NullProperty'
-    NumberProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/NumberProperty'
-    ObjectProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/ObjectProperty'
-    OptionProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/OptionProperty'
-    PrimitiveValueProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/PrimitiveValueProperty'
-    Property:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/Property'
-    PropertyOption:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/PropertyOption'
-    PropertyType:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/PropertyType'
-    StringProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/StringProperty'
     TaskDispatcherDefinition:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/TaskDispatcherDefinition'
-    TypeProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/TypeProperty'
-    ValueProperty:
-      $ref: '../hermes-task-dispatcher-api/task_dispatcher_specification.yaml#/components/schemas/ValueProperty'
+      $ref: '../hermes-task-dispatcher-api/task_dispatcher_definition_spec.yaml#/schemas/TaskDispatcherDefinition'

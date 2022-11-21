@@ -1,5 +1,9 @@
 def profiles = "prod"
 
+if (project.hasProperty("api-docs")) {
+    profiles += ",api-docs"
+}
+
 springBoot {
     buildInfo()
 }
@@ -23,3 +27,6 @@ processResources {
 }
 
 bootJar.dependsOn processResources
+compileJava.dependsOn processResources
+
+processResources.dependsOn bootBuildInfo

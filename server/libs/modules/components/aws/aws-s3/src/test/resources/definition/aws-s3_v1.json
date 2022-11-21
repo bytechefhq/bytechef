@@ -11,48 +11,49 @@
         "label": "Get Object"
       },
       "name": "getObject",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
           "name": "uri",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "Filename to set for binary data.",
           "label": "Filename",
           "name": "filename",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "file.xml"
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
         }
       ]
     },
@@ -62,17 +63,17 @@
         "label": "Get URL"
       },
       "name": "getUrl",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
           "name": "uri",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
-        {
+          "required": true,
           "type": "STRING"
         }
       ]
@@ -83,23 +84,7 @@
         "label": "List Objects"
       },
       "name": "listObjects",
-      "inputs": [
-        {
-          "description": "The bucket to list AWS S3 objects from.",
-          "label": "Bucket",
-          "name": "bucket",
-          "type": "STRING",
-          "required": true
-        },
-        {
-          "description": "The prefix of an AWS S3 objects.",
-          "label": "Prefix",
-          "name": "prefix",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
+      "output": [
         {
           "type": "ARRAY",
           "items": [
@@ -122,6 +107,22 @@
             }
           ]
         }
+      ],
+      "properties": [
+        {
+          "description": "The bucket to list AWS S3 objects from.",
+          "label": "Bucket",
+          "name": "bucket",
+          "required": true,
+          "type": "STRING"
+        },
+        {
+          "description": "The prefix of an AWS S3 objects.",
+          "label": "Prefix",
+          "name": "prefix",
+          "required": true,
+          "type": "STRING"
+        }
       ]
     },
     {
@@ -130,17 +131,17 @@
         "label": "Get Pre-signed Object"
       },
       "name": "presignGetObject",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
           "name": "uri",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
-        {
+          "required": true,
           "type": "STRING"
         }
       ]
@@ -151,40 +152,46 @@
         "label": "Put Object"
       },
       "name": "putObject",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
           "name": "uri",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "description": "The object property which contains a reference to the file that needs to be written to AWS S3.",
           "label": "File",
           "name": "fileEntry",
-          "type": "OBJECT",
           "required": true,
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
           "properties": [
             {
               "name": "extension",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "mimeType",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "name",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "url",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             }
           ]
         },
@@ -192,11 +199,6 @@
           "description": "The canned ACL to apply to the object.",
           "label": "ACL",
           "name": "acl",
-          "type": "STRING"
-        }
-      ],
-      "outputSchema": [
-        {
           "type": "STRING"
         }
       ]

@@ -18,11 +18,13 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.definition.Display;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
+@Schema(name = "ComponentDisplay", description = "An info about the component.")
 public final class ComponentDisplay extends Display {
 
     private String category;
@@ -63,14 +65,17 @@ public final class ComponentDisplay extends Display {
         return this;
     }
 
+    @Schema(name = "category", description = "The category of the component.")
     public String getCategory() {
         return category;
     }
 
+    @Schema(name = "subtitle", description = "Additional explanation.")
     public String getSubtitle() {
         return subtitle;
     }
 
+    @Schema(name = "tags", description = "Tags for the component.")
     public String[] getTags() {
         return tags;
     }
