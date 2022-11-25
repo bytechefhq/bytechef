@@ -4,7 +4,10 @@ import {PageHeader} from 'components/PageHeader/PageHeader';
 export const Integrations = (): JSX.Element => {
 	return (
 		<SidebarContentLayout title={'Integrations'}>
-			<PageHeader />
+			<PageHeader
+				subTitle="All Integrations"
+				buttonTitle="New Integration"
+			/>
 			{/* <IntegrationList /> */}
 		</SidebarContentLayout>
 	);
