@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.cli;
+package com.bytechef.cli.command.component.subcommand;
 
+import com.bytechef.cli.CliApplication;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 
-public class CliApplicationTest {
+/**
+ * @author Ivica Cardic
+ */
+public class InitSubcommandTest {
 
     @Test
     public void testComponentInit() {
@@ -27,10 +31,27 @@ public class CliApplicationTest {
             "component",
             "init",
             "--open-api-path",
-            CliApplicationTest.class.getResource("/dependencies/petstore.yml").getFile(),
-            "--output",
+            InitSubcommandTest.class.getResource("/dependencies/petstore.yaml").getFile(),
+            "--output-path",
             new File("build/test/generated").getAbsolutePath(),
             "petstore"
         });
+
+        // TODO Add asserts
+    }
+
+    @Test
+    public void testComponentInit2() {
+        CliApplication.main(new String[] {
+            "component",
+            "init",
+            "--open-api-path",
+            InitSubcommandTest.class.getResource("/dependencies/petstore2.yaml").getFile(),
+            "--output-path",
+            new File("build/test/generated").getAbsolutePath(),
+            "petstore"
+        });
+
+        // TODO Add asserts
     }
 }
