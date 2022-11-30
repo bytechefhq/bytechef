@@ -25,7 +25,6 @@ subprojects {
     dependencies {
         annotationProcessor libs.picocli.codegen
 
-        implementation libs.handlebars
         implementation libs.logback.core
         implementation libs.logback.classic
         implementation libs.picocli
