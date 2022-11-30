@@ -1,14 +1,27 @@
 import {SidebarContentLayout} from '../../components/Layouts/SidebarContentLayout';
 import {PageHeader} from 'components/PageHeader/PageHeader';
+import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
+import {IntegrationList} from './IntegrationList';
 
 export const Integrations = (): JSX.Element => {
 	return (
 		<SidebarContentLayout title={'Integrations'}>
 			<PageHeader
 				subTitle="All Integrations"
-				buttonTitle="New Integration"
+				buttonLabel="New Integration"
 			/>
-			{/* <IntegrationList /> */}
+
+			<IntegrationItem
+				name="NAME"
+				status="STATUS"
+				dropdownTrigger="DROPDOWNTRIGGER"
+				category="CATEGORY"
+				tag="TAG"
+				button="BUTTON"
+				date="DATE"
+			/>
+
+			{<IntegrationList />}
 		</SidebarContentLayout>
 	);
 };
