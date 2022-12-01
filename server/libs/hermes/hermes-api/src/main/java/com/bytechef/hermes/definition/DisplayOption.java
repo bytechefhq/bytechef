@@ -17,12 +17,8 @@
 package com.bytechef.hermes.definition;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -30,34 +26,10 @@ import java.util.stream.Collectors;
 @Schema(name = "DisplayOption", description = "Defines rules when a property should be shown or hidden.")
 public class DisplayOption {
 
-    private Map<String, List<Object>> hideWhen;
-    private Map<String, List<Object>> showWhen;
+    protected Map<String, List<Object>> hideWhen;
+    protected Map<String, List<Object>> showWhen;
 
-    private DisplayOption() {}
-
-    public static DisplayOption of(List<DisplayOptionCondition> displayOptionConditions) {
-        DisplayOption displayOption = new DisplayOption();
-
-        for (DisplayOptionCondition displayOptionCondition : displayOptionConditions) {
-            if (displayOptionCondition instanceof HideDisplayOptionCondition hideDisplayOptionCondition) {
-                if (displayOption.hideWhen == null) {
-                    displayOption.hideWhen = new HashMap<>();
-                }
-
-                displayOption.hideWhen.computeIfAbsent(
-                        hideDisplayOptionCondition.propertyName, key -> displayOptionCondition.values);
-            } else if (displayOptionCondition instanceof ShowDisplayOptionCondition showDisplayOptionCondition) {
-                if (displayOption.showWhen == null) {
-                    displayOption.showWhen = new HashMap<>();
-                }
-
-                displayOption.showWhen.computeIfAbsent(
-                        showDisplayOptionCondition.propertyName, key -> displayOptionCondition.values);
-            }
-        }
-
-        return displayOption;
-    }
+    protected DisplayOption() {}
 
     @Schema(
             name = "hideWhen",
@@ -73,117 +45,5 @@ public class DisplayOption {
                     "The map of property names and list of values to check against if the property should be shown.")
     public Map<String, List<Object>> getShowWhen() {
         return showWhen;
-    }
-
-    public static class DisplayOptionProperty {
-        private DisplayOptionCondition displayOptionCondition;
-
-        public DisplayOptionProperty(DisplayOptionCondition displayOptionCondition) {
-            this.displayOptionCondition = displayOptionCondition;
-        }
-
-        public DisplayOptionCondition eq(Boolean value) {
-            displayOptionCondition.values = List.of(value);
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition eq(Integer value) {
-            displayOptionCondition.values = List.of(value);
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition eq(Long value) {
-            displayOptionCondition.values = List.of(value);
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition eq(Float value) {
-            displayOptionCondition.values = List.of(value);
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition eq(Double value) {
-            displayOptionCondition.values = List.of(value);
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition eq(String value) {
-            displayOptionCondition.values = List.of(value);
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition in(Boolean... values) {
-            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition in(Integer... values) {
-            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition in(Long... values) {
-            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition in(Float... values) {
-            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition in(Double... values) {
-            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return displayOptionCondition;
-        }
-
-        public DisplayOptionCondition in(String... values) {
-            displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-            return displayOptionCondition;
-        }
-    }
-
-    public abstract static class DisplayOptionCondition {
-
-        protected final String propertyName;
-        protected List<Object> values = List.of();
-
-        public DisplayOptionCondition(String propertyName) {
-            this.propertyName = propertyName;
-        }
-
-        public String getPropertyName() {
-            return propertyName;
-        }
-
-        public List<Object> getValues() {
-            return new ArrayList<>(values);
-        }
-    }
-
-    public static class HideDisplayOptionCondition extends DisplayOptionCondition {
-
-        public HideDisplayOptionCondition(String propertyName) {
-            super(propertyName);
-        }
-    }
-
-    public static class ShowDisplayOptionCondition extends DisplayOptionCondition {
-
-        public ShowDisplayOptionCondition(String propertyName) {
-            super(propertyName);
-        }
     }
 }

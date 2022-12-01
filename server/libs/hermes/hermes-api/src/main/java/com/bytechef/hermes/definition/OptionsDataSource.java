@@ -25,28 +25,16 @@ import java.util.function.Function;
  * @author Ivica Cardic
  */
 @Schema(
-        name = "FunctionOptionsDataSource",
+        name = "OptionsDataSource",
         description = "Defines function that should dynamically load options for the property.")
 public class OptionsDataSource {
 
-    private List<String> loadOptionsDependsOn;
+    protected List<String> loadOptionsDependsOn;
 
     @JsonIgnore
-    private Function<Object, Object> loadOptionsFunction;
+    protected Function<Object, Object> loadOptionsFunction;
 
-    @SuppressWarnings("unchecked")
-    public OptionsDataSource loadOptionsDependsOn(String... propertyNames) {
-        this.loadOptionsDependsOn = List.of(propertyNames);
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public OptionsDataSource loadOptionsFunction(Function<Object, Object> loadOptionsFunction) {
-        this.loadOptionsFunction = loadOptionsFunction;
-
-        return this;
-    }
+    protected OptionsDataSource() {}
 
     @Schema(
             name = "loadOptionsDependsOn",
