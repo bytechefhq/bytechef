@@ -57,13 +57,13 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1")));
 
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(TaskExecution.of(new WorkflowTask(Map.of("type", "print"))));
+        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "print"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -79,7 +79,7 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2")));
 
         switchTaskDispatcher.dispatch(taskExecution);
@@ -93,7 +93,7 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases",
                 Arrays.asList(
                         Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
@@ -104,7 +104,7 @@ public class SwitchTaskDispatcherTest {
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(TaskExecution.of(new WorkflowTask(Map.of("type", "sleep"))));
+        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "sleep"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -120,7 +120,7 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases",
                 Arrays.asList(
                         Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),

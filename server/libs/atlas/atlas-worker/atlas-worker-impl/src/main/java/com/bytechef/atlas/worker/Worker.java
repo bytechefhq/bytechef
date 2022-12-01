@@ -203,7 +203,7 @@ public class Worker {
     private void executeSubTasks(TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Context context)
             throws Exception {
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
-            TaskExecution subTaskExecution = TaskExecution.of(subWorkflowTask, taskExecution.getJobId());
+            TaskExecution subTaskExecution = new TaskExecution(subWorkflowTask, taskExecution.getJobId());
 
             TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 

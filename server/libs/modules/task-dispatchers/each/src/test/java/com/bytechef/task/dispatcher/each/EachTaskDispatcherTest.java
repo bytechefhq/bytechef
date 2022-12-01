@@ -75,7 +75,7 @@ public class EachTaskDispatcherTest {
                 contextService,
                 counterService,
                 SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "list", Arrays.asList(1, 2, 3),
                 "iteratee", Collections.singletonMap("type", "print"))));
 
@@ -97,7 +97,7 @@ public class EachTaskDispatcherTest {
                 contextService,
                 counterService,
                 SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "list", List.of(),
                 "iteratee", Collections.singletonMap("type", "print"))));
 

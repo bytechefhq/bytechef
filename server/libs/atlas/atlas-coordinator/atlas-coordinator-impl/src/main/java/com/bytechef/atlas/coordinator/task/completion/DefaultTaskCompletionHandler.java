@@ -131,7 +131,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         TaskExecution evaluatedJobTaskExecution =
-                taskEvaluator.evaluate(TaskExecution.of(new WorkflowTask(source)), context);
+                taskEvaluator.evaluate(new TaskExecution(new WorkflowTask(source)), context);
         Job updateJob = new Job(job);
 
         updateJob.setStatus(JobStatus.COMPLETED);

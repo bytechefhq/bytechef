@@ -44,7 +44,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         MapTaskDispatcherAdapterTaskHandler taskHandler =
                 new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
 
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"), ACTION, "map")));
 
         taskExecution.setId("1234");
@@ -64,7 +64,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             MapTaskDispatcherAdapterTaskHandler taskHandler =
                     new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
 
-            TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+            TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                     "list", List.of(1, 2, 3),
                     "iteratee", Map.of("type", "rogue"))));
 
@@ -121,7 +121,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         mapAdapterTaskHandlerRefs[0] =
                 new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, SpelTaskEvaluator.create());
 
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "finalize",
                 List.of(Map.of(
                         "name",

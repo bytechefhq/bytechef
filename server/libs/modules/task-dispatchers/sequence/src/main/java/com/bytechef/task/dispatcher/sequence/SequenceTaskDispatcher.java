@@ -74,7 +74,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            TaskExecution subTaskExecution = TaskExecution.of(
+            TaskExecution subTaskExecution = new TaskExecution(
                     subWorkflowTask,
                     sequenceTaskExecution.getJobId(),
                     sequenceTaskExecution.getId(),

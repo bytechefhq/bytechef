@@ -80,7 +80,7 @@ public class JobExecutor {
 
         WorkflowTask workflowTask = workflowTasks.get(job.getCurrentTask());
 
-        TaskExecution taskExecution = TaskExecution.of(workflowTask, job.getId(), job.getPriority());
+        TaskExecution taskExecution = new TaskExecution(workflowTask, job.getId(), job.getPriority());
 
         if (workflow.getRetry() > 0 && taskExecution.getRetry() < 1) {
             taskExecution.setRetry(workflow.getRetry());

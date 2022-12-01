@@ -76,7 +76,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             counterService.set(taskExecution.getId(), workflowTasks.size());
 
             for (WorkflowTask workflowTask : workflowTasks) {
-                TaskExecution parallelTaskExecution = TaskExecution.of(
+                TaskExecution parallelTaskExecution = new TaskExecution(
                         workflowTask, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority());
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));

@@ -82,7 +82,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            TaskExecution subTaskExecution = TaskExecution.of(
+            TaskExecution subTaskExecution = new TaskExecution(
                     subWorkflowTask,
                     ifTaskExecution.getJobId(),
                     ifTaskExecution.getId(),

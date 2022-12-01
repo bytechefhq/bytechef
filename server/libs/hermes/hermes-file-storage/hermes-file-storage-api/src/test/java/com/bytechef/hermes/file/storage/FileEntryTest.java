@@ -53,7 +53,8 @@ public class FileEntryTest {
     @Test
     public void testSpelEvaluation() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution taskExecution = TaskExecution.of(WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
 
         TaskExecution evaluated = evaluator.evaluate(
                 taskExecution,

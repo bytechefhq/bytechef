@@ -99,7 +99,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(taskExecution.getInteger("branch"));
 
         if (taskExecution.getTaskNumber() < branchWorkflowTasks.size()) {
-            TaskExecution branchTaskExecution = TaskExecution.of(
+            TaskExecution branchTaskExecution = new TaskExecution(
                     branchWorkflowTasks.get(taskExecution.getTaskNumber()),
                     Map.of("branch", taskExecution.getInteger("branch")));
 

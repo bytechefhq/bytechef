@@ -45,262 +45,276 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test1() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = new TaskExecution();
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(evaluated.getWorkflowTask(), jt.getWorkflowTask());
+        TaskExecution taskExecution = new TaskExecution();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(evaluatedTaskExecution.getWorkflowTask(), taskExecution.getWorkflowTask());
     }
 
     @Test
     public void test2() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "world"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(evaluated.getWorkflowTask(), jt.getWorkflowTask());
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "world"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(evaluatedTaskExecution.getWorkflowTask(), taskExecution.getWorkflowTask());
     }
 
     @Test
     public void test3() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "${name}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.singletonMap("name", "arik")));
-        Assertions.assertEquals("arik", evaluated.getString("hello"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "${name}"));
+        TaskExecution evaluatedTaskExecution =
+                evaluator.evaluate(taskExecution, new Context(Collections.singletonMap("name", "arik")));
+        Assertions.assertEquals("arik", evaluatedTaskExecution.getString("hello"));
     }
 
     @Test
     public void test4() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "${firstName} ${lastName}"));
-        Context ctx = new Context();
-        ctx.put("firstName", "Arik");
-        ctx.put("lastName", "Cohen");
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals("Arik Cohen", evaluated.getString("hello"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "${firstName} ${lastName}"));
+        Context context = new Context();
+        context.put("firstName", "Arik");
+        context.put("lastName", "Cohen");
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals("Arik Cohen", evaluatedTaskExecution.getString("hello"));
     }
 
     @Test
     public void test5() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "${T(java.lang.Integer).valueOf(number)}"));
-        Context ctx = new Context();
-        ctx.put("number", "5");
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals(Integer.valueOf(5), ((Integer) evaluated.get("hello")));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("hello", "${T(java.lang.Integer).valueOf(number)}"));
+        Context context = new Context();
+        context.put("number", "5");
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals(Integer.valueOf(5), ((Integer) evaluatedTaskExecution.get("hello")));
     }
 
     @Test
     public void test6() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("list", Arrays.asList("${firstName}", "${lastName}")));
-        Context ctx = new Context();
-        ctx.put("firstName", "Arik");
-        ctx.put("lastName", "Cohen");
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals(Arrays.asList("Arik", "Cohen"), evaluated.getList("list", String.class));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("list", Arrays.asList("${firstName}", "${lastName}")));
+        Context context = new Context();
+        context.put("firstName", "Arik");
+        context.put("lastName", "Cohen");
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals(Arrays.asList("Arik", "Cohen"), evaluatedTaskExecution.getList("list", String.class));
     }
 
     @Test
     public void test7() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("map", Collections.singletonMap("hello", "${firstName}")));
-        Context ctx = new Context();
-        ctx.put("firstName", "Arik");
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals(Collections.singletonMap("hello", "Arik"), evaluated.getMap("map"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("map", Collections.singletonMap("hello", "${firstName}")));
+        Context context = new Context();
+        context.put("firstName", "Arik");
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals(Collections.singletonMap("hello", "Arik"), evaluatedTaskExecution.getMap("map"));
     }
 
     @Test
     public void test8() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("mult", "${n1*n2}"));
-        Context ctx = new Context();
-        ctx.put("n1", 5);
-        ctx.put("n2", 3);
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals(Integer.valueOf(15), evaluated.getInteger("mult"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("mult", "${n1*n2}"));
+        Context context = new Context();
+        context.put("n1", 5);
+        context.put("n2", 3);
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals(Integer.valueOf(15), evaluatedTaskExecution.getInteger("mult"));
     }
 
     @Test
     public void test9() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("message", "${name}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("${name}", evaluated.getString("message"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "${name}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("${name}", evaluatedTaskExecution.getString("message"));
     }
 
     @Test
     public void test10() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("message", "yo ${name}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("yo ${name}", evaluated.getString("message"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "yo ${name}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("yo ${name}", evaluatedTaskExecution.getString("message"));
     }
 
     @Test
     public void test11() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("thing", "${number}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.singletonMap("number", 1)));
-        Assertions.assertEquals(Integer.valueOf(1), evaluated.get("thing"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number}"));
+        TaskExecution evaluatedTaskExecution =
+                evaluator.evaluate(taskExecution, new Context(Collections.singletonMap("number", 1)));
+        Assertions.assertEquals(Integer.valueOf(1), evaluatedTaskExecution.get("thing"));
     }
 
     @Test
     public void test12() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("thing", "${number*3}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.singletonMap("number", 1)));
-        Assertions.assertEquals(Integer.valueOf(3), evaluated.get("thing"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number*3}"));
+        TaskExecution evaluatedTaskExecution =
+                evaluator.evaluate(taskExecution, new Context(Collections.singletonMap("number", 1)));
+        Assertions.assertEquals(Integer.valueOf(3), evaluatedTaskExecution.get("thing"));
     }
 
     @Test
     public void test13() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("thing", "${number*3}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("${number*3}", evaluated.get("thing"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number*3}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("${number*3}", evaluatedTaskExecution.get("thing"));
     }
 
     @Test
     public void test14() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("list", "${range(1,3)}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluated.get("list"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("list", "${range(1,3)}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluatedTaskExecution.get("list"));
     }
 
     @Test
     public void test15() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("sub", Collections.singletonMap("list", "${range(1,3)}")));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluated.getMap("sub").get("list"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("sub", Collections.singletonMap("list", "${range(1,3)}")));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(
+                Arrays.asList(1, 2, 3), evaluatedTaskExecution.getMap("sub").get("list"));
     }
 
     @Test
     public void test16() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("message", "${item1}-${item2}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Map.of("item1", "hello", "item2", "world")));
-        Assertions.assertEquals("hello-world", evaluated.get("message"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "${item1}-${item2}"));
+        TaskExecution evaluatedTaskExecution =
+                evaluator.evaluate(taskExecution, new Context(Map.of("item1", "hello", "item2", "world")));
+        Assertions.assertEquals("hello-world", evaluatedTaskExecution.get("message"));
     }
 
     @Test
     public void test17() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someBoolean", "${boolean('1')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Boolean.valueOf(true), evaluated.get("someBoolean"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someBoolean", "${boolean('1')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Boolean.valueOf(true), evaluatedTaskExecution.get("someBoolean"));
     }
 
     @Test
     public void test18() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someByte", "${byte('127')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Byte.valueOf(Byte.MAX_VALUE), evaluated.get("someByte"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someByte", "${byte('127')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Byte.valueOf(Byte.MAX_VALUE), evaluatedTaskExecution.get("someByte"));
     }
 
     @Test
     public void test19() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someChar", "${char('c')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Character.valueOf('c'), evaluated.get("someChar"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someChar", "${char('c')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Character.valueOf('c'), evaluatedTaskExecution.get("someChar"));
     }
 
     @Test
     public void test20() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someShort", "${short('32767')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Short.valueOf(Short.MAX_VALUE), evaluated.get("someShort"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someShort", "${short('32767')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Short.valueOf(Short.MAX_VALUE), evaluatedTaskExecution.get("someShort"));
     }
 
     @Test
     public void test21() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someInt", "${int('1')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Integer.valueOf(1), evaluated.get("someInt"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someInt", "${int('1')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Integer.valueOf(1), evaluatedTaskExecution.get("someInt"));
     }
 
     @Test
     public void test22() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someLong", "${long('1')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Long.valueOf(1L), evaluated.get("someLong"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someLong", "${long('1')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Long.valueOf(1L), evaluatedTaskExecution.get("someLong"));
     }
 
     @Test
     public void test23() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someFloat", "${float('1.337')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Float.valueOf(1.337f), evaluated.get("someFloat"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someFloat", "${float('1.337')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Float.valueOf(1.337f), evaluatedTaskExecution.get("someFloat"));
     }
 
     @Test
     public void test24() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someDouble", "${double('1.337')}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Double.valueOf(1.337d), evaluated.get("someDouble"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someDouble", "${double('1.337')}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Double.valueOf(1.337d), evaluatedTaskExecution.get("someDouble"));
     }
 
     @Test
     public void test25() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("joined", "${join(',',range(1,3))}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("1,2,3", evaluated.get("joined"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(',',range(1,3))}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("1,2,3", evaluatedTaskExecution.get("joined"));
     }
 
     @Test
     public void test26() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("joined", "${join(',',range(1,1))}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("1", evaluated.get("joined"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(',',range(1,1))}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("1", evaluatedTaskExecution.get("joined"));
     }
 
     @Test
     public void test27() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("joined", "${join(' and ',{'a','b','c'})}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("a and b and c", evaluated.get("joined"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(' and ',{'a','b','c'})}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("a and b and c", evaluatedTaskExecution.get("joined"));
     }
 
     @Test
     public void test28() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), evaluated.get("concatenated"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(
+                Arrays.asList("a", "b", "c", "d", "e", "f"), evaluatedTaskExecution.get("concatenated"));
     }
 
     @Test
     public void test29() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("concatenated", "${concat({'a','b','c'}, range(1,3))}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), evaluated.get("concatenated"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("concatenated", "${concat({'a','b','c'}, range(1,3))}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), evaluatedTaskExecution.get("concatenated"));
     }
 
     @Test
     public void test30() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), evaluated.get("flattened"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), evaluatedTaskExecution.get("flattened"));
     }
 
     @Test
     public void test31() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("flattened", "${flatten({{'a','b','c'},range(1,3)})}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), evaluated.get("flattened"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("flattened", "${flatten({{'a','b','c'},range(1,3)})}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), evaluatedTaskExecution.get("flattened"));
     }
 
     @Test
@@ -308,110 +322,111 @@ public class SpelTaskEvaluatorTest {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder()
                 .methodExecutor("tempDir", new TempDir())
                 .build();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("tempDir", "${tempDir()}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("tempDir", "${tempDir()}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir.endsWith(File.separator)) {
             tmpDir = FilenameUtils.getFullPathNoEndSeparator(tmpDir);
         }
-        Assertions.assertEquals(tmpDir, evaluated.get("tempDir"));
+        Assertions.assertEquals(tmpDir, evaluatedTaskExecution.get("tempDir"));
     }
 
     @Test
     public void test33() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("uuid", "${uuid()}"));
-        TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
-        Assertions.assertNotNull(evaluated.get("uuid"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("uuid", "${uuid()}"));
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        Assertions.assertNotNull(evaluatedTaskExecution.get("uuid"));
     }
 
     @Test
     public void test34() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("fullName", "${firstName} ${lastName}"));
-        Context ctx = new Context();
-        ctx.put("firstName", "Arik");
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals("Arik ${lastName}", evaluated.getString("fullName"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("fullName", "${firstName} ${lastName}"));
+        Context context = new Context();
+        context.put("firstName", "Arik");
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals("Arik ${lastName}", evaluatedTaskExecution.getString("fullName"));
     }
 
     @Test
     public void test35() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("result", "${num/den}"));
-        Context ctx = new Context();
-        ctx.put("num", 5.0);
-        ctx.put("den", 10.0);
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals(0.5d, evaluated.getDouble("result"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("result", "${num/den}"));
+        Context context = new Context();
+        context.put("num", 5.0);
+        context.put("den", 10.0);
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals(0.5d, evaluatedTaskExecution.getDouble("result"));
     }
 
     @Test
     public void test36() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("number", "${stringf('%03d',5)}"));
-        Context ctx = new Context();
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals("005", evaluated.getString("number"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("number", "${stringf('%03d',5)}"));
+        Context context = new Context();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals("005", evaluatedTaskExecution.getString("number"));
     }
 
     @Test
     public void test37() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("number", "${stringf('%s %s','hello','world')}"));
-        Context ctx = new Context();
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals("hello world", evaluated.getString("number"));
+        TaskExecution taskExecution =
+                new TaskExecution(WorkflowTask.of("number", "${stringf('%s %s','hello','world')}"));
+        Context context = new Context();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals("hello world", evaluatedTaskExecution.getString("number"));
     }
 
     @Test
     public void test38() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("sorted", "${sort({3,1,2})}"));
-        Context ctx = new Context();
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluated.getList("sorted", Integer.class));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("sorted", "${sort({3,1,2})}"));
+        Context context = new Context();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluatedTaskExecution.getList("sorted", Integer.class));
     }
 
     @Test
     public void test39() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("sorted", "${sort({'C','A','B'})}"));
-        Context ctx = new Context();
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals(Arrays.asList("A", "B", "C"), evaluated.getList("sorted", String.class));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("sorted", "${sort({'C','A','B'})}"));
+        Context context = new Context();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals(Arrays.asList("A", "B", "C"), evaluatedTaskExecution.getList("sorted", String.class));
     }
 
     @Test
     public void test40() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("date", "${dateFormat(now(),'yyyyMMdd')}"));
-        Context ctx = new Context();
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("date", "${dateFormat(now(),'yyyyMMdd')}"));
+        Context context = new Context();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Assertions.assertEquals(sdf.format(new Date()), evaluated.getString("date"));
+        Assertions.assertEquals(sdf.format(new Date()), evaluatedTaskExecution.getString("date"));
     }
 
     @Test
     public void test41() {
-        Environment env = mock(Environment.class);
-        when(env.getProperty("my.property")).thenReturn("something");
+        Environment environment = mock(Environment.class);
+        when(environment.getProperty("my.property")).thenReturn("something");
         SpelTaskEvaluator evaluator =
-                SpelTaskEvaluator.builder().environment(env).build();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("myValue", "${config('my.property')}"));
-        Context ctx = new Context();
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals("something", evaluated.getString("myValue"));
+                SpelTaskEvaluator.builder().environment(environment).build();
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("myValue", "${config('my.property')}"));
+        Context context = new Context();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals("something", evaluatedTaskExecution.getString("myValue"));
     }
 
     @Test
     public void test42() {
-        Environment env = mock(Environment.class);
+        Environment environment = mock(Environment.class);
         SpelTaskEvaluator evaluator =
-                SpelTaskEvaluator.builder().environment(env).build();
-        TaskExecution jt = TaskExecution.of(WorkflowTask.of("myValue", "${config('no.such.property')}"));
-        Context ctx = new Context();
-        TaskExecution evaluated = evaluator.evaluate(jt, ctx);
-        Assertions.assertEquals("${config('no.such.property')}", evaluated.getString("myValue"));
+                SpelTaskEvaluator.builder().environment(environment).build();
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("myValue", "${config('no.such.property')}"));
+        Context context = new Context();
+        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        Assertions.assertEquals("${config('no.such.property')}", evaluatedTaskExecution.getString("myValue"));
     }
 }

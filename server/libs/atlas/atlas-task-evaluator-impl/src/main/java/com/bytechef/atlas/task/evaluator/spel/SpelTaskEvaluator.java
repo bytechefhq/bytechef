@@ -103,7 +103,7 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
         Map<String, Object> map = evaluateInternal(workflowTask.asMap(), context);
 
-        taskExecution = TaskExecution.of(taskExecution, new WorkflowTask(map));
+        taskExecution = new TaskExecution(taskExecution, new WorkflowTask(map));
 
         return taskExecution;
     }

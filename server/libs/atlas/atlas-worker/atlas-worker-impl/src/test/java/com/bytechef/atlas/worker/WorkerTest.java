@@ -106,7 +106,7 @@ public class WorkerTest {
                 .withEventPublisher(e -> {})
                 .build();
 
-        TaskExecution task = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution task = new TaskExecution(new WorkflowTask(Map.of(
                 "pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")),
                 "type", "var",
                 "value", "${myVar}")));
@@ -149,7 +149,7 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "post", List.of(Map.of("type", "rm", "path", tempDir)),
                 "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
                 "type", "pass")));
@@ -194,7 +194,7 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
                 "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
                 "type", "rogue")));

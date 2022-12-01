@@ -104,7 +104,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = TaskExecution.of(
+            TaskExecution subTaskExecution = new TaskExecution(
                     subWorkflowTask,
                     ifTaskExecution.getJobId(),
                     ifTaskExecution.getId(),
