@@ -20,7 +20,7 @@ import javax.annotation.Generated;
  */
 
 @JsonTypeName("ConnectionUpdate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:15:34.685557+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-28T17:57:21.937957+01:00[Europe/Zagreb]")
 public class ConnectionUpdateModel {
 
   @JsonProperty("name")
