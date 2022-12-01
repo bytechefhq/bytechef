@@ -11,7 +11,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":server:libs:core:encryption:encryption-api")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-standard")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-default")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
 }
