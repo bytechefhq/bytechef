@@ -23,46 +23,16 @@ import com.bytechef.hermes.definition.Resources;
 /**
  * @author Ivica Cardic
  */
-public final class JdbcComponentDefinition {
-    private String databaseJdbcName;
-    private String jdbcDriverClassName;
-    private Display display;
-    private String name;
-    private Resources resources;
-    private double version = Versions.VERSION_1;
+public sealed class JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcComponentDefinition {
+    protected String databaseJdbcName;
+    protected String jdbcDriverClassName;
+    protected Display display;
+    protected Resources resources;
+    protected double version = Versions.VERSION_1;
+    private final String name;
 
-    public JdbcComponentDefinition(String name) {
+    protected JdbcComponentDefinition(String name) {
         this.name = name;
-    }
-
-    public JdbcComponentDefinition databaseJdbcName(String databaseJdbcName) {
-        this.databaseJdbcName = databaseJdbcName;
-
-        return this;
-    }
-
-    public JdbcComponentDefinition jdbcDriverClassName(String jdbcDriverClassName) {
-        this.jdbcDriverClassName = jdbcDriverClassName;
-
-        return this;
-    }
-
-    public JdbcComponentDefinition display(Display display) {
-        this.display = display;
-
-        return this;
-    }
-
-    public JdbcComponentDefinition resources(Resources resources) {
-        this.resources = resources;
-
-        return this;
-    }
-
-    public JdbcComponentDefinition version(double version) {
-        this.version = version;
-
-        return this;
     }
 
     public String getDatabaseJdbcName() {

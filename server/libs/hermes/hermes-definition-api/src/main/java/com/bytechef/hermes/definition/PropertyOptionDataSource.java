@@ -25,16 +25,16 @@ import java.util.function.Function;
  * @author Ivica Cardic
  */
 @Schema(
-        name = "OptionsDataSource",
+        name = "PropertyOptionDataSource",
         description = "Defines function that should dynamically load options for the property.")
-public class OptionsDataSource {
+public sealed class PropertyOptionDataSource permits DefinitionDSL.ModifiablePropertyOptionDataSource {
 
     protected List<String> loadOptionsDependsOn;
 
     @JsonIgnore
     protected Function<Object, Object> loadOptionsFunction;
 
-    protected OptionsDataSource() {}
+    protected PropertyOptionDataSource() {}
 
     @Schema(
             name = "loadOptionsDependsOn",

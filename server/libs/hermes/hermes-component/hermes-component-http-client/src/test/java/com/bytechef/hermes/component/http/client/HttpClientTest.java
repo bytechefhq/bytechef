@@ -23,6 +23,8 @@ import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.constants.ComponentConstants;
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.http.client.constants.HttpClientConstants;
 import com.bytechef.hermes.component.test.mock.MockContext;
 import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
@@ -69,7 +71,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClientConstants.ResponseFormat.FILE.name());
+        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClient.ResponseFormat.FILE.name());
 
         bodyHandler = httpClient.createBodyHandler(parameters);
 
@@ -79,7 +81,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClientConstants.ResponseFormat.XML.name());
+        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClient.ResponseFormat.XML.name());
 
         bodyHandler = httpClient.createBodyHandler(parameters);
 
@@ -90,15 +92,15 @@ public class HttpClientTest {
     public void testCreateBodyPublisher() {
         MockExecutionParameters parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.FORM_DATA.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.FORM_DATA.name());
         parameters.set(
                 HttpClientConstants.BODY_PARAMETERS,
                 List.of(
-                        Map.of(HttpClientConstants.KEY, "key1", HttpClientConstants.VALUE, "value1"),
+                        Map.of(ComponentConstants.KEY, "key1", ComponentConstants.VALUE, "value1"),
                         Map.of(
-                                HttpClientConstants.KEY,
+                                ComponentConstants.KEY,
                                 "key2",
-                                HttpClientConstants.VALUE,
+                                ComponentConstants.VALUE,
                                 com.bytechef.hermes.file.storage.domain.FileEntry.of("fileName.txt")
                                         .toMap())));
 
@@ -118,13 +120,12 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(
-                HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.FORM_URLENCODED.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.FORM_URLENCODED.name());
         parameters.set(
                 HttpClientConstants.BODY_PARAMETERS,
                 List.of(
-                        Map.of(HttpClientConstants.KEY, "key1", HttpClientConstants.VALUE, "value1"),
-                        Map.of(HttpClientConstants.KEY, "key2", HttpClientConstants.VALUE, "value2")));
+                        Map.of(ComponentConstants.KEY, "key1", ComponentConstants.VALUE, "value1"),
+                        Map.of(ComponentConstants.KEY, "key2", ComponentConstants.VALUE, "value2")));
 
         FormBodyPublisher formBodyPublisher = (FormBodyPublisher) httpClient.createBodyPublisher(context, parameters);
 
@@ -136,7 +137,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.JSON.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.JSON.name());
         parameters.set(HttpClientConstants.BODY_PARAMETERS, Map.of("key1", "value1"));
 
         MimeBodyPublisherAdapter mimeBodyPublisherAdapter =
@@ -148,7 +149,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.XML.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.XML.name());
         parameters.set(HttpClientConstants.BODY_PARAMETERS, Map.of("key1", "value1"));
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(context, parameters);
@@ -159,7 +160,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.RAW.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.RAW.name());
         parameters.set(HttpClientConstants.BODY_PARAMETERS, "text");
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(context, parameters);
@@ -181,25 +182,25 @@ public class HttpClientTest {
                 com.bytechef.hermes.file.storage.domain.FileEntry.of("filename", "base64:text")
                         .toMap());
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.BINARY.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.BINARY.name());
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(context, parameters);
 
         Assertions.assertEquals(MediaType.APPLICATION_OCTET_STREAM, mimeBodyPublisherAdapter.mediaType());
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.JSON.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.JSON.name());
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(context, parameters);
 
         Assertions.assertEquals(MediaType.APPLICATION_JSON, mimeBodyPublisherAdapter.mediaType());
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.XML.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.XML.name());
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(context, parameters);
 
         Assertions.assertEquals(MediaType.APPLICATION_XML, mimeBodyPublisherAdapter.mediaType());
 
-        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClientConstants.BodyContentType.RAW.name());
+        parameters.set(HttpClientConstants.BODY_CONTENT_TYPE, HttpClient.BodyContentType.RAW.name());
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(context, parameters);
 
@@ -236,50 +237,50 @@ public class HttpClientTest {
 
         Connection connection = new Connection();
 
-        connection.setName(HttpClientConstants.AuthType.API_KEY.name());
-        connection.setParameters(Map.of(
-                HttpClientConstants.KEY, HttpClientConstants.API_TOKEN, HttpClientConstants.VALUE, "token_value"));
+        connection.setAuthorizationName(Authorization.AuthorizationType.API_KEY.name());
+        connection.setParameters(
+                Map.of(ComponentConstants.KEY, ComponentConstants.API_TOKEN, ComponentConstants.VALUE, "token_value"));
 
         Mockito.doReturn(Optional.of(new ConnectionParametersImpl(connection)))
                 .when(context)
-                .fetchConnection();
+                .fetchConnectionParameters();
 
         Map<String, List<String>> headers = new HashMap<>();
 
         this.httpClient.createHTTPClient(context, parameters, headers, Map.of());
 
-        Assertions.assertEquals(Map.of(HttpClientConstants.API_TOKEN, List.of("token_value")), headers);
+        Assertions.assertEquals(Map.of(ComponentConstants.API_TOKEN, List.of("token_value")), headers);
 
         connection = new Connection();
 
-        connection.setName(HttpClientConstants.AuthType.API_KEY.name());
+        connection.setAuthorizationName(Authorization.AuthorizationType.API_KEY.name());
         connection.setParameters(Map.of(
-                HttpClientConstants.KEY,
-                HttpClientConstants.API_TOKEN,
-                HttpClientConstants.VALUE,
+                ComponentConstants.KEY,
+                ComponentConstants.API_TOKEN,
+                ComponentConstants.VALUE,
                 "token_value",
-                HttpClientConstants.ADD_TO,
-                HttpClientConstants.ApiTokenLocation.QUERY_PARAMS));
+                ComponentConstants.ADD_TO,
+                Authorization.ApiTokenLocation.QUERY_PARAMS));
 
         Mockito.doReturn(Optional.of(new ConnectionParametersImpl(connection)))
                 .when(context)
-                .fetchConnection();
+                .fetchConnectionParameters();
 
         Map<String, List<String>> queryParams = new HashMap<>();
 
         this.httpClient.createHTTPClient(context, parameters, Map.of(), queryParams);
 
-        Assertions.assertEquals(Map.of(HttpClientConstants.API_TOKEN, List.of("token_value")), queryParams);
+        Assertions.assertEquals(Map.of(ComponentConstants.API_TOKEN, List.of("token_value")), queryParams);
 
         connection = new Connection();
 
+        connection.setAuthorizationName(Authorization.AuthorizationType.BASIC_AUTH.name());
         connection.setParameters(
-                Map.of(HttpClientConstants.USERNAME, "username", HttpClientConstants.PASSWORD, "password"));
-        connection.setName(HttpClientConstants.AuthType.BASIC_AUTH.name());
+                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
 
         Mockito.doReturn(Optional.of(new ConnectionParametersImpl(connection)))
                 .when(context)
-                .fetchConnection();
+                .fetchConnectionParameters();
 
         httpClient = this.httpClient.createHTTPClient(context, parameters, Map.of(), Map.of());
 
@@ -293,12 +294,12 @@ public class HttpClientTest {
 
         connection = new Connection();
 
-        connection.setParameters(Map.of(HttpClientConstants.TOKEN, "token"));
-        connection.setName(HttpClientConstants.AuthType.BEARER_TOKEN.name());
+        connection.setAuthorizationName(Authorization.AuthorizationType.BEARER_TOKEN.name());
+        connection.setParameters(Map.of(ComponentConstants.TOKEN, "token"));
 
         Mockito.doReturn(Optional.of(new ConnectionParametersImpl(connection)))
                 .when(context)
-                .fetchConnection();
+                .fetchConnectionParameters();
 
         headers = new HashMap<>();
 
@@ -308,13 +309,13 @@ public class HttpClientTest {
 
         connection = new Connection();
 
+        connection.setAuthorizationName(Authorization.AuthorizationType.DIGEST_AUTH.name());
         connection.setParameters(
-                Map.of(HttpClientConstants.USERNAME, "username", HttpClientConstants.PASSWORD, "password"));
-        connection.setName(HttpClientConstants.AuthType.DIGEST_AUTH.name());
+                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
 
         Mockito.doReturn(Optional.of(new ConnectionParametersImpl(connection)))
                 .when(context)
-                .fetchConnection();
+                .fetchConnectionParameters();
 
         httpClient = this.httpClient.createHTTPClient(context, parameters, Map.of(), Map.of());
 
@@ -328,12 +329,12 @@ public class HttpClientTest {
 
         connection = new Connection();
 
-        connection.setParameters(Map.of(HttpClientConstants.ACCESS_TOKEN, "access_token"));
-        connection.setName(HttpClientConstants.AuthType.OAUTH2.name());
+        connection.setAuthorizationName(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name());
+        connection.setParameters(Map.of(ComponentConstants.ACCESS_TOKEN, "access_token"));
 
         Mockito.doReturn(Optional.of(new ConnectionParametersImpl(connection)))
                 .when(context)
-                .fetchConnection();
+                .fetchConnectionParameters();
 
         headers = new HashMap<>();
 
@@ -392,11 +393,11 @@ public class HttpClientTest {
         HttpRequest httpRequest = httpClient.createHTTPRequest(
                 context,
                 parameters,
-                HttpClientConstants.RequestMethod.DELETE,
+                HttpClient.RequestMethod.DELETE,
                 Map.of("header1", List.of("value1")),
                 Map.of("param1", List.of("value1")));
 
-        Assertions.assertEquals(HttpClientConstants.RequestMethod.DELETE.name(), httpRequest.method());
+        Assertions.assertEquals(HttpClient.RequestMethod.DELETE.name(), httpRequest.method());
         Assertions.assertEquals(
                 Map.of("header1", List.of("value1")), httpRequest.headers().map());
         Assertions.assertEquals(URI.create("http://localhost:8080?param1=value1"), httpRequest.uri());
@@ -412,7 +413,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClientConstants.ResponseFormat.FILE.name());
+        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClient.ResponseFormat.FILE.name());
 
         Assertions.assertEquals(
                 com.bytechef.hermes.file.storage.domain.FileEntry.of("file.txt", "base64:dGV4dA==")
@@ -428,7 +429,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClientConstants.ResponseFormat.JSON.name());
+        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClient.ResponseFormat.JSON.name());
 
         Assertions.assertEquals(
                 Map.of("key1", "value1"),
@@ -446,7 +447,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClientConstants.ResponseFormat.TEXT.name());
+        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClient.ResponseFormat.TEXT.name());
 
         Assertions.assertEquals("text", httpClient.handleResponse(context, parameters, new TestHttpResponse("text")));
 
@@ -454,7 +455,7 @@ public class HttpClientTest {
 
         parameters = new MockExecutionParameters();
 
-        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClientConstants.ResponseFormat.XML.name());
+        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClient.ResponseFormat.XML.name());
 
         Assertions.assertEquals(
                 Map.of("object", Map.of("key1", "value1")),
@@ -477,7 +478,7 @@ public class HttpClientTest {
 
         parameters.set(HttpClientConstants.FULL_RESPONSE, true);
 
-        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClientConstants.ResponseFormat.TEXT.name());
+        parameters.set(HttpClientConstants.RESPONSE_FORMAT, HttpClient.ResponseFormat.TEXT.name());
 
         Assertions.assertEquals(
                 new HttpClient.HttpResponseEntry("text", Map.of(), 200),
@@ -540,12 +541,19 @@ public class HttpClientTest {
     }
 
     private static class ConnectionParametersImpl implements ConnectionParameters {
+        private final String authName;
         private final String name;
         private final Map<String, Object> parameters;
 
         public ConnectionParametersImpl(Connection connection) {
+            this.authName = connection.getAuthorizationName();
             this.name = connection.getName();
             this.parameters = connection.getParameters();
+        }
+
+        @Override
+        public String getAuthorizationName() {
+            return authName;
         }
 
         @Override

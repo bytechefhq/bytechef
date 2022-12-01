@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Ivica Cardic
  */
 @Schema(name = "PropertyOption", description = "Defines valid property value.")
-public class PropertyOption {
+public sealed class PropertyOption permits DefinitionDSL.ModifiablePropertyOption {
 
     protected String description;
     protected DisplayOption displayOption;

@@ -16,10 +16,10 @@
 
 package com.bytechef.component.var;
 
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -35,7 +35,7 @@ public class VarComponentHandler implements ComponentHandler {
     private static final String SET = "set";
     private static final String VALUE = "value";
 
-    private final ComponentDefinition componentDefinition = createComponent(VAR)
+    private final ComponentDefinition componentDefinition = component(VAR)
             .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
             .actions(action(SET)
                     .display(display("Set value"))
@@ -43,7 +43,7 @@ public class VarComponentHandler implements ComponentHandler {
                             .label("Value")
                             .description("Value of any type to set.")
                             .required(true))
-                    .performFunction(this::performSetValue));
+                    .perform(this::performSetValue));
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -22,12 +22,12 @@ import static com.bytechef.component.script.constants.ScriptConstants.JAVASCRIPT
 import static com.bytechef.component.script.constants.ScriptConstants.PYTHON;
 import static com.bytechef.component.script.constants.ScriptConstants.R;
 import static com.bytechef.component.script.constants.ScriptConstants.SCRIPT;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.component;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.script.constants.ScriptConstants;
 import com.bytechef.hermes.component.ComponentHandler;

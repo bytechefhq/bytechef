@@ -18,7 +18,6 @@ package com.bytechef.hermes.task.dispatcher.definition;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
 
-import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
@@ -35,64 +34,24 @@ import java.util.List;
 @Schema(
         name = "TaskDispatcherDefinition",
         description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
-public final class TaskDispatcherDefinition implements Definition {
+public sealed class TaskDispatcherDefinition permits TaskDispatcherDSL.ModifiableTaskDispatcherDefinition {
 
-    private Display display;
-    private String name;
-    private List<Property<? extends Property<?>>> output;
+    protected Display display;
+    private final String name;
+    protected List<Property<? extends Property<?>>> output;
     protected List<Property<?>> properties;
-    private Resources resources;
-    private int version = VERSION_1;
+    protected Resources resources;
+    protected int version = VERSION_1;
     protected List<Property<?>> taskProperties;
 
-    private TaskDispatcherDefinition() {}
-
-    public TaskDispatcherDefinition(String name) {
+    protected TaskDispatcherDefinition(String name) {
         this.name = name;
     }
 
-    public TaskDispatcherDefinition display(Display display) {
-        this.display = display;
-
-        return this;
-    }
-
-    public TaskDispatcherDefinition display(Resources resources) {
-        this.resources = resources;
-
-        return this;
-    }
-
-    public TaskDispatcherDefinition output(Property... output) {
-        this.output = List.of(output);
-
-        return this;
-    }
-
-    public TaskDispatcherDefinition properties(Property<?>... properties) {
-        this.properties = List.of(properties);
-
-        return this;
-    }
-
-    public TaskDispatcherDefinition version(int version) {
-        this.version = version;
-
-        return this;
-    }
-
-    public TaskDispatcherDefinition taskProperties(Property<?>... taskProperties) {
-        this.taskProperties = List.of(taskProperties);
-
-        return this;
-    }
-
-    @Override
     public Display getDisplay() {
         return display;
     }
 
-    @Override
     @Schema(name = "name", description = "The connection name.")
     public String getName() {
         return name;
@@ -108,12 +67,10 @@ public final class TaskDispatcherDefinition implements Definition {
         return properties;
     }
 
-    @Override
     public Resources getResources() {
         return resources;
     }
 
-    @Override
     public int getVersion() {
         return version;
     }

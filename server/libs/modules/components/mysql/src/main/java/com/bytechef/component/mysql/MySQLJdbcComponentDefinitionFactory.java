@@ -17,18 +17,18 @@
 package com.bytechef.component.mysql;
 
 import static com.bytechef.component.mysql.constants.MySQLConstants.MYSQL;
-import static com.bytechef.hermes.component.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.jdbcComponent;
 
-import com.bytechef.hermes.component.ComponentDSL;
-import com.bytechef.hermes.component.JdbcComponentFactory;
+import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class MySQLJdbcComponentFactory implements JdbcComponentFactory {
+public class MySQLJdbcComponentDefinitionFactory implements JdbcComponentDefinitionFactory {
 
-    private static final JdbcComponentDefinition COMPONENT_DEFINITION = ComponentDSL.createJdbcComponent(MYSQL)
+    private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(MYSQL)
             .display(display("MySQL").description("Query, insert nd update data from MySQL."))
             .databaseJdbcName("mysql")
             .jdbcDriverClassName("com.mysql.jdbc.Driver");

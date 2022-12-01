@@ -19,7 +19,7 @@
 package com.bytechef.component.bash;
 
 import com.bytechef.component.bash.constants.BashConstants;
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.test.mock.MockContext;
 import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
 import com.bytechef.test.jsonasssert.AssertUtils;
@@ -52,7 +52,7 @@ public class BashComponentHandlerTest {
                 new MockExecutionParameters(Map.of(
                         BashConstants.SCRIPT,
                         "ls -l " + classPathResource.getFile().getAbsolutePath(),
-                        Action.ACTION,
+                        ActionDefinition.ACTION,
                         BashConstants.EXECUTE)));
 
         Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));

@@ -38,7 +38,7 @@ public class ExecuteJdbcOperation implements JdbcOperation<Map<String, Integer>>
         String executeStatement = executionParameters.getRequiredString(JdbcConstants.EXECUTE);
         Map<String, ?> paramMap = executionParameters.getMap(JdbcConstants.PARAMETERS, Map.of());
 
-        int rowsAffected = jdbcExecutor.update(context.getConnection(), executeStatement, paramMap);
+        int rowsAffected = jdbcExecutor.update(context.getConnectionParameters(), executeStatement, paramMap);
 
         return Map.of("rows", rowsAffected);
     }

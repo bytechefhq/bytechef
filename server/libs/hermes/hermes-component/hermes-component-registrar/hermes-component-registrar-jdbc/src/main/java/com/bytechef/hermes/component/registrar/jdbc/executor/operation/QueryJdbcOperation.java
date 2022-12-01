@@ -42,19 +42,20 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
         String queryStatement = executionParameters.getRequiredString(JdbcConstants.QUERY);
         Map<String, ?> paramMap = executionParameters.getMap(JdbcConstants.PARAMETERS, Map.of());
 
-        return jdbcExecutor.query(context.getConnection(), queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
-            Map<String, Object> row = new HashMap<>();
+        return jdbcExecutor.query(
+                context.getConnectionParameters(), queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
+                    Map<String, Object> row = new HashMap<>();
 
-            ResultSetMetaData rsMetaData = rs.getMetaData();
-            int columnCount = rsMetaData.getColumnCount();
+                    ResultSetMetaData rsMetaData = rs.getMetaData();
+                    int columnCount = rsMetaData.getColumnCount();
 
-            for (int i = 1; i <= columnCount; i++) {
-                String columnName = rsMetaData.getColumnName(i);
+                    for (int i = 1; i <= columnCount; i++) {
+                        String columnName = rsMetaData.getColumnName(i);
 
-                row.put(columnName, rs.getObject(i));
-            }
+                        row.put(columnName, rs.getObject(i));
+                    }
 
-            return row;
-        });
+                    return row;
+                });
     }
 }

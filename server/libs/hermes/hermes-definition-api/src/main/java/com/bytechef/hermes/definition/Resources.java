@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Ivica Cardic
  */
 @Schema(name = "Resources", description = "A set of available resources.")
-public class Resources {
+public sealed class Resources permits DefinitionDSL.ModifiableResources {
 
     protected String documentationUrl;
 

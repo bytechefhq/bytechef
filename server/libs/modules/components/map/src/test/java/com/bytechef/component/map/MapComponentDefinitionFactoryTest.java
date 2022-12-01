@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class MapComponentFactoryTest {
+public class MapComponentDefinitionFactoryTest {
 
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/map_v1.json", new MapComponentFactory().getDefinition());
+        AssertUtils.assertEquals("definition/map_v1.json", new MapComponentDefinitionFactory().getDefinition());
     }
 }

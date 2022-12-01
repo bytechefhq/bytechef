@@ -21,10 +21,10 @@ import static com.bytechef.component.randomhelper.constants.RandomHelperConstant
 import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.RANDOM_HELPER;
 import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.RANDOM_INT;
 import static com.bytechef.component.randomhelper.constants.RandomHelperConstants.START_INCLUSIVE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -37,7 +37,7 @@ import org.apache.commons.lang3.RandomUtils;
  */
 public class RandomHelperComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(RANDOM_HELPER)
+    private final ComponentDefinition componentDefinition = component(RANDOM_HELPER)
             .display(display("Random Helper").description("The Random Helper allows you to generate random values."))
             .actions(
                     action(RANDOM_INT)
@@ -51,10 +51,10 @@ public class RandomHelperComponentHandler implements ComponentHandler {
                                             .description("The maximum possible generated value.")
                                             .required(true)
                                             .defaultValue(100))
-                            .performFunction(this::performNextInt),
+                            .perform(this::performNextInt),
                     action(RANDOM_FLOAT)
                             .display(display("Float").description("Generates a random float value."))
-                            .performFunction(this::performNextFloat));
+                            .perform(this::performNextFloat));
 
     @Override
     public ComponentDefinition getDefinition() {

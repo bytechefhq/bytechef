@@ -1,6 +1,5 @@
 dependencies {
     api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
-    api project(":server:libs:hermes:hermes-api")
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"

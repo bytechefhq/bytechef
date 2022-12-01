@@ -16,13 +16,13 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.any;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.integer;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.any;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.EACH;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_INDEX;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EachTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(EACH)
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(EACH)
             .display(
                     display("Each")
                             .description(

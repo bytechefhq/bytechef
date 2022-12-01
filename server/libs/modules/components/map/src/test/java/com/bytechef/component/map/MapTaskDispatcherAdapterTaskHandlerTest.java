@@ -18,7 +18,7 @@
 
 package com.bytechef.component.map;
 
-import static com.bytechef.hermes.component.definition.Action.ACTION;
+import static com.bytechef.hermes.component.definition.ActionDefinition.ACTION;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;

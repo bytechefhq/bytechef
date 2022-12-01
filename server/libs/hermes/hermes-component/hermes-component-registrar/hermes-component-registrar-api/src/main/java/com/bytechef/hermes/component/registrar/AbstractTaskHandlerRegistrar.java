@@ -18,16 +18,18 @@ package com.bytechef.hermes.component.registrar;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistrar;
-import com.bytechef.hermes.component.ComponentFactory;
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import java.util.ServiceLoader;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractTaskHandlerRegistrar<T extends ComponentFactory> implements TaskHandlerRegistrar {
+public abstract class AbstractTaskHandlerRegistrar<T extends ComponentDefinitionFactory>
+        implements TaskHandlerRegistrar {
 
     private final Class<T> componentFactoryClass;
 
@@ -50,21 +52,26 @@ public abstract class AbstractTaskHandlerRegistrar<T extends ComponentFactory> i
             return;
         }
 
-        for (Action action : componentDefinition.getActions()) {
+        for (ActionDefinition actionDefinition : componentDefinition.getActionDefinitions()) {
             beanFactory.registerSingleton(
-                    getBeanName(componentDefinition.getName(), componentDefinition.getVersion(), action.getName()),
-                    createTaskHandler(action, componentFactory));
+                    getBeanName(
+                            componentDefinition.getName(),
+                            componentDefinition.getVersion(),
+                            actionDefinition.getName()),
+                    createTaskHandler(
+                            actionDefinition, componentDefinition.getConnectionDefinition(), componentFactory));
         }
 
         beanFactory.registerSingleton(
                 getBeanName(
                         componentDefinition.getName(),
                         componentDefinition.getVersion(),
-                        ComponentFactory.class.getSimpleName()),
+                        ComponentDefinitionFactory.class.getSimpleName()),
                 componentFactory);
     }
 
-    protected abstract TaskHandler<?> createTaskHandler(Action action, T componentFactory);
+    protected abstract TaskHandler<?> createTaskHandler(
+            ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition, T componentFactory);
 
     private String getBeanName(String componentName, int version, String typeName) {
         return componentName + "/v" + version + "/" + typeName;

@@ -17,15 +17,12 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.constants.Versions;
-import com.bytechef.hermes.definition.Definition;
+import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * Used for specifying a component.
@@ -36,78 +33,18 @@ import java.util.stream.Stream;
         name = "ComponentDefinition",
         description =
                 "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
-public final class ComponentDefinition implements Definition {
+public sealed class ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
-    private List<ActionDefinition> actionDefinitions;
-    private ConnectionDefinition connectionDefinition;
-    private ComponentDisplay display;
-    private Map<String, Object> metadata;
-    private String name;
-    private Resources resources;
-    private int version = Versions.VERSION_1;
+    protected List<ActionDefinition> actionDefinitions;
+    protected ConnectionDefinition connectionDefinition;
+    protected Display display;
+    protected Map<String, Object> metadata;
+    protected String name;
+    protected Resources resources;
+    protected int version = Versions.VERSION_1;
 
-    private ComponentDefinition() {}
-
-    public ComponentDefinition(String name) {
+    protected ComponentDefinition(String name) {
         this.name = name;
-    }
-
-    public ComponentDefinition actions(ActionDefinition... actionDefinitions) {
-        this.actionDefinitions = List.of(actionDefinitions);
-
-        return this;
-    }
-
-    public ComponentDefinition actions(List<ActionDefinition>... actionsList) {
-        this.actionDefinitions =
-                Stream.of(actionsList).flatMap(Collection::stream).toList();
-
-        return this;
-    }
-
-    public ComponentDefinition connection(ConnectionDefinition connectionDefinition) {
-        this.connectionDefinition = connectionDefinition;
-
-        this.connectionDefinition.setComponentName(name);
-        this.connectionDefinition.setDisplay(display);
-
-        return this;
-    }
-
-    public ComponentDefinition display(ComponentDisplay display) {
-        this.display = display;
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public ComponentDefinition metadata(String key, String value) {
-        if (metadata == null) {
-            metadata = new HashMap<>();
-        }
-
-        this.metadata.put(key, value);
-
-        return this;
-    }
-
-    @SuppressFBWarnings("EI2")
-    public ComponentDefinition metadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-
-        return this;
-    }
-
-    public ComponentDefinition resources(Resources resources) {
-        this.resources = resources;
-
-        return this;
-    }
-
-    public ComponentDefinition version(int version) {
-        this.version = version;
-
-        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -122,8 +59,7 @@ public final class ComponentDefinition implements Definition {
         return connectionDefinition;
     }
 
-    @Override
-    public ComponentDisplay getDisplay() {
+    public Display getDisplay() {
         return display;
     }
 

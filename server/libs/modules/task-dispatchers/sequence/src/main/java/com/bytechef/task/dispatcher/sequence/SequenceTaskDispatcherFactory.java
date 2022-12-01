@@ -16,10 +16,10 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
 import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
 
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SequenceTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(SEQUENCE)
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SEQUENCE)
             .display(display("Sequence").description("Executes list of tasks in a sequence."))
             .taskProperties(array(TASKS)
                     .description("The task to use in each iteration.")

@@ -44,7 +44,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ivica Cardic
  */
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
-public class Authorization {
+public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
 
     public enum AuthorizationType {
         API_KEY((AuthorizationContext authorizationContext, ConnectionParameters connectionParameters) -> {
@@ -102,125 +102,52 @@ public class Authorization {
     }
 
     @JsonIgnore
-    private BiConsumer<AuthorizationContext, ConnectionParameters> applyConsumer;
+    protected BiConsumer<AuthorizationContext, ConnectionParameters> applyConsumer;
 
     @JsonIgnore
-    private BiFunction<ConnectionParameters, String, String> authorizationCallbackFunction;
+    protected BiFunction<ConnectionParameters, String, String> authorizationCallbackFunction;
 
     @JsonIgnore
-    private Function<ConnectionParameters, String> authorizationUrlFunction =
+    protected Function<ConnectionParameters, String> authorizationUrlFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.AUTHORIZATION_URL);
 
     @JsonIgnore
-    private Function<ConnectionParameters, String> clientIdFunction =
+    protected Function<ConnectionParameters, String> clientIdFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.CLIENT_ID);
 
     @JsonIgnore
-    private Function<ConnectionParameters, String> clientSecretFunction =
+    protected Function<ConnectionParameters, String> clientSecretFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.CLIENT_SECRET);
 
-    private Display display;
-    private String name;
+    protected Display display;
 
     @JsonIgnore
-    private List<Object> onRefresh;
+    protected List<Object> onRefresh;
 
-    private List<Property<?>> properties;
-
-    @JsonIgnore
-    private Function<ConnectionParameters, String> refreshFunction;
+    protected List<Property<?>> properties;
 
     @JsonIgnore
-    private Function<ConnectionParameters, String> refreshUrlFunction =
+    protected Function<ConnectionParameters, String> refreshFunction;
+
+    @JsonIgnore
+    protected Function<ConnectionParameters, String> refreshUrlFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.REFRESH_URL);
 
     @JsonIgnore
-    private Function<ConnectionParameters, List<String>> scopes =
+    protected Function<ConnectionParameters, List<String>> scopes =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.SCOPES);
 
     @JsonIgnore
-    private Function<ConnectionParameters, String> tokenUrlFunction =
+    protected Function<ConnectionParameters, String> tokenUrlFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.TOKEN_URL);
 
+    private final String name;
     private final AuthorizationType type;
 
-    public Authorization(String name, AuthorizationType type) {
+    protected Authorization(String name, AuthorizationType type) {
         this.name = name;
         this.type = type;
         this.applyConsumer = type.getDefaultApplyConsumer();
-    }
-
-    public Authorization apply(BiConsumer<AuthorizationContext, ConnectionParameters> applyConsumer) {
-        this.applyConsumer = applyConsumer;
-
-        return this;
-    }
-
-    public Authorization authorizationCallback(
-            BiFunction<ConnectionParameters, String, String> authorizationCallbackFunction) {
-        this.authorizationCallbackFunction = authorizationCallbackFunction;
-
-        return this;
-    }
-
-    public Authorization authorizationUrl(Function<ConnectionParameters, String> authorizationUrlFunction) {
-        this.authorizationUrlFunction = authorizationUrlFunction;
-
-        return this;
-    }
-
-    public Authorization clientId(Function<ConnectionParameters, String> clientIdFunction) {
-        this.clientIdFunction = clientIdFunction;
-
-        return this;
-    }
-
-    public Authorization clientSecret(Function<ConnectionParameters, String> clientSecretFunction) {
-        this.clientSecretFunction = clientSecretFunction;
-
-        return this;
-    }
-
-    public Authorization display(Display display) {
-        this.display = display;
-
-        return this;
-    }
-
-    public Authorization onRefresh(List<Object> onRefresh) {
-        this.onRefresh = onRefresh;
-
-        return this;
-    }
-
-    public Authorization properties(Property... properties) {
-        this.properties = List.of(properties);
-
-        return this;
-    }
-
-    public Authorization refresh(Function<ConnectionParameters, String> refreshFunction) {
-        this.refreshFunction = refreshFunction;
-
-        return this;
-    }
-
-    public Authorization refreshUrl(Function<ConnectionParameters, String> refreshUrlFunction) {
-        this.refreshUrlFunction = refreshUrlFunction;
-
-        return this;
-    }
-
-    public Authorization scopes(Function<ConnectionParameters, List<String>> scopes) {
-        this.scopes = scopes;
-
-        return this;
-    }
-
-    public Authorization tokenUrl(Function<ConnectionParameters, String> tokenUrlFunction) {
-        this.tokenUrlFunction = tokenUrlFunction;
-
-        return this;
     }
 
     public BiConsumer<AuthorizationContext, ConnectionParameters> getApplyConsumer() {

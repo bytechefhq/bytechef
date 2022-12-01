@@ -24,6 +24,7 @@ import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
 import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -34,16 +35,19 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public class ContextImpl implements Context {
+    private final ConnectionDefinition connectionDefinition;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final TaskExecution taskExecution;
 
     public ContextImpl(
+            ConnectionDefinition connectionDefinition,
             ConnectionService connectionService,
             EventPublisher eventPublisher,
             FileStorageService fileStorageService,
             TaskExecution taskExecution) {
+        this.connectionDefinition = connectionDefinition;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
@@ -51,7 +55,7 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public Optional<ConnectionParameters> fetchConnection() {
+    public Optional<ConnectionParameters> fetchConnectionParameters() {
         if (taskExecution.containsKey(CONNECTION_ID)) {
             return connectionService
                     .fetchConnection(taskExecution.getString(CONNECTION_ID))
@@ -62,7 +66,12 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public ConnectionParameters getConnection() {
+    public ConnectionDefinition getConnectionDefinition() {
+        return connectionDefinition;
+    }
+
+    @Override
+    public ConnectionParameters getConnectionParameters() {
         return new ConnectionParametersImpl(
                 connectionService.getConnection(taskExecution.getRequiredString(CONNECTION_ID)));
     }

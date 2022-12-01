@@ -18,7 +18,7 @@
 
 package com.bytechef.component.delay;
 
-import static com.bytechef.hermes.component.definition.Action.ACTION;
+import static com.bytechef.hermes.component.definition.ActionDefinition.ACTION;
 
 import com.bytechef.hermes.component.test.mock.MockContext;
 import com.bytechef.hermes.component.test.mock.MockExecutionParameters;

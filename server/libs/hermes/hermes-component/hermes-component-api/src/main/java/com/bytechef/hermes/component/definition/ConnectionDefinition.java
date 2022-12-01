@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.definition;
 import static com.bytechef.hermes.component.constants.ComponentConstants.BASE_URI;
 
 import com.bytechef.hermes.component.ConnectionParameters;
-import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
@@ -36,59 +35,21 @@ import java.util.function.Function;
  * @author Ivica Cardic
  */
 @Schema(name = "ConnectionDefinition", description = "A connection to an outside service.")
-public final class ConnectionDefinition implements Definition {
+public sealed class ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
-    private String componentName;
-    private List<Authorization> authorizations = Collections.emptyList();
-    private Function<ConnectionParameters, String> baseUriFunction =
+    protected String componentName;
+    protected List<Authorization> authorizations = Collections.emptyList();
+    protected Function<ConnectionParameters, String> baseUriFunction =
             (connectionParameters) -> connectionParameters.getParameter(BASE_URI);
-    private Display display;
-    private List<Property<?>> properties;
-    private Resources resources;
-    private String subtitle;
+    protected Display display;
+    protected List<Property<?>> properties;
+    protected Resources resources;
+    protected String subtitle;
 
     @JsonIgnore
-    private Consumer<ConnectionParameters> testConsumer;
+    protected Consumer<ConnectionParameters> testConsumer;
 
-    public ConnectionDefinition() {}
-
-    public ConnectionDefinition authorizations(Authorization... authorizations) {
-        if (authorizations != null) {
-            this.authorizations = List.of(authorizations);
-        }
-
-        return this;
-    }
-
-    public ConnectionDefinition baseUri(Function<ConnectionParameters, String> baseUriFunction) {
-        this.baseUriFunction = baseUriFunction;
-
-        return this;
-    }
-
-    public ConnectionDefinition properties(Property<?>... properties) {
-        this.properties = List.of(properties);
-
-        return this;
-    }
-
-    public ConnectionDefinition resources(Resources resources) {
-        this.resources = resources;
-
-        return this;
-    }
-
-    public ConnectionDefinition subtitle(String subtitle) {
-        this.subtitle = subtitle;
-
-        return this;
-    }
-
-    public ConnectionDefinition testConsumer(Consumer<ConnectionParameters> testConsumer) {
-        this.testConsumer = testConsumer;
-
-        return this;
-    }
+    protected ConnectionDefinition() {}
 
     public List<Authorization> getAuthorizations() {
         return authorizations;
@@ -123,13 +84,5 @@ public final class ConnectionDefinition implements Definition {
 
     public Consumer<ConnectionParameters> getTestConsumer() {
         return testConsumer;
-    }
-
-    public void setComponentName(String componentName) {
-        this.componentName = componentName;
-    }
-
-    public void setDisplay(Display display) {
-        this.display = new Display(display.getLabel());
     }
 }

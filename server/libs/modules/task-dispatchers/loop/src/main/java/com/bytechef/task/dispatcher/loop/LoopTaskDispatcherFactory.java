@@ -16,14 +16,14 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.any;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.bool;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.integer;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.any;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_VAR;
@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoopTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(LOOP)
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP)
             .display(display("Loop").description("Loops sequentially over list of items."))
             .properties(
                     array(LIST).label("List of items").description("List of items to iterate over."),

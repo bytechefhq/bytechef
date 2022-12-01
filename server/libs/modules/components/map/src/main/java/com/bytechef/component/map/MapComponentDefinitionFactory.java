@@ -16,22 +16,22 @@
 
 package com.bytechef.component.map;
 
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_VAR;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.MAP;
 
-import com.bytechef.hermes.component.ComponentFactory;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 
-public class MapComponentFactory implements ComponentFactory {
+public class MapComponentDefinitionFactory implements ComponentDefinitionFactory {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = createComponent(MAP)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(MAP)
             .display(
                     display("Map")
                             .description(

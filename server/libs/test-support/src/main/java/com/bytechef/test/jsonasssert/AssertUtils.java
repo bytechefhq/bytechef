@@ -16,7 +16,6 @@
 
 package com.bytechef.test.jsonasssert;
 
-import com.bytechef.hermes.definition.Definition;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -37,7 +36,7 @@ public class AssertUtils {
         }
     };
 
-    public static void assertEquals(String definitionFileName, Definition definition) {
+    public static void assertEquals(String definitionFileName, Object definition) {
         try {
             JSONAssert.assertEquals(
                     FileUtils.readFileToString(

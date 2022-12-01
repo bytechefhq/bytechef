@@ -45,7 +45,7 @@ import java.util.Map;
     @JsonSubTypes.Type(value = Property.ObjectProperty.class, name = "OBJECT"),
     @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
 })
-public abstract class Property<P> {
+public sealed class Property<P extends Property<P>> permits Property.AnyProperty, Property.ValueProperty {
 
     public enum ControlType {
         CODE,
@@ -133,7 +133,8 @@ public abstract class Property<P> {
 
     @Schema(name = "AnyProperty", description = "An any property type.")
     @JsonTypeName("ANY")
-    public static class AnyProperty extends Property<AnyProperty> {
+    public static sealed class AnyProperty extends Property<AnyProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableAnyProperty {
 
         protected List<? extends Property<?>> types;
 
@@ -148,12 +149,21 @@ public abstract class Property<P> {
     }
 
     @Schema(name = "ValueProperty", description = "A base property for all value based properties.")
-    public abstract static class ValueProperty<V, P extends ValueProperty<V, P>> extends Property<P> {
+    public abstract static sealed class ValueProperty<V, P extends ValueProperty<V, P>> extends Property<P>
+            permits Property.ArrayProperty,
+                    Property.BooleanProperty,
+                    Property.DateProperty,
+                    Property.DateTimeProperty,
+                    Property.IntegerProperty,
+                    Property.NullProperty,
+                    Property.NumberProperty,
+                    Property.ObjectProperty,
+                    Property.StringProperty {
 
         protected V defaultValue;
         protected V exampleValue;
         protected List<PropertyOption> options;
-        protected OptionsDataSource optionsDataSource;
+        protected PropertyOptionDataSource optionDataSource;
 
         private ValueProperty(Type type) {
             this(null, type);
@@ -178,14 +188,15 @@ public abstract class Property<P> {
             return options;
         }
 
-        public OptionsDataSource getOptionsDataSource() {
-            return optionsDataSource;
+        public PropertyOptionDataSource getOptionsDataSource() {
+            return optionDataSource;
         }
     }
 
     @JsonTypeName("ARRAY")
     @Schema(name = "ArrayProperty", description = "An array property type.")
-    public static class ArrayProperty extends ValueProperty<Object[], ArrayProperty> {
+    public static sealed class ArrayProperty extends ValueProperty<Object[], ArrayProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableArrayProperty {
 
         protected List<? extends Property> items;
 
@@ -201,7 +212,8 @@ public abstract class Property<P> {
 
     @JsonTypeName("BOOLEAN")
     @Schema(name = "BooleanProperty", description = "A boolean property type.")
-    public static class BooleanProperty extends ValueProperty<Boolean, BooleanProperty> {
+    public static sealed class BooleanProperty extends ValueProperty<Boolean, BooleanProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty {
 
         protected BooleanProperty(String name) {
             super(name, Type.BOOLEAN);
@@ -210,7 +222,8 @@ public abstract class Property<P> {
 
     @JsonTypeName("DATE")
     @Schema(name = "DateProperty", description = "A date property type.")
-    public static class DateProperty extends ValueProperty<LocalDate, DateProperty> {
+    public static sealed class DateProperty extends ValueProperty<LocalDate, DateProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableDateProperty {
 
         protected DateProperty(String name) {
             super(name, Type.DATE);
@@ -219,7 +232,8 @@ public abstract class Property<P> {
 
     @JsonTypeName("DATE_TIME")
     @Schema(name = "DateTimeProperty", description = "A date-time property type.")
-    public static class DateTimeProperty extends ValueProperty<LocalDateTime, DateTimeProperty> {
+    public static sealed class DateTimeProperty extends ValueProperty<LocalDateTime, DateTimeProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty {
 
         protected DateTimeProperty(String name) {
             super(name, Type.DATE_TIME);
@@ -228,7 +242,7 @@ public abstract class Property<P> {
 
     @JsonTypeName("NULL")
     @Schema(name = "NullProperty", description = "A null property type.")
-    public static class NullProperty extends ValueProperty<Integer, NullProperty> {
+    public static final class NullProperty extends ValueProperty<Integer, NullProperty> {
 
         protected NullProperty(String name) {
             super(name, Type.NULL);
@@ -237,7 +251,8 @@ public abstract class Property<P> {
 
     @JsonTypeName("NUMBER")
     @Schema(name = "NumberProperty", description = "A number property type.")
-    public static class NumberProperty extends ValueProperty<Double, NumberProperty> {
+    public static sealed class NumberProperty extends ValueProperty<Double, NumberProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableNumberProperty {
 
         protected Integer maxValue;
         protected Integer minValue;
@@ -265,7 +280,8 @@ public abstract class Property<P> {
 
     @JsonTypeName("INTEGER")
     @Schema(name = "IntegerProperty", description = "An integer property type.")
-    public static class IntegerProperty extends ValueProperty<Integer, IntegerProperty> {
+    public static sealed class IntegerProperty extends ValueProperty<Integer, IntegerProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty {
 
         protected Integer maxValue;
         protected Integer minValue;
@@ -287,7 +303,8 @@ public abstract class Property<P> {
 
     @JsonTypeName("OBJECT")
     @Schema(name = "ObjectProperty", description = "An object property type.")
-    public static class ObjectProperty extends ValueProperty<Object, ObjectProperty> {
+    public static sealed class ObjectProperty extends ValueProperty<Object, ObjectProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableObjectProperty {
 
         protected Boolean additionalProperties;
         protected String objectType;
@@ -315,7 +332,8 @@ public abstract class Property<P> {
 
     @JsonTypeName("STRING")
     @Schema(name = "StringProperty", description = "A string property.")
-    public static class StringProperty extends ValueProperty<String, StringProperty> {
+    public static sealed class StringProperty extends ValueProperty<String, StringProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableStringProperty {
 
         protected ControlType controlType;
 

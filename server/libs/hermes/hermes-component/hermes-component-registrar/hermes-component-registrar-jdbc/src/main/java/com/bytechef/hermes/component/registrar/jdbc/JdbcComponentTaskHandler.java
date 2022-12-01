@@ -16,18 +16,18 @@
 
 package com.bytechef.hermes.component.registrar.jdbc;
 
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.bool;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.createConnection;
-import static com.bytechef.hermes.component.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.number;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.registrar.jdbc.executor.constants.JdbcConstants.COLUMNS;
 import static com.bytechef.hermes.component.registrar.jdbc.executor.constants.JdbcConstants.DATABASE;
 import static com.bytechef.hermes.component.registrar.jdbc.executor.constants.JdbcConstants.DELETE;
@@ -58,6 +58,7 @@ import com.bytechef.hermes.component.registrar.jdbc.executor.operation.InsertJdb
 import com.bytechef.hermes.component.registrar.jdbc.executor.operation.QueryJdbcOperation;
 import com.bytechef.hermes.component.registrar.jdbc.executor.operation.UpdateJdbcOperation;
 import com.bytechef.hermes.definition.Display;
+import com.bytechef.hermes.definition.Property;
 import java.util.List;
 import java.util.Map;
 
@@ -109,16 +110,18 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
     }
 
     private ComponentDefinition getComponentDefinition(String name, Display display) {
-        return createComponent(name)
+        return component(name)
                 .display(display(display.getLabel()).icon(display.getIcon()))
-                .connections(createConnection(name)
-                        .display(display)
+                .connection(connection()
                         .properties(
                                 string(HOST).label("Host").required(true),
                                 integer(PORT).label("Port").required(true),
                                 string(DATABASE).label("Database").required(true),
                                 string(USERNAME).label("Username").required(true),
-                                string(PASSWORD).label("Password").required(true)))
+                                string(PASSWORD)
+                                        .label("Password")
+                                        .controlType(Property.ControlType.PASSWORD)
+                                        .required(true)))
                 .actions(
                         action(QUERY)
                                 .display(display("Query").description("Execute an SQL query."))
@@ -136,7 +139,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                                                         "The list of properties which should be used as query parameters.")
                                                 .properties(bool(), dateTime(), number(), string()))
                                 .output(array().items(object().properties(integer())))
-                                .performFunction(this::performQuery),
+                                .perform(this::performQuery),
                         action(INSERT)
                                 .display(display("Insert").description("Insert rows in database."))
                                 .properties(
@@ -160,7 +163,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                                                 .items(object().additionalProperties(true)
                                                         .properties(any())))
                                 .output(object().properties(integer()))
-                                .performFunction(this::performInsert),
+                                .perform(this::performInsert),
                         action(UPDATE)
                                 .display(display("Update").description("Update rows in database."))
                                 .properties(
@@ -189,7 +192,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                                                 .items(object().additionalProperties(true)
                                                         .properties(any())))
                                 .output(object().properties(integer()))
-                                .performFunction(this::performUpdate),
+                                .perform(this::performUpdate),
                         action(DELETE)
                                 .display(display("Delete").description("Delete rows from database."))
                                 .properties(
@@ -213,7 +216,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                                                 .items(object().additionalProperties(true)
                                                         .properties(any())))
                                 .output(object().properties(integer()))
-                                .performFunction(this::performDelete),
+                                .perform(this::performDelete),
                         action(EXECUTE)
                                 .display(display("Execute").description("Execute an SQL DML or DML statement."))
                                 .properties(
@@ -235,6 +238,6 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                                                         "The list of properties which should be used as parameters.")
                                                 .properties(bool(), dateTime(), number(), string()))
                                 .output(object().properties(integer()))
-                                .performFunction(this::performExecute));
+                                .perform(this::performExecute));
     }
 }

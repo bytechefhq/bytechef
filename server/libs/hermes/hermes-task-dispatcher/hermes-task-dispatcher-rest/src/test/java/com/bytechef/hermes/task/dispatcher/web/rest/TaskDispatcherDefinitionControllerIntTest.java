@@ -16,8 +16,8 @@
 
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.web.rest.config.TaskDispatcherDefinitionRestTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +38,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 public class TaskDispatcherDefinitionControllerIntTest {
 
     private static final List<TaskDispatcherFactory> TASK_DISPATCHER_FACTORIES = List.of(
-            () -> TaskDispatcherDSL.create("task-dispatcher1"), () -> TaskDispatcherDSL.create("task-dispatcher2"));
+            () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher1"),
+            () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher2"));
 
     @Autowired
     private WebTestClient webTestClient;

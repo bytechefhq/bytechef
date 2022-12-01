@@ -44,7 +44,7 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String table = executionParameters.getRequiredString(JdbcConstants.TABLE);
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-                context.getConnection(),
+                context.getConnectionParameters(),
                 "INSERT INTO "
                         + schema
                         + "."
