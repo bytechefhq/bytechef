@@ -16,13 +16,19 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.constants.Versions;
+import static com.bytechef.hermes.component.constants.ComponentConstants.BASE_URI;
+
+import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Used for specifying an connection.
@@ -32,32 +38,35 @@ import java.util.List;
 @Schema(name = "ConnectionDefinition", description = "A connection to an outside service.")
 public final class ConnectionDefinition implements Definition {
 
+    private String componentName;
+    private List<Authorization> authorizations = Collections.emptyList();
+    private Function<ConnectionParameters, String> baseUriFunction =
+            (connectionParameters) -> connectionParameters.getParameter(BASE_URI);
     private Display display;
-    private String name;
-    private List<Property> properties;
+    private List<Property<?>> properties;
     private Resources resources;
     private String subtitle;
-    private int version = Versions.VERSION_1;
 
-    private ConnectionDefinition() {}
+    @JsonIgnore
+    private Consumer<ConnectionParameters> testConsumer;
 
-    public ConnectionDefinition(String name) {
-        this.name = name;
-    }
+    public ConnectionDefinition() {}
 
-    public ConnectionDefinition display(Display display) {
-        this.display = display;
-
-        return this;
-    }
-
-    public ConnectionDefinition name(String name) {
-        this.name = name;
+    public ConnectionDefinition authorizations(Authorization... authorizations) {
+        if (authorizations != null) {
+            this.authorizations = List.of(authorizations);
+        }
 
         return this;
     }
 
-    public ConnectionDefinition properties(Property... properties) {
+    public ConnectionDefinition baseUri(Function<ConnectionParameters, String> baseUriFunction) {
+        this.baseUriFunction = baseUriFunction;
+
+        return this;
+    }
+
+    public ConnectionDefinition properties(Property<?>... properties) {
         this.properties = List.of(properties);
 
         return this;
@@ -75,29 +84,36 @@ public final class ConnectionDefinition implements Definition {
         return this;
     }
 
-    public ConnectionDefinition version(int version) {
-        this.version = version;
+    public ConnectionDefinition testConsumer(Consumer<ConnectionParameters> testConsumer) {
+        this.testConsumer = testConsumer;
 
         return this;
+    }
+
+    public List<Authorization> getAuthorizations() {
+        return authorizations;
+    }
+
+    public Function<ConnectionParameters, String> getBaseUriFunction() {
+        return baseUriFunction;
+    }
+
+    @Schema(name = "componentName", description = "The name of a connection this connection can be used for.")
+    public String getComponentName() {
+        return componentName;
     }
 
     public Display getDisplay() {
         return display;
     }
 
-    @Schema(name = "name", description = "The connection name.")
-    public String getName() {
-        return name;
+    @Schema(name = "properties", description = "Properties of the connection.")
+    public List<Property<?>> getProperties() {
+        return properties;
     }
 
-    @Override
     public Resources getResources() {
         return resources;
-    }
-
-    @Schema(name = "properties", description = "Properties of the connection.")
-    public List<Property> getProperties() {
-        return properties;
     }
 
     @Schema(name = "subtitle", description = "Additional explanation.")
@@ -105,8 +121,15 @@ public final class ConnectionDefinition implements Definition {
         return subtitle;
     }
 
-    @Override
-    public int getVersion() {
-        return version;
+    public Consumer<ConnectionParameters> getTestConsumer() {
+        return testConsumer;
+    }
+
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
+    }
+
+    public void setDisplay(Display display) {
+        this.display = new Display(display.getLabel());
     }
 }

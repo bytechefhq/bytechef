@@ -52,14 +52,13 @@ public class ComponentDefinitionTest {
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testDisplayOption() throws JSONException, JsonProcessingException {
         DisplayOption displayOption =
-                DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(true, false)));
+                DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(true, false)));
 
         jsonAssertEquals("""
                 {"hideWhen":{"name":[true,false]}}
                 """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(1, 2)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1, 2)));
 
         jsonAssertEquals(
                 """
@@ -69,8 +68,7 @@ public class ComponentDefinitionTest {
             """,
                 displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(1L, 2L)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1L, 2L)));
 
         jsonAssertEquals(
                 """
@@ -80,8 +78,7 @@ public class ComponentDefinitionTest {
             """,
                 displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(1F, 2F)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1F, 2F)));
 
         jsonAssertEquals("""
         {
@@ -89,8 +86,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in(1D, 2D)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1D, 2D)));
 
         jsonAssertEquals("""
         {
@@ -98,8 +94,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.hideWhen("name").in("value1", "value2")));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in("value1", "value2")));
 
         jsonAssertEquals(
                 """
@@ -108,8 +103,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.hideWhen("name1").eq(1)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name1").eq(1)));
 
         jsonAssertEquals("""
         {
@@ -117,7 +111,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption = DisplayOption.build(List.of(
+        displayOption = DisplayOption.of(List.of(
                 ComponentDSL.hideWhen("name1").eq(1),
                 ComponentDSL.hideWhen("name2").eq(2)));
 
@@ -128,8 +122,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(true, false)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(true, false)));
 
         jsonAssertEquals(
                 """
@@ -138,8 +131,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(1, 2)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1, 2)));
 
         jsonAssertEquals(
                 """
@@ -149,8 +141,7 @@ public class ComponentDefinitionTest {
             """,
                 displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(1L, 2L)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1L, 2L)));
 
         jsonAssertEquals(
                 """
@@ -160,8 +151,7 @@ public class ComponentDefinitionTest {
             """,
                 displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(1F, 2F)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1F, 2F)));
 
         jsonAssertEquals("""
         {
@@ -169,8 +159,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.showWhen("name").in(1D, 2D)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1D, 2D)));
 
         jsonAssertEquals("""
         {
@@ -178,8 +167,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.showWhen("name").in("value1", "value2")));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in("value1", "value2")));
 
         jsonAssertEquals(
                 """
@@ -188,8 +176,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption =
-                DisplayOption.build(List.of(ComponentDSL.showWhen("name1").eq(1)));
+        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name1").eq(1)));
 
         jsonAssertEquals("""
         {
@@ -197,7 +184,7 @@ public class ComponentDefinitionTest {
         }
         """, displayOption);
 
-        displayOption = DisplayOption.build(List.of(
+        displayOption = DisplayOption.of(List.of(
                 ComponentDSL.showWhen("name1").eq(1),
                 ComponentDSL.showWhen("name2").eq(2)));
 
@@ -416,7 +403,8 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testTaskOperation() throws JSONException, JsonProcessingException {
-        Action action = ComponentDSL.action("name").display(display("label").description("description"));
+        ActionDefinition action =
+                ComponentDSL.action("name").display(display("label").description("description"));
 
         jsonAssertEquals(
                 """
@@ -452,17 +440,16 @@ public class ComponentDefinitionTest {
     @Test
     public void testTaskHandlerDescription() throws JSONException, JsonProcessingException {
         ComponentDefinition componentDefinition;
-        componentDefinition = ComponentDSL.createComponent("name")
+        componentDefinition = ComponentDSL.component("name")
                 .display(display("label")
                         .description("description")
                         .subtitle("subtitle")
                         .icon("icon"))
-                .connections()
                 .version(VERSION_1);
 
         jsonAssertEquals(
                 """
-                    {"connections":[],"display":{"description":"description","icon":"icon","label":"label","subtitle":"subtitle"},"name":"name","version":1.0}
+                    {"display":{"description":"description","icon":"icon","label":"label","subtitle":"subtitle"},"name":"name","version":1.0}
             """,
                 componentDefinition);
     }

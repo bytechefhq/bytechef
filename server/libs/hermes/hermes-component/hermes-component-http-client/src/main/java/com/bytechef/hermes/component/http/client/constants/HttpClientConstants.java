@@ -34,15 +34,9 @@ public class HttpClientConstants {
     public static final String PROXY = "proxy";
     public static final String TIMEOUT = "timeout";
     public static final String HEADER_PARAMETERS = "headerParameters";
-    public static final String KEY = "key";
-    public static final String VALUE = "value";
     public static final String QUERY_PARAMETERS = "queryParameters";
     public static final String BODY_PARAMETERS = "bodyParameters";
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
     public static final String HTTP_CLIENT = "httpClient";
-    public static final String TOKEN = "token";
-    public static final String ADD_TO = "addTo";
     public static final String GET = "get";
     public static final String POST = "post";
     public static final String PUT = "put";
@@ -50,45 +44,4 @@ public class HttpClientConstants {
     public static final String DELETE = "delete";
     public static final String HEAD = "head";
     public static final String SEND_FILE = "sendFile";
-    public static final String ACCESS_TOKEN = "accessToken";
-    public static final String HEADER_PREFIX = "headerPrefix";
-    public static final String API_TOKEN = "api_token";
-
-    public enum ApiTokenLocation {
-        HEADER,
-        QUERY_PARAMS,
-    }
-
-    public enum AuthType {
-        API_KEY,
-        BASIC_AUTH,
-        BEARER_TOKEN,
-        DIGEST_AUTH,
-        OAUTH2,
-    }
-
-    public enum BodyContentType {
-        BINARY,
-        FORM_DATA,
-        FORM_URLENCODED,
-        JSON,
-        RAW,
-        XML
-    }
-
-    public enum ResponseFormat {
-        FILE,
-        JSON,
-        TEXT,
-        XML,
-    }
-
-    public enum RequestMethod {
-        DELETE,
-        GET,
-        HEAD,
-        PATCH,
-        POST,
-        PUT,
-    }
 }

@@ -21,6 +21,22 @@ package com.bytechef.hermes.component.constants;
  */
 public class ComponentConstants {
 
+    public static final String ACCESS_TOKEN = "accessToken";
+    public static final String ADD_TO = "addTo";
+    public static final String API_TOKEN = "api_token";
+    public static final String AUTHORIZATION_URL = "authorizationUrl";
+    public static final String BASE_URI = "baseUri";
+    public static final String CLIENT_ID = "clientId";
+    public static final String CLIENT_SECRET = "clientSecret";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
+    public static final String HEADER_PREFIX = "headerPrefix";
+    public static final String KEY = "key";
+    public static final String PASSWORD = "password";
+    public static final String REFRESH_URL = "refreshUrl";
+    public static final String SCOPES = "scopes";
+    public static final String TOKEN = "token";
+    public static final String TOKEN_URL = "tokenUrl";
+    public static final String USERNAME = "username";
+    public static final String VALUE = "value";
 }

@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-@Schema(name = "ComponentDisplay", description = "An info about the component.")
+@Schema(name = "ComponentDisplay", description = "A display information about the component.")
 public final class ComponentDisplay extends Display {
 
     private String category;

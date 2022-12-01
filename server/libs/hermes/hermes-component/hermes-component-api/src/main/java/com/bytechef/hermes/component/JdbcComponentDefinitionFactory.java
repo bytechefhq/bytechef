@@ -16,12 +16,14 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 
 /**
+ * The component definition factory used for JDBC based components.
+ *
  * @author Ivica Cardic
  */
-public interface ComponentFactory {
+public interface JdbcComponentDefinitionFactory {
 
-    ComponentDefinition getDefinition();
+    JdbcComponentDefinition getJdbcComponentDefinition();
 }

@@ -16,7 +16,8 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDisplay;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
@@ -45,6 +46,10 @@ public final class ComponentDSL {
 
     public static Property.ArrayProperty array(String name) {
         return new Property.ArrayProperty(name);
+    }
+
+    public static Authorization authorization(String name, Authorization.AuthorizationType authorizationType) {
+        return new Authorization(name, authorizationType);
     }
 
     public static Property.BooleanProperty bool() {
@@ -121,8 +126,8 @@ public final class ComponentDSL {
         return new Property.ObjectProperty(name);
     }
 
-    public static Action action(String name) {
-        return new Action(name);
+    public static ActionDefinition action(String name) {
+        return new ActionDefinition(name);
     }
 
     public static Resources resources() {
@@ -137,15 +142,15 @@ public final class ComponentDSL {
         return new Property.StringProperty(name);
     }
 
-    public static ComponentDefinition createComponent(String name) {
+    public static ConnectionDefinition connection() {
+        return new ConnectionDefinition();
+    }
+
+    public static ComponentDefinition component(String name) {
         return new ComponentDefinition(name);
     }
 
-    public static ConnectionDefinition createConnection(String name) {
-        return new ConnectionDefinition(name);
-    }
-
-    public static JdbcComponentDefinition createJdbcComponent(String name) {
+    public static JdbcComponentDefinition jdbcComponent(String name) {
         return new JdbcComponentDefinition(name);
     }
 
@@ -163,6 +168,14 @@ public final class ComponentDSL {
 
     public static PropertyOption option(String name, String value) {
         return new PropertyOption(name, value, null);
+    }
+
+    public static PropertyOption option(String name, boolean value) {
+        return new PropertyOption(name, value, null);
+    }
+
+    public static PropertyOption option(String name, boolean value, String description) {
+        return new PropertyOption(name, value, description);
     }
 
     public static PropertyOption option(String name, int value, String description) {

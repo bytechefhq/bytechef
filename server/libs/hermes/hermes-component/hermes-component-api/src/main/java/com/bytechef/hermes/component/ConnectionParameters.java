@@ -20,6 +20,9 @@ package com.bytechef.hermes.component;
  * @author Ivica Cardic
  */
 public interface ConnectionParameters {
+
+    String getAuthorizationName();
+
     String getName();
 
     <T> T getParameter(String name);
