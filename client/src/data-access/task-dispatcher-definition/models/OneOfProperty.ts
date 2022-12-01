@@ -27,44 +27,58 @@ import {
 } from './Property';
 
 /**
- * A null property type.
+ * A one property type.
  * @export
- * @interface NullProperty
+ * @interface OneOfProperty
  */
-export interface NullProperty extends Property {
+export interface OneOfProperty extends Property {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof OneOfProperty
+     */
+    required?: boolean;
+    /**
+     * Possible types of properties that can be used.
+     * @type {Array<Property>}
+     * @memberof OneOfProperty
+     */
+    types?: Array<Property>;
     /**
      * 
      * @type {string}
-     * @memberof NullProperty
+     * @memberof OneOfProperty
      */
     type: string;
 }
 
 /**
- * Check if a given object implements the NullProperty interface.
+ * Check if a given object implements the OneOfProperty interface.
  */
-export function instanceOfNullProperty(value: object): boolean {
+export function instanceOfOneOfProperty(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
 
-export function NullPropertyFromJSON(json: any): NullProperty {
-    return NullPropertyFromJSONTyped(json, false);
+export function OneOfPropertyFromJSON(json: any): OneOfProperty {
+    return OneOfPropertyFromJSONTyped(json, false);
 }
 
-export function NullPropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): NullProperty {
+export function OneOfPropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): OneOfProperty {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         ...PropertyFromJSONTyped(json, ignoreDiscriminator),
+        'required': !exists(json, 'required') ? undefined : json['required'],
+        'types': !exists(json, 'types') ? undefined : ((json['types'] as Array<any>).map(PropertyFromJSON)),
         'type': json['type'],
     };
 }
 
-export function NullPropertyToJSON(value?: NullProperty | null): any {
+export function OneOfPropertyToJSON(value?: OneOfProperty | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -73,6 +87,8 @@ export function NullPropertyToJSON(value?: NullProperty | null): any {
     }
     return {
         ...PropertyToJSON(value),
+        'required': value.required,
+        'types': value.types === undefined ? undefined : ((value.types as Array<any>).map(PropertyToJSON)),
         'type': value.type,
     };
 }

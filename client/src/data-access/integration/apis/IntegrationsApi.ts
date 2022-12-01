@@ -45,7 +45,8 @@ export interface PutIntegrationRequest {
 export class IntegrationsApi extends runtime.BaseAPI {
 
     /**
-     * TODO
+     * Delete an integration.
+     * Delete an integration.
      */
     async deleteIntegrationRaw(requestParameters: DeleteIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -67,14 +68,16 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Delete an integration.
+     * Delete an integration.
      */
     async deleteIntegration(requestParameters: DeleteIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteIntegrationRaw(requestParameters, initOverrides);
     }
 
     /**
-     * TODO
+     * Get an integration by id.
+     * Get an integration by id.
      */
     async getIntegrationRaw(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -96,7 +99,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Get an integration by id.
+     * Get an integration by id.
      */
     async getIntegration(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
         const response = await this.getIntegrationRaw(requestParameters, initOverrides);
@@ -104,7 +108,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Get integrations.
+     * Get integrations.
      */
     async getIntegrationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Integration>>> {
         const queryParameters: any = {};
@@ -122,7 +127,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Get integrations.
+     * Get integrations.
      */
     async getIntegrations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Integration>> {
         const response = await this.getIntegrationsRaw(initOverrides);
@@ -130,7 +136,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Create a new integration.
+     * Create a new integration.
      */
     async postIntegrationRaw(requestParameters: PostIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
         if (requestParameters.integration === null || requestParameters.integration === undefined) {
@@ -155,7 +162,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Create a new integration.
+     * Create a new integration.
      */
     async postIntegration(requestParameters: PostIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
         const response = await this.postIntegrationRaw(requestParameters, initOverrides);
@@ -163,7 +171,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Update an existing integration.
+     * Update an existing integration.
      */
     async putIntegrationRaw(requestParameters: PutIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -192,7 +201,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * TODO
+     * Update an existing integration.
+     * Update an existing integration.
      */
     async putIntegration(requestParameters: PutIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
         const response = await this.putIntegrationRaw(requestParameters, initOverrides);
