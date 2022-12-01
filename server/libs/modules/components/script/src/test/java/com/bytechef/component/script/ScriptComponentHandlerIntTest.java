@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.function;
+package com.bytechef.component.script;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Ivica Cardic
  */
 @ComponentIntTest
-public class FunctionComponentHandlerIntTest {
+public class ScriptComponentHandlerIntTest {
 
     private TestVarTaskHandler<Integer, Integer> testVarTaskHandler;
 
@@ -55,7 +55,7 @@ public class FunctionComponentHandlerIntTest {
     @Test
     public void testPerformJavaScript() {
         Job job = workflowExecutor.execute(
-                "function_v1_javascript", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+                "script_v1_javascript", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -67,7 +67,7 @@ public class FunctionComponentHandlerIntTest {
     @Test
     public void testPerformPython() {
         Job job = workflowExecutor.execute(
-                "function_v1_python", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+                "script_v1_python", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -78,8 +78,8 @@ public class FunctionComponentHandlerIntTest {
 
     @Test
     public void testPerformR() {
-        Job job = workflowExecutor.execute(
-                "function_v1_r", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+        Job job =
+                workflowExecutor.execute("script_v1_r", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -91,7 +91,7 @@ public class FunctionComponentHandlerIntTest {
     @Test
     public void testPerformRuby() {
         Job job = workflowExecutor.execute(
-                "function_v1_ruby", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+                "script_v1_ruby", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 

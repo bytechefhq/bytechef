@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.function;
+package com.bytechef.component.script;
 
 import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Matija Petanjek
  */
-public class FunctionComponentHandlerTest {
+public class ScriptComponentHandlerTest {
 
     @Test
     public void testGetDefinition() {
-        AssertUtils.assertEquals("definition/function_v1.json", new FunctionComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/script_v1.json", new ScriptComponentHandler().getDefinition());
     }
 }

@@ -1,9 +1,9 @@
 {
   "display": {
     "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
-    "label": "Function"
+    "label": "Script"
   },
-  "name": "function",
+  "name": "script",
   "actions": [
     {
       "display": {

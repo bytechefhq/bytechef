@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.function.constants;
+package com.bytechef.component.script.constants;
 
 /**
  * @author Matija Petanjek
  */
-public class FunctionConstants {
+public class ScriptConstants {
 
-    public static final String FUNCTION = "function";
     public static final String INPUT = "input";
     public static final String JAVA = "java";
     public static final String JAVASCRIPT = "javascript";

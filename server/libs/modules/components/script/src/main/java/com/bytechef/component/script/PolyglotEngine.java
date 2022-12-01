@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.function;
+package com.bytechef.component.script;
 
-import static com.bytechef.component.function.constants.FunctionConstants.INPUT;
-import static com.bytechef.component.function.constants.FunctionConstants.SCRIPT;
+import static com.bytechef.component.script.constants.ScriptConstants.INPUT;
+import static com.bytechef.component.script.constants.ScriptConstants.SCRIPT;
 
 import com.bytechef.hermes.component.ExecutionParameters;
 import java.util.function.Function;
