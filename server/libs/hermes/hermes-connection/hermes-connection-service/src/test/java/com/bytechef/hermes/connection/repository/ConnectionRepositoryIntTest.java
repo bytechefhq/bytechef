@@ -78,7 +78,6 @@ public class ConnectionRepositoryIntTest {
     public void testUpdate() {
         Connection connection = connectionRepository.save(getConnection());
 
-        connection.setLabel("label2");
         connection.setName("name2");
         connection.setParameters(Map.of("key2", "value2"));
 
@@ -87,7 +86,6 @@ public class ConnectionRepositoryIntTest {
         Connection updatedConnection =
                 connectionRepository.findById(connection.getId()).get();
 
-        Assertions.assertEquals(connection.getLabel(), updatedConnection.getLabel());
         Assertions.assertEquals("name2", updatedConnection.getName());
         Assertions.assertEquals(Map.of("key2", "value2"), updatedConnection.getParameters());
     }
@@ -97,7 +95,6 @@ public class ConnectionRepositoryIntTest {
 
         connection.setComponentName("componentName");
         connection.setComponentVersion(1);
-        connection.setLabel("label");
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
 
