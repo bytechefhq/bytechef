@@ -29,7 +29,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-07T16:28:15.510907+01:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -137,11 +137,11 @@ public class JobModel {
   }
 
   /**
-   * Created by.
+   * The created by.
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Created by.", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -156,11 +156,11 @@ public class JobModel {
   }
 
   /**
-   * Created date.
+   * The created date.
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Created date.", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -259,11 +259,11 @@ public class JobModel {
   }
 
   /**
-   * The key-value map of inputs passed to the job when it was created.
+   * The key-value map of the inputs passed to the job when it was created.
    * @return inputs
   */
   
-  @Schema(name = "inputs", description = "The key-value map of inputs passed to the job when it was created.", required = false)
+  @Schema(name = "inputs", description = "The key-value map of the inputs passed to the job when it was created.", required = false)
   public Map<String, Object> getInputs() {
     return inputs;
   }
@@ -297,11 +297,11 @@ public class JobModel {
   }
 
   /**
-   * Last modified by.
+   * The last modified by.
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -316,11 +316,11 @@ public class JobModel {
   }
 
   /**
-   * Last modified date.
+   * The last modified date.
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -343,11 +343,11 @@ public class JobModel {
   }
 
   /**
-   * The key-value map of outputs returned.
+   * The key-value map of the outputs returned.
    * @return outputs
   */
   
-  @Schema(name = "outputs", description = "The key-value map of outputs returned.", required = false)
+  @Schema(name = "outputs", description = "The key-value map of the outputs returned.", required = false)
   public Map<String, Object> getOutputs() {
     return outputs;
   }
@@ -446,11 +446,11 @@ public class JobModel {
   }
 
   /**
-   * The list of webhooks configured.
+   * The list of the webhooks configured.
    * @return webhooks
   */
   @Valid 
-  @Schema(name = "webhooks", description = "The list of webhooks configured.", required = false)
+  @Schema(name = "webhooks", description = "The list of the webhooks configured.", required = false)
   public List<Map<String, Object>> getWebhooks() {
     return webhooks;
   }

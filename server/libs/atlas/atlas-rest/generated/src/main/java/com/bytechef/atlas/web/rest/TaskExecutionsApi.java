@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-07T16:28:15.510907+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-executions", description = "the task-executions API")
 public interface TaskExecutionsApi {
@@ -41,7 +41,7 @@ public interface TaskExecutionsApi {
      * GET /task-executions/{id} : Get a task execution by id.
      * Get a task execution by id.
      *
-     * @param id Id of the task execution. (required)
+     * @param id The id of the task execution to get. (required)
      * @return The task execution. (status code 200)
      */
     @Operation(
@@ -60,7 +60,7 @@ public interface TaskExecutionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<TaskExecutionModel>> getTaskExecution(
-        @Parameter(name = "id", description = "Id of the task execution.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the task execution to get.", required = true) @PathVariable("id") String id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();

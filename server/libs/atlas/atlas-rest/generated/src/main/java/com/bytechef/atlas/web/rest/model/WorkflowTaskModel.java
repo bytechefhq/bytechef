@@ -25,7 +25,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-07T16:28:15.510907+01:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @JsonProperty("finalize")
@@ -157,11 +157,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The key-value map of task parameters.
+   * Key-value map of task parameters.
    * @return parameters
   */
   
-  @Schema(name = "parameters", description = "The key-value map of task parameters.", required = false)
+  @Schema(name = "parameters", description = "Key-value map of task parameters.", required = false)
   public Map<String, Object> getParameters() {
     return parameters;
   }
@@ -249,11 +249,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The type of the task.
+   * Type of the task.
    * @return type
   */
   
-  @Schema(name = "type", description = "The type of the task.", required = false)
+  @Schema(name = "type", description = "Type of the task.", required = false)
   public String getType() {
     return type;
   }
