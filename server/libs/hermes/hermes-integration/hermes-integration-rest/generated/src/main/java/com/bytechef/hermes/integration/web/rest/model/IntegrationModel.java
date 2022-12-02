@@ -20,12 +20,12 @@ import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * TODO
+ * A group of workflows that make one logical integration.
  */
 
-@Schema(name = "Integration", description = "TODO")
+@Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:58:11.789560+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-02T12:00:57.220855+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("createdBy")
@@ -61,11 +61,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The created by.
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -80,11 +80,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The created date.
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -99,11 +99,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The id of the integration.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the integration.", required = false)
   public String getId() {
     return id;
   }
@@ -118,11 +118,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The name of the integration.
    * @return name
   */
   
-  @Schema(name = "name", description = "TODO", required = false)
+  @Schema(name = "name", description = "The name of the integration.", required = false)
   public String getName() {
     return name;
   }
@@ -137,11 +137,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The description of the integration.
    * @return description
   */
   
-  @Schema(name = "description", description = "TODO", required = false)
+  @Schema(name = "description", description = "The description of the integration.", required = false)
   public String getDescription() {
     return description;
   }
@@ -156,11 +156,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The last modified by.
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -175,11 +175,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The last modified date.
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -202,11 +202,11 @@ public class IntegrationModel {
   }
 
   /**
-   * TODO
+   * The workflow ids belonging to this integration.
    * @return workflowIds
   */
   
-  @Schema(name = "workflowIds", description = "TODO", required = false)
+  @Schema(name = "workflowIds", description = "The workflow ids belonging to this integration.", required = false)
   public List<String> getWorkflowIds() {
     return workflowIds;
   }

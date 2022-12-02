@@ -32,23 +32,24 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:58:11.789560+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-02T12:00:57.220855+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "the integrations API")
 public interface IntegrationsApi {
 
     /**
-     * DELETE /integrations/{id}
-     * TODO
+     * DELETE /integrations/{id} : Delete an integration.
+     * Delete an integration.
      *
-     * @param id TODO (required)
-     * @return TODO (status code 200)
+     * @param id The id of the integration. (required)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "deleteIntegration",
+        summary = "Delete an integration.",
         tags = { "integrations" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "TODO")
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -56,7 +57,7 @@ public interface IntegrationsApi {
         value = "/integrations/{id}"
     )
     default Mono<ResponseEntity<Void>> deleteIntegration(
-        @Parameter(name = "id", description = "TODO", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the integration.", required = true) @PathVariable("id") String id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -67,17 +68,18 @@ public interface IntegrationsApi {
 
 
     /**
-     * GET /integrations/{id}
-     * TODO
+     * GET /integrations/{id} : Get an integration by id.
+     * Get an integration by id.
      *
-     * @param id TODO (required)
-     * @return TODO (status code 200)
+     * @param id The id of the integration. (required)
+     * @return The integration object. (status code 200)
      */
     @Operation(
         operationId = "getIntegration",
+        summary = "Get an integration by id.",
         tags = { "integrations" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "TODO", content = {
+            @ApiResponse(responseCode = "200", description = "The integration object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
             })
         }
@@ -88,7 +90,7 @@ public interface IntegrationsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<IntegrationModel>> getIntegration(
-        @Parameter(name = "id", description = "TODO", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the integration.", required = true) @PathVariable("id") String id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -106,16 +108,17 @@ public interface IntegrationsApi {
 
 
     /**
-     * GET /integrations
-     * TODO
+     * GET /integrations : Get integrations.
+     * Get integrations.
      *
-     * @return TODO OK (status code 200)
+     * @return The list of integrations. (status code 200)
      */
     @Operation(
         operationId = "getIntegrations",
+        summary = "Get integrations.",
         tags = { "integrations" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "TODO OK", content = {
+            @ApiResponse(responseCode = "200", description = "The list of integrations.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
             })
         }
@@ -143,17 +146,18 @@ public interface IntegrationsApi {
 
 
     /**
-     * POST /integrations
-     * TODO
+     * POST /integrations : Create a new integration.
+     * Create a new integration.
      *
      * @param integrationModel  (required)
-     * @return TODO OK (status code 200)
+     * @return The integration object. (status code 200)
      */
     @Operation(
         operationId = "postIntegration",
+        summary = "Create a new integration.",
         tags = { "integrations" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "TODO OK", content = {
+            @ApiResponse(responseCode = "200", description = "The integration object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
             })
         }
@@ -183,18 +187,19 @@ public interface IntegrationsApi {
 
 
     /**
-     * PUT /integrations/{id}
-     * TODO
+     * PUT /integrations/{id} : Update an existing integration.
+     * Update an existing integration.
      *
-     * @param id TODO (required)
+     * @param id The id of the integration. (required)
      * @param integrationModel  (required)
-     * @return TODO (status code 200)
+     * @return The updated integration object. (status code 200)
      */
     @Operation(
         operationId = "putIntegration",
+        summary = "Update an existing integration.",
         tags = { "integrations" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "TODO", content = {
+            @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
                 @Content(mediaType = "*/*", schema = @Schema(implementation = IntegrationModel.class))
             })
         }
@@ -206,7 +211,7 @@ public interface IntegrationsApi {
         consumes = { "application/json" }
     )
     default Mono<ResponseEntity<IntegrationModel>> putIntegration(
-        @Parameter(name = "id", description = "TODO", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the integration.", required = true) @PathVariable("id") String id,
         @Parameter(name = "IntegrationModel", description = "", required = true) @Valid @RequestBody Mono<IntegrationModel> integrationModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
