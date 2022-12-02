@@ -61,7 +61,7 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/SingleValueProperty'
+      - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
           type:
@@ -72,7 +72,7 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/SingleValueProperty'
+      - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
           type:
@@ -83,23 +83,23 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/SingleValueProperty'
+      - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
           type:
             type: string
   Display:
-    description: Info about the component.
+    description: Display information.
     type: object
     properties:
       description:
-        description: The component description.
+        description: The description.
         type: string
       icon:
-        description: The component icon.
+        description: The icon.
         type: string
       label:
-        description: The component label.
+        description: The name.
         type: string
   DisplayOption:
     description: Defines rules when a property should be shown or hidden.
@@ -119,7 +119,7 @@ schemas:
           type: array
           items:
             type: object
-  EditorType:
+  ControlType:
     description: A type of the editor to show in UI.
     type: string
     enum:
@@ -130,7 +130,7 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/SingleValueProperty'
+      - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
           maxValue:
@@ -149,7 +149,7 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/SingleValueProperty'
+      - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
           type:
@@ -160,7 +160,7 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/SingleValueProperty'
+      - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
           maxValue:
@@ -209,27 +209,33 @@ schemas:
                 - $ref: '#/schemas/ObjectProperty'
           type:
             type: string
-  SingleValueProperty:
-    description: A base property for all single value properties.
+  OptionsDataSource:
+    description: Defines function that should dynamically load options for the property.
     type: object
-    allOf:
-      - $ref: '#/schemas/ValueProperty'
-      - type: object
-        properties:
-          options:
-            description: The list of valid property options.
-            type: array
-            items:
-              $ref: '#/schemas/PropertyOption'
+    properties:
+      loadOptionsDependsOn:
+        description: The list of property names on which value change the property options should load/reload.
+        type: array
+        items:
+          type: string
+      loadOptionsFunction:
+        description: The function that should dynamically load options for the property.
+        type: object
   Property:
     description: A base property.
     type: object
     properties:
+      advancedOption:
+        description: If the property should be grouped under advanced options.
+        type: boolean
       description:
         description: The property description.
         type: string
       displayOption:
         $ref: '#/schemas/DisplayOption'
+      hidden:
+        description: If the property should be hidden or not.
+        type: boolean
       label:
         description: The property label.
         type: string
@@ -274,9 +280,15 @@ schemas:
       value:
         description: Value of the option.
         oneOf:
+          - type: boolean
           - type: string
+            format: date
+          - type: string
+            format: date-time
           - type: integer
             format: int32
+          - type: object
+          - type: string
   Resources:
     description: A set of available resources.
     type: object
@@ -290,11 +302,11 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/SingleValueProperty'
+      - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
-          editorType:
-            $ref: '#/schemas/EditorType'
+          controlType:
+            $ref: '#/schemas/ControlType'
           type:
             type: string
   ValueProperty:
@@ -310,11 +322,11 @@ schemas:
           exampleValue:
             description: The property example value.
             type: object
-          loadOptionsDependsOn:
-            description: The list of property names on which value change the property options should load/reload.
+          options:
+            description: The list of valid property options.
             type: array
             items:
-              type: string
-          loadOptionsFunction:
-            description: The code that should dynamically load options for the property.
-            type: object
+              $ref: '#/schemas/PropertyOption'
+#          optionsDataSource:
+#            oneOf:
+#              - '#/schemas/FunctionOptionsDataSource'
