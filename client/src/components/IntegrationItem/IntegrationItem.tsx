@@ -1,6 +1,6 @@
-import {PropsWithChildren} from 'react';
-import IntegrationItemFooter from './IntegrationItemFooter';
-import IntegrationItemHeader from './IntegrationItemHeader';
+import React, {PropsWithChildren} from 'react';
+import Footer from './Footer';
+import Header from './Header';
 
 type Props = {
 	name: string;
@@ -22,18 +22,13 @@ export const IntegrationItem: React.FC<PropsWithChildren<Props>> = ({
 	date,
 }) => {
 	return (
-		<>
-			<IntegrationItemHeader
+		<div>
+			<Header
 				name={name}
 				status={status}
 				dropdownTrigger={dropdownTrigger}
 			/>
-			<IntegrationItemFooter
-				category={category}
-				tag={tag}
-				button={button}
-				date={date}
-			/>
-		</>
+			<Footer category={category} tag={tag} button={button} date={date} />
+		</div>
 	);
 };

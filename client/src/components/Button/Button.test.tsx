@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import {render, screen, userEvent} from '../../utils/test-utils';
+import {render, screen} from '../../utils/test-utils';
 import {Button} from './Button';
 
 describe('Button', async () => {
