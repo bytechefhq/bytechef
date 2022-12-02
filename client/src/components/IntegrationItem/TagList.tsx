@@ -1,5 +1,5 @@
 import React, {PropsWithChildren} from 'react';
-import {Button} from './Button';
+import {AddTagButton} from './AddTagButton';
 import {Tag} from './Tag';
 
 type Props = {
@@ -11,7 +11,7 @@ export const TagList: React.FC<PropsWithChildren<Props>> = ({tag, button}) => {
 	return (
 		<div>
 			<Tag tag={tag} />
-			<Button button={button} />
+			<AddTagButton button={button} />
 		</div>
 	);
 };
