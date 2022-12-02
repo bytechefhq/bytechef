@@ -3,8 +3,8 @@ info:
   description: Common Definition structs.
   version: v1
 schemas:
-  AnyProperty:
-    description: An any property type.
+  OneOfProperty:
+    description: A one of property type.
     type: object
     required:
       - type
@@ -18,16 +18,7 @@ schemas:
             description: Possible types of properties that can be used.
             type: array
             items:
-              oneOf:
-                - $ref: '#/schemas/ArrayProperty'
-                - $ref: '#/schemas/BooleanProperty'
-                - $ref: '#/schemas/DateProperty'
-                - $ref: '#/schemas/DateTimeProperty'
-                - $ref: '#/schemas/IntegerProperty'
-                - $ref: '#/schemas/NullProperty'
-                - $ref: '#/schemas/NumberProperty'
-                - $ref: '#/schemas/StringProperty'
-                - $ref: '#/schemas/ObjectProperty'
+              $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
           type:
             type: string
   ArrayProperty:
@@ -43,16 +34,7 @@ schemas:
             description: Types of the array items.
             type: array
             items:
-              oneOf:
-                - $ref: '#/schemas/AnyProperty'
-                - $ref: '#/schemas/ArrayProperty'
-                - $ref: '#/schemas/BooleanProperty'
-                - $ref: '#/schemas/DateProperty'
-                - $ref: '#/schemas/DateTimeProperty'
-                - $ref: '#/schemas/IntegerProperty'
-                - $ref: '#/schemas/NumberProperty'
-                - $ref: '#/schemas/StringProperty'
-                - $ref: '#/schemas/ObjectProperty'
+              $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
           type:
             type: string
   BooleanProperty:
@@ -92,6 +74,9 @@ schemas:
     description: Display information.
     type: object
     properties:
+      category:
+        description: The category of the component.
+        type: string
       description:
         description: The description.
         type: string
@@ -99,20 +84,28 @@ schemas:
         description: The icon.
         type: string
       label:
-        description: The name.
+        description: The label.
         type: string
+      subtitle:
+        description: Additional explanation.
+        type: string
+      tags:
+        description: Tags for the component.
+        type: array
+        items:
+          type: string
   DisplayOption:
     description: Defines rules when a property should be shown or hidden.
     type: object
     properties:
-      hideWhen:
+      hide:
         description: The map of property names and list of values to check against if the property should be hidden.
         type: object
         additionalProperties:
           type: array
           items:
             type: object
-      showWhen:
+      show:
         description: The map of property names and list of values to check against if the property should be shown.
         type: object
         additionalProperties:
@@ -124,6 +117,7 @@ schemas:
     type: string
     enum:
       - CODE
+      - PASSWORD
   IntegerProperty:
     description: An integer property type.
     type: object
@@ -149,7 +143,7 @@ schemas:
     required:
       - type
     allOf:
-      - $ref: '#/schemas/ValueProperty'
+      - $ref: '#/schemas/Property'
       - type: object
         properties:
           type:
@@ -187,8 +181,10 @@ schemas:
       - type: object
         properties:
           additionalProperties:
-            description: The object can contain dynamically defined properties.
-            type: boolean
+            description: Types of dynamically defined properties.
+            type: array
+            items:
+              $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
           objectType:
             description: The object type.
             type: string
@@ -196,31 +192,9 @@ schemas:
             description: The list of valid object property types.
             type: array
             items:
-              oneOf:
-                - $ref: '#/schemas/AnyProperty'
-                - $ref: '#/schemas/ArrayProperty'
-                - $ref: '#/schemas/BooleanProperty'
-                - $ref: '#/schemas/DateProperty'
-                - $ref: '#/schemas/DateTimeProperty'
-                - $ref: '#/schemas/IntegerProperty'
-                - $ref: '#/schemas/NullProperty'
-                - $ref: '#/schemas/NumberProperty'
-                - $ref: '#/schemas/StringProperty'
-                - $ref: '#/schemas/ObjectProperty'
+              $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
           type:
             type: string
-  OptionsDataSource:
-    description: Defines function that should dynamically load options for the property.
-    type: object
-    properties:
-      loadOptionsDependsOn:
-        description: The list of property names on which value change the property options should load/reload.
-        type: array
-        items:
-          type: string
-      loadOptionsFunction:
-        description: The function that should dynamically load options for the property.
-        type: object
   Property:
     description: A base property.
     type: object
@@ -255,7 +229,6 @@ schemas:
     discriminator:
       propertyName: type
       mapping:
-        ANY: '#/schemas/AnyProperty'
         ARRAY: '#/schemas/ArrayProperty'
         BOOLEAN: '#/schemas/BooleanProperty'
         DATE: '#/schemas/DateProperty'
@@ -265,6 +238,7 @@ schemas:
         NUMBER: '#/schemas/NumberProperty'
         STRING: '#/schemas/StringProperty'
         OBJECT: '#/schemas/ObjectProperty'
+        ONE_OF: '#/schemas/OneOfProperty'
   PropertyOption:
     description: Defines valid property value.
     type: object
@@ -279,16 +253,19 @@ schemas:
         type: string
       value:
         description: Value of the option.
-        oneOf:
-          - type: boolean
-          - type: string
-            format: date
-          - type: string
-            format: date-time
-          - type: integer
-            format: int32
-          - type: object
-          - type: string
+        type: object
+  PropertyOptionDataSource:
+    description: Defines function that should dynamically load options for the property.
+    type: object
+    properties:
+      loadOptionsDependsOn:
+        description: The list of property names on which value change the property options should load/reload.
+        type: array
+        items:
+          type: string
+      loadOptionsFunction:
+        description: The function that should dynamically load options for the property.
+        type: object
   Resources:
     description: A set of available resources.
     type: object
@@ -327,6 +304,6 @@ schemas:
             type: array
             items:
               $ref: '#/schemas/PropertyOption'
-#          optionsDataSource:
+#          optionDataSource:
 #            oneOf:
-#              - '#/schemas/FunctionOptionsDataSource'
+#              - '#/schemas/PropertyOptionDataSource'
