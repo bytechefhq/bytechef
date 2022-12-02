@@ -1,6 +1,5 @@
 import {SidebarContentLayout} from '../../components/Layouts/SidebarContentLayout';
 import {PageHeader} from 'components/PageHeader/PageHeader';
-import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
 import {IntegrationList} from './IntegrationList';
 
 export const Integrations = (): JSX.Element => {
@@ -11,17 +10,7 @@ export const Integrations = (): JSX.Element => {
 				buttonLabel="New Integration"
 			/>
 
-			<IntegrationItem
-				name="NAME"
-				status="STATUS"
-				dropdownTrigger="DROPDOWNTRIGGER"
-				category="CATEGORY"
-				tag="TAG"
-				button="BUTTON"
-				date="DATE"
-			/>
-
-			{<IntegrationList />}
+			<IntegrationList />
 		</SidebarContentLayout>
 	);
 };
