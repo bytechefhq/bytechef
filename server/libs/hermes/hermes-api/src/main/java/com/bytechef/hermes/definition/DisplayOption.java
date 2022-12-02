@@ -35,23 +35,7 @@ public class DisplayOption {
 
     private DisplayOption() {}
 
-    @Schema(
-            name = "hideWhen",
-            description =
-                    "The map of property names and list of values to check against if the property should be hidden.")
-    public Map<String, List<Object>> getHideWhen() {
-        return hideWhen;
-    }
-
-    @Schema(
-            name = "showWhen",
-            description =
-                    "The map of property names and list of values to check against if the property should be shown.")
-    public Map<String, List<Object>> getShowWhen() {
-        return showWhen;
-    }
-
-    public static DisplayOption build(List<DisplayOptionCondition> displayOptionConditions) {
+    public static DisplayOption of(List<DisplayOptionCondition> displayOptionConditions) {
         DisplayOption displayOption = new DisplayOption();
 
         for (DisplayOptionCondition displayOptionCondition : displayOptionConditions) {
@@ -73,6 +57,22 @@ public class DisplayOption {
         }
 
         return displayOption;
+    }
+
+    @Schema(
+            name = "hideWhen",
+            description =
+                    "The map of property names and list of values to check against if the property should be hidden.")
+    public Map<String, List<Object>> getHideWhen() {
+        return hideWhen;
+    }
+
+    @Schema(
+            name = "showWhen",
+            description =
+                    "The map of property names and list of values to check against if the property should be shown.")
+    public Map<String, List<Object>> getShowWhen() {
+        return showWhen;
     }
 
     public static class DisplayOptionProperty {

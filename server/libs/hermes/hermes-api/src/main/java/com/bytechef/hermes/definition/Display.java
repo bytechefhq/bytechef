@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * @author Ivica Cardic
  */
-@Schema(name = "Display", description = "Info about the component.")
+@Schema(name = "Display", description = "Display information.")
 public class Display {
 
     protected String description;
@@ -44,17 +44,17 @@ public class Display {
         return this;
     }
 
-    @Schema(name = "description", description = "The component description.")
+    @Schema(name = "description", description = "The description.")
     public String getDescription() {
         return description;
     }
 
-    @Schema(name = "icon", description = " The component icon.")
+    @Schema(name = "icon", description = " The icon.")
     public String getIcon() {
         return icon;
     }
 
-    @Schema(name = "label", description = " The component label.")
+    @Schema(name = "label", description = "The label.")
     public String getLabel() {
         return label;
     }

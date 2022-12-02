@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
@@ -50,8 +48,9 @@ import java.util.function.Function;
 })
 public abstract sealed class Property<P> permits Property.AnyProperty, Property.ValueProperty {
 
-    public enum EditorType {
-        CODE
+    public enum ControlType {
+        CODE,
+        PASSWORD
     }
 
     public enum Type {
@@ -67,8 +66,10 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
         STRING
     }
 
+    private Boolean advancedOption;
     private String description;
     private DisplayOption displayOption;
+    private Boolean hidden;
     private String label;
     private Map<String, Object> metadata;
     private final String name;
@@ -82,6 +83,13 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
     }
 
     @SuppressWarnings("unchecked")
+    public P advancedOption(boolean additional) {
+        this.advancedOption = additional;
+
+        return (P) this;
+    }
+
+    @SuppressWarnings("unchecked")
     public P description(String description) {
         this.description = description;
 
@@ -90,7 +98,14 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @SuppressWarnings("unchecked")
     public P displayOption(DisplayOption.DisplayOptionCondition... displayOptionConditions) {
-        this.displayOption = DisplayOption.build(List.of(displayOptionConditions));
+        this.displayOption = DisplayOption.of(List.of(displayOptionConditions));
+
+        return (P) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public P hidden(boolean hidden) {
+        this.hidden = hidden;
 
         return (P) this;
     }
@@ -135,6 +150,11 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
         return (P) this;
     }
 
+    @Schema(name = "additional", description = "If the property should be grouped under additional properties.")
+    public Boolean getAdvancedOption() {
+        return advancedOption;
+    }
+
     @Schema(name = "description", description = "The property description.")
     public String getDescription() {
         return description;
@@ -143,6 +163,11 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
     @Schema(name = "description", description = "The property description.")
     public DisplayOption getDisplayOption() {
         return displayOption;
+    }
+
+    @Schema(name = "hidden", description = "If the property should be visible or not.")
+    public Boolean getHidden() {
+        return hidden;
     }
 
     @Schema(name = "label", description = "The property label.")
@@ -203,14 +228,20 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @Schema(name = "ValueProperty", description = "A base property for all value based properties.")
     public abstract static sealed class ValueProperty<V, P extends ValueProperty<V, P>> extends Property<P>
-            permits ArrayProperty, ObjectProperty, SingleValueProperty {
+            permits ArrayProperty,
+                    BooleanProperty,
+                    DateProperty,
+                    DateTimeProperty,
+                    IntegerProperty,
+                    NullProperty,
+                    NumberProperty,
+                    ObjectProperty,
+                    StringProperty {
 
         protected V defaultValue;
         protected V exampleValue;
-        private List<String> loadOptionsDependsOn;
-
-        @JsonIgnore
-        private Function<Object, Object> loadOptionsFunction;
+        private List<PropertyOption> options;
+        private OptionsDataSource optionsDataSource;
 
         private ValueProperty(Type type) {
             this(null, type);
@@ -221,15 +252,15 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
         }
 
         @SuppressWarnings("unchecked")
-        public P loadOptionsDependsOn(String... propertyNames) {
-            this.loadOptionsDependsOn = List.of(propertyNames);
+        public P options(PropertyOption... options) {
+            this.options = List.of(options);
 
             return (P) this;
         }
 
         @SuppressWarnings("unchecked")
-        public P loadOptionsMethod(Function<Object, Object> loadOptionsFunction) {
-            this.loadOptionsFunction = loadOptionsFunction;
+        public P optionsDataSource(OptionsDataSource optionsDataSource) {
+            this.optionsDataSource = optionsDataSource;
 
             return (P) this;
         }
@@ -244,49 +275,13 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
             return exampleValue;
         }
 
-        @Schema(
-                name = "",
-                description =
-                        "The list of property names on which value change the property options should load/reload.")
-        public List<String> getLoadOptionsDependsOn() {
-            return loadOptionsDependsOn;
-        }
-
-        public Function<Object, Object> getLoadOptionsFunction() {
-            return loadOptionsFunction;
-        }
-    }
-
-    @Schema(name = "SingleValueProperty", description = "A base property for all single value properties.")
-    public static sealed class SingleValueProperty<V, P extends SingleValueProperty<V, P>> extends ValueProperty<V, P>
-            permits BooleanProperty,
-                    DateProperty,
-                    DateTimeProperty,
-                    IntegerProperty,
-                    NullProperty,
-                    NumberProperty,
-                    StringProperty {
-
-        protected List<PropertyOption> options;
-
-        private SingleValueProperty(Type type) {
-            this(null, type);
-        }
-
-        public SingleValueProperty(String name, Type type) {
-            super(name, type);
-        }
-
-        @SuppressWarnings("unchecked")
-        public P options(PropertyOption... options) {
-            this.options = List.of(options);
-
-            return (P) this;
-        }
-
         @Schema(name = "options", description = "The list of valid property options.")
         public List<PropertyOption> getOptions() {
             return options;
+        }
+
+        public OptionsDataSource getOptionsDataSource() {
+            return optionsDataSource;
         }
     }
 
@@ -402,7 +397,7 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @JsonTypeName("BOOLEAN")
     @Schema(name = "BooleanProperty", description = "A boolean property type.")
-    public static final class BooleanProperty extends SingleValueProperty<Boolean, BooleanProperty> {
+    public static final class BooleanProperty extends ValueProperty<Boolean, BooleanProperty> {
 
         private BooleanProperty() {
             super(Type.BOOLEAN);
@@ -427,7 +422,7 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @JsonTypeName("DATE")
     @Schema(name = "DateProperty", description = "A date property type.")
-    public static final class DateProperty extends SingleValueProperty<LocalDate, DateProperty> {
+    public static final class DateProperty extends ValueProperty<LocalDate, DateProperty> {
 
         private DateProperty() {
             super(Type.DATE);
@@ -452,7 +447,7 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @JsonTypeName("DATE_TIME")
     @Schema(name = "DateTimeProperty", description = "A date-time property type.")
-    public static final class DateTimeProperty extends SingleValueProperty<LocalDateTime, DateTimeProperty> {
+    public static final class DateTimeProperty extends ValueProperty<LocalDateTime, DateTimeProperty> {
 
         private DateTimeProperty() {
             super(Type.DATE_TIME);
@@ -477,7 +472,7 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @JsonTypeName("NULL")
     @Schema(name = "NullProperty", description = "A null property type.")
-    public static final class NullProperty extends SingleValueProperty<Integer, NullProperty> {
+    public static final class NullProperty extends ValueProperty<Integer, NullProperty> {
 
         private NullProperty() {
             super(Type.NULL);
@@ -490,7 +485,7 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @JsonTypeName("NUMBER")
     @Schema(name = "NumberProperty", description = "A number property type.")
-    public static final class NumberProperty extends SingleValueProperty<Double, NumberProperty> {
+    public static final class NumberProperty extends ValueProperty<Double, NumberProperty> {
 
         private Integer maxValue;
         private Integer minValue;
@@ -524,6 +519,30 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
         public NumberProperty defaultValue(double value) {
             this.defaultValue = value;
+
+            return this;
+        }
+
+        public NumberProperty exampleValue(int value) {
+            this.exampleValue = (double) value;
+
+            return this;
+        }
+
+        public NumberProperty exampleValue(long value) {
+            this.exampleValue = (double) value;
+
+            return this;
+        }
+
+        public NumberProperty exampleValue(float value) {
+            this.exampleValue = (double) value;
+
+            return this;
+        }
+
+        public NumberProperty exampleValue(double value) {
+            this.exampleValue = value;
 
             return this;
         }
@@ -564,7 +583,7 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @JsonTypeName("INTEGER")
     @Schema(name = "IntegerProperty", description = "An integer property type.")
-    public static final class IntegerProperty extends SingleValueProperty<Integer, IntegerProperty> {
+    public static final class IntegerProperty extends ValueProperty<Integer, IntegerProperty> {
 
         private Integer maxValue;
         private Integer minValue;
@@ -577,8 +596,14 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
             super(name, Type.INTEGER);
         }
 
-        public IntegerProperty defaultValue(Integer value) {
+        public IntegerProperty defaultValue(int value) {
             this.defaultValue = value;
+
+            return this;
+        }
+
+        public IntegerProperty exampleValue(int exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
@@ -670,9 +695,9 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
 
     @JsonTypeName("STRING")
     @Schema(name = "StringProperty", description = "A string property.")
-    public static final class StringProperty extends SingleValueProperty<String, StringProperty> {
+    public static final class StringProperty extends ValueProperty<String, StringProperty> {
 
-        EditorType editorType;
+        ControlType controlType;
 
         private StringProperty() {
             super(Type.STRING);
@@ -688,14 +713,20 @@ public abstract sealed class Property<P> permits Property.AnyProperty, Property.
             return this;
         }
 
-        public StringProperty editorType(EditorType editorType) {
-            this.editorType = editorType;
+        public StringProperty exampleValue(String exampleValue) {
+            this.exampleValue = exampleValue;
 
             return this;
         }
 
-        public EditorType getEditorType() {
-            return editorType;
+        public StringProperty controlType(ControlType controlType) {
+            this.controlType = controlType;
+
+            return this;
+        }
+
+        public ControlType getControlType() {
+            return controlType;
         }
     }
 }

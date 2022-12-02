@@ -22,10 +22,4 @@ package com.bytechef.hermes.definition;
 public interface Definition {
 
     Display getDisplay();
-
-    Resources getResources();
-
-    String getName();
-
-    int getVersion();
 }
