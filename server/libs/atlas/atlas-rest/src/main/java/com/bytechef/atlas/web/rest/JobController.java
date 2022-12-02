@@ -28,7 +28,7 @@ import com.bytechef.atlas.web.rest.model.JobParametersModel;
 import com.bytechef.atlas.web.rest.model.PostJob200ResponseModel;
 import com.bytechef.atlas.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -98,7 +98,7 @@ public class JobController implements JobsApi {
             JobParametersDTO jobParametersDTO =
                     conversionService.convert(workflowParametersModel, JobParametersDTO.class);
 
-            String id = UUIDGenerator.generate();
+            String id = UUIDUtils.generate();
 
             jobParametersDTO.setJobId(id);
 
