@@ -34,7 +34,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -82,7 +82,10 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
         if (selectedCase.containsKey(SwitchTaskDispatcherConstants.TASKS)) {
             List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
-                            selectedCase, SwitchTaskDispatcherConstants.TASKS, Map.class, Collections.emptyList())
+                            selectedCase,
+                            SwitchTaskDispatcherConstants.TASKS,
+                            WorkflowTask.class,
+                            Collections.emptyList())
                     .stream()
                     .map(WorkflowTask::new)
                     .toList();

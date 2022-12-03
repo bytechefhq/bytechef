@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.definition;
 import static com.bytechef.hermes.component.constants.Versions.VERSION_1;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
-import com.bytechef.hermes.definition.DisplayOption;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.PropertyOption;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -46,154 +44,6 @@ public class ComponentDefinitionTest {
             setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
     };
-
-    @Test
-    @SuppressWarnings("checkstyle:methodlengthcheck")
-    public void testDisplayOption() throws JSONException, JsonProcessingException {
-        DisplayOption displayOption =
-                DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(true, false)));
-
-        jsonAssertEquals("""
-                {"hideWhen":{"name":[true,false]}}
-                """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1, 2)));
-
-        jsonAssertEquals(
-                """
-            {
-                "hideWhen":{"name":[1,2]}
-            }
-            """,
-                displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1L, 2L)));
-
-        jsonAssertEquals(
-                """
-            {
-                "hideWhen":{"name":[1,2]}
-            }
-            """,
-                displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1F, 2F)));
-
-        jsonAssertEquals("""
-        {
-            "hideWhen":{"name":[1.0,2.0]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in(1D, 2D)));
-
-        jsonAssertEquals("""
-        {
-            "hideWhen":{"name":[1.0,2.0]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name").in("value1", "value2")));
-
-        jsonAssertEquals(
-                """
-        {
-            "hideWhen":{"name":["value1","value2"]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.hideWhen("name1").eq(1)));
-
-        jsonAssertEquals("""
-        {
-         "hideWhen":{"name1":[1]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(
-                ComponentDSL.hideWhen("name1").eq(1),
-                ComponentDSL.hideWhen("name2").eq(2)));
-
-        jsonAssertEquals(
-                """
-        {
-            "hideWhen":{"name1":[1],"name2":[2]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(true, false)));
-
-        jsonAssertEquals(
-                """
-        {
-            "showWhen":{"name":[true, false]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1, 2)));
-
-        jsonAssertEquals(
-                """
-            {
-                "showWhen":{"name": [1,2]}
-            }
-            """,
-                displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1L, 2L)));
-
-        jsonAssertEquals(
-                """
-            {
-                "showWhen":{"name":[1,2]}
-            }
-            """,
-                displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1F, 2F)));
-
-        jsonAssertEquals("""
-        {
-            "showWhen":{"name":[1.0,2.0]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in(1D, 2D)));
-
-        jsonAssertEquals("""
-        {
-            "showWhen":{"name":[1.0,2.0]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name").in("value1", "value2")));
-
-        jsonAssertEquals(
-                """
-        {
-            "showWhen":{"name":["value1","value2"]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(ComponentDSL.showWhen("name1").eq(1)));
-
-        jsonAssertEquals("""
-        {
-         "showWhen":{"name1":[1]}
-        }
-        """, displayOption);
-
-        displayOption = DisplayOption.of(List.of(
-                ComponentDSL.showWhen("name1").eq(1),
-                ComponentDSL.showWhen("name2").eq(2)));
-
-        jsonAssertEquals(
-                """
-        {
-            "showWhen":{"name1":[1],"name2":[2]}
-        }
-        """, displayOption);
-    }
 
     @Test
     public void testAnyProperty() throws JSONException, JsonProcessingException {

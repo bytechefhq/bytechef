@@ -22,9 +22,8 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
-import com.bytechef.commons.collection.MapUtils;
-import com.bytechef.commons.xml.XmlUtils;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.hermes.component.utils.XmlUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
@@ -82,7 +81,7 @@ public class XmlFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat(MapUtils.getMapKey(outputs, "writeXMLFile", WorkflowConstants.NAME))
+        assertThat(((Map) outputs.get("writeXMLFile")).get(WorkflowConstants.NAME))
                 .isEqualTo("file.xml");
 
         File sampleFile = getFile("sample.xml");

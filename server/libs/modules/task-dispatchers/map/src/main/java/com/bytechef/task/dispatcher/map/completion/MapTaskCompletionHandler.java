@@ -26,7 +26,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
+import com.bytechef.commons.utils.LocalDateTimeUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;

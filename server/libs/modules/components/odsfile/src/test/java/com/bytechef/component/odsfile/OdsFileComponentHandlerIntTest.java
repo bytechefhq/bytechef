@@ -23,7 +23,6 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
-import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -86,7 +85,7 @@ public class OdsFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat(MapUtils.getMapKey(outputs, "writeOdsFile", WorkflowConstants.NAME))
+        assertThat(((Map) outputs.get("writeOdsFile")).get(WorkflowConstants.NAME))
                 .isEqualTo("file.ods");
 
         File sampleFile = getFile("sample_header.ods");

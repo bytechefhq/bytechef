@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.collection;
+package com.bytechef.hermes.component.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

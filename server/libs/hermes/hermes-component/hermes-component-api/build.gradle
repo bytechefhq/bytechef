@@ -3,11 +3,15 @@ version="1.0"
 dependencies {
     api project(":server:libs:hermes:hermes-definition-api")
 
+    implementation "com.fasterxml.jackson.core:jackson-annotations"
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    implementation "com.jayway.jsonpath:json-path"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
-    implementation "com.fasterxml.jackson.core:jackson-annotations"
+    implementation libs.swagger.annotations
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    implementation libs.swagger.annotations
 }

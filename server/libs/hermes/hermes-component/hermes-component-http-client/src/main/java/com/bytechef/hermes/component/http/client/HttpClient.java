@@ -33,8 +33,6 @@ import static com.bytechef.hermes.component.http.client.constants.HttpClientCons
 import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.RESPONSE_FORMAT;
 import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.TIMEOUT;
 
-import com.bytechef.commons.json.JsonUtils;
-import com.bytechef.commons.xml.XmlUtils;
 import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.component.Context;
@@ -43,6 +41,8 @@ import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.http.client.constants.HttpClientConstants;
+import com.bytechef.hermes.component.utils.JsonUtils;
+import com.bytechef.hermes.component.utils.XmlUtils;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;

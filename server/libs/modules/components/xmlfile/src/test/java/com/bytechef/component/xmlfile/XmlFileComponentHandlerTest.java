@@ -21,11 +21,11 @@ import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_EN
 import static com.bytechef.hermes.component.definition.ActionDefinition.ACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.commons.xml.XmlUtils;
 import com.bytechef.component.xmlfile.constants.XmlFileConstants;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.test.mock.MockContext;
 import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.hermes.component.utils.XmlUtils;
 import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.File;
 import java.io.FileInputStream;

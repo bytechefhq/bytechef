@@ -19,7 +19,7 @@
 package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.time.Duration;

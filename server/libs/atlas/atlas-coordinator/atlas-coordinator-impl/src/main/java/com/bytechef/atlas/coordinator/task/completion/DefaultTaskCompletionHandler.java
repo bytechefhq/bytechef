@@ -34,7 +34,7 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
