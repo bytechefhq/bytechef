@@ -1,18 +1,14 @@
+import PageHeader from 'components/PageHeader/PageHeader';
 import {SidebarContentLayout} from '../../components/Layouts/SidebarContentLayout';
-import {PageHeader} from 'components/PageHeader/PageHeader';
 import {IntegrationList} from './IntegrationList';
-import NewIntegrationModal from 'components/NewIntegrationModal/NewIntegrationModal';
+import React from 'react';
 
-export const Integrations = (): JSX.Element => {
-	return (
-		<SidebarContentLayout title={'Integrations'}>
-			<PageHeader
-				subTitle="All Integrations"
-				buttonTitle="New Integration"
-			/>
-			<NewIntegrationModal />
+const Integrations: React.FC = () => (
+    <SidebarContentLayout title={'Integrations'}>
+        <PageHeader subTitle="All Integrations" buttonLabel="New Integration" />
 
-			<IntegrationList />
-		</SidebarContentLayout>
-	);
-};
+        <IntegrationList />
+    </SidebarContentLayout>
+);
+
+export default Integrations;
