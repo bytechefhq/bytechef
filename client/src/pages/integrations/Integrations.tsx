@@ -11,7 +11,8 @@ export const Integrations = (): JSX.Element => {
 				buttonTitle="New Integration"
 			/>
 			<NewIntegrationModal />
-			{/* <IntegrationList /> */}
+
+			<IntegrationList />
 		</SidebarContentLayout>
 	);
 };
