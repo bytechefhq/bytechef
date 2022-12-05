@@ -1,15 +1,14 @@
+import PageHeader from 'components/PageHeader/PageHeader';
 import {SidebarContentLayout} from '../../components/Layouts/SidebarContentLayout';
 import {IntegrationList} from './IntegrationList';
-import {Button} from '../../components/Button/Button';
+import React from 'react';
 
-export const Integrations = () => {
-    return (
-        <SidebarContentLayout
-            title={'Integrations'}
-            subTitle={'All Integrations'}
-            topRight={<Button title={'New Integration'} />}
-        >
-            <IntegrationList />
-        </SidebarContentLayout>
-    );
-};
+const Integrations: React.FC = () => (
+    <SidebarContentLayout title={'Integrations'}>
+        <PageHeader subTitle="All Integrations" buttonLabel="New Integration" />
+
+        <IntegrationList />
+    </SidebarContentLayout>
+);
+
+export default Integrations;
