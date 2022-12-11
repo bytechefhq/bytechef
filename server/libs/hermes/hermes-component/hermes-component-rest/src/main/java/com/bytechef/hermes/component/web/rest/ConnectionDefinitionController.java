@@ -18,6 +18,8 @@ package com.bytechef.hermes.component.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +27,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -75,18 +76,12 @@ public class ConnectionDefinitionController {
             method = RequestMethod.GET,
             value = "/definitions/connections",
             produces = {"application/json"})
-    public Mono<ResponseEntity<Flux<Map<String, Object>>>> getConnectionDefinitions(
+    public Mono<ResponseEntity<Flux<ConnectionDefinition>>> getConnectionDefinitions(
             @Parameter(hidden = true) final ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(componentDefinitionFactories.stream()
                 .map(ComponentDefinitionFactory::getDefinition)
-                .filter(componentDefinition -> componentDefinition.getConnectionDefinition() != null)
-                .map(componentDefinition -> new HashMap<String, Object>() {
-                    {
-                        put("connections", componentDefinition.getConnectionDefinition());
-                        put("name", componentDefinition.getName());
-                        put("version", componentDefinition.getVersion());
-                    }
-                })
+                .filter(componentDefinition -> componentDefinition.getConnection() != null)
+                .map(ComponentDefinition::getConnection)
                 .toList())));
     }
 }
