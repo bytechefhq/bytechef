@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.file.storage.filesystem.service;
 
+import com.bytechef.commons.utils.UUIDUtils;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.exception.FileStorageException;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -29,7 +30,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @author Ivica Cardic
@@ -83,7 +83,7 @@ public class FilesystemFileStorageService implements FileStorageService {
             throw new FileStorageException("Failed to store empty file " + fileName);
         }
 
-        return FileEntry.of(fileName, "file:" + path);
+        return new FileEntry(fileName, "file:" + path);
     }
 
     @Override
@@ -119,6 +119,6 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     private String generate() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return UUIDUtils.generate();
     }
 }
