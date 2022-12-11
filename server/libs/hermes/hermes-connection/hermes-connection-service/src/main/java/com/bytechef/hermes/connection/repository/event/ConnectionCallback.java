@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.connection.repository.event;
 
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
@@ -36,7 +36,7 @@ public class ConnectionCallback implements BeforeConvertCallback<Connection> {
         if (connection.isNew()) {
             connection.setCreatedBy("system");
             connection.setCreatedDate(LocalDateTime.now());
-            connection.setId(UUIDGenerator.generate());
+            connection.setId(UUIDUtils.generate());
         }
 
         connection.setLastModifiedBy("system");

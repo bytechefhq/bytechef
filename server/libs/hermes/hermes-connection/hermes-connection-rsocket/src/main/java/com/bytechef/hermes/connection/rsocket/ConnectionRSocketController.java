@@ -42,12 +42,6 @@ public class ConnectionRSocketController {
         return Mono.create(sink -> sink.success(connectionService.add(connection)));
     }
 
-    @MessageMapping("fetchConnection")
-    public Mono<Connection> fetchConnection(String id) {
-        return Mono.create(
-                sink -> sink.success(connectionService.fetchConnection(id).orElse(null)));
-    }
-
     @MessageMapping("getConnection")
     public Mono<Connection> getConnection(String id) {
         return Mono.create(sink -> sink.success(connectionService.getConnection(id)));

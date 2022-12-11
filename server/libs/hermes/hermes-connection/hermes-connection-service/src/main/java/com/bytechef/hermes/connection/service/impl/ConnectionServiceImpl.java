@@ -21,7 +21,6 @@ import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.StreamSupport;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,12 +49,6 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public void delete(String id) {
         connectionRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Connection> fetchConnection(String id) {
-        return connectionRepository.findById(id);
     }
 
     @Override

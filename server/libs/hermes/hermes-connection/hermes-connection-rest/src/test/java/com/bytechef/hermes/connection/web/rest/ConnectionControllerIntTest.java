@@ -154,6 +154,8 @@ public class ConnectionControllerIntTest {
         Connection connection = getConnection();
         ConnectionUpdateModel connectionUpdateModel = new ConnectionUpdateModel().name("name2");
 
+        connection.setName("name2");
+
         when(connectionService.update(anyString(), anyString())).thenReturn(connection);
 
         try {
