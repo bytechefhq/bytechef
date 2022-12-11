@@ -1,0 +1,13 @@
+dependencies {
+    api project(":server:libs:atlas:atlas-sync-executor")
+    api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    api project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
+
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot-test"
+    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
+    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
+    implementation project(":server:libs:core:encryption:encryption-api")
+    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+}
