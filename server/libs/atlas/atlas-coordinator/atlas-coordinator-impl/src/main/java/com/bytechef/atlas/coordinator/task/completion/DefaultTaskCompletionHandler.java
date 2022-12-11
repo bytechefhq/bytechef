@@ -130,14 +130,15 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
                     MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
         }
 
-        TaskExecution evaluatedJobTaskExecution =
+        TaskExecution evaluatedTaskExecution =
                 taskEvaluator.evaluate(new TaskExecution(new WorkflowTask(source)), context);
         Job updateJob = new Job(job);
 
         updateJob.setStatus(JobStatus.COMPLETED);
         updateJob.setEndTime(new Date());
         updateJob.setCurrentTask(-1);
-        updateJob.setOutputs(evaluatedJobTaskExecution.getWorkflowTaskParameters());
+
+        updateJob.setOutputs(evaluatedTaskExecution.getParameters());
 
         jobService.update(updateJob);
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), updateJob.getStatus()));

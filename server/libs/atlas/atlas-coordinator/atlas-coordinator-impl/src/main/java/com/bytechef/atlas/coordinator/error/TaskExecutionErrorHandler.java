@@ -29,7 +29,7 @@ import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -83,7 +83,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
             TaskExecution retryTaskExecution = new TaskExecution(taskExecution);
 
-            retryTaskExecution.setId(UUIDGenerator.generate());
+            retryTaskExecution.setId(UUIDUtils.generate());
             retryTaskExecution.setStatus(TaskStatus.CREATED);
             retryTaskExecution.setError(null);
             retryTaskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);

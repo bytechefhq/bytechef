@@ -30,23 +30,23 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfig;
-import com.bytechef.atlas.repository.jdbc.config.WorkflowJdbcPersistenceConfiguration;
+import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.bytechef.atlas.repository.jdbc.config.WorkflowRepositoryJdbcConfiguration;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
+import com.bytechef.commons.utils.UUIDUtils;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -136,7 +136,7 @@ public class CoordinatorIntTest {
                 .withTaskHandlerResolver(taskHandlerResolver)
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
@@ -146,14 +146,14 @@ public class CoordinatorIntTest {
         DefaultTaskDispatcher taskDispatcher = new DefaultTaskDispatcher(coordinatorMessageBroker, List.of());
 
         JobExecutor jobExecutor = new JobExecutor(
-                contextService, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create(), workflowService);
+                contextService, taskDispatcher, taskExecutionService, TaskEvaluator.create(), workflowService);
 
         DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler(
                 contextService,
                 e -> {},
                 jobExecutor,
                 jobService,
-                SpelTaskEvaluator.create(),
+                TaskEvaluator.create(),
                 taskExecutionService,
                 workflowService);
 
@@ -171,7 +171,7 @@ public class CoordinatorIntTest {
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
         messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((String) jobId));
 
-        String jobId = UUID.randomUUID().toString().replaceAll("-", "");
+        String jobId = UUIDUtils.generate();
 
         JobParametersDTO jobParametersDTO = new JobParametersDTO();
 
@@ -184,7 +184,11 @@ public class CoordinatorIntTest {
         return jobService.getJob(jobId);
     }
 
-    @Import({WorkflowConfiguration.class, WorkflowJdbcPersistenceConfiguration.class, WorkflowRepositoryConfig.class})
+    @Import({
+        WorkflowConfiguration.class,
+        WorkflowRepositoryJdbcConfiguration.class,
+        WorkflowRepositoryConfiguration.class
+    })
     @ComponentScan(
             basePackages = {"com.bytechef.atlas.repository.resource", "com.bytechef.atlas.repository.jdbc.event"})
     @TestConfiguration
