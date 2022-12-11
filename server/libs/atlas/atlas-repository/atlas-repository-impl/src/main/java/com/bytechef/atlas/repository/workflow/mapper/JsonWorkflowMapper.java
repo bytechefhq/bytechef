@@ -25,11 +25,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public Workflow readValue(WorkflowResource workflowResource) {
-        return readValue(workflowResource, objectMapper);
+        return readValue(workflowResource, OBJECT_MAPPER);
     }
 
     @Override

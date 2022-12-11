@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-public class WorkflowRepositoryConfig {
+public class WorkflowRepositoryConfiguration {
 
     @Bean
     @Primary
