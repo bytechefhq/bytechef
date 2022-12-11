@@ -20,22 +20,30 @@ package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.commons.utils.MapUtils;
-import java.beans.Transient;
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
+public class WorkflowTask implements Serializable, Task {
+
+    static {
+        MapUtils.addConverter(new Converter<Map, WorkflowTask>() {
+
+            @Override
+            public WorkflowTask convert(Map source) {
+                return new WorkflowTask(source);
+            }
+        });
+    }
 
     public static final WorkflowTask EMPTY_WORKFLOW_TASK = new WorkflowTask();
 
@@ -224,30 +232,12 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
         return type;
     }
 
-    @Transient
-    public WorkflowTask getWorkflowTask(String key) {
-        if (!containsKey(key)) {
-            return null;
-        }
-
-        return new WorkflowTask(getMap(key));
-    }
-
-    public List<WorkflowTask> getWorkflowTasks(String key) {
-        return getList(key, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
-    }
-
-    // WorkflowTaskParameter
-
-    @Override
-    public Map<String, Object> asMap() {
+    public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>(parameters);
 
         map.put(
                 WorkflowConstants.FINALIZE,
-                finalize.stream().map(WorkflowTask::asMap).toList());
+                finalize.stream().map(WorkflowTask::toMap).toList());
 
         if (label != null) {
             map.put(WorkflowConstants.LABEL, label);
@@ -261,8 +251,8 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
             map.put(WorkflowConstants.NODE, node);
         }
 
-        map.put(WorkflowConstants.POST, post.stream().map(WorkflowTask::asMap).toList());
-        map.put(WorkflowConstants.PRE, pre.stream().map(WorkflowTask::asMap).toList());
+        map.put(WorkflowConstants.POST, post.stream().map(WorkflowTask::toMap).toList());
+        map.put(WorkflowConstants.PRE, pre.stream().map(WorkflowTask::toMap).toList());
 
         if (timeout != null) {
             map.put(WorkflowConstants.TIMEOUT, timeout);
@@ -271,145 +261,6 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
         map.put(WorkflowConstants.TYPE, type);
 
         return Collections.unmodifiableMap(map);
-    }
-
-    @Override
-    public boolean containsKey(String key) {
-        return parameters.containsKey(key);
-    }
-
-    @Override
-    public Object get(String key) {
-        return parameters.get(key);
-    }
-
-    @Override
-    public <T> T get(String key, Class<T> returnType) {
-        return MapUtils.get(parameters, key, returnType);
-    }
-
-    @Override
-    public <T> T get(String key, Class<T> returnType, T defaultValue) {
-        return MapUtils.get(parameters, key, returnType, defaultValue);
-    }
-
-    @Override
-    public <T> T[] getArray(String key, Class<T> elementType) {
-        return MapUtils.getArray(parameters, key, elementType);
-    }
-
-    @Override
-    public Boolean getBoolean(String key) {
-        return MapUtils.getBoolean(parameters, key);
-    }
-
-    @Override
-    public boolean getBoolean(String key, boolean defaultValue) {
-        return MapUtils.getBoolean(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Date getDate(String key) {
-        return MapUtils.getDate(parameters, key);
-    }
-
-    @Override
-    public Double getDouble(String key) {
-        return MapUtils.getDouble(parameters, key);
-    }
-
-    @Override
-    public Double getDouble(String key, double defaultValue) {
-        return MapUtils.getDouble(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Duration getDuration(String key) {
-        return MapUtils.getDuration(parameters, key);
-    }
-
-    @Override
-    public Duration getDuration(String key, String defaultDuration) {
-        return MapUtils.getDuration(parameters, key, defaultDuration);
-    }
-
-    @Override
-    public Float getFloat(String key) {
-        return MapUtils.getFloat(parameters, key);
-    }
-
-    @Override
-    public float getFloat(String key, float defaultValue) {
-        return MapUtils.getFloat(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Integer getInteger(String key) {
-        return MapUtils.getInteger(parameters, key);
-    }
-
-    @Override
-    public int getInteger(String key, int defaultValue) {
-        return MapUtils.getInteger(parameters, key, defaultValue);
-    }
-
-    @Override
-    public <T> List<T> getList(String key, Class<T> elementType) {
-        return MapUtils.getList(parameters, key, elementType);
-    }
-
-    @Override
-    public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-        return MapUtils.getList(parameters, key, elementType, defaultValue);
-    }
-
-    @Override
-    public Long getLong(String key) {
-        return MapUtils.getLong(parameters, key);
-    }
-
-    @Override
-    public long getLong(String key, long defaultValue) {
-        return MapUtils.getLong(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Map<String, Object> getMap(String key) {
-        return MapUtils.getMap(parameters, key);
-    }
-
-    @Override
-    public Map<String, Object> getMap(String key, Map<String, Object> defaultValue) {
-        return MapUtils.getMap(parameters, key, defaultValue);
-    }
-
-    @Override
-    public String getRequiredString(String key) {
-        return MapUtils.getRequiredString(parameters, key);
-    }
-
-    @Override
-    public <T> T getRequired(String key) {
-        return MapUtils.getRequired(parameters, key);
-    }
-
-    @Override
-    public <T> T getRequired(String key, Class<T> returnType) {
-        return MapUtils.getRequired(parameters, key, returnType);
-    }
-
-    @Override
-    public String getString(String key) {
-        return MapUtils.getString(parameters, key);
-    }
-
-    @Override
-    public String getString(String key, String defaultValue) {
-        return MapUtils.getString(parameters, key, defaultValue);
-    }
-
-    public void put(String key, Object value) {
-        parameters.put(key, value);
     }
 
     @Override
