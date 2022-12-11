@@ -17,7 +17,7 @@
 package com.bytechef.atlas.repository.jdbc.event;
 
 import com.bytechef.atlas.domain.Context;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
@@ -36,7 +36,7 @@ public class ContextCallback implements BeforeConvertCallback<Context> {
         if (context.isNew()) {
             context.setCreatedBy("system");
             context.setCreatedDate(LocalDateTime.now());
-            context.setId(UUIDGenerator.generate());
+            context.setId(UUIDUtils.generate());
         }
 
         return context;
