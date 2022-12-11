@@ -8,10 +8,9 @@ dependencies {
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "com.jayway.jsonpath:json-path"
+    implementation libs.methanol
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
     implementation libs.swagger.annotations
-
-    testImplementation "com.fasterxml.jackson.core:jackson-databind"
-    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    implementation libs.tika.core
 }

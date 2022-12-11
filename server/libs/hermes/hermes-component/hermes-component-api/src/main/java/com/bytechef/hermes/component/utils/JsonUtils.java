@@ -78,6 +78,14 @@ public class JsonUtils {
         }
     }
 
+    public static <T> T read(InputStream inputStream, Class<T> clazz) {
+        try {
+            return objectMapper.readValue(inputStream, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> T read(String json, Class<T> clazz) {
         try {
             return objectMapper.readValue(json, clazz);
@@ -98,22 +106,6 @@ public class JsonUtils {
         return documentContext.read(path, new TypeRef<T>() {});
     }
 
-    public static <T> T read(ObjectMapper objectMapper, String json) {
-        try {
-            return objectMapper.readValue(json, new TypeReference<T>() {});
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T read(ObjectMapper objectMapper, String json, Class<T> returnValueClass) {
-        try {
-            return objectMapper.readValue(json, returnValueClass);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
             return new JsonParserStream(inputStream, objectMapper);
@@ -123,14 +115,6 @@ public class JsonUtils {
     }
 
     public static String write(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String write(ObjectMapper objectMapper, Object object) {
         try {
             return objectMapper.writeValueAsString(object);
         } catch (Exception e) {

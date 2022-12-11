@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.constants.Versions;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -32,7 +33,7 @@ public sealed class JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcC
     private final String name;
 
     protected JdbcComponentDefinition(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
     }
 
     public String getDatabaseJdbcName() {

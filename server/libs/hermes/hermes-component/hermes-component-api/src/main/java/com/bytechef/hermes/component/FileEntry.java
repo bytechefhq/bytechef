@@ -16,8 +16,9 @@
 
 package com.bytechef.hermes.component;
 
-import java.util.Map;
-
+/**
+ * @author Ivica Cardic
+ */
 public interface FileEntry {
 
     String getExtension();
@@ -27,17 +28,4 @@ public interface FileEntry {
     String getName();
 
     String getUrl();
-
-    static boolean isFileEntry(Map<String, String> map) {
-        if (!map.containsKey("extension")
-                || !map.containsKey("mimeType")
-                || !map.containsKey("name")
-                || !map.containsKey("url")) {
-            return false;
-        }
-
-        return true;
-    }
-
-    Map<String, String> toMap();
 }
