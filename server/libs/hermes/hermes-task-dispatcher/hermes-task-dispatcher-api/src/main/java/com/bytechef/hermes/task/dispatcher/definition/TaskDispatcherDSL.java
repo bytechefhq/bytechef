@@ -17,9 +17,7 @@
 package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Resources;
 import java.util.List;
 
 /**
@@ -45,26 +43,30 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             super(name);
         }
 
-        public ModifiableTaskDispatcherDefinition display(Display display) {
+        public ModifiableTaskDispatcherDefinition display(ModifiableDisplay display) {
             this.display = display;
 
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition display(Resources resources) {
+        public ModifiableTaskDispatcherDefinition display(ModifiableResources resources) {
             this.resources = resources;
 
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition output(Property... output) {
-            this.output = List.of(output);
+        public <P extends Property<?>> ModifiableTaskDispatcherDefinition output(P... output) {
+            if (output != null) {
+                this.output = List.of(output);
+            }
 
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition properties(Property<?>... properties) {
-            this.properties = List.of(properties);
+        public <P extends Property<?>> ModifiableTaskDispatcherDefinition properties(P... properties) {
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
@@ -75,7 +77,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition taskProperties(Property<?>... taskProperties) {
+        public <P extends Property<?>> ModifiableTaskDispatcherDefinition taskProperties(P... taskProperties) {
             this.taskProperties = List.of(taskProperties);
 
             return this;
