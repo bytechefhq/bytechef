@@ -1,5 +1,5 @@
 version="1.0"
 
 dependencies {
-    testImplementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-jdbc")
+    testImplementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
 }

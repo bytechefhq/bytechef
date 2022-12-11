@@ -18,11 +18,11 @@ package com.bytechef.component.filestorage;
 
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.CONTENT;
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.DOWNLOAD;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILENAME;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILE_ENTRY;
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILE_STORAGE;
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.READ;
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.WRITE;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
@@ -130,11 +130,11 @@ public class FileStorageComponentHandler implements ComponentHandler {
     }
 
     protected String performRead(Context context, ExecutionParameters executionParameters) {
-        return context.readFileToString(executionParameters.getFileEntry(FILE_ENTRY));
+        return context.readFileToString(executionParameters.get(FILE_ENTRY, FileEntry.class));
     }
 
     protected FileEntry performWrite(Context context, ExecutionParameters executionParameters) {
-        Object content = executionParameters.getRequiredObject(CONTENT);
+        Object content = executionParameters.getRequired(CONTENT);
         String fileName = executionParameters.getString(FILENAME, "file.txt");
 
         return context.storeFileContent(fileName, content instanceof String ? (String) content : content.toString());

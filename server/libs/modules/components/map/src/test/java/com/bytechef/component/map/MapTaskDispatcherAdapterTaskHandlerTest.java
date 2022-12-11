@@ -18,15 +18,14 @@
 
 package com.bytechef.component.map;
 
-import static com.bytechef.hermes.component.definition.ActionDefinition.ACTION;
-
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
+import com.bytechef.commons.utils.MapUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +39,12 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
     public void test1() {
-        TaskHandlerResolver resolver = task -> t -> t.get("value");
+        TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
         MapTaskDispatcherAdapterTaskHandler taskHandler =
-                new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
+                new MapTaskDispatcherAdapterTaskHandler(resolver, TaskEvaluator.create());
 
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                "list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"), ACTION, "map")));
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(
+                Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"))));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");
@@ -62,7 +61,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new IllegalArgumentException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler =
-                    new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
+                    new MapTaskDispatcherAdapterTaskHandler(resolver, TaskEvaluator.create());
 
             TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                     "list", List.of(1, 2, 3),
@@ -99,7 +98,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             String type = t1.getType();
 
             if ("var".equals(type)) {
-                return t2 -> t2.getRequired("value");
+                return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
             }
             if ("pass".equals(type)) {
                 return t2 -> null;
@@ -115,11 +114,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 .withTaskHandlerResolver(taskHandlerResolver)
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         mapAdapterTaskHandlerRefs[0] =
-                new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, SpelTaskEvaluator.create());
+                new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, TaskEvaluator.create());
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "finalize",
@@ -131,9 +130,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                         "list",
                         Arrays.asList(1, 2, 3),
                         "iteratee",
-                        Map.of("type", "var", "value", "${item}"),
-                        ACTION,
-                        "map")),
+                        Map.of("type", "var", "value", "${item}"))),
                 "post",
                 List.of(Map.of(
                         "name",
@@ -143,9 +140,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                         "list",
                         Arrays.asList(1, 2, 3),
                         "iteratee",
-                        Map.of("type", "var", "value", "${item}"),
-                        ACTION,
-                        "map")),
+                        Map.of("type", "var", "value", "${item}"))),
                 "pre",
                 List.of(Map.of(
                         "name",
@@ -155,9 +150,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                         "list",
                         Arrays.asList(1, 2, 3),
                         "iteratee",
-                        Map.of("type", "var", "value", "${item}"),
-                        ACTION,
-                        "map")),
+                        Map.of("type", "var", "value", "${item}"))),
                 "type",
                 "pass")));
 

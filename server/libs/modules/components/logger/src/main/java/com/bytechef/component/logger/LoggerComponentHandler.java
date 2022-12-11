@@ -23,8 +23,8 @@ import static com.bytechef.component.logger.constants.LoggerConstants.LOGGER;
 import static com.bytechef.component.logger.constants.LoggerConstants.TEXT;
 import static com.bytechef.component.logger.constants.LoggerConstants.WARN;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.any;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -46,14 +46,20 @@ public class LoggerComponentHandler implements ComponentHandler {
             .actions(
                     action(DEBUG)
                             .display(display("Debug"))
-                            .properties(any(TEXT))
+                            .properties(string(TEXT))
                             .perform(this::performDebug),
                     action(ERROR)
                             .display(display("Error"))
-                            .properties(any(TEXT))
+                            .properties(string(TEXT))
                             .perform(this::performError),
-                    action(INFO).display(display("Info")).properties(any(TEXT)).perform(this::performInfo),
-                    action(WARN).display(display("Warn")).properties(any(TEXT)).perform(this::performWarn));
+                    action(INFO)
+                            .display(display("Info"))
+                            .properties(string(TEXT))
+                            .perform(this::performInfo),
+                    action(WARN)
+                            .display(display("Warn"))
+                            .properties(string(TEXT))
+                            .perform(this::performWarn));
 
     @Override
     public ComponentDefinition getDefinition() {

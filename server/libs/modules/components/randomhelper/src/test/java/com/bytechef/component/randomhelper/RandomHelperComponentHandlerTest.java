@@ -16,7 +16,7 @@
 
 package com.bytechef.component.randomhelper;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,8 @@ public class RandomHelperComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/randomhelper_v1.json", new RandomHelperComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+                "definition/randomhelper_v1.json", new RandomHelperComponentHandler().getDefinition());
     }
 
     @Disabled

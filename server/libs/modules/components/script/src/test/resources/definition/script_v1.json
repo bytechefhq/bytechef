@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
-    "label": "Script"
-  },
-  "name": "script",
   "actions": [
     {
       "display": {
@@ -13,20 +8,76 @@
       "name": "java",
       "output": [
         {
-          "type": "ANY"
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ],
       "properties": [
         {
           "description": "Initialize parameter values used in the custom code.",
-          "displayOption": {},
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
-          "additionalProperties": true,
-          "properties": [
+          "additionalProperties": [
             {
-              "type": "ANY"
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
             }
           ]
         },
@@ -35,7 +86,7 @@
           "label": "Java code",
           "name": "script",
           "type": "STRING",
-          "editorType": "CODE"
+          "controlType": "CODE"
         }
       ]
     },
@@ -47,7 +98,36 @@
       "name": "javascript",
       "output": [
         {
-          "type": "ANY"
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ],
       "properties": [
@@ -56,10 +136,38 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
-          "additionalProperties": true,
-          "properties": [
+          "additionalProperties": [
             {
-              "type": "ANY"
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
             }
           ]
         },
@@ -68,7 +176,7 @@
           "label": "JavaScript code",
           "name": "script",
           "type": "STRING",
-          "editorType": "CODE"
+          "controlType": "CODE"
         }
       ]
     },
@@ -80,7 +188,36 @@
       "name": "python",
       "output": [
         {
-          "type": "ANY"
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ],
       "properties": [
@@ -89,10 +226,38 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
-          "additionalProperties": true,
-          "properties": [
+          "additionalProperties": [
             {
-              "type": "ANY"
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
             }
           ]
         },
@@ -101,7 +266,7 @@
           "label": "Python code",
           "name": "script",
           "type": "STRING",
-          "editorType": "CODE"
+          "controlType": "CODE"
         }
       ]
     },
@@ -113,7 +278,36 @@
       "name": "r",
       "output": [
         {
-          "type": "ANY"
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ],
       "properties": [
@@ -122,10 +316,38 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
-          "additionalProperties": true,
-          "properties": [
+          "additionalProperties": [
             {
-              "type": "ANY"
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
             }
           ]
         },
@@ -134,7 +356,7 @@
           "label": "R code",
           "name": "script",
           "type": "STRING",
-          "editorType": "CODE"
+          "controlType": "CODE"
         }
       ]
     },
@@ -146,7 +368,36 @@
       "name": "ruby",
       "output": [
         {
-          "type": "ANY"
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ],
       "properties": [
@@ -155,10 +406,38 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
-          "additionalProperties": true,
-          "properties": [
+          "additionalProperties": [
             {
-              "type": "ANY"
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
             }
           ]
         },
@@ -167,10 +446,15 @@
           "label": "Ruby code",
           "name": "script",
           "type": "STRING",
-          "editorType": "CODE"
+          "controlType": "CODE"
         }
       ]
     }
   ],
+  "display": {
+    "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "label": "Script"
+  },
+  "name": "script",
   "version": 1
 }

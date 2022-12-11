@@ -6,15 +6,15 @@ inputs:
 
 outputs:
   - name: result
-    value: ${function1}
+    value: ${script1}
 
 tasks:
   - name: var1
     label: Set value
     type: var/v1/set
     value: 1000
-  - name: function1
-    type: function/v1/javascript
+  - name: script1
+    type: script/v1/javascript
     input:
       factor: ${factor}
       var : ${var1}

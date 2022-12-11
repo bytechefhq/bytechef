@@ -16,27 +16,26 @@
 
 package com.bytechef.component.xlsxfile;
 
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.FILENAME;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.FILE_ENTRY;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.HEADER_ROW;
 import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.INCLUDE_EMPTY_CELLS;
 import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PAGE_NUMBER;
 import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PAGE_SIZE;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PROPERTY_HEADER_ROW;
 import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.READ_AS_STRING;
 import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.ROWS;
 import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.SHEET_NAME;
 import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.WRITE;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.component.xlsxfile.constants.XlsxFileConstants;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -45,7 +44,6 @@ import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
-import com.bytechef.hermes.component.utils.MapUtils;
 import com.bytechef.hermes.component.utils.ValueUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -85,29 +83,37 @@ public class XlsxFileComponentHandler implements ComponentHandler {
                                             .description(
                                                     "The object property which contains a reference to the XLS/XLSX file to read from.")
                                             .required(true),
-                                    bool(PROPERTY_HEADER_ROW)
+                                    bool(HEADER_ROW)
                                             .label("Header Row")
                                             .description("The first row of the file contains the header names.")
-                                            .defaultValue(true),
+                                            .defaultValue(true)
+                                            .advancedOption(true),
                                     bool(INCLUDE_EMPTY_CELLS)
                                             .label("Include Empty Cells")
                                             .description(
                                                     "When reading from file the empty cells will be filled with an empty string.")
-                                            .defaultValue(false),
+                                            .defaultValue(false)
+                                            .advancedOption(true),
                                     integer(PAGE_SIZE)
                                             .label("Page Size")
-                                            .description("The amount of child elements to return in a page."),
-                                    integer(PAGE_NUMBER).label("Page Number").description("The page number to get."),
+                                            .description("The amount of child elements to return in a page.")
+                                            .advancedOption(true),
+                                    integer(PAGE_NUMBER)
+                                            .label("Page Number")
+                                            .description("The page number to get.")
+                                            .advancedOption(true),
                                     bool(READ_AS_STRING)
                                             .label("Read As String")
                                             .description(
                                                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                            .defaultValue(false),
+                                            .defaultValue(false)
+                                            .advancedOption(true),
                                     string(SHEET_NAME)
                                             .label("Sheet Name")
                                             .description(
                                                     "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                                            .defaultValue("Sheet"))
+                                            .defaultValue("Sheet")
+                                            .advancedOption(true))
                             .output(array())
                             .perform(this::performRead),
                     action(WRITE)
@@ -117,18 +123,19 @@ public class XlsxFileComponentHandler implements ComponentHandler {
                                             .label("Rows")
                                             .description("The array of objects to write to the file.")
                                             .required(true)
-                                            .items(object().additionalProperties(true)
-                                                    .properties(bool(), dateTime(), number(), string())),
+                                            .items(object().additionalProperties(oneOf())),
                                     string(FILENAME)
                                             .label("Filename")
                                             .description(
                                                     "Filename to set for binary data. By default, \"file.xlsx\" will be used.")
                                             .required(true)
-                                            .defaultValue("file.xlsx"),
+                                            .defaultValue("file.xlsx")
+                                            .advancedOption(true),
                                     string(SHEET_NAME)
                                             .label("Sheet Name")
                                             .description("The name of the sheet to create in the spreadsheet.")
-                                            .defaultValue("Sheet"))
+                                            .defaultValue("Sheet")
+                                            .advancedOption(true))
                             .output(fileEntry())
                             .perform(this::performWrite));
 
@@ -143,8 +150,8 @@ public class XlsxFileComponentHandler implements ComponentHandler {
     }
 
     protected List<Map<String, ?>> performRead(Context context, ExecutionParameters executionParameters) {
-        FileEntry fileEntry = executionParameters.getFileEntry(FILE_ENTRY);
-        boolean headerRow = executionParameters.getBoolean(PROPERTY_HEADER_ROW, true);
+        FileEntry fileEntry = executionParameters.get(FILE_ENTRY, FileEntry.class);
+        boolean headerRow = executionParameters.getBoolean(HEADER_ROW, true);
         boolean includeEmptyCells = executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
         Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
         Integer pageNumber = executionParameters.getInteger(PAGE_NUMBER);
@@ -182,7 +189,8 @@ public class XlsxFileComponentHandler implements ComponentHandler {
 
     protected FileEntry performWrite(Context context, ExecutionParameters executionParameters) {
         String fileName = executionParameters.getString(FILENAME, getaDefaultFileName());
-        List<Map<String, ?>> rows = executionParameters.getRequiredList(ROWS);
+        @SuppressWarnings("unchecked")
+        List<Map<String, ?>> rows = (List) executionParameters.getList(ROWS, Map.class, List.of());
 
         String sheetName = executionParameters.getString(SHEET_NAME, "Sheet");
 
@@ -192,6 +200,11 @@ public class XlsxFileComponentHandler implements ComponentHandler {
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to handle task " + executionParameters, ioException);
         }
+    }
+
+    public List<Map<String, ?>> read(InputStream inputStream) throws IOException {
+        return read(
+                FileFormat.XLSX, inputStream, new ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
     }
 
     private String getaDefaultFileName() {
@@ -302,15 +315,17 @@ public class XlsxFileComponentHandler implements ComponentHandler {
 
                     rows.add(map);
                 } else {
-                    List<Object> values = new ArrayList<>();
+                    Map<String, Object> map = new HashMap<>();
 
                     for (int i = 0; i < lastColumn; i++) {
                         Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
 
-                        values.add(processValue(cell, configuration.includeEmptyCells(), configuration.readAsString()));
+                        map.put(
+                                "column_" + (i + 1),
+                                processValue(cell, configuration.includeEmptyCells(), configuration.readAsString()));
                     }
 
-                    rows.add(MapUtils.of(values));
+                    rows.add(map);
                 }
             } else {
                 if (count >= configuration.rangeEndRow()) {

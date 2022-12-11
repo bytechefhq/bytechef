@@ -21,14 +21,10 @@ import static com.bytechef.component.objecthelper.constants.ObjectHelperConstant
 import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.OBJECT_HELPER;
 import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.any;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -52,15 +48,14 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
                                     .label("Source")
                                     .description("The JSON string to convert to the data.")
                                     .required(true))
-                            .output(any())
+                            .output(oneOf())
                             .perform(this::performParse),
                     action(JSON_STRINGIFY)
                             .display(display("Convert to JSON string")
                                     .description("Writes the object/array to a JSON string."))
-                            .properties(any(SOURCE)
+                            .properties(oneOf(SOURCE)
                                     .label("Source")
                                     .description("The data to convert to JSON string.")
-                                    .types(array(), bool(), number(), object(), string())
                                     .required(true))
                             .output(string())
                             .perform(this::performStringify));
@@ -71,13 +66,13 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
     }
 
     protected Object performParse(Context context, ExecutionParameters executionParameters) {
-        Object input = executionParameters.getRequiredObject("input");
+        Object input = executionParameters.getRequired(SOURCE);
 
         return JsonUtils.read((String) input);
     }
 
     protected String performStringify(Context context, ExecutionParameters executionParameters) {
-        Object input = executionParameters.getRequiredObject("input");
+        Object input = executionParameters.getRequired(SOURCE);
 
         return JsonUtils.write(input);
     }

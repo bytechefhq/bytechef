@@ -20,6 +20,7 @@ import static com.bytechef.component.aws.s3.constants.AwsS3Constants.ACL;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.AWS_S3;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.BUCKET;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.FILENAME;
+import static com.bytechef.component.aws.s3.constants.AwsS3Constants.FILE_ENTRY;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.GET_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.GET_URL;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.LIST_OBJECTS;
@@ -27,7 +28,6 @@ import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PREFIX;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PRESIGN_GET_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PUT_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.URI;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
@@ -40,7 +40,6 @@ import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.constants.ComponentConstants;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -77,7 +76,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                             .label("URI")
                                             .description("The AWS S3 uri.")
                                             .required(true),
-                                    string(ComponentConstants.FILENAME)
+                                    string(FILENAME)
                                             .label("Filename")
                                             .description("Filename to set for binary data.")
                                             .required(true)
@@ -198,7 +197,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
-        FileEntry fileEntry = executionParameters.getFileEntry(FILE_ENTRY);
+        FileEntry fileEntry = executionParameters.get(FILE_ENTRY, FileEntry.class);
 
         try (S3Client s3Client = S3Client.builder().build()) {
             Path tempFilePath = Files.createTempFile("", ".tmp");

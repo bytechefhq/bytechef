@@ -27,4 +27,6 @@ public class FileStorageConstants {
     public static final String WRITE = "write";
     public static final String DOWNLOAD = "download";
     public static final String URL = "url";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILENAME = "filename";
 }

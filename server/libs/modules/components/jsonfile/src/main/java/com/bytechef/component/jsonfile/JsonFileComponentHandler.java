@@ -16,6 +16,8 @@
 
 package com.bytechef.component.jsonfile;
 
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FILENAME;
+import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FILE_ENTRY;
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FILE_TYPE;
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.IS_ARRAY;
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.JSON_FILE;
@@ -25,10 +27,7 @@ import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.PA
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.READ;
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.SOURCE;
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.WRITE;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.any;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
@@ -37,8 +36,9 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.showWhen;
+import static com.bytechef.hermes.component.definition.ComponentDSL.show;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -94,18 +94,21 @@ public class JsonFileComponentHandler implements ComponentHandler {
                                             .label("Path")
                                             .description(
                                                     "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                                            .displayOption(showWhen(IS_ARRAY).eq(true)),
+                                            .displayOption(show(IS_ARRAY, true))
+                                            .advancedOption(true),
                                     integer(PAGE_SIZE)
                                             .label("Page Size")
                                             .description("The amount of child elements to return in a page.")
-                                            .displayOption(showWhen(IS_ARRAY).eq(true)),
+                                            .displayOption(show(IS_ARRAY, true))
+                                            .advancedOption(true),
                                     integer(PAGE_NUMBER)
                                             .label("Page Number")
                                             .description("The page number to get.")
-                                            .displayOption(showWhen(IS_ARRAY).eq(true)))
+                                            .displayOption(show(IS_ARRAY, true))
+                                            .advancedOption(true))
                             .output(
-                                    array().displayOption(showWhen(IS_ARRAY).eq(true)),
-                                    object().displayOption(showWhen(IS_ARRAY).eq(false)))
+                                    array().displayOption(show(IS_ARRAY, true)),
+                                    object().displayOption(show(IS_ARRAY, false)))
                             .perform(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to a JSON file."))
@@ -118,7 +121,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
                                                     option("JSON Line", FileType.JSONL.name()))
                                             .defaultValue(FileType.JSON.name())
                                             .required(true),
-                                    any(SOURCE)
+                                    oneOf(SOURCE)
                                             .label("Source")
                                             .description("The data to write to the file.")
                                             .required(true)
@@ -128,7 +131,8 @@ public class JsonFileComponentHandler implements ComponentHandler {
                                             .description(
                                                     "Filename to set for binary data. By default, \"file.json\" will be used.")
                                             .required(true)
-                                            .defaultValue("file.json"))
+                                            .defaultValue("file.json")
+                                            .advancedOption(true))
                             .output(fileEntry())
                             .perform(this::performWrite));
 
@@ -142,7 +146,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
             throws ActionExecutionException {
 
         FileType fileType = getFileType(executionParameters);
-        FileEntry fileEntry = executionParameters.getFileEntry(FILE_ENTRY);
+        FileEntry fileEntry = executionParameters.getRequired(FILE_ENTRY, FileEntry.class);
         boolean isArray = executionParameters.getBoolean(IS_ARRAY, true);
         Object result;
 
@@ -199,7 +203,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
     protected FileEntry performWrite(Context context, ExecutionParameters executionParameters)
             throws ActionExecutionException {
         FileType fileType = getFileType(executionParameters);
-        Object source = executionParameters.getRequiredObject(SOURCE);
+        Object source = executionParameters.getRequired(SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -228,7 +232,6 @@ public class JsonFileComponentHandler implements ComponentHandler {
     }
 
     private FileType getFileType(ExecutionParameters executionParameters) {
-
         return FileType.valueOf(StringUtils.upperCase(executionParameters.getString(FILE_TYPE, FileType.JSON.name())));
     }
 }

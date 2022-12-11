@@ -133,19 +133,23 @@
           "items": [
             {
               "type": "OBJECT",
-              "additionalProperties": true,
-              "properties": [
+              "additionalProperties": [
                 {
-                  "type": "BOOLEAN"
-                },
-                {
-                  "type": "DATE_TIME"
-                },
-                {
-                  "type": "NUMBER"
-                },
-                {
-                  "type": "STRING"
+                  "type": "ONE_OF",
+                  "types": [
+                    {
+                      "type": "BOOLEAN"
+                    },
+                    {
+                      "type": "DATE_TIME"
+                    },
+                    {
+                      "type": "NUMBER"
+                    },
+                    {
+                      "type": "STRING"
+                    }
+                  ]
                 }
               ]
             }

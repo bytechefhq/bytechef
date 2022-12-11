@@ -17,9 +17,9 @@
 package com.bytechef.component.var;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.any;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -39,7 +39,7 @@ public class VarComponentHandler implements ComponentHandler {
             .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
             .actions(action(SET)
                     .display(display("Set value"))
-                    .properties(any(VALUE)
+                    .properties(oneOf(VALUE)
                             .label("Value")
                             .description("Value of any type to set.")
                             .required(true))
@@ -51,6 +51,6 @@ public class VarComponentHandler implements ComponentHandler {
     }
 
     protected Object performSetValue(Context context, ExecutionParameters executionParameters) {
-        return executionParameters.getObject(VALUE);
+        return executionParameters.get(VALUE);
     }
 }

@@ -44,14 +44,14 @@ public class DelayComponentHandler implements ComponentHandler {
                             .description("Time in milliseconds.")
                             .required(true)
                             .defaultValue(1))
-                    .perform(this::sleep));
+                    .perform(this::performSleep));
 
     @Override
     public ComponentDefinition getDefinition() {
         return componentDefinition;
     }
 
-    protected Object sleep(Context context, ExecutionParameters executionParameters) {
+    protected Object performSleep(Context context, ExecutionParameters executionParameters) {
         try {
             if (executionParameters.containsKey("millis")) {
                 Thread.sleep(executionParameters.getLong("millis"));

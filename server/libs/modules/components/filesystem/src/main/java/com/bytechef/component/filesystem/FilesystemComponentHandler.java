@@ -17,15 +17,15 @@
 package com.bytechef.component.filesystem;
 
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.CREATE_TEMP_DIR;
+import static com.bytechef.component.filesystem.constants.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.FILESYSTEM;
+import static com.bytechef.component.filesystem.constants.FilesystemConstants.FILE_ENTRY;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.GET_FILE_PATH;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.LS;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.MKDIR;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.READ_FILE;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.RM;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.WRITE_FILE;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
@@ -189,8 +189,10 @@ public class FilesystemComponentHandler implements ComponentHandler {
     }
 
     protected FileEntry performReadFile(Context context, ExecutionParameters executionParameters) {
-        try (InputStream inputStream = new FileInputStream(executionParameters.getRequiredString(FILENAME))) {
-            return context.storeFileContent(executionParameters.getRequiredString(FILENAME), inputStream);
+        String filename = executionParameters.getRequiredString(FILENAME);
+
+        try (InputStream inputStream = new FileInputStream(filename)) {
+            return context.storeFileContent(filename, inputStream);
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to open file " + executionParameters, ioException);
         }
@@ -199,7 +201,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
     protected Map<String, Long> performWriteFile(Context context, ExecutionParameters executionParameters) {
         String fileName = executionParameters.getRequiredString(FILENAME);
 
-        try (InputStream inputStream = context.getFileStream(executionParameters.getFileEntry(FILE_ENTRY))) {
+        try (InputStream inputStream = context.getFileStream(executionParameters.get(FILE_ENTRY, FileEntry.class))) {
             return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to create file " + executionParameters, ioException);

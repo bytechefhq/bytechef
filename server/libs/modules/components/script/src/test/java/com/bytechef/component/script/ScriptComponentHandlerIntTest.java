@@ -21,11 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ComponentIntTest
 public class ScriptComponentHandlerIntTest {
 
-    private TestVarTaskHandler<Integer, Integer> testVarTaskHandler;
+    private TaskHandler<Object> taskHandler = taskExecution -> {
+        Map<String, Object> parameters = taskExecution.getParameters();
+
+        return parameters.get("value");
+    };
 
     @Autowired
     private WorkflowExecutor workflowExecutor;
-
-    @BeforeEach
-    void setUp() {
-        testVarTaskHandler = new TestVarTaskHandler<>(Map::put);
-    }
 
     @Disabled
     @Test
@@ -55,7 +53,7 @@ public class ScriptComponentHandlerIntTest {
     @Test
     public void testPerformJavaScript() {
         Job job = workflowExecutor.execute(
-                "script_v1_javascript", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+                "script_v1_javascript", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -66,8 +64,7 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformPython() {
-        Job job = workflowExecutor.execute(
-                "script_v1_python", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+        Job job = workflowExecutor.execute("script_v1_python", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -78,8 +75,7 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformR() {
-        Job job =
-                workflowExecutor.execute("script_v1_r", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+        Job job = workflowExecutor.execute("script_v1_r", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -90,8 +86,7 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformRuby() {
-        Job job = workflowExecutor.execute(
-                "script_v1_ruby", Map.of("factor", 3), Map.of("var/v1/set", testVarTaskHandler));
+        Job job = workflowExecutor.execute("script_v1_ruby", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
