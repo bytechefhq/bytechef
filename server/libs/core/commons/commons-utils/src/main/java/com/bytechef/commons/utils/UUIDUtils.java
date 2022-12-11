@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,22 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.commons.uuid;
+package com.bytechef.commons.utils;
 
 import java.util.UUID;
 
 /**
- * @author Arik Cohen
+ * @author Ivica Cardic
  */
-public final class UUIDGenerator {
-
-    private UUIDGenerator() {}
+public class UUIDUtils {
 
     public static String generate() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return UUID.randomUUID().toString();
     }
 }
