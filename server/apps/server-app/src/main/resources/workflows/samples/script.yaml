@@ -12,8 +12,8 @@ tasks:
     type: randomHelper/v1/randomInt
     startInclusive: 0
     endInclusive: 5000
-  - name: function1
-    type: function/v1/javascript
+  - name: script1
+    type: script/v1/javascript
     input:
       randomNum : ${randomNumber}
       randomInput: ${yourName}
@@ -27,9 +27,9 @@ tasks:
       }
   - label: Print result from the JavaScript script
     type: logger/v1/info
-    text: 'Result from function1: ${function1}'
-  - name: function2
-    type: function/v1/python
+    text: 'Result from script1: ${script1}'
+  - name: script2
+    type: script/v1/python
     input:
       randomNum : ${randomNumber}
       randomInput: ${yourName}
@@ -42,9 +42,9 @@ tasks:
         return 2 * input.randomNum
   - label: Print result from the Python script
     type: logger/v1/info
-    text: 'Result from function2: ${function2}'
-  - name: function3
-    type: function/v1/r
+    text: 'Result from script2: ${script2}'
+  - name: script3
+    type: script/v1/r
     input:
       randomNum: ${randomNumber}
       randomInput: ${yourName}
@@ -54,9 +54,9 @@ tasks:
       }
   - label: Print result from the R script
     type: logger/v1/info
-    text: 'Result from function3: ${function3}'
-  - name: function4
-    type: function/v1/ruby
+    text: 'Result from script3: ${script3}'
+  - name: script4
+    type: script/v1/ruby
     input:
       randomNum : ${randomNumber}
       randomInput: ${yourName}
@@ -66,4 +66,4 @@ tasks:
       end
   - label: Print result from the Ruby script
     type: logger/v1/info
-    text: 'Result from function4: ${function4}'
+    text: 'Result from script4: ${script4}'
