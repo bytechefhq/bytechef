@@ -29,7 +29,6 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-upgrade")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
-    implementation project(":server:libs:core:commons:commons-utils")
     implementation project(":server:libs:core:discovery:discovery-config")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")
@@ -40,5 +39,5 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-integration:hermes-integration-service")
     implementation project(":server:libs:hermes:hermes-integration:hermes-integration-upgrade")
 
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-int-support")
 }
