@@ -21,9 +21,10 @@ import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.UUIDUtils;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class WorkerTest {
                 .withTaskHandlerResolver(jt -> t -> "done")
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         TaskExecution task = new TaskExecution();
@@ -71,7 +72,7 @@ public class WorkerTest {
                 })
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
         TaskExecution task = new TaskExecution();
         task.setId("1234");
@@ -96,13 +97,13 @@ public class WorkerTest {
                 .withTaskHandlerResolver(t1 -> {
                     String type = t1.getType();
                     if ("var".equals(type)) {
-                        return t2 -> t2.getRequired("value");
+                        return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
                     } else {
                         throw new IllegalArgumentException("unknown type: " + type);
                     }
                 })
                 .withMessageBroker(messageBroker)
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .withEventPublisher(e -> {})
                 .build();
 
@@ -120,7 +121,7 @@ public class WorkerTest {
     @Test
     public void test4() {
         String tempDir =
-                new File(new File(System.getProperty("java.io.tmpdir")), UUIDGenerator.generate()).getAbsolutePath();
+                new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate()).getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(Queues.COMPLETIONS, t -> {
@@ -132,11 +133,12 @@ public class WorkerTest {
                 .withTaskHandlerResolver(t1 -> {
                     String type = t1.getType();
                     if ("var".equals(type)) {
-                        return t2 -> t2.getRequired("value");
+                        return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
                     } else if ("mkdir".equals(type)) {
-                        return t2 -> (new File(t2.getString("path")).mkdirs());
+                        return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
                     } else if ("rm".equals(type)) {
-                        return t2 -> FileUtils.deleteQuietly((new File(t2.getString("path"))));
+                        return t2 ->
+                                FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
                     } else if ("pass".equals(type)) {
                         Assertions.assertTrue(new File(tempDir).exists());
                         return t2 -> null;
@@ -146,7 +148,7 @@ public class WorkerTest {
                 })
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
@@ -163,7 +165,7 @@ public class WorkerTest {
     @Test
     public void test5() {
         String tempDir =
-                new File(new File(System.getProperty("java.io.tmpdir")), UUIDGenerator.generate()).getAbsolutePath();
+                new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate()).getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(Queues.ERRORS, t -> {
@@ -175,11 +177,12 @@ public class WorkerTest {
                 .withTaskHandlerResolver(t1 -> {
                     String type = t1.getType();
                     if ("var".equals(type)) {
-                        return t2 -> t2.getRequired("value");
+                        return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
                     } else if ("mkdir".equals(type)) {
-                        return t2 -> (new File(t2.getString("path")).mkdirs());
+                        return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
                     } else if ("rm".equals(type)) {
-                        return t2 -> FileUtils.deleteQuietly((new File(t2.getString("path"))));
+                        return t2 ->
+                                FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
                     } else if ("rogue".equals(type)) {
                         Assertions.assertTrue(new File(tempDir).exists());
                         return t2 -> {
@@ -191,7 +194,7 @@ public class WorkerTest {
                 })
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
@@ -222,7 +225,7 @@ public class WorkerTest {
                 })
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         TaskExecution task = new TaskExecution();
@@ -257,7 +260,7 @@ public class WorkerTest {
                 })
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         TaskExecution task1 = new TaskExecution();
@@ -299,7 +302,7 @@ public class WorkerTest {
                 })
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
-                .withTaskEvaluator(SpelTaskEvaluator.create())
+                .withTaskEvaluator(TaskEvaluator.create())
                 .build();
 
         TaskExecution task1 = new TaskExecution();
