@@ -16,7 +16,7 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,6 +26,6 @@ public class EachTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        AssertUtils.assertEquals("definition/each_v1.json", new EachTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/each_v1.json", new EachTaskDispatcherFactory().getDefinition());
     }
 }

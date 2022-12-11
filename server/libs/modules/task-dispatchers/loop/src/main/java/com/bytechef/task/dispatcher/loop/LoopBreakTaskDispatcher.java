@@ -27,7 +27,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.utils.LocalDateTimeUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import org.springframework.util.Assert;
@@ -51,8 +50,6 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
         TaskExecution loopTaskExecution = findLoopTaskExecution(taskExecution.getParentId());
 
         loopTaskExecution.setEndTime(LocalDateTime.now());
-        loopTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(loopTaskExecution.getEndTime())
-                - LocalDateTimeUtils.getTime(loopTaskExecution.getStartTime()));
 
         messageBroker.send(Queues.COMPLETIONS, loopTaskExecution);
     }

@@ -16,7 +16,7 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.any;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
@@ -49,7 +49,7 @@ public class EachTaskDispatcherFactory implements TaskDispatcherFactory {
                     array(LIST)
                             .label("List of items")
                             .description("List of items to iterate over.")
-                            .items(any()),
+                            .items(oneOf()),
                     string(ITEM_VAR)
                             .label("Item Var")
                             .description("The name of the item variable.")
@@ -58,7 +58,7 @@ public class EachTaskDispatcherFactory implements TaskDispatcherFactory {
                             .label("Item Index")
                             .description("The name of the index variable.")
                             .defaultValue(ITEM_INDEX))
-            .output(any("item"), integer("itemIndex"))
+            .output(oneOf("item"), integer("itemIndex"))
             .taskProperties(task(ITERATEE));
 
     @Override

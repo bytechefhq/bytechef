@@ -30,10 +30,12 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matija Petanjek
@@ -96,9 +98,9 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         List<WorkflowTask> subWorkflowTasks;
 
         if (IfTaskUtils.resolveCase(ifTaskExecution)) {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_TRUE);
+            subWorkflowTasks = getSubWorkflowTasks(ifTaskExecution, CASE_TRUE);
         } else {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_FALSE);
+            subWorkflowTasks = getSubWorkflowTasks(ifTaskExecution, CASE_FALSE);
         }
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
@@ -124,10 +126,14 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         // no more tasks to execute -- complete the If
         else {
             ifTaskExecution.setEndTime(LocalDateTime.now());
-            ifTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(ifTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(ifTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(ifTaskExecution);
         }
+    }
+
+    private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution ifTaskExecution, String caseTrue) {
+        return MapUtils.getList(ifTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList()).stream()
+                .map(WorkflowTask::new)
+                .toList();
     }
 }

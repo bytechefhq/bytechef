@@ -18,8 +18,8 @@ package com.bytechef.task.dispatcher.each;
 
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
-import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -31,7 +31,7 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +56,7 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
+                contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1")));
 
@@ -78,7 +78,7 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
+                contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2")));
 
@@ -92,7 +92,7 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
+                contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases",
                 Arrays.asList(
@@ -119,7 +119,7 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
+                contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "cases",
                 Arrays.asList(

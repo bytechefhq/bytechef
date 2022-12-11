@@ -35,9 +35,11 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
@@ -124,28 +126,35 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         // no more tasks to execute -- complete the switch
         else {
             switchTaskExecution.setEndTime(LocalDateTime.now());
-            switchTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(switchTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(switchTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(switchTaskExecution);
         }
     }
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
-        Object expression = taskExecution.getRequired(EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks = taskExecution.getWorkflowTasks(CASES);
+        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        List<WorkflowTask> caseWorkflowTasks =
+                MapUtils.getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList()).stream()
+                        .map(WorkflowTask::new)
+                        .toList();
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a switch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
-            Object key = caseWorkflowTask.getRequired(KEY);
-            List<WorkflowTask> subWorkflowTasks = caseWorkflowTask.getWorkflowTasks(TASKS);
+            Object key = MapUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
+            List<WorkflowTask> subWorkflowTasks =
+                    MapUtils.getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList())
+                            .stream()
+                            .map(WorkflowTask::new)
+                            .toList();
 
             if (key.equals(expression)) {
                 return subWorkflowTasks;
             }
         }
 
-        return taskExecution.getWorkflowTasks(DEFAULT);
+        return MapUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList()).stream()
+                .map(WorkflowTask::new)
+                .toList();
     }
 }
