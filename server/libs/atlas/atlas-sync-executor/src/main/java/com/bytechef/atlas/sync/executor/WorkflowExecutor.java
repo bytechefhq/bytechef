@@ -40,12 +40,11 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -144,7 +143,7 @@ public class WorkflowExecutor {
                 Stream.concat(getTaskHandlerMapSupplier.get().entrySet().stream(), taskHandlerMap.entrySet().stream())
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))));
 
-        TaskEvaluator taskEvaluator = SpelTaskEvaluator.create();
+        TaskEvaluator taskEvaluator = TaskEvaluator.create();
 
         Worker worker = Worker.builder()
                 .withTaskHandlerResolver(taskHandlerResolverChain)
@@ -212,7 +211,7 @@ public class WorkflowExecutor {
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
         messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((String) jobId));
 
-        String jobId = UUIDGenerator.generate();
+        String jobId = UUIDUtils.generate();
 
         JobParametersDTO jobParametersDTO = new JobParametersDTO();
 
