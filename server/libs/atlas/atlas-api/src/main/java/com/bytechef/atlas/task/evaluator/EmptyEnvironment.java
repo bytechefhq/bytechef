@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator.spel;
+package com.bytechef.atlas.task.evaluator;
 
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
