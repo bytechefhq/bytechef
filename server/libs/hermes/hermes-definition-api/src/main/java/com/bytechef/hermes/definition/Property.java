@@ -36,16 +36,17 @@ import java.util.Map;
         property = "type",
         visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Property.AnyProperty.class, name = "ANY"),
     @JsonSubTypes.Type(value = Property.ArrayProperty.class, name = "ARRAY"),
     @JsonSubTypes.Type(value = Property.BooleanProperty.class, name = "BOOLEAN"),
     @JsonSubTypes.Type(value = Property.DateTimeProperty.class, name = "DATE_TIME"),
     @JsonSubTypes.Type(value = Property.IntegerProperty.class, name = "INTEGER"),
     @JsonSubTypes.Type(value = Property.NumberProperty.class, name = "NUMBER"),
     @JsonSubTypes.Type(value = Property.ObjectProperty.class, name = "OBJECT"),
+    @JsonSubTypes.Type(value = Property.OneOfProperty.class, name = "ONE_OF"),
     @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
 })
-public sealed class Property<P extends Property<P>> permits Property.AnyProperty, Property.ValueProperty {
+public sealed class Property<P extends Property<P>>
+        permits Property.OneOfProperty, Property.NullProperty, Property.ValueProperty {
 
     public enum ControlType {
         CODE,
@@ -53,7 +54,6 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
     }
 
     public enum Type {
-        ANY,
         ARRAY,
         BOOLEAN,
         DATE,
@@ -62,6 +62,7 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
         NULL,
         NUMBER,
         OBJECT,
+        ONE_OF,
         STRING
     }
 
@@ -81,7 +82,7 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
         this.type = type;
     }
 
-    @Schema(name = "additional", description = "If the property should be grouped under additional properties.")
+    @Schema(name = "advancedOption", description = "If the property should be grouped under advanced options.")
     public Boolean getAdvancedOption() {
         return advancedOption;
     }
@@ -131,15 +132,24 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
         return type;
     }
 
-    @Schema(name = "AnyProperty", description = "An any property type.")
-    @JsonTypeName("ANY")
-    public static sealed class AnyProperty extends Property<AnyProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableAnyProperty {
+    @Schema(name = "OneOfProperty", description = "A one of property type.")
+    @JsonTypeName("OneOf")
+    public static sealed class OneOfProperty extends Property<OneOfProperty>
+            permits DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty {
 
-        protected List<? extends Property<?>> types;
+        protected List<? extends Property<?>> types = List.of(
+                new ArrayProperty(null),
+                new BooleanProperty(null),
+                new DateProperty(null),
+                new DateTimeProperty(null),
+                new IntegerProperty(null),
+                new NullProperty(null),
+                new NumberProperty(null),
+                new ObjectProperty(null),
+                new StringProperty(null));
 
-        protected AnyProperty(String name) {
-            super(name, Type.ANY);
+        protected OneOfProperty(String name) {
+            super(name, Type.ONE_OF);
         }
 
         @Schema(name = "types", description = "Possible types of properties that can be used.")
@@ -155,7 +165,6 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
                     Property.DateProperty,
                     Property.DateTimeProperty,
                     Property.IntegerProperty,
-                    Property.NullProperty,
                     Property.NumberProperty,
                     Property.ObjectProperty,
                     Property.StringProperty {
@@ -198,14 +207,14 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
     public static sealed class ArrayProperty extends ValueProperty<Object[], ArrayProperty>
             permits DefinitionDSL.ModifiableProperty.ModifiableArrayProperty {
 
-        protected List<? extends Property> items;
+        protected List<Property<?>> items;
 
         protected ArrayProperty(String name) {
             super(name, Type.ARRAY);
         }
 
-        @Schema(name = "items", description = "An array property type.")
-        public List<? extends Property> getItems() {
+        @Schema(name = "items", description = "Types of the array items.")
+        public List<Property<?>> getItems() {
             return items;
         }
     }
@@ -242,7 +251,7 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
 
     @JsonTypeName("NULL")
     @Schema(name = "NullProperty", description = "A null property type.")
-    public static final class NullProperty extends ValueProperty<Integer, NullProperty> {
+    public static final class NullProperty extends Property<NullProperty> {
 
         protected NullProperty(String name) {
             super(name, Type.NULL);
@@ -306,7 +315,7 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
     public static sealed class ObjectProperty extends ValueProperty<Object, ObjectProperty>
             permits DefinitionDSL.ModifiableProperty.ModifiableObjectProperty {
 
-        protected Boolean additionalProperties;
+        protected List<Property<?>> additionalProperties;
         protected String objectType;
         protected List<? extends Property<?>> properties;
 
@@ -314,8 +323,8 @@ public sealed class Property<P extends Property<P>> permits Property.AnyProperty
             super(name, Type.OBJECT);
         }
 
-        @Schema(name = "additionalProperties", description = "The object can contain dynamically defined properties.")
-        public Boolean getAdditionalProperties() {
+        @Schema(name = "additionalProperties", description = "Types of dynamically defined properties.")
+        public List<Property<?>> getAdditionalProperties() {
             return additionalProperties;
         }
 

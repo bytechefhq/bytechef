@@ -26,24 +26,27 @@ import java.util.Map;
 @Schema(name = "DisplayOption", description = "Defines rules when a property should be shown or hidden.")
 public sealed class DisplayOption permits DefinitionDSL.ModifiableDisplayOption {
 
-    protected Map<String, List<Object>> hideWhen;
-    protected Map<String, List<Object>> showWhen;
+    protected Map<String, List<Object>> hide;
+    protected Map<String, List<Object>> show;
 
-    protected DisplayOption() {}
+    protected DisplayOption(Map<String, List<Object>> hide, Map<String, List<Object>> show) {
+        this.hide = hide;
+        this.show = show;
+    }
 
     @Schema(
             name = "hideWhen",
             description =
                     "The map of property names and list of values to check against if the property should be hidden.")
-    public Map<String, List<Object>> getHideWhen() {
-        return hideWhen;
+    public Map<String, List<Object>> getHide() {
+        return hide;
     }
 
     @Schema(
             name = "showWhen",
             description =
                     "The map of property names and list of values to check against if the property should be shown.")
-    public Map<String, List<Object>> getShowWhen() {
-        return showWhen;
+    public Map<String, List<Object>> getShow() {
+        return show;
     }
 }
