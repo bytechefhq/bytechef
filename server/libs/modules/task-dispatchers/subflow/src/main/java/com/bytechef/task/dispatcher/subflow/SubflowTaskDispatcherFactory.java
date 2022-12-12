@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -33,14 +34,14 @@ import org.springframework.stereotype.Component;
 public class SubflowTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(
-                    SubflowTaskDispatcherConstants.SUBFLOW)
+        SubflowTaskDispatcherConstants.SUBFLOW)
             .display(
-                    display("Subflow")
-                            .description(
-                                    "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task."))
+                display("Subflow")
+                    .description(
+                        "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task."))
             .properties(string(WorkflowConstants.WORKFLOW_ID)
-                    .label("Workflow Id")
-                    .description("The id of sub-workflow to execute."));
+                .label("Workflow Id")
+                .description("The id of sub-workflow to execute."));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

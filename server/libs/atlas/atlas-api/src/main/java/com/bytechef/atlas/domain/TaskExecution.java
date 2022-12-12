@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -51,13 +52,14 @@ import org.springframework.util.Assert;
 /**
  * Wraps the {@link WorkflowTask} instance to add execution semantics to the task.
  *
- * <p>{@link TaskExecution} instances capture the life cycle of a single execution of a task. By single execution is
- * meant that the task goes through the following states:
+ * <p>
+ * {@link TaskExecution} instances capture the life cycle of a single execution of a task. By single execution is meant
+ * that the task goes through the following states:
  *
  * <ol>
- *   <li><code>CREATED</code>
- *   <li><code>STARTED</code>
- *   <li><code>COMPLETED</code> or <code>FAILED</code> or <code>CANCELLED</code>
+ * <li><code>CREATED</code>
+ * <li><code>STARTED</code>
+ * <li><code>COMPLETED</code> or <code>FAILED</code> or <code>CANCELLED</code>
  * </ol>
  *
  * @author Arik Cohen
@@ -65,7 +67,7 @@ import org.springframework.util.Assert;
  */
 @Table
 public final class TaskExecution
-        implements Errorable, Persistable<String>, Prioritizable, Progressable, Retryable, Task {
+    implements Errorable, Persistable<String>, Prioritizable, Progressable, Retryable, Task {
 
     @CreatedBy
     @Column("created_by")
@@ -142,7 +144,8 @@ public final class TaskExecution
     @Column("workflow_task")
     private WorkflowTask workflowTask = WorkflowTask.EMPTY_WORKFLOW_TASK;
 
-    public TaskExecution() {}
+    public TaskExecution() {
+    }
 
     public TaskExecution(TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "taskExecution cannot be null");
@@ -291,8 +294,8 @@ public final class TaskExecution
     }
 
     /**
-     * Returns the total time in ms for this task to execute (excluding wait time of the task in
-     * transit). i.e. actual execution time on a worker node.
+     * Returns the total time in ms for this task to execute (excluding wait time of the task in transit). i.e. actual
+     * execution time on a worker node.
      *
      * @return long
      */
@@ -386,7 +389,8 @@ public final class TaskExecution
 
     @Override
     public long getRetryDelayMillis() {
-        long delay = Duration.parse("PT" + getRetryDelay()).toMillis();
+        long delay = Duration.parse("PT" + getRetryDelay())
+            .toMillis();
         int retryAttempts = getRetryAttempts();
         int retryDelayFactor = getRetryDelayFactor();
         return delay * retryAttempts * retryDelayFactor;
@@ -574,247 +578,247 @@ public final class TaskExecution
 
     // WorkflowTaskParameter
 
-    //    @Override
-    //    public Map<String, Object> asMap() {
-    //        return workflowTask.asMap();
-    //    }
+    // @Override
+    // public Map<String, Object> asMap() {
+    // return workflowTask.asMap();
+    // }
     //
-    //    @Override
-    //    public boolean containsKey(String key) {
-    //        return MapUtils.containsKey(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public boolean containsKey(String key) {
+    // return MapUtils.containsKey(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Object get(String key) {
-    //        return MapUtils.get(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Object get(String key) {
+    // return MapUtils.get(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public <T> T get(String key, ParameterizedTypeReference<T> returnType) {
-    //        return MapUtils.get(workflowTask.getParameters(), key, returnType);
-    //    }
+    // @Override
+    // public <T> T get(String key, ParameterizedTypeReference<T> returnType) {
+    // return MapUtils.get(workflowTask.getParameters(), key, returnType);
+    // }
     //
-    //    @Override
-    //    public <T> T get(String key, Class<T> returnType, T defaultValue) {
-    //        return MapUtils.get(workflowTask.getParameters(), key, returnType, defaultValue);
-    //    }
+    // @Override
+    // public <T> T get(String key, Class<T> returnType, T defaultValue) {
+    // return MapUtils.get(workflowTask.getParameters(), key, returnType, defaultValue);
+    // }
     //
-    //    @Override
-    //    public <T> T get(String key, ParameterizedTypeReference<T> returnType, T defaultValue) {
-    //        return MapUtils.get(workflowTask.getParameters(), key, returnType, defaultValue);
-    //    }
+    // @Override
+    // public <T> T get(String key, ParameterizedTypeReference<T> returnType, T defaultValue) {
+    // return MapUtils.get(workflowTask.getParameters(), key, returnType, defaultValue);
+    // }
     //
-    //    @Override
-    //    public <T> T get(String key, Class<T> returnType) {
-    //        return MapUtils.get(workflowTask.getParameters(), key, returnType);
-    //    }
+    // @Override
+    // public <T> T get(String key, Class<T> returnType) {
+    // return MapUtils.get(workflowTask.getParameters(), key, returnType);
+    // }
     //
-    //    @Override
-    //    public <T> T[] getArray(String key, Class<T> elementType) {
-    //        return MapUtils.getArray(workflowTask.getParameters(), key, elementType);
-    //    }
+    // @Override
+    // public <T> T[] getArray(String key, Class<T> elementType) {
+    // return MapUtils.getArray(workflowTask.getParameters(), key, elementType);
+    // }
     //
-    //    @Override
-    //    public Boolean getBoolean(String key) {
-    //        return MapUtils.getBoolean(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Boolean getBoolean(String key) {
+    // return MapUtils.getBoolean(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public boolean getBoolean(String key, boolean defaultValue) {
-    //        return MapUtils.getBoolean(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public boolean getBoolean(String key, boolean defaultValue) {
+    // return MapUtils.getBoolean(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public Date getDate(String key) {
-    //        return MapUtils.getDate(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Date getDate(String key) {
+    // return MapUtils.getDate(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Date getDate(String key, Date defaultValue) {
-    //        return MapUtils.getDate(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public Date getDate(String key, Date defaultValue) {
+    // return MapUtils.getDate(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public Double getDouble(String key) {
-    //        return MapUtils.getDouble(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Double getDouble(String key) {
+    // return MapUtils.getDouble(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Double getDouble(String key, double defaultValue) {
-    //        return MapUtils.getDouble(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public Double getDouble(String key, double defaultValue) {
+    // return MapUtils.getDouble(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public Duration getDuration(String key) {
-    //        return MapUtils.getDuration(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Duration getDuration(String key) {
+    // return MapUtils.getDuration(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Duration getDuration(String key, Duration defaultDuration) {
-    //        return MapUtils.getDuration(workflowTask.getParameters(), key, defaultDuration);
-    //    }
+    // @Override
+    // public Duration getDuration(String key, Duration defaultDuration) {
+    // return MapUtils.getDuration(workflowTask.getParameters(), key, defaultDuration);
+    // }
     //
-    //    @Override
-    //    public Float getFloat(String key) {
-    //        return MapUtils.getFloat(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Float getFloat(String key) {
+    // return MapUtils.getFloat(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public float getFloat(String key, float defaultValue) {
-    //        return MapUtils.getFloat(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public float getFloat(String key, float defaultValue) {
+    // return MapUtils.getFloat(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public Integer getInteger(String key) {
-    //        return MapUtils.getInteger(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Integer getInteger(String key) {
+    // return MapUtils.getInteger(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public int getInteger(String key, int defaultValue) {
-    //        return MapUtils.getInteger(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public int getInteger(String key, int defaultValue) {
+    // return MapUtils.getInteger(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public <T> List<T> getList(String key, Class<T> elementType) {
-    //        return MapUtils.getList(workflowTask.getParameters(), key, elementType);
-    //    }
+    // @Override
+    // public <T> List<T> getList(String key, Class<T> elementType) {
+    // return MapUtils.getList(workflowTask.getParameters(), key, elementType);
+    // }
     //
-    //    @Override
-    //    public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-    //        return MapUtils.getList(workflowTask.getParameters(), key, elementType, defaultValue);
-    //    }
+    // @Override
+    // public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
+    // return MapUtils.getList(workflowTask.getParameters(), key, elementType, defaultValue);
+    // }
     //
-    //    @Override
-    //    public <T> List<T> getList(String key, ParameterizedTypeReference<T> elementType) {
-    //        return MapUtils.getList(workflowTask.getParameters(), key, elementType);
-    //    }
+    // @Override
+    // public <T> List<T> getList(String key, ParameterizedTypeReference<T> elementType) {
+    // return MapUtils.getList(workflowTask.getParameters(), key, elementType);
+    // }
     //
-    //    @Override
-    //    public <T> List<T> getList(String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
-    //        return MapUtils.getList(workflowTask.getParameters(), key, elementType, defaultValue);
-    //    }
+    // @Override
+    // public <T> List<T> getList(String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+    // return MapUtils.getList(workflowTask.getParameters(), key, elementType, defaultValue);
+    // }
     //
-    //    @Override
-    //    public LocalDate getLocalDate(String key) {
-    //        return MapUtils.getLocalDate(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public LocalDate getLocalDate(String key) {
+    // return MapUtils.getLocalDate(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public LocalDate getLocalDate(String key, LocalDate defaultValue) {
-    //        return MapUtils.getLocalDate(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public LocalDate getLocalDate(String key, LocalDate defaultValue) {
+    // return MapUtils.getLocalDate(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public LocalDateTime getLocalDateTime(String key) {
-    //        return MapUtils.getLocalDateTime(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public LocalDateTime getLocalDateTime(String key) {
+    // return MapUtils.getLocalDateTime(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
-    //        return MapUtils.getLocalDateTime(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
+    // return MapUtils.getLocalDateTime(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public Long getLong(String key) {
-    //        return MapUtils.getLong(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Long getLong(String key) {
+    // return MapUtils.getLong(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public long getLong(String key, long defaultValue) {
-    //        return MapUtils.getLong(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public long getLong(String key, long defaultValue) {
+    // return MapUtils.getLong(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    public <V> Map<String, V> getMap(String key) {
-    //        return MapUtils.getMap(workflowTask.getParameters(), key);
-    //    }
+    // public <V> Map<String, V> getMap(String key) {
+    // return MapUtils.getMap(workflowTask.getParameters(), key);
+    // }
     //
-    //    public <V> Map<String, V> getMap(String key, Map<String, V> defaultValue) {
-    //        return MapUtils.getMap(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // public <V> Map<String, V> getMap(String key, Map<String, V> defaultValue) {
+    // return MapUtils.getMap(workflowTask.getParameters(), key, defaultValue);
+    // }
     //
-    //    @Override
-    //    public <T> T getRequired(String key) {
-    //        return MapUtils.getRequired(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public <T> T getRequired(String key) {
+    // return MapUtils.getRequired(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public <T> T getRequired(String key, Class<T> returnType) {
-    //        return MapUtils.getRequired(workflowTask.getParameters(), key, returnType);
-    //    }
+    // @Override
+    // public <T> T getRequired(String key, Class<T> returnType) {
+    // return MapUtils.getRequired(workflowTask.getParameters(), key, returnType);
+    // }
     //
-    //    @Override
-    //    public Boolean getRequiredBoolean(String key) {
-    //        return MapUtils.getRequiredBoolean(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Boolean getRequiredBoolean(String key) {
+    // return MapUtils.getRequiredBoolean(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Date getRequiredDate(String key) {
-    //        return MapUtils.getRequiredDate(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Date getRequiredDate(String key) {
+    // return MapUtils.getRequiredDate(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Double getRequiredDouble(String key) {
-    //        return MapUtils.getRequiredDouble(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Double getRequiredDouble(String key) {
+    // return MapUtils.getRequiredDouble(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Float getRequiredFloat(String key) {
-    //        return MapUtils.getRequiredFloat(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Float getRequiredFloat(String key) {
+    // return MapUtils.getRequiredFloat(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public Integer getRequiredInteger(String key) {
-    //        return MapUtils.getRequiredInteger(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public Integer getRequiredInteger(String key) {
+    // return MapUtils.getRequiredInteger(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public LocalDate getRequiredLocalDate(String key) {
-    //        return MapUtils.getRequiredLocalDate(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public LocalDate getRequiredLocalDate(String key) {
+    // return MapUtils.getRequiredLocalDate(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public LocalDateTime getRequiredLocalDateTime(String key) {
-    //        return MapUtils.getRequiredLocalDateTime(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public LocalDateTime getRequiredLocalDateTime(String key) {
+    // return MapUtils.getRequiredLocalDateTime(workflowTask.getParameters(), key);
+    // }
     //
-    //    public String getRequiredString(String key) {
-    //        return MapUtils.getRequiredString(workflowTask.getParameters(), key);
-    //    }
+    // public String getRequiredString(String key) {
+    // return MapUtils.getRequiredString(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public String getString(String key) {
-    //        return MapUtils.getString(workflowTask.getParameters(), key);
-    //    }
+    // @Override
+    // public String getString(String key) {
+    // return MapUtils.getString(workflowTask.getParameters(), key);
+    // }
     //
-    //    @Override
-    //    public String getString(String key, String defaultValue) {
-    //        return MapUtils.getString(workflowTask.getParameters(), key, defaultValue);
-    //    }
+    // @Override
+    // public String getString(String key, String defaultValue) {
+    // return MapUtils.getString(workflowTask.getParameters(), key, defaultValue);
+    // }
 
     @Override
     public String toString() {
         return "TaskExecution{" + "createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", endTime="
-                + endTime + ", error="
-                + error + ", executionTime="
-                + executionTime + ", id='"
-                + id + '\'' + ", isNew="
-                + isNew + ", job="
-                + job + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", output="
-                + output + ", parent="
-                + parent + ", priority="
-                + priority + ", progress="
-                + progress + ", retry="
-                + retry + ", retryAttempts="
-                + retryAttempts + ", retryDelay='"
-                + retryDelay + '\'' + ", retryDelayFactor="
-                + retryDelayFactor + ", startTime="
-                + startTime + ", status="
-                + status + ", taskNumber="
-                + taskNumber + ", workflowTask="
-                + workflowTask + '}';
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", endTime="
+            + endTime + ", error="
+            + error + ", executionTime="
+            + executionTime + ", id='"
+            + id + '\'' + ", isNew="
+            + isNew + ", job="
+            + job + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", output="
+            + output + ", parent="
+            + parent + ", priority="
+            + priority + ", progress="
+            + progress + ", retry="
+            + retry + ", retryAttempts="
+            + retryAttempts + ", retryDelay='"
+            + retryDelay + '\'' + ", retryDelayFactor="
+            + retryDelayFactor + ", startTime="
+            + startTime + ", status="
+            + status + ", taskNumber="
+            + taskNumber + ", workflowTask="
+            + workflowTask + '}';
     }
 }

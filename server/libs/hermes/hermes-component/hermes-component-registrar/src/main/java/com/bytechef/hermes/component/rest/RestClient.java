@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -30,11 +31,11 @@ public class RestClient {
     public Object execute(ActionDefinition actionDefinition, Context context, TaskExecution taskExecution) {
         Map<String, Object> metadata = actionDefinition.getMetadata();
 
-        //        Map<String, Object> parameters = taskExecution.getParameters();
+        // Map<String, Object> parameters = taskExecution.getParameters();
 
         return HttpClientUtils.executor()
-                .exchange((String) metadata.get("path"), getRequestMethod(metadata))
-                .execute(context);
+            .exchange((String) metadata.get("path"), getRequestMethod(metadata))
+            .execute(context);
     }
 
     private static HttpClientUtils.RequestMethod getRequestMethod(Map<String, Object> metadata) {

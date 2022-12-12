@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,34 +54,37 @@ public class ComponentDefinitionController {
     }
 
     /**
-     * GET /definitions/components
-     * Returns all component definitions
+     * GET /definitions/components Returns all component definitions
      *
      * @return OK (status code 200)
      */
     @Operation(
-            description = "Returns all component definitions.",
-            operationId = "getComponentDefinitions",
-            summary = "Returns all component definitions.",
-            tags = {"component-definitions"},
-            responses = {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "OK",
-                        content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ComponentDefinition.class))
-                        })
-            })
+        description = "Returns all component definitions.",
+        operationId = "getComponentDefinitions",
+        summary = "Returns all component definitions.",
+        tags = {
+            "component-definitions"
+        },
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = {
+                    @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ComponentDefinition.class))
+                })
+        })
     @RequestMapping(
-            method = RequestMethod.GET,
-            value = "/definitions/components",
-            produces = {"application/json"})
+        method = RequestMethod.GET,
+        value = "/definitions/components",
+        produces = {
+            "application/json"
+        })
     public Mono<ResponseEntity<Flux<ComponentDefinition>>> getComponentDefinitions(
-            @Parameter(hidden = true) final ServerWebExchange exchange) {
+        @Parameter(hidden = true) final ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
-                .collect(Collectors.toList()))));
+            .map(ComponentDefinitionFactory::getDefinition)
+            .collect(Collectors.toList()))));
     }
 }

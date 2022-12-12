@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -44,7 +45,7 @@ public interface CounterRepository {
     /**
      * Set the counter to the give value.
      *
-     * @param id the id of the counter
+     * @param id    the id of the counter
      * @param value the value to set the counter to.
      */
     void update(String id, long value);

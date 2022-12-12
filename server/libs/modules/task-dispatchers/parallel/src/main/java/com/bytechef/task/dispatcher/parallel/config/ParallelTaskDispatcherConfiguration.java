@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -48,13 +49,13 @@ public class ParallelTaskDispatcherConfiguration {
 
     @Bean
     TaskCompletionHandlerFactory parallelTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) ->
-                new ParallelTaskCompletionHandler(counterService, taskCompletionHandler, taskExecutionService);
+        return (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
+            taskCompletionHandler, taskExecutionService);
     }
 
     @Bean
     TaskDispatcherResolverFactory parallelTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ParallelTaskDispatcher(
-                contextService, counterService, messageBroker, taskDispatcher, taskExecutionService);
+            contextService, counterService, messageBroker, taskDispatcher, taskExecutionService);
     }
 }

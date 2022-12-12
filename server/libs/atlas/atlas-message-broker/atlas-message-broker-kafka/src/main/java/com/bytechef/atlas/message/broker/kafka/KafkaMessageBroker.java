@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -42,9 +43,10 @@ public class KafkaMessageBroker implements MessageBroker {
         }
 
         kafkaTemplate.send(MessageBuilder.withPayload(message)
-                .setHeader(KafkaHeaders.TOPIC, routingKey)
-                .setHeader("_type", message.getClass().getName())
-                .build());
+            .setHeader(KafkaHeaders.TOPIC, routingKey)
+            .setHeader("_type", message.getClass()
+                .getName())
+            .build());
     }
 
     private void delay(long aValue) {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -51,11 +52,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskCompletionHandler taskCompletionHandler;
 
     public LoopTaskCompletionHandler(
-            ContextService contextService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -70,7 +71,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(LOOP + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(LOOP + "/v" + VERSION_1);
         }
 
         return false;
@@ -84,34 +86,34 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecutionService.update(completedSubTaskExecution);
 
-        TaskExecution loopTaskExecution =
-                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution loopTaskExecution = new TaskExecution(
+            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
-        WorkflowTask iterateeWorkflowTask =
-                new WorkflowTask(MapUtils.getMap(loopTaskExecution.getParameters(), ITERATEE));
-        List<Object> list =
-                MapUtils.getList(loopTaskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
+        WorkflowTask iterateeWorkflowTask = new WorkflowTask(
+            MapUtils.getMap(loopTaskExecution.getParameters(), ITERATEE));
+        List<Object> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Object.class,
+            Collections.emptyList());
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
             TaskExecution subTaskExecution = new TaskExecution(
-                    iterateeWorkflowTask,
-                    loopTaskExecution.getJobId(),
-                    loopTaskExecution.getId(),
-                    loopTaskExecution.getPriority(),
-                    taskExecution.getTaskNumber() + 1);
+                iterateeWorkflowTask,
+                loopTaskExecution.getJobId(),
+                loopTaskExecution.getId(),
+                loopTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1);
 
             Context context = new Context(contextService.peek(loopTaskExecution.getId()));
 
             if (!list.isEmpty()) {
                 context.put(
-                        MapUtils.getString(loopTaskExecution.getParameters(), ITEM_VAR, ITEM),
-                        list.get(taskExecution.getTaskNumber()));
+                    MapUtils.getString(loopTaskExecution.getParameters(), ITEM_VAR, ITEM),
+                    list.get(taskExecution.getTaskNumber()));
             }
 
             context.put(
-                    MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
-                    taskExecution.getTaskNumber());
+                MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
+                taskExecution.getTaskNumber());
 
             contextService.push(subTaskExecution.getId(), context);
 

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -39,7 +40,7 @@ public class RestComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegist
 
     @SuppressFBWarnings("EI2")
     public RestComponentTaskHandlerRegistrar(
-            ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
         super(RestComponentHandler.class);
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
@@ -48,15 +49,15 @@ public class RestComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegist
 
     @Override
     protected TaskHandler<?> createTaskHandler(
-            ActionDefinition actionDefinition,
-            ConnectionDefinition connectionDefinition,
-            RestComponentHandler restComponentHandler) {
+        ActionDefinition actionDefinition,
+        ConnectionDefinition connectionDefinition,
+        RestComponentHandler restComponentHandler) {
         return new RestComponentTaskHandler(
-                actionDefinition,
-                connectionDefinition,
-                connectionService,
-                restComponentHandler,
-                eventPublisher,
-                fileStorageService);
+            actionDefinition,
+            connectionDefinition,
+            connectionService,
+            restComponentHandler,
+            eventPublisher,
+            fileStorageService);
     }
 }

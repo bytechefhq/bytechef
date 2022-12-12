@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -41,16 +42,19 @@ public class WorkerTest {
     public void test1() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(
-                Queues.COMPLETIONS,
-                t -> Assertions.assertTrue(((TaskExecution) t).getOutput().equals("done")));
-        messageBroker.receive(Queues.EVENTS, t -> {});
+            Queues.COMPLETIONS,
+            t -> Assertions.assertTrue(((TaskExecution) t).getOutput()
+                .equals("done")));
+        messageBroker.receive(Queues.EVENTS, t -> {
+        });
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(jt -> t -> "done")
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+            .withTaskHandlerResolver(jt -> t -> "done")
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
         TaskExecution task = new TaskExecution();
         task.setId("1234");
@@ -62,18 +66,22 @@ public class WorkerTest {
     public void test2() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(
-                Queues.ERRORS,
-                t -> Assertions.assertTrue(
-                        ((TaskExecution) t).getError().getMessage().equals("bad input")));
-        messageBroker.receive(Queues.EVENTS, t -> {});
+            Queues.ERRORS,
+            t -> Assertions.assertTrue(
+                ((TaskExecution) t).getError()
+                    .getMessage()
+                    .equals("bad input")));
+        messageBroker.receive(Queues.EVENTS, t -> {
+        });
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(jt -> t -> {
-                    throw new IllegalArgumentException("bad input");
-                })
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+            .withTaskHandlerResolver(jt -> t -> {
+                throw new IllegalArgumentException("bad input");
+            })
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
         TaskExecution task = new TaskExecution();
         task.setId("1234");
         task.setJobId("4567");
@@ -85,32 +93,34 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-                Queues.COMPLETIONS, t -> Assertions.assertEquals("done", (((TaskExecution) t).getOutput())));
+            Queues.COMPLETIONS, t -> Assertions.assertEquals("done", (((TaskExecution) t).getOutput())));
         messageBroker.receive(Queues.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {
+        });
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(t1 -> {
-                    String type = t1.getType();
-                    if ("var".equals(type)) {
-                        return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
-                    } else {
-                        throw new IllegalArgumentException("unknown type: " + type);
-                    }
-                })
-                .withMessageBroker(messageBroker)
-                .withTaskEvaluator(TaskEvaluator.create())
-                .withEventPublisher(e -> {})
-                .build();
+            .withTaskHandlerResolver(t1 -> {
+                String type = t1.getType();
+                if ("var".equals(type)) {
+                    return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
+                } else {
+                    throw new IllegalArgumentException("unknown type: " + type);
+                }
+            })
+            .withMessageBroker(messageBroker)
+            .withTaskEvaluator(TaskEvaluator.create())
+            .withEventPublisher(e -> {
+            })
+            .build();
 
         TaskExecution task = new TaskExecution(new WorkflowTask(Map.of(
-                "pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")),
-                "type", "var",
-                "value", "${myVar}")));
+            "pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")),
+            "type", "var",
+            "value", "${myVar}")));
 
         task.setId("1234");
         task.setJobId("4567");
@@ -120,41 +130,42 @@ public class WorkerTest {
 
     @Test
     public void test4() {
-        String tempDir =
-                new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate()).getAbsolutePath();
+        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate())
+            .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(Queues.COMPLETIONS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {
+        });
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(t1 -> {
-                    String type = t1.getType();
-                    if ("var".equals(type)) {
-                        return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
-                    } else if ("mkdir".equals(type)) {
-                        return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
-                    } else if ("rm".equals(type)) {
-                        return t2 ->
-                                FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
-                    } else if ("pass".equals(type)) {
-                        Assertions.assertTrue(new File(tempDir).exists());
-                        return t2 -> null;
-                    } else {
-                        throw new IllegalArgumentException("unknown type: " + type);
-                    }
-                })
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+            .withTaskHandlerResolver(t1 -> {
+                String type = t1.getType();
+                if ("var".equals(type)) {
+                    return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
+                } else if ("mkdir".equals(type)) {
+                    return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
+                } else if ("rm".equals(type)) {
+                    return t2 -> FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
+                } else if ("pass".equals(type)) {
+                    Assertions.assertTrue(new File(tempDir).exists());
+                    return t2 -> null;
+                } else {
+                    throw new IllegalArgumentException("unknown type: " + type);
+                }
+            })
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                "post", List.of(Map.of("type", "rm", "path", tempDir)),
-                "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
-                "type", "pass")));
+            "post", List.of(Map.of("type", "rm", "path", tempDir)),
+            "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
+            "type", "pass")));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");
@@ -164,43 +175,44 @@ public class WorkerTest {
 
     @Test
     public void test5() {
-        String tempDir =
-                new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate()).getAbsolutePath();
+        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate())
+            .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(Queues.ERRORS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {
+        });
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(t1 -> {
-                    String type = t1.getType();
-                    if ("var".equals(type)) {
-                        return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
-                    } else if ("mkdir".equals(type)) {
-                        return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
-                    } else if ("rm".equals(type)) {
-                        return t2 ->
-                                FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
-                    } else if ("rogue".equals(type)) {
-                        Assertions.assertTrue(new File(tempDir).exists());
-                        return t2 -> {
-                            throw new TaskExecutionException("Unexpected task type: rogue");
-                        };
-                    } else {
-                        throw new IllegalArgumentException("unknown type: " + type);
-                    }
-                })
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+            .withTaskHandlerResolver(t1 -> {
+                String type = t1.getType();
+                if ("var".equals(type)) {
+                    return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
+                } else if ("mkdir".equals(type)) {
+                    return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
+                } else if ("rm".equals(type)) {
+                    return t2 -> FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
+                } else if ("rogue".equals(type)) {
+                    Assertions.assertTrue(new File(tempDir).exists());
+                    return t2 -> {
+                        throw new TaskExecutionException("Unexpected task type: rogue");
+                    };
+                } else {
+                    throw new IllegalArgumentException("unknown type: " + type);
+                }
+            })
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
-                "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
-                "type", "rogue")));
+            "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
+            "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
+            "type", "rogue")));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");
@@ -214,19 +226,20 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(jt -> t -> {
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException interruptedException) {
-                        throw new TaskExecutionException("Unable to sleep due interruption");
-                    }
+            .withTaskHandlerResolver(jt -> t -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException interruptedException) {
+                    throw new TaskExecutionException("Unable to sleep due interruption");
+                }
 
-                    return null;
-                })
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+                return null;
+            })
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
         TaskExecution task = new TaskExecution();
         task.setId("1234");
@@ -235,12 +248,14 @@ public class WorkerTest {
         executors.submit(() -> worker.handle(task));
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
-        Assertions.assertEquals(1, worker.getTaskExecutions().size());
+        Assertions.assertEquals(1, worker.getTaskExecutions()
+            .size());
         // cancel the execution of the task
         worker.handle(new CancelControlTask(task.getJobId(), task.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
-        Assertions.assertEquals(0, worker.getTaskExecutions().size());
+        Assertions.assertEquals(0, worker.getTaskExecutions()
+            .size());
     }
 
     @Test
@@ -249,19 +264,20 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         Worker worker = (Worker) Worker.builder()
-                .withTaskHandlerResolver(jt -> t -> {
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException interruptedException) {
-                        throw new TaskExecutionException("Unable to sleep due interruption");
-                    }
+            .withTaskHandlerResolver(jt -> t -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException interruptedException) {
+                    throw new TaskExecutionException("Unable to sleep due interruption");
+                }
 
-                    return null;
-                })
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+                return null;
+            })
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
         TaskExecution task1 = new TaskExecution();
         task1.setId("1111");
@@ -278,12 +294,14 @@ public class WorkerTest {
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(2, worker.getTaskExecutions().size());
+        Assertions.assertEquals(2, worker.getTaskExecutions()
+            .size());
         // cancel the execution of the task
         worker.handle(new CancelControlTask(task1.getJobId(), task1.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
-        Assertions.assertEquals(1, worker.getTaskExecutions().size());
+        Assertions.assertEquals(1, worker.getTaskExecutions()
+            .size());
     }
 
     @Test
@@ -291,19 +309,20 @@ public class WorkerTest {
         ExecutorService executors = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         Worker worker = (Worker) Worker.builder()
-                .withTaskHandlerResolver(jt -> t -> {
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException interruptedException) {
-                        throw new TaskExecutionException("Unable to sleep due interruption");
-                    }
+            .withTaskHandlerResolver(jt -> t -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException interruptedException) {
+                    throw new TaskExecutionException("Unable to sleep due interruption");
+                }
 
-                    return null;
-                })
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+                return null;
+            })
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
         TaskExecution task1 = new TaskExecution();
         task1.setId("1111");
@@ -321,11 +340,13 @@ public class WorkerTest {
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(2, worker.getTaskExecutions().size());
+        Assertions.assertEquals(2, worker.getTaskExecutions()
+            .size());
         // cancel the execution of the task
         worker.handle(new CancelControlTask(task1.getJobId(), task1.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
-        Assertions.assertEquals(0, worker.getTaskExecutions().size());
+        Assertions.assertEquals(0, worker.getTaskExecutions()
+            .size());
     }
 }

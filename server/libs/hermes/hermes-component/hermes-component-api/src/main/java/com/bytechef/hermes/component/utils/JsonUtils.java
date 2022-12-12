@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -68,11 +69,13 @@ public class JsonUtils {
         });
     }
 
-    private JsonUtils() {}
+    private JsonUtils() {
+    }
 
     public static <T> T read(String json) {
         try {
-            return objectMapper.readValue(json, new TypeReference<>() {});
+            return objectMapper.readValue(json, new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -103,7 +106,8 @@ public class JsonUtils {
     public static <T> T read(String json, String path) {
         DocumentContext documentContext = JsonPath.parse(json);
 
-        return documentContext.read(path, new TypeRef<T>() {});
+        return documentContext.read(path, new TypeRef<T>() {
+        });
     }
 
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {

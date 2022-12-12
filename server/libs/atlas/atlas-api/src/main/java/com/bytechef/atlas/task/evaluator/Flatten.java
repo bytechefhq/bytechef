@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -35,7 +36,9 @@ class Flatten implements MethodExecutor {
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
         @SuppressWarnings("unchecked")
         List<List<?>> list = (List<List<?>>) aArguments[0];
-        List<?> flat = list.stream().flatMap(List::stream).collect(Collectors.toList());
+        List<?> flat = list.stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
 
         return new TypedValue(flat);
     }

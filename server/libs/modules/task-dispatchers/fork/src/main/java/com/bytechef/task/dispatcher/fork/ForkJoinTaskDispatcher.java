@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -45,10 +46,13 @@ import org.springframework.util.Assert;
 /**
  * Implements a Fork/Join construct.
  *
- * <p>Fork/Join tasks are expected to have a "branches" property which contains a list of task list.</p>
+ * <p>
+ * Fork/Join tasks are expected to have a "branches" property which contains a list of task list.
+ * </p>
  *
- * <p>Each branch executes in isolation, in parallel to the other branches in the fork and has its own context
- * namespace.</p>
+ * <p>
+ * Each branch executes in isolation, in parallel to the other branches in the fork and has its own context namespace.
+ * </p>
  *
  * <pre>
  *   - type: fork
@@ -87,12 +91,12 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskExecutionService taskExecutionService;
 
     public ForkJoinTaskDispatcher(
-            ContextService contextService,
-            CounterService counterService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        CounterService counterService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
@@ -104,11 +108,14 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     public void dispatch(TaskExecution taskExecution) {
         @SuppressWarnings("unchecked")
-        List<List<WorkflowTask>> branchesWorkflowTasks =
-                MapUtils.getList(taskExecution.getParameters(), BRANCHES, List.class).stream()
-                        .map(curList -> ((List<Map<String, Object>>) curList)
-                                .stream().map(WorkflowTask::new).toList())
-                        .toList();
+        List<List<WorkflowTask>> branchesWorkflowTasks = MapUtils
+            .getList(taskExecution.getParameters(), BRANCHES, List.class)
+            .stream()
+            .map(curList -> ((List<Map<String, Object>>) curList)
+                .stream()
+                .map(WorkflowTask::new)
+                .toList())
+            .toList();
 
         Assert.notNull(branchesWorkflowTasks, "'branches' property can't be null");
 
@@ -160,7 +167,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(FORK_JOIN + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(FORK_JOIN + "/v" + VERSION_1)) {
             return this;
         }
 

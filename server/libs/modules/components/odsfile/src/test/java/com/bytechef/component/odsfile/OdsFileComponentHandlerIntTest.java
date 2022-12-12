@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -55,60 +56,60 @@ public class OdsFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.ods");
 
         Job job = workflowExecutor.execute(
-                "odsfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))
-                                .toMap()));
+            "odsfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))
+                    .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
-                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readOdsFile")),
-                true);
+            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readOdsFile")),
+            true);
     }
 
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = workflowExecutor.execute(
-                "odsfile_v1_write",
-                Map.of(
-                        "rows",
-                        new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
+            "odsfile_v1_write",
+            Map.of(
+                "rows",
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertThat(((Map) outputs.get("writeOdsFile")).get(WorkflowConstants.NAME))
-                .isEqualTo("file.ods");
+            .isEqualTo("file.ods");
 
         File sampleFile = getFile("sample_header.ods");
 
         job = workflowExecutor.execute(
-                "odsfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(sampleFile.getName(), new FileInputStream(sampleFile))
-                                .toMap()));
+            "odsfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(sampleFile.getName(), new FileInputStream(sampleFile))
+                    .toMap()));
 
         outputs = job.getOutputs();
 
         assertEquals(
-                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readOdsFile")),
-                true);
+            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readOdsFile")),
+            true);
     }
 
     private File getFile(String fileName) {
         return new File(OdsFileComponentHandlerIntTest.class
-                .getClassLoader()
-                .getResource("dependencies/" + fileName)
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/" + fileName)
+            .getFile());
     }
 }

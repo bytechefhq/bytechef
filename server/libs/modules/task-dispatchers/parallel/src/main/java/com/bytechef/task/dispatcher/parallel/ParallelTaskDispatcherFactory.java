@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -34,14 +35,14 @@ import org.springframework.stereotype.Component;
 public class ParallelTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = TaskDispatcherDSL.taskDispatcher(
-                    PARALLEL)
-            .display(
-                    display("Parallel")
-                            .description(
-                                    "Run collection of tasks in parallel, without waiting until the previous function has completed."))
-            .taskProperties(array(TASKS)
-                    .description("The task to use in each iteration.")
-                    .items(task()));
+        PARALLEL)
+        .display(
+            display("Parallel")
+                .description(
+                    "Run collection of tasks in parallel, without waiting until the previous function has completed."))
+        .taskProperties(array(TASKS)
+            .description("The task to use in each iteration.")
+            .items(task()));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

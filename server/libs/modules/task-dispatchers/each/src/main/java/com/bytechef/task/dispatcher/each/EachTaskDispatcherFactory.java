@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -41,25 +42,25 @@ import org.springframework.stereotype.Component;
 public class EachTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(EACH)
-            .display(
-                    display("Each")
-                            .description(
-                                    "Iterates over each item in `list`, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order."))
-            .properties(
-                    array(LIST)
-                            .label("List of items")
-                            .description("List of items to iterate over.")
-                            .items(oneOf()),
-                    string(ITEM_VAR)
-                            .label("Item Var")
-                            .description("The name of the item variable.")
-                            .defaultValue(ITEM),
-                    string(ITEM_INDEX)
-                            .label("Item Index")
-                            .description("The name of the index variable.")
-                            .defaultValue(ITEM_INDEX))
-            .output(oneOf("item"), integer("itemIndex"))
-            .taskProperties(task(ITERATEE));
+        .display(
+            display("Each")
+                .description(
+                    "Iterates over each item in `list`, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order."))
+        .properties(
+            array(LIST)
+                .label("List of items")
+                .description("List of items to iterate over.")
+                .items(oneOf()),
+            string(ITEM_VAR)
+                .label("Item Var")
+                .description("The name of the item variable.")
+                .defaultValue(ITEM),
+            string(ITEM_INDEX)
+                .label("Item Index")
+                .description("The name of the index variable.")
+                .defaultValue(ITEM_INDEX))
+        .output(oneOf("item"), integer("itemIndex"))
+        .taskProperties(task(ITERATEE));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

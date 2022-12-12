@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,14 +53,16 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional(readOnly = true)
     public Workflow getWorkflow(String id) {
-        return workflowRepository.findById(id).orElseThrow();
+        return workflowRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Workflow> getWorkflows() {
-        return StreamSupport.stream(workflowRepository.findAll().spliterator(), false)
-                .toList();
+        return StreamSupport.stream(workflowRepository.findAll()
+            .spliterator(), false)
+            .toList();
     }
 
     @Override

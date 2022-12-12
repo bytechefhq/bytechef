@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -84,7 +85,7 @@ public class MapUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> T get(
-            Map<String, Object> map, String key, ParameterizedTypeReference<T> returnType, T defaultValue) {
+        Map<String, Object> map, String key, ParameterizedTypeReference<T> returnType, T defaultValue) {
         return get(map, key, (Class<T>) ((ParameterizedType) returnType.getType()).getRawType(), defaultValue);
     }
 
@@ -92,7 +93,11 @@ public class MapUtils {
     public static <T> T[] getArray(Map<String, Object> map, String key, Class<T> elementType) {
         Object value = get(map, key);
 
-        if (value.getClass().isArray() && value.getClass().getComponentType().equals(elementType)) {
+        if (value.getClass()
+            .isArray()
+            && value.getClass()
+                .getComponentType()
+                .equals(elementType)) {
             return (T[]) value;
         }
 
@@ -202,22 +207,23 @@ public class MapUtils {
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
 
-        return getList(map, key, (Class<T>) ResolvableType.forType(elementType).getRawClass());
+        return getList(map, key, (Class<T>) ResolvableType.forType(elementType)
+            .getRawClass());
     }
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(
-            Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+        Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
 
-        List<T> list =
-                getList(map, key, (Class<T>) ResolvableType.forType(elementType).getRawClass(), defaultValue);
+        List<T> list = getList(map, key, (Class<T>) ResolvableType.forType(elementType)
+            .getRawClass(), defaultValue);
 
         return list != null ? list : defaultValue;
     }
 
     @SuppressWarnings("unchecked")
     public static List<Object> getList(
-            Map<String, Object> map, String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
+        Map<String, Object> map, String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
 
         List<Object> list = get(map, key, List.class);
 
@@ -225,16 +231,16 @@ public class MapUtils {
             list = defaultValue;
         } else {
             list = list.stream()
-                    .map(value -> {
-                        for (Class<?> elementType : elementTypes) {
-                            if (conversionService.canConvert(value.getClass(), elementType)) {
-                                value = conversionService.convert(value, elementType);
-                            }
+                .map(value -> {
+                    for (Class<?> elementType : elementTypes) {
+                        if (conversionService.canConvert(value.getClass(), elementType)) {
+                            value = conversionService.convert(value, elementType);
                         }
+                    }
 
-                        return value;
-                    })
-                    .toList();
+                    return value;
+                })
+                .toList();
         }
 
         return list;
@@ -306,26 +312,29 @@ public class MapUtils {
     }
 
     public static Map<String, Object> getMap(
-            Map<String, Object> map, String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
+        Map<String, Object> map, String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
         Map<String, Object> mapValue = getMap(map, key);
 
         if (mapValue == null) {
             mapValue = defaultValue;
         } else {
-            mapValue = mapValue.entrySet().stream()
-                    .map(entry -> {
-                        for (Class<?> valueType : valueTypes) {
-                            if (entry.getValue() != null
-                                    && conversionService.canConvert(
-                                            entry.getValue().getClass(), valueType)) {
-                                entry = Map.entry(
-                                        entry.getKey(), conversionService.convert(entry.getValue(), valueType));
-                            }
+            mapValue = mapValue.entrySet()
+                .stream()
+                .map(entry -> {
+                    for (Class<?> valueType : valueTypes) {
+                        if (entry.getValue() != null
+                            && conversionService.canConvert(
+                                entry.getValue()
+                                    .getClass(),
+                                valueType)) {
+                            entry = Map.entry(
+                                entry.getKey(), conversionService.convert(entry.getValue(), valueType));
                         }
+                    }
 
-                        return entry;
-                    })
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    return entry;
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
 
         return mapValue;

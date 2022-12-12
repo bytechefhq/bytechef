@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -62,15 +63,17 @@ public class JobServiceImpl implements JobService {
     public Job add(JobParametersDTO jobParametersDTO) {
         String workflowId = jobParametersDTO.getWorkflowId();
 
-        Workflow workflow = workflowRepository.findById(workflowId).orElseThrow();
+        Workflow workflow = workflowRepository.findById(workflowId)
+            .orElseThrow();
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
         Assert.isNull(
-                workflow.getError(),
-                workflow.getError() != null
-                        ? String.format(
-                                "%s: %s", workflowId, workflow.getError().getMessage())
-                        : "");
+            workflow.getError(),
+            workflow.getError() != null
+                ? String.format(
+                    "%s: %s", workflowId, workflow.getError()
+                        .getMessage())
+                : "");
 
         validate(jobParametersDTO, workflow);
 
@@ -82,9 +85,9 @@ public class JobServiceImpl implements JobService {
         job.setLabel(jobParametersDTO.getLabel() == null ? workflow.getLabel() : jobParametersDTO.getLabel());
         job.setParentTaskExecutionId(jobParametersDTO.getParentTaskExecutionId());
         job.setPriority(
-                jobParametersDTO.getPriority() == null
-                        ? Prioritizable.DEFAULT_PRIORITY
-                        : jobParametersDTO.getPriority());
+            jobParametersDTO.getPriority() == null
+                ? Prioritizable.DEFAULT_PRIORITY
+                : jobParametersDTO.getPriority());
         job.setStatus(JobStatus.CREATED);
         job.setWebhooks(jobParametersDTO.getWebhooks());
         job.setWorkflowId(workflow.getId());
@@ -99,14 +102,16 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public List<Job> getJobs() {
-        return StreamSupport.stream(jobRepository.findAll().spliterator(), false)
-                .toList();
+        return StreamSupport.stream(jobRepository.findAll()
+            .spliterator(), false)
+            .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Job getJob(String id) {
-        return jobRepository.findById(id).orElseThrow();
+        return jobRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
@@ -131,7 +136,8 @@ public class JobServiceImpl implements JobService {
     public Job resume(String jobId) {
         log.debug("Resuming job {}", jobId);
 
-        Job job = jobRepository.findById(jobId).orElseThrow();
+        Job job = jobRepository.findById(jobId)
+            .orElseThrow();
 
         Assert.notNull(job, String.format("Unknown job %s", jobId));
         Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
@@ -146,7 +152,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job start(String jobId) {
-        Job job = jobRepository.findById(jobId).orElseThrow();
+        Job job = jobRepository.findById(jobId)
+            .orElseThrow();
 
         job.setCurrentTask(0);
         job.setStartTime(new Date());
@@ -159,12 +166,13 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job stop(String jobId) {
-        Job job = jobRepository.findById(jobId).orElseThrow();
+        Job job = jobRepository.findById(jobId)
+            .orElseThrow();
 
         Assert.notNull(job, "Unknown job: " + jobId);
         Assert.isTrue(
-                job.getStatus() == JobStatus.STARTED,
-                "Job " + jobId + " can not be stopped as it is " + job.getStatus());
+            job.getStatus() == JobStatus.STARTED,
+            "Job " + jobId + " can not be stopped as it is " + job.getStatus());
 
         Job simpleJob = new Job(job);
 
@@ -192,8 +200,8 @@ public class JobServiceImpl implements JobService {
         for (Map<String, Object> input : workflow.getInputs()) {
             if (MapUtils.getBoolean(input, WorkflowConstants.REQUIRED, false)) {
                 Assert.isTrue(
-                        inputs.containsKey(input.get(WorkflowConstants.NAME)),
-                        "Missing required param: " + input.get("name"));
+                    inputs.containsKey(input.get(WorkflowConstants.NAME)),
+                    "Missing required param: " + input.get("name"));
             }
         }
 

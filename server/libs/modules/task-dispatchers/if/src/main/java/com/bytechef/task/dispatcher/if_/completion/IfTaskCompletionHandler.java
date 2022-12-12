@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -49,11 +50,11 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
 
     public IfTaskCompletionHandler(
-            ContextService contextService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -68,7 +69,8 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentTaskExecution.getType().equals(IF + "/v" + VERSION_1);
+            return parentTaskExecution.getType()
+                .equals(IF + "/v" + VERSION_1);
         }
 
         return false;
@@ -82,8 +84,8 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecutionService.update(completedSubTaskExecution);
 
-        TaskExecution ifTaskExecution =
-                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution ifTaskExecution = new TaskExecution(
+            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(ifTaskExecution.getId());
@@ -107,11 +109,11 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution subTaskExecution = new TaskExecution(
-                    subWorkflowTask,
-                    ifTaskExecution.getJobId(),
-                    ifTaskExecution.getId(),
-                    ifTaskExecution.getPriority(),
-                    taskExecution.getTaskNumber() + 1);
+                subWorkflowTask,
+                ifTaskExecution.getJobId(),
+                ifTaskExecution.getId(),
+                ifTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1);
 
             Context context = new Context(contextService.peek(ifTaskExecution.getId()));
 
@@ -132,8 +134,9 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution ifTaskExecution, String caseTrue) {
-        return MapUtils.getList(ifTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
+        return MapUtils.getList(ifTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
     }
 }

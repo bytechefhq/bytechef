@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -36,15 +37,15 @@ import java.util.concurrent.TimeUnit;
 public class DelayComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = ComponentDSL.component(DELAY)
-            .display(display("Delay").description("Sets a value which can then be referenced in other tasks."))
-            .actions(action(DELAY)
-                    .display(display("Delay"))
-                    .properties(integer(DelayConstants.MILLIS)
-                            .label("Millis")
-                            .description("Time in milliseconds.")
-                            .required(true)
-                            .defaultValue(1))
-                    .perform(this::performSleep));
+        .display(display("Delay").description("Sets a value which can then be referenced in other tasks."))
+        .actions(action(DELAY)
+            .display(display("Delay"))
+            .properties(integer(DelayConstants.MILLIS)
+                .label("Millis")
+                .description("Time in milliseconds.")
+                .required(true)
+                .defaultValue(1))
+            .perform(this::performSleep));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -56,7 +57,8 @@ public class DelayComponentHandler implements ComponentHandler {
             if (executionParameters.containsKey("millis")) {
                 Thread.sleep(executionParameters.getLong("millis"));
             } else if (executionParameters.containsKey("duration")) {
-                Thread.sleep(executionParameters.getDuration("duration").toMillis());
+                Thread.sleep(executionParameters.getDuration("duration")
+                    .toMillis());
             } else {
                 TimeUnit.SECONDS.sleep(1);
             }

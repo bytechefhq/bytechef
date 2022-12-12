@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -35,17 +36,15 @@ public sealed class DisplayOption permits DefinitionDSL.ModifiableDisplayOption 
     }
 
     @Schema(
-            name = "hideWhen",
-            description =
-                    "The map of property names and list of values to check against if the property should be hidden.")
+        name = "hideWhen",
+        description = "The map of property names and list of values to check against if the property should be hidden.")
     public Map<String, List<Object>> getHide() {
         return hide;
     }
 
     @Schema(
-            name = "showWhen",
-            description =
-                    "The map of property names and list of values to check against if the property should be shown.")
+        name = "showWhen",
+        description = "The map of property names and list of values to check against if the property should be shown.")
     public Map<String, List<Object>> getShow() {
         return show;
     }

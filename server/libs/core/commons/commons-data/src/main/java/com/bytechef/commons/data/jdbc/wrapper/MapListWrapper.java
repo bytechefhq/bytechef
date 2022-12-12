@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,10 +32,13 @@ public class MapListWrapper {
 
     private List<Map<String, Object>> list = Collections.emptyList();
 
-    public MapListWrapper() {}
+    public MapListWrapper() {
+    }
 
     public MapListWrapper(List<Map<String, Object>> list) {
-        this.list = new ArrayList<>(list.stream().map(HashMap::new).toList());
+        this.list = new ArrayList<>(list.stream()
+            .map(HashMap::new)
+            .toList());
     }
 
     public List<Map<String, Object>> getList() {

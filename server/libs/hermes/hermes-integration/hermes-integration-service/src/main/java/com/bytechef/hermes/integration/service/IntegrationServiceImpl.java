@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -48,13 +49,15 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration getIntegration(String id) {
-        return integrationRepository.findById(id).orElseThrow();
+        return integrationRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
     public List<Integration> getIntegrations() {
-        return StreamSupport.stream(integrationRepository.findAll().spliterator(), false)
-                .toList();
+        return StreamSupport.stream(integrationRepository.findAll()
+            .spliterator(), false)
+            .toList();
     }
 
     @Override

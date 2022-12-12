@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -47,12 +48,12 @@ public class RestComponentTaskHandler implements TaskHandler<Object> {
 
     @SuppressFBWarnings("EI2")
     public RestComponentTaskHandler(
-            ActionDefinition actionDefinition,
-            ConnectionDefinition connectionDefinition,
-            ConnectionService connectionService,
-            RestComponentHandler restComponentHandler,
-            EventPublisher eventPublisher,
-            FileStorageService fileStorageService) {
+        ActionDefinition actionDefinition,
+        ConnectionDefinition connectionDefinition,
+        ConnectionService connectionService,
+        RestComponentHandler restComponentHandler,
+        EventPublisher eventPublisher,
+        FileStorageService fileStorageService) {
         this.actionDefinition = actionDefinition;
         this.connectionDefinition = connectionDefinition;
         this.connectionService = connectionService;
@@ -64,11 +65,11 @@ public class RestComponentTaskHandler implements TaskHandler<Object> {
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         Context context = new ContextImpl(
-                connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
+            connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
 
         try {
             return restComponentHandler.postExecute(
-                    actionDefinition, REST_CLIENT.execute(actionDefinition, context, taskExecution));
+                actionDefinition, REST_CLIENT.execute(actionDefinition, context, taskExecution));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }

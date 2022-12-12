@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -72,66 +73,66 @@ public class CsvFileComponentHandler implements ComponentHandler {
     private static final Logger logger = LoggerFactory.getLogger(CsvFileComponentHandler.class);
 
     public final ComponentDefinition componentDefinition = component(CSV_FILE)
-            .display(display("CSV File").description("Reads and writes data from a csv file."))
-            .actions(
-                    action(READ)
-                            .display(display("Read from file").description("Reads data from a csv file."))
-                            .properties(
-                                    fileEntry(FILE_ENTRY)
-                                            .label("File")
-                                            .description(
-                                                    "The object property which contains a reference to the csv file to read from.")
-                                            .required(true),
-                                    string(DELIMITER)
-                                            .label("Delimiter")
-                                            .description("Delimiter to use when reading a csv file.")
-                                            .defaultValue(",")
-                                            .advancedOption(true),
-                                    bool(HEADER_ROW)
-                                            .label("Header Row")
-                                            .description("The first row of the file contains the header names.")
-                                            .defaultValue(true)
-                                            .advancedOption(true),
-                                    bool(INCLUDE_EMPTY_CELLS)
-                                            .label("Include Empty Cells")
-                                            .description(
-                                                    "When reading from file the empty cells will be filled with an empty string.")
-                                            .defaultValue(false)
-                                            .advancedOption(true),
-                                    integer(PAGE_SIZE)
-                                            .label("Page Size")
-                                            .description("The amount of child elements to return in a page.")
-                                            .advancedOption(true),
-                                    integer(PAGE_NUMBER)
-                                            .label("Page Number")
-                                            .description("The page number to get.")
-                                            .advancedOption(true),
-                                    bool(READ_AS_STRING)
-                                            .label("Read As String")
-                                            .description(
-                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                            .defaultValue(false)
-                                            .advancedOption(true))
-                            .output(array())
-                            .perform(this::performRead),
-                    action(WRITE)
-                            .display(display("Write to file").description("Writes the data to a csv file."))
-                            .properties(
-                                    array(ROWS)
-                                            .label("Rows")
-                                            .description("The array of objects to write to the file.")
-                                            .required(true)
-                                            .items(ComponentDSL.object()
-                                                    .additionalProperties(
-                                                            oneOf().types(bool(), dateTime(), number(), string()))),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description(
-                                                    "Filename to set for binary data. By default, \"file.csv\" will be used.")
-                                            .defaultValue("file.csv")
-                                            .advancedOption(true))
-                            .output(fileEntry())
-                            .perform(this::performWrite));
+        .display(display("CSV File").description("Reads and writes data from a csv file."))
+        .actions(
+            action(READ)
+                .display(display("Read from file").description("Reads data from a csv file."))
+                .properties(
+                    fileEntry(FILE_ENTRY)
+                        .label("File")
+                        .description(
+                            "The object property which contains a reference to the csv file to read from.")
+                        .required(true),
+                    string(DELIMITER)
+                        .label("Delimiter")
+                        .description("Delimiter to use when reading a csv file.")
+                        .defaultValue(",")
+                        .advancedOption(true),
+                    bool(HEADER_ROW)
+                        .label("Header Row")
+                        .description("The first row of the file contains the header names.")
+                        .defaultValue(true)
+                        .advancedOption(true),
+                    bool(INCLUDE_EMPTY_CELLS)
+                        .label("Include Empty Cells")
+                        .description(
+                            "When reading from file the empty cells will be filled with an empty string.")
+                        .defaultValue(false)
+                        .advancedOption(true),
+                    integer(PAGE_SIZE)
+                        .label("Page Size")
+                        .description("The amount of child elements to return in a page.")
+                        .advancedOption(true),
+                    integer(PAGE_NUMBER)
+                        .label("Page Number")
+                        .description("The page number to get.")
+                        .advancedOption(true),
+                    bool(READ_AS_STRING)
+                        .label("Read As String")
+                        .description(
+                            "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                        .defaultValue(false)
+                        .advancedOption(true))
+                .output(array())
+                .perform(this::performRead),
+            action(WRITE)
+                .display(display("Write to file").description("Writes the data to a csv file."))
+                .properties(
+                    array(ROWS)
+                        .label("Rows")
+                        .description("The array of objects to write to the file.")
+                        .required(true)
+                        .items(ComponentDSL.object()
+                            .additionalProperties(
+                                oneOf().types(bool(), dateTime(), number(), string()))),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description(
+                            "Filename to set for binary data. By default, \"file.csv\" will be used.")
+                        .defaultValue("file.csv")
+                        .advancedOption(true))
+                .output(fileEntry())
+                .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -157,14 +158,14 @@ public class CsvFileComponentHandler implements ComponentHandler {
             }
 
             return read(
-                    inputStream,
-                    new ReadConfiguration(
-                            delimiter,
-                            headerRow,
-                            includeEmptyCells,
-                            rangeStartRow == null ? 0 : rangeStartRow,
-                            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                            readAsString));
+                inputStream,
+                new ReadConfiguration(
+                    delimiter,
+                    headerRow,
+                    includeEmptyCells,
+                    rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
+                    readAsString));
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to stream CSV file", ioException);
         }
@@ -183,16 +184,16 @@ public class CsvFileComponentHandler implements ComponentHandler {
 
     protected List<Map<String, Object>> read(InputStream inputStream) throws IOException {
         return read(
-                inputStream,
-                new CsvFileComponentHandler.ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false));
+            inputStream,
+            new CsvFileComponentHandler.ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false));
     }
 
     protected List<Map<String, Object>> read(InputStream inputStream, ReadConfiguration configuration)
-            throws IOException {
+        throws IOException {
         List<Map<String, Object>> rows = new ArrayList<>();
 
-        try (BufferedReader bufferedReader =
-                new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+        try (BufferedReader bufferedReader = new BufferedReader(
+            new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             int count = 0;
             String[] headers = null;
             long lastColumn = 0;
@@ -227,9 +228,9 @@ public class CsvFileComponentHandler implements ComponentHandler {
                             String value = (i == lineValues.length) ? null : lineValues[i];
 
                             map.computeIfAbsent(
-                                    headers[i],
-                                    key -> processValue(
-                                            value, configuration.includeEmptyCells(), configuration.readAsString()));
+                                headers[i],
+                                key -> processValue(
+                                    value, configuration.includeEmptyCells(), configuration.readAsString()));
                         }
 
                         rows.add(map);
@@ -238,11 +239,11 @@ public class CsvFileComponentHandler implements ComponentHandler {
 
                         for (int i = 0; i < lastColumn; i++) {
                             map.put(
-                                    "column_" + (i + 1),
-                                    processValue(
-                                            i == lineValues.length ? null : lineValues[i],
-                                            configuration.includeEmptyCells(),
-                                            configuration.readAsString()));
+                                "column_" + (i + 1),
+                                processValue(
+                                    i == lineValues.length ? null : lineValues[i],
+                                    configuration.includeEmptyCells(),
+                                    configuration.readAsString()));
                         }
 
                         rows.add(map);
@@ -320,10 +321,11 @@ public class CsvFileComponentHandler implements ComponentHandler {
     }
 
     private record ReadConfiguration(
-            String delimiter,
-            boolean headerRow,
-            boolean includeEmptyCells,
-            long rangeStartRow,
-            long rangeEndRow,
-            boolean readAsString) {}
+        String delimiter,
+        boolean headerRow,
+        boolean includeEmptyCells,
+        long rangeStartRow,
+        long rangeEndRow,
+        boolean readAsString) {
+    }
 }

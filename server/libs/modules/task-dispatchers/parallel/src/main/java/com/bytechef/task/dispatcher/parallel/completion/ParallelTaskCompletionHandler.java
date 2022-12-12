@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -28,11 +29,11 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
 
 /**
- * A {@link TaskCompletionHandler} implementation which handles completions of parallel construct
- * tasks.
+ * A {@link TaskCompletionHandler} implementation which handles completions of parallel construct tasks.
  *
- * <p>This handler keeps track of how many tasks were completed so far and when all parallel tasks
- * completed for a given task it will then complete the overall <code>parallel</code> task.
+ * <p>
+ * This handler keeps track of how many tasks were completed so far and when all parallel tasks completed for a given
+ * task it will then complete the overall <code>parallel</code> task.
  *
  * @author Arik Cohen
  * @since May 12, 2017
@@ -45,9 +46,9 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
 
     public ParallelTaskCompletionHandler(
-            CounterService counterService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskExecutionService taskExecutionService) {
+        CounterService counterService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskExecutionService taskExecutionService) {
         this.counterService = counterService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskExecutionService = taskExecutionService;
@@ -70,7 +71,8 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
-            return parentExecution.getType().equals(PARALLEL + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(PARALLEL + "/v" + VERSION_1);
         }
         return false;
     }

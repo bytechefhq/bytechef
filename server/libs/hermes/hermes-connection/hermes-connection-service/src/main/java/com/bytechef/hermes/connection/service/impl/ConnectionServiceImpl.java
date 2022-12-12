@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -54,25 +55,27 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public Connection getConnection(String id) {
-        return connectionRepository.findById(id).orElseThrow();
+        return connectionRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections() {
-        return StreamSupport.stream(connectionRepository.findAll().spliterator(), false)
-                .toList();
+        return StreamSupport.stream(connectionRepository.findAll()
+            .spliterator(), false)
+            .toList();
     }
 
     @Override
     public Connection update(String id, String name) {
         return connectionRepository
-                .findById(id)
-                .map(connection -> {
-                    connection.setName(name);
+            .findById(id)
+            .map(connection -> {
+                connection.setName(name);
 
-                    return connectionRepository.save(connection);
-                })
-                .orElseThrow();
+                return connectionRepository.save(connection);
+            })
+            .orElseThrow();
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -35,7 +36,9 @@ class Sort implements MethodExecutor {
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
         Collection<?> list = (Collection<?>) aArguments[0];
-        List<?> sorted = list.stream().sorted().collect(Collectors.toList());
+        List<?> sorted = list.stream()
+            .sorted()
+            .collect(Collectors.toList());
 
         return new TypedValue(sorted);
     }

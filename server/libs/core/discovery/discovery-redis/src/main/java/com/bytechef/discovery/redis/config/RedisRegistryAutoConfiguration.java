@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -37,13 +38,15 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  */
 @Configuration
 @ConditionalOnProperty(value = "spring.cloud.redis.enabled", matchIfMissing = true)
-@AutoConfigureBefore({CommonsClientAutoConfiguration.class, ServiceRegistryAutoConfiguration.class})
+@AutoConfigureBefore({
+    CommonsClientAutoConfiguration.class, ServiceRegistryAutoConfiguration.class
+})
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 public class RedisRegistryAutoConfiguration {
 
     @Bean
     RedisAutoServiceRegistration redisAutoServiceRegistration(
-            RedisServiceRegistry redisServiceRegistry, AutoServiceRegistrationProperties properties) {
+        RedisServiceRegistry redisServiceRegistry, AutoServiceRegistrationProperties properties) {
         return new RedisAutoServiceRegistration(redisServiceRegistry, properties);
     }
 

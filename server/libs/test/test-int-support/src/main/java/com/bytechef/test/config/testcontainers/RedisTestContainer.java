@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -45,10 +46,10 @@ public class RedisTestContainer implements InitializingBean, DisposableBean {
     public void afterPropertiesSet() {
         if (null == redisContainer) {
             redisContainer = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-                    .withExposedPorts(6379)
-                    .withLogConsumer(new Slf4jLogConsumer(log))
-                    .withPrivilegedMode(true)
-                    .withReuse(true);
+                .withExposedPorts(6379)
+                .withLogConsumer(new Slf4jLogConsumer(log))
+                .withPrivilegedMode(true)
+                .withReuse(true);
         }
 
         if (!redisContainer.isRunning()) {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -87,7 +88,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
                 TaskExecution iterateeTaskExecution = new TaskExecution(
-                        iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
+                    iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
@@ -115,7 +116,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
     @Override
     public TaskDispatcher<?> resolve(Task task) {
-        if (task.getType().equals(MAP + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(MAP + "/v" + VERSION_1)) {
             return this;
         }
 

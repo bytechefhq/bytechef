@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -38,12 +39,14 @@ public class GitWorkflowRepositoryTest {
 
     @Test
     public void test1() {
-        GitWorkflowRepository workflowRepository =
-                new GitWorkflowRepository(new DummyGitWorkflowOperations(), new YamlWorkflowMapper());
+        GitWorkflowRepository workflowRepository = new GitWorkflowRepository(new DummyGitWorkflowOperations(),
+            new YamlWorkflowMapper());
 
         Iterable<Workflow> findAll = workflowRepository.findAll();
 
-        Assertions.assertEquals("hello/123", findAll.iterator().next().getId());
+        Assertions.assertEquals("hello/123", findAll.iterator()
+            .next()
+            .getId());
     }
 
     private static class DummyGitWorkflowOperations implements GitWorkflowOperations {
@@ -53,13 +56,13 @@ public class GitWorkflowRepositoryTest {
         @Override
         public List<WorkflowResource> getHeadFiles() {
             return List.of(new WorkflowResource(
-                    "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML));
+                "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML));
         }
 
         @Override
         public WorkflowResource getFile(String aFileId) {
             return new WorkflowResource(
-                    "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML);
+                "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML);
         }
     }
 }

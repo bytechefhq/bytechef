@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,6 +26,8 @@ import java.time.ZoneId;
 public class LocalDateTimeUtils {
 
     public static long getTime(LocalDateTime localDateTime) {
-        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return localDateTime.atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli();
     }
 }

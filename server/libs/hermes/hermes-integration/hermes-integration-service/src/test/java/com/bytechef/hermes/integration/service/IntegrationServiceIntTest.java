@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -46,10 +47,11 @@ public class IntegrationServiceIntTest {
         Integration integration = integrationService.add(getIntegration());
 
         Assertions.assertEquals(
-                List.of("workflow1"),
-                integration.getIntegrationWorkflows().stream()
-                        .map(IntegrationWorkflow::getWorkflowId)
-                        .toList());
+            List.of("workflow1"),
+            integration.getIntegrationWorkflows()
+                .stream()
+                .map(IntegrationWorkflow::getWorkflowId)
+                .toList());
         Assertions.assertEquals("name", integration.getName());
     }
 
@@ -61,7 +63,8 @@ public class IntegrationServiceIntTest {
         integrationService.delete(integration.getId());
 
         Assertions.assertFalse(
-                integrationRepository.findById(integration.getId()).isPresent());
+            integrationRepository.findById(integration.getId())
+                .isPresent());
     }
 
     @Test
@@ -80,7 +83,8 @@ public class IntegrationServiceIntTest {
 
         integrationRepository.save(getIntegration());
 
-        Assertions.assertEquals(1, integrationService.getIntegrations().size());
+        Assertions.assertEquals(1, integrationService.getIntegrations()
+            .size());
     }
 
     @Test

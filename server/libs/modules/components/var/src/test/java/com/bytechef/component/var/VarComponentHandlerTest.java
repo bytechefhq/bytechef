@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -33,5 +34,6 @@ public class VarComponentHandlerTest {
 
     @Disabled
     @Test
-    public void performSetValue() {}
+    public void performSetValue() {
+    }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -38,155 +39,155 @@ public class DisplayOptionTest {
     @Test
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testDisplayOption() throws JSONException, JsonProcessingException {
-        DefinitionDSL.ModifiableDisplayOption.DisplayOptionCondition displayOptionCondition =
-                DefinitionDSL.hide("name", List.of(true, false));
+        DefinitionDSL.ModifiableDisplayOption.DisplayOptionCondition displayOptionCondition = DefinitionDSL.hide("name",
+            List.of(true, false));
 
         jsonAssertEquals(
-                """
+            """
                 {"conditions":{"name":[true,false]}}
                 """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.hide("name", List.of(1, 2));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name":[1,2]}
-        }
-        """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":[1,2]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.hide("name", List.of(1L, 2L));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name":[1,2]}
-        }
-        """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":[1,2]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.hide("name", List.of(1F, 2F));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name":[1.0,2.0]}
-        }
-        """,
-                displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":[1.0,2.0]}
+                }
+                """,
+            displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.hide("name", List.of(1D, 2D));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name":[1.0,2.0]}
-        }
-        """,
-                displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":[1.0,2.0]}
+                }
+                """,
+            displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.hide("name", List.of("value1", "value2"));
 
         jsonAssertEquals(
-                """
-    {
-        "conditions":{"name":["value1","value2"]}
-    }
-    """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":["value1","value2"]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.hide("name1", List.of(1));
 
         jsonAssertEquals(
-                """
-        {
-         "conditions":{"name1":[1]}
-        }
-        """, displayOptionCondition);
+            """
+                {
+                 "conditions":{"name1":[1]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.hide("name1", List.of(1), "name2", List.of(2));
 
         jsonAssertEquals(
-                """
-    {
-        "conditions":{"name1":[1],"name2":[2]}
-    }
-    """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name1":[1],"name2":[2]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name", List.of(true, false));
 
         jsonAssertEquals("""
-    {
-        "conditions":{"name":[true, false]}
-    }
-    """, displayOptionCondition);
+            {
+                "conditions":{"name":[true, false]}
+            }
+            """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name", List.of(1, 2));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name": [1,2]}
-        }
-        """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name": [1,2]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name", List.of(1L, 2L));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name":[1,2]}
-        }
-        """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":[1,2]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name", List.of(1F, 2F));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name":[1.0,2.0]}
-        }
-        """,
-                displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":[1.0,2.0]}
+                }
+                """,
+            displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name", List.of(1D, 2D));
 
         jsonAssertEquals(
-                """
-        {
-            "conditions":{"name":[1.0,2.0]}
-        }
-        """,
-                displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":[1.0,2.0]}
+                }
+                """,
+            displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name", List.of("value1", "value2"));
 
         jsonAssertEquals(
-                """
-    {
-        "conditions":{"name":["value1","value2"]}
-    }
-    """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name":["value1","value2"]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name1", List.of(1));
 
         jsonAssertEquals(
-                """
-        {
-         "conditions":{"name1":[1]}
-        }
-        """, displayOptionCondition);
+            """
+                {
+                 "conditions":{"name1":[1]}
+                }
+                """, displayOptionCondition);
 
         displayOptionCondition = DefinitionDSL.show("name1", List.of(1), "name2", List.of(2));
 
         jsonAssertEquals(
-                """
-    {
-        "conditions":{"name1":[1],"name2":[2]}
-    }
-    """, displayOptionCondition);
+            """
+                {
+                    "conditions":{"name1":[1],"name2":[2]}
+                }
+                """, displayOptionCondition);
     }
 
     private void jsonAssertEquals(String expectedString, Object jsonObject)
-            throws JSONException, JsonProcessingException {
+        throws JSONException, JsonProcessingException {
         JSONAssert.assertEquals(expectedString, objectMapper.writeValueAsString(jsonObject), true);
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,29 +32,37 @@ public class InitSubcommand implements Callable<Integer> {
     private transient CommandLine.Model.CommandSpec commandSpec;
 
     @CommandLine.Option(
-            names = {"--base-package-name"},
-            paramLabel = "base package name",
-            description = "package for generated classes",
-            defaultValue = "com.bytechef.component")
+        names = {
+            "--base-package-name"
+        },
+        paramLabel = "base package name",
+        description = "package for generated classes",
+        defaultValue = "com.bytechef.component")
     private transient String basePackageName;
 
     @CommandLine.Option(
-            names = {"--open-api-path"},
-            description = "path to the OpenAPI specification")
+        names = {
+            "--open-api-path"
+        },
+        description = "path to the OpenAPI specification")
     private transient String openApiPath;
 
     @CommandLine.Option(
-            names = {"-o", "--output-path"},
-            paramLabel = "output directory",
-            description = "where to write the generated files (current dir by default)",
-            defaultValue = "")
+        names = {
+            "-o", "--output-path"
+        },
+        paramLabel = "output directory",
+        description = "where to write the generated files (current dir by default)",
+        defaultValue = "")
     private transient String outputPath;
 
     @CommandLine.Option(
-            names = {"--standard-component"},
-            paramLabel = "standard component",
-            description = "if a component is the standard one(ships with the platform) or the custom one",
-            defaultValue = "false")
+        names = {
+            "--standard-component"
+        },
+        paramLabel = "standard component",
+        description = "if a component is the standard one(ships with the platform) or the custom one",
+        defaultValue = "false")
     private transient boolean standardComponent;
 
     @CommandLine.Parameters(paramLabel = "COMPONENT", description = "component name")
@@ -71,7 +80,7 @@ public class InitSubcommand implements Callable<Integer> {
     private void generateOpenAPIComponent() throws Exception {
         if (!openApiPath.matches("^http(s)?://.*") && !new File(openApiPath).exists()) {
             throw new CommandLine.ParameterException(
-                    commandSpec.commandLine(), "The OpenAPI file is not found: " + openApiPath);
+                commandSpec.commandLine(), "The OpenAPI file is not found: " + openApiPath);
         }
 
         new RestComponentGenerator(basePackageName, componentName, openApiPath, outputPath).generate();

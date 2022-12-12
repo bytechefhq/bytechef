@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,24 +25,24 @@ import java.util.List;
 
 public class StatusCategorySchema {
     public static final List<Property> COMPONENT_SCHEMA = List.of(
-            string("self")
-                    .label("Self")
-                    .description("The URL of the status category.")
-                    .required(false),
-            integer("id")
-                    .label("Id")
-                    .description("The ID of the status category.")
-                    .required(false),
-            string("key")
-                    .label("Key")
-                    .description("The key of the status category.")
-                    .required(false),
-            string("colorName")
-                    .label("ColorName")
-                    .description("The name of the color used to represent the status category.")
-                    .required(false),
-            string("name")
-                    .label("Name")
-                    .description("The name of the status category.")
-                    .required(false));
+        string("self")
+            .label("Self")
+            .description("The URL of the status category.")
+            .required(false),
+        integer("id")
+            .label("Id")
+            .description("The ID of the status category.")
+            .required(false),
+        string("key")
+            .label("Key")
+            .description("The key of the status category.")
+            .required(false),
+        string("colorName")
+            .label("ColorName")
+            .description("The name of the color used to represent the status category.")
+            .required(false),
+        string("name")
+            .label("Name")
+            .description("The name of the status category.")
+            .required(false));
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -28,8 +29,8 @@ public class TaskEvaluatorConfiguration {
     @Bean
     TaskEvaluator taskEvaluator(Environment environment) {
         return TaskEvaluator.builder()
-                .environment(environment)
-                .methodExecutor("tempDir", new TempDir())
-                .build();
+            .environment(environment)
+            .methodExecutor("tempDir", new TempDir())
+            .build();
     }
 }

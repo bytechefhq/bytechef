@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -35,38 +36,42 @@ import java.util.List;
 
 public abstract class AbstractJiraComponentHandler implements RestComponentHandler {
     private final ComponentDefinition componentDefinition = component("jira")
-            .display(display("Jira").description("Jira Cloud platform REST API documentation"))
-            .actions(IssuesActions.ACTIONS, IssueSearchActions.ACTIONS)
-            .connection(connection()
-                    .baseUri(connection -> "https://your-domain.atlassian.net")
-                    .authorizations(
-                            authorization(
-                                            AuthorizationType.BASIC_AUTH.name().toLowerCase(),
-                                            AuthorizationType.BASIC_AUTH)
-                                    .display(display("Basic Auth"))
-                                    .properties(
-                                            string(USERNAME).label("Username").required(true),
-                                            string(PASSWORD).label("Password").required(true)),
-                            authorization(
-                                            AuthorizationType.OAUTH2_AUTHORIZATION_CODE
-                                                    .name()
-                                                    .toLowerCase(),
-                                            AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                                    .display(display("OAuth2 Authorization code"))
-                                    .properties(
-                                            string(CLIENT_ID).label("Client Id").required(true),
-                                            string(CLIENT_SECRET)
-                                                    .label("Client Secret")
-                                                    .required(true))
-                                    .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
-                                    .refreshUrl(connection -> null)
-                                    .scopes(connection -> List.of(
-                                            "read:jira-user",
-                                            "read:jira-work",
-                                            "write:jira-work",
-                                            "manage:jira-project",
-                                            "manage:jira-configuration"))
-                                    .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token")));
+        .display(display("Jira").description("Jira Cloud platform REST API documentation"))
+        .actions(IssuesActions.ACTIONS, IssueSearchActions.ACTIONS)
+        .connection(connection()
+            .baseUri(connection -> "https://your-domain.atlassian.net")
+            .authorizations(
+                authorization(
+                    AuthorizationType.BASIC_AUTH.name()
+                        .toLowerCase(),
+                    AuthorizationType.BASIC_AUTH)
+                        .display(display("Basic Auth"))
+                        .properties(
+                            string(USERNAME).label("Username")
+                                .required(true),
+                            string(PASSWORD).label("Password")
+                                .required(true)),
+                authorization(
+                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE
+                        .name()
+                        .toLowerCase(),
+                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                        .display(display("OAuth2 Authorization code"))
+                        .properties(
+                            string(CLIENT_ID).label("Client Id")
+                                .required(true),
+                            string(CLIENT_SECRET)
+                                .label("Client Secret")
+                                .required(true))
+                        .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
+                        .refreshUrl(connection -> null)
+                        .scopes(connection -> List.of(
+                            "read:jira-user",
+                            "read:jira-work",
+                            "write:jira-work",
+                            "manage:jira-project",
+                            "manage:jira-configuration"))
+                        .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token")));
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -51,35 +52,39 @@ public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
     public enum AuthorizationType {
         API_KEY((AuthorizationContext authorizationContext, Connection connection) -> {
             if (ApiTokenLocation.valueOf(
-                            StringUtils.upperCase(connection.getParameter(ADD_TO, ApiTokenLocation.HEADER.name())))
-                    == ApiTokenLocation.HEADER) {
+                StringUtils.upperCase(
+                    connection.getParameter(ADD_TO, ApiTokenLocation.HEADER.name()))) == ApiTokenLocation.HEADER) {
                 authorizationContext.setHeaders(
-                        Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
+                    Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
             } else {
                 authorizationContext.setQueryParameters(
-                        Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
+                    Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
             }
         }),
-        BASIC_AUTH((AuthorizationContext authorizationContext, Connection connection) ->
-                authorizationContext.setUsernamePassword(
-                        connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
+        BASIC_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
+            .setUsernamePassword(
+                connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
         BEARER_TOKEN(
-                (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext.setHeaders(
-                        Map.of("Authorization", List.of("Bearer " + connection.getParameter(TOKEN))))),
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext.setHeaders(
+                Map.of("Authorization", List.of("Bearer " + connection.getParameter(TOKEN))))),
         CUSTOM(null),
-        DIGEST_AUTH((AuthorizationContext authorizationContext, Connection connection) ->
-                authorizationContext.setUsernamePassword(
-                        connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
-        OAUTH2_AUTHORIZATION_CODE((AuthorizationContext authorizationContext, Connection connection) ->
-                authorizationContext.setHeaders(Map.of(
-                        "Authorization",
-                        List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
-                                + connection.getParameter(ACCESS_TOKEN))))),
-        OAUTH2_CLIENT_CREDENTIALS((AuthorizationContext authorizationContext, Connection connection) ->
-                authorizationContext.setHeaders(Map.of(
-                        "Authorization",
-                        List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
-                                + connection.getParameter(ACCESS_TOKEN)))));
+        DIGEST_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
+            .setUsernamePassword(
+                connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
+        OAUTH2_AUTHORIZATION_CODE(
+            (
+                AuthorizationContext authorizationContext,
+                Connection connection) -> authorizationContext.setHeaders(Map.of(
+                    "Authorization",
+                    List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
+                        + connection.getParameter(ACCESS_TOKEN))))),
+        OAUTH2_CLIENT_CREDENTIALS(
+            (
+                AuthorizationContext authorizationContext,
+                Connection connection) -> authorizationContext.setHeaders(Map.of(
+                    "Authorization",
+                    List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
+                        + connection.getParameter(ACCESS_TOKEN)))));
 
         private final BiConsumer<AuthorizationContext, Connection> defaultApplyConsumer;
 
@@ -104,16 +109,16 @@ public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
     protected BiFunction<Connection, String, String> authorizationCallbackFunction;
 
     @JsonIgnore
-    protected Function<Connection, String> authorizationUrlFunction =
-            connectionParameters -> connectionParameters.getParameter(ComponentConstants.AUTHORIZATION_URL);
+    protected Function<Connection, String> authorizationUrlFunction = connectionParameters -> connectionParameters
+        .getParameter(ComponentConstants.AUTHORIZATION_URL);
 
     @JsonIgnore
-    protected Function<Connection, String> clientIdFunction =
-            connectionParameters -> connectionParameters.getParameter(ComponentConstants.CLIENT_ID);
+    protected Function<Connection, String> clientIdFunction = connectionParameters -> connectionParameters
+        .getParameter(ComponentConstants.CLIENT_ID);
 
     @JsonIgnore
-    protected Function<Connection, String> clientSecretFunction =
-            connectionParameters -> connectionParameters.getParameter(ComponentConstants.CLIENT_SECRET);
+    protected Function<Connection, String> clientSecretFunction = connectionParameters -> connectionParameters
+        .getParameter(ComponentConstants.CLIENT_SECRET);
 
     protected Display display;
 
@@ -126,16 +131,16 @@ public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
     protected Function<Connection, String> refreshFunction;
 
     @JsonIgnore
-    protected Function<Connection, String> refreshUrlFunction =
-            connectionParameters -> connectionParameters.getParameter(ComponentConstants.REFRESH_URL);
+    protected Function<Connection, String> refreshUrlFunction = connectionParameters -> connectionParameters
+        .getParameter(ComponentConstants.REFRESH_URL);
 
     @JsonIgnore
-    protected Function<Connection, List<String>> scopesFunction =
-            connectionParameters -> connectionParameters.getParameter(ComponentConstants.SCOPES);
+    protected Function<Connection, List<String>> scopesFunction = connectionParameters -> connectionParameters
+        .getParameter(ComponentConstants.SCOPES);
 
     @JsonIgnore
-    protected Function<Connection, String> tokenUrlFunction =
-            connectionParameters -> connectionParameters.getParameter(ComponentConstants.TOKEN_URL);
+    protected Function<Connection, String> tokenUrlFunction = connectionParameters -> connectionParameters
+        .getParameter(ComponentConstants.TOKEN_URL);
 
     private final String name;
     private final AuthorizationType type;

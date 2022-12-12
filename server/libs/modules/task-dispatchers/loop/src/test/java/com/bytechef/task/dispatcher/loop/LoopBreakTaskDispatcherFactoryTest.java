@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -27,6 +28,6 @@ public class LoopBreakTaskDispatcherFactoryTest {
     @Test
     public void testGetTaskDispatcherDefinition() {
         JsonFileAssert.assertEquals(
-                "definition/loop-break_v1.json", new LoopBreakTaskDispatcherFactory().getDefinition());
+            "definition/loop-break_v1.json", new LoopBreakTaskDispatcherFactory().getDefinition());
     }
 }

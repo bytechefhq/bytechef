@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -36,14 +37,14 @@ public class VarComponentHandler implements ComponentHandler {
     private static final String VALUE = "value";
 
     private final ComponentDefinition componentDefinition = component(VAR)
-            .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
-            .actions(action(SET)
-                    .display(display("Set value"))
-                    .properties(oneOf(VALUE)
-                            .label("Value")
-                            .description("Value of any type to set.")
-                            .required(true))
-                    .perform(this::performSetValue));
+        .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
+        .actions(action(SET)
+            .display(display("Set value"))
+            .properties(oneOf(VALUE)
+                .label("Value")
+                .description("Value of any type to set.")
+                .required(true))
+            .perform(this::performSetValue));
 
     @Override
     public ComponentDefinition getDefinition() {

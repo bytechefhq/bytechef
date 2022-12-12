@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -41,27 +42,27 @@ import java.util.Map;
 public class XmlHelperComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(XML_HELPER)
-            .display(display("XML Helper").description("Converts between XML string and object/array."))
-            .actions(
-                    action(XML_PARSE)
-                            .display(display("Convert from XML string")
-                                    .description("Converts the XML string to object/array."))
-                            .properties(string(SOURCE)
-                                    .label("Source")
-                                    .description("The XML string to convert to the data.")
-                                    .required(true))
-                            .output(object())
-                            .perform(this::performParse),
-                    action(XML_STRINGIFY)
-                            .display(display("Convert to XML string")
-                                    .description("Writes the object/array to a XML string."))
-                            .properties(oneOf(SOURCE)
-                                    .label("Source")
-                                    .description("The data to convert to XML string.")
-                                    .required(true)
-                                    .types(array(), object()))
-                            .output(string())
-                            .perform(this::performStringify));
+        .display(display("XML Helper").description("Converts between XML string and object/array."))
+        .actions(
+            action(XML_PARSE)
+                .display(display("Convert from XML string")
+                    .description("Converts the XML string to object/array."))
+                .properties(string(SOURCE)
+                    .label("Source")
+                    .description("The XML string to convert to the data.")
+                    .required(true))
+                .output(object())
+                .perform(this::performParse),
+            action(XML_STRINGIFY)
+                .display(display("Convert to XML string")
+                    .description("Writes the object/array to a XML string."))
+                .properties(oneOf(SOURCE)
+                    .label("Source")
+                    .description("The data to convert to XML string.")
+                    .required(true)
+                    .types(array(), object()))
+                .output(string())
+                .perform(this::performStringify));
 
     @Override
     public ComponentDefinition getDefinition() {

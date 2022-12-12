@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -35,22 +36,25 @@ public class OpenApiConfiguration {
     @SuppressWarnings("PMD.NP")
     @SuppressFBWarnings("NP")
     public List<GroupedOpenApi> apis(
-            SwaggerUiConfigParameters swaggerUiConfigParameters, RouteDefinitionLocator locator) {
-        List<RouteDefinition> definitions =
-                locator.getRouteDefinitions().collectList().block();
+        SwaggerUiConfigParameters swaggerUiConfigParameters, RouteDefinitionLocator locator) {
+        List<RouteDefinition> definitions = locator.getRouteDefinitions()
+            .collectList()
+            .block();
 
         return definitions.stream()
-                .filter(routeDefinition -> routeDefinition.getId().matches(".*-service"))
-                .map(routeDefinition -> {
-                    String name = routeDefinition.getId().replaceAll("-service", "");
+            .filter(routeDefinition -> routeDefinition.getId()
+                .matches(".*-service"))
+            .map(routeDefinition -> {
+                String name = routeDefinition.getId()
+                    .replaceAll("-service", "");
 
-                    swaggerUiConfigParameters.addGroup(name);
+                swaggerUiConfigParameters.addGroup(name);
 
-                    return GroupedOpenApi.builder()
-                            .pathsToMatch("/" + name + "/**")
-                            .group(name)
-                            .build();
-                })
-                .toList();
+                return GroupedOpenApi.builder()
+                    .pathsToMatch("/" + name + "/**")
+                    .group(name)
+                    .build();
+            })
+            .toList();
     }
 }

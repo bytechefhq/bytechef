@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -40,11 +41,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     @Test
     public void test1() {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
-        MapTaskDispatcherAdapterTaskHandler taskHandler =
-                new MapTaskDispatcherAdapterTaskHandler(resolver, TaskEvaluator.create());
+        MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver,
+            TaskEvaluator.create());
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(
-                Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"))));
+            Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"))));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");
@@ -60,12 +61,12 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             TaskHandlerResolver resolver = task -> t -> {
                 throw new IllegalArgumentException("i'm rogue");
             };
-            MapTaskDispatcherAdapterTaskHandler taskHandler =
-                    new MapTaskDispatcherAdapterTaskHandler(resolver, TaskEvaluator.create());
+            MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver,
+                TaskEvaluator.create());
 
             TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                    "list", List.of(1, 2, 3),
-                    "iteratee", Map.of("type", "rogue"))));
+                "list", List.of(1, 2, 3),
+                "iteratee", Map.of("type", "rogue"))));
 
             taskExecution.setId("1234");
             taskExecution.setJobId("4567");
@@ -90,7 +91,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             Assertions.assertNull(taskExecution.getError());
         });
 
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(Queues.EVENTS, t -> {
+        });
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];
 
@@ -111,48 +113,49 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         };
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(taskHandlerResolver)
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+            .withTaskHandlerResolver(taskHandlerResolver)
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
-        mapAdapterTaskHandlerRefs[0] =
-                new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, TaskEvaluator.create());
+        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver,
+            TaskEvaluator.create());
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                "finalize",
-                List.of(Map.of(
-                        "name",
-                        "output",
-                        "type",
-                        "map",
-                        "list",
-                        Arrays.asList(1, 2, 3),
-                        "iteratee",
-                        Map.of("type", "var", "value", "${item}"))),
-                "post",
-                List.of(Map.of(
-                        "name",
-                        "output",
-                        "type",
-                        "map",
-                        "list",
-                        Arrays.asList(1, 2, 3),
-                        "iteratee",
-                        Map.of("type", "var", "value", "${item}"))),
-                "pre",
-                List.of(Map.of(
-                        "name",
-                        "output",
-                        "type",
-                        "map",
-                        "list",
-                        Arrays.asList(1, 2, 3),
-                        "iteratee",
-                        Map.of("type", "var", "value", "${item}"))),
+            "finalize",
+            List.of(Map.of(
+                "name",
+                "output",
                 "type",
-                "pass")));
+                "map",
+                "list",
+                Arrays.asList(1, 2, 3),
+                "iteratee",
+                Map.of("type", "var", "value", "${item}"))),
+            "post",
+            List.of(Map.of(
+                "name",
+                "output",
+                "type",
+                "map",
+                "list",
+                Arrays.asList(1, 2, 3),
+                "iteratee",
+                Map.of("type", "var", "value", "${item}"))),
+            "pre",
+            List.of(Map.of(
+                "name",
+                "output",
+                "type",
+                "map",
+                "list",
+                Arrays.asList(1, 2, 3),
+                "iteratee",
+                Map.of("type", "var", "value", "${item}"))),
+            "type",
+            "pass")));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");

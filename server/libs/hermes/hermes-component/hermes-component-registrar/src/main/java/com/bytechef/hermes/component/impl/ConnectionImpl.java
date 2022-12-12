@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -58,6 +59,7 @@ public class ConnectionImpl implements Connection {
 
     @Override
     public <T> T getParameter(String name, T defaultValue) {
-        return MapUtils.get(parameters, name, new ParameterizedTypeReference<>() {}, defaultValue);
+        return MapUtils.get(parameters, name, new ParameterizedTypeReference<>() {
+        }, defaultValue);
     }
 }

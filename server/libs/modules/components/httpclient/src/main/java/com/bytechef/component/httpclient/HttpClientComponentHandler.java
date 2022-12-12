@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -98,376 +99,393 @@ public class HttpClientComponentHandler implements ComponentHandler {
         // General properties
         //
         string(URI)
-                .label("URI")
-                .description("The URI to make the request to")
-                .placeholder("https://example.com/index.html")
-                .defaultValue("")
-                .required(true),
+            .label("URI")
+            .description("The URI to make the request to")
+            .placeholder("https://example.com/index.html")
+            .defaultValue("")
+            .required(true),
         bool(ALLOW_UNAUTHORIZED_CERTS)
-                .label("Allow Unauthorized Certs")
-                .description("Download the response even if SSL certificate validation is not possible.")
-                .defaultValue(false),
+            .label("Allow Unauthorized Certs")
+            .description("Download the response even if SSL certificate validation is not possible.")
+            .defaultValue(false),
         string(RESPONSE_FORMAT)
-                .label("Response Format")
-                .description("The format in which the data gets returned from the URL.")
-                .options(
-                        ComponentDSL.option(
-                                "JSON",
-                                ResponseFormat.JSON.name(),
-                                "The response is automatically converted to object/array."),
-                        ComponentDSL.option(
-                                "XML",
-                                ResponseFormat.XML.name(),
-                                "The response is automatically converted to object/array."),
-                        ComponentDSL.option("Text", ResponseFormat.TEXT.name(), "The response is returned as a text."),
-                        ComponentDSL.option(
-                                "File", ResponseFormat.FILE.name(), "The response is returned as a file object."))
-                .defaultValue(ResponseFormat.JSON.name()),
+            .label("Response Format")
+            .description("The format in which the data gets returned from the URL.")
+            .options(
+                ComponentDSL.option(
+                    "JSON",
+                    ResponseFormat.JSON.name(),
+                    "The response is automatically converted to object/array."),
+                ComponentDSL.option(
+                    "XML",
+                    ResponseFormat.XML.name(),
+                    "The response is automatically converted to object/array."),
+                ComponentDSL.option("Text", ResponseFormat.TEXT.name(), "The response is returned as a text."),
+                ComponentDSL.option(
+                    "File", ResponseFormat.FILE.name(), "The response is returned as a file object."))
+            .defaultValue(ResponseFormat.JSON.name()),
         string(RESPONSE_FILENAME)
-                .label("Response Filename")
-                .description("The name of the file if the response is returned as a file object.")
-                .displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())),
+            .label("Response Filename")
+            .description("The name of the file if the response is returned as a file object.")
+            .displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())),
         //
         // Header properties
         //
 
         array(HEADER_PARAMETERS)
-                .label("Header Parameters")
-                .description("Header parameters to send.")
-                .defaultValue("")
-                .placeholder("Add Parameter")
-                .items(object().label("Parameter").additionalProperties(string())),
+            .label("Header Parameters")
+            .description("Header parameters to send.")
+            .defaultValue("")
+            .placeholder("Add Parameter")
+            .items(object().label("Parameter")
+                .additionalProperties(string())),
         //
         // Query parameters properties
         //
 
         array(QUERY_PARAMETERS)
-                .label("Query Parameters")
-                .description("Query parameters to send.")
-                .defaultValue("")
-                .placeholder("Add Parameter")
-                .items(object().label("Parameter").additionalProperties(string()))
+            .label("Query Parameters")
+            .description("Query parameters to send.")
+            .defaultValue("")
+            .placeholder("Add Parameter")
+            .items(object().label("Parameter")
+                .additionalProperties(string()))
     };
 
     private static final Property<?>[] BODY_CONTENT_PROPERTIES = new Property[] {
         bool(SEND_FILE)
-                .label("Send File")
-                .description("Send file instead of body parameters.")
-                .displayOption(show(
-                        BODY_CONTENT_TYPE,
-                        List.of(BodyContentType.JSON.name(), BodyContentType.RAW.name(), BodyContentType.XML.name())))
-                .defaultValue(false),
+            .label("Send File")
+            .description("Send file instead of body parameters.")
+            .displayOption(show(
+                BODY_CONTENT_TYPE,
+                List.of(BodyContentType.JSON.name(), BodyContentType.RAW.name(), BodyContentType.XML.name())))
+            .defaultValue(false),
         object(BODY_PARAMETERS)
-                .label("Body Parameters")
-                .description("Body parameters to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
-                .additionalProperties(oneOf())
-                .placeholder("Add Parameter"),
+            .label("Body Parameters")
+            .description("Body parameters to send.")
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
+            .additionalProperties(oneOf())
+            .placeholder("Add Parameter"),
         object(BODY_PARAMETERS)
-                .label("Body Parameters")
-                .description("Body parameters to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
-                .placeholder("Add Parameter")
-                .additionalProperties(string()),
+            .label("Body Parameters")
+            .description("Body parameters to send.")
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
+            .placeholder("Add Parameter")
+            .additionalProperties(string()),
         object(BODY_PARAMETERS)
-                .label("Body Parameters")
-                .description("Body parameters to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_URLENCODED.name()))
-                .placeholder("Add Parameter")
-                .additionalProperties(oneOf().types(string(), fileEntry())),
+            .label("Body Parameters")
+            .description("Body parameters to send.")
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_URLENCODED.name()))
+            .placeholder("Add Parameter")
+            .additionalProperties(oneOf().types(string(), fileEntry())),
         string(BODY)
-                .label("Body")
-                .description("The raw text to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
+            .label("Body")
+            .description("The raw text to send.")
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
         fileEntry(FILE_ENTRY)
-                .label("File")
-                .description("The object property which contains a reference to the file with data to upload.")
-                .displayOption(
-                        hide(SEND_FILE, false),
-                        show(
-                                BODY_CONTENT_TYPE,
-                                List.of(
-                                        BodyContentType.BINARY.name(),
-                                        BodyContentType.JSON.name(),
-                                        BodyContentType.RAW.name(),
-                                        BodyContentType.XML.name()))),
+            .label("File")
+            .description("The object property which contains a reference to the file with data to upload.")
+            .displayOption(
+                hide(SEND_FILE, false),
+                show(
+                    BODY_CONTENT_TYPE,
+                    List.of(
+                        BodyContentType.BINARY.name(),
+                        BodyContentType.JSON.name(),
+                        BodyContentType.RAW.name(),
+                        BodyContentType.XML.name()))),
     };
 
     private static final Property<?>[] OUTPUT_PROPERTIES = {
         object().properties(oneOf("body").types(array(), object()), object("headers"), integer("status"))
-                .displayOption(show(
-                        RESPONSE_FORMAT,
-                        List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()),
-                        FULL_RESPONSE,
-                        List.of(false))),
+            .displayOption(show(
+                RESPONSE_FORMAT,
+                List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()),
+                FULL_RESPONSE,
+                List.of(false))),
         oneOf().types(array(), object())
-                .displayOption(show(
-                        RESPONSE_FORMAT,
-                        List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()),
-                        FULL_RESPONSE,
-                        List.of(true))),
+            .displayOption(show(
+                RESPONSE_FORMAT,
+                List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()),
+                FULL_RESPONSE,
+                List.of(true))),
         string().displayOption(
-                        show(RESPONSE_FORMAT, List.of(ResponseFormat.TEXT.name()), FULL_RESPONSE, List.of(true))),
+            show(RESPONSE_FORMAT, List.of(ResponseFormat.TEXT.name()), FULL_RESPONSE, List.of(true))),
         object().properties(string("body"), object("headers"), integer("status"))
-                .displayOption(
-                        show(RESPONSE_FORMAT, List.of(ResponseFormat.TEXT.name()), FULL_RESPONSE, List.of(false))),
+            .displayOption(
+                show(RESPONSE_FORMAT, List.of(ResponseFormat.TEXT.name()), FULL_RESPONSE, List.of(false))),
         fileEntry()
-                .displayOption(
-                        show(RESPONSE_FORMAT, List.of(ResponseFormat.FILE.name()), FULL_RESPONSE, List.of(true))),
+            .displayOption(
+                show(RESPONSE_FORMAT, List.of(ResponseFormat.FILE.name()), FULL_RESPONSE, List.of(true))),
         object().properties(fileEntry("body"), object("headers"), integer("status"))
-                .displayOption(
-                        show(RESPONSE_FORMAT, List.of(ResponseFormat.FILE.name()), FULL_RESPONSE, List.of(false)))
+            .displayOption(
+                show(RESPONSE_FORMAT, List.of(ResponseFormat.FILE.name()), FULL_RESPONSE, List.of(false)))
     };
 
     private final ComponentDefinition componentDefinition = component(HTTP_CLIENT)
-            .display(display("HTTP Client").description("Makes an HTTP request and returns the response data."))
-            .connection(connection()
-                    .properties(string(BASE_URI).label("Base URI"))
-                    .authorizations(
-                            authorization(AuthorizationType.API_KEY.name().toLowerCase(), AuthorizationType.API_KEY)
-                                    .display(display("API Key"))
-                                    .properties(
-                                            string(KEY)
-                                                    .label("Key")
-                                                    .required(true)
-                                                    .defaultValue(API_TOKEN),
-                                            string(VALUE).label("Value").required(true),
-                                            string(ADD_TO)
-                                                    .label("Add to")
-                                                    .required(true)
-                                                    .options(
-                                                            ComponentDSL.option(
-                                                                    "Header", ApiTokenLocation.HEADER.name()),
-                                                            ComponentDSL.option(
-                                                                    "QueryParams",
-                                                                    ApiTokenLocation.QUERY_PARAMETERS.name()))),
-                            authorization(
-                                            AuthorizationType.BEARER_TOKEN
-                                                    .name()
-                                                    .toLowerCase(),
-                                            AuthorizationType.BEARER_TOKEN)
-                                    .display(display("Bearer Token"))
-                                    .properties(string(TOKEN).label("Token").required(true)),
-                            authorization(
-                                            AuthorizationType.BASIC_AUTH.name().toLowerCase(),
-                                            AuthorizationType.BASIC_AUTH)
-                                    .display(display("Basic Auth"))
-                                    .properties(
-                                            string(USERNAME).label("Username").required(true),
-                                            string(PASSWORD).label("Password").required(true)),
-                            authorization(
-                                            AuthorizationType.DIGEST_AUTH.name().toLowerCase(),
-                                            AuthorizationType.DIGEST_AUTH)
-                                    .display(display("Digest Auth"))
-                                    .properties(
-                                            string(USERNAME).label("Username").required(true),
-                                            string(PASSWORD).label("Password").required(true)),
-                            authorization(
-                                            AuthorizationType.OAUTH2_AUTHORIZATION_CODE
-                                                    .name()
-                                                    .toLowerCase(),
-                                            AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                                    .display(display("OAuth2 Authorization code"))
-                                    .properties(
-                                            string(AUTHORIZATION_URL)
-                                                    .label("Authorization URL")
-                                                    .required(true),
-                                            string(TOKEN_URL).label("Token URL").required(true),
-                                            array(SCOPES).label("Scopes").items(string()),
-                                            string(CLIENT_ID).label("Client Id").required(true),
-                                            string(CLIENT_SECRET)
-                                                    .label("Client Secret")
-                                                    .required(true)),
-                            authorization(
-                                            AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
-                                                    .name()
-                                                    .toLowerCase(),
-                                            AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
-                                    .display(display("OAuth2 Client Credentials"))
-                                    .properties(
-                                            string(TOKEN_URL).label("Token URL").required(true),
-                                            array(SCOPES).label("Scopes").items(string()),
-                                            string(CLIENT_ID).label("Client Id").required(true),
-                                            string(CLIENT_SECRET)
-                                                    .label("Client Secret")
-                                                    .required(true))))
-            .actions(
-                    action(GET)
-                            .display(display("GET").description("The request method to use."))
-                            .properties(
-                                    //
-                                    // Common properties
-                                    //
+        .display(display("HTTP Client").description("Makes an HTTP request and returns the response data."))
+        .connection(connection()
+            .properties(string(BASE_URI).label("Base URI"))
+            .authorizations(
+                authorization(AuthorizationType.API_KEY.name()
+                    .toLowerCase(), AuthorizationType.API_KEY)
+                        .display(display("API Key"))
+                        .properties(
+                            string(KEY)
+                                .label("Key")
+                                .required(true)
+                                .defaultValue(API_TOKEN),
+                            string(VALUE).label("Value")
+                                .required(true),
+                            string(ADD_TO)
+                                .label("Add to")
+                                .required(true)
+                                .options(
+                                    ComponentDSL.option(
+                                        "Header", ApiTokenLocation.HEADER.name()),
+                                    ComponentDSL.option(
+                                        "QueryParams",
+                                        ApiTokenLocation.QUERY_PARAMETERS.name()))),
+                authorization(
+                    AuthorizationType.BEARER_TOKEN
+                        .name()
+                        .toLowerCase(),
+                    AuthorizationType.BEARER_TOKEN)
+                        .display(display("Bearer Token"))
+                        .properties(string(TOKEN).label("Token")
+                            .required(true)),
+                authorization(
+                    AuthorizationType.BASIC_AUTH.name()
+                        .toLowerCase(),
+                    AuthorizationType.BASIC_AUTH)
+                        .display(display("Basic Auth"))
+                        .properties(
+                            string(USERNAME).label("Username")
+                                .required(true),
+                            string(PASSWORD).label("Password")
+                                .required(true)),
+                authorization(
+                    AuthorizationType.DIGEST_AUTH.name()
+                        .toLowerCase(),
+                    AuthorizationType.DIGEST_AUTH)
+                        .display(display("Digest Auth"))
+                        .properties(
+                            string(USERNAME).label("Username")
+                                .required(true),
+                            string(PASSWORD).label("Password")
+                                .required(true)),
+                authorization(
+                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE
+                        .name()
+                        .toLowerCase(),
+                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                        .display(display("OAuth2 Authorization code"))
+                        .properties(
+                            string(AUTHORIZATION_URL)
+                                .label("Authorization URL")
+                                .required(true),
+                            string(TOKEN_URL).label("Token URL")
+                                .required(true),
+                            array(SCOPES).label("Scopes")
+                                .items(string()),
+                            string(CLIENT_ID).label("Client Id")
+                                .required(true),
+                            string(CLIENT_SECRET)
+                                .label("Client Secret")
+                                .required(true)),
+                authorization(
+                    AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
+                        .name()
+                        .toLowerCase(),
+                    AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
+                        .display(display("OAuth2 Client Credentials"))
+                        .properties(
+                            string(TOKEN_URL).label("Token URL")
+                                .required(true),
+                            array(SCOPES).label("Scopes")
+                                .items(string()),
+                            string(CLIENT_ID).label("Client Id")
+                                .required(true),
+                            string(CLIENT_SECRET)
+                                .label("Client Secret")
+                                .required(true))))
+        .actions(
+            action(GET)
+                .display(display("GET").description("The request method to use."))
+                .properties(
+                    //
+                    // Common properties
+                    //
 
-                                    COMMON_PROPERTIES)
-                            .output(
-                                    oneOf().types(array(), object())
-                                            .displayOption(show(
-                                                    RESPONSE_FORMAT,
-                                                    List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
-                                    string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
-                                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())))
-                            .perform(this::performGet),
-                    action(POST)
-                            .display(display("POST").description("The request method to use."))
-                            .properties(ArrayUtils.addAll(
-                                    ArrayUtils.addAll(
-                                            //
-                                            // Common properties
-                                            //
+                    COMMON_PROPERTIES)
+                .output(
+                    oneOf().types(array(), object())
+                        .displayOption(show(
+                            RESPONSE_FORMAT,
+                            List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
+                    string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
+                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())))
+                .perform(this::performGet),
+            action(POST)
+                .display(display("POST").description("The request method to use."))
+                .properties(ArrayUtils.addAll(
+                    ArrayUtils.addAll(
+                        //
+                        // Common properties
+                        //
 
-                                            COMMON_PROPERTIES,
-                                            //
-                                            // Body Content properties
-                                            //
+                        COMMON_PROPERTIES,
+                        //
+                        // Body Content properties
+                        //
 
-                                            BODY_CONTENT_PROPERTIES),
-                                    //
-                                    // Options
-                                    //
+                        BODY_CONTENT_PROPERTIES),
+                    //
+                    // Options
+                    //
 
-                                    options(true)))
-                            .output(
-                                    oneOf().types(array(), object())
-                                            .displayOption(show(
-                                                    RESPONSE_FORMAT,
-                                                    List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
-                                    string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
-                                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())))
-                            .perform(this::performPost),
-                    action(PUT)
-                            .display(display("PUT").description("The request method to use."))
-                            .properties(ArrayUtils.addAll(
-                                    ArrayUtils.addAll(
-                                            //
-                                            // Common properties
-                                            //
+                    options(true)))
+                .output(
+                    oneOf().types(array(), object())
+                        .displayOption(show(
+                            RESPONSE_FORMAT,
+                            List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
+                    string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
+                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())))
+                .perform(this::performPost),
+            action(PUT)
+                .display(display("PUT").description("The request method to use."))
+                .properties(ArrayUtils.addAll(
+                    ArrayUtils.addAll(
+                        //
+                        // Common properties
+                        //
 
-                                            COMMON_PROPERTIES,
-                                            //
-                                            // Body Content properties
-                                            //
+                        COMMON_PROPERTIES,
+                        //
+                        // Body Content properties
+                        //
 
-                                            BODY_CONTENT_PROPERTIES),
-                                    //
-                                    // Options
-                                    //
+                        BODY_CONTENT_PROPERTIES),
+                    //
+                    // Options
+                    //
 
-                                    options(true)))
-                            .output(OUTPUT_PROPERTIES)
-                            .perform(this::performPut),
-                    action(PATCH)
-                            .display(display("PATCH").description("The request method to use."))
-                            .properties(ArrayUtils.addAll(
-                                    ArrayUtils.addAll(
-                                            //
-                                            // Common properties
-                                            //
+                    options(true)))
+                .output(OUTPUT_PROPERTIES)
+                .perform(this::performPut),
+            action(PATCH)
+                .display(display("PATCH").description("The request method to use."))
+                .properties(ArrayUtils.addAll(
+                    ArrayUtils.addAll(
+                        //
+                        // Common properties
+                        //
 
-                                            COMMON_PROPERTIES,
-                                            //
-                                            // Body Content properties
-                                            //
+                        COMMON_PROPERTIES,
+                        //
+                        // Body Content properties
+                        //
 
-                                            BODY_CONTENT_PROPERTIES),
-                                    //
-                                    // Options
-                                    //
+                        BODY_CONTENT_PROPERTIES),
+                    //
+                    // Options
+                    //
 
-                                    options(true)))
-                            .output(OUTPUT_PROPERTIES)
-                            .perform(this::performPatch),
-                    action(DELETE)
-                            .display(display("DELETE").description("The request method to use."))
-                            .properties(ArrayUtils.addAll(
-                                    //
-                                    // Common properties
-                                    //
+                    options(true)))
+                .output(OUTPUT_PROPERTIES)
+                .perform(this::performPatch),
+            action(DELETE)
+                .display(display("DELETE").description("The request method to use."))
+                .properties(ArrayUtils.addAll(
+                    //
+                    // Common properties
+                    //
 
-                                    COMMON_PROPERTIES,
-                                    //
-                                    // Options
-                                    //
+                    COMMON_PROPERTIES,
+                    //
+                    // Options
+                    //
 
-                                    options(false)))
-                            .output(OUTPUT_PROPERTIES)
-                            .perform(this::performDelete),
-                    action(HEAD)
-                            .display(display("HEAD").description("The request method to use."))
-                            .properties(ArrayUtils.addAll(
-                                    //
-                                    // Common properties
-                                    //
+                    options(false)))
+                .output(OUTPUT_PROPERTIES)
+                .perform(this::performDelete),
+            action(HEAD)
+                .display(display("HEAD").description("The request method to use."))
+                .properties(ArrayUtils.addAll(
+                    //
+                    // Common properties
+                    //
 
-                                    COMMON_PROPERTIES,
-                                    //
-                                    // Options
-                                    //
+                    COMMON_PROPERTIES,
+                    //
+                    // Options
+                    //
 
-                                    options(false)))
-                            .output(OUTPUT_PROPERTIES)
-                            .perform(this::performHead));
+                    options(false)))
+                .output(OUTPUT_PROPERTIES)
+                .perform(this::performHead));
 
     private static Property<?>[] options(boolean includeBodyContentProperties) {
         List<Property<?>> properties = new ArrayList<>();
 
         if (includeBodyContentProperties) {
             properties.add(string(BODY_CONTENT_TYPE)
-                    .label("Body Content Type")
-                    .description("Content-Type to use when sending body parameters.")
-                    .options(
-                            ComponentDSL.option("JSON", BodyContentType.JSON.name()),
-                            ComponentDSL.option("Raw", BodyContentType.RAW.name()),
-                            ComponentDSL.option("Form-Data", BodyContentType.FORM_DATA.name()),
-                            ComponentDSL.option("Form-Urlencoded", BodyContentType.FORM_URLENCODED.name()),
-                            ComponentDSL.option("Binary", BodyContentType.BINARY.name()),
-                            ComponentDSL.option("XML", BodyContentType.XML.name()))
-                    .defaultValue("JSON")
-                    .advancedOption(true));
+                .label("Body Content Type")
+                .description("Content-Type to use when sending body parameters.")
+                .options(
+                    ComponentDSL.option("JSON", BodyContentType.JSON.name()),
+                    ComponentDSL.option("Raw", BodyContentType.RAW.name()),
+                    ComponentDSL.option("Form-Data", BodyContentType.FORM_DATA.name()),
+                    ComponentDSL.option("Form-Urlencoded", BodyContentType.FORM_URLENCODED.name()),
+                    ComponentDSL.option("Binary", BodyContentType.BINARY.name()),
+                    ComponentDSL.option("XML", BodyContentType.XML.name()))
+                .defaultValue("JSON")
+                .advancedOption(true));
         }
         if (includeBodyContentProperties) {
             properties.add(string(MIME_TYPE)
-                    .label("Mime Type")
-                    .description("Mime-Type to use when sending raw body content.")
-                    .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
-                    .placeholder("text/xml")
-                    .advancedOption(true));
+                .label("Mime Type")
+                .description("Mime-Type to use when sending raw body content.")
+                .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
+                .placeholder("text/xml")
+                .advancedOption(true));
         }
 
         properties.addAll(List.of(
-                bool(FULL_RESPONSE)
-                        .label("Full Response")
-                        .description("Returns the full response data instead of only the body.")
-                        .defaultValue(false)
-                        .advancedOption(true),
-                bool(FOLLOW_ALL_REDIRECTS)
-                        .label("Follow All Redirects")
-                        .description("Follow non-GET HTTP 3xx redirects.")
-                        .defaultValue(false)
-                        .advancedOption(true),
-                bool(FOLLOW_REDIRECT)
-                        .label("Follow GET Redirect")
-                        .description("Follow GET HTTP 3xx redirects.")
-                        .defaultValue(false)
-                        .advancedOption(true),
-                bool(IGNORE_RESPONSE_CODE)
-                        .label("Ignore Response Code")
-                        .description("Succeeds also when the status code is not 2xx.")
-                        .defaultValue(false)
-                        .advancedOption(true),
-                string(PROXY)
-                        .label("Proxy")
-                        .description("HTTP proxy to use.")
-                        .placeholder("https://myproxy:3128")
-                        .defaultValue("")
-                        .advancedOption(true),
-                integer(TIMEOUT)
-                        .label("Timeout")
-                        .description(
-                                "Time in ms to wait for the server to send a response before aborting the request.")
-                        .defaultValue(1000)
-                        .minValue(1)
-                        .advancedOption(true)));
+            bool(FULL_RESPONSE)
+                .label("Full Response")
+                .description("Returns the full response data instead of only the body.")
+                .defaultValue(false)
+                .advancedOption(true),
+            bool(FOLLOW_ALL_REDIRECTS)
+                .label("Follow All Redirects")
+                .description("Follow non-GET HTTP 3xx redirects.")
+                .defaultValue(false)
+                .advancedOption(true),
+            bool(FOLLOW_REDIRECT)
+                .label("Follow GET Redirect")
+                .description("Follow GET HTTP 3xx redirects.")
+                .defaultValue(false)
+                .advancedOption(true),
+            bool(IGNORE_RESPONSE_CODE)
+                .label("Ignore Response Code")
+                .description("Succeeds also when the status code is not 2xx.")
+                .defaultValue(false)
+                .advancedOption(true),
+            string(PROXY)
+                .label("Proxy")
+                .description("HTTP proxy to use.")
+                .placeholder("https://myproxy:3128")
+                .defaultValue("")
+                .advancedOption(true),
+            integer(TIMEOUT)
+                .label("Timeout")
+                .description(
+                    "Time in ms to wait for the server to send a response before aborting the request.")
+                .defaultValue(1000)
+                .minValue(1)
+                .advancedOption(true)));
 
         return properties.toArray(new Property[0]);
     }
@@ -502,16 +520,16 @@ public class HttpClientComponentHandler implements ComponentHandler {
     }
 
     private Object execute(
-            Context context, ExecutionParameters executionParameters, HttpClientUtils.RequestMethod requestMethod) {
+        Context context, ExecutionParameters executionParameters, HttpClientUtils.RequestMethod requestMethod) {
         HttpClientUtils.Payload payload = null;
 
         BodyContentType bodyContentType = executionParameters.containsKey(BODY_CONTENT_TYPE)
-                ? BodyContentType.valueOf(StringUtils.upperCase(executionParameters.getString(BODY_CONTENT_TYPE)))
-                : null;
+            ? BodyContentType.valueOf(StringUtils.upperCase(executionParameters.getString(BODY_CONTENT_TYPE)))
+            : null;
 
         if (executionParameters.containsKey(BODY_PARAMETERS)) {
             payload = HttpClientUtils.Payload.of(
-                    executionParameters.getMap(BODY_PARAMETERS, List.of(FileEntry.class), Map.of()), bodyContentType);
+                executionParameters.getMap(BODY_PARAMETERS, List.of(FileEntry.class), Map.of()), bodyContentType);
         } else if (executionParameters.containsKey(BODY)) {
             payload = HttpClientUtils.Payload.of(executionParameters.getString(BODY), bodyContentType);
         } else if (executionParameters.containsKey(FILE_ENTRY)) {
@@ -519,24 +537,24 @@ public class HttpClientComponentHandler implements ComponentHandler {
         }
 
         return HttpClientUtils.executor()
-                .configuration(HttpClientUtils.Configuration.builder()
-                        .allowUnauthorizedCerts(executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                        .filename(executionParameters.getString(RESPONSE_FILENAME))
-                        .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                        .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
-                        .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
-                        .mimeType(executionParameters.getString(MIME_TYPE))
-                        .proxy(executionParameters.getString(PROXY))
-                        .responseFormat(
-                                executionParameters.containsKey(RESPONSE_FORMAT)
-                                        ? ResponseFormat.valueOf(executionParameters.getString(RESPONSE_FORMAT))
-                                        : null)
-                        .timeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000)))
-                        .build())
-                .exchange(executionParameters.getRequiredString(URI), requestMethod)
-                .headers(executionParameters.getMap(HEADER_PARAMETERS))
-                .queryParameters(executionParameters.getMap(QUERY_PARAMETERS))
-                .payload(payload)
-                .execute(context);
+            .configuration(HttpClientUtils.Configuration.builder()
+                .allowUnauthorizedCerts(executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                .filename(executionParameters.getString(RESPONSE_FILENAME))
+                .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
+                .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
+                .mimeType(executionParameters.getString(MIME_TYPE))
+                .proxy(executionParameters.getString(PROXY))
+                .responseFormat(
+                    executionParameters.containsKey(RESPONSE_FORMAT)
+                        ? ResponseFormat.valueOf(executionParameters.getString(RESPONSE_FORMAT))
+                        : null)
+                .timeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000)))
+                .build())
+            .exchange(executionParameters.getRequiredString(URI), requestMethod)
+            .headers(executionParameters.getMap(HEADER_PARAMETERS))
+            .queryParameters(executionParameters.getMap(QUERY_PARAMETERS))
+            .payload(payload)
+            .execute(context);
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -39,9 +40,9 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
     private final CounterService counterService;
 
     public EachTaskCompletionHandler(
-            TaskExecutionService taskExecutionService,
-            TaskCompletionHandler taskCompletionHandler,
-            CounterService counterService) {
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService) {
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
@@ -54,7 +55,8 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(EACH + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(EACH + "/v" + VERSION_1);
         }
 
         return false;
@@ -71,8 +73,8 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         long subTasksLeft = counterService.decrement(taskExecution.getParentId());
 
         if (subTasksLeft == 0) {
-            TaskExecution eachTaskExecution =
-                    new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            TaskExecution eachTaskExecution = new TaskExecution(
+                taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
             eachTaskExecution.setEndTime(LocalDateTime.now());
 

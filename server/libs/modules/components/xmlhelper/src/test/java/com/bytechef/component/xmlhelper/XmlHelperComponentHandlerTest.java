@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -46,32 +47,32 @@ public class XmlHelperComponentHandlerTest {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequiredString(SOURCE))
-                .thenReturn(
-                        """
+            .thenReturn(
+                """
+                    <Flower id="45">
+                        <name>Poppy</name>
+                    </Flower>
+                    """);
+
+        assertThat((Map<String, ?>) xmlHelperComponentHandler.performParse(context, executionParameters))
+            .isEqualTo(Map.of("id", "45", "name", "Poppy"));
+
+        Mockito.when(executionParameters.getRequiredString(SOURCE))
+            .thenReturn(
+                """
+                    <Flowers>
                         <Flower id="45">
                             <name>Poppy</name>
                         </Flower>
-                        """);
-
-        assertThat((Map<String, ?>) xmlHelperComponentHandler.performParse(context, executionParameters))
-                .isEqualTo(Map.of("id", "45", "name", "Poppy"));
-
-        Mockito.when(executionParameters.getRequiredString(SOURCE))
-                .thenReturn(
-                        """
-                        <Flowers>
-                            <Flower id="45">
-                                <name>Poppy</name>
-                            </Flower>
-                            <Flower id="50">
-                                <name>Rose</name>
-                            </Flower>
-                        </Flowers>
-                        """);
+                        <Flower id="50">
+                            <name>Rose</name>
+                        </Flower>
+                    </Flowers>
+                    """);
 
         assertThat(xmlHelperComponentHandler.performParse(context, executionParameters))
-                .isEqualTo(Map.of(
-                        "Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
+            .isEqualTo(Map.of(
+                "Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
     }
 
     @Test
@@ -80,9 +81,10 @@ public class XmlHelperComponentHandlerTest {
 
         Map<String, ?> source = Map.of("id", 45, "name", "Poppy");
 
-        Mockito.when(executionParameters.getRequired(SOURCE)).thenReturn(source);
+        Mockito.when(executionParameters.getRequired(SOURCE))
+            .thenReturn(source);
 
         assertThat(xmlHelperComponentHandler.performStringify(context, executionParameters))
-                .isEqualTo(XmlUtils.write(source));
+            .isEqualTo(XmlUtils.write(source));
     }
 }

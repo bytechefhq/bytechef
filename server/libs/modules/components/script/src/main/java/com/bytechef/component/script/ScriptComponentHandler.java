@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -44,76 +45,76 @@ public class ScriptComponentHandler implements ComponentHandler {
     private static final PolyglotEngine polyglotEngine = new PolyglotEngine();
 
     private final ComponentDefinition componentDefinition = component(SCRIPT)
-            .display(
-                    display("Script")
-                            .description(
-                                    "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages."))
-            .actions(
-                    action(JAVA)
-                            .display(display("Java").description("Executes custom Java code."))
-                            .properties(
-                                    object(INPUT)
-                                            .label("Input")
-                                            .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(oneOf()),
-                                    string(SCRIPT)
-                                            .label("Java code")
-                                            .description("Add your Java custom logic here.")
-                                            .controlType(Property.ControlType.CODE))
-                            .output(oneOf())
-                            .perform(this::performJava),
-                    action(JAVASCRIPT)
-                            .display(display("JavaScript").description("Executes custom JavaScript code."))
-                            .properties(
-                                    object(INPUT)
-                                            .label("Input")
-                                            .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(oneOf()),
-                                    string(SCRIPT)
-                                            .label("JavaScript code")
-                                            .description("Add your JavaScript custom logic here.")
-                                            .controlType(Property.ControlType.CODE))
-                            .output(oneOf())
-                            .perform(this::performJavaScript),
-                    action(PYTHON)
-                            .display(display("Python").description("Executes custom Python code."))
-                            .properties(
-                                    object(INPUT)
-                                            .label("Input")
-                                            .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(oneOf()),
-                                    string(SCRIPT)
-                                            .label("Python code")
-                                            .description("Add your Python custom logic here.")
-                                            .controlType(Property.ControlType.CODE))
-                            .output(oneOf())
-                            .perform(this::performPython),
-                    action(R)
-                            .display(display("R").description("Executes custom R code."))
-                            .properties(
-                                    object(INPUT)
-                                            .label("Input")
-                                            .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(oneOf()),
-                                    string(SCRIPT)
-                                            .label("R code")
-                                            .description("Add your R custom logic here.")
-                                            .controlType(Property.ControlType.CODE))
-                            .output(oneOf())
-                            .perform(this::performR),
-                    action(ScriptConstants.RUBY)
-                            .display(display("Ruby").description("Executes custom Ruby code."))
-                            .properties(
-                                    object(INPUT)
-                                            .label("Input")
-                                            .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(oneOf()),
-                                    string(SCRIPT)
-                                            .label("Ruby code")
-                                            .description("Add your Ruby custom logic here.")
-                                            .controlType(Property.ControlType.CODE))
-                            .output(oneOf())
-                            .perform(this::performRuby));
+        .display(
+            display("Script")
+                .description(
+                    "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages."))
+        .actions(
+            action(JAVA)
+                .display(display("Java").description("Executes custom Java code."))
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(oneOf()),
+                    string(SCRIPT)
+                        .label("Java code")
+                        .description("Add your Java custom logic here.")
+                        .controlType(Property.ControlType.CODE))
+                .output(oneOf())
+                .perform(this::performJava),
+            action(JAVASCRIPT)
+                .display(display("JavaScript").description("Executes custom JavaScript code."))
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(oneOf()),
+                    string(SCRIPT)
+                        .label("JavaScript code")
+                        .description("Add your JavaScript custom logic here.")
+                        .controlType(Property.ControlType.CODE))
+                .output(oneOf())
+                .perform(this::performJavaScript),
+            action(PYTHON)
+                .display(display("Python").description("Executes custom Python code."))
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(oneOf()),
+                    string(SCRIPT)
+                        .label("Python code")
+                        .description("Add your Python custom logic here.")
+                        .controlType(Property.ControlType.CODE))
+                .output(oneOf())
+                .perform(this::performPython),
+            action(R)
+                .display(display("R").description("Executes custom R code."))
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(oneOf()),
+                    string(SCRIPT)
+                        .label("R code")
+                        .description("Add your R custom logic here.")
+                        .controlType(Property.ControlType.CODE))
+                .output(oneOf())
+                .perform(this::performR),
+            action(ScriptConstants.RUBY)
+                .display(display("Ruby").description("Executes custom Ruby code."))
+                .properties(
+                    object(INPUT)
+                        .label("Input")
+                        .description("Initialize parameter values used in the custom code.")
+                        .additionalProperties(oneOf()),
+                    string(SCRIPT)
+                        .label("Ruby code")
+                        .description("Add your Ruby custom logic here.")
+                        .controlType(Property.ControlType.CODE))
+                .output(oneOf())
+                .perform(this::performRuby));
 
     @Override
     public ComponentDefinition getDefinition() {

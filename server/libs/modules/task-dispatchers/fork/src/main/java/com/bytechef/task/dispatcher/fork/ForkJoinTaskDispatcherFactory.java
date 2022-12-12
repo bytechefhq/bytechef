@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -34,14 +35,14 @@ import org.springframework.stereotype.Component;
 public class ForkJoinTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(FORK_JOIN)
-            .display(
-                    display("Fork/Join")
-                            .description(
-                                    "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence."))
-            .taskProperties(array(BRANCHES)
-                    .description("The list of sequences of tasks to execute in parallel.")
-                    .items(array().description("The list of tasks that executes sequentially.")
-                            .items(task())));
+        .display(
+            display("Fork/Join")
+                .description(
+                    "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence."))
+        .taskProperties(array(BRANCHES)
+            .description("The list of sequences of tasks to execute in parallel.")
+            .items(array().description("The list of tasks that executes sequentially.")
+                .items(task())));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

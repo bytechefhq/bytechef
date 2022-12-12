@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -23,5 +24,7 @@ import java.util.List;
 
 public class IssueUpdateMetadataSchema {
     public static final List<Property> COMPONENT_SCHEMA = List.of(
-            object("fields").additionalProperties(object()).label("Fields").required(false));
+        object("fields").additionalProperties(object())
+            .label("Fields")
+            .required(false));
 }

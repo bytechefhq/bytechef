@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -44,7 +45,7 @@ public final class ComponentDSL extends DefinitionDSL {
     }
 
     public static ModifiableAuthorization authorization(
-            String name, Authorization.AuthorizationType authorizationType) {
+        String name, Authorization.AuthorizationType authorizationType) {
         return new ModifiableAuthorization(name, authorizationType);
     }
 
@@ -62,13 +63,13 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static ModifiableProperty.ModifiableObjectProperty fileEntry(String name) {
         return buildObject(
-                name,
-                null,
-                "FILE_ENTRY",
-                string("extension").required(true),
-                string("mimeType").required(true),
-                string("name").required(true),
-                string("url").required(true));
+            name,
+            null,
+            "FILE_ENTRY",
+            string("extension").required(true),
+            string("mimeType").required(true),
+            string("name").required(true),
+            string("url").required(true));
     }
 
     public static ModifiableJdbcComponentDefinition jdbcComponent(String name) {
@@ -146,7 +147,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization authorizationCallback(
-                BiFunction<Connection, String, String> authorizationCallbackFunction) {
+            BiFunction<Connection, String, String> authorizationCallbackFunction) {
             this.authorizationCallbackFunction = authorizationCallbackFunction;
 
             return this;
@@ -246,8 +247,9 @@ public final class ComponentDSL extends DefinitionDSL {
         @SafeVarargs
         public final ModifiableComponentDefinition actions(List<ModifiableActionDefinition>... actionsList) {
             if (actionsList != null) {
-                this.actions =
-                        Stream.of(actionsList).flatMap(Collection::stream).toList();
+                this.actions = Stream.of(actionsList)
+                    .flatMap(Collection::stream)
+                    .toList();
             }
 
             return this;
@@ -255,9 +257,9 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connection = connectionDefinition
-                    .componentName(name)
-                    .componentVersion(version)
-                    .display(display);
+                .componentName(name)
+                .componentVersion(version)
+                .display(display);
 
             return this;
         }
@@ -300,7 +302,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableConnectionDefinition extends ConnectionDefinition {
 
-        private ModifiableConnectionDefinition() {}
+        private ModifiableConnectionDefinition() {
+        }
 
         public ModifiableConnectionDefinition authorizations(ModifiableAuthorization... authorizations) {
             if (authorizations != null) {

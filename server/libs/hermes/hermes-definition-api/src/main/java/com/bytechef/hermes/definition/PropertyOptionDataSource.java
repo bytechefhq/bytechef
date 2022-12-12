@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,8 +26,8 @@ import java.util.function.Function;
  * @author Ivica Cardic
  */
 @Schema(
-        name = "PropertyOptionDataSource",
-        description = "Defines function that should dynamically load options for the property.")
+    name = "PropertyOptionDataSource",
+    description = "Defines function that should dynamically load options for the property.")
 public sealed class PropertyOptionDataSource permits DefinitionDSL.ModifiablePropertyOptionDataSource {
 
     protected List<String> loadOptionsDependsOn;
@@ -34,11 +35,12 @@ public sealed class PropertyOptionDataSource permits DefinitionDSL.ModifiablePro
     @JsonIgnore
     protected Function<Object, Object> loadOptionsFunction;
 
-    protected PropertyOptionDataSource() {}
+    protected PropertyOptionDataSource() {
+    }
 
     @Schema(
-            name = "loadOptionsDependsOn",
-            description = "The list of property names on which value change the property options should load/reload.")
+        name = "loadOptionsDependsOn",
+        description = "The list of property names on which value change the property options should load/reload.")
     public List<String> getLoadOptionsDependsOn() {
         return loadOptionsDependsOn;
     }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,4 +25,5 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface ConnectionRepository extends PagingAndSortingRepository<Connection, String> {}
+public interface ConnectionRepository extends PagingAndSortingRepository<Connection, String> {
+}

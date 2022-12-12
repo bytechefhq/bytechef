@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -54,7 +55,8 @@ public class ConnectionServiceIntTest {
 
         connectionService.delete(connection.getId());
 
-        Assertions.assertFalse(connectionRepository.findById(connection.getId()).isPresent());
+        Assertions.assertFalse(connectionRepository.findById(connection.getId())
+            .isPresent());
     }
 
     @Test
@@ -72,7 +74,8 @@ public class ConnectionServiceIntTest {
 
         connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(1, connectionService.getConnections().size());
+        Assertions.assertEquals(1, connectionService.getConnections()
+            .size());
     }
 
     @Test

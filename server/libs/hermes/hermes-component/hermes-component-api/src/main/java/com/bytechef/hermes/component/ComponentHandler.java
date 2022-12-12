@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -37,7 +38,7 @@ public interface ComponentHandler extends ComponentDefinitionFactory {
      * @throws ActionExecutionException
      */
     default Object handle(ActionDefinition actionDefinition, Context context, ExecutionParameters executionParameters)
-            throws ActionExecutionException {
+        throws ActionExecutionException {
 
         return null;
     }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -51,23 +52,24 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String updateKey = executionParameters.getString(UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-                context.getConnectionParameters(),
-                "UPDATE "
-                        + schema
-                        + "."
-                        + table
-                        + " SET "
-                        + String.join(
-                                " AND ",
-                                columns.stream()
-                                        .map(column -> column + "=:" + column)
-                                        .toList())
-                        + " WHERE "
-                        + updateKey
-                        + "=:"
-                        + updateKey,
-                SqlParameterSourceUtils.createBatch(rows.toArray()));
+            context.getConnectionParameters(),
+            "UPDATE "
+                + schema
+                + "."
+                + table
+                + " SET "
+                + String.join(
+                    " AND ",
+                    columns.stream()
+                        .map(column -> column + "=:" + column)
+                        .toList())
+                + " WHERE "
+                + updateKey
+                + "=:"
+                + updateKey,
+            SqlParameterSourceUtils.createBatch(rows.toArray()));
 
-        return Map.of("rows", Arrays.stream(rowsAffected).sum());
+        return Map.of("rows", Arrays.stream(rowsAffected)
+            .sum());
     }
 }

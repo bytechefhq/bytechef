@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,10 +32,10 @@ import java.util.Map;
  */
 @Schema(name = "Property", description = "A base property.")
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true)
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Property.ArrayProperty.class, name = "ARRAY"),
     @JsonSubTypes.Type(value = Property.BooleanProperty.class, name = "BOOLEAN"),
@@ -45,8 +46,8 @@ import java.util.Map;
     @JsonSubTypes.Type(value = Property.OneOfProperty.class, name = "ONE_OF"),
     @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
 })
-public sealed class Property<P extends Property<P>>
-        permits Property.OneOfProperty, Property.NullProperty, Property.ValueProperty {
+// CHECKSTYLE:OFF
+public sealed class Property<P extends Property<P>> permits Property.OneOfProperty,Property.NullProperty,Property.ValueProperty {
 
     public enum ControlType {
         CODE,
@@ -134,19 +135,19 @@ public sealed class Property<P extends Property<P>>
 
     @Schema(name = "OneOfProperty", description = "A one of property type.")
     @JsonTypeName("OneOf")
-    public static sealed class OneOfProperty extends Property<OneOfProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty {
+    public static sealed class OneOfProperty
+        extends Property<OneOfProperty>permits DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty {
 
         protected List<? extends Property<?>> types = List.of(
-                new ArrayProperty(null),
-                new BooleanProperty(null),
-                new DateProperty(null),
-                new DateTimeProperty(null),
-                new IntegerProperty(null),
-                new NullProperty(null),
-                new NumberProperty(null),
-                new ObjectProperty(null),
-                new StringProperty(null));
+            new ArrayProperty(null),
+            new BooleanProperty(null),
+            new DateProperty(null),
+            new DateTimeProperty(null),
+            new IntegerProperty(null),
+            new NullProperty(null),
+            new NumberProperty(null),
+            new ObjectProperty(null),
+            new StringProperty(null));
 
         protected OneOfProperty(String name) {
             super(name, Type.ONE_OF);
@@ -159,15 +160,8 @@ public sealed class Property<P extends Property<P>>
     }
 
     @Schema(name = "ValueProperty", description = "A base property for all value based properties.")
-    public abstract static sealed class ValueProperty<V, P extends ValueProperty<V, P>> extends Property<P>
-            permits Property.ArrayProperty,
-                    Property.BooleanProperty,
-                    Property.DateProperty,
-                    Property.DateTimeProperty,
-                    Property.IntegerProperty,
-                    Property.NumberProperty,
-                    Property.ObjectProperty,
-                    Property.StringProperty {
+    public abstract static sealed class ValueProperty<V, P extends ValueProperty<V, P>> extends
+        Property<P>permits Property.ArrayProperty,Property.BooleanProperty,Property.DateProperty,Property.DateTimeProperty,Property.IntegerProperty,Property.NumberProperty,Property.ObjectProperty,Property.StringProperty {
 
         protected V defaultValue;
         protected V exampleValue;
@@ -204,8 +198,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("ARRAY")
     @Schema(name = "ArrayProperty", description = "An array property type.")
-    public static sealed class ArrayProperty extends ValueProperty<Object[], ArrayProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableArrayProperty {
+    public static sealed class ArrayProperty
+        extends ValueProperty<Object[], ArrayProperty>permits DefinitionDSL.ModifiableProperty.ModifiableArrayProperty {
 
         protected List<Property<?>> items;
 
@@ -221,8 +215,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("BOOLEAN")
     @Schema(name = "BooleanProperty", description = "A boolean property type.")
-    public static sealed class BooleanProperty extends ValueProperty<Boolean, BooleanProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty {
+    public static sealed class BooleanProperty extends
+        ValueProperty<Boolean, BooleanProperty>permits DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty {
 
         protected BooleanProperty(String name) {
             super(name, Type.BOOLEAN);
@@ -231,8 +225,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("DATE")
     @Schema(name = "DateProperty", description = "A date property type.")
-    public static sealed class DateProperty extends ValueProperty<LocalDate, DateProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableDateProperty {
+    public static sealed class DateProperty
+        extends ValueProperty<LocalDate, DateProperty>permits DefinitionDSL.ModifiableProperty.ModifiableDateProperty {
 
         protected DateProperty(String name) {
             super(name, Type.DATE);
@@ -241,8 +235,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("DATE_TIME")
     @Schema(name = "DateTimeProperty", description = "A date-time property type.")
-    public static sealed class DateTimeProperty extends ValueProperty<LocalDateTime, DateTimeProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty {
+    public static sealed class DateTimeProperty extends
+        ValueProperty<LocalDateTime, DateTimeProperty>permits DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty {
 
         protected DateTimeProperty(String name) {
             super(name, Type.DATE_TIME);
@@ -260,8 +254,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("NUMBER")
     @Schema(name = "NumberProperty", description = "A number property type.")
-    public static sealed class NumberProperty extends ValueProperty<Double, NumberProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableNumberProperty {
+    public static sealed class NumberProperty
+        extends ValueProperty<Double, NumberProperty>permits DefinitionDSL.ModifiableProperty.ModifiableNumberProperty {
 
         protected Integer maxValue;
         protected Integer minValue;
@@ -289,8 +283,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("INTEGER")
     @Schema(name = "IntegerProperty", description = "An integer property type.")
-    public static sealed class IntegerProperty extends ValueProperty<Integer, IntegerProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty {
+    public static sealed class IntegerProperty extends
+        ValueProperty<Integer, IntegerProperty>permits DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty {
 
         protected Integer maxValue;
         protected Integer minValue;
@@ -312,8 +306,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("OBJECT")
     @Schema(name = "ObjectProperty", description = "An object property type.")
-    public static sealed class ObjectProperty extends ValueProperty<Object, ObjectProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableObjectProperty {
+    public static sealed class ObjectProperty
+        extends ValueProperty<Object, ObjectProperty>permits DefinitionDSL.ModifiableProperty.ModifiableObjectProperty {
 
         protected List<Property<?>> additionalProperties;
         protected String objectType;
@@ -341,8 +335,8 @@ public sealed class Property<P extends Property<P>>
 
     @JsonTypeName("STRING")
     @Schema(name = "StringProperty", description = "A string property.")
-    public static sealed class StringProperty extends ValueProperty<String, StringProperty>
-            permits DefinitionDSL.ModifiableProperty.ModifiableStringProperty {
+    public static sealed class StringProperty
+        extends ValueProperty<String, StringProperty>permits DefinitionDSL.ModifiableProperty.ModifiableStringProperty {
 
         protected ControlType controlType;
 
@@ -355,3 +349,4 @@ public sealed class Property<P extends Property<P>>
         }
     }
 }
+// CHECKSTYLE:ON

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -29,9 +30,9 @@ import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 public class PostgreSQLJdbcComponentDefinitionFactory implements JdbcComponentDefinitionFactory {
 
     private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(POSTGRESQL)
-            .display(display("PostgreSQL").description("Query, insert nd update data from PostgreSQL."))
-            .databaseJdbcName("postgresql")
-            .jdbcDriverClassName("org.postgresql.Driver");
+        .display(display("PostgreSQL").description("Query, insert nd update data from PostgreSQL."))
+        .databaseJdbcName("postgresql")
+        .jdbcDriverClassName("org.postgresql.Driver");
 
     @Override
     public JdbcComponentDefinition getJdbcComponentDefinition() {

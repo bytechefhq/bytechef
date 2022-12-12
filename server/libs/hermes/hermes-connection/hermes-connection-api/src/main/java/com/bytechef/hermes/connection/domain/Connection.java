@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -208,16 +209,16 @@ public final class Connection implements Persistable<String> {
     @Override
     public String toString() {
         return "Connection{" + "authorizationName='"
-                + authorizationName + '\'' + ", componentName='"
-                + componentName + '\'' + ", componentVersion="
-                + componentVersion + ", createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", id='"
-                + id + '\'' + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", name='"
-                + name + '\'' + ", parameters="
-                + parameters + ", version="
-                + version + '}';
+            + authorizationName + '\'' + ", componentName='"
+            + componentName + '\'' + ", componentVersion="
+            + componentVersion + ", createdBy='"
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", id='"
+            + id + '\'' + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", name='"
+            + name + '\'' + ", parameters="
+            + parameters + ", version="
+            + version + '}';
     }
 }

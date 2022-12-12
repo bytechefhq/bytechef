@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -77,7 +78,7 @@ public class WorkerConfiguration {
     @Bean
     TaskHandlerResolver taskDispatcherAdapterTaskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
         return new TaskDispatcherAdapterTaskHandlerResolver(
-                taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolver, taskEvaluator);
+            taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolver, taskEvaluator);
     }
 
     @Bean
@@ -86,8 +87,8 @@ public class WorkerConfiguration {
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(List.of(
-                taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-                defaultTaskHandlerResolver(taskHandlers)));
+            taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
+            defaultTaskHandlerResolver(taskHandlers)));
 
         return taskHandlerResolverChain;
     }
@@ -95,10 +96,10 @@ public class WorkerConfiguration {
     @Bean
     Worker worker(TaskHandlerResolver taskHandlerResolver, MessageBroker messageBroker, EventPublisher eventPublisher) {
         return Worker.builder()
-                .withTaskHandlerResolver(taskHandlerResolver)
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(eventPublisher)
-                .withTaskEvaluator(taskEvaluator)
-                .build();
+            .withTaskHandlerResolver(taskHandlerResolver)
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(eventPublisher)
+            .withTaskEvaluator(taskEvaluator)
+            .build();
     }
 }

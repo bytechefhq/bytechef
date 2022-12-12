@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -35,9 +36,13 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {"com.bytechef.atlas.repository.jdbc"})
+@ComponentScan(basePackages = {
+    "com.bytechef.atlas.repository.jdbc"
+})
 @EnableAutoConfiguration
-@Import({WorkflowRepositoryConfiguration.class})
+@Import({
+    WorkflowRepositoryConfiguration.class
+})
 @SpringBootConfiguration
 public class WorkflowRepositoryIntTestConfiguration {
 
@@ -48,7 +53,8 @@ public class WorkflowRepositoryIntTestConfiguration {
 
     @EnableCaching
     @TestConfiguration
-    public static class CacheConfiguration {}
+    public static class CacheConfiguration {
+    }
 
     @EnableJdbcAuditing
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")

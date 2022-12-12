@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,15 +32,20 @@ import org.graalvm.polyglot.proxy.ProxyObject;
  */
 public class PolyglotEngine {
 
-    private static final Engine engine = Engine.newBuilder().build();
+    private static final Engine engine = Engine.newBuilder()
+        .build();
 
     public Object execute(String languageId, ExecutionParameters executionParameters) {
-        try (Context polyglotContext =
-                Context.newBuilder().engine(engine).allowAllAccess(true).build()) {
+        try (Context polyglotContext = Context.newBuilder()
+            .engine(engine)
+            .allowAllAccess(true)
+            .build()) {
             polyglotContext.eval(languageId, executionParameters.getString(SCRIPT));
 
-            Function<ProxyObject, Object> performFunction =
-                    polyglotContext.getBindings(languageId).getMember("perform").as(new TypeLiteral<>() {});
+            Function<ProxyObject, Object> performFunction = polyglotContext.getBindings(languageId)
+                .getMember("perform")
+                .as(new TypeLiteral<>() {
+                });
 
             return performFunction.apply(ProxyObject.fromMap(executionParameters.getMap(INPUT)));
         }

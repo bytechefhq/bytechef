@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -68,16 +69,16 @@ public class DeleteJdbcActionIntTest {
         jdbcTemplate = new JdbcTemplate(dataSource);
 
         jdbcTemplate.execute(
-                """
-            CREATE TABLE test (
-                id   varchar(256) not null primary key,
-                name varchar(256) not null
-            );
-            INSERT INTO test VALUES('id1', 'name1');
-            INSERT INTO test VALUES('id2', 'name2');
-            INSERT INTO test VALUES('id3', 'name3');
-            INSERT INTO test VALUES('id4', 'name4');
-        """);
+            """
+                    CREATE TABLE test (
+                        id   varchar(256) not null primary key,
+                        name varchar(256) not null
+                    );
+                    INSERT INTO test VALUES('id1', 'name1');
+                    INSERT INTO test VALUES('id2', 'name2');
+                    INSERT INTO test VALUES('id3', 'name3');
+                    INSERT INTO test VALUES('id4', 'name4');
+                """);
     }
 
     @Test
@@ -85,10 +86,13 @@ public class DeleteJdbcActionIntTest {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getList(ROWS, Map.class, List.of()))
-                .thenReturn(List.of(Map.of("id", "id1"), Map.of("id", "id2")));
-        Mockito.when(executionParameters.getString(DELETE_KEY, "id")).thenReturn("id");
-        Mockito.when(executionParameters.getString(SCHEMA, "public")).thenReturn("public");
-        Mockito.when(executionParameters.getRequiredString(TABLE)).thenReturn("test");
+            .thenReturn(List.of(Map.of("id", "id1"), Map.of("id", "id2")));
+        Mockito.when(executionParameters.getString(DELETE_KEY, "id"))
+            .thenReturn("id");
+        Mockito.when(executionParameters.getString(SCHEMA, "public"))
+            .thenReturn("public");
+        Mockito.when(executionParameters.getRequiredString(TABLE))
+            .thenReturn("test");
 
         Map<String, Integer> result = deleteJdbcOperation.execute(Mockito.mock(Context.class), executionParameters);
 
@@ -104,15 +108,15 @@ public class DeleteJdbcActionIntTest {
         @Bean
         DeleteJdbcOperation deleteJdbcOperation() {
             return new DeleteJdbcOperation(new JdbcExecutor(
-                    null,
-                    new DataSourceFactory() {
-                        @Override
-                        public DataSource getDataSource(
-                                Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
-                            return dataSource;
-                        }
-                    },
-                    null));
+                null,
+                new DataSourceFactory() {
+                    @Override
+                    public DataSource getDataSource(
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        return dataSource;
+                    }
+                },
+                null));
         }
     }
 }

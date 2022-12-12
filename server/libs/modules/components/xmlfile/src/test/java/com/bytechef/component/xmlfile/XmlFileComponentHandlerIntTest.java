@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -51,59 +52,59 @@ public class XmlFileComponentHandlerIntTest {
         File sampleFile = getFile("sample.xml");
 
         Job job = workflowExecutor.execute(
-                "xmlfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getAbsolutePath(),
-                                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                                .toMap()));
+            "xmlfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getAbsolutePath(),
+                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-                .isEqualTo(XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class));
+            .isEqualTo(XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class));
     }
 
     @Test
     public void testWrite() throws IOException {
         Job job = workflowExecutor.execute(
-                "xmlfile_v1_write",
-                Map.of(
-                        "source",
-                        XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class)));
+            "xmlfile_v1_write",
+            Map.of(
+                "source",
+                XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class)));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertThat(((Map) outputs.get("writeXMLFile")).get(WorkflowConstants.NAME))
-                .isEqualTo("file.xml");
+            .isEqualTo("file.xml");
 
         File sampleFile = getFile("sample.xml");
 
         job = workflowExecutor.execute(
-                "xmlfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                                .toMap()));
+            "xmlfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-                .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, StandardCharsets.UTF_8), List.class));
+            .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, StandardCharsets.UTF_8), List.class));
     }
 
     private File getFile(String filename) {
         return new File(XmlFileComponentHandlerIntTest.class
-                .getClassLoader()
-                .getResource("dependencies/" + filename)
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/" + filename)
+            .getFile());
     }
 }

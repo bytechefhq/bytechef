@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -61,11 +62,11 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private final TaskExecutionService taskExecutionService;
 
     public SwitchTaskDispatcher(
-            ContextService contextService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService,
-            TaskEvaluator taskEvaluator) {
+        ContextService contextService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService,
+        TaskEvaluator taskEvaluator) {
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
@@ -85,18 +86,18 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         Map<String, Object> selectedCase = resolveCase(taskExecution);
 
         if (selectedCase.containsKey(TASKS)) {
-            List<WorkflowTask> subWorkflowTasks =
-                    MapUtils.getList(selectedCase, TASKS, WorkflowTask.class, Collections.emptyList());
+            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(selectedCase, TASKS, WorkflowTask.class,
+                Collections.emptyList());
 
             if (!subWorkflowTasks.isEmpty()) {
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
                 TaskExecution subTaskExecution = new TaskExecution(
-                        subWorkflowTask,
-                        switchTaskExecution.getJobId(),
-                        switchTaskExecution.getId(),
-                        switchTaskExecution.getPriority(),
-                        1);
+                    subWorkflowTask,
+                    switchTaskExecution.getJobId(),
+                    switchTaskExecution.getId(),
+                    switchTaskExecution.getPriority(),
+                    1);
 
                 Context context = new Context(contextService.peek(switchTaskExecution.getId()));
 
@@ -131,7 +132,8 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(SWITCH + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(SWITCH + "/v" + VERSION_1)) {
             return this;
         }
 
@@ -140,8 +142,9 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     private Map<String, Object> resolveCase(TaskExecution taskExecution) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases =
-                MapUtils.getList(taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
+        List<Map<String, Object>> cases = MapUtils.getList(taskExecution.getParameters(), CASES,
+            new ParameterizedTypeReference<>() {
+            });
 
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
 

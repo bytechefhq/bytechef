@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -54,14 +55,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The class responsible for executing tasks spawned by the {@link
- * com.bytechef.atlas.coordinator.Coordinator}.
+ * The class responsible for executing tasks spawned by the {@link com.bytechef.atlas.coordinator.Coordinator}.
  *
- * <p>Worker threads typically execute on a different process than the {@link
- * com.bytechef.atlas.coordinator.Coordinator} process and most likely on a seperate node
- * altogether.
+ * <p>
+ * Worker threads typically execute on a different process than the {@link com.bytechef.atlas.coordinator.Coordinator}
+ * process and most likely on a seperate node altogether.
  *
- * <p>Communication between the two is decoupled through the {@link MessageBroker} interface.
+ * <p>
+ * Communication between the two is decoupled through the {@link MessageBroker} interface.
  *
  * @author Arik Cohen
  * @since Jun 12, 2016
@@ -89,8 +90,7 @@ public class Worker {
     }
 
     /**
-     * Handle the execution of a {@link TaskExecution}. Implementors are expected to execute the
-     * task asynchronously.
+     * Handle the execution of a {@link TaskExecution}. Implementors are expected to execute the task asynchronously.
      *
      * @param taskExecution The task to execute.
      * @throws InterruptedException
@@ -102,7 +102,7 @@ public class Worker {
         Future<?> future = executors.submit(() -> {
             try {
                 eventPublisher.publishEvent(
-                        new TaskStartedWorkflowEvent(taskExecution.getJobId(), taskExecution.getId()));
+                    new TaskStartedWorkflowEvent(taskExecution.getJobId(), taskExecution.getId()));
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
@@ -140,8 +140,8 @@ public class Worker {
     }
 
     /**
-     * Handle control tasks. Control tasks are used by the Coordinator to control Worker instances.
-     * For example, to stop an ongoing task or to adjust something on a worker outside the context of a job.
+     * Handle control tasks. Control tasks are used by the Coordinator to control Worker instances. For example, to stop
+     * an ongoing task or to adjust something on a worker outside the context of a job.
      */
     public void handle(ControlTask controlTask) {
         logger.debug("received control task: {}", controlTask);
@@ -201,7 +201,7 @@ public class Worker {
     }
 
     private void executeSubTasks(TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Context context)
-            throws Exception {
+        throws Exception {
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
             TaskExecution subTaskExecution = new TaskExecution(subWorkflowTask, taskExecution.getJobId());
 
@@ -221,7 +221,7 @@ public class Worker {
         TaskExecution updatedTaskExecution = new TaskExecution(taskExecution);
 
         updatedTaskExecution.setError(
-                new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+            new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         updatedTaskExecution.setStatus(TaskStatus.FAILED);
 
         messageBroker.send(Queues.ERRORS, updatedTaskExecution);
@@ -229,7 +229,8 @@ public class Worker {
 
     private long calculateTimeout(TaskExecution taskExecution) {
         if (taskExecution.getTimeout() != null) {
-            return Duration.parse("PT" + taskExecution.getTimeout()).toMillis();
+            return Duration.parse("PT" + taskExecution.getTimeout())
+                .toMillis();
         }
 
         return DEFAULT_TIME_OUT;

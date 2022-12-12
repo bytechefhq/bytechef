@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -54,63 +55,63 @@ public class JsonFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_array.json");
 
         Job job = workflowExecutor.execute(
-                "jsonfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getAbsolutePath(),
-                                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                                .toMap()));
+            "jsonfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getAbsolutePath(),
+                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
-                new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readJSONFile")),
-                true);
+            new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readJSONFile")),
+            true);
     }
 
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = workflowExecutor.execute(
-                "jsonfile_v1_write",
-                Map.of(
-                        "source",
-                        new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)).toList()));
+            "jsonfile_v1_write",
+            Map.of(
+                "source",
+                new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)).toList()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertThat(((Map) outputs.get("writeJSONFile")).get(WorkflowConstants.NAME))
-                .isEqualTo("file.json");
+            .isEqualTo("file.json");
 
         File sampleFile = getFile("sample_array.json");
 
         job = workflowExecutor.execute(
-                "jsonfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                                .toMap()));
+            "jsonfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         outputs = job.getOutputs();
 
         assertEquals(
-                new JSONArray(Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readJSONFile")),
-                true);
+            new JSONArray(Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readJSONFile")),
+            true);
     }
 
     private File getFile(String filename) {
         return new File(JsonFileComponentHandlerIntTest.class
-                .getClassLoader()
-                .getResource("dependencies/" + filename)
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/" + filename)
+            .getFile());
     }
 }

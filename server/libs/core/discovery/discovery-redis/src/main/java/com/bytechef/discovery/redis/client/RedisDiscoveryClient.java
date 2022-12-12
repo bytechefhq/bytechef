@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,21 +54,22 @@ public class RedisDiscoveryClient implements DiscoveryClient {
 
         List<String> range = listOperations.range(serviceId, 0, -1);
 
-        return Objects.requireNonNull(range).parallelStream()
-                .map((Function<String, ServiceInstance>) s -> {
-                    RedisRegistration redisRegistration = new RedisRegistration();
+        return Objects.requireNonNull(range)
+            .parallelStream()
+            .map((Function<String, ServiceInstance>) s -> {
+                RedisRegistration redisRegistration = new RedisRegistration();
 
-                    redisRegistration.setApplicationName(serviceId);
+                redisRegistration.setApplicationName(serviceId);
 
-                    String hostName = Objects.requireNonNull(StringUtils.split(s, ":"))[0];
-                    String port = Objects.requireNonNull(StringUtils.split(s, ":"))[1];
+                String hostName = Objects.requireNonNull(StringUtils.split(s, ":"))[0];
+                String port = Objects.requireNonNull(StringUtils.split(s, ":"))[1];
 
-                    redisRegistration.setHost(hostName);
-                    redisRegistration.setPort(Integer.parseInt(port));
+                redisRegistration.setHost(hostName);
+                redisRegistration.setPort(Integer.parseInt(port));
 
-                    return redisRegistration;
-                })
-                .collect(Collectors.toList());
+                return redisRegistration;
+            })
+            .collect(Collectors.toList());
     }
 
     @Override

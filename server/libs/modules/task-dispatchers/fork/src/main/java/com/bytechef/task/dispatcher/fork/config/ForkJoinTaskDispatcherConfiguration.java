@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -51,17 +52,17 @@ public class ForkJoinTaskDispatcherConfiguration {
     @Bean("forkJoinTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-                taskExecutionService,
-                taskCompletionHandler,
-                counterService,
-                taskDispatcher,
-                contextService,
-                taskEvaluator);
+            taskExecutionService,
+            taskCompletionHandler,
+            counterService,
+            taskDispatcher,
+            contextService,
+            taskEvaluator);
     }
 
     @Bean("forkJoinTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory forkTaskDispatcherFactory() {
         return (taskDispatcher) -> new ForkJoinTaskDispatcher(
-                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
     }
 }

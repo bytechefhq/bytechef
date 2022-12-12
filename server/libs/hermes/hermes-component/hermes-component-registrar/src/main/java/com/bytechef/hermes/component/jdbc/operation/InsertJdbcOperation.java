@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -45,20 +46,23 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String table = executionParameters.getRequiredString(JdbcConstants.TABLE);
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-                context.getConnectionParameters(),
-                "INSERT INTO "
-                        + schema
-                        + "."
-                        + table
-                        + " ("
-                        + String.join(",", columns)
-                        + ") VALUES( "
-                        + String.join(
-                                ",",
-                                columns.stream().map(column -> ":" + column).toList())
-                        + ")",
-                SqlParameterSourceUtils.createBatch(rows.toArray()));
+            context.getConnectionParameters(),
+            "INSERT INTO "
+                + schema
+                + "."
+                + table
+                + " ("
+                + String.join(",", columns)
+                + ") VALUES( "
+                + String.join(
+                    ",",
+                    columns.stream()
+                        .map(column -> ":" + column)
+                        .toList())
+                + ")",
+            SqlParameterSourceUtils.createBatch(rows.toArray()));
 
-        return Map.of("rows", Arrays.stream(rowsAffected).sum());
+        return Map.of("rows", Arrays.stream(rowsAffected)
+            .sum());
     }
 }

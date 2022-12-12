@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -38,11 +39,11 @@ public class DataSourceFactory {
         Assert.notNull(jdbcDriverClassName, "jdbcDriverClassName cannot be null");
 
         String url = "jdbc:" + databaseJdbcName + "://"
-                + connection.getParameter(JdbcConstants.HOST)
-                + ":"
-                + connection.getParameter(JdbcConstants.PORT)
-                + "/"
-                + connection.getParameter(JdbcConstants.DATABASE);
+            + connection.getParameter(JdbcConstants.HOST)
+            + ":"
+            + connection.getParameter(JdbcConstants.PORT)
+            + "/"
+            + connection.getParameter(JdbcConstants.DATABASE);
         String username = connection.getParameter(JdbcConstants.USERNAME);
 
         return dataSourceMap.computeIfAbsent(url + username, key -> {

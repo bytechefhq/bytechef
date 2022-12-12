@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -65,8 +66,9 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
 
     private Workflow readWorkflowDefinition(Workflow workflow) {
         return workflowMapper.readValue(new WorkflowResource(
-                workflow.getId(),
-                new ByteArrayResource(workflow.getDefinition().getBytes(StandardCharsets.UTF_8)),
-                workflow.getFormat()));
+            workflow.getId(),
+            new ByteArrayResource(workflow.getDefinition()
+                .getBytes(StandardCharsets.UTF_8)),
+            workflow.getFormat()));
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -49,13 +50,15 @@ public class PostgreSqlTestContainer implements InitializingBean, DisposableBean
     public void afterPropertiesSet() {
         if (null == postgreSQLContainer) {
             postgreSQLContainer = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14-alpine"))
-                    .withCreateContainerCmdModifier(
-                            cmd -> cmd.getHostConfig().withMemory(memoryInBytes).withMemorySwap(memorySwapInBytes))
-                    .withDatabaseName("bytechef")
-                    .withLogConsumer(new Slf4jLogConsumer(log))
-                    .withPrivilegedMode(true)
-                    .withReuse(true)
-                    .withTmpFs(Collections.singletonMap("/testtmpfs", "rw"));
+                .withCreateContainerCmdModifier(
+                    cmd -> cmd.getHostConfig()
+                        .withMemory(memoryInBytes)
+                        .withMemorySwap(memorySwapInBytes))
+                .withDatabaseName("bytechef")
+                .withLogConsumer(new Slf4jLogConsumer(log))
+                .withPrivilegedMode(true)
+                .withReuse(true)
+                .withTmpFs(Collections.singletonMap("/testtmpfs", "rw"));
         }
 
         if (!postgreSQLContainer.isRunning()) {

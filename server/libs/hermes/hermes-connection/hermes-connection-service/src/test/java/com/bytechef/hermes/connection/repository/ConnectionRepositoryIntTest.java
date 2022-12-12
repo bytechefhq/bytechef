@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -41,7 +42,8 @@ public class ConnectionRepositoryIntTest {
         Connection connection = connectionRepository.save(getConnection());
 
         Assertions.assertEquals(
-                connection, connectionRepository.findById(connection.getId()).get());
+            connection, connectionRepository.findById(connection.getId())
+                .get());
     }
 
     @Test
@@ -49,11 +51,13 @@ public class ConnectionRepositoryIntTest {
         Connection connection = connectionRepository.save(getConnection());
 
         Assertions.assertEquals(
-                connection, connectionRepository.findById(connection.getId()).orElseThrow());
+            connection, connectionRepository.findById(connection.getId())
+                .orElseThrow());
 
         connectionRepository.deleteById(connection.getId());
 
-        Assertions.assertFalse(connectionRepository.findById(connection.getId()).isPresent());
+        Assertions.assertFalse(connectionRepository.findById(connection.getId())
+            .isPresent());
     }
 
     @Test
@@ -61,9 +65,10 @@ public class ConnectionRepositoryIntTest {
         connectionRepository.save(getConnection());
 
         Assertions.assertEquals(
-                1,
-                StreamSupport.stream(connectionRepository.findAll().spliterator(), false)
-                        .count());
+            1,
+            StreamSupport.stream(connectionRepository.findAll()
+                .spliterator(), false)
+                .count());
     }
 
     @Test
@@ -71,7 +76,8 @@ public class ConnectionRepositoryIntTest {
         Connection connection = connectionRepository.save(getConnection());
 
         Assertions.assertEquals(
-                connection, connectionRepository.findById(connection.getId()).get());
+            connection, connectionRepository.findById(connection.getId())
+                .get());
     }
 
     @Test
@@ -83,8 +89,8 @@ public class ConnectionRepositoryIntTest {
 
         connectionRepository.save(connection);
 
-        Connection updatedConnection =
-                connectionRepository.findById(connection.getId()).get();
+        Connection updatedConnection = connectionRepository.findById(connection.getId())
+            .get();
 
         Assertions.assertEquals("name2", updatedConnection.getName());
         Assertions.assertEquals(Map.of("key2", "value2"), updatedConnection.getParameters());

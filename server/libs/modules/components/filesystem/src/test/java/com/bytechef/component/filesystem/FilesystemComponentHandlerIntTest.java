@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -54,14 +55,14 @@ public class FilesystemComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry =
-                fileStorageService.storeFileContent("sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
+        FileEntry fileEntry = fileStorageService.storeFileContent("sample.txt",
+            Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
         assertThat(outputs.get("readLocalFile"))
-                .hasFieldOrPropertyWithValue("extension", "txt")
-                .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-                .hasFieldOrPropertyWithValue("name", "sample.txt")
-                .hasFieldOrPropertyWithValue("url", fileEntry.getUrl());
+            .hasFieldOrPropertyWithValue("extension", "txt")
+            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
+            .hasFieldOrPropertyWithValue("name", "sample.txt")
+            .hasFieldOrPropertyWithValue("url", fileEntry.getUrl());
     }
 
     @Test
@@ -70,16 +71,16 @@ public class FilesystemComponentHandlerIntTest {
         File tempFile = Files.newTemporaryFile();
 
         Job job = workflowExecutor.execute(
-                "filesystem_v1_writeFile",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getAbsolutePath(),
-                                        Files.contentOf(getFile(), StandardCharsets.UTF_8))
-                                .toMap(),
-                        "filename",
-                        tempFile.getAbsolutePath()));
+            "filesystem_v1_writeFile",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getAbsolutePath(),
+                        Files.contentOf(getFile(), StandardCharsets.UTF_8))
+                    .toMap(),
+                "filename",
+                tempFile.getAbsolutePath()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -90,8 +91,8 @@ public class FilesystemComponentHandlerIntTest {
 
     private File getFile() throws IOException {
         return new File(FilesystemComponentHandlerIntTest.class
-                .getClassLoader()
-                .getResource("dependencies/sample.txt")
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/sample.txt")
+            .getFile());
     }
 }

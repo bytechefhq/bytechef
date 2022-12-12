@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -35,7 +36,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {"com.bytechef.hermes.connection"})
+@ComponentScan(basePackages = {
+    "com.bytechef.hermes.connection"
+})
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class ConnectionIntTestConfiguration {
@@ -47,7 +50,8 @@ public class ConnectionIntTestConfiguration {
 
     @EnableCaching
     @TestConfiguration
-    public static class CacheConfiguration {}
+    public static class CacheConfiguration {
+    }
 
     @TestConfiguration
     public static class EncryptionIntTestConfiguration {

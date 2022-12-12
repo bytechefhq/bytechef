@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -57,23 +58,24 @@ public class HttpClientUtilsTest {
     @Test
     public void testCreateBodyHandler() {
         HttpResponse.BodyHandler<?> bodyHandler = httpClient.createBodyHandler(
-                HttpClientUtils.Configuration.builder().build());
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.discarding());
 
         //
 
         bodyHandler = httpClient.createBodyHandler(HttpClientUtils.Configuration.builder()
-                .responseFormat(HttpClientUtils.ResponseFormat.FILE)
-                .build());
+            .responseFormat(HttpClientUtils.ResponseFormat.FILE)
+            .build());
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofInputStream());
 
         //
 
         bodyHandler = httpClient.createBodyHandler(HttpClientUtils.Configuration.builder()
-                .responseFormat(HttpClientUtils.ResponseFormat.XML)
-                .build());
+            .responseFormat(HttpClientUtils.ResponseFormat.XML)
+            .build());
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofString());
     }
@@ -82,71 +84,85 @@ public class HttpClientUtilsTest {
     public void testCreateBodyPublisher() {
         FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
-        Mockito.when(fileEntry.getName()).thenReturn("fileName");
-        Mockito.when(fileEntry.getExtension()).thenReturn("txt");
-        Mockito.when(fileEntry.getMimeType()).thenReturn("text/plain");
+        Mockito.when(fileEntry.getName())
+            .thenReturn("fileName");
+        Mockito.when(fileEntry.getExtension())
+            .thenReturn("txt");
+        Mockito.when(fileEntry.getMimeType())
+            .thenReturn("text/plain");
 
         MultipartBodyPublisher multipartBodyPublisher = (MultipartBodyPublisher) httpClient.createBodyPublisher(
-                context,
-                HttpClientUtils.Payload.of(
-                        Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            HttpClientUtils.Payload.of(
+                Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
-        Assertions.assertTrue(multipartBodyPublisher.mediaType().toString().startsWith("multipart/form-data"));
+        Assertions.assertTrue(multipartBodyPublisher.mediaType()
+            .toString()
+            .startsWith("multipart/form-data"));
 
-        MimeBodyPublisherAdapter mimeBodyPublisherAdapter =
-                (MimeBodyPublisherAdapter) multipartBodyPublisher.parts().stream()
-                        .map(MultipartBodyPublisher.Part::bodyPublisher)
-                        .filter(bodyPublisher -> bodyPublisher instanceof MimeBodyPublisherAdapter)
-                        .findFirst()
-                        .orElseThrow();
+        MimeBodyPublisherAdapter mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) multipartBodyPublisher.parts()
+            .stream()
+            .map(MultipartBodyPublisher.Part::bodyPublisher)
+            .filter(bodyPublisher -> bodyPublisher instanceof MimeBodyPublisherAdapter)
+            .findFirst()
+            .orElseThrow();
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         FormBodyPublisher formBodyPublisher = (FormBodyPublisher) httpClient.createBodyPublisher(
-                context,
-                HttpClientUtils.Payload.of(
-                        Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URLENCODED),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            HttpClientUtils.Payload.of(
+                Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URLENCODED),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(MediaType.APPLICATION_FORM_URLENCODED, formBodyPublisher.mediaType());
 
-        Assertions.assertTrue(formBodyPublisher.encodedString().contains("key1=value1"));
-        Assertions.assertTrue(formBodyPublisher.encodedString().contains("key2=value2"));
+        Assertions.assertTrue(formBodyPublisher.encodedString()
+            .contains("key1=value1"));
+        Assertions.assertTrue(formBodyPublisher.encodedString()
+            .contains("key2=value2"));
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
-                context,
-                HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.JSON),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.JSON),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(MediaType.APPLICATION_JSON, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
-                context,
-                HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.XML),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.XML),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(MediaType.APPLICATION_XML, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
-                context,
-                HttpClientUtils.Payload.of("text"),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            HttpClientUtils.Payload.of("text"),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
         HttpRequest.BodyPublisher emptyBodyPublisher = httpClient.createBodyPublisher(
-                context,
-                null,
-                HttpClientUtils.Configuration.builder().mimeType("text/html").build());
+            context,
+            null,
+            HttpClientUtils.Configuration.builder()
+                .mimeType("text/html")
+                .build());
 
         Assertions.assertEquals(0, emptyBodyPublisher.contentLength());
 
@@ -154,20 +170,24 @@ public class HttpClientUtilsTest {
 
         fileEntry = Mockito.mock(FileEntry.class);
 
-        Mockito.when(fileEntry.getName()).thenReturn("fileName");
-        Mockito.when(fileEntry.getUrl()).thenReturn("base64:text");
+        Mockito.when(fileEntry.getName())
+            .thenReturn("fileName");
+        Mockito.when(fileEntry.getUrl())
+            .thenReturn("base64:text");
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
-                context,
-                HttpClientUtils.Payload.of(fileEntry),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            HttpClientUtils.Payload.of(fileEntry),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(MediaType.APPLICATION_OCTET_STREAM, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         HttpRequest.BodyPublisher bodyPublisher = httpClient.createBodyPublisher(
-                context, null, HttpClientUtils.Configuration.builder().build());
+            context, null, HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(0, bodyPublisher.contentLength());
     }
@@ -177,40 +197,43 @@ public class HttpClientUtilsTest {
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testCreateHTTPClient() {
         HttpClient httpClient = this.httpClient.createHttpClient(
-                context,
-                Map.of(),
-                Map.of(),
-                HttpClientUtils.Configuration.builder()
-                        .allowUnauthorizedCerts(true)
-                        .build());
+            context,
+            Map.of(),
+            Map.of(),
+            HttpClientUtils.Configuration.builder()
+                .allowUnauthorizedCerts(true)
+                .build());
 
-        Assertions.assertTrue(httpClient.authenticator().isEmpty());
+        Assertions.assertTrue(httpClient.authenticator()
+            .isEmpty());
 
         Assertions.assertNotNull(httpClient.sslContext());
 
         //
 
         Mockito.when(context.getConnectionDefinition())
-                .thenReturn(ComponentDSL.connection()
-                        .authorizations(ComponentDSL.authorization(
-                                Authorization.AuthorizationType.API_KEY.name(),
-                                Authorization.AuthorizationType.API_KEY)));
+            .thenReturn(ComponentDSL.connection()
+                .authorizations(ComponentDSL.authorization(
+                    Authorization.AuthorizationType.API_KEY.name(),
+                    Authorization.AuthorizationType.API_KEY)));
 
         MockConnection connection = new MockConnection();
 
         connection.setAuthorizationName(Authorization.AuthorizationType.API_KEY.name());
         connection.setParameters(
-                Map.of(ComponentConstants.KEY, ComponentConstants.API_TOKEN, ComponentConstants.VALUE, "token_value"));
+            Map.of(ComponentConstants.KEY, ComponentConstants.API_TOKEN, ComponentConstants.VALUE, "token_value"));
 
-        Mockito.when(context.fetchConnectionParameters()).thenReturn(Optional.of(connection));
+        Mockito.when(context.fetchConnectionParameters())
+            .thenReturn(Optional.of(connection));
 
         Map<String, List<String>> headers = new HashMap<>();
 
         this.httpClient.createHttpClient(
-                context,
-                headers,
-                Map.of(),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            headers,
+            Map.of(),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(Map.of(ComponentConstants.API_TOKEN, List.of("token_value")), headers);
 
@@ -218,268 +241,289 @@ public class HttpClientUtilsTest {
 
         connection.setAuthorizationName(Authorization.AuthorizationType.API_KEY.name());
         connection.setParameters(Map.of(
-                ComponentConstants.KEY,
-                ComponentConstants.API_TOKEN,
-                ComponentConstants.VALUE,
-                "token_value",
-                ComponentConstants.ADD_TO,
-                Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()));
+            ComponentConstants.KEY,
+            ComponentConstants.API_TOKEN,
+            ComponentConstants.VALUE,
+            "token_value",
+            ComponentConstants.ADD_TO,
+            Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()));
 
-        Mockito.when(context.fetchConnectionParameters()).thenReturn(Optional.of(connection));
+        Mockito.when(context.fetchConnectionParameters())
+            .thenReturn(Optional.of(connection));
 
         Map<String, List<String>> queryParameters = new HashMap<>();
 
         this.httpClient.createHttpClient(
-                context,
-                Map.of(),
-                queryParameters,
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            Map.of(),
+            queryParameters,
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(Map.of(ComponentConstants.API_TOKEN, List.of("token_value")), queryParameters);
 
         Mockito.when(context.getConnectionDefinition())
-                .thenReturn(ComponentDSL.connection()
-                        .authorizations(ComponentDSL.authorization(
-                                Authorization.AuthorizationType.BASIC_AUTH.name(),
-                                Authorization.AuthorizationType.BASIC_AUTH)));
+            .thenReturn(ComponentDSL.connection()
+                .authorizations(ComponentDSL.authorization(
+                    Authorization.AuthorizationType.BASIC_AUTH.name(),
+                    Authorization.AuthorizationType.BASIC_AUTH)));
 
         connection = new MockConnection();
 
         connection.setAuthorizationName(Authorization.AuthorizationType.BASIC_AUTH.name());
         connection.setParameters(
-                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
+            Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
 
-        Mockito.when(context.fetchConnectionParameters()).thenReturn(Optional.of(connection));
+        Mockito.when(context.fetchConnectionParameters())
+            .thenReturn(Optional.of(connection));
 
         httpClient = this.httpClient.createHttpClient(
-                context,
-                Map.of(),
-                Map.of(),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            Map.of(),
+            Map.of(),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         PasswordAuthentication passwordAuthentication = httpClient
-                .authenticator()
-                .get()
-                .requestPasswordAuthenticationInstance(null, null, 0, null, null, null, null, null);
+            .authenticator()
+            .get()
+            .requestPasswordAuthenticationInstance(null, null, 0, null, null, null, null, null);
 
         Assertions.assertArrayEquals(passwordAuthentication.getPassword(), "password".toCharArray());
         Assertions.assertEquals(passwordAuthentication.getUserName(), "username");
 
         Mockito.when(context.getConnectionDefinition())
-                .thenReturn(ComponentDSL.connection()
-                        .authorizations(ComponentDSL.authorization(
-                                Authorization.AuthorizationType.BEARER_TOKEN.name(),
-                                Authorization.AuthorizationType.BEARER_TOKEN)));
+            .thenReturn(ComponentDSL.connection()
+                .authorizations(ComponentDSL.authorization(
+                    Authorization.AuthorizationType.BEARER_TOKEN.name(),
+                    Authorization.AuthorizationType.BEARER_TOKEN)));
 
         connection = new MockConnection();
 
         connection.setAuthorizationName(Authorization.AuthorizationType.BEARER_TOKEN.name());
         connection.setParameters(Map.of(ComponentConstants.TOKEN, "token"));
 
-        Mockito.when(context.fetchConnectionParameters()).thenReturn(Optional.of(connection));
+        Mockito.when(context.fetchConnectionParameters())
+            .thenReturn(Optional.of(connection));
 
         headers = new HashMap<>();
 
         this.httpClient.createHttpClient(
-                context,
-                headers,
-                Map.of(),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            headers,
+            Map.of(),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
         Mockito.when(context.getConnectionDefinition())
-                .thenReturn(ComponentDSL.connection()
-                        .authorizations(ComponentDSL.authorization(
-                                Authorization.AuthorizationType.DIGEST_AUTH.name(),
-                                Authorization.AuthorizationType.DIGEST_AUTH)));
+            .thenReturn(ComponentDSL.connection()
+                .authorizations(ComponentDSL.authorization(
+                    Authorization.AuthorizationType.DIGEST_AUTH.name(),
+                    Authorization.AuthorizationType.DIGEST_AUTH)));
 
         connection = new MockConnection();
 
         connection.setAuthorizationName(Authorization.AuthorizationType.DIGEST_AUTH.name());
         connection.setParameters(
-                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
+            Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
 
-        Mockito.when(context.fetchConnectionParameters()).thenReturn(Optional.of(connection));
+        Mockito.when(context.fetchConnectionParameters())
+            .thenReturn(Optional.of(connection));
 
         httpClient = this.httpClient.createHttpClient(
-                context,
-                Map.of(),
-                Map.of(),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            Map.of(),
+            Map.of(),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         passwordAuthentication = httpClient
-                .authenticator()
-                .get()
-                .requestPasswordAuthenticationInstance(null, null, 0, null, null, null, null, null);
+            .authenticator()
+            .get()
+            .requestPasswordAuthenticationInstance(null, null, 0, null, null, null, null, null);
 
         Assertions.assertArrayEquals(passwordAuthentication.getPassword(), "password".toCharArray());
         Assertions.assertEquals(passwordAuthentication.getUserName(), "username");
 
         Mockito.when(context.getConnectionDefinition())
-                .thenReturn(ComponentDSL.connection()
-                        .authorizations(ComponentDSL.authorization(
-                                Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name(),
-                                Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)));
+            .thenReturn(ComponentDSL.connection()
+                .authorizations(ComponentDSL.authorization(
+                    Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name(),
+                    Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)));
 
         connection = new MockConnection();
 
         connection.setAuthorizationName(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name());
         connection.setParameters(Map.of(ComponentConstants.ACCESS_TOKEN, "access_token"));
 
-        Mockito.when(context.fetchConnectionParameters()).thenReturn(Optional.of(connection));
+        Mockito.when(context.fetchConnectionParameters())
+            .thenReturn(Optional.of(connection));
 
         headers = new HashMap<>();
 
         this.httpClient.createHttpClient(
-                context,
-                headers,
-                Map.of(),
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            headers,
+            Map.of(),
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
         //
 
         httpClient = this.httpClient.createHttpClient(
-                context,
-                new HashMap<>(),
-                new HashMap<>(),
-                HttpClientUtils.Configuration.builder().followRedirect(true).build());
+            context,
+            new HashMap<>(),
+            new HashMap<>(),
+            HttpClientUtils.Configuration.builder()
+                .followRedirect(true)
+                .build());
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
         httpClient = this.httpClient.createHttpClient(
-                context,
-                new HashMap<>(),
-                new HashMap<>(),
-                HttpClientUtils.Configuration.builder().followAllRedirects(true).build());
+            context,
+            new HashMap<>(),
+            new HashMap<>(),
+            HttpClientUtils.Configuration.builder()
+                .followAllRedirects(true)
+                .build());
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
         httpClient = this.httpClient.createHttpClient(
-                context,
-                new HashMap<>(),
-                new HashMap<>(),
-                HttpClientUtils.Configuration.builder().proxy("10.11.12.13:30").build());
+            context,
+            new HashMap<>(),
+            new HashMap<>(),
+            HttpClientUtils.Configuration.builder()
+                .proxy("10.11.12.13:30")
+                .build());
 
-        Assertions.assertTrue(httpClient.proxy().isPresent());
+        Assertions.assertTrue(httpClient.proxy()
+            .isPresent());
 
         //
 
         httpClient = this.httpClient.createHttpClient(
-                context,
-                new HashMap<>(),
-                new HashMap<>(),
-                HttpClientUtils.Configuration.builder()
-                        .timeout(Duration.ofMillis(2000))
-                        .build());
+            context,
+            new HashMap<>(),
+            new HashMap<>(),
+            HttpClientUtils.Configuration.builder()
+                .timeout(Duration.ofMillis(2000))
+                .build());
 
         Assertions.assertEquals(
-                Duration.ofMillis(2000), httpClient.connectTimeout().orElseThrow());
+            Duration.ofMillis(2000), httpClient.connectTimeout()
+                .orElseThrow());
     }
 
     @Test
     public void testCreateHTTPRequest() {
         HttpRequest httpRequest = httpClient.createHTTPRequest(
-                context,
-                "http://localhost:8080",
-                HttpClientUtils.RequestMethod.DELETE,
-                Map.of("header1", List.of("value1")),
-                Map.of("param1", List.of("value1")),
-                null,
-                HttpClientUtils.Configuration.builder().build());
+            context,
+            "http://localhost:8080",
+            HttpClientUtils.RequestMethod.DELETE,
+            Map.of("header1", List.of("value1")),
+            Map.of("param1", List.of("value1")),
+            null,
+            HttpClientUtils.Configuration.builder()
+                .build());
 
         Assertions.assertEquals(HttpClientUtils.RequestMethod.DELETE.name(), httpRequest.method());
         Assertions.assertEquals(
-                Map.of("header1", List.of("value1")), httpRequest.headers().map());
+            Map.of("header1", List.of("value1")), httpRequest.headers()
+                .map());
         Assertions.assertEquals(URI.create("http://localhost:8080?param1=value1"), httpRequest.uri());
     }
 
     @Test
     public void testHandleResponse() throws Exception {
         Assertions.assertNull(httpClient.handleResponse(
-                context,
-                new TestHttpResponse(null),
-                HttpClientUtils.Configuration.builder().build()));
+            context,
+            new TestHttpResponse(null),
+            HttpClientUtils.Configuration.builder()
+                .build()));
 
         //
 
         FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
         Mockito.when(context.storeFileContent(Mockito.anyString(), (InputStream) Mockito.any()))
-                .thenReturn(fileEntry);
+            .thenReturn(fileEntry);
 
         Assertions.assertEquals(
-                fileEntry,
-                httpClient.handleResponse(
-                        context,
-                        new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
-                        HttpClientUtils.Configuration.builder()
-                                .responseFormat(HttpClientUtils.ResponseFormat.FILE)
-                                .build()));
+            fileEntry,
+            httpClient.handleResponse(
+                context,
+                new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
+                HttpClientUtils.Configuration.builder()
+                    .responseFormat(HttpClientUtils.ResponseFormat.FILE)
+                    .build()));
 
         //
 
         Assertions.assertEquals(
-                Map.of("key1", "value1"),
-                httpClient.handleResponse(
-                        context,
-                        new TestHttpResponse(
-                                """
-                                {
-                                    "key1": "value1"
-                                }
-                                """),
-                        HttpClientUtils.Configuration.builder()
-                                .responseFormat(HttpClientUtils.ResponseFormat.JSON)
-                                .build()));
+            Map.of("key1", "value1"),
+            httpClient.handleResponse(
+                context,
+                new TestHttpResponse(
+                    """
+                        {
+                            "key1": "value1"
+                        }
+                        """),
+                HttpClientUtils.Configuration.builder()
+                    .responseFormat(HttpClientUtils.ResponseFormat.JSON)
+                    .build()));
 
         //
 
         Assertions.assertEquals(
-                "text",
-                httpClient.handleResponse(
-                        context,
-                        new TestHttpResponse("text"),
-                        HttpClientUtils.Configuration.builder()
-                                .responseFormat(HttpClientUtils.ResponseFormat.TEXT)
-                                .build()));
+            "text",
+            httpClient.handleResponse(
+                context,
+                new TestHttpResponse("text"),
+                HttpClientUtils.Configuration.builder()
+                    .responseFormat(HttpClientUtils.ResponseFormat.TEXT)
+                    .build()));
 
         //
 
         Assertions.assertEquals(
-                Map.of("object", Map.of("key1", "value1")),
-                httpClient.handleResponse(
-                        context,
-                        new TestHttpResponse(
-                                """
-                                <root>
-                                    <object>
-                                        <key1>value1</key1>
-                                    </object>
-                                </root>
+            Map.of("object", Map.of("key1", "value1")),
+            httpClient.handleResponse(
+                context,
+                new TestHttpResponse(
+                    """
+                        <root>
+                            <object>
+                                <key1>value1</key1>
+                            </object>
+                        </root>
 
-                                """),
-                        HttpClientUtils.Configuration.builder()
-                                .responseFormat(HttpClientUtils.ResponseFormat.XML)
-                                .build()));
+                        """),
+                HttpClientUtils.Configuration.builder()
+                    .responseFormat(HttpClientUtils.ResponseFormat.XML)
+                    .build()));
 
         //
 
         Assertions.assertEquals(
-                new HttpClientUtils.HttpResponseEntry("text", Map.of(), 200),
-                httpClient.handleResponse(
-                        context,
-                        new TestHttpResponse("text"),
-                        HttpClientUtils.Configuration.builder()
-                                .fullResponse(true)
-                                .responseFormat(HttpClientUtils.ResponseFormat.TEXT)
-                                .build()));
+            new HttpClientUtils.HttpResponseEntry("text", Map.of(), 200),
+            httpClient.handleResponse(
+                context,
+                new TestHttpResponse("text"),
+                HttpClientUtils.Configuration.builder()
+                    .fullResponse(true)
+                    .responseFormat(HttpClientUtils.ResponseFormat.TEXT)
+                    .build()));
     }
 
     private static class TestHttpResponse implements HttpResponse<Object> {
@@ -542,7 +586,8 @@ public class HttpClientUtilsTest {
         private String name;
         private Map<String, Object> parameters;
 
-        public MockConnection() {}
+        public MockConnection() {
+        }
 
         @Override
         public boolean containsKey(String key) {

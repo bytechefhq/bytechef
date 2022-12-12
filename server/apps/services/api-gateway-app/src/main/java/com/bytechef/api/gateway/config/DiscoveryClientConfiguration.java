@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,4 +25,5 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableDiscoveryClient
-public class DiscoveryClientConfiguration {}
+public class DiscoveryClientConfiguration {
+}

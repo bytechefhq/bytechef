@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -39,5 +40,6 @@ public final class JdbcConstants {
     public static final String PASSWORD = "password";
     public static final String PORT = "port";
 
-    private JdbcConstants() {}
+    private JdbcConstants() {
+    }
 }

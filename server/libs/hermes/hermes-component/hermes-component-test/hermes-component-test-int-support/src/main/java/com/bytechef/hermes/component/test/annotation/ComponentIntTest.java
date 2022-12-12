@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -26,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
-        classes = ComponentTestIntConfiguration.class,
-        properties = "bytechef.workflow.workflow-repository.classpath.enabled=true")
-public @interface ComponentIntTest {}
+    classes = ComponentTestIntConfiguration.class,
+    properties = "bytechef.workflow.workflow-repository.classpath.enabled=true")
+public @interface ComponentIntTest {
+}
