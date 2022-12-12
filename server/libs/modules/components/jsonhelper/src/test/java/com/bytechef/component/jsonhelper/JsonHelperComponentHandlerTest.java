@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.objecthelper;
+package com.bytechef.component.jsonhelper;
 
-import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.SOURCE;
+import static com.bytechef.component.jsonhelper.constants.JsonHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.hermes.component.Context;
@@ -31,15 +31,14 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelperComponentHandlerTest {
+public class JsonHelperComponentHandlerTest {
 
     private static final Context context = Mockito.mock(Context.class);
-    private static final ObjectHelperComponentHandler objectHelperComponentHandler = new ObjectHelperComponentHandler();
+    private static final JsonHelperComponentHandler JSON_HELPER_COMPONENT_HANDLER = new JsonHelperComponentHandler();
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-                "definition/objecthelper_v1.json", new ObjectHelperComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/jsonhelper_v1.json", new JsonHelperComponentHandler().getDefinition());
     }
 
     @Test
@@ -53,7 +52,7 @@ public class ObjectHelperComponentHandlerTest {
             }
             """);
 
-        assertThat(objectHelperComponentHandler.performParse(context, executionParameters))
+        assertThat(JSON_HELPER_COMPONENT_HANDLER.performParse(context, executionParameters))
                 .isEqualTo(Map.of("key", 3));
 
         executionParameters = Mockito.mock(ExecutionParameters.class);
@@ -68,7 +67,7 @@ public class ObjectHelperComponentHandlerTest {
             ]
             """);
 
-        assertThat(objectHelperComponentHandler.performParse(context, executionParameters))
+        assertThat(JSON_HELPER_COMPONENT_HANDLER.performParse(context, executionParameters))
                 .isEqualTo(List.of(Map.of("key", 3)));
     }
 
@@ -80,7 +79,7 @@ public class ObjectHelperComponentHandlerTest {
 
         Mockito.when(executionParameters.getRequired(SOURCE)).thenReturn(Map.of("key", 3));
 
-        assertThat(objectHelperComponentHandler.performStringify(context, executionParameters))
+        assertThat(JSON_HELPER_COMPONENT_HANDLER.performStringify(context, executionParameters))
                 .isEqualTo(JsonUtils.write(input));
     }
 }
