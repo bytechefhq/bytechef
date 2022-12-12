@@ -98,18 +98,12 @@ subprojects {
             ).onlyIfContentMatches(
                 "author\\sArik\\sCohen"
             )
-            palantirJavaFormat()
+            eclipse().configFile("$rootDir/config/eclipse/eclipse-code-formatter-settings.xml")
             removeUnusedImports()
             trimTrailingWhitespace()
             indentWithSpaces(4)
             endWithNewline()
-//            prettier(["prettier": "2.7.1", "prettier-plugin-java": "1.6.2"]).config(["parser": "java", "printWidth": 120, "tabWidth": 4, "useTabs": false])
         }
-//        format "styling", {
-//            target "**/*.json", "**/*.yaml", "**/*.yml"
-//
-//            prettier()
-//        }
     }
 
     check.dependsOn 'spotlessCheck'
