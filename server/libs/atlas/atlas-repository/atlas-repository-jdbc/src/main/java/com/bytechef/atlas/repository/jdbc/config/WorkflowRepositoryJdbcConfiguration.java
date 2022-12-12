@@ -19,8 +19,6 @@ package com.bytechef.atlas.repository.jdbc.config;
 
 import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
@@ -55,8 +53,6 @@ public class WorkflowRepositoryJdbcConfiguration extends AbstractJdbcConfigurati
             new MapListWrapperToStringConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
-            new StringToMapListWrapperConverter(objectMapper),
-            new StringToWorkflowTaskConverter(objectMapper),
-            new WorkflowTaskToStringConverter(objectMapper));
+            new StringToMapListWrapperConverter(objectMapper));
     }
 }
