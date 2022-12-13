@@ -17,9 +17,16 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,11 +141,11 @@ public class DefinitionDSL {
     }
 
     public static Property.NullProperty nullable() {
-        return new Property.NullProperty(null);
+        return new ModifiableProperty.ModifiableNullProperty(null);
     }
 
     public static Property.NullProperty nullable(String name) {
-        return new Property.NullProperty(name);
+        return new ModifiableProperty.ModifiableNullProperty(name);
     }
 
     public static ModifiableProperty.ModifiableNumberProperty number() {
@@ -310,10 +317,17 @@ public class DefinitionDSL {
             .properties(properties);
     }
 
-    public static final class ModifiableDisplay extends Display {
+    public static final class ModifiableDisplay implements Display {
+
+        private String category;
+        private String description;
+        private String icon;
+        private String label;
+        private String subtitle;
+        private String[] tags;
 
         private ModifiableDisplay(String label) {
-            super(label);
+            this.label = label;
         }
 
         public ModifiableDisplay category(String category) {
@@ -345,12 +359,54 @@ public class DefinitionDSL {
 
             return this;
         }
+
+        @Override
+        public String getCategory() {
+            return category;
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public String getIcon() {
+            return icon;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
+
+        @Override
+        public String getSubtitle() {
+            return subtitle;
+        }
+
+        @Override
+        public String[] getTags() {
+            return tags == null ? null : tags.clone();
+        }
     }
 
-    public static final class ModifiableDisplayOption extends DisplayOption {
+    public static final class ModifiableDisplayOption implements DisplayOption {
+
+        private Map<String, List<Object>> hide;
+        private Map<String, List<Object>> show;
 
         private ModifiableDisplayOption(Map<String, List<Object>> hide, Map<String, List<Object>> show) {
-            super(hide, show);
+            this.hide = hide;
+            this.show = show;
+        }
+
+        public Map<String, List<Object>> getHide() {
+            return hide == null ? null : new HashMap<>(hide);
+        }
+
+        public Map<String, List<Object>> getShow() {
+            return show == null ? null : new HashMap<>(show);
         }
 
         abstract static class DisplayOptionCondition {
@@ -381,177 +437,194 @@ public class DefinitionDSL {
         }
     }
 
-    public static final class ModifiablePropertyOptionDataSource extends PropertyOptionDataSource {
+    // CHECKSTYLE:OFF
+    @JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true)
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = Property.ArrayProperty.class, name = "ARRAY"),
+        @JsonSubTypes.Type(value = Property.BooleanProperty.class, name = "BOOLEAN"),
+        @JsonSubTypes.Type(value = Property.DateTimeProperty.class, name = "DATE_TIME"),
+        @JsonSubTypes.Type(value = Property.IntegerProperty.class, name = "INTEGER"),
+        @JsonSubTypes.Type(value = Property.NumberProperty.class, name = "NUMBER"),
+        @JsonSubTypes.Type(value = Property.ObjectProperty.class, name = "OBJECT"),
+        @JsonSubTypes.Type(value = Property.OneOfProperty.class, name = "ONE_OF"),
+        @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
+    })
+    public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property<P>>
+        implements
+        Property<P>permits ModifiableProperty.ModifiableOneOfProperty,ModifiableProperty.ModifiableNullProperty,ModifiableProperty.ModifiableValueProperty {
 
-        private ModifiablePropertyOptionDataSource() {
+        private Boolean advancedOption;
+        private String description;
+        private DisplayOption displayOption;
+        private Boolean hidden;
+        private String label;
+        private Map<String, Object> metadata;
+        private String placeholder;
+        private Boolean required;
+        private final String name;
+        private final Property.Type type;
+
+        protected ModifiableProperty(String name, Property.Type type) {
+            this.name = name;
+            this.type = type;
         }
 
         @SuppressWarnings("unchecked")
-        public PropertyOptionDataSource loadOptionsDependsOn(String... propertyNames) {
-            this.loadOptionsDependsOn = List.of(propertyNames);
+        public M advancedOption(boolean advancedOption) {
+            this.advancedOption = advancedOption;
 
-            return this;
+            return (M) this;
         }
 
         @SuppressWarnings("unchecked")
-        public PropertyOptionDataSource loadOptionsFunction(Function<Object, Object> loadOptionsFunction) {
-            this.loadOptionsFunction = loadOptionsFunction;
+        public M description(String description) {
+            this.description = description;
 
-            return this;
-        }
-    }
-
-    public static class ModifiableProperty {
-        public static final class ModifiableOneOfProperty extends Property.OneOfProperty {
-
-            private ModifiableOneOfProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableOneOfProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
-            }
-
-            public ModifiableOneOfProperty types(Property<?>... properties) {
-                this.types = List.of(properties);
-
-                return this;
-            }
+            return (M) this;
         }
 
-        public static final class ModifiableArrayProperty extends Property.ArrayProperty {
+        @SuppressWarnings("unchecked")
+        public M displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+            this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+            this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M displayOption(
+            ModifiableDisplayOption.ShowDisplayOptionCondition show,
+            ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M displayOption(
+            ModifiableDisplayOption.HideDisplayOptionCondition hide,
+            ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M hidden(boolean hidden) {
+            this.hidden = hidden;
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M label(String label) {
+            this.label = label;
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M metadata(String key, String value) {
+            if (metadata == null) {
+                metadata = new HashMap<>();
+            }
+
+            this.metadata.put(key, value);
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        @SuppressFBWarnings("EI2")
+        public M metadata(Map<String, Object> metadata) {
+            this.metadata = metadata;
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M placeholder(String placeholder) {
+            this.placeholder = placeholder;
+
+            return (M) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public M required(Boolean required) {
+            this.required = required;
+
+            return (M) this;
+        }
+
+        @Override
+        public Boolean getAdvancedOption() {
+            return advancedOption;
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public DisplayOption getDisplayOption() {
+            return displayOption;
+        }
+
+        @Override
+        public Boolean getHidden() {
+            return hidden;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
+        }
+
+        @Override
+        public Map<String, Object> getMetadata() {
+            return metadata == null ? null : new HashMap<>(metadata);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getPlaceholder() {
+            return placeholder;
+        }
+
+        @Override
+        public Boolean getRequired() {
+            return required;
+        }
+
+        @Override
+        public Property.Type getType() {
+            return type;
+        }
+
+        @JsonTypeName("ARRAY")
+        public static final class ModifiableArrayProperty
+            extends ModifiableValueProperty<Object[], ModifiableArrayProperty, ArrayProperty>
+            implements Property.ArrayProperty {
+
+            protected List<Property<?>> items;
 
             private ModifiableArrayProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableArrayProperty advancedOption(boolean advancedOption) {
-                this.advancedOption = advancedOption;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableArrayProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableArrayProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableArrayProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableArrayProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableArrayProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
+                super(name, Type.ARRAY);
             }
 
             public ModifiableArrayProperty exampleValue(Boolean... exampleValue) {
@@ -638,18 +711,6 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableArrayProperty options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return this;
-            }
-
-            public ModifiableArrayProperty propertyOptionDataSource(PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
-
-                return this;
-            }
-
             public ModifiableArrayProperty items(Property<?>... items) {
                 if (items != null) {
                     this.items = List.of(items);
@@ -657,93 +718,20 @@ public class DefinitionDSL {
 
                 return this;
             }
+
+            @Override
+            public List<Property<?>> getItems() {
+                return items;
+            }
         }
 
-        public static final class ModifiableBooleanProperty extends Property.BooleanProperty {
+        @JsonTypeName("BOOLEAN")
+        public static final class ModifiableBooleanProperty
+            extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty, BooleanProperty>
+            implements Property.BooleanProperty {
 
             private ModifiableBooleanProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableBooleanProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableBooleanProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
+                super(name, Type.BOOLEAN);
             }
 
             public ModifiableBooleanProperty defaultValue(boolean defaultValue) {
@@ -757,106 +745,14 @@ public class DefinitionDSL {
 
                 return this;
             }
-
-            public ModifiableBooleanProperty options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return this;
-            }
-
-            public ModifiableBooleanProperty propertyOptionDataSource(
-                PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
-
-                return this;
-            }
         }
 
-        public static final class ModifiableDateProperty extends Property.DateProperty {
+        @JsonTypeName("DATE")
+        public static final class ModifiableDateProperty extends
+            ModifiableValueProperty<LocalDate, ModifiableDateProperty, DateProperty> implements Property.DateProperty {
 
             private ModifiableDateProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableDateProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
-
-                return this;
-            }
-
-            public ModifiableDateProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableDateProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableDateProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableDateProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableDateProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableDateProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableDateProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableDateProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableDateProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableDateProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableDateProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
+                super(name, Type.DATE);
             }
 
             public ModifiableDateProperty defaultValue(LocalDate defaultValue) {
@@ -870,105 +766,15 @@ public class DefinitionDSL {
 
                 return this;
             }
-
-            public ModifiableDateProperty options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return this;
-            }
-
-            public ModifiableDateProperty propertyOptionDataSource(PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
-
-                return this;
-            }
         }
 
-        public static final class ModifiableDateTimeProperty extends Property.DateTimeProperty {
+        @JsonTypeName("DATE_TIME")
+        public static final class ModifiableDateTimeProperty
+            extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty, DateTimeProperty>
+            implements Property.DateTimeProperty {
 
             private ModifiableDateTimeProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableDateTimeProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableDateTimeProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableDateTimeProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
+                super(name, Type.DATE_TIME);
             }
 
             public ModifiableDateTimeProperty defaultValue(LocalDateTime defaultValue) {
@@ -982,106 +788,76 @@ public class DefinitionDSL {
 
                 return this;
             }
+        }
 
-            public ModifiableDateTimeProperty options(PropertyOption... options) {
-                this.options = List.of(options);
+        @JsonTypeName("INTEGER")
+        public static final class ModifiableIntegerProperty
+            extends ModifiableValueProperty<Integer, ModifiableIntegerProperty, IntegerProperty>
+            implements Property.IntegerProperty {
+
+            private Integer maxValue;
+            private Integer minValue;
+
+            private ModifiableIntegerProperty(String name) {
+                super(name, Type.INTEGER);
+            }
+
+            public ModifiableIntegerProperty defaultValue(int value) {
+                this.defaultValue = value;
 
                 return this;
             }
 
-            public ModifiableDateTimeProperty propertyOptionDataSource(
-                PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
+            public ModifiableIntegerProperty exampleValue(int exampleValue) {
+                this.exampleValue = exampleValue;
 
                 return this;
+            }
+
+            public ModifiableIntegerProperty maxValue(int maxValue) {
+                this.maxValue = maxValue;
+
+                return this;
+            }
+
+            public ModifiableIntegerProperty minValue(int minValue) {
+                this.minValue = minValue;
+
+                return this;
+            }
+
+            @Override
+            public Integer getMaxValue() {
+                return maxValue;
+            }
+
+            @Override
+            public Integer getMinValue() {
+                return minValue;
             }
         }
 
-        public static final class ModifiableNumberProperty extends Property.NumberProperty {
+        @JsonTypeName("NULL")
+        @Schema(name = "NullProperty", description = "A null property type.")
+        public static final class ModifiableNullProperty
+            extends ModifiableProperty<ModifiableNullProperty, NullProperty> implements Property.NullProperty {
+
+            protected ModifiableNullProperty(String name) {
+                super(name, Type.NULL);
+            }
+        }
+
+        @JsonTypeName("NUMBER")
+        public static final class ModifiableNumberProperty
+            extends ModifiableValueProperty<Double, ModifiableNumberProperty, NumberProperty>
+            implements Property.NumberProperty {
+
+            private Integer maxValue;
+            private Integer minValue;
+            private Integer numberPrecision;
 
             private ModifiableNumberProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableNumberProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
-
-                return this;
-            }
-
-            public ModifiableNumberProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableNumberProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableNumberProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableNumberProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableNumberProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableNumberProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableNumberProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableNumberProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableNumberProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableNumberProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableNumberProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
+                super(name, Type.NUMBER);
             }
 
             public ModifiableNumberProperty defaultValue(int value) {
@@ -1132,19 +908,6 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableNumberProperty options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return this;
-            }
-
-            public ModifiableNumberProperty propertyOptionDataSource(
-                PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
-
-                return this;
-            }
-
             public ModifiableNumberProperty maxValue(int maxValue) {
                 this.maxValue = maxValue;
 
@@ -1162,218 +925,34 @@ public class DefinitionDSL {
 
                 return this;
             }
-        }
 
-        public static final class ModifiableIntegerProperty extends Property.IntegerProperty {
-
-            private ModifiableIntegerProperty(String name) {
-                super(name);
+            @Override
+            public Integer getMaxValue() {
+                return maxValue;
             }
 
-            public ModifiableIntegerProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
-
-                return this;
+            @Override
+            public Integer getMinValue() {
+                return minValue;
             }
 
-            public ModifiableIntegerProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableIntegerProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty defaultValue(int value) {
-                this.defaultValue = value;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty exampleValue(int exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty propertyOptionDataSource(
-                PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty maxValue(int maxValue) {
-                this.maxValue = maxValue;
-
-                return this;
-            }
-
-            public ModifiableIntegerProperty minValue(int minValue) {
-                this.minValue = minValue;
-
-                return this;
+            @Override
+            public Integer getNumberPrecision() {
+                return numberPrecision;
             }
         }
 
-        public static final class ModifiableObjectProperty extends Property.ObjectProperty {
+        @JsonTypeName("OBJECT")
+        public static final class ModifiableObjectProperty
+            extends ModifiableValueProperty<Object, ModifiableObjectProperty, ObjectProperty>
+            implements Property.ObjectProperty {
+
+            private List<Property<?>> additionalProperties;
+            private String objectType;
+            private List<? extends Property<?>> properties;
 
             private ModifiableObjectProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableObjectProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
-
-                return this;
-            }
-
-            public ModifiableObjectProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableObjectProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableObjectProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableObjectProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableObjectProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableObjectProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableObjectProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableObjectProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableObjectProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableObjectProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableObjectProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
+                super(name, Type.OBJECT);
             }
 
             public ModifiableObjectProperty defaultValue(Map<String, Object> defaultValue) {
@@ -1384,19 +963,6 @@ public class DefinitionDSL {
 
             public ModifiableObjectProperty exampleValue(Map<String, Object> exampleValue) {
                 this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            public ModifiableObjectProperty options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return this;
-            }
-
-            public ModifiableObjectProperty propertyOptionDataSource(
-                PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
 
                 return this;
             }
@@ -1433,93 +999,62 @@ public class DefinitionDSL {
 
                 return this;
             }
+
+            @Override
+            public List<Property<?>> getAdditionalProperties() {
+                return additionalProperties;
+            }
+
+            @Override
+            public String getObjectType() {
+                return objectType;
+            }
+
+            @Override
+            public List<? extends Property<?>> getProperties() {
+                return properties == null ? null : new ArrayList<>(properties);
+            }
         }
 
-        public static final class ModifiableStringProperty extends Property.StringProperty {
+        @JsonTypeName("ONE_OF")
+        public static final class ModifiableOneOfProperty
+            extends ModifiableProperty<ModifiableOneOfProperty, OneOfProperty> implements Property.OneOfProperty {
+
+            private List<? extends Property<?>> types = List.of(
+                new ModifiableArrayProperty(null),
+                new ModifiableBooleanProperty(null),
+                new ModifiableDateProperty(null),
+                new ModifiableDateTimeProperty(null),
+                new ModifiableIntegerProperty(null),
+                new ModifiableNullProperty(null),
+                new ModifiableNumberProperty(null),
+                new ModifiableObjectProperty(null),
+                new ModifiableStringProperty(null));
+
+            private ModifiableOneOfProperty(String name) {
+                super(name, Type.ONE_OF);
+            }
+
+            public ModifiableOneOfProperty types(Property<?>... properties) {
+                this.types = List.of(properties);
+
+                return this;
+            }
+
+            public List<? extends Property<?>> getTypes() {
+                return types;
+            }
+        }
+
+        @JsonTypeName("STRING")
+        public static final class ModifiableStringProperty
+            extends ModifiableValueProperty<String, ModifiableStringProperty, StringProperty>
+            implements Property.StringProperty {
+
+            private ControlType controlType;
 
             private ModifiableStringProperty(String name) {
-                super(name);
-            }
-
-            public ModifiableStringProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
-
-                return this;
-            }
-
-            public ModifiableStringProperty description(String description) {
-                this.description = description;
-
-                return this;
-            }
-
-            public ModifiableStringProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-                return this;
-            }
-
-            public ModifiableStringProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableStringProperty displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableStringProperty displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-                return this;
-            }
-
-            public ModifiableStringProperty hidden(boolean hidden) {
-                this.hidden = hidden;
-
-                return this;
-            }
-
-            public ModifiableStringProperty label(String label) {
-                this.label = label;
-
-                return this;
-            }
-
-            public ModifiableStringProperty metadata(String key, String value) {
-                if (metadata == null) {
-                    metadata = new HashMap<>();
-                }
-
-                this.metadata.put(key, value);
-
-                return this;
-            }
-
-            @SuppressFBWarnings("EI2")
-            public ModifiableStringProperty metadata(Map<String, Object> metadata) {
-                this.metadata = metadata;
-
-                return this;
-            }
-
-            public ModifiableStringProperty placeholder(String placeholder) {
-                this.placeholder = placeholder;
-
-                return this;
-            }
-
-            public ModifiableStringProperty required(Boolean required) {
-                this.required = required;
-
-                return this;
+                super(name, Type.STRING);
             }
 
             public ModifiableStringProperty defaultValue(String value) {
@@ -1534,35 +1069,89 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableStringProperty options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return this;
-            }
-
-            public ModifiableStringProperty propertyOptionDataSource(
-                PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
-
-                return this;
-            }
-
             public ModifiableStringProperty controlType(ControlType controlType) {
                 this.controlType = controlType;
 
                 return this;
             }
+
+            @Override
+            public ControlType getControlType() {
+                return controlType;
+            }
+        }
+
+        public abstract static sealed class ModifiableValueProperty<V, M extends ModifiableValueProperty<V, M, P>, P extends ValueProperty<V, P>>
+            extends ModifiableProperty<M, P>
+            implements
+            Property.ValueProperty<V, P>permits ModifiableArrayProperty,ModifiableBooleanProperty,ModifiableDateProperty,ModifiableDateTimeProperty,ModifiableIntegerProperty,ModifiableNumberProperty,ModifiableObjectProperty,ModifiableStringProperty {
+
+            protected V defaultValue;
+            protected V exampleValue;
+            private List<PropertyOption> options;
+            private PropertyOptionDataSource optionDataSource;
+
+            private ModifiableValueProperty(Property.Type type) {
+                this(null, type);
+            }
+
+            protected ModifiableValueProperty(String name, Property.Type type) {
+                super(name, type);
+            }
+
+            @SuppressWarnings("unchecked")
+            public M options(PropertyOption... options) {
+                this.options = List.of(options);
+
+                return (M) this;
+            }
+
+            @SuppressWarnings("unchecked")
+            public M propertyOptionDataSource(PropertyOptionDataSource propertyOptionDataSource) {
+                this.optionDataSource = propertyOptionDataSource;
+
+                return (M) this;
+            }
+
+            @Override
+            public V getDefaultValue() {
+                return defaultValue;
+            }
+
+            @Override
+            public V getExampleValue() {
+                return exampleValue;
+            }
+
+            @Override
+            public List<PropertyOption> getOptions() {
+                return options;
+            }
+
+            @Override
+            public PropertyOptionDataSource getOptionsDataSource() {
+                return optionDataSource;
+            }
         }
     }
+    // CHECKSTYLE:ON
 
-    public static final class ModifiablePropertyOption extends PropertyOption {
+    public static final class ModifiablePropertyOption implements PropertyOption {
+
+        private String description;
+        private DisplayOption displayOption;
+        private String name;
+        private Object value;
 
         private ModifiablePropertyOption(String name, Object value) {
-            super(name, value);
+            this.name = name;
+            this.value = value;
         }
 
         private ModifiablePropertyOption(String name, Object value, String description) {
-            super(name, value, description);
+            this.name = name;
+            this.value = value;
+            this.description = description;
         }
 
         public ModifiablePropertyOption description(String description) {
@@ -1598,9 +1187,66 @@ public class DefinitionDSL {
 
             return this;
         }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public DisplayOption getDisplayOption() {
+            return displayOption;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Object getValue() {
+            return value;
+        }
     }
 
-    public static final class ModifiableResources extends Resources {
+    public static final class ModifiablePropertyOptionDataSource implements PropertyOptionDataSource {
+
+        protected List<String> loadOptionsDependsOn;
+
+        @JsonIgnore
+        private Function<Object, Object> loadOptionsFunction;
+
+        private ModifiablePropertyOptionDataSource() {
+        }
+
+        @SuppressWarnings("unchecked")
+        public PropertyOptionDataSource loadOptionsDependsOn(String... propertyNames) {
+            this.loadOptionsDependsOn = List.of(propertyNames);
+
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public PropertyOptionDataSource loadOptionsFunction(Function<Object, Object> loadOptionsFunction) {
+            this.loadOptionsFunction = loadOptionsFunction;
+
+            return this;
+        }
+
+        @Override
+        public List<String> getLoadOptionsDependsOn() {
+            return loadOptionsDependsOn;
+        }
+
+        @Override
+        public Function<Object, Object> getLoadOptionsFunction() {
+            return loadOptionsFunction;
+        }
+    }
+
+    public static final class ModifiableResources implements Resources {
+
+        private String documentationUrl;
 
         private ModifiableResources() {
         }
@@ -1609,6 +1255,11 @@ public class DefinitionDSL {
             this.documentationUrl = documentationUrl;
 
             return this;
+        }
+
+        @Override
+        public String getDocumentationUrl() {
+            return documentationUrl;
         }
     }
 }

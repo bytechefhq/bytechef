@@ -17,13 +17,21 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableArrayProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNullProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNumberProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,30 +39,15 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Schema(name = "Property", description = "A base property.")
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "type",
-    visible = true)
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = Property.ArrayProperty.class, name = "ARRAY"),
-    @JsonSubTypes.Type(value = Property.BooleanProperty.class, name = "BOOLEAN"),
-    @JsonSubTypes.Type(value = Property.DateTimeProperty.class, name = "DATE_TIME"),
-    @JsonSubTypes.Type(value = Property.IntegerProperty.class, name = "INTEGER"),
-    @JsonSubTypes.Type(value = Property.NumberProperty.class, name = "NUMBER"),
-    @JsonSubTypes.Type(value = Property.ObjectProperty.class, name = "OBJECT"),
-    @JsonSubTypes.Type(value = Property.OneOfProperty.class, name = "ONE_OF"),
-    @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
-})
 // CHECKSTYLE:OFF
-public sealed class Property<P extends Property<P>> permits Property.OneOfProperty,Property.NullProperty,Property.ValueProperty {
+public sealed interface Property<P extends Property<P>> permits Property.OneOfProperty,Property.NullProperty,Property.ValueProperty,ModifiableProperty {
 
-    public enum ControlType {
+    enum ControlType {
         CODE,
         PASSWORD
     }
 
-    public enum Type {
+    enum Type {
         ARRAY,
         BOOLEAN,
         DATE,
@@ -67,286 +60,131 @@ public sealed class Property<P extends Property<P>> permits Property.OneOfProper
         STRING
     }
 
-    protected Boolean advancedOption;
-    protected String description;
-    protected DisplayOption displayOption;
-    protected Boolean hidden;
-    protected String label;
-    protected Map<String, Object> metadata;
-    protected String placeholder;
-    protected Boolean required;
-    private final String name;
-    private final Type type;
-
-    protected Property(String name, Type type) {
-        this.name = name;
-        this.type = type;
-    }
-
     @Schema(name = "advancedOption", description = "If the property should be grouped under advanced options.")
-    public Boolean getAdvancedOption() {
-        return advancedOption;
-    }
+    Boolean getAdvancedOption();
 
     @Schema(name = "description", description = "The property description.")
-    public String getDescription() {
-        return description;
-    }
+    String getDescription();
 
     @Schema(name = "description", description = "The property description.")
-    public DisplayOption getDisplayOption() {
-        return displayOption;
-    }
+    DisplayOption getDisplayOption();
 
     @Schema(name = "hidden", description = "If the property should be visible or not.")
-    public Boolean getHidden() {
-        return hidden;
-    }
+    Boolean getHidden();
 
     @Schema(name = "label", description = "The property label.")
-    public String getLabel() {
-        return label;
-    }
+    String getLabel();
 
     @Schema(name = "metadata", description = "Additional data that can be used during processing.")
-    public Map<String, Object> getMetadata() {
-        return metadata == null ? null : new HashMap<>(metadata);
-    }
+    Map<String, Object> getMetadata();
 
     @Schema(name = "name", description = "The property name.")
-    public String getName() {
-        return name;
-    }
+    String getName();
 
     @Schema(name = "placeholder", description = "The property placeholder.")
-    public String getPlaceholder() {
-        return placeholder;
-    }
+    String getPlaceholder();
 
     @Schema(name = "required", description = "If the property is required or not.")
-    public Boolean getRequired() {
-        return required;
-    }
+    Boolean getRequired();
 
     @Schema(name = "type", description = "The property type.")
-    public Type getType() {
-        return type;
-    }
+    Type getType();
 
     @Schema(name = "OneOfProperty", description = "A one of property type.")
-    @JsonTypeName("OneOf")
-    public static sealed class OneOfProperty
-        extends Property<OneOfProperty>permits DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty {
-
-        protected List<? extends Property<?>> types = List.of(
-            new ArrayProperty(null),
-            new BooleanProperty(null),
-            new DateProperty(null),
-            new DateTimeProperty(null),
-            new IntegerProperty(null),
-            new NullProperty(null),
-            new NumberProperty(null),
-            new ObjectProperty(null),
-            new StringProperty(null));
-
-        protected OneOfProperty(String name) {
-            super(name, Type.ONE_OF);
-        }
+    sealed interface OneOfProperty
+        extends Property<OneOfProperty>permits ModifiableOneOfProperty {
 
         @Schema(name = "types", description = "Possible types of properties that can be used.")
-        public List<? extends Property<?>> getTypes() {
-            return types;
-        }
+        List<? extends Property<?>> getTypes();
     }
 
     @Schema(name = "ValueProperty", description = "A base property for all value based properties.")
-    public abstract static sealed class ValueProperty<V, P extends ValueProperty<V, P>> extends
-        Property<P>permits Property.ArrayProperty,Property.BooleanProperty,Property.DateProperty,Property.DateTimeProperty,Property.IntegerProperty,Property.NumberProperty,Property.ObjectProperty,Property.StringProperty {
-
-        protected V defaultValue;
-        protected V exampleValue;
-        protected List<PropertyOption> options;
-        protected PropertyOptionDataSource optionDataSource;
-
-        private ValueProperty(Type type) {
-            this(null, type);
-        }
-
-        protected ValueProperty(String name, Type type) {
-            super(name, type);
-        }
+    sealed interface ValueProperty<V, P extends ValueProperty<V, P>> extends
+        Property<P>permits ArrayProperty,BooleanProperty,DateProperty,DateTimeProperty,IntegerProperty,NumberProperty,ObjectProperty,StringProperty,ModifiableValueProperty {
 
         @Schema(name = "defaultValue", description = "The property default value.")
-        public V getDefaultValue() {
-            return defaultValue;
-        }
+        V getDefaultValue();
 
         @Schema(name = "exampleValue", description = "The property example value.")
-        public V getExampleValue() {
-            return exampleValue;
-        }
+        V getExampleValue();
 
         @Schema(name = "options", description = "The list of valid property options.")
-        public List<PropertyOption> getOptions() {
-            return options;
-        }
+        List<PropertyOption> getOptions();
 
-        public PropertyOptionDataSource getOptionsDataSource() {
-            return optionDataSource;
-        }
+        PropertyOptionDataSource getOptionsDataSource();
     }
 
-    @JsonTypeName("ARRAY")
     @Schema(name = "ArrayProperty", description = "An array property type.")
-    public static sealed class ArrayProperty
-        extends ValueProperty<Object[], ArrayProperty>permits DefinitionDSL.ModifiableProperty.ModifiableArrayProperty {
-
-        protected List<Property<?>> items;
-
-        protected ArrayProperty(String name) {
-            super(name, Type.ARRAY);
-        }
+    sealed interface ArrayProperty
+        extends ValueProperty<Object[], ArrayProperty>permits ModifiableArrayProperty {
 
         @Schema(name = "items", description = "Types of the array items.")
-        public List<Property<?>> getItems() {
-            return items;
-        }
+        List<Property<?>> getItems();
     }
 
-    @JsonTypeName("BOOLEAN")
     @Schema(name = "BooleanProperty", description = "A boolean property type.")
-    public static sealed class BooleanProperty extends
-        ValueProperty<Boolean, BooleanProperty>permits DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty {
-
-        protected BooleanProperty(String name) {
-            super(name, Type.BOOLEAN);
-        }
+    sealed interface BooleanProperty extends
+        ValueProperty<Boolean, BooleanProperty>permits ModifiableBooleanProperty {
     }
 
-    @JsonTypeName("DATE")
     @Schema(name = "DateProperty", description = "A date property type.")
-    public static sealed class DateProperty
-        extends ValueProperty<LocalDate, DateProperty>permits DefinitionDSL.ModifiableProperty.ModifiableDateProperty {
-
-        protected DateProperty(String name) {
-            super(name, Type.DATE);
-        }
+    sealed interface DateProperty
+        extends ValueProperty<LocalDate, DateProperty>permits ModifiableDateProperty {
     }
 
-    @JsonTypeName("DATE_TIME")
     @Schema(name = "DateTimeProperty", description = "A date-time property type.")
-    public static sealed class DateTimeProperty extends
-        ValueProperty<LocalDateTime, DateTimeProperty>permits DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty {
-
-        protected DateTimeProperty(String name) {
-            super(name, Type.DATE_TIME);
-        }
+    sealed interface DateTimeProperty extends
+        ValueProperty<LocalDateTime, DateTimeProperty>permits ModifiableDateTimeProperty {
     }
 
-    @JsonTypeName("NULL")
-    @Schema(name = "NullProperty", description = "A null property type.")
-    public static final class NullProperty extends Property<NullProperty> {
-
-        protected NullProperty(String name) {
-            super(name, Type.NULL);
-        }
-    }
-
-    @JsonTypeName("NUMBER")
-    @Schema(name = "NumberProperty", description = "A number property type.")
-    public static sealed class NumberProperty
-        extends ValueProperty<Double, NumberProperty>permits DefinitionDSL.ModifiableProperty.ModifiableNumberProperty {
-
-        protected Integer maxValue;
-        protected Integer minValue;
-        protected Integer numberPrecision;
-
-        protected NumberProperty(String name) {
-            super(name, Type.NUMBER);
-        }
+    @Schema(name = "IntegerProperty", description = "An integer property type.")
+    sealed interface IntegerProperty extends
+        ValueProperty<Integer, IntegerProperty>permits ModifiableIntegerProperty {
 
         @Schema(name = "maxValue", description = "The maximum property value.")
-        public Integer getMaxValue() {
-            return maxValue;
-        }
+        Integer getMaxValue();
 
         @Schema(name = "minValue", description = "The minimum property value.")
-        public Integer getMinValue() {
-            return minValue;
-        }
+        Integer getMinValue();
+    }
+
+    @Schema(name = "NullProperty", description = "A null property type.")
+    sealed interface NullProperty extends Property<NullProperty>permits ModifiableNullProperty {
+    }
+
+    @Schema(name = "NumberProperty", description = "A number property type.")
+    sealed interface NumberProperty
+        extends ValueProperty<Double, NumberProperty>permits ModifiableNumberProperty {
+
+        @Schema(name = "maxValue", description = "The maximum property value.")
+        Integer getMaxValue();
+
+        @Schema(name = "minValue", description = "The minimum property value.")
+        Integer getMinValue();
 
         @Schema(name = "numberPrecision", description = "The number value precision.")
-        public Integer getNumberPrecision() {
-            return numberPrecision;
-        }
+        Integer getNumberPrecision();
     }
 
-    @JsonTypeName("INTEGER")
-    @Schema(name = "IntegerProperty", description = "An integer property type.")
-    public static sealed class IntegerProperty extends
-        ValueProperty<Integer, IntegerProperty>permits DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty {
-
-        protected Integer maxValue;
-        protected Integer minValue;
-
-        protected IntegerProperty(String name) {
-            super(name, Type.INTEGER);
-        }
-
-        @Schema(name = "maxValue", description = "The maximum property value.")
-        public Integer getMaxValue() {
-            return maxValue;
-        }
-
-        @Schema(name = "minValue", description = "The minimum property value.")
-        public Integer getMinValue() {
-            return minValue;
-        }
-    }
-
-    @JsonTypeName("OBJECT")
     @Schema(name = "ObjectProperty", description = "An object property type.")
-    public static sealed class ObjectProperty
-        extends ValueProperty<Object, ObjectProperty>permits DefinitionDSL.ModifiableProperty.ModifiableObjectProperty {
-
-        protected List<Property<?>> additionalProperties;
-        protected String objectType;
-        protected List<? extends Property<?>> properties;
-
-        protected ObjectProperty(String name) {
-            super(name, Type.OBJECT);
-        }
+    sealed interface ObjectProperty
+        extends ValueProperty<Object, ObjectProperty>permits ModifiableObjectProperty {
 
         @Schema(name = "additionalProperties", description = "Types of dynamically defined properties.")
-        public List<Property<?>> getAdditionalProperties() {
-            return additionalProperties;
-        }
+        List<Property<?>> getAdditionalProperties();
 
         @Schema(name = "objectType", description = "The object type.")
-        public String getObjectType() {
-            return objectType;
-        }
+        String getObjectType();
 
         @Schema(name = "properties", description = "The list of valid object property types.")
-        public List<? extends Property<?>> getProperties() {
-            return properties;
-        }
+        List<? extends Property<?>> getProperties();
     }
 
-    @JsonTypeName("STRING")
     @Schema(name = "StringProperty", description = "A string property.")
-    public static sealed class StringProperty
-        extends ValueProperty<String, StringProperty>permits DefinitionDSL.ModifiableProperty.ModifiableStringProperty {
+    sealed interface StringProperty
+        extends ValueProperty<String, StringProperty>permits ModifiableStringProperty {
 
-        protected ControlType controlType;
-
-        protected StringProperty(String name) {
-            super(name, Type.STRING);
-        }
-
-        public ControlType getControlType() {
-            return controlType;
-        }
+        ControlType getControlType();
     }
 }
 // CHECKSTYLE:ON

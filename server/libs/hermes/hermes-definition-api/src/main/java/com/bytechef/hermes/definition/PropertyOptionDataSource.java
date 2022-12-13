@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.function.Function;
@@ -28,29 +27,17 @@ import java.util.function.Function;
 @Schema(
     name = "PropertyOptionDataSource",
     description = "Defines function that should dynamically load options for the property.")
-public sealed class PropertyOptionDataSource permits DefinitionDSL.ModifiablePropertyOptionDataSource {
-
-    protected List<String> loadOptionsDependsOn;
-
-    @JsonIgnore
-    protected Function<Object, Object> loadOptionsFunction;
-
-    protected PropertyOptionDataSource() {
-    }
+public sealed interface PropertyOptionDataSource permits DefinitionDSL.ModifiablePropertyOptionDataSource {
 
     @Schema(
         name = "loadOptionsDependsOn",
         description = "The list of property names on which value change the property options should load/reload.")
-    public List<String> getLoadOptionsDependsOn() {
-        return loadOptionsDependsOn;
-    }
+    List<String> getLoadOptionsDependsOn();
 
     /**
      * The function that should dynamically load options for the property.
      *
      * @return a load options function implementation
      */
-    public Function<Object, Object> getLoadOptionsFunction() {
-        return loadOptionsFunction;
-    }
+    Function<Object, Object> getLoadOptionsFunction();
 }

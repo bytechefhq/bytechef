@@ -23,15 +23,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Ivica Cardic
  */
 @Schema(name = "Resources", description = "A set of available resources.")
-public sealed class Resources permits DefinitionDSL.ModifiableResources {
-
-    protected String documentationUrl;
-
-    protected Resources() {
-    }
+public sealed interface Resources permits DefinitionDSL.ModifiableResources {
 
     @Schema(name = "documentationUrl", description = "The url of available documentation.")
-    public String getDocumentationUrl() {
-        return documentationUrl;
-    }
+    String getDocumentationUrl();
 }
