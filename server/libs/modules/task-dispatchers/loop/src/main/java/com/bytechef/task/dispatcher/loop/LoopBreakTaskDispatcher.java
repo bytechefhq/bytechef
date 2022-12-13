@@ -17,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_BREAK;
 

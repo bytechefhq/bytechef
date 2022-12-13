@@ -17,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.if_.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.IF;
