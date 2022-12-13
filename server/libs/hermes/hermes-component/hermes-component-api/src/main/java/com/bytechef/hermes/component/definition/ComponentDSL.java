@@ -21,19 +21,29 @@ import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.constants.ComponentConstants;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Resources;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import static com.bytechef.hermes.component.constants.ComponentConstants.BASE_URI;
 
 /**
  * @author Ivica Cardic
@@ -76,10 +86,20 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableJdbcComponentDefinition(name);
     }
 
-    public static final class ModifiableActionDefinition extends ActionDefinition {
+    public static final class ModifiableActionDefinition implements ActionDefinition {
+
+        private Display display;
+        private Object exampleOutput;
+        private Map<String, Object> metadata;
+        private String name;
+        private List<Property<? extends Property<?>>> output;
+        private List<Property<?>> properties;
+
+        @JsonIgnore
+        private BiFunction<Context, ExecutionParameters, Object> performFunction;
 
         private ModifiableActionDefinition(String name) {
-            super(name);
+            this.name = Objects.requireNonNull(name);
         }
 
         public ModifiableActionDefinition display(ModifiableDisplay display) {
@@ -130,12 +150,91 @@ public final class ComponentDSL extends DefinitionDSL {
 
             return this;
         }
+
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public Object getExampleOutput() {
+            return exampleOutput;
+        }
+
+        @Override
+        public Map<String, Object> getMetadata() {
+            return metadata == null ? null : new HashMap<>(metadata);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public List<Property<? extends Property<?>>> getOutput() {
+            return output;
+        }
+
+        @Override
+        public List<Property<?>> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public Optional<BiFunction<Context, ExecutionParameters, Object>> getPerformFunction() {
+            return Optional.ofNullable(performFunction);
+        }
     }
 
-    public static final class ModifiableAuthorization extends Authorization {
+    public static final class ModifiableAuthorization implements Authorization {
+
+        @JsonIgnore
+        private BiConsumer<AuthorizationContext, Connection> applyConsumer;
+
+        @JsonIgnore
+        private BiFunction<Connection, String, String> authorizationCallbackFunction;
+
+        @JsonIgnore
+        private Function<Connection, String> authorizationUrlFunction = connectionParameters -> connectionParameters
+            .getParameter(ComponentConstants.AUTHORIZATION_URL);
+
+        @JsonIgnore
+        private Function<Connection, String> clientIdFunction = connectionParameters -> connectionParameters
+            .getParameter(ComponentConstants.CLIENT_ID);
+
+        @JsonIgnore
+        private Function<Connection, String> clientSecretFunction = connectionParameters -> connectionParameters
+            .getParameter(ComponentConstants.CLIENT_SECRET);
+
+        private Display display;
+
+        @JsonIgnore
+        private List<Object> onRefresh;
+
+        private List<Property<?>> properties;
+
+        @JsonIgnore
+        private Function<Connection, String> refreshFunction;
+
+        @JsonIgnore
+        private Function<Connection, String> refreshUrlFunction = connectionParameters -> connectionParameters
+            .getParameter(ComponentConstants.REFRESH_URL);
+
+        @JsonIgnore
+        private Function<Connection, List<String>> scopesFunction = connectionParameters -> connectionParameters
+            .getParameter(ComponentConstants.SCOPES);
+
+        @JsonIgnore
+        private Function<Connection, String> tokenUrlFunction = connectionParameters -> connectionParameters
+            .getParameter(ComponentConstants.TOKEN_URL);
+
+        private final String name;
+        private final AuthorizationType type;
 
         private ModifiableAuthorization(String name, AuthorizationType type) {
-            super(name, type);
+            this.name = Objects.requireNonNull(name);
+            this.type = Objects.requireNonNull(type);
+            this.applyConsumer = type.getDefaultApplyConsumer();
         }
 
         public ModifiableAuthorization apply(BiConsumer<AuthorizationContext, Connection> applyConsumer) {
@@ -228,12 +327,90 @@ public final class ComponentDSL extends DefinitionDSL {
 
             return this;
         }
+
+        @Override
+        public BiConsumer<AuthorizationContext, Connection> getApplyConsumer() {
+            return applyConsumer;
+        }
+
+        @Override
+        public Optional<BiFunction<Connection, String, String>> getAuthorizationCallbackFunction() {
+            return Optional.ofNullable(authorizationCallbackFunction);
+        }
+
+        @Override
+        public Function<Connection, String> getAuthorizationUrlFunction() {
+            return authorizationUrlFunction;
+        }
+
+        @Override
+        public Function<Connection, String> getClientIdFunction() {
+            return clientIdFunction;
+        }
+
+        @Override
+        public Function<Connection, String> getClientSecretFunction() {
+            return clientSecretFunction;
+        }
+
+        @Override
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public List<Object> getOnRefresh() {
+            return onRefresh;
+        }
+
+        @Override
+        public List<Property<?>> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public Optional<Function<Connection, String>> getRefreshFunction() {
+            return Optional.ofNullable(refreshFunction);
+        }
+
+        @Override
+        public Function<Connection, String> getRefreshUrlFunction() {
+            return refreshUrlFunction;
+        }
+
+        @Override
+        public Function<Connection, List<String>> getScopesFunction() {
+            return scopesFunction;
+        }
+
+        @Override
+        public Function<Connection, String> getTokenUrlFunction() {
+            return tokenUrlFunction;
+        }
+
+        @Override
+        public AuthorizationType getType() {
+            return type;
+        }
     }
 
-    public static final class ModifiableComponentDefinition extends ComponentDefinition {
+    public static final class ModifiableComponentDefinition implements ComponentDefinition {
+
+        private List<? extends ActionDefinition> actions;
+        private ConnectionDefinition connection;
+        private Display display;
+        private Map<String, Object> metadata;
+        private String name;
+        private Resources resources;
+        private int version = ComponentConstants.Versions.VERSION_1;
 
         private ModifiableComponentDefinition(String name) {
-            super(name);
+            this.name = Objects.requireNonNull(name);
         }
 
         public ModifiableComponentDefinition actions(ModifiableActionDefinition... actionDefinitions) {
@@ -298,9 +475,63 @@ public final class ComponentDSL extends DefinitionDSL {
 
             return this;
         }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<? extends ActionDefinition> getActions() {
+            return actions == null ? null : new ArrayList<>(actions);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public ConnectionDefinition getConnection() {
+            return connection;
+        }
+
+        @Override
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public Map<String, Object> getMetadata() {
+            return metadata == null ? null : new HashMap<>(metadata);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Resources getResources() {
+            return resources;
+        }
+
+        @Override
+        public int getVersion() {
+            return version;
+        }
     }
 
-    public static final class ModifiableConnectionDefinition extends ConnectionDefinition {
+    public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
+
+        private String componentName;
+        private int componentVersion;
+        private List<? extends Authorization> authorizations = Collections.emptyList();
+
+        @JsonIgnore
+        private Function<Connection, String> baseUriFunction = (
+            connectionParameters) -> connectionParameters.containsKey(BASE_URI)
+                ? connectionParameters.getParameter(BASE_URI) : null;
+
+        private Display display;
+        private List<? extends Property<?>> properties;
+        private Resources resources;
+        private String subtitle;
+
+        @JsonIgnore
+        private Consumer<Connection> testConsumer;
 
         private ModifiableConnectionDefinition() {
         }
@@ -341,35 +572,87 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        protected ModifiableConnectionDefinition componentName(String componentName) {
+        public ModifiableConnectionDefinition subtitle(String subtitle) {
+            this.subtitle = subtitle;
+
+            return this;
+        }
+
+        private ModifiableConnectionDefinition componentName(String componentName) {
             this.componentName = componentName;
 
             return this;
         }
 
-        protected ModifiableConnectionDefinition componentVersion(int componentVersion) {
+        private ModifiableConnectionDefinition componentVersion(int componentVersion) {
             this.componentVersion = componentVersion;
 
             return this;
         }
 
-        protected ModifiableConnectionDefinition display(Display display) {
+        private ModifiableConnectionDefinition display(Display display) {
             this.display = display;
 
             return this;
         }
 
-        protected ModifiableConnectionDefinition subtitle(String subtitle) {
-            this.subtitle = subtitle;
+        @Override
+        public List<? extends Authorization> getAuthorizations() {
+            return authorizations == null ? null : new ArrayList<>(authorizations);
+        }
 
-            return this;
+        @Override
+        public Function<Connection, String> getBaseUriFunction() {
+            return baseUriFunction;
+        }
+
+        @Override
+        public String getComponentName() {
+            return componentName;
+        }
+
+        @Override
+        public int getComponentVersion() {
+            return componentVersion;
+        }
+
+        @Override
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public List<? extends Property<?>> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public Resources getResources() {
+            return resources;
+        }
+
+        @Override
+        public String getSubtitle() {
+            return subtitle;
+        }
+
+        @Override
+        public Optional<Consumer<Connection>> getTestConsumer() {
+            return Optional.ofNullable(testConsumer);
         }
     }
 
-    public static final class ModifiableJdbcComponentDefinition extends JdbcComponentDefinition {
+    public static final class ModifiableJdbcComponentDefinition implements JdbcComponentDefinition {
+
+        private String databaseJdbcName;
+        private String jdbcDriverClassName;
+        private Display display;
+        private Resources resources;
+        private double version = ComponentConstants.Versions.VERSION_1;
+        private final String name;
 
         private ModifiableJdbcComponentDefinition(String name) {
-            super(name);
+            this.name = Objects.requireNonNull(name);
         }
 
         public ModifiableJdbcComponentDefinition databaseJdbcName(String databaseJdbcName) {
@@ -400,6 +683,36 @@ public final class ComponentDSL extends DefinitionDSL {
             this.version = version;
 
             return this;
+        }
+
+        @Override
+        public String getDatabaseJdbcName() {
+            return databaseJdbcName;
+        }
+
+        @Override
+        public String getJdbcDriverClassName() {
+            return jdbcDriverClassName;
+        }
+
+        @Override
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public Resources getResources() {
+            return resources;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public double getVersion() {
+            return version;
         }
     }
 }

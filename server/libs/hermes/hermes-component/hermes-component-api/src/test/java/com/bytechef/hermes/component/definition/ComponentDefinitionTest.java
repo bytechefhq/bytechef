@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.component.constants.ComponentConstants.Versions.VERSION_1;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.hermes.definition.Property;

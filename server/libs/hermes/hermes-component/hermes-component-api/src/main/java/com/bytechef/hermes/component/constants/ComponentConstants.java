@@ -38,4 +38,8 @@ public class ComponentConstants {
     public static final String TOKEN_URL = "tokenUrl";
     public static final String USERNAME = "username";
     public static final String VALUE = "value";
+
+    public static class Versions {
+        public static final int VERSION_1 = 1;
+    }
 }

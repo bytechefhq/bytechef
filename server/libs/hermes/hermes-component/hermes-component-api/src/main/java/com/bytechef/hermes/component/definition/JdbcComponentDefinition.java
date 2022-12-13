@@ -17,47 +17,23 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.constants.Versions;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public sealed class JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcComponentDefinition {
-    protected String databaseJdbcName;
-    protected String jdbcDriverClassName;
-    protected Display display;
-    protected Resources resources;
-    protected double version = Versions.VERSION_1;
-    private final String name;
+public sealed interface JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcComponentDefinition {
 
-    protected JdbcComponentDefinition(String name) {
-        this.name = Objects.requireNonNull(name);
-    }
+    String getDatabaseJdbcName();
 
-    public String getDatabaseJdbcName() {
-        return databaseJdbcName;
-    }
+    String getJdbcDriverClassName();
 
-    public String getJdbcDriverClassName() {
-        return jdbcDriverClassName;
-    }
+    Display getDisplay();
 
-    public Display getDisplay() {
-        return display;
-    }
+    Resources getResources();
 
-    public Resources getResources() {
-        return resources;
-    }
+    String getName();
 
-    public String getName() {
-        return name;
-    }
-
-    public double getVersion() {
-        return version;
-    }
+    double getVersion();
 }
