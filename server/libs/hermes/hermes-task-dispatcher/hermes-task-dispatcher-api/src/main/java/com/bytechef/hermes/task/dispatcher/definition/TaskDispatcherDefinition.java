@@ -17,8 +17,6 @@
 
 package com.bytechef.hermes.task.dispatcher.definition;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
-
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
@@ -35,49 +33,23 @@ import java.util.List;
 @Schema(
     name = "TaskDispatcherDefinition",
     description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
-public sealed class TaskDispatcherDefinition permits TaskDispatcherDSL.ModifiableTaskDispatcherDefinition {
+public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.ModifiableTaskDispatcherDefinition {
 
-    protected Display display;
-    private final String name;
-    protected List<Property<? extends Property<?>>> output;
-    protected List<Property<?>> properties;
-    protected Resources resources;
-    protected int version = VERSION_1;
-    protected List<Property<?>> taskProperties;
-
-    protected TaskDispatcherDefinition(String name) {
-        this.name = name;
-    }
-
-    public Display getDisplay() {
-        return display;
-    }
+    Display getDisplay();
 
     @Schema(name = "name", description = "The connection name.")
-    public String getName() {
-        return name;
-    }
+    String getName();
 
     @Schema(name = "output", description = "The output schema of a task dispatching result.")
-    public List<Property<? extends Property<?>>> getOutput() {
-        return output;
-    }
+    List<Property<? extends Property<?>>> getOutput();
 
     @Schema(name = "properties", description = "Properties of the connection.")
-    public List<Property<?>> getProperties() {
-        return properties;
-    }
+    List<Property<?>> getProperties();
 
-    public Resources getResources() {
-        return resources;
-    }
+    Resources getResources();
 
-    public int getVersion() {
-        return version;
-    }
+    int getVersion();
 
     @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.")
-    public List<Property<?>> getTaskProperties() {
-        return taskProperties;
-    }
+    List<Property<?>> getTaskProperties();
 }

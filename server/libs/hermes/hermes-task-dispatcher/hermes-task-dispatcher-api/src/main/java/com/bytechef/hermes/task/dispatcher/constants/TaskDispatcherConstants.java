@@ -20,6 +20,9 @@ package com.bytechef.hermes.task.dispatcher.constants;
 /**
  * @author Ivica Cardic
  */
-public class Versions {
-    public static final int VERSION_1 = 1;
+public class TaskDispatcherConstants {
+
+    public static class Versions {
+        public static final int VERSION_1 = 1;
+    }
 }

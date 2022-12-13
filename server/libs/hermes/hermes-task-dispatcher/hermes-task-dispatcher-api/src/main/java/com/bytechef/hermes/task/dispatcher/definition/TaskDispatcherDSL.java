@@ -18,8 +18,13 @@
 package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Resources;
+
 import java.util.List;
+
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 
 /**
  * @author Ivica Cardic
@@ -38,10 +43,18 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         return buildObject(name, "The task or task dispatcher to use.", "TASK");
     }
 
-    public static final class ModifiableTaskDispatcherDefinition extends TaskDispatcherDefinition {
+    public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {
+
+        private Display display;
+        private final String name;
+        private List<Property<? extends Property<?>>> output;
+        private List<Property<?>> properties;
+        private Resources resources;
+        private int version = VERSION_1;
+        private List<Property<?>> taskProperties;
 
         private ModifiableTaskDispatcherDefinition(String name) {
-            super(name);
+            this.name = name;
         }
 
         public ModifiableTaskDispatcherDefinition display(ModifiableDisplay display) {
@@ -82,6 +95,41 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             this.taskProperties = List.of(taskProperties);
 
             return this;
+        }
+
+        @Override
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public List<Property<? extends Property<?>>> getOutput() {
+            return output;
+        }
+
+        @Override
+        public List<Property<?>> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public Resources getResources() {
+            return resources;
+        }
+
+        @Override
+        public int getVersion() {
+            return version;
+        }
+
+        @Override
+        public List<Property<?>> getTaskProperties() {
+            return taskProperties;
         }
     }
 }
