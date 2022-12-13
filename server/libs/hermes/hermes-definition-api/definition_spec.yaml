@@ -113,7 +113,7 @@ schemas:
           items:
             type: object
   ControlType:
-    description: A type of the editor to show in UI.
+    description: A type of the control to show in UI.
     type: string
     enum:
       - CODE
