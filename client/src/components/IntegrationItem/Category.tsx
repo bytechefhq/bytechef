@@ -1,9 +1,5 @@
-import React, {PropsWithChildren} from 'react';
+import React from 'react';
 
-type Props = {
-	category: string;
-};
-
-export const Category: React.FC<PropsWithChildren<Props>> = ({category}) => {
-	return <div>{category}</div>;
+export const Category: React.FC<{category: string}> = ({category}) => {
+    return <div>{category}</div>;
 };

@@ -1,11 +1,7 @@
-import React, {PropsWithChildren} from 'react';
+import React from 'react';
 
-type Props = {
-	dropdownTrigger: string;
-};
-
-export const DropdownTrigger: React.FC<PropsWithChildren<Props>> = ({
-	dropdownTrigger,
+export const DropdownTrigger: React.FC<{dropdownTrigger: string}> = ({
+    dropdownTrigger,
 }) => {
-	return <div>{dropdownTrigger}</div>;
+    return <div>{dropdownTrigger}</div>;
 };

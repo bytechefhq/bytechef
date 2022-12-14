@@ -1,8 +1,5 @@
-import React, {PropsWithChildren} from 'react';
+import React from 'react';
 
-type Props = {
-	button: string;
-};
-export const AddTagButton: React.FC<PropsWithChildren<Props>> = ({button}) => {
-	return <div>{button}</div>;
+export const AddTagButton: React.FC<{button: string}> = ({button}) => {
+    return <div>{button}</div>;
 };

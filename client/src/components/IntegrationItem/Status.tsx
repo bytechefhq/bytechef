@@ -1,9 +1,5 @@
-import React, {PropsWithChildren} from 'react';
+import React from 'react';
 
-type Props = {
-	status: string;
-};
-
-export const Status: React.FC<PropsWithChildren<Props>> = ({status}) => {
-	return <div>{status}</div>;
+export const Status: React.FC<{status: string}> = ({status}) => {
+    return <div>{status}</div>;
 };
