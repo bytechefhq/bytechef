@@ -18,6 +18,7 @@
 package com.bytechef.hermes.connection.repository;
 
 import com.bytechef.hermes.connection.domain.Connection;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,5 +26,6 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface ConnectionRepository extends PagingAndSortingRepository<Connection, String> {
+public interface ConnectionRepository
+    extends PagingAndSortingRepository<Connection, String>, CrudRepository<Connection, String> {
 }

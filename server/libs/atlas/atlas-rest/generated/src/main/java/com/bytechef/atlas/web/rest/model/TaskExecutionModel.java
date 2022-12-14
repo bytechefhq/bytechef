@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * Adds execution semantics to the task.
@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-07T16:28:15.510907+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   @JsonProperty("createdBy")

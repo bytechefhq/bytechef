@@ -11,13 +11,13 @@ import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * TODO
@@ -25,7 +25,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-28T17:57:21.937957+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T15:12:27.587783+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")

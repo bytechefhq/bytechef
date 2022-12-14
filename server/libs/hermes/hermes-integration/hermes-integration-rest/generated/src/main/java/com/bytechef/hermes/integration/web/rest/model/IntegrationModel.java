@@ -11,13 +11,13 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * A group of workflows that make one logical integration.
@@ -25,7 +25,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-02T12:00:57.220855+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T15:17:10.759237+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("createdBy")

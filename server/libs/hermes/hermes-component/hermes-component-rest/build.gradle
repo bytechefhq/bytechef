@@ -17,7 +17,7 @@ dependencies {
     implementation libs.jackson.databind.nullable
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "jakarta.annotation:jakarta.annotation-api"
-    implementation "javax.validation:validation-api"
+    implementation "jakarta.validation:jakarta.validation-api"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-webflux"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
