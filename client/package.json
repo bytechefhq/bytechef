@@ -54,7 +54,6 @@
 		"react-hook-form": "^7.39.3",
 		"react-router-dom": "^6.4.3",
 		"reactflow": "^11.2.0",
-		"sass": "^1.56.1",
 		"tailwindcss-radix": "^2.6.1",
 		"yup": "^0.32.11",
 		"zustand": "^4.1.4"
