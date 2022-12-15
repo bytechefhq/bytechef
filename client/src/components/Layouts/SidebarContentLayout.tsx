@@ -1,11 +1,12 @@
-import {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
+import React, {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
+import PageHeader from '../PageHeader/PageHeader';
 
 type Props = {
-    sidebarContent?: ReactNode;
+    sidebar?: ReactNode;
     title: string;
-    subTitle?: string; //TODO define function
+    subTitle: string; //TODO define function
     topRight?: ReactNode;
 };
 
@@ -13,7 +14,7 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
     title,
     subTitle,
     topRight,
-    sidebarContent,
+    sidebar,
     children,
 }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -80,7 +81,7 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
                                 <div className="mt-5 h-0 flex-1 overflow-y-auto">
                                     <nav className="flex h-full flex-col">
                                         <div className="space-y-1">
-                                            {sidebarContent}
+                                            {sidebar}
                                         </div>
                                     </nav>
                                 </div>
@@ -97,12 +98,9 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
             <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
                 {/* Sidebar component, swap this element with another sidebar if you like */}
                 <nav className="flex h-full flex-col border-gray-200 bg-gray-50 px-4 dark:bg-gray-700">
-                    <div className="mb-6 flex shrink-0 items-center py-4 ">
-                        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-200">
-                            {title}
-                        </h1>
-                    </div>
-                    <div>{sidebarContent}</div>
+                    <PageHeader title={title} bold={true} />
+
+                    <div>{sidebar}</div>
                 </nav>
             </aside>
 
@@ -120,15 +118,7 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
                     {/*  </button>*/}
                     {/*</div>*/}
 
-                    <div className="mb-6 flex justify-center py-4">
-                        <div className="flex w-full items-center justify-between">
-                            <h2 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-200">
-                                {subTitle}
-                            </h2>
-
-                            <div>{topRight}</div>
-                        </div>
-                    </div>
+                    <PageHeader title={subTitle} right={topRight} />
 
                     <main className="flex flex-1 overflow-y-auto">
                         {/* Primary column */}
