@@ -7,7 +7,8 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
-        "reactive": "true"
+        "reactive": "true",
+        "useSpringBoot3": "true"
     ]
     generatorName = "spring"
     importMappings = [
@@ -46,7 +47,7 @@ dependencies {
 
     implementation libs.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
-    implementation "javax.validation:validation-api"
+    implementation "jakarta.validation:jakarta.validation-api"
     implementation libs.mapstruct
     implementation libs.mapstruct.spring.annotations
     implementation "org.slf4j:slf4j-api"
@@ -56,7 +57,6 @@ dependencies {
     implementation libs.swagger.annotations
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
     implementation project(":server:libs:core:autoconfigure-annotations")
-    implementation project(":server:libs:core:commons:commons-cache")
     implementation project(":server:libs:core:commons:commons-utils")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"

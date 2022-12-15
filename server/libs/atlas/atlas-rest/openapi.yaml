@@ -5,26 +5,16 @@ info:
 servers:
   - url: http://localhost:5173/api
 paths:
-  /caches/clear:
-    get:
-      description: Clears all cache state on demand.
-      summary: Clears all cache state on demand.
-      tags:
-        - caches
-      operationId: clearCache
-      responses:
-        "200":
-          description: Successful operation.
   /jobs:
     get:
-      description: Returns a page of jobs.
-      summary: Returns a page of jobs.
+      description: Get a page of jobs.
+      summary: Get a page of jobs.
       tags:
         - jobs
       operationId: getJobs
       parameters:
         - name: pageNumber
-          description: Number of the page to return.
+          description: The number of the page to return.
           in: query
           required: false
           schema:
@@ -53,7 +43,7 @@ paths:
         required: true
       responses:
         "200":
-          description: Id of the created job.
+          description: The id of the created job.
           content:
             application/json:
               schema:
@@ -84,7 +74,7 @@ paths:
       operationId: getJob
       parameters:
         - name: id
-          description: Id of the job to return.
+          description: The id of the job to return.
           in: path
           required: true
           schema:
@@ -105,7 +95,7 @@ paths:
       operationId: restartJob
       parameters:
         - name: id
-          description: Id of the job to restart.
+          description: The id of the job to restart.
           in: path
           required: true
           schema:
@@ -122,7 +112,7 @@ paths:
       operationId: stopJob
       parameters:
         - name: id
-          description: Id of the job to stop.
+          description: The id of the job to stop.
           in: path
           required: true
           schema:
@@ -139,7 +129,7 @@ paths:
       operationId: getJobTaskExecutions
       parameters:
         - name: id
-          description: Id of the job to return task executions for.
+          description: The id of the job to return task executions for.
           in: path
           required: true
           schema:
@@ -162,7 +152,7 @@ paths:
       operationId: getTaskExecution
       parameters:
         - name: id
-          description: Id of the task execution.
+          description: The id of the task execution to get.
           in: path
           required: true
           schema:
@@ -219,7 +209,7 @@ paths:
       operationId: deleteWorkflow
       parameters:
         - name: id
-          description: Id of the workflow to delete.
+          description: The id of the workflow to delete.
           in: path
           required: true
           schema:
@@ -235,7 +225,7 @@ paths:
       operationId: getWorkflow
       parameters:
         - name: id
-          description: Id of the workflow to return.
+          description: The id of the workflow to get.
           in: path
           required: true
           schema:
@@ -255,7 +245,7 @@ paths:
       operationId: putWorkflow
       parameters:
         - name: id
-          description: Id of the workflow to update.
+          description: The id of the workflow to update.
           in: path
           required: true
           schema:
@@ -293,11 +283,11 @@ components:
       type: object
       properties:
         createdBy:
-          description: Created by.
+          description: The created by.
           type: string
           readOnly: true
         createdDate:
-          description: Created date.
+          description: The created date.
           type: string
           format: date-time
           readOnly: true
@@ -316,7 +306,7 @@ components:
           type: string
           readOnly: true
         inputs:
-          description: The key-value map of inputs passed to the job when it was created.
+          description: The key-value map of the inputs passed to the job when it was created.
           type: object
           additionalProperties:
             type: object
@@ -324,16 +314,16 @@ components:
           description: The job's human-readable name.
           type: string
         lastModifiedBy:
-          description: Last modified by.
+          description: The last modified by.
           type: string
           readOnly: true
         lastModifiedDate:
-          description: Last modified date.
+          description: The last modified date.
           type: string
           format: date-time
           readOnly: true
         outputs:
-          description: The key-value map of outputs returned.
+          description: The key-value map of the outputs returned.
           type: object
           additionalProperties:
             type: object
@@ -358,7 +348,7 @@ components:
             - FAILED
             - COMPLETED
         webhooks:
-          description: The list of webhooks configured.
+          description: The list of the webhooks configured.
           type: array
           items:
             type: object
@@ -377,13 +367,13 @@ components:
           description: The size of the page.
           type: integer
         numberOfElements:
-          description: Number of elements.
+          description: The number of elements.
           type: integer
         totalPages:
-          description: Total number of pages.
+          description: The total number of pages.
           type: integer
         totalElements:
-          description: Total number of elements.
+          description: The total number of elements.
           type: integer
         content:
           description: List of elements.
@@ -395,11 +385,11 @@ components:
       type: object
       properties:
         createdBy:
-          description: Created by.
+          description: The created by.
           type: string
           readOnly: true
         createdDate:
-          description: Created date.
+          description: The created date.
           type: string
           format: date-time
           readOnly: true
@@ -421,11 +411,11 @@ components:
           description: The id of the job for which this task belongs to.
           type: string
         lastModifiedBy:
-          description: Last modified by.
+          description: The last modified by.
           type: string
           readOnly: true
         lastModifiedDate:
-          description: Last modified date.
+          description: The last modified date.
           type: string
           format: date-time
           readOnly: true
@@ -475,28 +465,28 @@ components:
           description: The numeric order of the task in the workflow.
           type: integer
           format: int32
-        workflowTask:
-          $ref: '#/components/schemas/WorkflowTask'
         retryDelayMillis:
           description: The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.
           type: integer
           format: int64
+        workflowTask:
+          $ref: '#/components/schemas/WorkflowTask'
         type:
           description: The type of the task.
           type: string
     Workflow:
-      description: The blueprint that describe the execution of a job.
+      description: The lueprint that describe the execution of a job.
       type: object
       properties:
         definition:
           description: Definition of the workflow that is executed as a job.
           type: string
         createdBy:
-          description: Created by.
+          description: The created by.
           type: string
           readOnly: true
         createdDate:
-          description: Created date.
+          description: The created date.
           type: string
           format: date-time
           readOnly: true
@@ -508,7 +498,7 @@ components:
             - YML
             - YAML
         id:
-          description: Id of the workflow.
+          description: The id of the workflow.
           type: string
           readOnly: true
         inputs:
@@ -519,14 +509,14 @@ components:
             additionalProperties:
               type: object
         label:
-          description: Descriptive name for the workflow
+          description: The descriptive name for the workflow
           type: string
         lastModifiedBy:
-          description: Last modified by.
+          description: The last modified by.
           type: string
           readOnly: true
         lastModifiedDate:
-          description: Last modified date.
+          description: The last modified date.
           type: string
           format: date-time
           readOnly: true
@@ -561,15 +551,15 @@ components:
           description: The job's human-readable name
           type: string
         outputs:
-          description: The outputs expected by the workflow
+          description: The outputs expected by the workflow.
           type: object
           additionalProperties:
             type: object
         parentTaskExecutionId:
-          description: Id of the parent task that created this job. Used for sub-flows.
+          description: The id of the parent task that created this job. Used for sub-flows.
           type: string
         priority:
-          description: the priority value used during execution of individual tasks.
+          description: The priority value used during execution of individual tasks.
           type: integer
         workflowId:
           description: Id of the workflow to execute.
@@ -600,7 +590,7 @@ components:
           description: Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is "encoder", then the task will be routed to the "encoder" queue which is presumably subscribed to by worker nodes of "encoder" type.
           type: string
         parameters:
-          description: The key-value map of task parameters.
+          description: Key-value map of task parameters.
           type: object
           additionalProperties:
             type: object
@@ -618,5 +608,5 @@ components:
           description: The timeout expression which describes when this task should be deemed as timed-out.
           type: string
         type:
-          description: The type of the task.
+          description: Type of the task.
           type: string

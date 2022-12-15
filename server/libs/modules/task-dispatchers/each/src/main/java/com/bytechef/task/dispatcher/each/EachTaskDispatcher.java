@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_VAR;
@@ -38,6 +39,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,12 +62,12 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final CounterService counterService;
 
     public EachTaskDispatcher(
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService,
-            MessageBroker messageBroker,
-            ContextService contextService,
-            CounterService counterService,
-            TaskEvaluator taskEvaluator) {
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService,
+        MessageBroker messageBroker,
+        ContextService contextService,
+        CounterService counterService,
+        TaskEvaluator taskEvaluator) {
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.messageBroker = messageBroker;
@@ -76,8 +78,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        WorkflowTask iteratee = taskExecution.getWorkflowTask(ITERATEE);
-        List<Object> list = taskExecution.getList(LIST, Object.class);
+        WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
+        List<Object> list = MapUtils.getList(taskExecution.getParameters(), LIST, Object.class);
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
         Assert.notNull(list, "'list' property can't be null");
@@ -94,13 +96,13 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
-                TaskExecution iterateeTaskExecution = TaskExecution.of(
-                        iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
+                TaskExecution iterateeTaskExecution = new TaskExecution(
+                    iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
-                context.put(taskExecution.getString(ITEM_VAR, ITEM), item);
-                context.put(taskExecution.getString(ITEM_INDEX, ITEM_INDEX), i);
+                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
+                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
                 contextService.push(iterateeTaskExecution.getId(), context);
 
@@ -123,7 +125,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
             return this;
         }
         return null;

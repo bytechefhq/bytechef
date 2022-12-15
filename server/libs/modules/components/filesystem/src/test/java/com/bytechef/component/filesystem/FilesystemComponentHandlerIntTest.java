@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -21,18 +22,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
-import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
@@ -56,14 +55,14 @@ public class FilesystemComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry =
-                fileStorageService.storeFileContent("sample.txt", Files.contentOf(getFile(), Charset.defaultCharset()));
+        FileEntry fileEntry = fileStorageService.storeFileContent("sample.txt",
+            Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
-        assertThat(MapUtils.getMap(outputs, "readLocalFile"))
-                .hasFieldOrPropertyWithValue("extension", "txt")
-                .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-                .hasFieldOrPropertyWithValue("name", "sample.txt")
-                .hasFieldOrPropertyWithValue("url", fileEntry.getUrl());
+        assertThat(outputs.get("readLocalFile"))
+            .hasFieldOrPropertyWithValue("extension", "txt")
+            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
+            .hasFieldOrPropertyWithValue("name", "sample.txt")
+            .hasFieldOrPropertyWithValue("url", fileEntry.getUrl());
     }
 
     @Test
@@ -72,16 +71,16 @@ public class FilesystemComponentHandlerIntTest {
         File tempFile = Files.newTemporaryFile();
 
         Job job = workflowExecutor.execute(
-                "filesystem_v1_writeFile",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getAbsolutePath(),
-                                        Files.contentOf(getFile(), Charset.defaultCharset()))
-                                .toMap(),
-                        "filename",
-                        tempFile.getAbsolutePath()));
+            "filesystem_v1_writeFile",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getAbsolutePath(),
+                        Files.contentOf(getFile(), StandardCharsets.UTF_8))
+                    .toMap(),
+                "filename",
+                tempFile.getAbsolutePath()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -91,8 +90,9 @@ public class FilesystemComponentHandlerIntTest {
     }
 
     private File getFile() throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/sample.txt");
-
-        return classPathResource.getFile();
+        return new File(FilesystemComponentHandlerIntTest.class
+            .getClassLoader()
+            .getResource("dependencies/sample.txt")
+            .getFile());
     }
 }

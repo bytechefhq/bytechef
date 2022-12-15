@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -20,7 +21,7 @@ import com.bytechef.hermes.file.storage.domain.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,25 +38,28 @@ public class Base64StorageServiceTest {
     @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.getFileStream(
-                FileEntry.of(Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset()))));
+            new FileEntry(Base64.getEncoder()
+                .encodeToString(string.getBytes(StandardCharsets.UTF_8))));
 
-        Assertions.assertThat(new String(inputStream.readAllBytes(), Charset.defaultCharset()))
-                .isEqualTo(string);
+        Assertions.assertThat(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
+            .isEqualTo(string);
     }
 
     @Test
     public void testRead() {
         Assertions.assertThat(base64StorageService.readFileToString(
-                        FileEntry.of(Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset())))))
-                .isEqualTo(string);
+            new FileEntry(Base64.getEncoder()
+                .encodeToString(string.getBytes(StandardCharsets.UTF_8)))))
+            .isEqualTo(string);
     }
 
     @Test
     public void testWrite() {
         FileEntry fileEntry = base64StorageService.storeFileContent(
-                "fileEntry", new ByteArrayInputStream(string.getBytes(Charset.defaultCharset())));
+            "fileEntry", new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertThat(fileEntry.getUrl())
-                .isEqualTo("base64:" + Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset())));
+            .isEqualTo("base64:" + Base64.getEncoder()
+                .encodeToString(string.getBytes(StandardCharsets.UTF_8)));
     }
 }

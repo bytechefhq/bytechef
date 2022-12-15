@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -115,7 +116,8 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     @Column("workflow_id")
     private String workflowId;
 
-    public Job() {}
+    public Job() {
+    }
 
     public Job(String id) {
         this.id = id;
@@ -379,23 +381,23 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     @Override
     public String toString() {
         return "Job{" + "createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", currentTask="
-                + currentTask + ", endTime="
-                + endTime + ", error="
-                + error + ", id='"
-                + id + '\'' + ", isNew="
-                + isNew + ", inputs="
-                + inputs + ", label='"
-                + label + '\'' + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", outputs="
-                + outputs + ", parentTaskExecution="
-                + parentTaskExecution + ", priority="
-                + priority + ", startTime="
-                + startTime + ", status="
-                + status + ", webhooks="
-                + webhooks + ", workflowId='"
-                + workflowId + '\'' + '}';
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", currentTask="
+            + currentTask + ", endTime="
+            + endTime + ", error="
+            + error + ", id='"
+            + id + '\'' + ", isNew="
+            + isNew + ", inputs="
+            + inputs + ", label='"
+            + label + '\'' + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", outputs="
+            + outputs + ", parentTaskExecution="
+            + parentTaskExecution + ", priority="
+            + priority + ", startTime="
+            + startTime + ", status="
+            + status + ", webhooks="
+            + webhooks + ", workflowId='"
+            + workflowId + '\'' + '}';
     }
 }

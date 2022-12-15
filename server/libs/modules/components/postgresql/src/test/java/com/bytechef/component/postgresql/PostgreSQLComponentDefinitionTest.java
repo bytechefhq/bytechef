@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,8 +17,8 @@
 
 package com.bytechef.component.postgresql;
 
-import com.bytechef.hermes.component.registrar.jdbc.JdbcComponentTaskHandler;
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.hermes.component.task.handler.JdbcComponentTaskHandler;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,9 +28,10 @@ public class PostgreSQLComponentDefinitionTest {
 
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals(
-                "definition/postgresql_v1.json",
-                new JdbcComponentTaskHandler(null, new PostgreSQLJdbcComponentFactory().getJdbcComponentDefinition())
-                        .getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/postgresql_v1.json",
+            new JdbcComponentTaskHandler(
+                null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
+                    .getDefinition());
     }
 }

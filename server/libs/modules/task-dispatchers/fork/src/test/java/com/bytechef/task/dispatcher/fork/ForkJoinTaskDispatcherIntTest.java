@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -20,8 +21,8 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler;
-import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,32 +50,35 @@ public class ForkJoinTaskDispatcherIntTest {
 
     @BeforeEach
     void beforeEach() {
-        testVarTaskHandler = new TestVarTaskHandler<>((valueMap, name, value) ->
-                valueMap.computeIfAbsent(name, key -> new ArrayList<>()).add(value));
+        testVarTaskHandler = new TestVarTaskHandler<>(
+            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
+                .add(value));
     }
 
     @Disabled
     @Test
     public void testDispatch() {
         workflowExecutor.execute(
-                "fork-join_v1",
-                (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                        List.of(new ForkJoinTaskCompletionHandler(
-                                taskExecutionService,
-                                taskCompletionHandler,
-                                counterService,
-                                taskDispatcher,
-                                contextService,
-                                taskEvaluator)),
-                (contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                        List.of(new ForkJoinTaskDispatcher(
-                                contextService,
-                                counterService,
-                                messageBroker,
-                                taskDispatcher,
-                                taskEvaluator,
-                                taskExecutionService)),
-                () -> Map.of("var", testVarTaskHandler));
+            "fork-join_v1",
+            (
+                counterService, taskCompletionHandler, taskDispatcher, taskEvaluator,
+                taskExecutionService) -> List.of(new ForkJoinTaskCompletionHandler(
+                    taskExecutionService,
+                    taskCompletionHandler,
+                    counterService,
+                    taskDispatcher,
+                    contextService,
+                    taskEvaluator)),
+            (
+                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
+                taskExecutionService) -> List.of(new ForkJoinTaskDispatcher(
+                    contextService,
+                    counterService,
+                    messageBroker,
+                    taskDispatcher,
+                    taskEvaluator,
+                    taskExecutionService)),
+            () -> Map.of("var", testVarTaskHandler));
 
         // TODO
     }

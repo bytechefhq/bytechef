@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -41,9 +42,11 @@ public class InMemoryContextRepository implements ContextRepository {
 
     @Override
     public Iterable<Context> findAll() {
-        return contexts.values().stream()
-                .flatMap(deque -> deque.stream().map(Context::new))
-                .toList();
+        return contexts.values()
+            .stream()
+            .flatMap(deque -> deque.stream()
+                .map(Context::new))
+            .toList();
     }
 
     @Override

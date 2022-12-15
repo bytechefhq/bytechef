@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -49,7 +50,8 @@ public final class Counter implements Persistable<String> {
 
     private Long value;
 
-    public Counter() {}
+    public Counter() {
+    }
 
     public Counter(String id, Long value) {
         Assert.notNull(id, "id cannot be null");
@@ -123,10 +125,10 @@ public final class Counter implements Persistable<String> {
     @Override
     public String toString() {
         return "Counter{" + "createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", id='"
-                + id + '\'' + ", isNew="
-                + isNew + ", value="
-                + value + '}';
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", id='"
+            + id + '\'' + ", isNew="
+            + isNew + ", value="
+            + value + '}';
     }
 }

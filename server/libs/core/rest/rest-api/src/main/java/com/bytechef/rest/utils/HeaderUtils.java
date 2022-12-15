@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -27,24 +28,27 @@ public class HeaderUtils {
 
     private static final Logger log = LoggerFactory.getLogger(HeaderUtils.class);
 
-    private HeaderUtils() {}
+    private HeaderUtils() {
+    }
 
     /**
-     * <p>createFailureAlert.</p>
+     * <p>
+     * createFailureAlert.
+     * </p>
      *
-     * @param applicationName a {@link String} object.
+     * @param applicationName   a {@link String} object.
      * @param enableTranslation a boolean.
-     * @param entityName a {@link String} object.
-     * @param errorKey a {@link String} object.
-     * @param defaultMessage a {@link String} object.
+     * @param entityName        a {@link String} object.
+     * @param errorKey          a {@link String} object.
+     * @param defaultMessage    a {@link String} object.
      * @return a {@link org.springframework.http.HttpHeaders} object.
      */
     public static HttpHeaders createFailureAlert(
-            String applicationName,
-            boolean enableTranslation,
-            String entityName,
-            String errorKey,
-            String defaultMessage) {
+        String applicationName,
+        boolean enableTranslation,
+        String entityName,
+        String errorKey,
+        String defaultMessage) {
         log.error("Entity processing failed, {}", defaultMessage);
 
         String message = enableTranslation ? "error." + errorKey : defaultMessage;

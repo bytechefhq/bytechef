@@ -13,25 +13,19 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-rsocket"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation "org.springframework.kafka:spring-kafka"
-    implementation libs.springdoc.openapi.native
-    implementation libs.springdoc.openapi.ui
-    implementation libs.springdoc.openapi.webflux.ui
+    implementation libs.springdoc.openapi.starter.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:atlas:atlas-event:atlas-event-impl")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
-    implementation project(":server:libs:atlas:atlas-task-evaluator-impl")
-    implementation project(":server:libs:core:commons:commons-utils")
     implementation project(":server:libs:core:discovery:discovery-config")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket-client")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-jdbc")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-openapi")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-standard")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-rest")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
@@ -42,21 +36,22 @@ dependencies {
     implementation project(":server:libs:modules:components:filestorage")
     implementation project(":server:libs:modules:components:httpclient")
     implementation project(":server:libs:modules:components:jsonfile")
+    implementation project(":server:libs:modules:components:jsonhelper")
     implementation project(":server:libs:modules:components:logger")
     implementation project(":server:libs:modules:components:filesystem")
-    implementation project(":server:libs:modules:components:function")
     implementation project(":server:libs:modules:components:map")
     implementation project(":server:libs:modules:components:mysql")
-    implementation project(":server:libs:modules:components:objecthelper")
     implementation project(":server:libs:modules:components:odsfile")
     implementation project(":server:libs:modules:components:postgresql")
     implementation project(":server:libs:modules:components:randomhelper")
+    implementation project(":server:libs:modules:components:script")
     implementation project(":server:libs:modules:components:var")
     implementation project(":server:libs:modules:components:xlsxfile")
     implementation project(":server:libs:modules:components:xmlfile")
     implementation project(":server:libs:modules:components:xmlhelper")
 
-    testImplementation "org.springframework.boot:spring-boot-starter-activemq"
+    testImplementation "org.apache.activemq:artemis-jakarta-server"
+    testImplementation "org.springframework.boot:spring-boot-starter-artemis"
     testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-support")
 }

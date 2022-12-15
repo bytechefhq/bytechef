@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,7 @@
 package com.bytechef.atlas.repository.jdbc.event;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
@@ -38,7 +39,7 @@ public class JobCallback implements BeforeConvertCallback<Job> {
             job.setCreatedDate(LocalDateTime.now());
 
             if (job.getId() == null) {
-                job.setId(UUIDGenerator.generate());
+                job.setId(UUIDUtils.generate());
             }
         }
 

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.component.httpclient;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ public class HttpClientComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/httpclient_v1.json", new HttpClientComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/httpclient_v1.json", new HttpClientComponentHandler().getDefinition());
     }
 
     @Disabled

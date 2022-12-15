@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -30,13 +31,13 @@ public class GitWorkflowRepositoryConfiguration {
     @Bean
     @Order(4)
     GitWorkflowRepository gitWorkflowRepository(
-            GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties, WorkflowMapper workflowMapper) {
+        GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties, WorkflowMapper workflowMapper) {
         return new GitWorkflowRepository(
-                gitWorkflowRepositoryProperties.getUrl(),
-                gitWorkflowRepositoryProperties.getBranch(),
-                gitWorkflowRepositoryProperties.getSearchPaths(),
-                gitWorkflowRepositoryProperties.getUsername(),
-                gitWorkflowRepositoryProperties.getPassword(),
-                workflowMapper);
+            gitWorkflowRepositoryProperties.getUrl(),
+            gitWorkflowRepositoryProperties.getBranch(),
+            gitWorkflowRepositoryProperties.getSearchPaths(),
+            gitWorkflowRepositoryProperties.getUsername(),
+            gitWorkflowRepositoryProperties.getPassword(),
+            workflowMapper);
     }
 }

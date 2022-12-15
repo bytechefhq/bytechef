@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -126,13 +127,13 @@ public class JobParametersDTO {
         JobParametersDTO workflowParameters = (JobParametersDTO) o;
 
         return Objects.equals(this.jobId, workflowParameters.jobId)
-                && Objects.equals(this.inputs, workflowParameters.inputs)
-                && Objects.equals(this.label, workflowParameters.label)
-                && Objects.equals(this.outputs, workflowParameters.outputs)
-                && Objects.equals(this.parentTaskExecutionId, workflowParameters.parentTaskExecutionId)
-                && Objects.equals(this.priority, workflowParameters.priority)
-                && Objects.equals(this.workflowId, workflowParameters.workflowId)
-                && Objects.equals(this.webhooks, workflowParameters.webhooks);
+            && Objects.equals(this.inputs, workflowParameters.inputs)
+            && Objects.equals(this.label, workflowParameters.label)
+            && Objects.equals(this.outputs, workflowParameters.outputs)
+            && Objects.equals(this.parentTaskExecutionId, workflowParameters.parentTaskExecutionId)
+            && Objects.equals(this.priority, workflowParameters.priority)
+            && Objects.equals(this.workflowId, workflowParameters.workflowId)
+            && Objects.equals(this.webhooks, workflowParameters.webhooks);
     }
 
     @Override
@@ -143,12 +144,12 @@ public class JobParametersDTO {
     @Override
     public String toString() {
         return "WorkflowParametersDTO{" + "inputs="
-                + inputs + ", label='"
-                + label + '\'' + ", outputs="
-                + outputs + ", parentTaskExecutionId='"
-                + parentTaskExecutionId + '\'' + ", priority="
-                + priority + ", workflowId='"
-                + workflowId + '\'' + ", webhooks="
-                + webhooks + '}';
+            + inputs + ", label='"
+            + label + '\'' + ", outputs="
+            + outputs + ", parentTaskExecutionId='"
+            + parentTaskExecutionId + '\'' + ", priority="
+            + priority + ", workflowId='"
+            + workflowId + '\'' + ", webhooks="
+            + webhooks + '}';
     }
 }

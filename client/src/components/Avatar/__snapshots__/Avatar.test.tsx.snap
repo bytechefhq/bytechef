@@ -2,7 +2,7 @@
 
 exports[`<Avatar /> > should render the empty Avatar 1`] = `
 <span
-  class="inline-block overflow-hidden rounded-full bg-gray-100 w-12 h-12"
+  class="inline-block overflow-hidden rounded-full bg-gray-200 w-12 h-12"
   data-testid="empty-avatar"
 >
   <svg

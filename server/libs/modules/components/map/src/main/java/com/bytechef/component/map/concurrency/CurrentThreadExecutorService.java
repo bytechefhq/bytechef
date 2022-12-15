@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,10 +32,8 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     private final Object lock = new Object();
 
     /*
-     * Conceptually, these two variables describe the executor being in one of three states:
-     *   - Active: shutdown == false
-     *   - Shutdown: runningTasks > 0 and shutdown == true
-     *   - Terminated: runningTasks == 0 and shutdown == true
+     * Conceptually, these two variables describe the executor being in one of three states: - Active: shutdown == false
+     * - Shutdown: runningTasks > 0 and shutdown == true - Terminated: runningTasks == 0 and shutdown == true
      */
     private int runningTasks = 0;
     private boolean shutdown = false;

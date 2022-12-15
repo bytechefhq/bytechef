@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -35,16 +36,19 @@ public class CounterRSocketClient implements CounterService {
 
     @Override
     public void delete(String id) {
-        rSocketRequester.route("deleteCounter").data(id).send().block();
+        rSocketRequester.route("deleteCounter")
+            .data(id)
+            .send()
+            .block();
     }
 
     @Override
     public long decrement(String id) {
         Long counter = rSocketRequester
-                .route("decrementCounter")
-                .data(id)
-                .retrieveMono(Long.class)
-                .block();
+            .route("decrementCounter")
+            .data(id)
+            .retrieveMono(Long.class)
+            .block();
 
         return counter == null ? 0 : counter;
     }
@@ -52,9 +56,9 @@ public class CounterRSocketClient implements CounterService {
     @Override
     public void set(String id, long value) {
         rSocketRequester
-                .route("setCounter")
-                .data(Map.of("id", id, "value", value))
-                .send()
-                .block();
+            .route("setCounter")
+            .data(Map.of("id", id, "value", value))
+            .send()
+            .block();
     }
 }

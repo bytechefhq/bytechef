@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -20,8 +21,8 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
-import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -54,18 +55,20 @@ public class SequenceTaskDispatcherIntTest {
     @Test
     public void testDispatch() {
         workflowExecutor.execute(
-                "sequence_v1",
-                (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                        List.of(new SequenceTaskCompletionHandler(
-                                contextService,
-                                taskCompletionHandler,
-                                taskDispatcher,
-                                taskEvaluator,
-                                taskExecutionService)),
-                (contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                        List.of(new SequenceTaskDispatcher(
-                                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService)),
-                () -> Map.of("var", testVarTaskHandler));
+            "sequence_v1",
+            (
+                counterService, taskCompletionHandler, taskDispatcher, taskEvaluator,
+                taskExecutionService) -> List.of(new SequenceTaskCompletionHandler(
+                    contextService,
+                    taskCompletionHandler,
+                    taskDispatcher,
+                    taskEvaluator,
+                    taskExecutionService)),
+            (
+                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
+                taskExecutionService) -> List.of(new SequenceTaskDispatcher(
+                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService)),
+            () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(1, (Integer) testVarTaskHandler.get("value1"));
         Assertions.assertEquals(2, (Integer) testVarTaskHandler.get("value2"));

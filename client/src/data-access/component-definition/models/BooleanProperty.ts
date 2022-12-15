@@ -25,19 +25,19 @@ import {
     PropertyOptionFromJSONTyped,
     PropertyOptionToJSON,
 } from './PropertyOption';
-import type { SingleValueProperty } from './SingleValueProperty';
+import type { ValueProperty } from './ValueProperty';
 import {
-    SingleValuePropertyFromJSON,
-    SingleValuePropertyFromJSONTyped,
-    SingleValuePropertyToJSON,
-} from './SingleValueProperty';
+    ValuePropertyFromJSON,
+    ValuePropertyFromJSONTyped,
+    ValuePropertyToJSON,
+} from './ValueProperty';
 
 /**
  * A boolean property type.
  * @export
  * @interface BooleanProperty
  */
-export interface BooleanProperty extends SingleValueProperty {
+export interface BooleanProperty extends ValueProperty {
     /**
      * 
      * @type {string}
@@ -65,7 +65,7 @@ export function BooleanPropertyFromJSONTyped(json: any, ignoreDiscriminator: boo
         return json;
     }
     return {
-        ...SingleValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
         'type': json['type'],
     };
 }
@@ -78,7 +78,7 @@ export function BooleanPropertyToJSON(value?: BooleanProperty | null): any {
         return null;
     }
     return {
-        ...SingleValuePropertyToJSON(value),
+        ...ValuePropertyToJSON(value),
         'type': value.type,
     };
 }

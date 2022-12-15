@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -42,12 +43,12 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     public GitWorkflowRepository(
-            String url,
-            String branch,
-            String[] searchPaths,
-            String username,
-            String password,
-            WorkflowMapper workflowMapper) {
+        String url,
+        String branch,
+        String[] searchPaths,
+        String username,
+        String password,
+        WorkflowMapper workflowMapper) {
         gitWorkflowOperations = new JGitWorkflowOperations(url, branch, searchPaths, username, password);
         this.workflowMapper = workflowMapper;
     }
@@ -56,8 +57,9 @@ public class GitWorkflowRepository implements WorkflowRepository {
     public Iterable<Workflow> findAll() {
         synchronized (this) {
             List<WorkflowResource> resources = gitWorkflowOperations.getHeadFiles();
-            List<Workflow> workflows =
-                    resources.stream().map(r -> workflowMapper.readValue(r)).collect(Collectors.toList());
+            List<Workflow> workflows = resources.stream()
+                .map(r -> workflowMapper.readValue(r))
+                .collect(Collectors.toList());
             return workflows;
         }
     }

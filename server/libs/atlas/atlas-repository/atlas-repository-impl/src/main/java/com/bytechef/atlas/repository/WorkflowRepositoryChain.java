@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -19,7 +20,6 @@
 package com.bytechef.atlas.repository;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.commons.cache.Clearable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Jun 2, 2017
  */
-public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
+public class WorkflowRepositoryChain implements WorkflowRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowRepositoryChain.class);
 
@@ -52,15 +52,6 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
 
         this.cacheManager = cacheManager;
         this.workflowRepositories = workflowRepositories;
-    }
-
-    @Override
-    public void clear() {
-        cacheManager.getCacheNames().forEach(cacheName -> {
-            Cache cache = Objects.requireNonNull(cacheManager.getCache(cacheName));
-
-            cache.clear();
-        });
     }
 
     @Override
@@ -93,7 +84,8 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
     public Optional<Workflow> findById(String id) {
         Cache cacheOne = cacheManager.getCache(CACHE_ONE);
 
-        if (Objects.requireNonNull(cacheOne).get(id) != null) {
+        if (Objects.requireNonNull(cacheOne)
+            .get(id) != null) {
             Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheOne.get(id));
 
             return Optional.of((Workflow) Objects.requireNonNull(valueWrapper.get()));
@@ -101,7 +93,8 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
 
         Cache cacheAll = cacheManager.getCache(CACHE_ALL);
 
-        if (Objects.requireNonNull(cacheAll).get(CACHE_ALL) != null) {
+        if (Objects.requireNonNull(cacheAll)
+            .get(CACHE_ALL) != null) {
             Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
 
             List<Workflow> workflows = (List<Workflow>) Objects.requireNonNull(valueWrapper.get());
@@ -116,8 +109,8 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
         for (WorkflowRepository workflowRepository : workflowRepositories) {
             try {
                 Workflow workflow = workflowRepository
-                        .findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Unknown workflow: " + id));
+                    .findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown workflow: " + id));
 
                 cacheOne.put(id, workflow);
 
@@ -141,15 +134,16 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
 
         if (cacheAll.get(CACHE_ALL) == null) {
             workflows = workflowRepositories.stream()
-                    .map(WorkflowRepository::findAll)
-                    .flatMap(iterable -> StreamSupport.stream(iterable.spliterator(), false))
-                    .sorted((a, b) -> {
-                        if (a.getLabel() == null || b.getLabel() == null) {
-                            return -1;
-                        }
-                        return a.getLabel().compareTo(b.getLabel());
-                    })
-                    .collect(Collectors.toList());
+                .map(WorkflowRepository::findAll)
+                .flatMap(iterable -> StreamSupport.stream(iterable.spliterator(), false))
+                .sorted((a, b) -> {
+                    if (a.getLabel() == null || b.getLabel() == null) {
+                        return -1;
+                    }
+                    return a.getLabel()
+                        .compareTo(b.getLabel());
+                })
+                .collect(Collectors.toList());
 
             cacheAll.put(CACHE_ALL, workflows);
         } else {
@@ -182,7 +176,7 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
         }
 
         throw new RuntimeException(
-                "Set bytechef.workflow.workflow-repository.jdbc.enabled=true property to create new workflow");
+            "Set bytechef.workflow.workflow-repository.jdbc.enabled=true property to create new workflow");
     }
 
     private Workflow update(Workflow workflow) {

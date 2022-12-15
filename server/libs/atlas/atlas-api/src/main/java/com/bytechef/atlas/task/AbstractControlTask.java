@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -27,7 +28,8 @@ public abstract class AbstractControlTask implements ControlTask {
 
     private String type;
 
-    public AbstractControlTask() {}
+    public AbstractControlTask() {
+    }
 
     public AbstractControlTask(String type) {
         this.type = type;

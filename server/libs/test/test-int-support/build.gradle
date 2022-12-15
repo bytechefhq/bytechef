@@ -1,0 +1,9 @@
+dependencies {
+    implementation "org.springframework:spring-test"
+    implementation "org.springframework.boot:spring-boot-test"
+    implementation libs.testcontainers
+    implementation libs.testcontainers.postgresql
+
+    runtimeOnly "com.zaxxer:HikariCP"
+    runtimeOnly "org.postgresql:postgresql"
+}

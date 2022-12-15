@@ -7,7 +7,6 @@ dependencies {
     implementation "org.springframework:spring-tx"
     implementation "org.springframework:spring-web"
     implementation "io.projectreactor:reactor-core"
-    implementation project(":server:libs:core:commons:commons-utils")
 
     testImplementation "org.springframework.boot:spring-boot-starter-web"
     testImplementation "org.springframework.security:spring-security-test"

@@ -89,8 +89,8 @@ export class JobsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a page of jobs.
-     * Returns a page of jobs.
+     * Get a page of jobs.
+     * Get a page of jobs.
      */
     async getJobsRaw(requestParameters: GetJobsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
         const queryParameters: any = {};
@@ -112,8 +112,8 @@ export class JobsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a page of jobs.
-     * Returns a page of jobs.
+     * Get a page of jobs.
+     * Get a page of jobs.
      */
     async getJobs(requestParameters: GetJobsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
         const response = await this.getJobsRaw(requestParameters, initOverrides);

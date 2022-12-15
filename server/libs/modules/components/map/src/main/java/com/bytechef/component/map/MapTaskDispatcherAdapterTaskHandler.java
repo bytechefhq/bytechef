@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -78,25 +79,26 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         });
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(taskHandlerResolver)
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withExecutors(new CurrentThreadExecutorService())
-                .withTaskEvaluator(taskEvaluator)
-                .build();
+            .withTaskHandlerResolver(taskHandlerResolver)
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withExecutors(new CurrentThreadExecutorService())
+            .withTaskEvaluator(taskEvaluator)
+            .build();
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
         contextService.push(taskExecution.getId(), new Context());
 
         MapTaskDispatcher dispatcher = MapTaskDispatcher.builder()
-                .contextService(contextService)
-                .counterService(new CounterServiceImpl(new InMemoryCounterRepository()))
-                .messageBroker(messageBroker)
-                .taskDispatcher(worker::handle)
-                .taskExecutionService(new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository()))
-                .taskEvaluator(taskEvaluator)
-                .build();
+            .contextService(contextService)
+            .counterService(new CounterServiceImpl(new InMemoryCounterRepository()))
+            .messageBroker(messageBroker)
+            .taskDispatcher(worker::handle)
+            .taskExecutionService(new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository()))
+            .taskEvaluator(taskEvaluator)
+            .build();
 
         dispatcher.dispatch(taskExecution);
 
@@ -105,7 +107,8 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
             for (ExecutionError error : errors) {
                 if (errorMessage.length() > 3000) {
-                    errorMessage.append("\n").append("...");
+                    errorMessage.append("\n")
+                        .append("...");
 
                     break;
                 }
@@ -114,7 +117,9 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                     errorMessage.append("\n");
                 }
 
-                errorMessage.append(error.getMessage()).append("\n").append(String.join("\n", error.getStackTrace()));
+                errorMessage.append(error.getMessage())
+                    .append("\n")
+                    .append(String.join("\n", error.getStackTrace()));
             }
 
             throw new RuntimeException(errorMessage.toString());

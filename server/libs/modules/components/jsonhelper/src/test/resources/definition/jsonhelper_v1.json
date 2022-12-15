@@ -1,0 +1,110 @@
+{
+  "actions": [
+    {
+      "display": {
+        "description": "Converts the JSON string to object/array.",
+        "label": "Convert from JSON string"
+      },
+      "name": "jsonParse",
+      "output": [
+        {
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "The JSON string to convert to the data.",
+          "label": "Source",
+          "required": true,
+          "name": "source",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Writes the object/array to a JSON string.",
+        "label": "Convert to JSON string"
+      },
+      "name": "jsonStringify",
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
+        {
+          "description": "The data to convert to JSON string.",
+          "label": "Source",
+          "required": true,
+          "name": "source",
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "display": {
+    "description": "JSON Helper allows you to do various operations on objects.",
+    "label": "JSON Helper"
+  },
+  "name": "jsonHelper",
+  "version": 1
+}

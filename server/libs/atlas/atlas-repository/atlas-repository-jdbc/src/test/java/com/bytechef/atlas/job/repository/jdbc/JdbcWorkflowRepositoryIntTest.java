@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,8 +32,8 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = WorkflowRepositoryIntTestConfiguration.class,
-        properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
+    classes = WorkflowRepositoryIntTestConfiguration.class,
+    properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
 public class JdbcWorkflowRepositoryIntTest {
 
     @Autowired
@@ -43,22 +44,24 @@ public class JdbcWorkflowRepositoryIntTest {
         Workflow workflow = new Workflow();
 
         workflow.setDefinition(
-                """
-            label: My Label
+            """
+                label: My Label
 
-            tasks:
-              - name: stringNumber
-                type: var/1.0
-                action: set
-                value: "1234"
-            """);
+                tasks:
+                  - name: stringNumber
+                    type: var/1.0
+                    action: set
+                    value: "1234"
+                """);
         workflow.setFormat(WorkflowFormat.YAML);
 
         workflow = workflowRepository.save(workflow);
 
-        Workflow resultWorkflow = workflowRepository.findById(workflow.getId()).orElseThrow();
+        Workflow resultWorkflow = workflowRepository.findById(workflow.getId())
+            .orElseThrow();
 
         Assertions.assertEquals("My Label", resultWorkflow.getLabel());
-        Assertions.assertEquals(1, resultWorkflow.getTasks().size());
+        Assertions.assertEquals(1, resultWorkflow.getTasks()
+            .size());
     }
 }

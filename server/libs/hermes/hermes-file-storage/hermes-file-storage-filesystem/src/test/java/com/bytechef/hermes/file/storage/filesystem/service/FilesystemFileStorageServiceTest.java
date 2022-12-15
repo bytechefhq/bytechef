@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -21,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
@@ -33,52 +34,56 @@ public class FilesystemFileStorageServiceTest {
 
     private static final String TEST_STRING = "test string";
 
-    private static final FilesystemFileStorageService fileStorageService =
-            new FilesystemFileStorageService("/tmp/test/bytechef/files");
+    private static final FilesystemFileStorageService fileStorageService = new FilesystemFileStorageService(
+        "/tmp/test/bytechef/files");
 
     @Test
     public void testDeleteFile() {
         FileEntry fileEntry = fileStorageService.storeFileContent(
-                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
+            "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
 
-        Assertions.assertThat(fileStorageService.readFileToString(fileEntry)).isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileStorageService.readFileToString(fileEntry))
+            .isEqualTo(TEST_STRING);
 
         fileStorageService.deleteFile(fileEntry);
 
-        Assertions.assertThat(fileStorageService.fileExists(fileEntry)).isFalse();
+        Assertions.assertThat(fileStorageService.fileExists(fileEntry))
+            .isFalse();
     }
 
     @Test
     public void testOpenInputStream() throws IOException {
         FileEntry fileEntry = fileStorageService.storeFileContent(
-                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
+            "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
 
         InputStream inputStream = fileStorageService.getFileStream(fileEntry);
 
-        Assertions.assertThat(new String(inputStream.readAllBytes(), Charset.defaultCharset()))
-                .isEqualTo(TEST_STRING);
+        Assertions.assertThat(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
+            .isEqualTo(TEST_STRING);
     }
 
     @Test
     public void testRead() {
         FileEntry fileEntry = fileStorageService.storeFileContent(
-                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
+            "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
 
-        Assertions.assertThat(fileStorageService.readFileToString(fileEntry)).isEqualTo(TEST_STRING);
+        Assertions.assertThat(fileStorageService.readFileToString(fileEntry))
+            .isEqualTo(TEST_STRING);
     }
 
     @Test
     public void testWrite() {
         FileEntry fileEntry = fileStorageService.storeFileContent(
-                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
+            "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
 
         String path = fileEntry.getUrl();
 
-        Assertions.assertThat(path).startsWith("file:/tmp/test/bytechef/files/");
+        Assertions.assertThat(path)
+            .startsWith("file:/tmp/test/bytechef/files/");
 
         String url = fileEntry.getUrl();
 
-        Assertions.assertThat(Files.contentOf(new File(url.replace("file:", "")), Charset.defaultCharset()))
-                .isEqualTo(TEST_STRING);
+        Assertions.assertThat(Files.contentOf(new File(url.replace("file:", "")), StandardCharsets.UTF_8))
+            .isEqualTo(TEST_STRING);
     }
 }

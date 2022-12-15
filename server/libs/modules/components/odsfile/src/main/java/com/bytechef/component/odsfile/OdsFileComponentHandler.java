@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,6 +17,8 @@
 
 package com.bytechef.component.odsfile;
 
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.FILENAME;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.FILE_ENTRY;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.HEADER_ROW;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.INCLUDE_EMPTY_CELLS;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.ODS_FILE;
@@ -26,21 +29,17 @@ import static com.bytechef.component.odsfile.constants.OdsFileConstants.READ_AS_
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.ROWS;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.SHEET_NAME;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.WRITE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.bool;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.number;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
-import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -69,63 +68,72 @@ import org.apache.commons.lang3.ObjectUtils;
  */
 public class OdsFileComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(ODS_FILE)
-            .display(display("ODS File").description("Reads and writes data from a ODS file."))
-            .actions(
-                    action(READ)
-                            .display(display("Read from file").description("Reads data from a ODS file."))
-                            .properties(
-                                    fileEntry(FILE_ENTRY)
-                                            .label("File")
-                                            .description(
-                                                    "The object property which contains a reference to the ODS file to read from.")
-                                            .required(true),
-                                    bool(HEADER_ROW)
-                                            .label("Header Row")
-                                            .description("The first row of the file contains the header names.")
-                                            .defaultValue(true),
-                                    bool(INCLUDE_EMPTY_CELLS)
-                                            .label("Include Empty Cells")
-                                            .description(
-                                                    "When reading from file the empty cells will be filled with an empty string.")
-                                            .defaultValue(false),
-                                    integer(PAGE_SIZE)
-                                            .label("Page Size")
-                                            .description("The amount of child elements to return in a page."),
-                                    integer(PAGE_NUMBER).label("Page Number").description("The page number to get."),
-                                    bool(READ_AS_STRING)
-                                            .label("Read As String")
-                                            .description(
-                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                            .defaultValue(false),
-                                    string(SHEET_NAME)
-                                            .label("Sheet Name")
-                                            .description(
-                                                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                                            .defaultValue("Sheet"))
-                            .output(array())
-                            .performFunction(this::performRead),
-                    action(WRITE)
-                            .display(display("Write to file").description("Writes the data to a ODS file."))
-                            .properties(
-                                    array(ROWS)
-                                            .label("Rows")
-                                            .description("The array of objects to write to the file.")
-                                            .required(true)
-                                            .items(object().additionalProperties(true)
-                                                    .properties(bool(), dateTime(), number(), string())),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description(
-                                                    "Filename to set for binary data. By default, \"file.ods\" will be used.")
-                                            .required(true)
-                                            .defaultValue("file.ods"),
-                                    string(SHEET_NAME)
-                                            .label("Sheet Name")
-                                            .description("The name of the sheet to create in the spreadsheet.")
-                                            .defaultValue("Sheet"))
-                            .output(fileEntry())
-                            .performFunction(this::performWrite));
+    private final ComponentDefinition componentDefinition = component(ODS_FILE)
+        .display(display("ODS File").description("Reads and writes data from a ODS file."))
+        .actions(
+            action(READ)
+                .display(display("Read from file").description("Reads data from a ODS file."))
+                .properties(
+                    fileEntry(FILE_ENTRY)
+                        .label("File")
+                        .description(
+                            "The object property which contains a reference to the ODS file to read from.")
+                        .required(true),
+                    bool(HEADER_ROW)
+                        .label("Header Row")
+                        .description("The first row of the file contains the header names.")
+                        .defaultValue(true)
+                        .advancedOption(true),
+                    bool(INCLUDE_EMPTY_CELLS)
+                        .label("Include Empty Cells")
+                        .description(
+                            "When reading from file the empty cells will be filled with an empty string.")
+                        .defaultValue(false)
+                        .advancedOption(true),
+                    integer(PAGE_SIZE)
+                        .label("Page Size")
+                        .description("The amount of child elements to return in a page.")
+                        .advancedOption(true),
+                    integer(PAGE_NUMBER)
+                        .label("Page Number")
+                        .description("The page number to get.")
+                        .advancedOption(true),
+                    bool(READ_AS_STRING)
+                        .label("Read As String")
+                        .description(
+                            "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                        .defaultValue(false)
+                        .advancedOption(true),
+                    string(SHEET_NAME)
+                        .label("Sheet Name")
+                        .description(
+                            "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
+                        .defaultValue("Sheet")
+                        .advancedOption(true))
+                .output(array())
+                .perform(this::performRead),
+            action(WRITE)
+                .display(display("Write to file").description("Writes the data to a ODS file."))
+                .properties(
+                    array(ROWS)
+                        .label("Rows")
+                        .description("The array of objects to write to the file.")
+                        .required(true)
+                        .items(object().additionalProperties(oneOf())),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description(
+                            "Filename to set for binary data. By default, \"file.ods\" will be used.")
+                        .required(true)
+                        .defaultValue("file.ods")
+                        .advancedOption(true),
+                    string(SHEET_NAME)
+                        .label("Sheet Name")
+                        .description("The name of the sheet to create in the spreadsheet.")
+                        .defaultValue("Sheet")
+                        .advancedOption(true))
+                .output(fileEntry())
+                .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -140,7 +148,7 @@ public class OdsFileComponentHandler implements ComponentHandler {
         boolean readAsString = executionParameters.getBoolean(READ_AS_STRING, false);
         String sheetName = executionParameters.getString(SHEET_NAME);
 
-        try (InputStream inputStream = context.getFileStream(executionParameters.getFileEntry(FILE_ENTRY))) {
+        try (InputStream inputStream = context.getFileStream(executionParameters.get(FILE_ENTRY, FileEntry.class))) {
             if (inputStream == null) {
                 throw new ActionExecutionException("Unable to get file content from task " + executionParameters);
             }
@@ -155,14 +163,14 @@ public class OdsFileComponentHandler implements ComponentHandler {
             }
 
             return read(
-                    inputStream,
-                    new ReadConfiguration(
-                            headerRow,
-                            includeEmptyCells,
-                            rangeStartRow == null ? 0 : rangeStartRow,
-                            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                            readAsString,
-                            sheetName));
+                inputStream,
+                new ReadConfiguration(
+                    headerRow,
+                    includeEmptyCells,
+                    rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
+                    readAsString,
+                    sheetName));
         } catch (Exception exception) {
             throw new ActionExecutionException("Unable to handle task " + executionParameters, exception);
         }
@@ -170,13 +178,14 @@ public class OdsFileComponentHandler implements ComponentHandler {
 
     protected FileEntry performWrite(Context context, ExecutionParameters executionParameters) {
         String fileName = executionParameters.getString(FILENAME, "file.ods");
-        List<Map<String, ?>> rows = executionParameters.getRequiredList(ROWS);
+        @SuppressWarnings("unchecked")
+        List<Map<String, ?>> rows = (List) executionParameters.getList(ROWS, Map.class, List.of());
 
         String sheetName = executionParameters.getString(SHEET_NAME, "Sheet");
 
         try {
             return context.storeFileContent(
-                    fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
+                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to handle task " + executionParameters, ioException);
         }
@@ -198,6 +207,12 @@ public class OdsFileComponentHandler implements ComponentHandler {
         }
 
         return values;
+    }
+
+    protected List<Map<String, ?>> read(InputStream inputStream) throws IOException {
+        return read(
+            inputStream,
+            new OdsFileComponentHandler.ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
     }
 
     private List<Map<String, ?>> read(InputStream inputStream, ReadConfiguration configuration) throws IOException {
@@ -248,25 +263,29 @@ public class OdsFileComponentHandler implements ComponentHandler {
                         Range cell = range.getCell(i, j);
 
                         map.computeIfAbsent(
-                                headers.get(j),
-                                key -> processValue(
-                                        cell.getValue(),
-                                        configuration.includeEmptyCells(),
-                                        configuration.readAsString()));
+                            headers.get(j),
+                            key -> processValue(
+                                cell.getValue(),
+                                configuration.includeEmptyCells(),
+                                configuration.readAsString()));
                     }
 
                     rows.add(map);
                 } else {
-                    List<Object> values = new ArrayList<>();
+                    Map<String, Object> map = new HashMap<>();
 
                     for (int j = 0; j <= range.getLastColumn(); j++) {
                         Range cell = range.getCell(i, j);
 
-                        values.add(processValue(
-                                cell.getValue(), configuration.includeEmptyCells(), configuration.readAsString()));
+                        map.put(
+                            "column_" + (j + 1),
+                            processValue(
+                                cell.getValue(),
+                                configuration.includeEmptyCells(),
+                                configuration.readAsString()));
                     }
 
-                    rows.add(MapUtils.of(values));
+                    rows.add(map);
                 }
             } else {
                 if (count >= configuration.rangeEndRow()) {
@@ -331,13 +350,15 @@ public class OdsFileComponentHandler implements ComponentHandler {
         return byteArrayOutputStream.toByteArray();
     }
 
-    private record WriteConfiguration(String fileName, String sheetName) {}
+    private record WriteConfiguration(String fileName, String sheetName) {
+    }
 
     private record ReadConfiguration(
-            boolean headerRow,
-            boolean includeEmptyCells,
-            long rangeStartRow,
-            long rangeEndRow,
-            boolean readAsString,
-            String sheetName) {}
+        boolean headerRow,
+        boolean includeEmptyCells,
+        long rangeStartRow,
+        long rangeEndRow,
+        boolean readAsString,
+        String sheetName) {
+    }
 }

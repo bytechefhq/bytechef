@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -34,7 +35,10 @@ import org.springframework.core.env.Environment;
  * @author Ivica Cardic
  */
 @SpringBootApplication(
-        exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
+    exclude = {
+        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
+    },
+    scanBasePackages = "com.bytechef")
 public class ApiGatewayApplication {
 
     private static final Logger log = LoggerFactory.getLogger(ApiGatewayApplication.class);
@@ -49,19 +53,20 @@ public class ApiGatewayApplication {
 
         springApplication.addListeners(new ApplicationPidFileWriter());
 
-        Environment environment = springApplication.run(args).getEnvironment();
+        Environment environment = springApplication.run(args)
+            .getEnvironment();
 
         logApplicationStartup(environment);
     }
 
     private static void logApplicationStartup(Environment environment) {
         String protocol = Optional.ofNullable(environment.getProperty("server.ssl.key-store"))
-                .map(key -> "https")
-                .orElse("http");
+            .map(key -> "https")
+            .orElse("http");
         String serverPort = environment.getProperty("server.port");
         String contextPath = Optional.ofNullable(environment.getProperty("server.servlet.context-path"))
-                .filter(StringUtils::isNotBlank)
-                .orElse("/");
+            .filter(StringUtils::isNotBlank)
+            .orElse("/");
         String hostAddress = "localhost";
 
         try {
@@ -73,25 +78,25 @@ public class ApiGatewayApplication {
         }
 
         log.info(
-                """
-                    ----------------------------------------------------------
-                    \tApplication '{}' is running! Access URLs:
-                    \tLocal: \t\t{}://localhost:{}{}
-                    \tExternal: \t{}://{}:{}{}
-                    \tSwaggerUI: \t{}
-                    \tProfile(s): \t{}
-                    ----------------------------------------------------------""",
-                environment.getProperty("spring.application.name"),
-                protocol,
-                serverPort,
-                contextPath,
-                protocol,
-                hostAddress,
-                serverPort,
-                contextPath,
-                ArrayUtils.contains(environment.getActiveProfiles(), "api-docs")
-                        ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
-                        : "",
-                environment.getActiveProfiles());
+            """
+                ----------------------------------------------------------
+                \tApplication '{}' is running! Access URLs:
+                \tLocal: \t\t{}://localhost:{}{}
+                \tExternal: \t{}://{}:{}{}
+                \tSwaggerUI: \t{}
+                \tProfile(s): \t{}
+                ----------------------------------------------------------""",
+            environment.getProperty("spring.application.name"),
+            protocol,
+            serverPort,
+            contextPath,
+            protocol,
+            hostAddress,
+            serverPort,
+            contextPath,
+            ArrayUtils.contains(environment.getActiveProfiles(), "api-docs")
+                ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
+                : "",
+            environment.getActiveProfiles());
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -60,11 +61,11 @@ public class ConnectionControllerIntTest {
     public void testDeleteConnection() {
         try {
             this.webTestClient
-                    .delete()
-                    .uri("/connections/1")
-                    .exchange()
-                    .expectStatus()
-                    .isOk();
+                .delete()
+                .uri("/connections/1")
+                .exchange()
+                .expectStatus()
+                .isOk();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -84,13 +85,13 @@ public class ConnectionControllerIntTest {
             when(connectionService.getConnection(anyString())).thenReturn(connection);
 
             this.webTestClient
-                    .get()
-                    .uri("/connections/1")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody(ConnectionModel.class);
+                .get()
+                .uri("/connections/1")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ConnectionModel.class);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -104,12 +105,12 @@ public class ConnectionControllerIntTest {
 
         try {
             this.webTestClient
-                    .get()
-                    .uri("/connections")
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBodyList(ConnectionModel.class);
+                .get()
+                .uri("/connections")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(ConnectionModel.class);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -119,33 +120,31 @@ public class ConnectionControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostConnection() {
         Connection connection = getConnection();
-        ConnectionModel connectionModel =
-                new ConnectionModel().name("name").label("label").parameters(Map.of("key1", "value1"));
+        ConnectionModel connectionModel = new ConnectionModel().name("name")
+            .parameters(Map.of("key1", "value1"));
 
         when(connectionService.add(any())).thenReturn(connection);
 
         try {
             assert connection.getId() != null;
             this.webTestClient
-                    .post()
-                    .uri("/connections")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(connectionModel)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .jsonPath("$.id")
-                    .isEqualTo(connection.getId())
-                    .jsonPath("$.label")
-                    .isEqualTo(connection.getLabel())
-                    .jsonPath("$.name")
-                    .isEqualTo(connection.getName())
-                    .jsonPath("$.parameters")
-                    .isMap()
-                    .jsonPath("$.parameters.key1")
-                    .isEqualTo("value1");
+                .post()
+                .uri("/connections")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(connectionModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id")
+                .isEqualTo(connection.getId())
+                .jsonPath("$.name")
+                .isEqualTo(connection.getName())
+                .jsonPath("$.parameters")
+                .isMap()
+                .jsonPath("$.parameters.key1")
+                .isEqualTo("value1");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -157,25 +156,25 @@ public class ConnectionControllerIntTest {
         Connection connection = getConnection();
         ConnectionUpdateModel connectionUpdateModel = new ConnectionUpdateModel().name("name2");
 
-        connection.setLabel("label2");
+        connection.setName("name2");
 
         when(connectionService.update(anyString(), anyString())).thenReturn(connection);
 
         try {
             this.webTestClient
-                    .put()
-                    .uri("/connections/1")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(connectionUpdateModel)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .jsonPath("$.id")
-                    .isEqualTo(connection.getId())
-                    .jsonPath("$.label")
-                    .isEqualTo("label2");
+                .put()
+                .uri("/connections/1")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(connectionUpdateModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id")
+                .isEqualTo(connection.getId())
+                .jsonPath("$.name")
+                .isEqualTo("name2");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -185,7 +184,6 @@ public class ConnectionControllerIntTest {
         Connection connection = new Connection();
 
         connection.setId("1");
-        connection.setLabel("label");
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
 

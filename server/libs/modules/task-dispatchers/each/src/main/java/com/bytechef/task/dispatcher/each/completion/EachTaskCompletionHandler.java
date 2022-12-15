@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.each.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.EACH;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -26,7 +27,6 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
 import java.time.LocalDateTime;
 
 /**
@@ -40,9 +40,9 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
     private final CounterService counterService;
 
     public EachTaskCompletionHandler(
-            TaskExecutionService taskExecutionService,
-            TaskCompletionHandler taskCompletionHandler,
-            CounterService counterService) {
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService) {
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
@@ -55,7 +55,8 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(EACH + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(EACH + "/v" + VERSION_1);
         }
 
         return false;
@@ -72,12 +73,10 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         long subTasksLeft = counterService.decrement(taskExecution.getParentId());
 
         if (subTasksLeft == 0) {
-            TaskExecution eachTaskExecution =
-                    new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            TaskExecution eachTaskExecution = new TaskExecution(
+                taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
             eachTaskExecution.setEndTime(LocalDateTime.now());
-            eachTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(eachTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(eachTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(eachTaskExecution);
             counterService.delete(taskExecution.getParentId());

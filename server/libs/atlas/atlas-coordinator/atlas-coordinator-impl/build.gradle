@@ -18,9 +18,7 @@ dependencies {
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
-    testImplementation project(":server:libs:atlas:atlas-task-evaluator-impl")
     testImplementation project(":server:libs:atlas:atlas-upgrade")
     testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
-    testImplementation project(":server:libs:core:commons:commons-utils")
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-int-support")
 }

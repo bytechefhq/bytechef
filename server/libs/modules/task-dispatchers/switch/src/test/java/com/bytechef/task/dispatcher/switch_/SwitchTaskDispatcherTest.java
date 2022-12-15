@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -31,7 +32,7 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -56,21 +57,22 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
-                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1")));
+            contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
+            "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1")));
 
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(TaskExecution.of(new WorkflowTask(Map.of("type", "print"))));
+        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "print"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
         ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
 
         verify(taskDispatcher, times(1)).dispatch(argument.capture());
-        Assertions.assertEquals("print", argument.getValue().getType());
+        Assertions.assertEquals("print", argument.getValue()
+            .getType());
     }
 
     @Test
@@ -78,9 +80,9 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
-                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2")));
+            contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
+            "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2")));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -92,26 +94,27 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
-                "cases",
-                Arrays.asList(
-                        Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
-                        Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
-                "expression",
-                "k2")));
+            contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
+            "cases",
+            Arrays.asList(
+                Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
+                Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
+            "expression",
+            "k2")));
 
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(TaskExecution.of(new WorkflowTask(Map.of("type", "sleep"))));
+        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "sleep"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
         ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
 
         verify(taskDispatcher, times(1)).dispatch(argument.capture());
-        Assertions.assertEquals("sleep", argument.getValue().getType());
+        Assertions.assertEquals("sleep", argument.getValue()
+            .getType());
     }
 
     @Test
@@ -119,16 +122,16 @@ public class SwitchTaskDispatcherTest {
         when(contextService.peek(any())).thenReturn(new Context());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
-                "cases",
-                Arrays.asList(
-                        Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
-                        Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
-                "default",
-                Collections.singletonMap("value", "1234"),
-                "expression",
-                "k99")));
+            contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
+            "cases",
+            Arrays.asList(
+                Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
+                Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
+            "default",
+            Collections.singletonMap("value", "1234"),
+            "expression",
+            "k99")));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -136,6 +139,7 @@ public class SwitchTaskDispatcherTest {
         ArgumentCaptor<TaskExecution> arg2 = ArgumentCaptor.forClass(TaskExecution.class);
 
         verify(messageBroker, times(1)).send(arg1.capture(), arg2.capture());
-        Assertions.assertEquals("1234", arg2.getValue().getOutput());
+        Assertions.assertEquals("1234", arg2.getValue()
+            .getOutput());
     }
 }

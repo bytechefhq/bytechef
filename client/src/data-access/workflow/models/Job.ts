@@ -27,13 +27,13 @@ import {
  */
 export interface Job {
     /**
-     * Created by.
+     * The created by.
      * @type {string}
      * @memberof Job
      */
     readonly createdBy?: string;
     /**
-     * Created date.
+     * The created date.
      * @type {Date}
      * @memberof Job
      */
@@ -63,7 +63,7 @@ export interface Job {
      */
     readonly id?: string;
     /**
-     * The key-value map of inputs passed to the job when it was created.
+     * The key-value map of the inputs passed to the job when it was created.
      * @type {{ [key: string]: object; }}
      * @memberof Job
      */
@@ -75,19 +75,19 @@ export interface Job {
      */
     label?: string;
     /**
-     * Last modified by.
+     * The last modified by.
      * @type {string}
      * @memberof Job
      */
     readonly lastModifiedBy?: string;
     /**
-     * Last modified date.
+     * The last modified date.
      * @type {Date}
      * @memberof Job
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The key-value map of outputs returned.
+     * The key-value map of the outputs returned.
      * @type {{ [key: string]: object; }}
      * @memberof Job
      */
@@ -117,7 +117,7 @@ export interface Job {
      */
     status?: JobStatusEnum;
     /**
-     * The list of webhooks configured.
+     * The list of the webhooks configured.
      * @type {Array<{ [key: string]: object; }>}
      * @memberof Job
      */

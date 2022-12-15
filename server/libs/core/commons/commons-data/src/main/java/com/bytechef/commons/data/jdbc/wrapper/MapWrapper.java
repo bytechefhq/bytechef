@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -28,7 +29,8 @@ public class MapWrapper {
 
     private Map<String, Object> map = new HashMap<>();
 
-    public MapWrapper() {}
+    public MapWrapper() {
+    }
 
     public MapWrapper(Map<String, Object> map) {
         this.map = new HashMap<>(map);

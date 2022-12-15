@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -53,32 +54,34 @@ public class WorkflowController implements WorkflowsApi {
     public Mono<ResponseEntity<Void>> deleteWorkflow(String id, ServerWebExchange exchange) {
         workflowService.delete(id);
 
-        return Mono.just(ResponseEntity.ok().build());
+        return Mono.just(ResponseEntity.ok()
+            .build());
     }
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> getWorkflow(String id, ServerWebExchange exchange) {
         return Mono.just(
-                ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)));
+            ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<Flux<WorkflowModel>>> getWorkflows(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(workflowService.getWorkflows().stream()
-                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-                .toList())));
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(workflowService.getWorkflows()
+            .stream()
+            .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+            .toList())));
     }
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> postWorkflow(
-            Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
+        Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
         return workflowModelMono.map(workflowModel -> ResponseEntity.ok(conversionService.convert(
-                workflowService.add(conversionService.convert(workflowModel, Workflow.class)), WorkflowModel.class)));
+            workflowService.add(conversionService.convert(workflowModel, Workflow.class)), WorkflowModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> putWorkflow(
-            String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
+        String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
         return workflowModelMono.map(workflowModel -> {
             Workflow workflow = conversionService.convert(workflowModel, Workflow.class);
 

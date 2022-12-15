@@ -28,14 +28,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.springframework.http.codec.multipart.Part;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "jobs", description = "the jobs API")
 public interface JobsApi {
@@ -44,7 +44,7 @@ public interface JobsApi {
      * GET /jobs/{id} : Get a job by id.
      * Get a job by id.
      *
-     * @param id Id of the job to return. (required)
+     * @param id The id of the job to return. (required)
      * @return The job. (status code 200)
      */
     @Operation(
@@ -63,7 +63,7 @@ public interface JobsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<JobModel>> getJob(
-        @Parameter(name = "id", description = "Id of the job to return.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to return.", required = true) @PathVariable("id") String id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -84,7 +84,7 @@ public interface JobsApi {
      * GET /jobs/{id}/task-executions : Get task executions of a job.
      * Get task executions of a job.
      *
-     * @param id Id of the job to return task executions for. (required)
+     * @param id The id of the job to return task executions for. (required)
      * @return List of task executions. (status code 200)
      */
     @Operation(
@@ -103,7 +103,7 @@ public interface JobsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
-        @Parameter(name = "id", description = "Id of the job to return task executions for.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to return task executions for.", required = true) @PathVariable("id") String id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -121,15 +121,15 @@ public interface JobsApi {
 
 
     /**
-     * GET /jobs : Returns a page of jobs.
-     * Returns a page of jobs.
+     * GET /jobs : Get a page of jobs.
+     * Get a page of jobs.
      *
-     * @param pageNumber Number of the page to return. (optional, default to 0)
+     * @param pageNumber The number of the page to return. (optional, default to 0)
      * @return The page of jobs. (status code 200)
      */
     @Operation(
         operationId = "getJobs",
-        summary = "Returns a page of jobs.",
+        summary = "Get a page of jobs.",
         tags = { "jobs" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The page of jobs.", content = {
@@ -143,7 +143,7 @@ public interface JobsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<org.springframework.data.domain.Page>> getJobs(
-        @Parameter(name = "pageNumber", description = "Number of the page to return.") @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
+        @Parameter(name = "pageNumber", description = "The number of the page to return.") @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -203,14 +203,14 @@ public interface JobsApi {
      * Create a request for running a new job.
      *
      * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
-     * @return Id of the created job. (status code 200)
+     * @return The id of the created job. (status code 200)
      */
     @Operation(
         operationId = "postJob",
         summary = "Create a request for running a new job.",
         tags = { "jobs" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Id of the created job.", content = {
+            @ApiResponse(responseCode = "200", description = "The id of the created job.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = PostJob200ResponseModel.class))
             })
         }
@@ -243,7 +243,7 @@ public interface JobsApi {
      * PUT /jobs/{id}/restart : Restart a job.
      * Restart a job.
      *
-     * @param id Id of the job to restart. (required)
+     * @param id The id of the job to restart. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -259,7 +259,7 @@ public interface JobsApi {
         value = "/jobs/{id}/restart"
     )
     default Mono<ResponseEntity<Void>> restartJob(
-        @Parameter(name = "id", description = "Id of the job to restart.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to restart.", required = true) @PathVariable("id") String id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -273,7 +273,7 @@ public interface JobsApi {
      * PUT /jobs/{id}/stop : Stop a job.
      * Stop a job.
      *
-     * @param id Id of the job to stop. (required)
+     * @param id The id of the job to stop. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -289,7 +289,7 @@ public interface JobsApi {
         value = "/jobs/{id}/stop"
     )
     default Mono<ResponseEntity<Void>> stopJob(
-        @Parameter(name = "id", description = "Id of the job to stop.", required = true) @PathVariable("id") String id,
+        @Parameter(name = "id", description = "The id of the job to stop.", required = true) @PathVariable("id") String id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();

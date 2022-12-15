@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -35,10 +36,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({
+    ElementType.TYPE, ElementType.METHOD
+})
 @ConditionalOnProperty(
-        prefix = "bytechef.workflow",
-        name = "worker.enabled",
-        havingValue = "true",
-        matchIfMissing = true)
-public @interface ConditionalOnWorker {}
+    prefix = "bytechef.workflow",
+    name = "worker.enabled",
+    havingValue = "true",
+    matchIfMissing = true)
+public @interface ConditionalOnWorker {
+}

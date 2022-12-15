@@ -25,19 +25,19 @@ import {
     PropertyOptionFromJSONTyped,
     PropertyOptionToJSON,
 } from './PropertyOption';
-import type { SingleValueProperty } from './SingleValueProperty';
+import type { ValueProperty } from './ValueProperty';
 import {
-    SingleValuePropertyFromJSON,
-    SingleValuePropertyFromJSONTyped,
-    SingleValuePropertyToJSON,
-} from './SingleValueProperty';
+    ValuePropertyFromJSON,
+    ValuePropertyFromJSONTyped,
+    ValuePropertyToJSON,
+} from './ValueProperty';
 
 /**
  * An integer property type.
  * @export
  * @interface IntegerProperty
  */
-export interface IntegerProperty extends SingleValueProperty {
+export interface IntegerProperty extends ValueProperty {
     /**
      * The maximum property value.
      * @type {number}
@@ -77,7 +77,7 @@ export function IntegerPropertyFromJSONTyped(json: any, ignoreDiscriminator: boo
         return json;
     }
     return {
-        ...SingleValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'type': json['type'],
@@ -92,7 +92,7 @@ export function IntegerPropertyToJSON(value?: IntegerProperty | null): any {
         return null;
     }
     return {
-        ...SingleValuePropertyToJSON(value),
+        ...ValuePropertyToJSON(value),
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'type': value.type,

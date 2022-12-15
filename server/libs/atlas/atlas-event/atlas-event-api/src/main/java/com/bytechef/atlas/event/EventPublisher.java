@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -24,8 +25,7 @@ package com.bytechef.atlas.event;
  */
 public interface EventPublisher {
     /**
-     * Notify all <strong>matching</strong> listeners registered with this application of an
-     * application event.
+     * Notify all <strong>matching</strong> listeners registered with this application of an application event.
      *
      * @param event the event to publish
      */

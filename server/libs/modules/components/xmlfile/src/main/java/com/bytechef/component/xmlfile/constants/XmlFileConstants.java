@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -29,4 +30,6 @@ public class XmlFileConstants {
     public static final String XML_FILE = "xmlFile";
     public static final String READ = "read";
     public static final String WRITE = "write";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILENAME = "filename";
 }

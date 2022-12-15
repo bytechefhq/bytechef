@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,7 +53,9 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources(locationPattern);
 
-            return Arrays.stream(resources).map(this::read).collect(Collectors.toList());
+            return Arrays.stream(resources)
+                .map(this::read)
+                .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -75,7 +78,8 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         List<Workflow> workflows = findAll();
 
         return workflows.stream()
-                .filter(workflow -> workflow.getId().equals(id))
-                .findFirst();
+            .filter(workflow -> workflow.getId()
+                .equals(id))
+            .findFirst();
     }
 }

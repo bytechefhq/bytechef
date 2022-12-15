@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,6 +27,7 @@ public class LoopBreakTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        AssertUtils.assertEquals("definition/loop-break_v1.json", new LoopBreakTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/loop-break_v1.json", new LoopBreakTaskDispatcherFactory().getDefinition());
     }
 }

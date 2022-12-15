@@ -3,15 +3,20 @@ info:
   description: Component Definition structs.
   version: v1
 schemas:
-  Action:
+  ActionDefinition:
     description: An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
     type: object
     properties:
       display:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       exampleOutput:
         description: The example of the action's output.
         type: object
+      metadata:
+        description: Additional data that can be used during processing.
+        type: object
+        additionalProperties:
+          type: object
       name:
         description: The action name.
         type: string
@@ -19,35 +24,42 @@ schemas:
         description: The output schema of an execution result.
         type: array
         items:
-          oneOf:
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/AnyProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NullProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
       properties:
         description: The list of action properties.
         type: array
         items:
-          oneOf:
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/AnyProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NullProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
       performFunction:
-        description: The code that should be performed when the action is executed as a task whe running inside the workflow engine.
+        description: Contains information required for a connection's authorization.
         type: object
+  Authorization:
+    description: Contains information required for a connection's authorization.
+    type: object
+    properties:
+      display:
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
+      name:
+        description: The authorization name.
+        type: string
+      properties:
+        description: Properties of the connection.
+        type: array
+        items:
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/ValueProperty'
+      type:
+        $ref: '#/schemas/AuthorizationType'
+  AuthorizationType:
+    description: Authorization type.
+    type: string
+    enum:
+      - API_KEY
+      - BASIC_AUTH
+      - BEARER_TOKEN
+      - CUSTOM
+      - DIGEST_AUTH
+      - OAUTH2_AUTHORIZATION_CODE
+      - OAUTH2_CLIENT_CREDENTIALS
   ComponentDefinition:
     description: A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.
     type: object
@@ -56,64 +68,47 @@ schemas:
         description: The list of all available actions the component can perform.
         type: array
         items:
-          $ref: '#/schemas/Action'
-      connections:
-        description: The list of possible connections to an outside service.
-        type: array
-        items:
-          $ref: '#/schemas/ConnectionDefinition'
+          $ref: '#/schemas/ActionDefinition'
+      connection:
+        $ref: '#/schemas/ConnectionDefinition'
       display:
-        $ref: '#/schemas/ComponentDisplay'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
+      metadata:
+        description: Additional data that can be used during processing.
+        type: object
+        additionalProperties:
+          type: object
       name:
         description: The connection name.
         type: string
       resources:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Resources'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
         type: number
         format: double
-  ComponentDisplay:
-    description: An info about the component.
-    type: object
-    allOf:
-      - $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
-      - type: object
-        properties:
-          category:
-            description: The category of the component.
-            type: string
-          subtitle:
-            description: Additional explanation.
-            type: string
-          tags:
-            description: Tags for the component.
-            type: array
-            items:
-              type: string
   ConnectionDefinition:
     description: A connection to an outside service.
     type: object
     properties:
-      display:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
-      name:
-        description: The connection name.
+      authorizations:
+        type: array
+        items:
+          $ref: '#/schemas/Authorization'
+      componentName:
+        description: The name of a component this connection can be used for.
         type: string
+      componentVersion:
+        description: The version of a component this connection can be used for.
+        type: string
+      display:
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       properties:
         description: Properties of the connection.
         type: array
         items:
-          oneOf:
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/ValueProperty'
       resources:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Resources'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       subtitle:
         description: Additional explanation.
         type: string
@@ -121,7 +116,7 @@ schemas:
         type: integer
         format: int32
   JdbcComponentDefinition:
-    description: A defintion of component used for building JDBC based components. The deinition is transformed into fully component definition.
+    description: A definition of component used for building JDBC based components. The deinition is transformed into fully component definition.
     type: object
     properties:
       databaseJdbcName:
@@ -131,12 +126,12 @@ schemas:
         description: Database type name used when defining a jdbc url.
         type: string
       display:
-        $ref: '#/schemas/ComponentDisplay'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       name:
         description: The connection name.
         type: string
       resources:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Resources'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
         type: number
         format: double

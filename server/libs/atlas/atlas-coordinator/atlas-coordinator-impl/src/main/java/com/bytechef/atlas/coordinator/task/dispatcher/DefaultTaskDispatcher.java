@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -39,10 +40,10 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     private static final String DEFAULT_QUEUE = Queues.TASKS;
 
     public DefaultTaskDispatcher(
-            MessageBroker messageBroker, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
+        MessageBroker messageBroker, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
         this.messageBroker = Objects.requireNonNull(messageBroker);
-        this.taskDispatcherPreSendProcessors =
-                taskDispatcherPreSendProcessors == null ? List.of() : taskDispatcherPreSendProcessors;
+        this.taskDispatcherPreSendProcessors = taskDispatcherPreSendProcessors == null ? List.of()
+            : taskDispatcherPreSendProcessors;
     }
 
     @Override

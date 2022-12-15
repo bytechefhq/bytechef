@@ -7,13 +7,14 @@ servers:
 paths:
   /integrations:
     get:
-      description: TODO
+      description: Get integrations.
+      summary: Get integrations.
       tags:
         - integrations
       operationId: getIntegrations
       responses:
         "200":
-          description: TODO OK
+          description: The list of integrations.
           content:
             application/json:
               schema:
@@ -21,7 +22,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Integration'
     post:
-      description: TODO
+      description: Create a new integration.
+      summary: Create a new integration.
       tags:
         - integrations
       operationId: postIntegration
@@ -33,54 +35,57 @@ paths:
         required: true
       responses:
         "200":
-          description: TODO OK
+          description: The integration object.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
   /integrations/{id}:
     delete:
-      description: TODO
+      description: Delete an integration.
+      summary: Delete an integration.
       tags:
         - integrations
       operationId: deleteIntegration
       parameters:
         - name: id
-          description: TODO
+          description: The id of the integration.
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: TODO
+          description: Successful operation.
     get:
-      description: TODO
+      description: Get an integration by id.
+      summary: Get an integration by id.
       tags:
         - integrations
       operationId: getIntegration
       parameters:
         - name: id
-          description: TODO
+          description: The id of the integration.
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: TODO
+          description: The integration object.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
     put:
-      description: TODO
+      description: Update an existing integration.
+      summary: Update an existing integration.
       tags:
         - integrations
       operationId: putIntegration
       parameters:
         - name: id
-          description: TODO
+          description: The id of the integration.
           in: path
           required: true
           schema:
@@ -93,7 +98,7 @@ paths:
         required: true
       responses:
         "200":
-          description: TODO
+          description: The updated integration object.
           content:
             '*/*':
               schema:
@@ -101,39 +106,39 @@ paths:
 components:
   schemas:
     Integration:
-      description: TODO
+      description: A group of workflows that make one logical integration.
       type: object
       properties:
         createdBy:
-          description: TODO
+          description: The created by.
           type: string
           readOnly: true
         createdDate:
-          description: TODO
+          description: The created date.
           type: string
           format: date-time
           readOnly: true
         id:
-          description: TODO
+          description: The id of the integration.
           type: string
           readOnly: true
         name:
-          description: TODO
+          description: The name of the integration.
           type: string
         description:
-          description: TODO
+          description: The description of the integration.
           type: string
         lastModifiedBy:
-          description: TODO
+          description: The last modified by.
           type: string
           readOnly: true
         lastModifiedDate:
-          description: TODO
+          description: The last modified date.
           type: string
           format: date-time
           readOnly: true
         workflowIds:
-          description: TODO
+          description: The workflow ids belonging to this integration.
           type: array
           items:
             type: string

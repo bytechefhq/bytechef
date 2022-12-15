@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -34,28 +35,28 @@ public class DefaultTaskDispatcherTest {
 
     @Test
     public void test1() {
-        DefaultTaskDispatcher defaultTaskDispatcher =
-                new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals(Queues.TASKS, k), List.of());
+        DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
+            (k, m) -> Assertions.assertEquals(Queues.TASKS, k), List.of());
 
         defaultTaskDispatcher.dispatch(new TaskExecution());
     }
 
     @Test
     public void test2() {
-        TaskExecution taskExecution = TaskExecution.of(WorkflowTask.of("node", "encoder"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("node", "encoder"));
 
-        DefaultTaskDispatcher defaultTaskDispatcher =
-                new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder", k), List.of());
+        DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
+            (k, m) -> Assertions.assertEquals("encoder", k), List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);
     }
 
     @Test
     public void test3() {
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of("node", "encoder.xlarge")));
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of("node", "encoder.xlarge")));
 
-        DefaultTaskDispatcher defaultTaskDispatcher =
-                new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder.xlarge", k), List.of());
+        DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
+            (k, m) -> Assertions.assertEquals("encoder.xlarge", k), List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);
     }

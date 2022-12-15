@@ -9,6 +9,11 @@ plugins {
 
 allprojects {
     apply plugin: "com.github.ben-manes.versions"
+
+    repositories {
+        mavenCentral()
+        maven { url 'https://repo.spring.io/milestone' }
+    }
 }
 
 subprojects {
@@ -98,18 +103,12 @@ subprojects {
             ).onlyIfContentMatches(
                 "author\\sArik\\sCohen"
             )
-            palantirJavaFormat()
+            eclipse().configFile("$rootDir/config/eclipse/eclipse-code-formatter-settings.xml")
             removeUnusedImports()
             trimTrailingWhitespace()
             indentWithSpaces(4)
             endWithNewline()
-//            prettier(["prettier": "2.7.1", "prettier-plugin-java": "1.6.2"]).config(["parser": "java", "printWidth": 120, "tabWidth": 4, "useTabs": false])
         }
-//        format "styling", {
-//            target "**/*.json", "**/*.yaml", "**/*.yml"
-//
-//            prettier()
-//        }
     }
 
     check.dependsOn 'spotlessCheck'
@@ -196,5 +195,5 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 }
 
 wrapper {
-    gradleVersion = "7.5.1"
+    gradleVersion = "7.6"
 }

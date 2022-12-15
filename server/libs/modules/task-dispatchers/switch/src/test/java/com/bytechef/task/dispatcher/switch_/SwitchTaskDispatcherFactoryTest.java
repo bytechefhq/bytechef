@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.switch_;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -29,6 +30,6 @@ public class SwitchTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        AssertUtils.assertEquals("definition/switch_v1.json", new SwitchTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/switch_v1.json", new SwitchTaskDispatcherFactory().getDefinition());
     }
 }

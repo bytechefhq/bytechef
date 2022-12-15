@@ -32,19 +32,19 @@ export interface JobParameters {
      */
     label?: string;
     /**
-     * The outputs expected by the workflow
+     * The outputs expected by the workflow.
      * @type {{ [key: string]: object; }}
      * @memberof JobParameters
      */
     outputs?: { [key: string]: object; };
     /**
-     * Id of the parent task that created this job. Used for sub-flows.
+     * The id of the parent task that created this job. Used for sub-flows.
      * @type {string}
      * @memberof JobParameters
      */
     parentTaskExecutionId?: string;
     /**
-     * the priority value used during execution of individual tasks.
+     * The priority value used during execution of individual tasks.
      * @type {number}
      * @memberof JobParameters
      */

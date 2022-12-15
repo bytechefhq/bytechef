@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,13 +53,13 @@ public class EachTaskDispatcherConfiguration {
 
     @Bean("eachTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory eachTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) ->
-                new EachTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService);
+        return (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(taskExecutionService,
+            taskCompletionHandler, counterService);
     }
 
     @Bean("eachTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory eachTaskDispatcherFactory() {
         return (taskDispatcher) -> new EachTaskDispatcher(
-                taskDispatcher, taskExecutionService, messageBroker, contextService, counterService, taskEvaluator);
+            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService, taskEvaluator);
     }
 }
