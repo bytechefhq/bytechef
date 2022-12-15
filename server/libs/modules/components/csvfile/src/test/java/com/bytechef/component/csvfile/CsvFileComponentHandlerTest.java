@@ -67,7 +67,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(true, false, null, null, false, getFile("sample_header.csv")))),
             true);
 
@@ -75,7 +75,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(true, true, null, null, false, getFile("sample_header.csv")))),
             true);
 
@@ -83,7 +83,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(true, false, null, null, true, getFile("sample_header.csv")))),
             true);
 
@@ -91,7 +91,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(true, true, null, null, true, getFile("sample_header.csv")))),
             true);
 
@@ -99,7 +99,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.csv")))),
             true);
 
@@ -107,7 +107,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.csv")))),
             true);
 
@@ -115,7 +115,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.csv")))),
             true);
 
@@ -123,7 +123,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.csv")))),
             true);
 
@@ -131,7 +131,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-            new JSONArray((List) csvFileComponentHandler.performRead(
+            new JSONArray(csvFileComponentHandler.performRead(
                 context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv")))),
             true);
     }
