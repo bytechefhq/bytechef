@@ -18,7 +18,6 @@
 package com.bytechef.atlas.repository.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -35,6 +34,6 @@ public class JsonWorkflowMapper extends AbstractWorkflowMapper implements Workfl
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getWorkflowFormat() == WorkflowFormat.JSON ? this : null;
+        return workflowResource.getWorkflowFormat() == Workflow.Format.JSON ? this : null;
     }
 }

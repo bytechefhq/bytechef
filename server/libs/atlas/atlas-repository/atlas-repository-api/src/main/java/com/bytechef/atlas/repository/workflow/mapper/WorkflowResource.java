@@ -19,7 +19,8 @@
 
 package com.bytechef.atlas.repository.workflow.mapper;
 
-import com.bytechef.atlas.workflow.WorkflowFormat;
+import com.bytechef.atlas.domain.Workflow;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,9 +36,9 @@ public class WorkflowResource implements Resource {
 
     private final String id;
     private final transient Resource resource;
-    private final WorkflowFormat workflowFormat;
+    private final Workflow.Format workflowFormat;
 
-    public WorkflowResource(String id, Resource resource, WorkflowFormat workflowFormat) {
+    public WorkflowResource(String id, Resource resource, Workflow.Format workflowFormat) {
         this.id = id;
         this.resource = resource;
         this.workflowFormat = workflowFormat;
@@ -47,7 +48,7 @@ public class WorkflowResource implements Resource {
         return id;
     }
 
-    public WorkflowFormat getWorkflowFormat() {
+    public Workflow.Format getWorkflowFormat() {
         return workflowFormat;
     }
 

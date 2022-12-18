@@ -20,7 +20,6 @@
 package com.bytechef.atlas.repository.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
@@ -38,8 +37,8 @@ public class YamlWorkflowMapper extends AbstractWorkflowMapper implements Workfl
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getWorkflowFormat() == WorkflowFormat.YML
-            || workflowResource.getWorkflowFormat() == WorkflowFormat.YAML
+        return workflowResource.getWorkflowFormat() == Workflow.Format.YML
+            || workflowResource.getWorkflowFormat() == Workflow.Format.YAML
                 ? this
                 : null;
     }

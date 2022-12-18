@@ -207,7 +207,7 @@ public class WorkflowControllerIntTest {
                 "tasks": []
             }
             """);
-        workflow.setFormat(WorkflowFormat.JSON);
+        workflow.setFormat(Workflow.Format.JSON);
 
         return workflow;
     }
