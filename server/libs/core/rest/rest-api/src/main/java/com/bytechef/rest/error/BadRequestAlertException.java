@@ -18,43 +18,30 @@
 package com.bytechef.rest.error;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import org.zalando.problem.AbstractThrowableProblem;
-import org.zalando.problem.Status;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.ErrorResponseException;
 
 /**
  * @author Ivica Cardic
  */
-public class BadRequestAlertException extends AbstractThrowableProblem {
+public class BadRequestAlertException extends ErrorResponseException {
 
     private static final long serialVersionUID = 1L;
 
-    private final String entityName;
-    private final String errorKey;
-
-    public BadRequestAlertException(String defaultMessage, String entityName, String errorKey) {
-        this(ErrorConstants.DEFAULT_TYPE, defaultMessage, entityName, errorKey);
-    }
-
     public BadRequestAlertException(URI type, String defaultMessage, String entityName, String errorKey) {
-        super(type, defaultMessage, Status.BAD_REQUEST, null, null, null, getAlertParameters(entityName, errorKey));
-        this.entityName = entityName;
-        this.errorKey = errorKey;
+        super(HttpStatus.BAD_REQUEST, asProblemDetail(type, defaultMessage, entityName, errorKey), null);
     }
 
-    public String getEntityName() {
-        return entityName;
-    }
+    private static ProblemDetail asProblemDetail(URI type, String message, String entityName, String errorKey) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
 
-    public String getErrorKey() {
-        return errorKey;
-    }
+        problemDetail.setTitle("Bad Request");
+        problemDetail.setType(type);
+        problemDetail.setProperty("message", "error." + errorKey);
+        problemDetail.setProperty("params", entityName);
 
-    private static Map<String, Object> getAlertParameters(String entityName, String errorKey) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("message", "error." + errorKey);
-        parameters.put("params", entityName);
-        return parameters;
+        return problemDetail;
     }
 }
