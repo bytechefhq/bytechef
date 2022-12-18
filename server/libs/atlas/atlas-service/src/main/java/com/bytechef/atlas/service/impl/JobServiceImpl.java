@@ -61,6 +61,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job create(JobParameters jobParameters) {
+        Assert.notNull(jobParameters, "jobParameters cannot be null.");
+
+        String workflowId = jobParameters.getWorkflowId();
 
         Workflow workflow = workflowRepositories.stream()
             .map(workflowRepository -> workflowRepository.findById(workflowId))
@@ -114,6 +117,8 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Job getJob(String id) {
+        Assert.notNull(id, "id cannot be null.");
+
         return jobRepository.findById(id)
             .orElseThrow();
     }
@@ -133,11 +138,16 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Job getTaskExecutionJob(String taskExecutionId) {
+        Assert.notNull(taskExecutionId, "taskExecutionId cannot be null.");
+
         return jobRepository.findByTaskExecutionId(taskExecutionId);
     }
 
     @Override
     public Job resume(String id) {
+        Assert.notNull(id, "id cannot be null.");
+
+        log.debug("Resuming job {}", id);
 
         Job job = jobRepository.findById(id)
             .orElseThrow();
@@ -170,7 +180,9 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Job stop(String id) {
         Assert.notNull(id, "id cannot be null.");
+
         Job job = jobRepository.findById(id)
             .orElseThrow();
 
@@ -190,6 +202,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job update(Job job) {
+        Assert.notNull(job, "job cannot be null.");
+
         return jobRepository.save(job);
     }
 
