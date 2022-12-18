@@ -22,3 +22,6 @@ trim_trailing_whitespace = false
 
 [*.ts]
 quote_type = single
+
+[{*.yaml, *.yml}]
+indent_size = 2
