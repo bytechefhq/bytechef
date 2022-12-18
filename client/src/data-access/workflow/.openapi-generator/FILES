@@ -8,6 +8,8 @@ models/Job.ts
 models/JobParameters.ts
 models/Page.ts
 models/PostJob200Response.ts
+models/PostWorkflowRequest.ts
+models/PostWorkflowRequestAllOf.ts
 models/TaskExecution.ts
 models/Workflow.ts
 models/WorkflowTask.ts
