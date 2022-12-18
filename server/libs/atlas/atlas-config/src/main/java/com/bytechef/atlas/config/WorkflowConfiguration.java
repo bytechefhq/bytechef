@@ -21,6 +21,7 @@ import com.bytechef.atlas.repository.ContextRepository;
 import com.bytechef.atlas.repository.CounterRepository;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
@@ -32,8 +33,11 @@ import com.bytechef.atlas.service.impl.CounterServiceImpl;
 import com.bytechef.atlas.service.impl.JobServiceImpl;
 import com.bytechef.atlas.service.impl.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -52,8 +56,8 @@ public class WorkflowConfiguration {
     }
 
     @Bean
-    public JobService jobService(JobRepository jobRepository, WorkflowRepository workflowRepository) {
-        return new JobServiceImpl(jobRepository, workflowRepository);
+    public JobService jobService(JobRepository jobRepository, List<WorkflowRepository> workflowRepositories) {
+        return new JobServiceImpl(jobRepository, workflowRepositories);
     }
 
     @Bean
@@ -62,7 +66,9 @@ public class WorkflowConfiguration {
     }
 
     @Bean
-    public WorkflowService workflowService(WorkflowRepository workflowRepository) {
-        return new WorkflowServiceImpl(workflowRepository);
+    public WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 }

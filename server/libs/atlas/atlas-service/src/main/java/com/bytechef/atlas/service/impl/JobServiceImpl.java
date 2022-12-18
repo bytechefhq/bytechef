@@ -51,18 +51,22 @@ public class JobServiceImpl implements JobService {
     private static final String WORKFLOW_ID = "workflowId";
 
     private final JobRepository jobRepository;
-    private final WorkflowRepository workflowRepository;
+    private final List<WorkflowRepository> workflowRepositories;
 
     @SuppressFBWarnings("EI2")
-    public JobServiceImpl(JobRepository jobRepository, WorkflowRepository workflowRepository) {
+    public JobServiceImpl(JobRepository jobRepository, List<WorkflowRepository> workflowRepositories) {
         this.jobRepository = jobRepository;
-        this.workflowRepository = workflowRepository;
+        this.workflowRepositories = workflowRepositories;
     }
 
     @Override
     public Job create(JobParameters jobParameters) {
 
-        Workflow workflow = workflowRepository.findById(workflowId)
+        Workflow workflow = workflowRepositories.stream()
+            .map(workflowRepository -> workflowRepository.findById(workflowId))
+            .findFirst()
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .orElseThrow();
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
