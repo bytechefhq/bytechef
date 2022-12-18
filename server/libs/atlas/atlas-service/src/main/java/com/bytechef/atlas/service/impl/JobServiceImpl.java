@@ -20,7 +20,7 @@ package com.bytechef.atlas.service.impl;
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.repository.JobRepository;
@@ -60,7 +60,6 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-        String workflowId = jobParametersDTO.getWorkflowId();
     public Job create(JobParameters jobParameters) {
 
         Workflow workflow = workflowRepository.findById(workflowId)
@@ -75,21 +74,21 @@ public class JobServiceImpl implements JobService {
                         .getMessage())
                 : "");
 
-        validate(jobParametersDTO, workflow);
+        validate(jobParameters, workflow);
 
         Job job = new Job();
 
-        job.setId(jobParametersDTO.getJobId() == null ? null : jobParametersDTO.getJobId());
-        job.setInputs(jobParametersDTO.getInputs());
+        job.setId(jobParameters.getJobId() == null ? null : jobParameters.getJobId());
+        job.setInputs(jobParameters.getInputs());
         job.setNew(true);
-        job.setLabel(jobParametersDTO.getLabel() == null ? workflow.getLabel() : jobParametersDTO.getLabel());
-        job.setParentTaskExecutionId(jobParametersDTO.getParentTaskExecutionId());
+        job.setLabel(jobParameters.getLabel() == null ? workflow.getLabel() : jobParameters.getLabel());
+        job.setParentTaskExecutionId(jobParameters.getParentTaskExecutionId());
         job.setPriority(
-            jobParametersDTO.getPriority() == null
+            jobParameters.getPriority() == null
                 ? Prioritizable.DEFAULT_PRIORITY
-                : jobParametersDTO.getPriority());
+                : jobParameters.getPriority());
         job.setStatus(JobStatus.CREATED);
-        job.setWebhooks(jobParametersDTO.getWebhooks());
+        job.setWebhooks(jobParameters.getWebhooks());
         job.setWorkflowId(workflow.getId());
 
         log.debug("Job {} started", job.getId());
@@ -192,7 +191,7 @@ public class JobServiceImpl implements JobService {
         return aJob.getStatus() == JobStatus.STOPPED || aJob.getStatus() == JobStatus.FAILED;
     }
 
-    private void validate(JobParametersDTO workflowParameters, Workflow workflow) {
+    private void validate(JobParameters workflowParameters, Workflow workflow) {
         // validate inputs
 
         Map<String, Object> inputs = workflowParameters.getInputs();
