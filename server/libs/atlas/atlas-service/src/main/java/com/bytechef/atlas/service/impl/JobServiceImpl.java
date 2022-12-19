@@ -20,7 +20,8 @@ package com.bytechef.atlas.service.impl;
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.repository.JobRepository;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -48,48 +50,53 @@ public class JobServiceImpl implements JobService {
 
     private static final Logger log = LoggerFactory.getLogger(JobServiceImpl.class);
 
-    private static final String WORKFLOW_ID = "workflowId";
-
     private final JobRepository jobRepository;
-    private final WorkflowRepository workflowRepository;
+    private final List<WorkflowRepository> workflowRepositories;
 
     @SuppressFBWarnings("EI2")
-    public JobServiceImpl(JobRepository jobRepository, WorkflowRepository workflowRepository) {
+    public JobServiceImpl(JobRepository jobRepository, List<WorkflowRepository> workflowRepositories) {
         this.jobRepository = jobRepository;
-        this.workflowRepository = workflowRepository;
+        this.workflowRepositories = workflowRepositories;
     }
 
     @Override
-    public Job add(JobParametersDTO jobParametersDTO) {
-        String workflowId = jobParametersDTO.getWorkflowId();
+    public Job create(JobParameters jobParameters) {
+        Assert.notNull(jobParameters, "jobParameters cannot be null.");
 
-        Workflow workflow = workflowRepository.findById(workflowId)
+        String workflowId = jobParameters.getWorkflowId();
+
+        Workflow workflow = workflowRepositories.stream()
+            .map(workflowRepository -> workflowRepository.findById(workflowId))
+            .findFirst()
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .orElseThrow();
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
+
+        ExecutionError executionError = workflow.getError();
+
         Assert.isNull(
-            workflow.getError(),
-            workflow.getError() != null
-                ? String.format(
-                    "%s: %s", workflowId, workflow.getError()
-                        .getMessage())
+            executionError,
+            executionError != null
+                ? String.format("%s: %s", workflowId, executionError.getMessage())
                 : "");
 
-        validate(jobParametersDTO, workflow);
+        validate(jobParameters, workflow);
 
         Job job = new Job();
 
-        job.setId(jobParametersDTO.getJobId() == null ? null : jobParametersDTO.getJobId());
-        job.setInputs(jobParametersDTO.getInputs());
+        job.setId(jobParameters.getJobId() == null ? null : jobParameters.getJobId());
+        job.setInputs(jobParameters.getInputs());
         job.setNew(true);
-        job.setLabel(jobParametersDTO.getLabel() == null ? workflow.getLabel() : jobParametersDTO.getLabel());
-        job.setParentTaskExecutionId(jobParametersDTO.getParentTaskExecutionId());
+        job.setLabel(jobParameters.getLabel() == null ? workflow.getLabel() : jobParameters.getLabel());
+        job.setParentTaskExecutionId(jobParameters.getParentTaskExecutionId());
         job.setPriority(
-            jobParametersDTO.getPriority() == null
+            jobParameters.getPriority() == null
                 ? Prioritizable.DEFAULT_PRIORITY
-                : jobParametersDTO.getPriority());
+                : jobParameters.getPriority());
         job.setStatus(JobStatus.CREATED);
-        job.setWebhooks(jobParametersDTO.getWebhooks());
+        job.setWebhooks(jobParameters.getWebhooks());
         job.setWorkflowId(workflow.getId());
 
         log.debug("Job {} started", job.getId());
@@ -110,6 +117,8 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Job getJob(String id) {
+        Assert.notNull(id, "id cannot be null.");
+
         return jobRepository.findById(id)
             .orElseThrow();
     }
@@ -129,19 +138,23 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Job getTaskExecutionJob(String taskExecutionId) {
+        Assert.notNull(taskExecutionId, "taskExecutionId cannot be null.");
+
         return jobRepository.findByTaskExecutionId(taskExecutionId);
     }
 
     @Override
-    public Job resume(String jobId) {
-        log.debug("Resuming job {}", jobId);
+    public Job resume(String id) {
+        Assert.notNull(id, "id cannot be null.");
 
-        Job job = jobRepository.findById(jobId)
+        log.debug("Resuming job {}", id);
+
+        Job job = jobRepository.findById(id)
             .orElseThrow();
 
-        Assert.notNull(job, String.format("Unknown job %s", jobId));
+        Assert.notNull(job, String.format("Unknown job %s", id));
         Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
-        Assert.isTrue(isRestartable(job), "can't restart job " + jobId + " as it is " + job.getStatus());
+        Assert.isTrue(isRestartable(job), "can't restart job " + id + " as it is " + job.getStatus());
 
         job.setStatus(JobStatus.STARTED);
 
@@ -151,8 +164,10 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job start(String jobId) {
-        Job job = jobRepository.findById(jobId)
+    public Job start(String id) {
+        Assert.notNull(id, "id cannot be null.");
+
+        Job job = jobRepository.findById(id)
             .orElseThrow();
 
         job.setCurrentTask(0);
@@ -165,14 +180,16 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job stop(String jobId) {
-        Job job = jobRepository.findById(jobId)
+    public Job stop(String id) {
+        Assert.notNull(id, "id cannot be null.");
+
+        Job job = jobRepository.findById(id)
             .orElseThrow();
 
-        Assert.notNull(job, "Unknown job: " + jobId);
+        Assert.notNull(job, "Unknown job: " + id);
         Assert.isTrue(
             job.getStatus() == JobStatus.STARTED,
-            "Job " + jobId + " can not be stopped as it is " + job.getStatus());
+            "Job " + id + " can not be stopped as it is " + job.getStatus());
 
         Job simpleJob = new Job(job);
 
@@ -185,14 +202,16 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job update(Job job) {
+        Assert.notNull(job, "job cannot be null.");
+
         return jobRepository.save(job);
     }
 
-    private boolean isRestartable(Job aJob) {
-        return aJob.getStatus() == JobStatus.STOPPED || aJob.getStatus() == JobStatus.FAILED;
+    private boolean isRestartable(Job job) {
+        return job.getStatus() == JobStatus.STOPPED || job.getStatus() == JobStatus.FAILED;
     }
 
-    private void validate(JobParametersDTO workflowParameters, Workflow workflow) {
+    private void validate(JobParameters workflowParameters, Workflow workflow) {
         // validate inputs
 
         Map<String, Object> inputs = workflowParameters.getInputs();

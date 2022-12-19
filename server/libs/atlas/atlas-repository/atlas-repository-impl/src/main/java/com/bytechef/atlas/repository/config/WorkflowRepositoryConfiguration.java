@@ -17,14 +17,11 @@
 
 package com.bytechef.atlas.repository.config;
 
-import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.WorkflowRepositoryChain;
 import com.bytechef.atlas.repository.workflow.mapper.JsonWorkflowMapper;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapperChain;
 import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
 import java.util.List;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -34,12 +31,6 @@ import org.springframework.context.annotation.Primary;
  */
 @Configuration
 public class WorkflowRepositoryConfiguration {
-
-    @Bean
-    @Primary
-    WorkflowRepository workflowRepository(CacheManager cacheManager, List<WorkflowRepository> workflowRepositories) {
-        return new WorkflowRepositoryChain(cacheManager, workflowRepositories);
-    }
 
     @Bean
     @Primary

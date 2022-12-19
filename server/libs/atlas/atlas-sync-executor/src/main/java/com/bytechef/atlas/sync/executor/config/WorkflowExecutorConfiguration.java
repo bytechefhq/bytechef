@@ -22,6 +22,7 @@ import com.bytechef.atlas.coordinator.event.EventListenerChain;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
@@ -46,6 +47,7 @@ import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -76,9 +78,9 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
     }
 
     @Bean
-    JobService jobService(WorkflowRepository workflowRepository, ObjectMapper objectMapper) {
+    JobService jobService(List<WorkflowRepository> workflowRepositories, ObjectMapper objectMapper) {
         return new JobServiceImpl(
-            new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepository);
+            new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepositories);
     }
 
     @Bean
@@ -92,8 +94,10 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
     }
 
     @Bean
-    WorkflowService workflowService(WorkflowRepository workflowRepository) {
-        return new WorkflowServiceImpl(workflowRepository);
+    WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 
     @Bean

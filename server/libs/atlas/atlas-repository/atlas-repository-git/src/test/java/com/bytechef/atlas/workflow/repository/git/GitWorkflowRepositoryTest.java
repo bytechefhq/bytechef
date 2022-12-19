@@ -24,7 +24,7 @@ import com.bytechef.atlas.repository.git.GitWorkflowRepository;
 import com.bytechef.atlas.repository.git.workflow.GitWorkflowOperations;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
-import com.bytechef.atlas.workflow.WorkflowFormat;
+
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -56,13 +56,13 @@ public class GitWorkflowRepositoryTest {
         @Override
         public List<WorkflowResource> getHeadFiles() {
             return List.of(new WorkflowResource(
-                "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML));
+                "hello/123", resolver.getResource("file:workflow/hello.yaml"), Workflow.Format.YAML));
         }
 
         @Override
         public WorkflowResource getFile(String aFileId) {
             return new WorkflowResource(
-                "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML);
+                "hello/123", resolver.getResource("file:workflow/hello.yaml"), Workflow.Format.YAML);
         }
     }
 }

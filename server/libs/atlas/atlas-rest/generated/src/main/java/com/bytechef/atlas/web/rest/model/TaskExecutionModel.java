@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   @JsonProperty("createdBy")
@@ -266,8 +266,8 @@ public class TaskExecutionModel {
    * The id of the job for which this task belongs to.
    * @return jobId
   */
-  
-  @Schema(name = "jobId", description = "The id of the job for which this task belongs to.", required = false)
+  @NotNull 
+  @Schema(name = "jobId", description = "The id of the job for which this task belongs to.", required = true)
   public String getJobId() {
     return jobId;
   }
@@ -361,8 +361,8 @@ public class TaskExecutionModel {
    * The priority value.
    * @return priority
   */
-  
-  @Schema(name = "priority", description = "The priority value.", required = false)
+  @NotNull 
+  @Schema(name = "priority", description = "The priority value.", required = true)
   public Integer getPriority() {
     return priority;
   }
@@ -475,8 +475,8 @@ public class TaskExecutionModel {
    * The time when this task instance was started.
    * @return startTime
   */
-  @Valid 
-  @Schema(name = "startTime", description = "The time when this task instance was started.", required = false)
+  @NotNull @Valid 
+  @Schema(name = "startTime", description = "The time when this task instance was started.", required = true)
   public LocalDateTime getStartTime() {
     return startTime;
   }
@@ -494,8 +494,8 @@ public class TaskExecutionModel {
    * The current status of this task.
    * @return status
   */
-  
-  @Schema(name = "status", description = "The current status of this task.", required = false)
+  @NotNull 
+  @Schema(name = "status", description = "The current status of this task.", required = true)
   public StatusEnum getStatus() {
     return status;
   }

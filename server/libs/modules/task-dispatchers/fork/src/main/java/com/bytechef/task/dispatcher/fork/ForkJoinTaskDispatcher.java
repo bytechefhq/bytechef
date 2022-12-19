@@ -150,7 +150,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
-                evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+                evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
                 taskDispatcher.dispatch(evaluatedTaskExecution);
             }

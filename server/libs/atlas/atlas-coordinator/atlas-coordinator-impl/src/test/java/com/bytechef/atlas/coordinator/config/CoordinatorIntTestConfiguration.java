@@ -39,9 +39,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@ComponentScan(basePackages = {
-    "com.bytechef.atlas.repository.jdbc"
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.atlas.repository.jdbc"
+    })
 @EnableAutoConfiguration
 @Import({
     ResourceWorkflowRepositoryConfiguration.class,

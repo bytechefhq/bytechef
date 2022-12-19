@@ -25,8 +25,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.web.rest.config.WorkflowRestTestConfiguration;
+import com.bytechef.atlas.web.rest.model.PostWorkflowRequestModel;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -41,9 +41,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = {
-    WorkflowRestTestConfiguration.class
-})
+@ContextConfiguration(
+    classes = {
+        WorkflowRestTestConfiguration.class
+    })
 @WebFluxTest(WorkflowController.class)
 public class WorkflowControllerIntTest {
 
@@ -116,15 +117,12 @@ public class WorkflowControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostWorkflow() {
         Workflow workflow = getWorkflow();
-        WorkflowModel workflowModel = new WorkflowModel()
-            .definition("""
-                {
-                    "tasks": []
-                }
-                """)
-            .format(WorkflowModel.FormatEnum.JSON);
+        PostWorkflowRequestModel workflowModel = new PostWorkflowRequestModel()
+            .definition("\"tasks\": []")
+            .providerType(PostWorkflowRequestModel.ProviderTypeEnum.JDBC)
+            .format(PostWorkflowRequestModel.FormatEnum.JSON);
 
-        when(workflowService.add(any())).thenReturn(workflow);
+        when(workflowService.create(any(), any())).thenReturn(workflow);
 
         try {
             assert workflow.getId() != null;
@@ -206,7 +204,7 @@ public class WorkflowControllerIntTest {
                 "tasks": []
             }
             """);
-        workflow.setFormat(WorkflowFormat.JSON);
+        workflow.setFormat(Workflow.Format.JSON);
 
         return workflow;
     }

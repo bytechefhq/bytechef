@@ -64,7 +64,8 @@ public class SwitchTaskDispatcherTest {
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "print"))));
+        when(taskExecutionService.create(any()))
+            .thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "print"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -106,7 +107,8 @@ public class SwitchTaskDispatcherTest {
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "sleep"))));
+        when(taskExecutionService.create(any()))
+            .thenReturn(new TaskExecution(new WorkflowTask(Map.of("type", "sleep"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 

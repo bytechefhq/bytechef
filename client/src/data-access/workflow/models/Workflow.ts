@@ -81,6 +81,12 @@ export interface Workflow {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * The type of the provider which stores the workflow definition.
+     * @type {string}
+     * @memberof Workflow
+     */
+    readonly providerType?: string;
+    /**
      * The workflow's list of expected outputs.
      * @type {Array<{ [key: string]: object; }>}
      * @memberof Workflow
@@ -140,6 +146,7 @@ export function WorkflowFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'label': !exists(json, 'label') ? undefined : json['label'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'providerType': !exists(json, 'providerType') ? undefined : json['providerType'],
         'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
         'retry': !exists(json, 'retry') ? undefined : json['retry'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskFromJSON)),

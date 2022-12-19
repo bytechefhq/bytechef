@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The lueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("definition")
@@ -97,6 +97,9 @@ public class WorkflowModel {
   @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
+
+  @JsonProperty("providerType")
+  private String providerType;
 
   @JsonProperty("outputs")
   @Valid
@@ -288,6 +291,25 @@ public class WorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public WorkflowModel providerType(String providerType) {
+    this.providerType = providerType;
+    return this;
+  }
+
+  /**
+   * The type of the provider which stores the workflow definition.
+   * @return providerType
+  */
+  
+  @Schema(name = "providerType", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the provider which stores the workflow definition.", required = false)
+  public String getProviderType() {
+    return providerType;
+  }
+
+  public void setProviderType(String providerType) {
+    this.providerType = providerType;
+  }
+
   public WorkflowModel outputs(List<Map<String, Object>> outputs) {
     this.outputs = outputs;
     return this;
@@ -379,6 +401,7 @@ public class WorkflowModel {
         Objects.equals(this.label, workflow.label) &&
         Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate) &&
+        Objects.equals(this.providerType, workflow.providerType) &&
         Objects.equals(this.outputs, workflow.outputs) &&
         Objects.equals(this.retry, workflow.retry) &&
         Objects.equals(this.tasks, workflow.tasks);
@@ -386,7 +409,7 @@ public class WorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition, createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, retry, tasks);
+    return Objects.hash(definition, createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, providerType, outputs, retry, tasks);
   }
 
   @Override
@@ -402,6 +425,7 @@ public class WorkflowModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    providerType: ").append(toIndentedString(providerType)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
     sb.append("    retry: ").append(toIndentedString(retry)).append("\n");
     sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");

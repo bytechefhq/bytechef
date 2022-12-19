@@ -56,7 +56,6 @@ dependencyResolutionManagement {
             library("methanol", "com.github.mizosoft.methanol:methanol:1.7.0")
             library("javapoet", "com.squareup:javapoet:1.13.0")
             library("jupiter-engine", "org.junit.jupiter:junit-jupiter-engine:5.9.1")
-            library("problem-spring-webflux", "org.zalando:problem-spring-webflux:0.28.0-RC.0")
             library("picocli", "info.picocli:picocli:4.7.0")
             library("picocli-codegen", "info.picocli:picocli-codegen:4.7.0")
             library("poi-ooxml", "org.apache.poi:poi-ooxml:5.2.3")

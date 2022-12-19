@@ -15,25 +15,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.workflow;
+package com.bytechef.component.shopify;
 
-import java.util.Objects;
-import org.apache.commons.io.FilenameUtils;
-import org.springframework.util.Assert;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
-/**
- * @author Ivica Cardic
- */
-public enum WorkflowFormat {
-    JSON,
-    YML,
-    YAML;
+public class ShopifyComponentHandlerTest {
 
-    public static WorkflowFormat parse(String fileName) {
-        Assert.notNull(fileName, "Filename %s can not be null".formatted(fileName));
-
-        String extension = FilenameUtils.getExtension(fileName);
-
-        return Objects.equals(extension.toLowerCase(), "json") ? JSON : YAML;
+    @Test
+    public void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals("definition/shopify_v1.json", new ShopifyComponentHandler().getDefinition());
     }
 }

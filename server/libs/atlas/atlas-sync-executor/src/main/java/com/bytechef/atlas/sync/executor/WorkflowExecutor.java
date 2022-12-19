@@ -27,7 +27,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
@@ -220,13 +220,13 @@ public class WorkflowExecutor {
 
         String jobId = UUIDUtils.generate();
 
-        JobParametersDTO jobParametersDTO = new JobParametersDTO();
+        JobParameters jobParameters = new JobParameters();
 
-        jobParametersDTO.setInputs(inputs);
-        jobParametersDTO.setJobId(jobId);
-        jobParametersDTO.setWorkflowId(workflowId);
+        jobParameters.setInputs(inputs);
+        jobParameters.setJobId(jobId);
+        jobParameters.setWorkflowId(workflowId);
 
-        coordinator.create(jobParametersDTO);
+        coordinator.create(jobParameters);
 
         return jobService.getJob(jobId);
     }

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -384,8 +384,8 @@ public class JobModel {
    * The priority value.
    * @return priority
   */
-  
-  @Schema(name = "priority", description = "The priority value.", required = false)
+  @NotNull 
+  @Schema(name = "priority", description = "The priority value.", required = true)
   public Integer getPriority() {
     return priority;
   }
@@ -403,8 +403,8 @@ public class JobModel {
    * The time of when the job began.
    * @return startTime
   */
-  @Valid 
-  @Schema(name = "startTime", description = "The time of when the job began.", required = false)
+  @NotNull @Valid 
+  @Schema(name = "startTime", description = "The time of when the job began.", required = true)
   public LocalDateTime getStartTime() {
     return startTime;
   }
@@ -422,8 +422,8 @@ public class JobModel {
    * The job's status.
    * @return status
   */
-  
-  @Schema(name = "status", description = "The job's status.", required = false)
+  @NotNull 
+  @Schema(name = "status", description = "The job's status.", required = true)
   public StatusEnum getStatus() {
     return status;
   }

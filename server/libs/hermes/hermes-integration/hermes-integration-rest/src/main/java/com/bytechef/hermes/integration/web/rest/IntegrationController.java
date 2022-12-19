@@ -82,7 +82,7 @@ public class IntegrationController implements IntegrationsApi {
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(conversionService.convert(
-            integrationFacade.add(conversionService.convert(integrationModel, Integration.class)),
+            integrationFacade.initialize(conversionService.convert(integrationModel, Integration.class)),
             IntegrationModel.class)));
     }
 

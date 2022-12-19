@@ -17,14 +17,18 @@
 
 package com.bytechef.hermes.integration.config;
 
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -38,9 +42,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {
-    "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"
+    })
 @EnableAutoConfiguration
 @Import({
     WorkflowRepositoryConfiguration.class
@@ -49,8 +54,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class IntegrationIntTestConfiguration {
 
     @Bean
-    public WorkflowService workflowService(WorkflowRepository workflowRepository) {
-        return new WorkflowServiceImpl(workflowRepository);
+    public WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 
     @EnableCaching

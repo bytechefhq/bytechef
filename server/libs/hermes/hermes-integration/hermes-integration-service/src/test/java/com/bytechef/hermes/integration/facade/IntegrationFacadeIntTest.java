@@ -44,7 +44,7 @@ public class IntegrationFacadeIntTest {
         integration.setName("name");
         integration.setDescription("description");
 
-        integration = integrationFacade.add(integration);
+        integration = integrationFacade.initialize(integration);
 
         Assertions.assertEquals("description", integration.getDescription());
         Assertions.assertEquals("name", integration.getName());

@@ -31,5 +31,6 @@ import org.springframework.core.convert.converter.Converter;
 public interface WorkflowModelMapper extends Converter<WorkflowModel, Workflow> {
 
     @Mapping(target = "error", ignore = true)
+    @Mapping(target = "providerType", ignore = true)
     Workflow convert(WorkflowModel workflowModel);
 }
