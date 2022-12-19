@@ -57,7 +57,7 @@ public class DelayComponentHandlerTest {
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-            delta >= 1500 && delta < 3000, String.format("Period %dms does not meet range [1500,1900>", delta));
+            delta >= 1500 && delta < 3000, String.format("Period %dms does not meet range [1500,3000>", delta));
     }
 
     @Test
