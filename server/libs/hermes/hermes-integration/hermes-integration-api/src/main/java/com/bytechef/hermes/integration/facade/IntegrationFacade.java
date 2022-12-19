@@ -24,5 +24,5 @@ import com.bytechef.hermes.integration.domain.Integration;
  */
 public interface IntegrationFacade {
 
-    Integration add(Integration integration);
+    Integration create(Integration integration);
 }
