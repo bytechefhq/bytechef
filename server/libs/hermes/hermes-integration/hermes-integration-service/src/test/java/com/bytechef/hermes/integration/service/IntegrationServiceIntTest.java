@@ -44,7 +44,7 @@ public class IntegrationServiceIntTest {
 
     @Test
     public void testAdd() {
-        Integration integration = integrationService.add(getIntegration());
+        Integration integration = integrationService.create(getIntegration());
 
         Assertions.assertEquals(
             List.of("workflow1"),

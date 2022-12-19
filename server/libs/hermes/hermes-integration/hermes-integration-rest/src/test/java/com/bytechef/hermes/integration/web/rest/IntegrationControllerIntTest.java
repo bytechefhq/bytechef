@@ -121,7 +121,7 @@ public class IntegrationControllerIntTest {
         IntegrationModel integrationModel = new IntegrationModel().name("name")
             .description("description");
 
-        when(integrationFacade.add(any())).thenReturn(integration);
+        when(integrationFacade.create(any())).thenReturn(integration);
 
         try {
             assert integration.getId() != null;
