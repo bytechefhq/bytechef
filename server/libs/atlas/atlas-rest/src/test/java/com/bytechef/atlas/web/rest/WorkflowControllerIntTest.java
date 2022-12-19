@@ -41,9 +41,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = {
-    WorkflowRestTestConfiguration.class
-})
+@ContextConfiguration(
+    classes = {
+        WorkflowRestTestConfiguration.class
+    })
 @WebFluxTest(WorkflowController.class)
 public class WorkflowControllerIntTest {
 
