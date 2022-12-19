@@ -1,0 +1,226 @@
+{
+    "actions": [
+        {
+            "display": {
+                "description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection#index-2020-10",
+                "label": "Retrieves a list of smart collections. Note: As of version 2019-10, this endpoint implements pagination by using links that are provided in the response header. To learn more, see Making requests to paginated REST Admin API endpoints."
+            },
+            "metadata": {
+                "path": "/admin/api/2020-10/smart_collections.json",
+                "requestMethod": "GET"
+            },
+            "name": "get_smart_collections",
+            "properties": [
+                {
+                    "description": "The number of results to show.\n                  (default: 50, maximum: 250)",
+                    "label": "Limit",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "limit",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show only the smart collections specified by a comma-separated list of IDs.",
+                    "label": "Ids",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "ids",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Restrict results to after the specified ID.",
+                    "label": "Since_id",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "since_id",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections with the specified title.",
+                    "label": "Title",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "title",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections that includes the specified product.",
+                    "label": "Product_id",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "product_id",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Filter results by smart collection handle.",
+                    "label": "Handle",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "handle",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections last updated after this date. (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Updated_at_min",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "updated_at_min",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections last updated before this date. (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Updated_at_max",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "updated_at_max",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections published after this date. (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Published_at_min",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "published_at_min",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections published before this date. (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Published_at_max",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "published_at_max",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Filter results based on the published status of smart collections.\n                  (default: any)\n                    \n                        published: Show only published smart collections.\n                        unpublished: Show only unpublished smart collections.\n                        any: Show all smart collections.",
+                    "label": "Published_status",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "published_status",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show only certain fields, specified by a comma-separated list of field names.",
+                    "label": "Fields",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "fields",
+                    "type": "OBJECT"
+                }
+            ]
+        },
+        {
+            "display": {
+                "description": "https://shopify.dev/docs/admin-api/rest/reference/products/smartcollection#count-2020-10",
+                "label": "Retrieves a count of smart collections"
+            },
+            "metadata": {
+                "path": "/admin/api/2020-10/smart_collections/count.json",
+                "requestMethod": "GET"
+            },
+            "name": "get_smart_collections_count",
+            "properties": [
+                {
+                    "description": "Show smart collections with the specified title.",
+                    "label": "Title",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "title",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections that include the specified product.",
+                    "label": "Product_id",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "product_id",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections last updated after this date. (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Updated_at_min",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "updated_at_min",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections last updated before this date.  (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Updated_at_max",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "updated_at_max",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections published after this date.  (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Published_at_min",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "published_at_min",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Show smart collections published before this date.  (format: 2014-04-25T16:15:47-04:00)",
+                    "label": "Published_at_max",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "published_at_max",
+                    "type": "OBJECT"
+                },
+                {
+                    "description": "Filter results based on the published status of smart collections.\n                  (default: any)\n                    \n                        published: Show only published smart collections.\n                        unpublished: Show only unpublished smart collections.\n                        any: Show all smart collections.",
+                    "label": "Published_status",
+                    "metadata": {
+                        "type": "QUERY"
+                    },
+                    "required": false,
+                    "name": "published_status",
+                    "type": "OBJECT"
+                }
+            ]
+        }
+    ],
+    "display": {
+        "description": "The REST Admin API lets you build apps and other integrations for the Shopify admin.",
+        "label": "Shopify"
+    },
+    "name": "shopify",
+    "version": 1
+}
