@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -29,16 +30,16 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  */
 public class YamlWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
 
-    private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
 
     public Workflow readValue(WorkflowResource workflowResource) {
-        return readValue(workflowResource, mapper);
+        return readValue(workflowResource, OBJECT_MAPPER);
     }
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
         return workflowResource.getWorkflowFormat() == WorkflowFormat.YML
-                        || workflowResource.getWorkflowFormat() == WorkflowFormat.YAML
+            || workflowResource.getWorkflowFormat() == WorkflowFormat.YAML
                 ? this
                 : null;
     }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -40,12 +41,6 @@ public class ConnectionRSocketController {
     @MessageMapping("createConnection")
     public Mono<Connection> createConnection(Connection connection) {
         return Mono.create(sink -> sink.success(connectionService.add(connection)));
-    }
-
-    @MessageMapping("fetchConnection")
-    public Mono<Connection> fetchConnection(String id) {
-        return Mono.create(
-                sink -> sink.success(connectionService.fetchConnection(id).orElse(null)));
     }
 
     @MessageMapping("getConnection")

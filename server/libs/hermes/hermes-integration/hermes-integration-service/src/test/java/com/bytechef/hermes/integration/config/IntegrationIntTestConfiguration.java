@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,7 @@
 package com.bytechef.hermes.integration.config;
 
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfig;
+import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
 import java.util.Optional;
@@ -37,9 +38,13 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {"com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"})
+@ComponentScan(basePackages = {
+    "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"
+})
 @EnableAutoConfiguration
-@Import({WorkflowRepositoryConfig.class})
+@Import({
+    WorkflowRepositoryConfiguration.class
+})
 @SpringBootConfiguration
 public class IntegrationIntTestConfiguration {
 
@@ -50,11 +55,14 @@ public class IntegrationIntTestConfiguration {
 
     @EnableCaching
     @TestConfiguration
-    public static class CacheConfiguration {}
+    public static class CacheConfiguration {
+    }
 
     @EnableJdbcAuditing
     @EnableJdbcRepositories(
-            basePackages = {"com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository"})
+        basePackages = {
+            "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository"
+        })
     @TestConfiguration
     public static class JdbcRepositoriesConfiguration {
 

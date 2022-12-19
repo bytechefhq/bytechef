@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * Represents a definition of the task.
@@ -25,7 +25,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @JsonProperty("finalize")
@@ -157,11 +157,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The key-value map of task parameters.
+   * Key-value map of task parameters.
    * @return parameters
   */
   
-  @Schema(name = "parameters", description = "The key-value map of task parameters.", required = false)
+  @Schema(name = "parameters", description = "Key-value map of task parameters.", required = false)
   public Map<String, Object> getParameters() {
     return parameters;
   }
@@ -249,11 +249,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The type of the task.
+   * Type of the task.
    * @return type
   */
   
-  @Schema(name = "type", description = "The type of the task.", required = false)
+  @Schema(name = "type", description = "Type of the task.", required = false)
   public String getType() {
     return type;
   }

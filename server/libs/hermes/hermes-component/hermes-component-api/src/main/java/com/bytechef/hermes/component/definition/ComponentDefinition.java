@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,11 +17,12 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.constants.Versions;
-import com.bytechef.hermes.definition.Definition;
+import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * Used for specifying a component.
@@ -28,84 +30,27 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Schema(
-        name = "ComponentDefinition",
-        description =
-                "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
-public final class ComponentDefinition implements Definition {
-
-    private List<ConnectionDefinition> connections;
-    private ComponentDisplay display;
-    private String name;
-    private List<Action> actions;
-    private Resources resources;
-    private int version = Versions.VERSION_1;
-
-    private ComponentDefinition() {}
-
-    public ComponentDefinition(String name) {
-        this.name = name;
-    }
-
-    public ComponentDefinition actions(Action... actions) {
-        this.actions = List.of(actions);
-
-        return this;
-    }
-
-    public ComponentDefinition connections(ConnectionDefinition... connections) {
-        this.connections = List.of(connections);
-
-        return this;
-    }
-
-    public ComponentDefinition display(com.bytechef.hermes.component.definition.ComponentDisplay display) {
-        this.display = display;
-
-        return this;
-    }
-
-    public ComponentDefinition resources(Resources resources) {
-        this.resources = resources;
-
-        return this;
-    }
-
-    public ComponentDefinition version(int version) {
-        this.version = version;
-
-        return this;
-    }
+    name = "ComponentDefinition",
+    description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
+public sealed interface ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
     @SuppressWarnings("unchecked")
     @Schema(name = "actions", description = "The list of all available actions the component can perform.")
-    public List<Action> getActions() {
-        return actions;
-    }
+    List<? extends ActionDefinition> getActions();
 
     @SuppressWarnings("unchecked")
-    @Schema(name = "connections", description = " The list of possible connections to an outside service.")
-    public List<ConnectionDefinition> getConnections() {
-        return connections;
-    }
+    @Schema(name = "connection", description = "Definition of connection to an outside service.")
+    ConnectionDefinition getConnection();
 
-    @Override
-    public ComponentDisplay getDisplay() {
-        return display;
-    }
+    Display getDisplay();
 
-    @Override
+    @Schema(name = "metadata", description = "Additional data that can be used during processing.")
+    Map<String, Object> getMetadata();
+
     @Schema(name = "name", description = "The connection name.")
-    public String getName() {
-        return name;
-    }
+    String getName();
 
-    @Override
-    public Resources getResources() {
-        return resources;
-    }
+    Resources getResources();
 
-    @Override
-    public int getVersion() {
-        return version;
-    }
+    int getVersion();
 }

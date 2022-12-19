@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
 public interface JdbcTaskExecutionRepository
-        extends PagingAndSortingRepository<TaskExecution, String>, TaskExecutionRepository {
+    extends PagingAndSortingRepository<TaskExecution, String>, TaskExecutionRepository {
 
     List<TaskExecution> findAllByJobOrderByCreatedDate(AggregateReference<Job, String> job);
 

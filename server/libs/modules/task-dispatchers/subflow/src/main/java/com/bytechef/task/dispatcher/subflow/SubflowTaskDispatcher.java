@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.subflow.constants.SubflowTaskDispatcherConstants.SUBFLOW;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
@@ -28,6 +29,7 @@ import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
+import com.bytechef.commons.utils.MapUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,16 +53,21 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     public void dispatch(TaskExecution taskExecution) {
         Map<String, Object> params = new HashMap<>();
 
-        params.put(WorkflowConstants.INPUTS, taskExecution.getMap(WorkflowConstants.INPUTS, Collections.emptyMap()));
+        params.put(
+            WorkflowConstants.INPUTS,
+            MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
         params.put(WorkflowConstants.PARENT_TASK_EXECUTION_ID, taskExecution.getId());
-        params.put(WorkflowConstants.WORKFLOW_ID, taskExecution.getRequiredString(WorkflowConstants.WORKFLOW_ID));
+        params.put(
+            WorkflowConstants.WORKFLOW_ID,
+            MapUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
 
         messageBroker.send(Queues.SUBFLOWS, params);
     }
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(SUBFLOW + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(SUBFLOW + "/v" + VERSION_1)) {
             return this;
         }
 

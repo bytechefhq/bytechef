@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -19,17 +20,16 @@
 package com.bytechef.atlas.message.broker;
 
 /**
- * Abstraction for sending messages between the various componentes of the application.
- * Implementations are responsible for the guranteed delivery of the message.
+ * Abstraction for sending messages between the various componentes of the application. Implementations are responsible
+ * for the guranteed delivery of the message.
  *
  * @author Arik Cohen
  * @since Jun 18, 2016
  */
 public interface MessageBroker {
     /**
-     * @param routingKey a string representaiton used for routing the message to the appropriate
-     *     destination.
-     * @param message The message to send.
+     * @param routingKey a string representaiton used for routing the message to the appropriate destination.
+     * @param message    The message to send.
      */
     void send(String routingKey, Object message);
 }

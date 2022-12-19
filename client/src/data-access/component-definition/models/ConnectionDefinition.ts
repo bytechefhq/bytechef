@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ConnectionDefinitionPropertiesInner } from './ConnectionDefinitionPropertiesInner';
+import type { Authorization } from './Authorization';
 import {
-    ConnectionDefinitionPropertiesInnerFromJSON,
-    ConnectionDefinitionPropertiesInnerFromJSONTyped,
-    ConnectionDefinitionPropertiesInnerToJSON,
-} from './ConnectionDefinitionPropertiesInner';
+    AuthorizationFromJSON,
+    AuthorizationFromJSONTyped,
+    AuthorizationToJSON,
+} from './Authorization';
 import type { Display } from './Display';
 import {
     DisplayFromJSON,
@@ -31,6 +31,12 @@ import {
     ResourcesFromJSONTyped,
     ResourcesToJSON,
 } from './Resources';
+import type { ValueProperty } from './ValueProperty';
+import {
+    ValuePropertyFromJSON,
+    ValuePropertyFromJSONTyped,
+    ValuePropertyToJSON,
+} from './ValueProperty';
 
 /**
  * A connection to an outside service.
@@ -40,22 +46,34 @@ import {
 export interface ConnectionDefinition {
     /**
      * 
+     * @type {Array<Authorization>}
+     * @memberof ConnectionDefinition
+     */
+    authorizations?: Array<Authorization>;
+    /**
+     * The name of a component this connection can be used for.
+     * @type {string}
+     * @memberof ConnectionDefinition
+     */
+    componentName?: string;
+    /**
+     * The version of a component this connection can be used for.
+     * @type {string}
+     * @memberof ConnectionDefinition
+     */
+    componentVersion?: string;
+    /**
+     * 
      * @type {Display}
      * @memberof ConnectionDefinition
      */
     display?: Display;
     /**
-     * The connection name.
-     * @type {string}
-     * @memberof ConnectionDefinition
-     */
-    name?: string;
-    /**
      * Properties of the connection.
-     * @type {Array<ConnectionDefinitionPropertiesInner>}
+     * @type {Array<ValueProperty>}
      * @memberof ConnectionDefinition
      */
-    properties?: Array<ConnectionDefinitionPropertiesInner>;
+    properties?: Array<ValueProperty>;
     /**
      * 
      * @type {Resources}
@@ -95,9 +113,11 @@ export function ConnectionDefinitionFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
+        'authorizations': !exists(json, 'authorizations') ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationFromJSON)),
+        'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
+        'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'display': !exists(json, 'display') ? undefined : DisplayFromJSON(json['display']),
-        'name': !exists(json, 'name') ? undefined : json['name'],
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(ConnectionDefinitionPropertiesInnerFromJSON)),
+        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(ValuePropertyFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesFromJSON(json['resources']),
         'subtitle': !exists(json, 'subtitle') ? undefined : json['subtitle'],
         'version': !exists(json, 'version') ? undefined : json['version'],
@@ -113,9 +133,11 @@ export function ConnectionDefinitionToJSON(value?: ConnectionDefinition | null):
     }
     return {
         
+        'authorizations': value.authorizations === undefined ? undefined : ((value.authorizations as Array<any>).map(AuthorizationToJSON)),
+        'componentName': value.componentName,
+        'componentVersion': value.componentVersion,
         'display': DisplayToJSON(value.display),
-        'name': value.name,
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(ConnectionDefinitionPropertiesInnerToJSON)),
+        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(ValuePropertyToJSON)),
         'resources': ResourcesToJSON(value.resources),
         'subtitle': value.subtitle,
         'version': value.version,

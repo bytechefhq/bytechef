@@ -24,13 +24,13 @@ export interface DisplayOption {
      * @type {{ [key: string]: Array<object>; }}
      * @memberof DisplayOption
      */
-    hideWhen?: { [key: string]: Array<object>; };
+    hide?: { [key: string]: Array<object>; };
     /**
      * The map of property names and list of values to check against if the property should be shown.
      * @type {{ [key: string]: Array<object>; }}
      * @memberof DisplayOption
      */
-    showWhen?: { [key: string]: Array<object>; };
+    show?: { [key: string]: Array<object>; };
 }
 
 /**
@@ -52,8 +52,8 @@ export function DisplayOptionFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'hideWhen': !exists(json, 'hideWhen') ? undefined : json['hideWhen'],
-        'showWhen': !exists(json, 'showWhen') ? undefined : json['showWhen'],
+        'hide': !exists(json, 'hide') ? undefined : json['hide'],
+        'show': !exists(json, 'show') ? undefined : json['show'],
     };
 }
 
@@ -66,8 +66,8 @@ export function DisplayOptionToJSON(value?: DisplayOption | null): any {
     }
     return {
         
-        'hideWhen': value.hideWhen,
-        'showWhen': value.showWhen,
+        'hide': value.hide,
+        'show': value.show,
     };
 }
 

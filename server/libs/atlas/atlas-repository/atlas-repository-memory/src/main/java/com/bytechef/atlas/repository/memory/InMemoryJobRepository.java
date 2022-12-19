@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -40,7 +41,7 @@ public class InMemoryJobRepository implements JobRepository {
 
     @SuppressFBWarnings("EI2")
     public InMemoryJobRepository(
-            InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository, ObjectMapper objectMapper) {
+        InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository, ObjectMapper objectMapper) {
         this.inMemoryTaskExecutionRepository = inMemoryTaskExecutionRepository;
         this.objectMapper = objectMapper;
     }
@@ -89,13 +90,14 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Job findByTaskExecutionId(String taskExecutionId) {
-        TaskExecution taskExecution =
-                inMemoryTaskExecutionRepository.findById(taskExecutionId).orElseThrow();
+        TaskExecution taskExecution = inMemoryTaskExecutionRepository.findById(taskExecutionId)
+            .orElseThrow();
 
-        return jobs.values().stream()
-                .filter(job -> Objects.equals(job.getId(), taskExecution.getJobId()))
-                .findFirst()
-                .orElseThrow();
+        return jobs.values()
+            .stream()
+            .filter(job -> Objects.equals(job.getId(), taskExecution.getJobId()))
+            .findFirst()
+            .orElseThrow();
     }
 
     @Override

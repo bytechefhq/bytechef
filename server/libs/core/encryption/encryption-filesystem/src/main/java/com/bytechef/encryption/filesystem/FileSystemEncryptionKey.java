@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,7 +26,8 @@ import java.nio.file.Path;
  */
 public class FileSystemEncryptionKey extends AbstractEncryptionKey {
 
-    public FileSystemEncryptionKey() {}
+    public FileSystemEncryptionKey() {
+    }
 
     @Override
     protected String fetchKey() {
@@ -33,8 +35,9 @@ public class FileSystemEncryptionKey extends AbstractEncryptionKey {
 
         try {
             Path keyPath = Files.createDirectories(
-                            Path.of(System.getProperty("user.home")).resolve(".bytechef"))
-                    .resolve("key");
+                Path.of(System.getProperty("user.home"))
+                    .resolve(".bytechef"))
+                .resolve("key");
 
             if (Files.exists(keyPath)) {
                 key = Files.readString(keyPath);

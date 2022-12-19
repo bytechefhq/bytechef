@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -18,7 +19,6 @@ package com.bytechef.hermes.connection.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -27,8 +27,6 @@ public interface ConnectionService {
     Connection add(Connection connection);
 
     void delete(String id);
-
-    Optional<Connection> fetchConnection(String id);
 
     Connection getConnection(String id);
 

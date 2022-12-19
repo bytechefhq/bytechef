@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -20,12 +21,12 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.if_.IfTaskDispatcher;
 import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
-import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,88 +56,106 @@ public class LoopTaskDispatcherIntTest {
 
     @BeforeEach
     void beforeEach() {
-        testVarTaskHandler = new TestVarTaskHandler<>((valueMap, name, value) ->
-                valueMap.computeIfAbsent(name, key -> new ArrayList<>()).add(value));
+        testVarTaskHandler = new TestVarTaskHandler<>(
+            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
+                .add(value));
     }
 
     @Test
     public void testDispatch1() {
         workflowExecutor.execute(
-                "loop_v1_1", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            "loop_v1_1", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
-                IntStream.rangeClosed(2, 11).boxed().collect(Collectors.toList()), testVarTaskHandler.get("sumVar1"));
+            IntStream.rangeClosed(2, 11)
+                .boxed()
+                .collect(Collectors.toList()),
+            testVarTaskHandler.get("sumVar1"));
     }
 
     @Test
     public void testDispatch2() {
         workflowExecutor.execute(
-                "loop_v1_2", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            "loop_v1_2", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
-                IntStream.rangeClosed(1, 10)
-                        .boxed()
-                        .flatMap(item1 -> IntStream.rangeClosed(1, item1).mapToObj(item2 -> item1 + "_" + item2))
-                        .collect(Collectors.toList()),
-                testVarTaskHandler.get("var1"));
+            IntStream.rangeClosed(1, 10)
+                .boxed()
+                .flatMap(item1 -> IntStream.rangeClosed(1, item1)
+                    .mapToObj(item2 -> item1 + "_" + item2))
+                .collect(Collectors.toList()),
+            testVarTaskHandler.get("var1"));
     }
 
     @Test
     public void testDispatch3() {
         workflowExecutor.execute(
-                "loop_v1_3", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            "loop_v1_3", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
-                IntStream.rangeClosed(4, 13).boxed().collect(Collectors.toList()), testVarTaskHandler.get("sumVar2"));
+            IntStream.rangeClosed(4, 13)
+                .boxed()
+                .collect(Collectors.toList()),
+            testVarTaskHandler.get("sumVar2"));
     }
 
     @Test
     public void testDispatch4() {
         workflowExecutor.execute(
-                "loop_v1_4", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            "loop_v1_4", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
-                IntStream.rangeClosed(4, 8).boxed().collect(Collectors.toList()), testVarTaskHandler.get("sumVar2"));
+            IntStream.rangeClosed(4, 8)
+                .boxed()
+                .collect(Collectors.toList()),
+            testVarTaskHandler.get("sumVar2"));
     }
 
     @Test
     public void testDispatch5() {
         workflowExecutor.execute(
-                "loop_v1_5", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            "loop_v1_5", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
-                IntStream.rangeClosed(4, 8).boxed().collect(Collectors.toList()), testVarTaskHandler.get("sumVar2"));
+            IntStream.rangeClosed(4, 8)
+                .boxed()
+                .collect(Collectors.toList()),
+            testVarTaskHandler.get("sumVar2"));
     }
 
     @Test
     public void testDispatch6() {
         workflowExecutor.execute(
-                "loop_v1_6", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            "loop_v1_6", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
-                IntStream.rangeClosed(3, 8).boxed().collect(Collectors.toList()), testVarTaskHandler.get("sumVar2"));
+            IntStream.rangeClosed(3, 8)
+                .boxed()
+                .collect(Collectors.toList()),
+            testVarTaskHandler.get("sumVar2"));
     }
 
     private WorkflowExecutor.GetTaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
         return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
-                new IfTaskCompletionHandler(
-                        contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
-                new LoopTaskCompletionHandler(
-                        contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
-                new SequenceTaskCompletionHandler(
-                        contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
+            new IfTaskCompletionHandler(
+                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+            new LoopTaskCompletionHandler(
+                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+            new SequenceTaskCompletionHandler(
+                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
     private static WorkflowExecutor.GetTaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
-        return (contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                List.of(
-                        new IfTaskDispatcher(
-                                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
-                        new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
-                        new LoopTaskDispatcher(
-                                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
-                        new SequenceTaskDispatcher(
-                                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
+        return (
+            contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
+            taskExecutionService) -> List.of(
+                new IfTaskDispatcher(
+                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
+                new LoopTaskDispatcher(
+                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                new SequenceTaskDispatcher(
+                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
     private WorkflowExecutor.GetTaskHandlerMapSupplier getTaskHandlerMap() {

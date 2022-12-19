@@ -1,5 +1,5 @@
 dependencies {
-    api project(":server:libs:hermes:hermes-api")
+    api project(":server:libs:hermes:hermes-definition-api")
 
     implementation libs.swagger.annotations
 }

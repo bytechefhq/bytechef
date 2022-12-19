@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -19,7 +20,7 @@ package com.bytechef.atlas.repository.jdbc.event;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
@@ -54,7 +55,7 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
         if (workflow.isNew()) {
             workflow.setCreatedBy("system");
             workflow.setCreatedDate(LocalDateTime.now());
-            workflow.setId(UUIDGenerator.generate());
+            workflow.setId(UUIDUtils.generate());
         }
 
         workflow.setLastModifiedBy("system");
@@ -65,8 +66,9 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
 
     private Workflow readWorkflowDefinition(Workflow workflow) {
         return workflowMapper.readValue(new WorkflowResource(
-                workflow.getId(),
-                new ByteArrayResource(workflow.getDefinition().getBytes(StandardCharsets.UTF_8)),
-                workflow.getFormat()));
+            workflow.getId(),
+            new ByteArrayResource(workflow.getDefinition()
+                .getBytes(StandardCharsets.UTF_8)),
+            workflow.getFormat()));
     }
 }

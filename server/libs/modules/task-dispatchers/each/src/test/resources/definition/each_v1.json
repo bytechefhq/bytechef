@@ -7,7 +7,36 @@
   "output": [
     {
       "name": "item",
-      "type": "ANY"
+      "type": "ONE_OF",
+      "types": [
+        {
+          "type": "ARRAY"
+        },
+        {
+          "type": "BOOLEAN"
+        },
+        {
+          "type": "DATE"
+        },
+        {
+          "type": "DATE_TIME"
+        },
+        {
+          "type": "INTEGER"
+        },
+        {
+          "type": "NULL"
+        },
+        {
+          "type": "NUMBER"
+        },
+        {
+          "type": "OBJECT"
+        },
+        {
+          "type": "STRING"
+        }
+      ]
     },
     {
       "name": "itemIndex",
@@ -22,7 +51,36 @@
       "type": "ARRAY",
       "items": [
         {
-          "type": "ANY"
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ]
     },

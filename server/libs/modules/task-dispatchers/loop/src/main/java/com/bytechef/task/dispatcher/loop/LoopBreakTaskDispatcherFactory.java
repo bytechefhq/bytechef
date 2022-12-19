@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,8 +17,8 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_BREAK;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
@@ -30,8 +31,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoopBreakTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION =
-            create(LOOP_BREAK).display(display("Loop Break").description("Breaks the loop execution."));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP_BREAK)
+        .display(display("Loop Break").description("Breaks the loop execution."));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

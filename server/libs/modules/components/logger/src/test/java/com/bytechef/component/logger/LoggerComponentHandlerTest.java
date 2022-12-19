@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.component.logger;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ public class LoggerComponentHandlerTest {
 
     @Test
     public void testGetDefinition() {
-        AssertUtils.assertEquals("definition/logger_v1.json", new LoggerComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/logger_v1.json", new LoggerComponentHandler().getDefinition());
     }
 
     @Disabled

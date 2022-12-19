@@ -24,6 +24,12 @@ export interface Connection {
      * @type {string}
      * @memberof Connection
      */
+    authorizationName?: string;
+    /**
+     * TODO
+     * @type {string}
+     * @memberof Connection
+     */
     componentName?: string;
     /**
      * TODO
@@ -60,18 +66,6 @@ export interface Connection {
      * @type {string}
      * @memberof Connection
      */
-    label?: string;
-    /**
-     * TODO
-     * @type {{ [key: string]: object; }}
-     * @memberof Connection
-     */
-    parameters?: { [key: string]: object; };
-    /**
-     * TODO
-     * @type {string}
-     * @memberof Connection
-     */
     readonly lastModifiedBy?: string;
     /**
      * TODO
@@ -79,6 +73,12 @@ export interface Connection {
      * @memberof Connection
      */
     readonly lastModifiedDate?: Date;
+    /**
+     * TODO
+     * @type {{ [key: string]: object; }}
+     * @memberof Connection
+     */
+    parameters?: { [key: string]: object; };
 }
 
 /**
@@ -100,16 +100,16 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
+        'authorizationName': !exists(json, 'authorizationName') ? undefined : json['authorizationName'],
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'name': !exists(json, 'name') ? undefined : json['name'],
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'parameters': !exists(json, 'parameters') ? undefined : json['parameters'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'parameters': !exists(json, 'parameters') ? undefined : json['parameters'],
     };
 }
 
@@ -122,10 +122,10 @@ export function ConnectionToJSON(value?: Connection | null): any {
     }
     return {
         
+        'authorizationName': value.authorizationName,
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
         'name': value.name,
-        'label': value.label,
         'parameters': value.parameters,
     };
 }

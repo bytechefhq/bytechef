@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -55,29 +56,30 @@ public class ConnectionController implements ConnectionsApi {
     @Override
     public Mono<ResponseEntity<ConnectionModel>> getConnection(String id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-                conversionService.convert(connectionService.getConnection(id), ConnectionModel.class)));
+            conversionService.convert(connectionService.getConnection(id), ConnectionModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<Flux<ConnectionModel>>> getConnections(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(connectionService.getConnections().stream()
-                .map(connection -> conversionService.convert(connection, ConnectionModel.class))
-                .toList())));
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(connectionService.getConnections()
+            .stream()
+            .map(connection -> conversionService.convert(connection, ConnectionModel.class))
+            .toList())));
     }
 
     @Override
     public Mono<ResponseEntity<ConnectionModel>> postConnection(
-            Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
+        Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
         return connectionModelMono.map(connectionModel -> ResponseEntity.ok(conversionService.convert(
-                connectionService.add(conversionService.convert(connectionModel, Connection.class)),
-                ConnectionModel.class)));
+            connectionService.add(conversionService.convert(connectionModel, Connection.class)),
+            ConnectionModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<ConnectionModel>> putConnection(
-            String id, Mono<ConnectionUpdateModel> connectionUpdateModelMono, ServerWebExchange exchange) {
+        String id, Mono<ConnectionUpdateModel> connectionUpdateModelMono, ServerWebExchange exchange) {
         return connectionUpdateModelMono.map(connectionUpdateModel -> ResponseEntity.ok(conversionService.convert(
-                connectionService.update(id, connectionUpdateModel.getName()), ConnectionModel.class)));
+            connectionService.update(id, connectionUpdateModel.getName()), ConnectionModel.class)));
     }
 }

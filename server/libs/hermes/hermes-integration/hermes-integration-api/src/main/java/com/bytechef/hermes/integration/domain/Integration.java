@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -73,7 +74,8 @@ public final class Integration implements Persistable<String> {
     @MappedCollection(idColumn = "integration_id")
     final Set<IntegrationWorkflow> integrationWorkflows = new HashSet<>();
 
-    public Integration() {}
+    public Integration() {
+    }
 
     @PersistenceCreator
     public Integration(String name, String description, Set<IntegrationWorkflow> integrationWorkflows) {
@@ -171,9 +173,9 @@ public final class Integration implements Persistable<String> {
 
     public void removeWorkflow(String workflowId) {
         integrationWorkflows.stream()
-                .filter(integrationWorkflow -> Objects.equals(integrationWorkflow.getWorkflowId(), workflowId))
-                .findFirst()
-                .ifPresent(integrationWorkflows::remove);
+            .filter(integrationWorkflow -> Objects.equals(integrationWorkflow.getWorkflowId(), workflowId))
+            .findFirst()
+            .ifPresent(integrationWorkflows::remove);
     }
 
     public void setCreatedBy(String createdBy) {
@@ -207,13 +209,13 @@ public final class Integration implements Persistable<String> {
     @Override
     public String toString() {
         return "Integration{" + "createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", description='"
-                + description + '\'' + ", id='"
-                + id + '\'' + ", name='"
-                + name + '\'' + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", version="
-                + version + '}';
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", description='"
+            + description + '\'' + ", id='"
+            + id + '\'' + ", name='"
+            + name + '\'' + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", version="
+            + version + '}';
     }
 }

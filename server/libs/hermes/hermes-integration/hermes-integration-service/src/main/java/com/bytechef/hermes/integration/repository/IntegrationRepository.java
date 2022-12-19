@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,6 +18,7 @@
 package com.bytechef.hermes.integration.repository;
 
 import com.bytechef.hermes.integration.domain.Integration;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,4 +26,6 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface IntegrationRepository extends PagingAndSortingRepository<Integration, String> {}
+public interface IntegrationRepository
+    extends PagingAndSortingRepository<Integration, String>, CrudRepository<Integration, String> {
+}

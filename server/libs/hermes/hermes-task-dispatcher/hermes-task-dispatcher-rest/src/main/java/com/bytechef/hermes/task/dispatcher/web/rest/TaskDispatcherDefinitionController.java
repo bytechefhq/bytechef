@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,34 +53,37 @@ public class TaskDispatcherDefinitionController {
     }
 
     /**
-     * GET /definitions/task-dispatchers
-     * Returns all task dispatcher definitions
+     * GET /definitions/task-dispatchers Returns all task dispatcher definitions
      *
      * @return OK (status code 200)
      */
     @Operation(
-            description = "Returns all task dispatcher definitions.",
-            operationId = "getTaskDispatcherDefinitions",
-            summary = "Returns all task dispatcher definitions.",
-            tags = {"task-dispatcher-definitions"},
-            responses = {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "OK",
-                        content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = TaskDispatcherDefinition.class))
-                        })
-            })
+        description = "Returns all task dispatcher definitions.",
+        operationId = "getTaskDispatcherDefinitions",
+        summary = "Returns all task dispatcher definitions.",
+        tags = {
+            "task-dispatcher-definitions"
+        },
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = {
+                    @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = TaskDispatcherDefinition.class))
+                })
+        })
     @RequestMapping(
-            method = RequestMethod.GET,
-            value = "/definitions/task-dispatchers",
-            produces = {"application/json"})
+        method = RequestMethod.GET,
+        value = "/definitions/task-dispatchers",
+        produces = {
+            "application/json"
+        })
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinition>>> getTaskDispatcherDefinitions(
-            @Parameter(hidden = true) ServerWebExchange exchange) {
+        @Parameter(hidden = true) ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskDispatcherFactories.stream()
-                .map(TaskDispatcherFactory::getDefinition)
-                .collect(Collectors.toList()))));
+            .map(TaskDispatcherFactory::getDefinition)
+            .collect(Collectors.toList()))));
     }
 }

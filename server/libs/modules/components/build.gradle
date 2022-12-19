@@ -10,8 +10,9 @@ subprojects {
         implementation "com.fasterxml.jackson.core:jackson-databind"
         implementation "org.apache.commons:commons-lang3"
         implementation "org.slf4j:slf4j-api"
-        implementation project(":server:libs:core:commons:commons-utils")
 
-        testImplementation project(":server:libs:hermes:hermes-component:hermes-component-test-support")
+        testImplementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
+        testImplementation project(":server:libs:hermes:hermes-component:hermes-component-test:hermes-component-test-int-support")
+        testImplementation project(":server:libs:test:test-support")
     }
 }

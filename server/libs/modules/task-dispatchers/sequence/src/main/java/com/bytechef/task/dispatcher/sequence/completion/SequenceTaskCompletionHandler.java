@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.sequence.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
 import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
 
@@ -29,9 +30,11 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -46,11 +49,11 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskEvaluator taskEvaluator;
 
     public SequenceTaskCompletionHandler(
-            ContextService contextService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -65,7 +68,8 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentTaskExecution.getType().equals(SEQUENCE + "/v" + VERSION_1);
+            return parentTaskExecution.getType()
+                .equals(SEQUENCE + "/v" + VERSION_1);
         }
 
         return false;
@@ -79,8 +83,8 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecutionService.update(completedSubTaskExecution);
 
-        TaskExecution sequenceTaskExecution =
-                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution sequenceTaskExecution = new TaskExecution(
+            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(sequenceTaskExecution.getId());
@@ -92,17 +96,21 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             contextService.push(sequenceTaskExecution.getId(), newContext);
         }
 
-        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks(TASKS);
+        List<WorkflowTask> subWorkflowTasks = MapUtils
+            .getList(sequenceTaskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                    subWorkflowTask,
-                    sequenceTaskExecution.getJobId(),
-                    sequenceTaskExecution.getId(),
-                    sequenceTaskExecution.getPriority(),
-                    taskExecution.getTaskNumber() + 1);
+            TaskExecution subTaskExecution = new TaskExecution(
+                subWorkflowTask,
+                sequenceTaskExecution.getJobId(),
+                sequenceTaskExecution.getId(),
+                sequenceTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1);
 
             Context context = new Context(contextService.peek(sequenceTaskExecution.getId()));
 
@@ -115,8 +123,6 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
             sequenceTaskExecution.setEndTime(LocalDateTime.now());
-            sequenceTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(sequenceTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(sequenceTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(sequenceTaskExecution);
         }

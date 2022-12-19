@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,8 +17,8 @@
 
 package com.bytechef.hermes.component.web.rest;
 
-import com.bytechef.hermes.component.ComponentDSL;
-import com.bytechef.hermes.component.ComponentFactory;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.web.rest.config.ComponentDefinitionRestTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -37,8 +38,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WebFluxTest(ComponentDefinitionController.class)
 public class ComponentDefinitionControllerIntTest {
 
-    private static final List<ComponentFactory> COMPONENT_FACTORIES =
-            List.of(() -> ComponentDSL.createComponent("component1"), () -> ComponentDSL.createComponent("component2"));
+    private static final List<ComponentDefinitionFactory> COMPONENT_FACTORIES = List
+        .of(() -> ComponentDSL.component("component1"), () -> ComponentDSL.component("component2"));
 
     @Autowired
     private WebTestClient webTestClient;
@@ -47,26 +48,26 @@ public class ComponentDefinitionControllerIntTest {
     public void testGetComponentDefinitions() {
         try {
             webTestClient
-                    .get()
-                    .uri("/definitions/components")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .json(
-                            """
-                            [
-                                {
-                                    "name":"component1",
-                                    "version":1.0
-                                },
-                                {
-                                    "name":"component2",
-                                    "version":1.0
-                                }
-                            ]
-                            """);
+                .get()
+                .uri("/definitions/components")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json(
+                    """
+                        [
+                            {
+                                "name":"component1",
+                                "version":1.0
+                            },
+                            {
+                                "name":"component2",
+                                "version":1.0
+                            }
+                        ]
+                        """);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -76,7 +77,7 @@ public class ComponentDefinitionControllerIntTest {
     static class ComponentFactoryConfiguration {
 
         @Bean
-        public List<ComponentFactory> componentFactories() {
+        public List<ComponentDefinitionFactory> componentFactories() {
             return COMPONENT_FACTORIES;
         }
     }

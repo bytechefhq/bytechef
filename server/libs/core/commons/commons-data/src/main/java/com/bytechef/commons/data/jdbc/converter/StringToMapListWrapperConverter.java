@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,7 @@
 package com.bytechef.commons.data.jdbc.converter;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapListWrapper;
-import com.bytechef.commons.json.JsonUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -36,8 +37,15 @@ public class StringToMapListWrapperConverter implements Converter<String, MapLis
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public MapListWrapper convert(String source) {
-        return source == null ? null : new MapListWrapper(JsonUtils.read(objectMapper, source, List.class));
+        return source == null ? null : new MapListWrapper(read(objectMapper, source));
+    }
+
+    private List read(ObjectMapper objectMapper, String json) {
+        try {
+            return objectMapper.readValue(json, List.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

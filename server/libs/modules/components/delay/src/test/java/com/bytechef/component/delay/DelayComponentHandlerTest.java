@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,63 +19,77 @@
 
 package com.bytechef.component.delay;
 
-import static com.bytechef.hermes.component.definition.Action.ACTION;
-
-import com.bytechef.hermes.component.test.mock.MockContext;
-import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
-import com.bytechef.test.jsonasssert.AssertUtils;
-import java.util.Map;
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Arik Cohen
  */
 public class DelayComponentHandlerTest {
 
-    private static final MockContext context = new MockContext();
-
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/delay_v1.json", new DelayComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/delay_v1.json", new DelayComponentHandler().getDefinition());
     }
 
     @Test
     public void test1() {
         long now = System.currentTimeMillis();
-        DelayComponentHandler sleepComponentAccessor = new DelayComponentHandler();
+        DelayComponentHandler delayComponentHandler = new DelayComponentHandler();
 
-        sleepComponentAccessor.sleep(context, new MockExecutionParameters(Map.of("duration", "1.5s", ACTION, "sleep")));
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+
+        Mockito.when(executionParameters.containsKey("millis"))
+            .thenReturn(false);
+        Mockito.when(executionParameters.containsKey("duration"))
+            .thenReturn(true);
+        Mockito.when(executionParameters.getDuration("duration"))
+            .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
+
+        delayComponentHandler.performSleep(Mockito.mock(Context.class), executionParameters);
 
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-                delta >= 1500 && delta < 1900, String.format("Period %dms does not meet range [1500,1900>", delta));
+            delta >= 1500 && delta < 3000, String.format("Period %dms does not meet range [1500,1900>", delta));
     }
 
     @Test
     public void test2() {
         long now = System.currentTimeMillis();
-        DelayComponentHandler sleepComponentAccessor = new DelayComponentHandler();
+        DelayComponentHandler delayComponentHandler = new DelayComponentHandler();
 
-        sleepComponentAccessor.sleep(context, new MockExecutionParameters(Map.of("millis", 500, ACTION, "sleep")));
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+
+        Mockito.when(executionParameters.containsKey("millis"))
+            .thenReturn(true);
+        Mockito.when(executionParameters.getLong("millis"))
+            .thenReturn(500L);
+
+        delayComponentHandler.performSleep(Mockito.mock(Context.class), executionParameters);
 
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-                delta >= 500 && delta < 600, String.format("Period %dms does not meet range [500,600>", delta));
+            delta >= 500 && delta < 600, String.format("Period %dms does not meet range [500,600>", delta));
     }
 
     @Test
     public void test3() {
         long now = System.currentTimeMillis();
-        DelayComponentHandler sleepComponentAccessor = new DelayComponentHandler();
+        DelayComponentHandler delayComponentHandler = new DelayComponentHandler();
 
-        sleepComponentAccessor.sleep(context, new MockExecutionParameters(Map.of(ACTION, "sleep")));
+        delayComponentHandler.performSleep(Mockito.mock(Context.class), Mockito.mock(ExecutionParameters.class));
 
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-                delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
+            delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
     }
 }

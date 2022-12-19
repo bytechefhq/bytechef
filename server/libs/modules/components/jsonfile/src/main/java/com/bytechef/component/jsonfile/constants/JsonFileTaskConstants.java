@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -30,6 +31,8 @@ public class JsonFileTaskConstants {
     public static final String JSON_FILE = "jsonFile";
     public static final String READ = "read";
     public static final String WRITE = "write";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILENAME = "filename";
 
     public enum FileType {
         JSON,

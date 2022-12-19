@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -19,7 +20,6 @@ package com.bytechef.hermes.connection.rsocket.client;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -39,41 +39,36 @@ public class ConnectionRSocketClient implements ConnectionService {
     @Override
     public Connection add(Connection connection) {
         return rSocketRequester
-                .route("createConnection")
-                .data(connection)
-                .retrieveMono(Connection.class)
-                .block();
+            .route("createConnection")
+            .data(connection)
+            .retrieveMono(Connection.class)
+            .block();
     }
 
     @Override
     public void delete(String id) {
-        rSocketRequester.route("removeConnection").data(id).send().block();
-    }
-
-    @Override
-    public Optional<Connection> fetchConnection(String id) {
-        return Optional.ofNullable(rSocketRequester
-                .route("fetchConnection")
-                .data(id)
-                .retrieveMono(Connection.class)
-                .block());
+        rSocketRequester.route("removeConnection")
+            .data(id)
+            .send()
+            .block();
     }
 
     @Override
     public Connection getConnection(String id) {
         return rSocketRequester
-                .route("getConnection")
-                .data(id)
-                .retrieveMono(Connection.class)
-                .block();
+            .route("getConnection")
+            .data(id)
+            .retrieveMono(Connection.class)
+            .block();
     }
 
     @Override
     public List<Connection> getConnections() {
         return rSocketRequester
-                .route("getConnections")
-                .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {})
-                .block();
+            .route("getConnections")
+            .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {
+            })
+            .block();
     }
 
     @Override
@@ -84,9 +79,9 @@ public class ConnectionRSocketClient implements ConnectionService {
         connection.setName(name);
 
         return rSocketRequester
-                .route("updateConnection")
-                .data(connection)
-                .retrieveMono(Connection.class)
-                .block();
+            .route("updateConnection")
+            .data(connection)
+            .retrieveMono(Connection.class)
+            .block();
     }
 }

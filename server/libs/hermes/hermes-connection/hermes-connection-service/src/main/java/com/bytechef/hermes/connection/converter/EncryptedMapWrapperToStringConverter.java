@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,6 @@
 package com.bytechef.hermes.connection.converter;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
-import com.bytechef.commons.json.JsonUtils;
 import com.bytechef.encryption.Encryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,6 +39,14 @@ public class EncryptedMapWrapperToStringConverter implements Converter<Encrypted
 
     @Override
     public String convert(EncryptedMapWrapper source) {
-        return encryption.encrypt(JsonUtils.write(objectMapper, source.getMap()));
+        return encryption.encrypt(write(objectMapper, source.getMap()));
+    }
+
+    private String write(ObjectMapper objectMapper, Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

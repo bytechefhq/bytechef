@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,9 +17,9 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
@@ -32,15 +33,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubflowTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(
-                    SubflowTaskDispatcherConstants.SUBFLOW)
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(
+        SubflowTaskDispatcherConstants.SUBFLOW)
             .display(
-                    display("Subflow")
-                            .description(
-                                    "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task."))
+                display("Subflow")
+                    .description(
+                        "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task."))
             .properties(string(WorkflowConstants.WORKFLOW_ID)
-                    .label("Workflow Id")
-                    .description("The id of sub-workflow to execute."));
+                .label("Workflow Id")
+                .description("The id of sub-workflow to execute."));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

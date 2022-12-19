@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -18,8 +19,8 @@ package com.bytechef.task.dispatcher.each;
 
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
-import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,31 +44,34 @@ public class EachTaskDispatcherIntTest {
 
     @BeforeEach
     void beforeEach() {
-        testVarTaskHandler = new TestVarTaskHandler<>((valueMap, name, value) ->
-                valueMap.computeIfAbsent(name, key -> new ArrayList<>()).add(value));
+        testVarTaskHandler = new TestVarTaskHandler<>(
+            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
+                .add(value));
     }
 
     @Test
     public void testEachTaskDispatcher() {
         workflowExecutor.execute(
-                "each_v1",
-                (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
-                        new EachTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService)),
-                (contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                        List.of(new EachTaskDispatcher(
-                                taskDispatcher,
-                                taskExecutionService,
-                                messageBroker,
-                                contextService,
-                                counterService,
-                                taskEvaluator)),
-                () -> Map.of("var", testVarTaskHandler));
+            "each_v1",
+            (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
+                new EachTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService)),
+            (
+                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
+                taskExecutionService) -> List.of(new EachTaskDispatcher(
+                    taskDispatcher,
+                    taskExecutionService,
+                    messageBroker,
+                    contextService,
+                    counterService,
+                    taskEvaluator)),
+            () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(
-                IntStream.rangeClosed(1, 25)
-                        .boxed()
-                        .flatMap(item1 -> IntStream.rangeClosed(1, 25).mapToObj(item2 -> item1 + "_" + item2))
-                        .collect(Collectors.toList()),
-                testVarTaskHandler.get("var1"));
+            IntStream.rangeClosed(1, 25)
+                .boxed()
+                .flatMap(item1 -> IntStream.rangeClosed(1, 25)
+                    .mapToObj(item2 -> item1 + "_" + item2))
+                .collect(Collectors.toList()),
+            testVarTaskHandler.get("var1"));
     }
 }

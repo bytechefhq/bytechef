@@ -13,37 +13,43 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { EditorType } from './EditorType';
+import type { ControlType } from './ControlType';
 import {
-    EditorTypeFromJSON,
-    EditorTypeFromJSONTyped,
-    EditorTypeToJSON,
-} from './EditorType';
+    ControlTypeFromJSON,
+    ControlTypeFromJSONTyped,
+    ControlTypeToJSON,
+} from './ControlType';
+import type { DisplayOption } from './DisplayOption';
+import {
+    DisplayOptionFromJSON,
+    DisplayOptionFromJSONTyped,
+    DisplayOptionToJSON,
+} from './DisplayOption';
 import type { PropertyOption } from './PropertyOption';
 import {
     PropertyOptionFromJSON,
     PropertyOptionFromJSONTyped,
     PropertyOptionToJSON,
 } from './PropertyOption';
-import type { SingleValueProperty } from './SingleValueProperty';
+import type { ValueProperty } from './ValueProperty';
 import {
-    SingleValuePropertyFromJSON,
-    SingleValuePropertyFromJSONTyped,
-    SingleValuePropertyToJSON,
-} from './SingleValueProperty';
+    ValuePropertyFromJSON,
+    ValuePropertyFromJSONTyped,
+    ValuePropertyToJSON,
+} from './ValueProperty';
 
 /**
  * A string property.
  * @export
  * @interface StringProperty
  */
-export interface StringProperty extends SingleValueProperty {
+export interface StringProperty extends ValueProperty {
     /**
      * 
-     * @type {EditorType}
+     * @type {ControlType}
      * @memberof StringProperty
      */
-    editorType?: EditorType;
+    controlType?: ControlType;
     /**
      * 
      * @type {string}
@@ -71,8 +77,8 @@ export function StringPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
         return json;
     }
     return {
-        ...SingleValuePropertyFromJSONTyped(json, ignoreDiscriminator),
-        'editorType': !exists(json, 'editorType') ? undefined : EditorTypeFromJSON(json['editorType']),
+        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        'controlType': !exists(json, 'controlType') ? undefined : ControlTypeFromJSON(json['controlType']),
         'type': json['type'],
     };
 }
@@ -85,8 +91,8 @@ export function StringPropertyToJSON(value?: StringProperty | null): any {
         return null;
     }
     return {
-        ...SingleValuePropertyToJSON(value),
-        'editorType': EditorTypeToJSON(value.editorType),
+        ...ValuePropertyToJSON(value),
+        'controlType': ControlTypeToJSON(value.controlType),
         'type': value.type,
     };
 }

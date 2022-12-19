@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -22,7 +23,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constants.MapConstants;
-import com.bytechef.hermes.component.constants.Versions;
+import com.bytechef.hermes.component.constants.ComponentConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,7 +41,7 @@ public class MapTaskDispatcherAdapterConfiguration {
 
             @Override
             public String getName() {
-                return MapConstants.MAP + "/v" + Versions.VERSION_1;
+                return MapConstants.MAP + "/v" + ComponentConstants.Versions.VERSION_1;
             }
         };
     }

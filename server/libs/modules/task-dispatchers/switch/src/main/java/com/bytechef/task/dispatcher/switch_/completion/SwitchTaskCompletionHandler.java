@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.switch_.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.CASES;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.DEFAULT;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.EXPRESSION;
@@ -35,9 +36,11 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
@@ -54,11 +57,11 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskEvaluator taskEvaluator;
 
     public SwitchTaskCompletionHandler(
-            ContextService contextService,
-            TaskExecutionService taskExecutionService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator) {
+        ContextService contextService,
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator) {
         this.contextService = contextService;
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
@@ -73,7 +76,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(SWITCH + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(SWITCH + "/v" + VERSION_1);
         }
 
         return false;
@@ -87,8 +91,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecutionService.update(completedSubTaskExecution);
 
-        TaskExecution switchTaskExecution =
-                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution switchTaskExecution = new TaskExecution(
+            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(switchTaskExecution.getId());
@@ -104,12 +108,12 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                    workflowTask,
-                    switchTaskExecution.getJobId(),
-                    switchTaskExecution.getId(),
-                    switchTaskExecution.getPriority(),
-                    taskExecution.getTaskNumber() + 1);
+            TaskExecution subTaskExecution = new TaskExecution(
+                workflowTask,
+                switchTaskExecution.getJobId(),
+                switchTaskExecution.getId(),
+                switchTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1);
 
             Context context = new Context(contextService.peek(switchTaskExecution.getId()));
 
@@ -124,28 +128,37 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         // no more tasks to execute -- complete the switch
         else {
             switchTaskExecution.setEndTime(LocalDateTime.now());
-            switchTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(switchTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(switchTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(switchTaskExecution);
         }
     }
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
-        Object expression = taskExecution.getRequired(EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks = taskExecution.getWorkflowTasks(CASES);
+        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        List<WorkflowTask> caseWorkflowTasks = MapUtils
+            .getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a switch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
-            Object key = caseWorkflowTask.getRequired(KEY);
-            List<WorkflowTask> subWorkflowTasks = caseWorkflowTask.getWorkflowTasks(TASKS);
+            Object key = MapUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
+            List<WorkflowTask> subWorkflowTasks = MapUtils
+                .getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
 
             if (key.equals(expression)) {
                 return subWorkflowTasks;
             }
         }
 
-        return taskExecution.getWorkflowTasks(DEFAULT);
+        return MapUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
     }
 }

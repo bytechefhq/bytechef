@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -20,6 +21,7 @@ import static com.bytechef.component.aws.s3.constants.AwsS3Constants.ACL;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.AWS_S3;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.BUCKET;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.FILENAME;
+import static com.bytechef.component.aws.s3.constants.AwsS3Constants.FILE_ENTRY;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.GET_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.GET_URL;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.LIST_OBJECTS;
@@ -27,20 +29,18 @@ import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PREFIX;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PRESIGN_GET_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PUT_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.URI;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.constants.ComponentConstants;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -66,69 +66,70 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
  */
 public class AwsS3ComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(AWS_S3)
-            .display(display("AWS S3")
-                    .description("AWS S3 is a simple object storage service provided by Amazon Web Services."))
-            .actions(
-                    action(GET_OBJECT)
-                            .display(display("Get Object").description("Get the AWS S3 object."))
-                            .properties(
-                                    string(URI)
-                                            .label("URI")
-                                            .description("The AWS S3 uri.")
-                                            .required(true),
-                                    string(ComponentConstants.FILENAME)
-                                            .label("Filename")
-                                            .description("Filename to set for binary data.")
-                                            .required(true)
-                                            .defaultValue("file.xml"))
-                            .output(fileEntry())
-                            .performFunction(this::performGetObject),
-                    action(GET_URL)
-                            .display(display("Get URL").description("Get the url of an AWS S3 object."))
-                            .properties(string(URI)
-                                    .label("URI")
-                                    .description("The AWS S3 uri.")
-                                    .required(true))
-                            .output(string())
-                            .performFunction(this::performGetUrl),
-                    action(LIST_OBJECTS)
-                            .display(display("List Objects").description("Get the list AWS S3 objects."))
-                            .properties(
-                                    string(BUCKET)
-                                            .label("Bucket")
-                                            .description("The bucket to list AWS S3 objects from.")
-                                            .required(true),
-                                    string(PREFIX)
-                                            .label("Prefix")
-                                            .description("The prefix of an AWS S3 objects.")
-                                            .required(true))
-                            .output(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
-                            .performFunction(this::performListObjects),
-                    action(PRESIGN_GET_OBJECT)
-                            .display(display("Get Pre-signed Object")
-                                    .description("Get the url of an pre-signed AWS S3 object."))
-                            .properties(string(URI)
-                                    .label("URI")
-                                    .description("The AWS S3 uri.")
-                                    .required(true))
-                            .output(string())
-                            .performFunction(this::performGetPresignedObject),
-                    action(PUT_OBJECT)
-                            .display(display("Put Object").description("Store an object to AWS S3."))
-                            .properties(
-                                    string(URI)
-                                            .label("URI")
-                                            .description("The AWS S3 uri.")
-                                            .required(true),
-                                    fileEntry(FILE_ENTRY)
-                                            .label("File")
-                                            .description(
-                                                    "The object property which contains a reference to the file that needs to be written to AWS S3.")
-                                            .required(true),
-                                    string(ACL).label("ACL").description("The canned ACL to apply to the object."))
-                            .output(string())
-                            .performFunction(this::performPutObject));
+    private final ComponentDefinition componentDefinition = component(AWS_S3)
+        .display(display("AWS S3")
+            .description("AWS S3 is a simple object storage service provided by Amazon Web Services."))
+        .actions(
+            action(GET_OBJECT)
+                .display(display("Get Object").description("Get the AWS S3 object."))
+                .properties(
+                    string(URI)
+                        .label("URI")
+                        .description("The AWS S3 uri.")
+                        .required(true),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description("Filename to set for binary data.")
+                        .required(true)
+                        .defaultValue("file.xml"))
+                .output(fileEntry())
+                .perform(this::performGetObject),
+            action(GET_URL)
+                .display(display("Get URL").description("Get the url of an AWS S3 object."))
+                .properties(string(URI)
+                    .label("URI")
+                    .description("The AWS S3 uri.")
+                    .required(true))
+                .output(string())
+                .perform(this::performGetUrl),
+            action(LIST_OBJECTS)
+                .display(display("List Objects").description("Get the list AWS S3 objects."))
+                .properties(
+                    string(BUCKET)
+                        .label("Bucket")
+                        .description("The bucket to list AWS S3 objects from.")
+                        .required(true),
+                    string(PREFIX)
+                        .label("Prefix")
+                        .description("The prefix of an AWS S3 objects.")
+                        .required(true))
+                .output(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
+                .perform(this::performListObjects),
+            action(PRESIGN_GET_OBJECT)
+                .display(display("Get Pre-signed Object")
+                    .description("Get the url of an pre-signed AWS S3 object."))
+                .properties(string(URI)
+                    .label("URI")
+                    .description("The AWS S3 uri.")
+                    .required(true))
+                .output(string())
+                .perform(this::performGetPresignedObject),
+            action(PUT_OBJECT)
+                .display(display("Put Object").description("Store an object to AWS S3."))
+                .properties(
+                    string(URI)
+                        .label("URI")
+                        .description("The AWS S3 uri.")
+                        .required(true),
+                    fileEntry(FILE_ENTRY)
+                        .label("File")
+                        .description(
+                            "The object property which contains a reference to the file that needs to be written to AWS S3.")
+                        .required(true),
+                    string(ACL).label("ACL")
+                        .description("The canned ACL to apply to the object."))
+                .output(string())
+                .perform(this::performPutObject));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -141,15 +142,16 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
-        try (S3Client s3Client = S3Client.builder().build()) {
+        try (S3Client s3Client = S3Client.builder()
+            .build()) {
             return context.storeFileContent(
-                    executionParameters.getRequiredString(FILENAME),
-                    s3Client.getObject(
-                            GetObjectRequest.builder()
-                                    .bucket(bucketName)
-                                    .key(key)
-                                    .build(),
-                            ResponseTransformer.toInputStream()));
+                executionParameters.getRequiredString(FILENAME),
+                s3Client.getObject(
+                    GetObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .build(),
+                    ResponseTransformer.toInputStream()));
         }
     }
 
@@ -159,24 +161,30 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
-        try (S3Client s3Client = S3Client.builder().build()) {
+        try (S3Client s3Client = S3Client.builder()
+            .build()) {
             return s3Client.utilities()
-                    .getUrl(GetUrlRequest.builder().bucket(bucketName).key(key).build())
-                    .toString();
+                .getUrl(GetUrlRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build())
+                .toString();
         }
     }
 
     protected List<S3ObjectDescription> performListObjects(Context context, ExecutionParameters executionParameters) {
-        try (S3Client s3Client = S3Client.builder().build()) {
+        try (S3Client s3Client = S3Client.builder()
+            .build()) {
 
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                    .bucket(executionParameters.getRequiredString(BUCKET))
-                    .prefix(executionParameters.getRequiredString(PREFIX))
-                    .build());
+                .bucket(executionParameters.getRequiredString(BUCKET))
+                .prefix(executionParameters.getRequiredString(PREFIX))
+                .build());
 
-            return response.contents().stream()
-                    .map(o -> new S3ObjectDescription(executionParameters.getRequiredString(BUCKET), o))
-                    .collect(Collectors.toList());
+            return response.contents()
+                .stream()
+                .map(o -> new S3ObjectDescription(executionParameters.getRequiredString(BUCKET), o))
+                .collect(Collectors.toList());
         }
     }
 
@@ -185,10 +193,12 @@ public class AwsS3ComponentHandler implements ComponentHandler {
 
         try (S3Presigner s3Presigner = S3Presigner.create()) {
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(z -> z.signatureDuration(
-                            Duration.parse("PT" + executionParameters.getRequiredString("signatureDuration")))
-                    .getObjectRequest(por -> por.bucket(amazonS3Uri.getBucket()).key(amazonS3Uri.getKey())));
+                Duration.parse("PT" + executionParameters.getRequiredString("signatureDuration")))
+                .getObjectRequest(por -> por.bucket(amazonS3Uri.getBucket())
+                    .key(amazonS3Uri.getKey())));
 
-            return presignedGetObjectRequest.url().toString();
+            return presignedGetObjectRequest.url()
+                .toString();
         }
     }
 
@@ -198,23 +208,24 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
-        FileEntry fileEntry = executionParameters.getFileEntry(FILE_ENTRY);
+        FileEntry fileEntry = executionParameters.get(FILE_ENTRY, FileEntry.class);
 
-        try (S3Client s3Client = S3Client.builder().build()) {
+        try (S3Client s3Client = S3Client.builder()
+            .build()) {
             Path tempFilePath = Files.createTempFile("", ".tmp");
 
             Files.copy(context.getFileStream(fileEntry), tempFilePath);
 
             s3Client.putObject(
-                    PutObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(key)
-                            .acl(
-                                    executionParameters.getString(ACL) != null
-                                            ? ObjectCannedACL.fromValue(executionParameters.getString(ACL))
-                                            : null)
-                            .build(),
-                    tempFilePath);
+                PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .acl(
+                        executionParameters.getString(ACL) != null
+                            ? ObjectCannedACL.fromValue(executionParameters.getString(ACL))
+                            : null)
+                    .build(),
+                tempFilePath);
 
             return null;
         } catch (IOException ioe) {

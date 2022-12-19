@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,6 +27,6 @@ public class SubflowTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        AssertUtils.assertEquals("definition/subflow_v1.json", new SubflowTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/subflow_v1.json", new SubflowTaskDispatcherFactory().getDefinition());
     }
 }

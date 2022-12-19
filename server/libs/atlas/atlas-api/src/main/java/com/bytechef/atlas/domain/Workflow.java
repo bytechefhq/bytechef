@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -23,7 +24,7 @@ import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.workflow.WorkflowFormat;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -109,14 +110,17 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
         id = MapUtils.getString(source, WorkflowConstants.ID);
         inputs = MapUtils.getList(
-                source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {
+            }, Collections.emptyList());
         label = MapUtils.getString(source, WorkflowConstants.LABEL);
         outputs = MapUtils.getList(
-                source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {
+            }, Collections.emptyList());
         retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, 0);
-        tasks = MapUtils.getList(source, WorkflowConstants.TASKS, Map.class).stream()
-                .map(WorkflowTask::new)
-                .toList();
+        tasks = MapUtils.getList(source, WorkflowConstants.TASKS, Map.class)
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
     }
 
     @Override
@@ -242,18 +246,18 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     @Override
     public String toString() {
         return "Workflow{" + "content='"
-                + definition + '\'' + ", createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", error="
-                + error + ", format="
-                + format + ", id='"
-                + id + '\'' + ", inputs="
-                + inputs + ", label='"
-                + label + '\'' + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", outputs="
-                + outputs + ", tasks="
-                + tasks + ", retry="
-                + retry + '}';
+            + definition + '\'' + ", createdBy='"
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", error="
+            + error + ", format="
+            + format + ", id='"
+            + id + '\'' + ", inputs="
+            + inputs + ", label='"
+            + label + '\'' + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", outputs="
+            + outputs + ", tasks="
+            + tasks + ", retry="
+            + retry + '}';
     }
 }

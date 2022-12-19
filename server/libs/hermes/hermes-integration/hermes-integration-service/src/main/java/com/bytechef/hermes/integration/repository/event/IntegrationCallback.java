@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.hermes.integration.repository.event;
 
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.domain.IntegrationWorkflow;
 import java.time.LocalDateTime;
@@ -37,14 +38,14 @@ public class IntegrationCallback implements BeforeConvertCallback<Integration> {
         if (integration.isNew()) {
             integration.setCreatedDate(LocalDateTime.now());
             integration.setCreatedBy("system");
-            integration.setId(UUIDGenerator.generate());
+            integration.setId(UUIDUtils.generate());
         }
 
         for (IntegrationWorkflow integrationWorkflow : integration.getIntegrationWorkflows()) {
             if (integrationWorkflow.isNew()) {
                 integrationWorkflow.setCreatedBy("system");
                 integrationWorkflow.setCreatedDate(LocalDateTime.now());
-                integrationWorkflow.setId(UUIDGenerator.generate());
+                integrationWorkflow.setId(UUIDUtils.generate());
             }
 
             integrationWorkflow.setLastModifiedBy("system");

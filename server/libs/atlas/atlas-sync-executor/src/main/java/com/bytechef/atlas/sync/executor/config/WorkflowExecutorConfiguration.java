@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -45,7 +46,6 @@ import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -78,7 +78,7 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
     @Bean
     JobService jobService(WorkflowRepository workflowRepository, ObjectMapper objectMapper) {
         return new JobServiceImpl(
-                new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepository);
+            new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepository);
     }
 
     @Bean
@@ -98,25 +98,24 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
 
     @Bean
     WorkflowExecutor workflowExecutor(
-            ContextService contextService,
-            CounterService counterService,
-            JobService jobService,
-            EventPublisher eventPublisher,
-            ObjectMapper objectMapper,
-            TaskExecutionService taskExecutionService,
-            @Autowired(required = false) Map<String, TaskHandler<?>> taskHandlerMap,
-            WorkflowService workflowService) {
+        ContextService contextService,
+        CounterService counterService,
+        JobService jobService,
+        EventPublisher eventPublisher,
+        TaskExecutionService taskExecutionService,
+        @Autowired(required = false) Map<String, TaskHandler<?>> taskHandlerMap,
+        WorkflowService workflowService) {
         return new WorkflowExecutor(
-                contextService,
-                counterService,
-                jobService,
-                eventPublisher,
-                taskExecutionService,
-                taskHandlerMap == null ? Map.of() : taskHandlerMap,
-                workflowService);
+            contextService,
+            counterService,
+            jobService,
+            eventPublisher,
+            taskExecutionService,
+            taskHandlerMap == null ? Map.of() : taskHandlerMap,
+            workflowService);
     }
 
-    @TestConfiguration
+    @Configuration
     public static class EventConfiguration {
 
         @Bean
@@ -131,7 +130,7 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
         }
     }
 
-    @TestConfiguration
+    @Configuration
     public static class MessageBrokerConfiguration {
 
         @Bean

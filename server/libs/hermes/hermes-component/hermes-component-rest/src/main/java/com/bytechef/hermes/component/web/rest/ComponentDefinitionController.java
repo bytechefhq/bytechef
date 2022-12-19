@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,7 @@
 package com.bytechef.hermes.component.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.component.ComponentFactory;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,40 +47,44 @@ import reactor.core.publisher.Mono;
 @Tag(name = "component-definitions")
 public class ComponentDefinitionController {
 
-    private final List<ComponentFactory> componentFactories;
+    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
 
-    public ComponentDefinitionController(List<ComponentFactory> componentFactories) {
-        this.componentFactories = componentFactories;
+    public ComponentDefinitionController(List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        this.componentDefinitionFactories = componentDefinitionFactories;
     }
 
     /**
-     * GET /definitions/components
-     * Returns all component definitions
+     * GET /definitions/components Returns all component definitions
      *
      * @return OK (status code 200)
      */
     @Operation(
-            description = "Returns all component definitions.",
-            operationId = "getComponentDefinitions",
-            summary = "Returns all component definitions.",
-            tags = {"component-definitions"},
-            responses = {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "OK",
-                        content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ComponentDefinition.class))
-                        })
-            })
+        description = "Returns all component definitions.",
+        operationId = "getComponentDefinitions",
+        summary = "Returns all component definitions.",
+        tags = {
+            "component-definitions"
+        },
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = {
+                    @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ComponentDefinition.class))
+                })
+        })
     @RequestMapping(
-            method = RequestMethod.GET,
-            value = "/definitions/components",
-            produces = {"application/json"})
+        method = RequestMethod.GET,
+        value = "/definitions/components",
+        produces = {
+            "application/json"
+        })
     public Mono<ResponseEntity<Flux<ComponentDefinition>>> getComponentDefinitions(
-            @Parameter(hidden = true) final ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(
-                componentFactories.stream().map(ComponentFactory::getDefinition).collect(Collectors.toList()))));
+        @Parameter(hidden = true) final ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(componentDefinitionFactories.stream()
+            .map(ComponentDefinitionFactory::getDefinition)
+            .collect(Collectors.toList()))));
     }
 }

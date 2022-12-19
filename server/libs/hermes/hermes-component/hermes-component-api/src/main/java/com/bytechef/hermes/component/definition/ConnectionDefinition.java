@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,97 +17,43 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.constants.Versions;
-import com.bytechef.hermes.definition.Definition;
+import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
- * Used for specifying an connection.
+ * Used for specifying a connection.
  *
  * @author Ivica Cardic
  */
 @Schema(name = "ConnectionDefinition", description = "A connection to an outside service.")
-public final class ConnectionDefinition implements Definition {
+public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
-    private Display display;
-    private String name;
-    private List<Property> properties;
-    private Resources resources;
-    private String subtitle;
-    private int version = Versions.VERSION_1;
+    List<? extends Authorization> getAuthorizations();
 
-    private ConnectionDefinition() {}
+    Function<Connection, String> getBaseUriFunction();
 
-    public ConnectionDefinition(String name) {
-        this.name = name;
-    }
+    @Schema(name = "componentName", description = "The name of a component this connection can be used for.")
+    String getComponentName();
 
-    public ConnectionDefinition display(Display display) {
-        this.display = display;
+    @Schema(name = "componentVersion", description = "The version of a component this connection can be used for.")
+    int getComponentVersion();
 
-        return this;
-    }
-
-    public ConnectionDefinition name(String name) {
-        this.name = name;
-
-        return this;
-    }
-
-    public ConnectionDefinition properties(Property... properties) {
-        this.properties = List.of(properties);
-
-        return this;
-    }
-
-    public ConnectionDefinition resources(Resources resources) {
-        this.resources = resources;
-
-        return this;
-    }
-
-    public ConnectionDefinition subtitle(String subtitle) {
-        this.subtitle = subtitle;
-
-        return this;
-    }
-
-    public ConnectionDefinition version(int version) {
-        this.version = version;
-
-        return this;
-    }
-
-    public Display getDisplay() {
-        return display;
-    }
-
-    @Schema(name = "name", description = "The connection name.")
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Resources getResources() {
-        return resources;
-    }
+    Display getDisplay();
 
     @Schema(name = "properties", description = "Properties of the connection.")
-    public List<Property> getProperties() {
-        return properties;
-    }
+    List<? extends Property<?>> getProperties();
+
+    Resources getResources();
 
     @Schema(name = "subtitle", description = "Additional explanation.")
-    public String getSubtitle() {
-        return subtitle;
-    }
+    String getSubtitle();
 
-    @Override
-    public int getVersion() {
-        return version;
-    }
+    Optional<Consumer<Connection>> getTestConsumer();
 }

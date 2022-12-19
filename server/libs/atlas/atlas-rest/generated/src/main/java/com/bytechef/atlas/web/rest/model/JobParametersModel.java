@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * Defines parameters used to execute a job.
@@ -25,7 +25,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @JsonProperty("inputs")
@@ -112,11 +112,11 @@ public class JobParametersModel {
   }
 
   /**
-   * The outputs expected by the workflow
+   * The outputs expected by the workflow.
    * @return outputs
   */
   
-  @Schema(name = "outputs", description = "The outputs expected by the workflow", required = false)
+  @Schema(name = "outputs", description = "The outputs expected by the workflow.", required = false)
   public Map<String, Object> getOutputs() {
     return outputs;
   }
@@ -131,11 +131,11 @@ public class JobParametersModel {
   }
 
   /**
-   * Id of the parent task that created this job. Used for sub-flows.
+   * The id of the parent task that created this job. Used for sub-flows.
    * @return parentTaskExecutionId
   */
   
-  @Schema(name = "parentTaskExecutionId", description = "Id of the parent task that created this job. Used for sub-flows.", required = false)
+  @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Used for sub-flows.", required = false)
   public String getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
@@ -150,11 +150,11 @@ public class JobParametersModel {
   }
 
   /**
-   * the priority value used during execution of individual tasks.
+   * The priority value used during execution of individual tasks.
    * @return priority
   */
   
-  @Schema(name = "priority", description = "the priority value used during execution of individual tasks.", required = false)
+  @Schema(name = "priority", description = "The priority value used during execution of individual tasks.", required = false)
   public Integer getPriority() {
     return priority;
   }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -29,7 +30,7 @@ import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -53,10 +54,10 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
     @SuppressFBWarnings("EI2")
     public TaskExecutionErrorHandler(
-            EventPublisher eventPublisher,
-            JobService jobService,
-            TaskDispatcher<TaskExecution> taskDispatcher,
-            TaskExecutionService taskExecutionService) {
+        EventPublisher eventPublisher,
+        JobService jobService,
+        TaskDispatcher<TaskExecution> taskDispatcher,
+        TaskExecutionService taskExecutionService) {
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.taskDispatcher = taskDispatcher;
@@ -83,7 +84,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
             TaskExecution retryTaskExecution = new TaskExecution(taskExecution);
 
-            retryTaskExecution.setId(UUIDGenerator.generate());
+            retryTaskExecution.setId(UUIDUtils.generate());
             retryTaskExecution.setStatus(TaskStatus.CREATED);
             retryTaskExecution.setError(null);
             retryTaskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);
@@ -95,8 +96,8 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         // if it's not retryable then we're gonna fail the job
         else {
             while (erroredTaskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
-                erroredTaskExecution =
-                        new TaskExecution(taskExecutionService.getTaskExecution(erroredTaskExecution.getParentId()));
+                erroredTaskExecution = new TaskExecution(
+                    taskExecutionService.getTaskExecution(erroredTaskExecution.getParentId()));
                 erroredTaskExecution.setStatus(TaskStatus.FAILED);
                 erroredTaskExecution.setEndTime(LocalDateTime.now());
 

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -23,7 +24,7 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,8 @@ public class TaskStartedWebhookEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (workflowEvent.getType().equals(TaskStartedWorkflowEvent.TASK_STARTED)) {
+        if (workflowEvent.getType()
+            .equals(TaskStartedWorkflowEvent.TASK_STARTED)) {
             handleEvent((TaskStartedWorkflowEvent) workflowEvent);
         }
     }
@@ -68,13 +70,13 @@ public class TaskStartedWebhookEventListener implements EventListener {
 
         for (Map<String, Object> webhook : job.getWebhooks()) {
             if (TaskStartedWorkflowEvent.TASK_STARTED.equals(
-                    MapUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
+                MapUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
                 Map<String, Object> webhookEvent = new HashMap<>(webhook);
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);
 
                 rest.postForObject(
-                        MapUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
+                    MapUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
             }
         }
     }

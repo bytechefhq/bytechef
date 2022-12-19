@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,11 +17,11 @@
 
 package com.bytechef.task.dispatcher.map;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_VAR;
@@ -38,22 +39,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class MapTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(MAP)
-            .display(
-                    display("Map")
-                            .description(
-                                    "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`."))
-            .properties(
-                    array(LIST).label("List of items").description("List of items to iterate over."),
-                    string(ITEM_VAR)
-                            .label("Item Var")
-                            .description("The name of the item variable.")
-                            .defaultValue(ITEM),
-                    string(ITEM_INDEX)
-                            .label("Item Index")
-                            .description("The name of the index variable.")
-                            .defaultValue(ITEM_INDEX))
-            .taskProperties(task(ITERATEE));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(MAP)
+        .display(
+            display("Map")
+                .description(
+                    "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`."))
+        .properties(
+            array(LIST).label("List of items")
+                .description("List of items to iterate over."),
+            string(ITEM_VAR)
+                .label("Item Var")
+                .description("The name of the item variable.")
+                .defaultValue(ITEM),
+            string(ITEM_INDEX)
+                .label("Item Index")
+                .description("The name of the index variable.")
+                .defaultValue(ITEM_INDEX))
+        .taskProperties(task(ITERATEE));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

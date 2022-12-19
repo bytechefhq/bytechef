@@ -1,0 +1,460 @@
+{
+  "actions": [
+    {
+      "display": {
+        "description": "Executes custom Java code.",
+        "label": "Java"
+      },
+      "name": "java",
+      "output": [
+        {
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": [
+            {
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "description": "Add your Java custom logic here.",
+          "label": "Java code",
+          "name": "script",
+          "type": "STRING",
+          "controlType": "CODE"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom JavaScript code.",
+        "label": "JavaScript"
+      },
+      "name": "javascript",
+      "output": [
+        {
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": [
+            {
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "description": "Add your JavaScript custom logic here.",
+          "label": "JavaScript code",
+          "name": "script",
+          "type": "STRING",
+          "controlType": "CODE"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom Python code.",
+        "label": "Python"
+      },
+      "name": "python",
+      "output": [
+        {
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": [
+            {
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "description": "Add your Python custom logic here.",
+          "label": "Python code",
+          "name": "script",
+          "type": "STRING",
+          "controlType": "CODE"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom R code.",
+        "label": "R"
+      },
+      "name": "r",
+      "output": [
+        {
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": [
+            {
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "description": "Add your R custom logic here.",
+          "label": "R code",
+          "name": "script",
+          "type": "STRING",
+          "controlType": "CODE"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom Ruby code.",
+        "label": "Ruby"
+      },
+      "name": "ruby",
+      "output": [
+        {
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": [
+            {
+              "type": "ONE_OF",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "BOOLEAN"
+                },
+                {
+                  "type": "DATE"
+                },
+                {
+                  "type": "DATE_TIME"
+                },
+                {
+                  "type": "INTEGER"
+                },
+                {
+                  "type": "NULL"
+                },
+                {
+                  "type": "NUMBER"
+                },
+                {
+                  "type": "OBJECT"
+                },
+                {
+                  "type": "STRING"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "description": "Add your Ruby custom logic here.",
+          "label": "Ruby code",
+          "name": "script",
+          "type": "STRING",
+          "controlType": "CODE"
+        }
+      ]
+    }
+  ],
+  "display": {
+    "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "label": "Script"
+  },
+  "name": "script",
+  "version": 1
+}

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,7 +54,7 @@ public class ConnectionConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
-                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
-                new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
+            new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+            new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
     }
 }

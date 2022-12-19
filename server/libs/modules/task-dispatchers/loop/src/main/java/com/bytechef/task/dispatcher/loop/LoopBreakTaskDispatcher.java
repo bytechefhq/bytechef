@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_BREAK;
 
@@ -27,7 +28,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.date.LocalDateTimeUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import org.springframework.util.Assert;
@@ -51,8 +51,6 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
         TaskExecution loopTaskExecution = findLoopTaskExecution(taskExecution.getParentId());
 
         loopTaskExecution.setEndTime(LocalDateTime.now());
-        loopTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(loopTaskExecution.getEndTime())
-                - LocalDateTimeUtils.getTime(loopTaskExecution.getStartTime()));
 
         messageBroker.send(Queues.COMPLETIONS, loopTaskExecution);
     }
@@ -62,7 +60,8 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         TaskExecution taskExecution = new TaskExecution(taskExecutionService.getTaskExecution(taskExecutionId));
 
-        if (taskExecution.getType().equals(LOOP + "/v" + VERSION_1)) {
+        if (taskExecution.getType()
+            .equals(LOOP + "/v" + VERSION_1)) {
             return taskExecution;
         } else {
             if (taskExecution.getParentId() == null) {
@@ -75,7 +74,8 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(LOOP_BREAK + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(LOOP_BREAK + "/v" + VERSION_1)) {
             return this;
         }
 

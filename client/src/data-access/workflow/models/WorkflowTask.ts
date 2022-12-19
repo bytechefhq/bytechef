@@ -44,7 +44,7 @@ export interface WorkflowTask {
      */
     node?: string;
     /**
-     * The key-value map of task parameters.
+     * Key-value map of task parameters.
      * @type {{ [key: string]: object; }}
      * @memberof WorkflowTask
      */
@@ -68,7 +68,7 @@ export interface WorkflowTask {
      */
     timeout?: string;
     /**
-     * The type of the task.
+     * Type of the task.
      * @type {string}
      * @memberof WorkflowTask
      */

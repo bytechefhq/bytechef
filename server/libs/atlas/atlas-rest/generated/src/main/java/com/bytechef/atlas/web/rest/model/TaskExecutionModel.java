@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * Adds execution semantics to the task.
@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   @JsonProperty("createdBy")
@@ -134,11 +134,11 @@ public class TaskExecutionModel {
   @JsonProperty("taskNumber")
   private Integer taskNumber;
 
-  @JsonProperty("workflowTask")
-  private WorkflowTaskModel workflowTask;
-
   @JsonProperty("retryDelayMillis")
   private Long retryDelayMillis;
+
+  @JsonProperty("workflowTask")
+  private WorkflowTaskModel workflowTask;
 
   @JsonProperty("type")
   private String type;
@@ -149,11 +149,11 @@ public class TaskExecutionModel {
   }
 
   /**
-   * Created by.
+   * The created by.
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Created by.", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -168,11 +168,11 @@ public class TaskExecutionModel {
   }
 
   /**
-   * Created date.
+   * The created date.
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Created date.", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -282,11 +282,11 @@ public class TaskExecutionModel {
   }
 
   /**
-   * Last modified by.
+   * The last modified by.
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -301,11 +301,11 @@ public class TaskExecutionModel {
   }
 
   /**
-   * Last modified date.
+   * The last modified date.
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -523,25 +523,6 @@ public class TaskExecutionModel {
     this.taskNumber = taskNumber;
   }
 
-  public TaskExecutionModel workflowTask(WorkflowTaskModel workflowTask) {
-    this.workflowTask = workflowTask;
-    return this;
-  }
-
-  /**
-   * Get workflowTask
-   * @return workflowTask
-  */
-  @Valid 
-  @Schema(name = "workflowTask", required = false)
-  public WorkflowTaskModel getWorkflowTask() {
-    return workflowTask;
-  }
-
-  public void setWorkflowTask(WorkflowTaskModel workflowTask) {
-    this.workflowTask = workflowTask;
-  }
-
   public TaskExecutionModel retryDelayMillis(Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
     return this;
@@ -559,6 +540,25 @@ public class TaskExecutionModel {
 
   public void setRetryDelayMillis(Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
+  }
+
+  public TaskExecutionModel workflowTask(WorkflowTaskModel workflowTask) {
+    this.workflowTask = workflowTask;
+    return this;
+  }
+
+  /**
+   * Get workflowTask
+   * @return workflowTask
+  */
+  @Valid 
+  @Schema(name = "workflowTask", required = false)
+  public WorkflowTaskModel getWorkflowTask() {
+    return workflowTask;
+  }
+
+  public void setWorkflowTask(WorkflowTaskModel workflowTask) {
+    this.workflowTask = workflowTask;
   }
 
   public TaskExecutionModel type(String type) {
@@ -609,14 +609,14 @@ public class TaskExecutionModel {
         Objects.equals(this.startTime, taskExecution.startTime) &&
         Objects.equals(this.status, taskExecution.status) &&
         Objects.equals(this.taskNumber, taskExecution.taskNumber) &&
-        Objects.equals(this.workflowTask, taskExecution.workflowTask) &&
         Objects.equals(this.retryDelayMillis, taskExecution.retryDelayMillis) &&
+        Objects.equals(this.workflowTask, taskExecution.workflowTask) &&
         Objects.equals(this.type, taskExecution.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endTime, error, executionTime, id, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, retry, retryAttempts, retryDelay, retryDelayFactor, startTime, status, taskNumber, workflowTask, retryDelayMillis, type);
+    return Objects.hash(createdBy, createdDate, endTime, error, executionTime, id, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, retry, retryAttempts, retryDelay, retryDelayFactor, startTime, status, taskNumber, retryDelayMillis, workflowTask, type);
   }
 
   @Override
@@ -643,8 +643,8 @@ public class TaskExecutionModel {
     sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    taskNumber: ").append(toIndentedString(taskNumber)).append("\n");
-    sb.append("    workflowTask: ").append(toIndentedString(workflowTask)).append("\n");
     sb.append("    retryDelayMillis: ").append(toIndentedString(retryDelayMillis)).append("\n");
+    sb.append("    workflowTask: ").append(toIndentedString(workflowTask)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -12,5 +12,5 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
     implementation project(":server:libs:modules:task-dispatchers:map")
 
-    testImplementation project(":server:libs:atlas:atlas-task-evaluator-impl")
+    testImplementation project(":server:libs:core:commons:commons-utils")
 }

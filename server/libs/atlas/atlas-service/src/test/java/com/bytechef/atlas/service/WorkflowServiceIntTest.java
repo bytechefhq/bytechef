@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,12 +32,12 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = WorkflowServiceIntTestConfiguration.class,
-        properties = {
-            "bytechef.workflow.context-repository.provider=jdbc",
-            "bytechef.workflow.persistence.provider=jdbc",
-            "bytechef.workflow.workflow-repository.jdbc.enabled=true"
-        })
+    classes = WorkflowServiceIntTestConfiguration.class,
+    properties = {
+        "bytechef.workflow.context-repository.provider=jdbc",
+        "bytechef.workflow.persistence.provider=jdbc",
+        "bytechef.workflow.workflow-repository.jdbc.enabled=true"
+    })
 public class WorkflowServiceIntTest {
 
     @Autowired
@@ -51,7 +52,8 @@ public class WorkflowServiceIntTest {
 
         workflowService.delete(workflow.getId());
 
-        Assertions.assertFalse(workflowRepository.findById(workflow.getId()).isPresent());
+        Assertions.assertFalse(workflowRepository.findById(workflow.getId())
+            .isPresent());
     }
 
     @Test
@@ -59,7 +61,8 @@ public class WorkflowServiceIntTest {
         Workflow workflow = workflowService.add(getWorkflow());
 
         Assertions.assertEquals(
-                workflow, workflowRepository.findById(workflow.getId()).orElseThrow());
+            workflow, workflowRepository.findById(workflow.getId())
+                .orElseThrow());
     }
 
     @Test
@@ -77,7 +80,8 @@ public class WorkflowServiceIntTest {
 
         workflowRepository.save(getWorkflow());
 
-        Assertions.assertEquals(1, workflowService.getWorkflows().size());
+        Assertions.assertEquals(1, workflowService.getWorkflows()
+            .size());
     }
 
     @Test
@@ -85,12 +89,12 @@ public class WorkflowServiceIntTest {
         Workflow workflow = workflowRepository.save(getWorkflow());
 
         workflow.setDefinition(
-                """
-            {
-                 "label": "Label,
-                "tasks": []
-            }
-            """);
+            """
+                {
+                     "label": "Label,
+                    "tasks": []
+                }
+                """);
 
         Assertions.assertEquals(workflow, workflowService.update(workflow));
     }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -22,7 +23,7 @@ package com.bytechef.component.xlsxfile.constants;
 public class XlsxFileConstants {
 
     public static final String ROWS = "rows";
-    public static final String PROPERTY_HEADER_ROW = "headerRow";
+    public static final String HEADER_ROW = "headerRow";
     public static final String PAGE_SIZE = "pageSize";
     public static final String PAGE_NUMBER = "pageNumber";
     public static final String READ_AS_STRING = "readAsString";
@@ -31,4 +32,6 @@ public class XlsxFileConstants {
     public static final String XLSX_FILE = "xlsxFile";
     public static final String WRITE = "write";
     public static final String READ = "read";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILENAME = "filename";
 }

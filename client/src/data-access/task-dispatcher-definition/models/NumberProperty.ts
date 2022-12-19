@@ -13,25 +13,31 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { DisplayOption } from './DisplayOption';
+import {
+    DisplayOptionFromJSON,
+    DisplayOptionFromJSONTyped,
+    DisplayOptionToJSON,
+} from './DisplayOption';
 import type { PropertyOption } from './PropertyOption';
 import {
     PropertyOptionFromJSON,
     PropertyOptionFromJSONTyped,
     PropertyOptionToJSON,
 } from './PropertyOption';
-import type { SingleValueProperty } from './SingleValueProperty';
+import type { ValueProperty } from './ValueProperty';
 import {
-    SingleValuePropertyFromJSON,
-    SingleValuePropertyFromJSONTyped,
-    SingleValuePropertyToJSON,
-} from './SingleValueProperty';
+    ValuePropertyFromJSON,
+    ValuePropertyFromJSONTyped,
+    ValuePropertyToJSON,
+} from './ValueProperty';
 
 /**
  * A number property type.
  * @export
  * @interface NumberProperty
  */
-export interface NumberProperty extends SingleValueProperty {
+export interface NumberProperty extends ValueProperty {
     /**
      * The maximum property value.
      * @type {number}
@@ -77,7 +83,7 @@ export function NumberPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
         return json;
     }
     return {
-        ...SingleValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
@@ -93,7 +99,7 @@ export function NumberPropertyToJSON(value?: NumberProperty | null): any {
         return null;
     }
     return {
-        ...SingleValuePropertyToJSON(value),
+        ...ValuePropertyToJSON(value),
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,
