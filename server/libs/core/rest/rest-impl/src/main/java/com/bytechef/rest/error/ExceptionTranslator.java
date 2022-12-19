@@ -17,7 +17,6 @@
 
 package com.bytechef.rest.error;
 
-import org.springframework.core.env.Environment;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -38,13 +37,10 @@ import reactor.core.publisher.Mono;
 @RestControllerAdvice
 public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
+    private static final Object[] DETAIL_MESSAGE_ARGUMENTS = {
+        ErrorConstants.ERR_CONCURRENCY_FAILURE
+    };
     private static final String MESSAGE_KEY = "message";
-
-    private final Environment env;
-
-    public ExceptionTranslator(Environment env) {
-        this.env = env;
-    }
 
     @ExceptionHandler
     public Mono<ResponseEntity<ProblemDetail>> handleConcurrencyFailure(
@@ -55,7 +51,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
                 .of(
                     createProblemDetail(
                         concurrencyFailureException, HttpStatus.CONFLICT, "Concurrency Failure", MESSAGE_KEY,
-                        new Object[] { ErrorConstants.ERR_CONCURRENCY_FAILURE }, serverWebExchange))
+                        DETAIL_MESSAGE_ARGUMENTS, serverWebExchange))
                 .build());
     }
 }
