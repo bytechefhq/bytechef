@@ -99,7 +99,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
                 TaskExecution evaluatedEachTask = taskEvaluator.evaluate(iterateeTaskExecution, context);
 
-                evaluatedEachTask = taskExecutionService.add(evaluatedEachTask);
+                evaluatedEachTask = taskExecutionService.create(evaluatedEachTask);
 
                 taskDispatcher.dispatch(evaluatedEachTask);
             }

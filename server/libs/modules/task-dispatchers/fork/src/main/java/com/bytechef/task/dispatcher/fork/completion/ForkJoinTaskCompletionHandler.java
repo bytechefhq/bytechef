@@ -125,7 +125,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
-            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
