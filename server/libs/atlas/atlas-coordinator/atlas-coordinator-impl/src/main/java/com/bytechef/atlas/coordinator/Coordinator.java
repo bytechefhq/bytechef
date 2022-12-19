@@ -93,7 +93,7 @@ public class Coordinator {
     public void create(JobParametersDTO jobParametersDTO) {
         Assert.notNull(jobParametersDTO, "request can't be null");
 
-        Job job = jobService.add(jobParametersDTO);
+        Job job = jobService.create(jobParameters);
 
         Context context = new Context(job.getInputs());
 

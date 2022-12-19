@@ -39,8 +39,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Workflow add(Workflow workflow) {
         workflow.setId(null);
+    public Workflow create(Workflow workflow, Workflow.ProviderType providerType) {
 
         return workflowRepository.save(workflow);
     }

@@ -26,7 +26,7 @@ import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandl
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.message.broker.Queues;
@@ -106,11 +106,11 @@ public class CoordinatorIntTest {
             Coordinator coordinator = new Coordinator(
                 contextService, null, null, null, jobService, null, null, null, taskExecutionService);
 
-            JobParametersDTO jobParametersDTO = new JobParametersDTO();
+            JobParameters jobParameters = new JobParameters();
 
-            jobParametersDTO.setWorkflowId("hello1");
+            jobParameters.setWorkflowId("hello1");
 
-            coordinator.create(jobParametersDTO);
+            coordinator.create(jobParameters);
         });
     }
 
@@ -178,13 +178,13 @@ public class CoordinatorIntTest {
 
         String jobId = UUIDUtils.generate();
 
-        JobParametersDTO jobParametersDTO = new JobParametersDTO();
+        JobParameters jobParameters = new JobParameters();
 
-        jobParametersDTO.setJobId(jobId);
-        jobParametersDTO.setInputs(Collections.singletonMap("yourName", "me"));
-        jobParametersDTO.setWorkflowId(workflowId);
+        jobParameters.setJobId(jobId);
+        jobParameters.setInputs(Collections.singletonMap("yourName", "me"));
+        jobParameters.setWorkflowId(workflowId);
 
-        coordinator.create(jobParametersDTO);
+        coordinator.create(jobParameters);
 
         return jobService.getJob(jobId);
     }
