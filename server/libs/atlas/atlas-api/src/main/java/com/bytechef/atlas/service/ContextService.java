@@ -23,6 +23,7 @@ import com.bytechef.atlas.domain.Context;
  * @author Ivica Cardic
  */
 public interface ContextService {
+
     void push(String stackId, Context context);
 
     Context peek(String stackId);

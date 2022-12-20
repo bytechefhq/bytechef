@@ -69,8 +69,7 @@ public class WorkflowRSocketClient implements WorkflowService {
     public List<Workflow> getWorkflows() {
         return rSocketRequester
             .route("getWorkflows")
-            .retrieveMono(new ParameterizedTypeReference<List<Workflow>>() {
-            })
+            .retrieveMono(new ParameterizedTypeReference<List<Workflow>>() {})
             .block();
     }
 

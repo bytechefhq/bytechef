@@ -43,6 +43,8 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 /**
@@ -115,9 +117,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     }
 
     @Override
-    public TaskDispatcher<?> resolve(Task task) {
-        if (task.getType()
-            .equals(MAP + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), MAP + "/v" + VERSION_1)) {
             return this;
         }
 

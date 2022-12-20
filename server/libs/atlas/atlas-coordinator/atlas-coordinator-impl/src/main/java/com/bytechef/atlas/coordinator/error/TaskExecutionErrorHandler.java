@@ -28,6 +28,7 @@ import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.UUIDUtils;
@@ -45,18 +46,18 @@ import org.springframework.util.Assert;
  */
 public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecutionErrorHandler.class);
+
     private final EventPublisher eventPublisher;
     private final JobService jobService;
-    private final TaskDispatcher<TaskExecution> taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @SuppressFBWarnings("EI2")
     public TaskExecutionErrorHandler(
         EventPublisher eventPublisher,
         JobService jobService,
-        TaskDispatcher<TaskExecution> taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
@@ -93,7 +94,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
             taskDispatcher.dispatch(retryTaskExecution);
         }
-        // if it's not retryable then we're gonna fail the job
+        // if it's not retryable then we're going fail the job
         else {
             while (erroredTaskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
                 erroredTaskExecution = new TaskExecution(

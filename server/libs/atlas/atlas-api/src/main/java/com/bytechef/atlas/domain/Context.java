@@ -60,21 +60,13 @@ public final class Context implements Persistable<String> {
     }
 
     public Context(Map<String, Object> value) {
-        Assert.notNull(value, "id cannot be value");
+        Assert.notNull(value, "'value' must not be null.");
 
         this.value = new MapWrapper(value);
     }
 
     public Context(String key, Object value) {
         this(Collections.singletonMap(key, value));
-    }
-
-    public Context(Context context) {
-        Assert.notNull(context, "Context cannot be null");
-
-        this.id = context.getId();
-        this.stackId = context.getStackId();
-        this.value = new MapWrapper(context.getValue());
     }
 
     @Override

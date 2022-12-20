@@ -69,8 +69,7 @@ class XmlIterator implements Iterator<Map<String, ?>> {
                 return false;
             }
 
-            value = xmlMapper.readValue(xmlStreamReader, new TypeReference<>() {
-            });
+            value = xmlMapper.readValue(xmlStreamReader, new TypeReference<>() {});
         } catch (Exception exception) {
             throw new ActionExecutionException("Unable to read value", exception);
         }

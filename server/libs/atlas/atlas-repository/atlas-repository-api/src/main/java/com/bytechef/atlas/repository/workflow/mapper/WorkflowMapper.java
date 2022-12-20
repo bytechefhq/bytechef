@@ -23,5 +23,6 @@ import com.bytechef.atlas.domain.Workflow;
  * @author Ivica Cardic
  */
 public interface WorkflowMapper {
+
     Workflow readValue(WorkflowResource workflowResource);
 }

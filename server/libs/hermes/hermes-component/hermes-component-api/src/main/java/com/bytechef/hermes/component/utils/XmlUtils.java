@@ -54,8 +54,7 @@ public class XmlUtils {
 
     public static Map<String, ?> read(String xml) {
         try {
-            return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {
-            });
+            return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {});
         } catch (Exception exception) {
             throw new ActionExecutionException("Unable to convert xml value", exception);
         }

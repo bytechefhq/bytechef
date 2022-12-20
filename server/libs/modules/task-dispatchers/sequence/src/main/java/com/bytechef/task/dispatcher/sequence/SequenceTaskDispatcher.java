@@ -36,6 +36,7 @@ import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -46,14 +47,14 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     public static final String TASKS = "tasks";
     private final ContextService contextService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public SequenceTaskDispatcher(
         ContextService contextService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -106,9 +107,8 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(SEQUENCE + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), SEQUENCE + "/v" + VERSION_1)) {
             return this;
         }
 

@@ -66,8 +66,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     public List<Connection> getConnections() {
         return rSocketRequester
             .route("getConnections")
-            .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {
-            })
+            .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {})
             .block();
     }
 

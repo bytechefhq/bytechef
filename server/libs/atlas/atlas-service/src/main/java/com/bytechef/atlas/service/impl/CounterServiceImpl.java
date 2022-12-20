@@ -21,6 +21,7 @@ import com.bytechef.atlas.domain.Counter;
 import com.bytechef.atlas.repository.CounterRepository;
 import com.bytechef.atlas.service.CounterService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -44,8 +45,8 @@ public class CounterServiceImpl implements CounterService {
      * @return the new value
      */
     @Override
-    public long decrement(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public long decrement(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         Long value = counterRepository.findValueByIdForUpdate(id);
 
@@ -61,8 +62,8 @@ public class CounterServiceImpl implements CounterService {
     }
 
     @Override
-    public void delete(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public void delete(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         counterRepository.deleteById(id);
     }
@@ -73,8 +74,8 @@ public class CounterServiceImpl implements CounterService {
      * @param id the id of the counter
      */
     @Override
-    public void set(String id, long value) {
-        Assert.notNull(id, "id cannot be null.");
+    public void set(@NonNull String id, long value) {
+        Assert.notNull(id, "'id' must not be null.");
 
         Long selectedValue = counterRepository.findValueByIdForUpdate(id);
 

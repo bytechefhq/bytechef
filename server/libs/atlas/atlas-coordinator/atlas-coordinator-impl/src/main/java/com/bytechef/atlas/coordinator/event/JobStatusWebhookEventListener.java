@@ -103,8 +103,8 @@ public class JobStatusWebhookEventListener implements EventListener {
     }
 
     private RetryTemplate createRetryTemplate(Map<String, Object> webhook) {
-        Map<String, Object> retryParams = MapUtils.get(webhook, "retry", new ParameterizedTypeReference<>() {
-        }, Collections.emptyMap());
+        Map<String, Object> retryParams = MapUtils.get(webhook, "retry", new ParameterizedTypeReference<>() {},
+            Collections.emptyMap());
 
         RetryTemplate retryTemplate = new RetryTemplate();
 
