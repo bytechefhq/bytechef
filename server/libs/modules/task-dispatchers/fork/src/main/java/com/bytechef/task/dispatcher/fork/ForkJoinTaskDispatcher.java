@@ -41,6 +41,8 @@ import com.bytechef.commons.utils.UUIDUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 /**
@@ -86,7 +88,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final ContextService contextService;
     private final CounterService counterService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
@@ -94,7 +96,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         ContextService contextService,
         CounterService counterService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -166,9 +168,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(FORK_JOIN + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), FORK_JOIN + "/v" + VERSION_1)) {
             return this;
         }
 

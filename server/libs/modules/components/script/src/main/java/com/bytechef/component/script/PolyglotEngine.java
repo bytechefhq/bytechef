@@ -44,8 +44,7 @@ public class PolyglotEngine {
 
             Function<ProxyObject, Object> performFunction = polyglotContext.getBindings(languageId)
                 .getMember("perform")
-                .as(new TypeLiteral<>() {
-                });
+                .as(new TypeLiteral<>() {});
 
             return performFunction.apply(ProxyObject.fromMap(executionParameters.getMap(INPUT)));
         }

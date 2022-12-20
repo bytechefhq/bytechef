@@ -82,7 +82,7 @@ public class TaskEvaluator {
         map.put("timestamp", new Timestamp());
         map.put("now", new Now());
         map.put("dateFormat", new DateFormat());
-        map.put("config", new Config(aBuilder.aEnvironment));
+        map.put("config", new Config(aBuilder.environment));
         map.putAll(aBuilder.methodExecutors);
 
         methodExecutors = Collections.unmodifiableMap(map);
@@ -162,9 +162,8 @@ public class TaskEvaluator {
                     return value;
                 }
             }
-        } else if (value instanceof List) {
+        } else if (value instanceof List<?> list) {
             List<Object> evaluatedlist = new ArrayList<>();
-            List<?> list = (List<?>) value;
 
             for (Object item : list) {
                 evaluatedlist.add(evaluate(item, context));
@@ -199,16 +198,16 @@ public class TaskEvaluator {
     public static class Builder {
 
         private final transient Map<String, MethodExecutor> methodExecutors = new HashMap<>();
-        private transient Environment aEnvironment;
+        private transient Environment environment;
 
-        public Builder environment(Environment aEnvironment) {
-            this.aEnvironment = aEnvironment;
+        public Builder environment(Environment environment) {
+            this.environment = environment;
 
             return this;
         }
 
-        public Builder methodExecutor(String aMethodName, MethodExecutor aMethodExecutor) {
-            methodExecutors.put(aMethodName, aMethodExecutor);
+        public Builder methodExecutor(String methodName, MethodExecutor methodExecutor) {
+            methodExecutors.put(methodName, methodExecutor);
 
             return this;
         }

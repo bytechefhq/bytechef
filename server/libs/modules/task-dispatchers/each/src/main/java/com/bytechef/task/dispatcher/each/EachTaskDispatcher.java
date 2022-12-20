@@ -43,6 +43,8 @@ import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 /**
@@ -54,7 +56,7 @@ import org.springframework.util.Assert;
  */
 public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
     private final MessageBroker messageBroker;
@@ -62,7 +64,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final CounterService counterService;
 
     public EachTaskDispatcher(
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService,
         MessageBroker messageBroker,
         ContextService contextService,
@@ -124,9 +126,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends TaskExecution> resolve(Task task) {
+        if (Objects.equals(task.getType(), EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
             return this;
         }
         return null;

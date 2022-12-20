@@ -36,7 +36,7 @@ public class AmqpMessageBroker implements MessageBroker {
 
     @Override
     public void send(String routingKey, Object message) {
-        Assert.notNull(routingKey, "routing key can't be null");
+        Assert.notNull(routingKey, "'routingKey' must not be null");
 
         amqpTemplate.convertAndSend(determineExchange(routingKey), determineRoutingKey(routingKey), message, m -> {
             if (message instanceof Retryable) {

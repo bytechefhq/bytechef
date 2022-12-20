@@ -93,7 +93,6 @@ public class Worker {
      * Handle the execution of a {@link TaskExecution}. Implementors are expected to execute the task asynchronously.
      *
      * @param taskExecution The task to execute.
-     * @throws InterruptedException
      */
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
@@ -309,8 +308,9 @@ public class Worker {
         }
 
         @Override
-        public T get(long aTimeout, TimeUnit aUnit) throws InterruptedException, ExecutionException, TimeoutException {
-            return future.get(aTimeout, aUnit);
+        public T get(long timeout, TimeUnit timeUnit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+            return future.get(timeout, timeUnit);
         }
     }
 }

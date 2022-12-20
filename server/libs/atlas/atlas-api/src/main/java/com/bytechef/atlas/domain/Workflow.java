@@ -60,7 +60,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         YAML;
 
         public static Format parse(String fileName) {
-            Assert.notNull(fileName, "Filename %s can not be null".formatted(fileName));
+            Assert.notNull(fileName, "Filename '%s' can not be null".formatted(fileName));
 
             String extension = FilenameUtils.getExtension(fileName);
 
@@ -93,10 +93,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private String id;
 
     @Transient
-    private List<Map<String, Object>> inputs;
+    private final List<Map<String, Object>> inputs;
 
     @Transient
-    private String label;
+    private final String label;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -107,16 +107,16 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private LocalDateTime lastModifiedDate;
 
     @Transient
-    private List<Map<String, Object>> outputs;
+    private final List<Map<String, Object>> outputs;
 
     @Transient
     private ProviderType providerType;
 
     @Transient
-    private int retry;
+    private final int retry;
 
     @Transient
-    private List<WorkflowTask> tasks;
+    private final List<WorkflowTask> tasks;
 
     // TODO Add version
     // @Version
@@ -132,14 +132,13 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
         id = MapUtils.getString(source, WorkflowConstants.ID);
         inputs = MapUtils.getList(
-            source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {
-            }, Collections.emptyList());
+            source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
         label = MapUtils.getString(source, WorkflowConstants.LABEL);
         outputs = MapUtils.getList(
-            source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {
-            }, Collections.emptyList());
+            source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
         retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, 0);
-        tasks = MapUtils.getList(source, WorkflowConstants.TASKS, Map.class)
+        tasks = MapUtils
+            .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
             .stream()
             .map(WorkflowTask::new)
             .toList();

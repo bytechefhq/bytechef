@@ -22,7 +22,6 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
@@ -39,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -60,8 +60,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job create(JobParameters jobParameters) {
-        Assert.notNull(jobParameters, "jobParameters cannot be null.");
+    public Job create(@NonNull JobParameters jobParameters) {
+        Assert.notNull(jobParameters, "'jobParameters' must not be null.");
 
         String workflowId = jobParameters.getWorkflowId();
 
@@ -78,9 +78,9 @@ public class JobServiceImpl implements JobService {
 
         Assert.isNull(
             executionError,
-            executionError != null
-                ? String.format("%s: %s", workflowId, executionError.getMessage())
-                : "");
+            executionError == null
+                ? ""
+                : String.format("%s: %s", workflowId, executionError.getMessage()));
 
         validate(jobParameters, workflow);
 
@@ -95,13 +95,13 @@ public class JobServiceImpl implements JobService {
             jobParameters.getPriority() == null
                 ? Prioritizable.DEFAULT_PRIORITY
                 : jobParameters.getPriority());
-        job.setStatus(JobStatus.CREATED);
+        job.setStatus(Job.Status.CREATED);
         job.setWebhooks(jobParameters.getWebhooks());
         job.setWorkflowId(workflow.getId());
 
         log.debug("Job {} started", job.getId());
 
-        jobRepository.save(job);
+        job = jobRepository.save(job);
 
         return job;
     }
@@ -116,8 +116,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Job getJob(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public Job getJob(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         return jobRepository.findById(id)
             .orElseThrow();
@@ -137,15 +137,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Job getTaskExecutionJob(String taskExecutionId) {
-        Assert.notNull(taskExecutionId, "taskExecutionId cannot be null.");
+    public Job getTaskExecutionJob(@NonNull String taskExecutionId) {
+        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null.");
 
         return jobRepository.findByTaskExecutionId(taskExecutionId);
     }
 
     @Override
-    public Job resume(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public Job resume(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         log.debug("Resuming job {}", id);
 
@@ -156,7 +156,7 @@ public class JobServiceImpl implements JobService {
         Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
         Assert.isTrue(isRestartable(job), "can't restart job " + id + " as it is " + job.getStatus());
 
-        job.setStatus(JobStatus.STARTED);
+        job.setStatus(Job.Status.STARTED);
 
         jobRepository.save(job);
 
@@ -164,15 +164,15 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job start(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public Job start(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         Job job = jobRepository.findById(id)
             .orElseThrow();
 
         job.setCurrentTask(0);
         job.setStartTime(new Date());
-        job.setStatus(JobStatus.STARTED);
+        job.setStatus(Job.Status.STARTED);
 
         jobRepository.save(job);
 
@@ -180,29 +180,26 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job stop(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public Job stop(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         Job job = jobRepository.findById(id)
             .orElseThrow();
 
-        Assert.notNull(job, "Unknown job: " + id);
         Assert.isTrue(
-            job.getStatus() == JobStatus.STARTED,
+            job.getStatus() == Job.Status.STARTED,
             "Job " + id + " can not be stopped as it is " + job.getStatus());
 
-        Job simpleJob = new Job(job);
+        job.setStatus(Job.Status.STOPPED);
 
-        simpleJob.setStatus(JobStatus.STOPPED);
+        jobRepository.save(job);
 
-        jobRepository.save(simpleJob);
-
-        return simpleJob;
+        return job;
     }
 
     @Override
-    public Job update(Job job) {
-        Assert.notNull(job, "job cannot be null.");
+    public Job update(@NonNull Job job) {
+        Assert.notNull(job, "'job' must not be null.");
 
         return jobRepository.save(job);
     }

@@ -95,7 +95,7 @@ public class AmazonS3Uri {
 
     private AmazonS3Uri(final URI uri, final boolean urlEncode) {
         if (uri == null) {
-            throw new IllegalArgumentException("uri cannot be null");
+            throw new IllegalArgumentException("uri must not be null");
         }
         this.uri = uri;
 

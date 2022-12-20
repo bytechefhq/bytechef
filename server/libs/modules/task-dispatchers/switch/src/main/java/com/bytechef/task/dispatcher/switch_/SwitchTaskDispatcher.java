@@ -44,6 +44,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
@@ -57,14 +59,14 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     private final ContextService contextService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public SwitchTaskDispatcher(
         ContextService contextService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService,
         TaskEvaluator taskEvaluator) {
         this.contextService = contextService;
@@ -131,9 +133,8 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(SWITCH + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), SWITCH + "/v" + VERSION_1)) {
             return this;
         }
 
@@ -142,9 +143,8 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     private Map<String, Object> resolveCase(TaskExecution taskExecution) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = MapUtils.getList(taskExecution.getParameters(), CASES,
-            new ParameterizedTypeReference<>() {
-            });
+        List<Map<String, Object>> cases = MapUtils.getList(
+            taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
 
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
 

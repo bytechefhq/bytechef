@@ -19,10 +19,11 @@ package com.bytechef.atlas.repository.jdbc.event;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.commons.utils.UUIDUtils;
-import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic

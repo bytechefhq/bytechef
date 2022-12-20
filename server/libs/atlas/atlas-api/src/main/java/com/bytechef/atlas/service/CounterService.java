@@ -21,6 +21,7 @@ package com.bytechef.atlas.service;
  * @author Ivica Cardic
  */
 public interface CounterService {
+
     void delete(String id);
 
     long decrement(String id);
