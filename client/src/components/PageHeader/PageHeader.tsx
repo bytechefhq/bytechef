@@ -1,10 +1,13 @@
+import Button from 'components/Button/Button';
 import React, {ReactNode} from 'react';
 
 const PageHeader: React.FC<{
     title: string;
-    right?: ReactNode;
+    buttonLabel?: string;
     bold?: boolean;
-}> = ({title, right, bold = false}) => (
+    buttonOnClick?: () => void;
+    right?: ReactNode;
+}> = ({title, right, bold = false, buttonLabel, buttonOnClick}) => (
     <div className="mb-6 flex justify-center py-4">
         <div className="flex w-full items-center justify-between">
             {bold ? (
@@ -17,7 +20,11 @@ const PageHeader: React.FC<{
                 </h2>
             )}
 
-            <div>{right}</div>
+            {right && <div>{right}</div>}
+
+            {buttonLabel && buttonOnClick && (
+                <Button handleClick={buttonOnClick} label={buttonLabel} />
+            )}
         </div>
     </div>
 );
