@@ -9,6 +9,7 @@ export const TagList: React.FC<{tag: string; button: string}> = ({
     return (
         <div>
             <Tag tag={tag} />
+
             <AddTagButton button={button} />
         </div>
     );
