@@ -18,6 +18,7 @@ export const IntegrationItem: React.FC<{
                 status={status}
                 dropdownTrigger={dropdownTrigger}
             />
+
             <Footer category={category} tag={tag} button={button} date={date} />
         </div>
     );
