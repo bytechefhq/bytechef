@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -36,6 +37,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table
 public final class Connection implements Persistable<String> {
 
+    @Column("authorization_name")
+    private String authorizationName;
+
     @Column("component_name")
     private String componentName;
 
@@ -52,9 +56,6 @@ public final class Connection implements Persistable<String> {
 
     @Id
     private String id;
-
-    @Column
-    private String label;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -95,6 +96,16 @@ public final class Connection implements Persistable<String> {
         return getClass().hashCode();
     }
 
+    /**
+     * Return the name of an authorization it is used with this connection.
+     */
+    public String getAuthorizationName() {
+        return authorizationName;
+    }
+
+    /**
+     * Return the name of a component.
+     */
     public String getComponentName() {
         return componentName;
     }
@@ -123,11 +134,6 @@ public final class Connection implements Persistable<String> {
         return id;
     }
 
-    /** Return the name of the authenconnectiontication. */
-    public String getLabel() {
-        return label;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -142,7 +148,7 @@ public final class Connection implements Persistable<String> {
     }
 
     /**
-     * Return the type of the connection.
+     * Return the connection name.
      */
     public String getName() {
         return name;
@@ -158,6 +164,10 @@ public final class Connection implements Persistable<String> {
     @Override
     public boolean isNew() {
         return id == null;
+    }
+
+    public void setAuthorizationName(String authorizationName) {
+        this.authorizationName = authorizationName;
     }
 
     public void setComponentName(String componentName) {
@@ -184,10 +194,6 @@ public final class Connection implements Persistable<String> {
         this.name = name;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = new EncryptedMapWrapper(parameters);
     }
@@ -202,14 +208,17 @@ public final class Connection implements Persistable<String> {
 
     @Override
     public String toString() {
-        return "Connection{" + "createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", id='"
-                + id + '\'' + ", label='"
-                + label + '\'' + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", name='"
-                + name + '\'' + ", parameters="
-                + parameters + '}';
+        return "Connection{" + "authorizationName='"
+            + authorizationName + '\'' + ", componentName='"
+            + componentName + '\'' + ", componentVersion="
+            + componentVersion + ", createdBy='"
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", id='"
+            + id + '\'' + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", name='"
+            + name + '\'' + ", parameters="
+            + parameters + ", version="
+            + version + '}';
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.map.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -26,7 +27,6 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,9 +42,9 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     private final CounterService counterService;
 
     public MapTaskCompletionHandler(
-            TaskExecutionService taskExecutionService,
-            TaskCompletionHandler taskCompletionHandler,
-            CounterService counterService) {
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService) {
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
@@ -61,16 +61,17 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
         long subtasksLeft = counterService.decrement(taskExecution.getParentId());
 
         if (subtasksLeft == 0) {
-            List<TaskExecution> childTaskExecutions =
-                    taskExecutionService.getParentTaskExecutions(taskExecution.getParentId());
-            TaskExecution mapTaskExecution =
-                    new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            List<TaskExecution> childTaskExecutions = taskExecutionService
+                .getParentTaskExecutions(taskExecution.getParentId());
+            TaskExecution mapTaskExecution = new TaskExecution(
+                taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
             mapTaskExecution.setEndTime(LocalDateTime.now());
-            mapTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(mapTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(mapTaskExecution.getStartTime()));
+
             mapTaskExecution.setOutput(
-                    childTaskExecutions.stream().map(TaskExecution::getOutput).collect(Collectors.toList()));
+                childTaskExecutions.stream()
+                    .map(TaskExecution::getOutput)
+                    .collect(Collectors.toList()));
 
             taskCompletionHandler.handle(mapTaskExecution);
             counterService.delete(taskExecution.getParentId());
@@ -82,7 +83,8 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
-            return parentExecution.getType().equals(MAP + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(MAP + "/v" + VERSION_1);
         }
         return false;
     }

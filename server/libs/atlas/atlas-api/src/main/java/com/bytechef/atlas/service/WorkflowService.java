@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,7 +25,7 @@ import java.util.List;
  */
 public interface WorkflowService {
 
-    Workflow add(Workflow workflow);
+    Workflow create(Workflow workflow, Workflow.ProviderType providerType);
 
     void delete(String id);
 

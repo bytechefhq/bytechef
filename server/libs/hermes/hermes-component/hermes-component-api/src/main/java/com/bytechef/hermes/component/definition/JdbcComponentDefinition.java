@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,76 +17,23 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.constants.Versions;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
 
 /**
  * @author Ivica Cardic
  */
-public final class JdbcComponentDefinition {
-    private String databaseJdbcName;
-    private String jdbcDriverClassName;
-    private Display display;
-    private String name;
-    private Resources resources;
-    private double version = Versions.VERSION_1;
+public sealed interface JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcComponentDefinition {
 
-    public JdbcComponentDefinition(String name) {
-        this.name = name;
-    }
+    String getDatabaseJdbcName();
 
-    public JdbcComponentDefinition databaseJdbcName(String databaseJdbcName) {
-        this.databaseJdbcName = databaseJdbcName;
+    String getJdbcDriverClassName();
 
-        return this;
-    }
+    Display getDisplay();
 
-    public JdbcComponentDefinition jdbcDriverClassName(String jdbcDriverClassName) {
-        this.jdbcDriverClassName = jdbcDriverClassName;
+    Resources getResources();
 
-        return this;
-    }
+    String getName();
 
-    public JdbcComponentDefinition display(Display display) {
-        this.display = display;
-
-        return this;
-    }
-
-    public JdbcComponentDefinition resources(Resources resources) {
-        this.resources = resources;
-
-        return this;
-    }
-
-    public JdbcComponentDefinition version(double version) {
-        this.version = version;
-
-        return this;
-    }
-
-    public String getDatabaseJdbcName() {
-        return databaseJdbcName;
-    }
-
-    public String getJdbcDriverClassName() {
-        return jdbcDriverClassName;
-    }
-
-    public Display getDisplay() {
-        return display;
-    }
-
-    public Resources getResources() {
-        return resources;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getVersion() {
-        return version;
-    }
+    double getVersion();
 }

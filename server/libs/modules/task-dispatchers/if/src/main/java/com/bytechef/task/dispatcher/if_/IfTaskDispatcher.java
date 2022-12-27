@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.if_;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.IF;
@@ -33,9 +34,12 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -50,11 +54,11 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     private final TaskExecutionService taskExecutionService;
 
     public IfTaskDispatcher(
-            ContextService contextService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
@@ -74,20 +78,28 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         List<WorkflowTask> subWorkflowTasks;
 
         if (IfTaskUtils.resolveCase(ifTaskExecution)) {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_TRUE);
+            subWorkflowTasks = MapUtils
+                .getList(ifTaskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
         } else {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_FALSE);
+            subWorkflowTasks = MapUtils
+                .getList(ifTaskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
         }
 
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                    subWorkflowTask,
-                    ifTaskExecution.getJobId(),
-                    ifTaskExecution.getId(),
-                    ifTaskExecution.getPriority(),
-                    1);
+            TaskExecution subTaskExecution = new TaskExecution(
+                subWorkflowTask,
+                ifTaskExecution.getJobId(),
+                ifTaskExecution.getId(),
+                ifTaskExecution.getPriority(),
+                1);
 
             Context context = new Context(contextService.peek(ifTaskExecution.getId()));
 
@@ -95,7 +107,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
             TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
@@ -111,7 +123,8 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(IF + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(IF + "/v" + VERSION_1)) {
             return this;
         }
 

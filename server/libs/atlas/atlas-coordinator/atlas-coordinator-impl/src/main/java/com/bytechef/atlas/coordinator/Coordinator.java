@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -23,7 +24,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
@@ -63,15 +64,15 @@ public class Coordinator {
     private final TaskExecutionService taskExecutionService;
 
     public Coordinator(
-            ContextService contextService,
-            ErrorHandler errorHandler,
-            EventPublisher eventPublisher,
-            JobExecutor jobExecutor,
-            JobService jobService,
-            MessageBroker messageBroker,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        ErrorHandler errorHandler,
+        EventPublisher eventPublisher,
+        JobExecutor jobExecutor,
+        JobService jobService,
+        MessageBroker messageBroker,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.errorHandler = errorHandler;
         this.eventPublisher = eventPublisher;
@@ -86,13 +87,13 @@ public class Coordinator {
     /**
      * Starts a job instance.
      *
-     * @param jobParametersDTO The Key-Value map representing the workflow parameters
+     * @param jobParameters The Key-Value map representing the workflow parameters
      * @return The instance of the Job
      */
-    public void create(JobParametersDTO jobParametersDTO) {
-        Assert.notNull(jobParametersDTO, "request can't be null");
+    public void create(JobParameters jobParameters) {
+        Assert.notNull(jobParameters, "request can't be null");
 
-        Job job = jobService.add(jobParametersDTO);
+        Job job = jobService.create(jobParameters);
 
         Context context = new Context(job.getInputs());
 
@@ -133,7 +134,7 @@ public class Coordinator {
             taskExecutionService.update(currentTaskExecution);
 
             taskDispatcher.dispatch(
-                    new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
+                new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
         }
 
         return job;
@@ -165,7 +166,7 @@ public class Coordinator {
             TaskExecution erroredTaskExecution = new TaskExecution(taskExecution);
 
             erroredTaskExecution.setError(
-                    new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
             handleError(erroredTaskExecution);
         }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -19,15 +20,12 @@
 package com.bytechef.component.bash;
 
 import com.bytechef.component.bash.constants.BashConstants;
-import com.bytechef.hermes.component.definition.Action;
-import com.bytechef.hermes.component.test.mock.MockContext;
-import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
-import com.bytechef.test.jsonasssert.AssertUtils;
-import java.io.IOException;
-import java.util.Map;
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
+import org.mockito.Mockito;
 
 /**
  * @author Arik Cohen
@@ -35,25 +33,25 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class BashComponentHandlerTest {
 
-    private static final MockContext context = new MockContext();
-
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/bash_v1.json", new BashComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/bash_v1.json", new BashComponentHandler().getDefinition());
     }
 
     @Test
-    public void testPerformExecute() throws IOException {
+    public void testPerformExecute() {
         BashComponentHandler bashComponentAccessor = new BashComponentHandler();
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/test.txt");
 
-        String output = bashComponentAccessor.performExecute(
-                context,
-                new MockExecutionParameters(Map.of(
-                        BashConstants.SCRIPT,
-                        "ls -l " + classPathResource.getFile().getAbsolutePath(),
-                        Action.ACTION,
-                        BashConstants.EXECUTE)));
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+
+        Mockito.when(executionParameters.getRequiredString(BashConstants.SCRIPT))
+            .thenReturn("ls -l "
+                + BashComponentHandlerTest.class
+                    .getClassLoader()
+                    .getResource("dependencies/test.txt")
+                    .getFile());
+
+        String output = bashComponentAccessor.performExecute(Mockito.mock(Context.class), executionParameters);
 
         Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
     }

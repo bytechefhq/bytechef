@@ -7,7 +7,7 @@
         </layout>
     </appender>
 
-    <logger name="com.mkyong" level="debug" additivity="false">
+    <logger name="com.bytechef" level="debug" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

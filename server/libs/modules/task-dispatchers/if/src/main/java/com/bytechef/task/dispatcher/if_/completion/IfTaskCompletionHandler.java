@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.if_.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.IF;
@@ -30,10 +31,12 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matija Petanjek
@@ -47,11 +50,11 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
 
     public IfTaskCompletionHandler(
-            ContextService contextService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -66,7 +69,8 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentTaskExecution.getType().equals(IF + "/v" + VERSION_1);
+            return parentTaskExecution.getType()
+                .equals(IF + "/v" + VERSION_1);
         }
 
         return false;
@@ -80,8 +84,8 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecutionService.update(completedSubTaskExecution);
 
-        TaskExecution ifTaskExecution =
-                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution ifTaskExecution = new TaskExecution(
+            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(ifTaskExecution.getId());
@@ -96,20 +100,20 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         List<WorkflowTask> subWorkflowTasks;
 
         if (IfTaskUtils.resolveCase(ifTaskExecution)) {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_TRUE);
+            subWorkflowTasks = getSubWorkflowTasks(ifTaskExecution, CASE_TRUE);
         } else {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_FALSE);
+            subWorkflowTasks = getSubWorkflowTasks(ifTaskExecution, CASE_FALSE);
         }
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                    subWorkflowTask,
-                    ifTaskExecution.getJobId(),
-                    ifTaskExecution.getId(),
-                    ifTaskExecution.getPriority(),
-                    taskExecution.getTaskNumber() + 1);
+            TaskExecution subTaskExecution = new TaskExecution(
+                subWorkflowTask,
+                ifTaskExecution.getJobId(),
+                ifTaskExecution.getId(),
+                ifTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1);
 
             Context context = new Context(contextService.peek(ifTaskExecution.getId()));
 
@@ -117,17 +121,22 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
             TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
             taskDispatcher.dispatch(evaluatedTaskExecution);
         }
         // no more tasks to execute -- complete the If
         else {
             ifTaskExecution.setEndTime(LocalDateTime.now());
-            ifTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(ifTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(ifTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(ifTaskExecution);
         }
+    }
+
+    private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution ifTaskExecution, String caseTrue) {
+        return MapUtils.getList(ifTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
     }
 }

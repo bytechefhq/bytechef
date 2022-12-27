@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -23,5 +24,5 @@ import com.bytechef.hermes.integration.domain.Integration;
  */
 public interface IntegrationFacade {
 
-    Integration add(Integration integration);
+    Integration initialize(Integration integration);
 }

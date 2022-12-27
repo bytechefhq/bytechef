@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,14 +17,14 @@
 
 package com.bytechef.task.dispatcher.parallel;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.TASKS;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -33,14 +34,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ParallelTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = TaskDispatcherDSL.create(PARALLEL)
-            .display(
-                    display("Parallel")
-                            .description(
-                                    "Run collection of tasks in parallel, without waiting until the previous function has completed."))
-            .taskProperties(array(TASKS)
-                    .description("The task to use in each iteration.")
-                    .items(task()));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = TaskDispatcherDSL.taskDispatcher(
+        PARALLEL)
+        .display(
+            display("Parallel")
+                .description(
+                    "Run collection of tasks in parallel, without waiting until the previous function has completed."))
+        .taskProperties(array(TASKS)
+            .description("The task to use in each iteration.")
+            .items(task()));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

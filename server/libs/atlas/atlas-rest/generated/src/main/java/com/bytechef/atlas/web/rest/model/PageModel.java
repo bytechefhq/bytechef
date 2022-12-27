@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.
@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 
 @Schema(name = "Page", description = "A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.")
 @JsonTypeName("Page")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
 public class PageModel {
 
   @JsonProperty("number")
@@ -89,11 +89,11 @@ public class PageModel {
   }
 
   /**
-   * Number of elements.
+   * The number of elements.
    * @return numberOfElements
   */
   
-  @Schema(name = "numberOfElements", description = "Number of elements.", required = false)
+  @Schema(name = "numberOfElements", description = "The number of elements.", required = false)
   public Integer getNumberOfElements() {
     return numberOfElements;
   }
@@ -108,11 +108,11 @@ public class PageModel {
   }
 
   /**
-   * Total number of pages.
+   * The total number of pages.
    * @return totalPages
   */
   
-  @Schema(name = "totalPages", description = "Total number of pages.", required = false)
+  @Schema(name = "totalPages", description = "The total number of pages.", required = false)
   public Integer getTotalPages() {
     return totalPages;
   }
@@ -127,11 +127,11 @@ public class PageModel {
   }
 
   /**
-   * Total number of elements.
+   * The total number of elements.
    * @return totalElements
   */
   
-  @Schema(name = "totalElements", description = "Total number of elements.", required = false)
+  @Schema(name = "totalElements", description = "The total number of elements.", required = false)
   public Integer getTotalElements() {
     return totalElements;
   }

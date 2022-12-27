@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -58,11 +59,11 @@ public class IntegrationControllerIntTest {
     public void testDeleteIntegration() {
         try {
             this.webTestClient
-                    .delete()
-                    .uri("/integrations/1")
-                    .exchange()
-                    .expectStatus()
-                    .isOk();
+                .delete()
+                .uri("/integrations/1")
+                .exchange()
+                .expectStatus()
+                .isOk();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -82,13 +83,13 @@ public class IntegrationControllerIntTest {
             when(integrationService.getIntegration(anyString())).thenReturn(integration);
 
             this.webTestClient
-                    .get()
-                    .uri("/integrations/1")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody(IntegrationModel.class);
+                .get()
+                .uri("/integrations/1")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(IntegrationModel.class);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -102,12 +103,12 @@ public class IntegrationControllerIntTest {
 
         try {
             this.webTestClient
-                    .get()
-                    .uri("/integrations")
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBodyList(IntegrationModel.class);
+                .get()
+                .uri("/integrations")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(IntegrationModel.class);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -117,30 +118,31 @@ public class IntegrationControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostIntegration() {
         Integration integration = getIntegration();
-        IntegrationModel integrationModel = new IntegrationModel().name("name").description("description");
+        IntegrationModel integrationModel = new IntegrationModel().name("name")
+            .description("description");
 
-        when(integrationFacade.add(any())).thenReturn(integration);
+        when(integrationFacade.initialize(any())).thenReturn(integration);
 
         try {
             assert integration.getId() != null;
             this.webTestClient
-                    .post()
-                    .uri("/integrations")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(integrationModel)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .jsonPath("$.description")
-                    .isEqualTo(integration.getDescription())
-                    .jsonPath("$.id")
-                    .isEqualTo(integration.getId())
-                    .jsonPath("$.name")
-                    .isEqualTo(integration.getName())
-                    .jsonPath("$.workflowIds[0]")
-                    .isEqualTo("workflow1");
+                .post()
+                .uri("/integrations")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(integrationModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.description")
+                .isEqualTo(integration.getDescription())
+                .jsonPath("$.id")
+                .isEqualTo(integration.getId())
+                .jsonPath("$.name")
+                .isEqualTo(integration.getName())
+                .jsonPath("$.workflowIds[0]")
+                .isEqualTo("workflow1");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -150,7 +152,8 @@ public class IntegrationControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPutIntegration() {
         Integration integration = getIntegration();
-        IntegrationModel integrationModel = new IntegrationModel().id("1").name("name");
+        IntegrationModel integrationModel = new IntegrationModel().id("1")
+            .name("name");
 
         integration.setName("name2");
 
@@ -158,23 +161,23 @@ public class IntegrationControllerIntTest {
 
         try {
             this.webTestClient
-                    .put()
-                    .uri("/integrations/1")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(integrationModel)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .jsonPath("$.id")
-                    .isEqualTo(integration.getId())
-                    .jsonPath("$.description")
-                    .isEqualTo(integration.getDescription())
-                    .jsonPath("$.name")
-                    .isEqualTo("name2")
-                    .jsonPath("$.workflowIds[0]")
-                    .isEqualTo("workflow1");
+                .put()
+                .uri("/integrations/1")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(integrationModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id")
+                .isEqualTo(integration.getId())
+                .jsonPath("$.description")
+                .isEqualTo(integration.getDescription())
+                .jsonPath("$.name")
+                .isEqualTo("name2")
+                .jsonPath("$.workflowIds[0]")
+                .isEqualTo("workflow1");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

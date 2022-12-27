@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -23,7 +24,8 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface TaskExecutionService {
-    TaskExecution add(TaskExecution taskExecution);
+
+    TaskExecution create(TaskExecution taskExecution);
 
     TaskExecution getTaskExecution(String id);
 

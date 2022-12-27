@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -20,7 +21,7 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
-import com.bytechef.atlas.workflow.WorkflowFormat;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -52,7 +53,9 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources(locationPattern);
 
-            return Arrays.stream(resources).map(this::read).collect(Collectors.toList());
+            return Arrays.stream(resources)
+                .map(this::read)
+                .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -64,7 +67,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
             String uri = resourceURI.toString();
             String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
 
-            return workflowMapper.readValue(new WorkflowResource(id, resource, WorkflowFormat.parse(uri)));
+            return workflowMapper.readValue(new WorkflowResource(id, resource, Workflow.Format.parse(uri)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -75,7 +78,8 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         List<Workflow> workflows = findAll();
 
         return workflows.stream()
-                .filter(workflow -> workflow.getId().equals(id))
-                .findFirst();
+            .filter(workflow -> workflow.getId()
+                .equals(id))
+            .findFirst();
     }
 }

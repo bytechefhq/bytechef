@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -33,7 +34,7 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -77,7 +78,7 @@ public class WorkerConfiguration {
     @Bean
     TaskHandlerResolver taskDispatcherAdapterTaskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
         return new TaskDispatcherAdapterTaskHandlerResolver(
-                taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolver, taskEvaluator);
+            taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolver, taskEvaluator);
     }
 
     @Bean
@@ -86,8 +87,8 @@ public class WorkerConfiguration {
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(List.of(
-                taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-                defaultTaskHandlerResolver(taskHandlers)));
+            taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
+            defaultTaskHandlerResolver(taskHandlers)));
 
         return taskHandlerResolverChain;
     }
@@ -95,10 +96,10 @@ public class WorkerConfiguration {
     @Bean
     Worker worker(TaskHandlerResolver taskHandlerResolver, MessageBroker messageBroker, EventPublisher eventPublisher) {
         return Worker.builder()
-                .withTaskHandlerResolver(taskHandlerResolver)
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(eventPublisher)
-                .withTaskEvaluator(taskEvaluator)
-                .build();
+            .withTaskHandlerResolver(taskHandlerResolver)
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(eventPublisher)
+            .withTaskEvaluator(taskEvaluator)
+            .build();
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -19,6 +20,7 @@ package com.bytechef.atlas.rsocket.client;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import java.util.List;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -36,42 +38,48 @@ public class WorkflowRSocketClient implements WorkflowService {
     }
 
     @Override
-    public Workflow add(Workflow workflow) {
+    public Workflow create(Workflow workflow, Workflow.ProviderType providerType) {
+        workflow.setProviderType(providerType);
+
         return rSocketRequester
-                .route("createWorkflow")
-                .data(workflow)
-                .retrieveMono(Workflow.class)
-                .block();
+            .route("createWorkflow")
+            .data(workflow)
+            .retrieveMono(Workflow.class)
+            .block();
     }
 
     @Override
     public void delete(String id) {
-        rSocketRequester.route("deleteWorkflow").data(id).send().block();
+        rSocketRequester.route("deleteWorkflow")
+            .data(id)
+            .send()
+            .block();
     }
 
     @Override
     public Workflow getWorkflow(String id) {
         return rSocketRequester
-                .route("getWorkflow")
-                .data(id)
-                .retrieveMono(Workflow.class)
-                .block();
+            .route("getWorkflow")
+            .data(id)
+            .retrieveMono(Workflow.class)
+            .block();
     }
 
     @Override
     public List<Workflow> getWorkflows() {
         return rSocketRequester
-                .route("getWorkflows")
-                .retrieveMono(new ParameterizedTypeReference<List<Workflow>>() {})
-                .block();
+            .route("getWorkflows")
+            .retrieveMono(new ParameterizedTypeReference<List<Workflow>>() {
+            })
+            .block();
     }
 
     @Override
     public Workflow update(Workflow workflow) {
         return rSocketRequester
-                .route("updateWorkflow")
-                .data(workflow)
-                .retrieveMono(Workflow.class)
-                .block();
+            .route("updateWorkflow")
+            .data(workflow)
+            .retrieveMono(Workflow.class)
+            .block();
     }
 }

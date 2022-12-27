@@ -7,20 +7,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * ConnectionUpdateModel
  */
 
 @JsonTypeName("ConnectionUpdate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:15:34.685557+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T15:12:27.587783+01:00[Europe/Zagreb]")
 public class ConnectionUpdateModel {
 
   @JsonProperty("name")

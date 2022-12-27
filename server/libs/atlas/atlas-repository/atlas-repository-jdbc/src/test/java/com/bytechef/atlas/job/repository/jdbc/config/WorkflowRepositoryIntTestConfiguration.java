@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,8 @@
 
 package com.bytechef.atlas.job.repository.jdbc.config;
 
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfig;
+import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -34,15 +36,26 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {"com.bytechef.atlas.repository.jdbc"})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.atlas.repository.jdbc"
+    })
 @EnableAutoConfiguration
-@Import({WorkflowRepositoryConfig.class})
+@Import({
+    WorkflowRepositoryConfiguration.class
+})
 @SpringBootConfiguration
 public class WorkflowRepositoryIntTestConfiguration {
 
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
     @EnableCaching
     @TestConfiguration
-    public static class CacheConfiguration {}
+    public static class CacheConfiguration {
+    }
 
     @EnableJdbcAuditing
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")

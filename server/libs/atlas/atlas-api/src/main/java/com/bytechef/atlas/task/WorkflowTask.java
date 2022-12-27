@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -19,36 +20,44 @@
 package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
-import com.bytechef.commons.collection.MapUtils;
-import java.beans.Transient;
+import com.bytechef.commons.utils.MapUtils;
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
+public class WorkflowTask implements Serializable, Task {
+
+    static {
+        MapUtils.addConverter(new Converter<Map, WorkflowTask>() {
+
+            @Override
+            public WorkflowTask convert(Map source) {
+                return new WorkflowTask(source);
+            }
+        });
+    }
 
     public static final WorkflowTask EMPTY_WORKFLOW_TASK = new WorkflowTask();
 
     private static final List<String> STATIC_FIELDS = List.of(
-            WorkflowConstants.FINALIZE,
-            WorkflowConstants.LABEL,
-            WorkflowConstants.NAME,
-            WorkflowConstants.NODE,
-            WorkflowConstants.POST,
-            WorkflowConstants.PRE,
-            WorkflowConstants.TASK_NUMBER,
-            WorkflowConstants.TIMEOUT,
-            WorkflowConstants.TYPE);
+        WorkflowConstants.FINALIZE,
+        WorkflowConstants.LABEL,
+        WorkflowConstants.NAME,
+        WorkflowConstants.NODE,
+        WorkflowConstants.POST,
+        WorkflowConstants.PRE,
+        WorkflowConstants.TASK_NUMBER,
+        WorkflowConstants.TIMEOUT,
+        WorkflowConstants.TYPE);
 
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
@@ -60,24 +69,27 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
     private String timeout;
     private String type;
 
-    public WorkflowTask() {}
+    public WorkflowTask() {
+    }
 
     public WorkflowTask(Map<String, Object> source) {
         Assert.notNull(source, "source cannot be null.");
 
-        this.finalize =
-                MapUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList()).stream()
-                        .map(WorkflowTask::new)
-                        .toList();
+        this.finalize = MapUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
         this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
         this.name = MapUtils.getString(source, WorkflowConstants.NAME);
         this.node = MapUtils.getString(source, WorkflowConstants.NODE);
-        this.post = MapUtils.getList(source, WorkflowConstants.POST, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
-        this.pre = MapUtils.getList(source, WorkflowConstants.PRE, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
+        this.post = MapUtils.getList(source, WorkflowConstants.POST, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
+        this.pre = MapUtils.getList(source, WorkflowConstants.PRE, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
         this.timeout = MapUtils.getString(source, WorkflowConstants.TIMEOUT);
         this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
 
@@ -128,14 +140,14 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
         WorkflowTask that = (WorkflowTask) o;
 
         return finalize.equals(that.finalize)
-                && Objects.equals(label, that.label)
-                && Objects.equals(name, that.name)
-                && Objects.equals(node, that.node)
-                && parameters.equals(that.parameters)
-                && post.equals(that.post)
-                && pre.equals(that.pre)
-                && Objects.equals(timeout, that.timeout)
-                && Objects.equals(type, that.type);
+            && Objects.equals(label, that.label)
+            && Objects.equals(name, that.name)
+            && Objects.equals(node, that.node)
+            && parameters.equals(that.parameters)
+            && post.equals(that.post)
+            && pre.equals(that.pre)
+            && Objects.equals(timeout, that.timeout)
+            && Objects.equals(type, that.type);
     }
 
     @Override
@@ -144,11 +156,11 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
     }
 
     /**
-     * The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it
-     * had failed or not.
+     * The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had
+     * failed or not.
      *
-     * @return the list of {@link WorkflowTask}s to execute after execution of this task -- regardless of whether it
-     * had failed or not. Never return a <code>null</code>
+     * @return the list of {@link WorkflowTask}s to execute after execution of this task -- regardless of whether it had
+     *         failed or not. Never return a <code>null</code>
      */
     public List<WorkflowTask> getFinalize() {
         return finalize;
@@ -164,8 +176,8 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
     }
 
     /**
-     * Get the identifier name of the task. Task names are used for assigning the output of one task so it can be
-     * later used by subsequent tasks.
+     * Get the identifier name of the task. Task names are used for assigning the output of one task so it can be later
+     * used by subsequent tasks.
      *
      * @return String
      */
@@ -192,7 +204,7 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
      * The (optional) list of tasks that are to be executed after the succesful execution of this task.
      *
      * @return the list of {@link WorkflowTask}s to execute after the succesful execution of this task. Never return a
-     * <code>null</code>
+     *         <code>null</code>
      */
     public List<WorkflowTask> getPost() {
         return post;
@@ -201,8 +213,8 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
     /**
      * The (optional) list of tasks that are to be executed prior to this task.
      *
-     * @return the list of {@link WorkflowTask}s to execute prior to the execution of this task.
-     *     Never return a <code>null</code>
+     * @return the list of {@link WorkflowTask}s to execute prior to the execution of this task. Never return a
+     *         <code>null</code>
      */
     public List<WorkflowTask> getPre() {
         return pre;
@@ -211,7 +223,8 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
     /**
      * Returns the timeout expression which describes when this task should be deemed as timed-out.
      *
-     * <p>The formats accepted are based on the ISO-8601 duration format with days considered to be exactly 24 hours.
+     * <p>
+     * The formats accepted are based on the ISO-8601 duration format with days considered to be exactly 24 hours.
      *
      * @return String
      */
@@ -224,30 +237,14 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
         return type;
     }
 
-    @Transient
-    public WorkflowTask getWorkflowTask(String key) {
-        if (!containsKey(key)) {
-            return null;
-        }
-
-        return new WorkflowTask(getMap(key));
-    }
-
-    public List<WorkflowTask> getWorkflowTasks(String key) {
-        return getList(key, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
-    }
-
-    // WorkflowTaskParameter
-
-    @Override
-    public Map<String, Object> asMap() {
+    public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>(parameters);
 
         map.put(
-                WorkflowConstants.FINALIZE,
-                finalize.stream().map(WorkflowTask::asMap).toList());
+            WorkflowConstants.FINALIZE,
+            finalize.stream()
+                .map(WorkflowTask::toMap)
+                .toList());
 
         if (label != null) {
             map.put(WorkflowConstants.LABEL, label);
@@ -261,8 +258,12 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
             map.put(WorkflowConstants.NODE, node);
         }
 
-        map.put(WorkflowConstants.POST, post.stream().map(WorkflowTask::asMap).toList());
-        map.put(WorkflowConstants.PRE, pre.stream().map(WorkflowTask::asMap).toList());
+        map.put(WorkflowConstants.POST, post.stream()
+            .map(WorkflowTask::toMap)
+            .toList());
+        map.put(WorkflowConstants.PRE, pre.stream()
+            .map(WorkflowTask::toMap)
+            .toList());
 
         if (timeout != null) {
             map.put(WorkflowConstants.TIMEOUT, timeout);
@@ -274,155 +275,16 @@ public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
     }
 
     @Override
-    public boolean containsKey(String key) {
-        return parameters.containsKey(key);
-    }
-
-    @Override
-    public Object get(String key) {
-        return parameters.get(key);
-    }
-
-    @Override
-    public <T> T get(String key, Class<T> returnType) {
-        return MapUtils.get(parameters, key, returnType);
-    }
-
-    @Override
-    public <T> T get(String key, Class<T> returnType, T defaultValue) {
-        return MapUtils.get(parameters, key, returnType, defaultValue);
-    }
-
-    @Override
-    public <T> T[] getArray(String key, Class<T> elementType) {
-        return MapUtils.getArray(parameters, key, elementType);
-    }
-
-    @Override
-    public Boolean getBoolean(String key) {
-        return MapUtils.getBoolean(parameters, key);
-    }
-
-    @Override
-    public boolean getBoolean(String key, boolean defaultValue) {
-        return MapUtils.getBoolean(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Date getDate(String key) {
-        return MapUtils.getDate(parameters, key);
-    }
-
-    @Override
-    public Double getDouble(String key) {
-        return MapUtils.getDouble(parameters, key);
-    }
-
-    @Override
-    public Double getDouble(String key, double defaultValue) {
-        return MapUtils.getDouble(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Duration getDuration(String key) {
-        return MapUtils.getDuration(parameters, key);
-    }
-
-    @Override
-    public Duration getDuration(String key, String defaultDuration) {
-        return MapUtils.getDuration(parameters, key, defaultDuration);
-    }
-
-    @Override
-    public Float getFloat(String key) {
-        return MapUtils.getFloat(parameters, key);
-    }
-
-    @Override
-    public float getFloat(String key, float defaultValue) {
-        return MapUtils.getFloat(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Integer getInteger(String key) {
-        return MapUtils.getInteger(parameters, key);
-    }
-
-    @Override
-    public int getInteger(String key, int defaultValue) {
-        return MapUtils.getInteger(parameters, key, defaultValue);
-    }
-
-    @Override
-    public <T> List<T> getList(String key, Class<T> elementType) {
-        return MapUtils.getList(parameters, key, elementType);
-    }
-
-    @Override
-    public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-        return MapUtils.getList(parameters, key, elementType, defaultValue);
-    }
-
-    @Override
-    public Long getLong(String key) {
-        return MapUtils.getLong(parameters, key);
-    }
-
-    @Override
-    public long getLong(String key, long defaultValue) {
-        return MapUtils.getLong(parameters, key, defaultValue);
-    }
-
-    @Override
-    public Map<String, Object> getMap(String key) {
-        return MapUtils.getMap(parameters, key);
-    }
-
-    @Override
-    public Map<String, Object> getMap(String key, Map<String, Object> defaultValue) {
-        return MapUtils.getMap(parameters, key, defaultValue);
-    }
-
-    @Override
-    public String getRequiredString(String key) {
-        return MapUtils.getRequiredString(parameters, key);
-    }
-
-    @Override
-    public <T> T getRequired(String key) {
-        return MapUtils.getRequired(parameters, key);
-    }
-
-    @Override
-    public <T> T getRequired(String key, Class<T> returnType) {
-        return MapUtils.getRequired(parameters, key, returnType);
-    }
-
-    @Override
-    public String getString(String key) {
-        return MapUtils.getString(parameters, key);
-    }
-
-    @Override
-    public String getString(String key, String defaultValue) {
-        return MapUtils.getString(parameters, key, defaultValue);
-    }
-
-    public void put(String key, Object value) {
-        parameters.put(key, value);
-    }
-
-    @Override
     public String toString() {
         return "WorkflowTask{" + "finalize="
-                + finalize + ", label='"
-                + label + '\'' + ", name='"
-                + name + '\'' + ", node='"
-                + node + '\'' + ", post="
-                + post + ", pre="
-                + pre + ", timeout='"
-                + timeout + '\'' + ", type='"
-                + type + '\'' + ", parameters='"
-                + parameters + '\'' + '}';
+            + finalize + ", label='"
+            + label + '\'' + ", name='"
+            + name + '\'' + ", node='"
+            + node + '\'' + ", post="
+            + post + ", pre="
+            + pre + ", timeout='"
+            + timeout + '\'' + ", type='"
+            + type + '\'' + ", parameters='"
+            + parameters + '\'' + '}';
     }
 }

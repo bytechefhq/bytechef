@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -21,7 +22,6 @@ import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.StreamSupport;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,32 +54,28 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Connection> fetchConnection(String id) {
-        return connectionRepository.findById(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Connection getConnection(String id) {
-        return connectionRepository.findById(id).orElseThrow();
+        return connectionRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections() {
-        return StreamSupport.stream(connectionRepository.findAll().spliterator(), false)
-                .toList();
+        return StreamSupport.stream(connectionRepository.findAll()
+            .spliterator(), false)
+            .toList();
     }
 
     @Override
     public Connection update(String id, String name) {
         return connectionRepository
-                .findById(id)
-                .map(connection -> {
-                    connection.setLabel(name);
+            .findById(id)
+            .map(connection -> {
+                connection.setName(name);
 
-                    return connectionRepository.save(connection);
-                })
-                .orElseThrow();
+                return connectionRepository.save(connection);
+            })
+            .orElseThrow();
     }
 }

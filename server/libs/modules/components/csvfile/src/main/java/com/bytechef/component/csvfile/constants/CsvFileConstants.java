@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,10 +26,12 @@ public class CsvFileConstants {
     public static final String DELIMITER = "delimiter";
     public static final String HEADER_ROW = "headerRow";
     public static final String PAGE_SIZE = "pageSize";
-    public static final String AGE_NUMBER = "pageNumber";
+    public static final String PAGE_NUMBER = "pageNumber";
     public static final String READ_AS_STRING = "readAsString";
     public static final String INCLUDE_EMPTY_CELLS = "includeEmptyCells";
     public static final String CSV_FILE = "csvFile";
     public static final String READ = "read";
     public static final String WRITE = "write";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILENAME = "filename";
 }

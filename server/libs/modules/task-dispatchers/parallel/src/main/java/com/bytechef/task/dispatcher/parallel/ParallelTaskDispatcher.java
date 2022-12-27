@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,8 +19,9 @@
 
 package com.bytechef.task.dispatcher.parallel;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
+import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.TASKS;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -32,9 +34,11 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
@@ -54,11 +58,11 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskExecutionService taskExecutionService;
 
     public ParallelTaskDispatcher(
-            ContextService contextService,
-            CounterService counterService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        CounterService counterService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
@@ -68,7 +72,11 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks = taskExecution.getWorkflowTasks(ParallelTaskDispatcherConstants.TASKS);
+        List<WorkflowTask> workflowTasks = MapUtils
+            .getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 
@@ -76,12 +84,12 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             counterService.set(taskExecution.getId(), workflowTasks.size());
 
             for (WorkflowTask workflowTask : workflowTasks) {
-                TaskExecution parallelTaskExecution = TaskExecution.of(
-                        workflowTask, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority());
+                TaskExecution parallelTaskExecution = new TaskExecution(
+                    workflowTask, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority());
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
-                TaskExecution evaluatedTaskExecution = taskExecutionService.add(parallelTaskExecution);
+                TaskExecution evaluatedTaskExecution = taskExecutionService.create(parallelTaskExecution);
 
                 contextService.push(evaluatedTaskExecution.getId(), context);
                 taskDispatcher.dispatch(evaluatedTaskExecution);
@@ -99,7 +107,8 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(PARALLEL + "/v" + VERSION_1)) {
+        if (aTask.getType()
+            .equals(PARALLEL + "/v" + VERSION_1)) {
             return this;
         }
         return null;

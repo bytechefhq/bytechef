@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -19,7 +20,6 @@
 package com.bytechef.atlas.repository.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
@@ -29,16 +29,16 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  */
 public class YamlWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
 
-    private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
 
     public Workflow readValue(WorkflowResource workflowResource) {
-        return readValue(workflowResource, mapper);
+        return readValue(workflowResource, OBJECT_MAPPER);
     }
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getWorkflowFormat() == WorkflowFormat.YML
-                        || workflowResource.getWorkflowFormat() == WorkflowFormat.YAML
+        return workflowResource.getWorkflowFormat() == Workflow.Format.YML
+            || workflowResource.getWorkflowFormat() == Workflow.Format.YAML
                 ? this
                 : null;
     }

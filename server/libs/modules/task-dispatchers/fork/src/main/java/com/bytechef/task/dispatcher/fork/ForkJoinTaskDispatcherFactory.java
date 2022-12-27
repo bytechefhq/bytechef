@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,10 +17,10 @@
 
 package com.bytechef.task.dispatcher.fork;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
@@ -33,15 +34,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ForkJoinTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(FORK_JOIN)
-            .display(
-                    display("Fork/Join")
-                            .description(
-                                    "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence."))
-            .taskProperties(array(BRANCHES)
-                    .description("The list of sequences of tasks to execute in parallel.")
-                    .items(array().description("The list of tasks that executes sequentially.")
-                            .items(task())));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(FORK_JOIN)
+        .display(
+            display("Fork/Join")
+                .description(
+                    "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence."))
+        .taskProperties(array(BRANCHES)
+            .description("The list of sequences of tasks to execute in parallel.")
+            .items(array().description("The list of tasks that executes sequentially.")
+                .items(task())));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

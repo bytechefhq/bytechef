@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.loop.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_VAR;
@@ -34,7 +35,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.date.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -51,11 +52,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskCompletionHandler taskCompletionHandler;
 
     public LoopTaskCompletionHandler(
-            ContextService contextService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -70,7 +71,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(LOOP + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(LOOP + "/v" + VERSION_1);
         }
 
         return false;
@@ -84,40 +86,44 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecutionService.update(completedSubTaskExecution);
 
-        TaskExecution loopTaskExecution =
-                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution loopTaskExecution = new TaskExecution(
+            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
-        boolean loopForever = loopTaskExecution.getBoolean(LOOP_FOREVER, false);
-        WorkflowTask iterateeWorkflowTask = loopTaskExecution.getWorkflowTask(ITERATEE);
-        List<Object> list = loopTaskExecution.getList(LIST, Object.class, Collections.emptyList());
+        boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
+        WorkflowTask iterateeWorkflowTask = new WorkflowTask(
+            MapUtils.getMap(loopTaskExecution.getParameters(), ITERATEE));
+        List<Object> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Object.class,
+            Collections.emptyList());
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
-            TaskExecution subTaskExecution = TaskExecution.of(
-                    iterateeWorkflowTask,
-                    loopTaskExecution.getJobId(),
-                    loopTaskExecution.getId(),
-                    loopTaskExecution.getPriority(),
-                    taskExecution.getTaskNumber() + 1);
+            TaskExecution subTaskExecution = new TaskExecution(
+                iterateeWorkflowTask,
+                loopTaskExecution.getJobId(),
+                loopTaskExecution.getId(),
+                loopTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1);
 
             Context context = new Context(contextService.peek(loopTaskExecution.getId()));
 
             if (!list.isEmpty()) {
-                context.put(loopTaskExecution.getString(ITEM_VAR, ITEM), list.get(taskExecution.getTaskNumber()));
+                context.put(
+                    MapUtils.getString(loopTaskExecution.getParameters(), ITEM_VAR, ITEM),
+                    list.get(taskExecution.getTaskNumber()));
             }
 
-            context.put(loopTaskExecution.getString(ITEM_INDEX, ITEM_INDEX), taskExecution.getTaskNumber());
+            context.put(
+                MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
+                taskExecution.getTaskNumber());
 
             contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
             loopTaskExecution.setEndTime(LocalDateTime.now());
-            loopTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(loopTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(loopTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(loopTaskExecution);
         }

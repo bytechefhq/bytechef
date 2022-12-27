@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -22,19 +23,17 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
-import com.bytechef.commons.collection.MapUtils;
-import com.bytechef.commons.xml.XmlUtils;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.hermes.component.utils.XmlUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
@@ -53,58 +52,59 @@ public class XmlFileComponentHandlerIntTest {
         File sampleFile = getFile("sample.xml");
 
         Job job = workflowExecutor.execute(
-                "xmlfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getAbsolutePath(),
-                                        Files.contentOf(sampleFile, Charset.defaultCharset()))
-                                .toMap()));
+            "xmlfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getAbsolutePath(),
+                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-                .isEqualTo(XmlUtils.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class));
+            .isEqualTo(XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class));
     }
 
     @Test
     public void testWrite() throws IOException {
         Job job = workflowExecutor.execute(
-                "xmlfile_v1_write",
-                Map.of(
-                        "source",
-                        XmlUtils.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)));
+            "xmlfile_v1_write",
+            Map.of(
+                "source",
+                XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class)));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat(MapUtils.getMapKey(outputs, "writeXMLFile", WorkflowConstants.NAME))
-                .isEqualTo("file.xml");
+        assertThat(((Map) outputs.get("writeXMLFile")).get(WorkflowConstants.NAME))
+            .isEqualTo("file.xml");
 
         File sampleFile = getFile("sample.xml");
 
         job = workflowExecutor.execute(
-                "xmlfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))
-                                .toMap()));
+            "xmlfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-                .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, Charset.defaultCharset()), List.class));
+            .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, StandardCharsets.UTF_8), List.class));
     }
 
-    private File getFile(String fileName) throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/" + fileName);
-
-        return classPathResource.getFile();
+    private File getFile(String filename) {
+        return new File(XmlFileComponentHandlerIntTest.class
+            .getClassLoader()
+            .getResource("dependencies/" + filename)
+            .getFile());
     }
 }

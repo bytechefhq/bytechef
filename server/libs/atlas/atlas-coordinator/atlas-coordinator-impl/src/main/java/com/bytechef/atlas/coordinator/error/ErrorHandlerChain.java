@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -54,7 +55,8 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
                 return;
             }
 
-            if (method.getParameters()[0].getType().isAssignableFrom(errorable.getClass())) {
+            if (method.getParameters()[0].getType()
+                .isAssignableFrom(errorable.getClass())) {
                 handler.handle(errorable);
             }
         }

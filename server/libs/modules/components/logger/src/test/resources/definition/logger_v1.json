@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "Logs a value to the system log.",
-    "label": "Logger"
-  },
-  "name": "logger",
   "actions": [
     {
       "display": {
@@ -13,7 +8,7 @@
       "properties": [
         {
           "name": "text",
-          "type": "ANY"
+          "type": "STRING"
         }
       ]
     },
@@ -25,7 +20,7 @@
       "properties": [
         {
           "name": "text",
-          "type": "ANY"
+          "type": "STRING"
         }
       ]
     },
@@ -37,7 +32,7 @@
       "properties": [
         {
           "name": "text",
-          "type": "ANY"
+          "type": "STRING"
         }
       ]
     },
@@ -49,10 +44,15 @@
       "properties": [
         {
           "name": "text",
-          "type": "ANY"
+          "type": "STRING"
         }
       ]
     }
   ],
+  "display": {
+    "description": "Logs a value to the system log.",
+    "label": "Logger"
+  },
+  "name": "logger",
   "version": 1
 }

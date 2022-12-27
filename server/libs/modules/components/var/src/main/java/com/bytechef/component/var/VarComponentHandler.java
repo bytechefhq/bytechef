@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,10 +17,10 @@
 
 package com.bytechef.component.var;
 
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -35,15 +36,15 @@ public class VarComponentHandler implements ComponentHandler {
     private static final String SET = "set";
     private static final String VALUE = "value";
 
-    private final ComponentDefinition componentDefinition = createComponent(VAR)
-            .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
-            .actions(action(SET)
-                    .display(display("Set value"))
-                    .properties(any(VALUE)
-                            .label("Value")
-                            .description("Value of any type to set.")
-                            .required(true))
-                    .performFunction(this::performSetValue));
+    private final ComponentDefinition componentDefinition = component(VAR)
+        .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
+        .actions(action(SET)
+            .display(display("Set value"))
+            .properties(oneOf(VALUE)
+                .label("Value")
+                .description("Value of any type to set.")
+                .required(true))
+            .perform(this::performSetValue));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -51,6 +52,6 @@ public class VarComponentHandler implements ComponentHandler {
     }
 
     protected Object performSetValue(Context context, ExecutionParameters executionParameters) {
-        return executionParameters.getObject(VALUE);
+        return executionParameters.get(VALUE);
     }
 }

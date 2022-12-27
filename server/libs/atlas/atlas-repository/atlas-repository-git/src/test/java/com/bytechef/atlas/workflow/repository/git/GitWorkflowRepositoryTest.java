@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -23,7 +24,7 @@ import com.bytechef.atlas.repository.git.GitWorkflowRepository;
 import com.bytechef.atlas.repository.git.workflow.GitWorkflowOperations;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
-import com.bytechef.atlas.workflow.WorkflowFormat;
+
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,12 +39,14 @@ public class GitWorkflowRepositoryTest {
 
     @Test
     public void test1() {
-        GitWorkflowRepository workflowRepository =
-                new GitWorkflowRepository(new DummyGitWorkflowOperations(), new YamlWorkflowMapper());
+        GitWorkflowRepository workflowRepository = new GitWorkflowRepository(new DummyGitWorkflowOperations(),
+            new YamlWorkflowMapper());
 
         Iterable<Workflow> findAll = workflowRepository.findAll();
 
-        Assertions.assertEquals("hello/123", findAll.iterator().next().getId());
+        Assertions.assertEquals("hello/123", findAll.iterator()
+            .next()
+            .getId());
     }
 
     private static class DummyGitWorkflowOperations implements GitWorkflowOperations {
@@ -53,13 +56,13 @@ public class GitWorkflowRepositoryTest {
         @Override
         public List<WorkflowResource> getHeadFiles() {
             return List.of(new WorkflowResource(
-                    "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML));
+                "hello/123", resolver.getResource("file:workflow/hello.yaml"), Workflow.Format.YAML));
         }
 
         @Override
         public WorkflowResource getFile(String aFileId) {
             return new WorkflowResource(
-                    "hello/123", resolver.getResource("file:workflow/hello.yaml"), WorkflowFormat.YAML);
+                "hello/123", resolver.getResource("file:workflow/hello.yaml"), Workflow.Format.YAML);
         }
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -34,7 +35,7 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,13 +60,13 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final WorkflowService workflowService;
 
     public DefaultTaskCompletionHandler(
-            ContextService contextService,
-            EventPublisher eventPublisher,
-            JobExecutor jobExecutor,
-            JobService jobService,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService,
-            WorkflowService workflowService) {
+        ContextService contextService,
+        EventPublisher eventPublisher,
+        JobExecutor jobExecutor,
+        JobService jobService,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService,
+        WorkflowService workflowService) {
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
@@ -126,18 +127,19 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         for (Map<String, Object> output : workflow.getOutputs()) {
             source.put(
-                    MapUtils.getRequiredString(output, WorkflowConstants.NAME),
-                    MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
+                MapUtils.getRequiredString(output, WorkflowConstants.NAME),
+                MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
         }
 
-        TaskExecution evaluatedJobTaskExecution =
-                taskEvaluator.evaluate(TaskExecution.of(new WorkflowTask(source)), context);
+        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
+            new TaskExecution(new WorkflowTask(source)), context);
         Job updateJob = new Job(job);
 
         updateJob.setStatus(JobStatus.COMPLETED);
         updateJob.setEndTime(new Date());
         updateJob.setCurrentTask(-1);
-        updateJob.setOutputs(evaluatedJobTaskExecution.getWorkflowTaskParameters());
+
+        updateJob.setOutputs(evaluatedTaskExecution.getParameters());
 
         jobService.update(updateJob);
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), updateJob.getStatus()));
@@ -148,6 +150,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private boolean hasMoreTasks(Job job) {
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        return job.getCurrentTask() + 1 < workflow.getTasks().size();
+        return job.getCurrentTask() + 1 < workflow.getTasks()
+            .size();
     }
 }

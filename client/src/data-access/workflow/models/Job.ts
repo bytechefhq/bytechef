@@ -27,13 +27,13 @@ import {
  */
 export interface Job {
     /**
-     * Created by.
+     * The created by.
      * @type {string}
      * @memberof Job
      */
     readonly createdBy?: string;
     /**
-     * Created date.
+     * The created date.
      * @type {Date}
      * @memberof Job
      */
@@ -63,7 +63,7 @@ export interface Job {
      */
     readonly id?: string;
     /**
-     * The key-value map of inputs passed to the job when it was created.
+     * The key-value map of the inputs passed to the job when it was created.
      * @type {{ [key: string]: object; }}
      * @memberof Job
      */
@@ -75,19 +75,19 @@ export interface Job {
      */
     label?: string;
     /**
-     * Last modified by.
+     * The last modified by.
      * @type {string}
      * @memberof Job
      */
     readonly lastModifiedBy?: string;
     /**
-     * Last modified date.
+     * The last modified date.
      * @type {Date}
      * @memberof Job
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The key-value map of outputs returned.
+     * The key-value map of the outputs returned.
      * @type {{ [key: string]: object; }}
      * @memberof Job
      */
@@ -103,21 +103,21 @@ export interface Job {
      * @type {number}
      * @memberof Job
      */
-    priority?: number;
+    priority: number;
     /**
      * The time of when the job began.
      * @type {Date}
      * @memberof Job
      */
-    startTime?: Date;
+    startTime: Date;
     /**
      * The job's status.
      * @type {string}
      * @memberof Job
      */
-    status?: JobStatusEnum;
+    status: JobStatusEnum;
     /**
-     * The list of webhooks configured.
+     * The list of the webhooks configured.
      * @type {Array<{ [key: string]: object; }>}
      * @memberof Job
      */
@@ -149,6 +149,9 @@ export type JobStatusEnum = typeof JobStatusEnum[keyof typeof JobStatusEnum];
  */
 export function instanceOfJob(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "priority" in value;
+    isInstance = isInstance && "startTime" in value;
+    isInstance = isInstance && "status" in value;
 
     return isInstance;
 }
@@ -175,9 +178,9 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
         'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
-        'priority': !exists(json, 'priority') ? undefined : json['priority'],
-        'startTime': !exists(json, 'startTime') ? undefined : (new Date(json['startTime'])),
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'priority': json['priority'],
+        'startTime': (new Date(json['startTime'])),
+        'status': json['status'],
         'webhooks': !exists(json, 'webhooks') ? undefined : json['webhooks'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
     };
@@ -200,7 +203,7 @@ export function JobToJSON(value?: Job | null): any {
         'outputs': value.outputs,
         'parentTaskExecutionId': value.parentTaskExecutionId,
         'priority': value.priority,
-        'startTime': value.startTime === undefined ? undefined : (value.startTime.toISOString()),
+        'startTime': (value.startTime.toISOString()),
         'status': value.status,
         'webhooks': value.webhooks,
         'workflowId': value.workflowId,

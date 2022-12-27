@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,6 @@
 package com.bytechef.atlas.repository.jdbc.converter;
 
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.commons.json.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
@@ -38,6 +38,14 @@ public class ExecutionErrorToStringConverter implements Converter<ExecutionError
 
     @Override
     public String convert(ExecutionError source) {
-        return JsonUtils.write(objectMapper, source);
+        return write(objectMapper, source);
+    }
+
+    private String write(ObjectMapper objectMapper, Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

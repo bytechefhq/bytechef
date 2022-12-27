@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,8 +17,8 @@
 
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.web.rest.config.TaskDispatcherDefinitionRestTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +39,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 public class TaskDispatcherDefinitionControllerIntTest {
 
     private static final List<TaskDispatcherFactory> TASK_DISPATCHER_FACTORIES = List.of(
-            () -> TaskDispatcherDSL.create("task-dispatcher1"), () -> TaskDispatcherDSL.create("task-dispatcher2"));
+        () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher1"),
+        () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher2"));
 
     @Autowired
     private WebTestClient webTestClient;
@@ -47,26 +49,26 @@ public class TaskDispatcherDefinitionControllerIntTest {
     public void testGetTaskDispatcherDefinitions() {
         try {
             webTestClient
-                    .get()
-                    .uri("/definitions/task-dispatchers")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .json(
-                            """
-                            [
-                                {
-                                    "name":"task-dispatcher1",
-                                    "version":1.0
-                                },
-                                {
-                                    "name":"task-dispatcher2",
-                                    "version":1.0
-                                }
-                            ]
-                            """);
+                .get()
+                .uri("/definitions/task-dispatchers")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json(
+                    """
+                        [
+                            {
+                                "name":"task-dispatcher1",
+                                "version":1.0
+                            },
+                            {
+                                "name":"task-dispatcher2",
+                                "version":1.0
+                            }
+                        ]
+                        """);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

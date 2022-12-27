@@ -19,12 +19,6 @@ import {
     DisplayOptionFromJSONTyped,
     DisplayOptionToJSON,
 } from './DisplayOption';
-import type { PropertyOptionValue } from './PropertyOptionValue';
-import {
-    PropertyOptionValueFromJSON,
-    PropertyOptionValueFromJSONTyped,
-    PropertyOptionValueToJSON,
-} from './PropertyOptionValue';
 
 /**
  * Defines valid property value.
@@ -51,11 +45,11 @@ export interface PropertyOption {
      */
     name?: string;
     /**
-     * 
-     * @type {PropertyOptionValue}
+     * Value of the option.
+     * @type {object}
      * @memberof PropertyOption
      */
-    value?: PropertyOptionValue;
+    value?: object;
 }
 
 /**
@@ -80,7 +74,7 @@ export function PropertyOptionFromJSONTyped(json: any, ignoreDiscriminator: bool
         'description': !exists(json, 'description') ? undefined : json['description'],
         'displayOption': !exists(json, 'displayOption') ? undefined : DisplayOptionFromJSON(json['displayOption']),
         'name': !exists(json, 'name') ? undefined : json['name'],
-        'value': !exists(json, 'value') ? undefined : PropertyOptionValueFromJSON(json['value']),
+        'value': !exists(json, 'value') ? undefined : json['value'],
     };
 }
 
@@ -96,7 +90,7 @@ export function PropertyOptionToJSON(value?: PropertyOption | null): any {
         'description': value.description,
         'displayOption': DisplayOptionToJSON(value.displayOption),
         'name': value.name,
-        'value': PropertyOptionValueToJSON(value.value),
+        'value': value.value,
     };
 }
 

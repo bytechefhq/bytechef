@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -22,8 +23,7 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.workflow.WorkflowFormat;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -31,6 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -52,6 +54,24 @@ import org.springframework.util.Assert;
 @Table
 public final class Workflow implements Errorable, Persistable<String>, Serializable {
 
+    public enum Format {
+        JSON,
+        YML,
+        YAML;
+
+        public static Format parse(String fileName) {
+            Assert.notNull(fileName, "Filename %s can not be null".formatted(fileName));
+
+            String extension = FilenameUtils.getExtension(fileName);
+
+            return Objects.equals(extension.toLowerCase(), "json") ? JSON : YAML;
+        }
+    }
+
+    public enum ProviderType {
+        CLASSPATH, FILESYSTEM, GIT, JDBC
+    }
+
     @Column
     private String definition;
 
@@ -67,7 +87,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private ExecutionError error;
 
     @Column
-    private WorkflowFormat format;
+    private Format format;
 
     @Id
     private String id;
@@ -90,10 +110,13 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private List<Map<String, Object>> outputs;
 
     @Transient
-    private List<WorkflowTask> tasks;
+    private ProviderType providerType;
 
     @Transient
     private int retry;
+
+    @Transient
+    private List<WorkflowTask> tasks;
 
     // TODO Add version
     // @Version
@@ -109,14 +132,17 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
         id = MapUtils.getString(source, WorkflowConstants.ID);
         inputs = MapUtils.getList(
-                source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {
+            }, Collections.emptyList());
         label = MapUtils.getString(source, WorkflowConstants.LABEL);
         outputs = MapUtils.getList(
-                source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {
+            }, Collections.emptyList());
         retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, 0);
-        tasks = MapUtils.getList(source, WorkflowConstants.TASKS, Map.class).stream()
-                .map(WorkflowTask::new)
-                .toList();
+        tasks = MapUtils.getList(source, WorkflowConstants.TASKS, Map.class)
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
     }
 
     @Override
@@ -156,7 +182,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return error;
     }
 
-    public WorkflowFormat getFormat() {
+    public Format getFormat() {
         return format;
     }
 
@@ -186,6 +212,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     /** Returns the workflow's expected outputs */
     public List<Map<String, Object>> getOutputs() {
         return Collections.unmodifiableList(outputs);
+    }
+
+    public ProviderType getProviderType() {
+        return providerType;
     }
 
     /**
@@ -223,7 +253,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.error = error;
     }
 
-    public void setFormat(WorkflowFormat format) {
+    public void setFormat(Format format) {
         this.format = format;
     }
 
@@ -239,21 +269,25 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    public void setProviderType(ProviderType providerType) {
+        this.providerType = providerType;
+    }
+
     @Override
     public String toString() {
         return "Workflow{" + "content='"
-                + definition + '\'' + ", createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", error="
-                + error + ", format="
-                + format + ", id='"
-                + id + '\'' + ", inputs="
-                + inputs + ", label='"
-                + label + '\'' + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", outputs="
-                + outputs + ", tasks="
-                + tasks + ", retry="
-                + retry + '}';
+            + definition + '\'' + ", createdBy='"
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", error="
+            + error + ", format="
+            + format + ", id='"
+            + id + '\'' + ", inputs="
+            + inputs + ", label='"
+            + label + '\'' + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", outputs="
+            + outputs + ", tasks="
+            + tasks + ", retry="
+            + retry + '}';
     }
 }

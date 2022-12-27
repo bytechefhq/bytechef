@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.JobService;
@@ -28,7 +29,7 @@ import com.bytechef.atlas.web.rest.model.JobParametersModel;
 import com.bytechef.atlas.web.rest.model.PostJob200ResponseModel;
 import com.bytechef.atlas.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -55,10 +56,10 @@ public class JobController implements JobsApi {
 
     @SuppressFBWarnings("EI2")
     public JobController(
-            ConversionService conversionService,
-            JobService jobService,
-            MessageBroker messageBroker,
-            TaskExecutionService taskExecutionService) {
+        ConversionService conversionService,
+        JobService jobService,
+        MessageBroker messageBroker,
+        TaskExecutionService taskExecutionService) {
         this.conversionService = conversionService;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
@@ -72,37 +73,40 @@ public class JobController implements JobsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
-            String jobId, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId).stream()
-                .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
-                .toList())));
+        String jobId, ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId)
+            .stream()
+            .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
+            .toList())));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Mono<ResponseEntity<Page>> getJobs(Integer pageNumber, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-                jobService.getJobs(pageNumber).map(job -> conversionService.convert(job, JobModel.class))));
+            jobService.getJobs(pageNumber)
+                .map(job -> conversionService.convert(job, JobModel.class))));
     }
 
     @Override
     public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-                conversionService.convert(jobService.fetchLatestJob().orElse(null), JobModel.class)));
+            conversionService.convert(jobService.fetchLatestJob()
+                .orElse(null), JobModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<PostJob200ResponseModel>> postJob(
-            Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
+        Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
         return workflowParametersModelMono.map(workflowParametersModel -> {
-            JobParametersDTO jobParametersDTO =
-                    conversionService.convert(workflowParametersModel, JobParametersDTO.class);
+            JobParameters jobParameters = conversionService.convert(workflowParametersModel,
+                JobParameters.class);
 
-            String id = UUIDGenerator.generate();
+            String id = UUIDUtils.generate();
 
-            jobParametersDTO.setJobId(id);
+            jobParameters.setJobId(id);
 
-            messageBroker.send(Queues.REQUESTS, jobParametersDTO);
+            messageBroker.send(Queues.REQUESTS, jobParameters);
 
             return ResponseEntity.ok(new PostJob200ResponseModel().jobId(id));
         });

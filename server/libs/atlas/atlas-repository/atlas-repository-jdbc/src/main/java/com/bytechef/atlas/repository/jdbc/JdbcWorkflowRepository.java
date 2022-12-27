@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,6 +18,7 @@
 package com.bytechef.atlas.repository.jdbc;
 
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
@@ -29,10 +31,16 @@ import org.springframework.stereotype.Repository;
 @Order(5)
 @Repository
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "workflow-repository.jdbc.enabled", havingValue = "true")
-public interface JdbcWorkflowRepository extends PagingAndSortingRepository<Workflow, String>, WorkflowRepository {
+public interface JdbcWorkflowRepository
+    extends PagingAndSortingRepository<Workflow, String>, WorkflowRepository, WorkflowCrudRepository {
 
     @Override
     void deleteById(String id);
+
+    @Override
+    default Workflow.ProviderType getProviderType() {
+        return Workflow.ProviderType.JDBC;
+    }
 
     @Override
     Workflow save(Workflow workflow);

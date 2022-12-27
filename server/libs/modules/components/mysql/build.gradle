@@ -1,7 +1,7 @@
 version="1.0"
 
 dependencies {
-    runtimeOnly "mysql:mysql-connector-java:8.0.29"
+    runtimeOnly "mysql:mysql-connector-java:8.0.31"
 
-    testImplementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-jdbc")
+    testImplementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
 }

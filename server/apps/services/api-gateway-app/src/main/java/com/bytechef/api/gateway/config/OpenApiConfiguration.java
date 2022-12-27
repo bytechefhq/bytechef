@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -18,8 +19,8 @@ package com.bytechef.api.gateway.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.SwaggerUiConfigParameters;
+import org.springdoc.core.models.GroupedOpenApi;
+import org.springdoc.core.properties.SwaggerUiConfigParameters;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
 import org.springframework.context.annotation.Bean;
@@ -35,22 +36,29 @@ public class OpenApiConfiguration {
     @SuppressWarnings("PMD.NP")
     @SuppressFBWarnings("NP")
     public List<GroupedOpenApi> apis(
-            SwaggerUiConfigParameters swaggerUiConfigParameters, RouteDefinitionLocator locator) {
-        List<RouteDefinition> definitions =
-                locator.getRouteDefinitions().collectList().block();
+        SwaggerUiConfigParameters swaggerUiConfigParameters, RouteDefinitionLocator locator) {
+        List<RouteDefinition> definitions = locator.getRouteDefinitions()
+            .collectList()
+            .block();
 
         return definitions.stream()
-                .filter(routeDefinition -> routeDefinition.getId().matches(".*-service"))
-                .map(routeDefinition -> {
-                    String name = routeDefinition.getId().replaceAll("-service", "");
+            .filter(routeDefinition -> {
+                String id = routeDefinition.getId();
 
-                    swaggerUiConfigParameters.addGroup(name);
+                return id.matches(".*-service");
+            })
+            .map(routeDefinition -> {
+                String id = routeDefinition.getId();
 
-                    return GroupedOpenApi.builder()
-                            .pathsToMatch("/" + name + "/**")
-                            .group(name)
-                            .build();
-                })
-                .toList();
+                String name = id.replaceAll("-service", "");
+
+                swaggerUiConfigParameters.addGroup(name);
+
+                return GroupedOpenApi.builder()
+                    .pathsToMatch("/" + name + "/**")
+                    .group(name)
+                    .build();
+            })
+            .toList();
     }
 }

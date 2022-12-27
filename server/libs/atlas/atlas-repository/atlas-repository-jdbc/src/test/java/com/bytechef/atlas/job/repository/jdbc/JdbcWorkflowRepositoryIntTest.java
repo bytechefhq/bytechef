@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -18,8 +19,7 @@ package com.bytechef.atlas.job.repository.jdbc;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
-import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.workflow.WorkflowFormat;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,34 +31,36 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = WorkflowRepositoryIntTestConfiguration.class,
-        properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
+    classes = WorkflowRepositoryIntTestConfiguration.class,
+    properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
 public class JdbcWorkflowRepositoryIntTest {
 
     @Autowired
-    private WorkflowRepository workflowRepository;
+    private WorkflowCrudRepository workflowCrudRepository;
 
     @Test
     public void testFindById() {
         Workflow workflow = new Workflow();
 
         workflow.setDefinition(
-                """
-            label: My Label
+            """
+                label: My Label
 
-            tasks:
-              - name: stringNumber
-                type: var/1.0
-                action: set
-                value: "1234"
-            """);
-        workflow.setFormat(WorkflowFormat.YAML);
+                tasks:
+                  - name: stringNumber
+                    type: var/1.0
+                    action: set
+                    value: "1234"
+                """);
+        workflow.setFormat(Workflow.Format.YAML);
 
-        workflow = workflowRepository.save(workflow);
+        workflow = workflowCrudRepository.save(workflow);
 
-        Workflow resultWorkflow = workflowRepository.findById(workflow.getId()).orElseThrow();
+        Workflow resultWorkflow = workflowCrudRepository.findById(workflow.getId())
+            .orElseThrow();
 
         Assertions.assertEquals("My Label", resultWorkflow.getLabel());
-        Assertions.assertEquals(1, resultWorkflow.getTasks().size());
+        Assertions.assertEquals(1, resultWorkflow.getTasks()
+            .size());
     }
 }

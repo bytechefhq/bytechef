@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,9 +19,13 @@
 
 package com.bytechef.task.dispatcher.switch_;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.CASES;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.DEFAULT;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.EXPRESSION;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.KEY;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.TASKS;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -34,12 +39,12 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.collection.MapUtils;
-import com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**
@@ -57,11 +62,11 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private final TaskExecutionService taskExecutionService;
 
     public SwitchTaskDispatcher(
-            ContextService contextService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService,
-            TaskEvaluator taskEvaluator) {
+        ContextService contextService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService,
+        TaskEvaluator taskEvaluator) {
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
@@ -80,22 +85,19 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
         Map<String, Object> selectedCase = resolveCase(taskExecution);
 
-        if (selectedCase.containsKey(SwitchTaskDispatcherConstants.TASKS)) {
-            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
-                            selectedCase, SwitchTaskDispatcherConstants.TASKS, Map.class, Collections.emptyList())
-                    .stream()
-                    .map(WorkflowTask::new)
-                    .toList();
+        if (selectedCase.containsKey(TASKS)) {
+            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(selectedCase, TASKS, WorkflowTask.class,
+                Collections.emptyList());
 
             if (!subWorkflowTasks.isEmpty()) {
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-                TaskExecution subTaskExecution = TaskExecution.of(
-                        subWorkflowTask,
-                        switchTaskExecution.getJobId(),
-                        switchTaskExecution.getId(),
-                        switchTaskExecution.getPriority(),
-                        1);
+                TaskExecution subTaskExecution = new TaskExecution(
+                    subWorkflowTask,
+                    switchTaskExecution.getJobId(),
+                    switchTaskExecution.getId(),
+                    switchTaskExecution.getPriority(),
+                    1);
 
                 Context context = new Context(contextService.peek(switchTaskExecution.getId()));
 
@@ -103,7 +105,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
                 TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-                evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+                evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
                 taskDispatcher.dispatch(evaluatedTaskExecution);
             } else {
@@ -130,7 +132,8 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(SWITCH + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(SWITCH + "/v" + VERSION_1)) {
             return this;
         }
 
@@ -138,19 +141,21 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     private Map<String, Object> resolveCase(TaskExecution taskExecution) {
-        Object expression = taskExecution.getRequired(EXPRESSION);
-        List<Map<String, Object>> cases = (List) taskExecution.getList(SwitchTaskDispatcherConstants.CASES, Map.class);
+        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        List<Map<String, Object>> cases = MapUtils.getList(taskExecution.getParameters(), CASES,
+            new ParameterizedTypeReference<>() {
+            });
 
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
 
         for (Map<String, Object> oneCase : cases) {
-            Object key = MapUtils.getRequired(oneCase, SwitchTaskDispatcherConstants.KEY);
+            Object key = MapUtils.getRequired(oneCase, KEY);
 
             if (key.equals(expression)) {
                 return oneCase;
             }
         }
 
-        return taskExecution.getMap(SwitchTaskDispatcherConstants.DEFAULT, Collections.emptyMap());
+        return MapUtils.getMap(taskExecution.getParameters(), DEFAULT, Collections.emptyMap());
     }
 }

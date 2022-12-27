@@ -21,7 +21,7 @@ import {
 } from './WorkflowTask';
 
 /**
- * The blueprint that describe the execution of a job.
+ * The lueprint that describe the execution of a job.
  * @export
  * @interface Workflow
  */
@@ -33,13 +33,13 @@ export interface Workflow {
      */
     definition?: string;
     /**
-     * Created by.
+     * The created by.
      * @type {string}
      * @memberof Workflow
      */
     readonly createdBy?: string;
     /**
-     * Created date.
+     * The created date.
      * @type {Date}
      * @memberof Workflow
      */
@@ -51,7 +51,7 @@ export interface Workflow {
      */
     format?: WorkflowFormatEnum;
     /**
-     * Id of the workflow.
+     * The id of the workflow.
      * @type {string}
      * @memberof Workflow
      */
@@ -63,23 +63,29 @@ export interface Workflow {
      */
     inputs?: Array<{ [key: string]: object; }>;
     /**
-     * Descriptive name for the workflow
+     * The descriptive name for the workflow
      * @type {string}
      * @memberof Workflow
      */
     label?: string;
     /**
-     * Last modified by.
+     * The last modified by.
      * @type {string}
      * @memberof Workflow
      */
     readonly lastModifiedBy?: string;
     /**
-     * Last modified date.
+     * The last modified date.
      * @type {Date}
      * @memberof Workflow
      */
     readonly lastModifiedDate?: Date;
+    /**
+     * The type of the provider which stores the workflow definition.
+     * @type {string}
+     * @memberof Workflow
+     */
+    readonly providerType?: string;
     /**
      * The workflow's list of expected outputs.
      * @type {Array<{ [key: string]: object; }>}
@@ -140,6 +146,7 @@ export function WorkflowFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'label': !exists(json, 'label') ? undefined : json['label'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'providerType': !exists(json, 'providerType') ? undefined : json['providerType'],
         'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
         'retry': !exists(json, 'retry') ? undefined : json['retry'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskFromJSON)),

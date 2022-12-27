@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -39,7 +40,7 @@ public class WorkflowRSocketController {
 
     @MessageMapping("createWorkflow")
     public Mono<Workflow> createWorkflow(Workflow workflow) {
-        return Mono.create(sink -> sink.success(workflowService.add(workflow)));
+        return Mono.create(sink -> sink.success(workflowService.create(workflow, workflow.getProviderType())));
     }
 
     @MessageMapping("getWorkflow")

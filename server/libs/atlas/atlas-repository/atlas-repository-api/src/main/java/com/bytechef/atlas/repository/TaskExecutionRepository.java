@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -45,8 +46,7 @@ public interface TaskExecutionRepository {
     List<TaskExecution> findAllByJobInOrderByCreatedDate(List<AggregateReference<Job, String>> jobs);
 
     /**
-     * Returns a collection of {@link TaskExecution} instances which belong to the job of the given
-     * id.
+     * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.
      *
      * @param job
      * @return
@@ -54,8 +54,7 @@ public interface TaskExecutionRepository {
     List<TaskExecution> findAllByJobOrderByTaskNumber(AggregateReference<Job, String> job);
 
     /**
-     * Returns a collection of {@link TaskExecution} instances which are the children of the given
-     * parent id.
+     * Returns a collection of {@link TaskExecution} instances which are the children of the given parent id.
      *
      * @param parentId
      * @return

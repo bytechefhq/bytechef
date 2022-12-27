@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -57,7 +58,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "message-broker.provider", havingValue = "amqp")
 public class AmqpMessageBrokerConfiguration
-        implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
+    implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -102,35 +103,39 @@ public class AmqpMessageBrokerConfiguration
 
     @Bean
     Exchange tasksExchange() {
-        return ExchangeBuilder.directExchange(Exchanges.TASKS).durable(true).build();
+        return ExchangeBuilder.directExchange(Exchanges.TASKS)
+            .durable(true)
+            .build();
     }
 
     @Bean
     Exchange controlExchange() {
-        return ExchangeBuilder.fanoutExchange(Exchanges.CONTROL).durable(true).build();
+        return ExchangeBuilder.fanoutExchange(Exchanges.CONTROL)
+            .durable(true)
+            .build();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer<RabbitListenerEndpointRegistrar> messageBrokerConfigurer :
-                messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<RabbitListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }
 
     @Override
     public void registerListenerEndpoint(
-            RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
-            String queueName,
-            int concurrency,
-            Object delegate,
-            String methodName) {
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
+        String queueName,
+        int concurrency,
+        Object delegate,
+        String methodName) {
         logger.info(
-                "Registring AMQP Listener: {} -> {}:{}",
-                queueName,
-                delegate.getClass().getName(),
-                methodName);
+            "Registring AMQP Listener: {} -> {}:{}",
+            queueName,
+            delegate.getClass()
+                .getName(),
+            methodName);
 
         Exchange exchange;
         Queue queue;
@@ -152,18 +157,18 @@ public class AmqpMessageBrokerConfiguration
     }
 
     private void registerListenerEndpoint(
-            RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
-            Queue queue,
-            Exchange exchange,
-            int concurrency,
-            Object delegate,
-            String methodName) {
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
+        Queue queue,
+        Exchange exchange,
+        int concurrency,
+        Object delegate,
+        String methodName) {
         admin(connectionFactory).declareQueue(queue);
         admin(connectionFactory)
-                .declareBinding(BindingBuilder.bind(queue)
-                        .to(exchange)
-                        .with(queue.getName())
-                        .noargs());
+            .declareBinding(BindingBuilder.bind(queue)
+                .to(exchange)
+                .with(queue.getName())
+                .noargs());
 
         MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(delegate);
 
@@ -185,7 +190,9 @@ public class AmqpMessageBrokerConfiguration
         factory.setConnectionFactory(connectionFactory);
         factory.setDefaultRequeueRejected(false);
         factory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
-        factory.setPrefetchCount(rabbitProperties.getListener().getDirect().getPrefetch());
+        factory.setPrefetchCount(rabbitProperties.getListener()
+            .getDirect()
+            .getPrefetch());
         return factory;
     }
 }

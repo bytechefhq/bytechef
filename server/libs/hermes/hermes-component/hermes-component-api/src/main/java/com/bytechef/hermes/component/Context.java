@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,6 +17,7 @@
 
 package com.bytechef.hermes.component;
 
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -24,9 +26,11 @@ import java.util.Optional;
  */
 public interface Context {
 
-    Optional<ConnectionParameters> fetchConnection();
+    Optional<Connection> fetchConnectionParameters();
 
-    ConnectionParameters getConnection();
+    ConnectionDefinition getConnectionDefinition();
+
+    Connection getConnectionParameters();
 
     InputStream getFileStream(FileEntry fileEntry);
 

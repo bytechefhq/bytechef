@@ -14,21 +14,21 @@ import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
- * The blueprint that describe the execution of a job.
+ * The lueprint that describe the execution of a job.
  */
 
-@Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
+@Schema(name = "Workflow", description = "The lueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("definition")
@@ -98,6 +98,9 @@ public class WorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
+  @JsonProperty("providerType")
+  private String providerType;
+
   @JsonProperty("outputs")
   @Valid
   private List<Map<String, Object>> outputs = null;
@@ -134,11 +137,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Created by.
+   * The created by.
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Created by.", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -153,11 +156,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Created date.
+   * The created date.
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Created date.", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -191,11 +194,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Id of the workflow.
+   * The id of the workflow.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "Id of the workflow.", required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the workflow.", required = false)
   public String getId() {
     return id;
   }
@@ -237,11 +240,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Descriptive name for the workflow
+   * The descriptive name for the workflow
    * @return label
   */
   
-  @Schema(name = "label", description = "Descriptive name for the workflow", required = false)
+  @Schema(name = "label", description = "The descriptive name for the workflow", required = false)
   public String getLabel() {
     return label;
   }
@@ -256,11 +259,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Last modified by.
+   * The last modified by.
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -275,17 +278,36 @@ public class WorkflowModel {
   }
 
   /**
-   * Last modified date.
+   * The last modified date.
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
   public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
+  }
+
+  public WorkflowModel providerType(String providerType) {
+    this.providerType = providerType;
+    return this;
+  }
+
+  /**
+   * The type of the provider which stores the workflow definition.
+   * @return providerType
+  */
+  
+  @Schema(name = "providerType", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the provider which stores the workflow definition.", required = false)
+  public String getProviderType() {
+    return providerType;
+  }
+
+  public void setProviderType(String providerType) {
+    this.providerType = providerType;
   }
 
   public WorkflowModel outputs(List<Map<String, Object>> outputs) {
@@ -379,6 +401,7 @@ public class WorkflowModel {
         Objects.equals(this.label, workflow.label) &&
         Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate) &&
+        Objects.equals(this.providerType, workflow.providerType) &&
         Objects.equals(this.outputs, workflow.outputs) &&
         Objects.equals(this.retry, workflow.retry) &&
         Objects.equals(this.tasks, workflow.tasks);
@@ -386,7 +409,7 @@ public class WorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition, createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, retry, tasks);
+    return Objects.hash(definition, createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, providerType, outputs, retry, tasks);
   }
 
   @Override
@@ -402,6 +425,7 @@ public class WorkflowModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    providerType: ").append(toIndentedString(providerType)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
     sb.append("    retry: ").append(toIndentedString(retry)).append("\n");
     sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");

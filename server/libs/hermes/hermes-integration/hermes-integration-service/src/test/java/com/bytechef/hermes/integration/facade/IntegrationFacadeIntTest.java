@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -29,8 +30,8 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = IntegrationIntTestConfiguration.class,
-        properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
+    classes = IntegrationIntTestConfiguration.class,
+    properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
 public class IntegrationFacadeIntTest {
 
     @Autowired
@@ -43,11 +44,12 @@ public class IntegrationFacadeIntTest {
         integration.setName("name");
         integration.setDescription("description");
 
-        integration = integrationFacade.add(integration);
+        integration = integrationFacade.initialize(integration);
 
         Assertions.assertEquals("description", integration.getDescription());
         Assertions.assertEquals("name", integration.getName());
         Assertions.assertNotNull(integration.getId());
-        Assertions.assertEquals(1, integration.getIntegrationWorkflows().size());
+        Assertions.assertEquals(1, integration.getIntegrationWorkflows()
+            .size());
     }
 }

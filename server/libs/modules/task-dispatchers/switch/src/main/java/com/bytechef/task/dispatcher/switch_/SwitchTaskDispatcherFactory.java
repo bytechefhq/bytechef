@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,12 +17,12 @@
 
 package com.bytechef.task.dispatcher.switch_;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.object;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.CASES;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.DEFAULT;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.EXPRESSION;
@@ -39,26 +40,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class SwitchTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(SWITCH)
-            .display(display("Switch")
-                    .description("Executes one and only one branch of execution based on the `expression` value."))
-            .display(display("Branch"))
-            .properties(string(EXPRESSION)
-                    .label("Expression")
-                    .description("Defines expression upon which evaluation the proper branch continues execution."))
-            .taskProperties(
-                    array(CASES)
-                            .description(
-                                    "The list of tasks to execute if the result of expression matches the 'key' value.")
-                            .items(object().properties(
-                                            string(KEY),
-                                            array(TASKS)
-                                                    .description("The list of tasks.")
-                                                    .items(task()))),
-                    array(DEFAULT)
-                            .description(
-                                    "The list of tasks to execute if the result of expression does not match any of 'key' values.")
-                            .items(task()));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SWITCH)
+        .display(display("Switch")
+            .description("Executes one and only one branch of execution based on the `expression` value."))
+        .display(display("Branch"))
+        .properties(string(EXPRESSION)
+            .label("Expression")
+            .description("Defines expression upon which evaluation the proper branch continues execution."))
+        .taskProperties(
+            array(CASES)
+                .description(
+                    "The list of tasks to execute if the result of expression matches the 'key' value.")
+                .items(object().properties(
+                    string(KEY),
+                    array(TASKS)
+                        .description("The list of tasks.")
+                        .items(task()))),
+            array(DEFAULT)
+                .description(
+                    "The list of tasks to execute if the result of expression does not match any of 'key' values.")
+                .items(task()));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,8 +25,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.web.rest.config.WorkflowRestTestConfiguration;
+import com.bytechef.atlas.web.rest.model.PostWorkflowRequestModel;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -40,7 +41,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = {WorkflowRestTestConfiguration.class})
+@ContextConfiguration(
+    classes = {
+        WorkflowRestTestConfiguration.class
+    })
 @WebFluxTest(WorkflowController.class)
 public class WorkflowControllerIntTest {
 
@@ -54,11 +58,11 @@ public class WorkflowControllerIntTest {
     public void testDeleteWorkflow() {
         try {
             this.webTestClient
-                    .delete()
-                    .uri("/workflows/1")
-                    .exchange()
-                    .expectStatus()
-                    .isOk();
+                .delete()
+                .uri("/workflows/1")
+                .exchange()
+                .expectStatus()
+                .isOk();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -78,13 +82,13 @@ public class WorkflowControllerIntTest {
             when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
 
             this.webTestClient
-                    .get()
-                    .uri("/workflows/1")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody(WorkflowModel.class);
+                .get()
+                .uri("/workflows/1")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(WorkflowModel.class);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -98,12 +102,12 @@ public class WorkflowControllerIntTest {
 
         try {
             this.webTestClient
-                    .get()
-                    .uri("/workflows")
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBodyList(WorkflowModel.class);
+                .get()
+                .uri("/workflows")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(WorkflowModel.class);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -113,34 +117,32 @@ public class WorkflowControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostWorkflow() {
         Workflow workflow = getWorkflow();
-        WorkflowModel workflowModel = new WorkflowModel()
-                .definition("""
-            {
-                "tasks": []
-            }
-            """)
-                .format(WorkflowModel.FormatEnum.JSON);
+        PostWorkflowRequestModel workflowModel = new PostWorkflowRequestModel()
+            .definition("\"tasks\": []")
+            .providerType(PostWorkflowRequestModel.ProviderTypeEnum.JDBC)
+            .format(PostWorkflowRequestModel.FormatEnum.JSON);
 
-        when(workflowService.add(any())).thenReturn(workflow);
+        when(workflowService.create(any(), any())).thenReturn(workflow);
 
         try {
             assert workflow.getId() != null;
             this.webTestClient
-                    .post()
-                    .uri("/workflows")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(workflowModel)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .jsonPath("$.definition")
-                    .isEqualTo(workflow.getDefinition())
-                    .jsonPath("$.format")
-                    .isEqualTo(workflow.getFormat().toString())
-                    .jsonPath("$.id")
-                    .isEqualTo(workflow.getId());
+                .post()
+                .uri("/workflows")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(workflowModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.definition")
+                .isEqualTo(workflow.getDefinition())
+                .jsonPath("$.format")
+                .isEqualTo(workflow.getFormat()
+                    .toString())
+                .jsonPath("$.id")
+                .isEqualTo(workflow.getId());
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -151,42 +153,43 @@ public class WorkflowControllerIntTest {
     public void testPutWorkflow() {
         Workflow workflow = getWorkflow();
         WorkflowModel workflowModel = new WorkflowModel()
-                .id("1")
-                .definition(
-                        """
-            {
-                "label": "label",
-                "tasks": []
-            }
-            """);
+            .id("1")
+            .definition(
+                """
+                    {
+                        "label": "label",
+                        "tasks": []
+                    }
+                    """);
 
         workflow.setDefinition(
-                """
-            {
-                "label": "label",
-                "tasks": []
-            }
-            """);
+            """
+                {
+                    "label": "label",
+                    "tasks": []
+                }
+                """);
 
         when(workflowService.update(workflow)).thenReturn(workflow);
 
         try {
             this.webTestClient
-                    .put()
-                    .uri("/workflows/1")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(workflowModel)
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody()
-                    .jsonPath("$.definition")
-                    .isEqualTo(workflow.getDefinition())
-                    .jsonPath("$.format")
-                    .isEqualTo(workflow.getFormat().toString())
-                    .jsonPath("$.id")
-                    .isEqualTo(workflow.getId());
+                .put()
+                .uri("/workflows/1")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(workflowModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.definition")
+                .isEqualTo(workflow.getDefinition())
+                .jsonPath("$.format")
+                .isEqualTo(workflow.getFormat()
+                    .toString())
+                .jsonPath("$.id")
+                .isEqualTo(workflow.getId());
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -201,7 +204,7 @@ public class WorkflowControllerIntTest {
                 "tasks": []
             }
             """);
-        workflow.setFormat(WorkflowFormat.JSON);
+        workflow.setFormat(Workflow.Format.JSON);
 
         return workflow;
     }

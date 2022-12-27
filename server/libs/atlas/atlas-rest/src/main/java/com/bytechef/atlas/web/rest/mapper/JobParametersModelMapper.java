@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.atlas.web.rest.mapper;
 
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.atlas.web.rest.model.JobParametersModel;
 import org.mapstruct.Mapper;
@@ -27,8 +28,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = WorkflowMapperSpringConfig.class)
-public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParametersDTO> {
+public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
 
     @Mapping(target = "jobId", ignore = true)
-    JobParametersDTO convert(JobParametersModel jobParametersModel);
+    JobParameters convert(JobParametersModel jobParametersModel);
 }

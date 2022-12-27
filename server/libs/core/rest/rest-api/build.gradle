@@ -1,4 +1,5 @@
 dependencies {
-    implementation "org.springframework:spring-web"
-    implementation libs.problem.spring.webflux
+    implementation "org.slf4j:slf4j-api"
+//    implementation "org.springframework:spring-web"
+    implementation "org.springframework:spring-webflux"
 }

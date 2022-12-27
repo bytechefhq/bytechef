@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -23,8 +24,10 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -40,7 +43,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
-    public TaskExecution add(TaskExecution taskExecution) {
+    public TaskExecution create(TaskExecution taskExecution) {
         taskExecution.setNew(true);
 
         return taskExecutionRepository.save(taskExecution);
@@ -49,35 +52,46 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Override
     @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(String id) {
-        return taskExecutionRepository.findById(id).orElseThrow();
+        Assert.notNull(id, "id cannot be null.");
+
+        return taskExecutionRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
     public List<TaskExecution> getJobTaskExecutions(String jobId) {
+        Assert.notNull(jobId, "jobId cannot be null.");
+
         return taskExecutionRepository.findAllByJobOrderByCreatedDate(
-                new AggregateReference.IdOnlyAggregateReference<>(jobId));
+            new AggregateReference.IdOnlyAggregateReference<>(jobId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getParentTaskExecutions(String parentId) {
+        Assert.notNull(parentId, "workflparentIdow cannot be null.");
+
         return taskExecutionRepository.findAllByParent(new AggregateReference.IdOnlyAggregateReference<>(parentId));
     }
 
     @Override
     public TaskExecution update(TaskExecution taskExecution) {
-        Optional<TaskExecution> currentTaskExecutionOptional =
-                taskExecutionRepository.findByIdForUpdate(taskExecution.getId());
+        Assert.notNull(taskExecution, "taskExecution cannot be null.");
+
+        Optional<TaskExecution> currentTaskExecutionOptional = taskExecutionRepository
+            .findByIdForUpdate(taskExecution.getId());
 
         if (currentTaskExecutionOptional.isPresent()) {
             TaskExecution currentTaskExecution = currentTaskExecutionOptional.get();
 
-            if (currentTaskExecution.getStatus().isTerminated() && taskExecution.getStatus() == TaskStatus.STARTED) {
+            if (currentTaskExecution.getStatus()
+                .isTerminated() && taskExecution.getStatus() == TaskStatus.STARTED) {
                 taskExecution = new TaskExecution(currentTaskExecution);
 
                 taskExecution.setStartTime(taskExecution.getStartTime());
-            } else if (taskExecution.getStatus().isTerminated()
-                    && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
+            } else if (taskExecution.getStatus()
+                .isTerminated()
+                && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
                 taskExecution.setStartTime(currentTaskExecution.getStartTime());
             }
         }

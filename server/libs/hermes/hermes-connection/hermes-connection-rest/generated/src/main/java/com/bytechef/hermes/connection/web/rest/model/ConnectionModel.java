@@ -11,13 +11,13 @@ import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
 import java.util.*;
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 /**
  * TODO
@@ -25,8 +25,11 @@ import javax.annotation.Generated;
 
 @Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:15:34.685557+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T15:12:27.587783+01:00[Europe/Zagreb]")
 public class ConnectionModel {
+
+  @JsonProperty("authorizationName")
+  private String authorizationName;
 
   @JsonProperty("componentName")
   private String componentName;
@@ -47,19 +50,35 @@ public class ConnectionModel {
   @JsonProperty("id")
   private String id;
 
-  @JsonProperty("label")
-  private String label;
-
-  @JsonProperty("parameters")
-  @Valid
-  private Map<String, Object> parameters = null;
-
   @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
   @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
+
+  @JsonProperty("parameters")
+  @Valid
+  private Map<String, Object> parameters = null;
+
+  public ConnectionModel authorizationName(String authorizationName) {
+    this.authorizationName = authorizationName;
+    return this;
+  }
+
+  /**
+   * TODO
+   * @return authorizationName
+  */
+  
+  @Schema(name = "authorizationName", description = "TODO", required = false)
+  public String getAuthorizationName() {
+    return authorizationName;
+  }
+
+  public void setAuthorizationName(String authorizationName) {
+    this.authorizationName = authorizationName;
+  }
 
   public ConnectionModel componentName(String componentName) {
     this.componentName = componentName;
@@ -175,52 +194,6 @@ public class ConnectionModel {
     this.id = id;
   }
 
-  public ConnectionModel label(String label) {
-    this.label = label;
-    return this;
-  }
-
-  /**
-   * TODO
-   * @return label
-  */
-  
-  @Schema(name = "label", description = "TODO", required = false)
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public ConnectionModel parameters(Map<String, Object> parameters) {
-    this.parameters = parameters;
-    return this;
-  }
-
-  public ConnectionModel putParametersItem(String key, Object parametersItem) {
-    if (this.parameters == null) {
-      this.parameters = new HashMap<>();
-    }
-    this.parameters.put(key, parametersItem);
-    return this;
-  }
-
-  /**
-   * TODO
-   * @return parameters
-  */
-  
-  @Schema(name = "parameters", description = "TODO", required = false)
-  public Map<String, Object> getParameters() {
-    return parameters;
-  }
-
-  public void setParameters(Map<String, Object> parameters) {
-    this.parameters = parameters;
-  }
-
   public ConnectionModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
@@ -259,6 +232,33 @@ public class ConnectionModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public ConnectionModel parameters(Map<String, Object> parameters) {
+    this.parameters = parameters;
+    return this;
+  }
+
+  public ConnectionModel putParametersItem(String key, Object parametersItem) {
+    if (this.parameters == null) {
+      this.parameters = new HashMap<>();
+    }
+    this.parameters.put(key, parametersItem);
+    return this;
+  }
+
+  /**
+   * TODO
+   * @return parameters
+  */
+  
+  @Schema(name = "parameters", description = "TODO", required = false)
+  public Map<String, Object> getParameters() {
+    return parameters;
+  }
+
+  public void setParameters(Map<String, Object> parameters) {
+    this.parameters = parameters;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -268,37 +268,37 @@ public class ConnectionModel {
       return false;
     }
     ConnectionModel connection = (ConnectionModel) o;
-    return Objects.equals(this.componentName, connection.componentName) &&
+    return Objects.equals(this.authorizationName, connection.authorizationName) &&
+        Objects.equals(this.componentName, connection.componentName) &&
         Objects.equals(this.componentVersion, connection.componentVersion) &&
         Objects.equals(this.createdBy, connection.createdBy) &&
         Objects.equals(this.createdDate, connection.createdDate) &&
         Objects.equals(this.name, connection.name) &&
         Objects.equals(this.id, connection.id) &&
-        Objects.equals(this.label, connection.label) &&
-        Objects.equals(this.parameters, connection.parameters) &&
         Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, connection.lastModifiedDate);
+        Objects.equals(this.lastModifiedDate, connection.lastModifiedDate) &&
+        Objects.equals(this.parameters, connection.parameters);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, createdBy, createdDate, name, id, label, parameters, lastModifiedBy, lastModifiedDate);
+    return Objects.hash(authorizationName, componentName, componentVersion, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionModel {\n");
+    sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
-    sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("}");
     return sb.toString();
   }

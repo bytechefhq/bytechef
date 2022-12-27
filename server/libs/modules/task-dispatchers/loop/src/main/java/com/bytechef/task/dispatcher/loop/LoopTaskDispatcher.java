@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_VAR;
@@ -37,14 +38,15 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * A {@link TaskDispatcher} implementation which implements a loop construct. The dispatcher works
- * by executing the <code>iteratee</code> function on each item on the <code>stream</code>.
+ * A {@link TaskDispatcher} implementation which implements a loop construct. The dispatcher works by executing the
+ * <code>iteratee</code> function on each item on the <code>stream</code>.
  *
  * @author Ivica Cardic
  */
@@ -57,11 +59,11 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final TaskExecutionService taskExecutionService;
 
     public LoopTaskDispatcher(
-            ContextService contextService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.messageBroker = messageBroker;
@@ -71,9 +73,10 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        boolean loopForever = taskExecution.getBoolean(LOOP_FOREVER, false);
-        WorkflowTask iteratee = taskExecution.getWorkflowTask(ITERATEE);
-        List<Object> list = taskExecution.getList(LIST, Object.class, Collections.emptyList());
+        boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
+        WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
+        List<Object> list = MapUtils.getList(taskExecution.getParameters(), LIST, Object.class,
+            Collections.emptyList());
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
 
@@ -85,22 +88,22 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         taskExecutionService.update(loopTaskExecution);
 
         if (loopForever || !list.isEmpty()) {
-            TaskExecution subTaskExecution = TaskExecution.of(
-                    iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1);
+            TaskExecution subTaskExecution = new TaskExecution(
+                iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1);
 
             Context context = new Context(contextService.peek(taskExecution.getId()));
 
             if (!list.isEmpty()) {
-                context.put(taskExecution.getString(ITEM_VAR, ITEM), list.get(0));
+                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
             }
 
-            context.put(taskExecution.getString(ITEM_INDEX, ITEM_INDEX), 0);
+            context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
             contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
@@ -116,7 +119,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(LOOP + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(LOOP + "/v" + VERSION_1)) {
             return this;
         }
 

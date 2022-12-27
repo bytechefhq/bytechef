@@ -4,6 +4,5 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
-    implementation project(":server:libs:atlas:atlas-task-evaluator-impl")
     implementation project(":server:libs:core:autoconfigure-annotations")
 }

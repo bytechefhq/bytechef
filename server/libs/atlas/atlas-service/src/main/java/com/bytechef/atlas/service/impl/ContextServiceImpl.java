@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -21,6 +22,7 @@ import com.bytechef.atlas.repository.ContextRepository;
 import com.bytechef.atlas.service.ContextService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 @Transactional
 public class ContextServiceImpl implements ContextService {
@@ -34,6 +36,9 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     public void push(String stackId, Context context) {
+        Assert.notNull(stackId, "stackId cannot be null.");
+        Assert.notNull(context, "context cannot be null.");
+
         context.setId(null);
         context.setStackId(stackId);
 
@@ -43,6 +48,8 @@ public class ContextServiceImpl implements ContextService {
     @Override
     @Transactional(readOnly = true)
     public Context peek(String stackId) {
+        Assert.notNull(stackId, "stackId cannot be null.");
+
         return contextRepository.findTop1ByStackIdOrderByCreatedDateDesc(stackId);
     }
 }

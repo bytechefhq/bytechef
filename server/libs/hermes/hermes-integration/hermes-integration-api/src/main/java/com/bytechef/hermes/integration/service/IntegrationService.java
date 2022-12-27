@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -23,7 +24,8 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface IntegrationService {
-    Integration add(Integration integration);
+
+    Integration create(Integration integration);
 
     void delete(String id);
 

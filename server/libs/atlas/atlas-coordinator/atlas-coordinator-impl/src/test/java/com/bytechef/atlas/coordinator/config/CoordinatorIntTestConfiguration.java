@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,7 @@
 package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.config.WorkflowConfiguration;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfig;
+import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Optional;
@@ -38,15 +39,23 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@ComponentScan(basePackages = {"com.bytechef.atlas.repository.jdbc"})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.atlas.repository.jdbc"
+    })
 @EnableAutoConfiguration
-@Import({ResourceWorkflowRepositoryConfiguration.class, WorkflowConfiguration.class, WorkflowRepositoryConfig.class})
+@Import({
+    ResourceWorkflowRepositoryConfiguration.class,
+    WorkflowConfiguration.class,
+    WorkflowRepositoryConfiguration.class
+})
 @SpringBootConfiguration
 public class CoordinatorIntTestConfiguration {
 
     @EnableCaching
     @TestConfiguration
-    public static class CacheConfiguration {}
+    public static class CacheConfiguration {
+    }
 
     @EnableJdbcAuditing
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")

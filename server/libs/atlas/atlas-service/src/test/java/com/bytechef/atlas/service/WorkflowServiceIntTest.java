@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,9 +18,8 @@
 package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.service.config.WorkflowServiceIntTestConfiguration;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,66 +31,69 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = WorkflowServiceIntTestConfiguration.class,
-        properties = {
-            "bytechef.workflow.context-repository.provider=jdbc",
-            "bytechef.workflow.persistence.provider=jdbc",
-            "bytechef.workflow.workflow-repository.jdbc.enabled=true"
-        })
+    classes = WorkflowServiceIntTestConfiguration.class,
+    properties = {
+        "bytechef.workflow.context-repository.provider=jdbc",
+        "bytechef.workflow.persistence.provider=jdbc",
+        "bytechef.workflow.workflow-repository.jdbc.enabled=true"
+    })
 public class WorkflowServiceIntTest {
 
     @Autowired
-    private WorkflowRepository workflowRepository;
+    private WorkflowCrudRepository workflowCrudRepository;
 
     @Autowired
     private WorkflowService workflowService;
 
     @Test
     public void testDelete() {
-        Workflow workflow = workflowRepository.save(getWorkflow());
+        Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
         workflowService.delete(workflow.getId());
 
-        Assertions.assertFalse(workflowRepository.findById(workflow.getId()).isPresent());
+        Assertions.assertFalse(workflowCrudRepository.findById(workflow.getId())
+            .isPresent());
     }
 
     @Test
-    public void testAdd() {
-        Workflow workflow = workflowService.add(getWorkflow());
+    public void testCreate() {
+        Workflow workflow = workflowService.create(getWorkflow(), Workflow.ProviderType.JDBC);
 
         Assertions.assertEquals(
-                workflow, workflowRepository.findById(workflow.getId()).orElseThrow());
+            workflow, workflowCrudRepository.findById(workflow.getId())
+                .orElseThrow());
     }
 
     @Test
     public void testGetWorkflow() {
-        Workflow workflow = workflowRepository.save(getWorkflow());
+        Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
         Assertions.assertEquals(workflow, workflowService.getWorkflow(workflow.getId()));
     }
 
     @Test
     public void testGetWorkflows() {
-        for (Workflow workflow : workflowRepository.findAll()) {
-            workflowRepository.deleteById(workflow.getId());
+        for (Workflow workflow : workflowCrudRepository.findAll()) {
+            workflowCrudRepository.deleteById(workflow.getId());
         }
 
-        workflowRepository.save(getWorkflow());
+        workflowCrudRepository.save(getWorkflow());
 
-        Assertions.assertEquals(1, workflowService.getWorkflows().size());
+        Assertions.assertEquals(1, workflowService.getWorkflows()
+            .size());
     }
 
     @Test
     public void testUpdate() {
-        Workflow workflow = workflowRepository.save(getWorkflow());
+        Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
         workflow.setDefinition(
-                """
-            {
-                 "label": "Label,
-                "tasks": []
-            }
-            """);
+            """
+                {
+                     "label": "Label,
+                    "tasks": []
+                }
+                """);
 
         Assertions.assertEquals(workflow, workflowService.update(workflow));
     }
@@ -103,7 +106,7 @@ public class WorkflowServiceIntTest {
                 "tasks": []
             }
             """);
-        workflow.setFormat(WorkflowFormat.JSON);
+        workflow.setFormat(Workflow.Format.JSON);
 
         return workflow;
     }

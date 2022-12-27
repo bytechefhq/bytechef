@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -47,7 +48,7 @@ public class TaskStartedEventListener implements EventListener {
 
     @SuppressFBWarnings("EI2")
     public TaskStartedEventListener(
-            TaskExecutionService taskExecutionService, TaskDispatcher taskDispatcher, JobService jobService) {
+        TaskExecutionService taskExecutionService, TaskDispatcher taskDispatcher, JobService jobService) {
         this.taskExecutionService = taskExecutionService;
         this.taskDispatcher = taskDispatcher;
         this.jobService = jobService;
@@ -74,7 +75,7 @@ public class TaskStartedEventListener implements EventListener {
                 TaskExecution updatedTaskExecution = new TaskExecution(taskExecution);
 
                 if (updatedTaskExecution.getStartTime() == null
-                        && updatedTaskExecution.getStatus() != TaskStatus.STARTED) {
+                    && updatedTaskExecution.getStatus() != TaskStatus.STARTED) {
                     updatedTaskExecution.setStartTime(workflowEvent.getCreatedDate());
                     updatedTaskExecution.setStatus(TaskStatus.STARTED);
 

@@ -3,12 +3,7 @@ import {Dialog, Transition} from '@headlessui/react';
 import reactLogo from '../../assets/logo.svg';
 import {XMarkIcon} from '@heroicons/react/24/outline';
 
-export function MobileSidebar({
-    user,
-    navigation,
-    mobileMenuOpen,
-    setMobileMenuOpen,
-}: {
+type Props = {
     user: {name: string; email: string; imageUrl: string};
     navigation: {
         name: string;
@@ -17,7 +12,14 @@ export function MobileSidebar({
     }[];
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (value: boolean) => void;
-}) {
+};
+
+export function MobileSidebar({
+    user,
+    navigation,
+    mobileMenuOpen,
+    setMobileMenuOpen,
+}: Props) {
     return (
         <Transition.Root show={mobileMenuOpen} as={Fragment}>
             <Dialog
@@ -66,6 +68,7 @@ export function MobileSidebar({
                                         <span className="sr-only">
                                             Close sidebar
                                         </span>
+
                                         <XMarkIcon
                                             className="h-6 w-6 text-white"
                                             aria-hidden="true"
@@ -73,6 +76,7 @@ export function MobileSidebar({
                                     </button>
                                 </div>
                             </Transition.Child>
+
                             <div className="pt-5 pb-4">
                                 <div className="flex shrink-0 items-center px-4">
                                     <img
@@ -81,6 +85,7 @@ export function MobileSidebar({
                                         alt="ByteChef"
                                     />
                                 </div>
+
                                 <nav aria-label="Sidebar" className="mt-5">
                                     <div className="space-y-1 px-2">
                                         {navigation.map((item) => (
@@ -93,12 +98,14 @@ export function MobileSidebar({
                                                     className="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-500"
                                                     aria-hidden="true"
                                                 />
+
                                                 {item.name}
                                             </a>
                                         ))}
                                     </div>
                                 </nav>
                             </div>
+
                             <div className="flex shrink-0 border-t border-gray-200 p-4">
                                 <a href="#" className="group block shrink-0">
                                     <div className="flex items-center">
@@ -109,10 +116,12 @@ export function MobileSidebar({
                                                 alt=""
                                             />
                                         </div>
+
                                         <div className="ml-3">
                                             <p className="text-base font-medium text-gray-700 group-hover:text-gray-900">
                                                 {user.name}
                                             </p>
+
                                             <p className="text-sm font-medium text-gray-500 group-hover:text-gray-700">
                                                 Account Settings
                                             </p>
@@ -122,9 +131,8 @@ export function MobileSidebar({
                             </div>
                         </Dialog.Panel>
                     </Transition.Child>
-                    <div className="w-14 shrink-0" aria-hidden="true">
-                        {/* Force sidebar to shrink to fit close icon */}
-                    </div>
+
+                    <div className="w-14 shrink-0" aria-hidden="true" />
                 </div>
             </Dialog>
         </Transition.Root>

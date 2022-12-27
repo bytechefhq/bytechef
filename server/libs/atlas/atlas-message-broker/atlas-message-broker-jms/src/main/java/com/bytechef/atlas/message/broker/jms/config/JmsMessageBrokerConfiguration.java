@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -27,9 +28,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import javax.jms.ConnectionFactory;
-import javax.jms.Message;
-import javax.jms.Session;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ import org.springframework.jms.support.converter.MessageType;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "message-broker.provider", havingValue = "jms")
 public class JmsMessageBrokerConfiguration
-        implements JmsListenerConfigurer, MessageBrokerListenerRegistrar<JmsListenerEndpointRegistrar> {
+    implements JmsListenerConfigurer, MessageBrokerListenerRegistrar<JmsListenerEndpointRegistrar> {
 
     @Autowired
     private ConnectionFactory connectionFactory;
@@ -85,7 +86,7 @@ public class JmsMessageBrokerConfiguration
 
     @Bean
     public JmsListenerContainerFactory<?> jmsListenerContainerFactory(
-            ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
+        ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         configurer.configure(factory, connectionFactory);
         return factory;
@@ -101,21 +102,22 @@ public class JmsMessageBrokerConfiguration
 
     @Override
     public void registerListenerEndpoint(
-            JmsListenerEndpointRegistrar listenerEndpointRegistrar,
-            String queueName,
-            int concurrency,
-            Object delegate,
-            String methodName) {
+        JmsListenerEndpointRegistrar listenerEndpointRegistrar,
+        String queueName,
+        int concurrency,
+        Object delegate,
+        String methodName) {
 
         if (Objects.equals(queueName, Queues.CONTROL)) {
             queueName = Exchanges.CONTROL + "/" + Exchanges.CONTROL;
         }
 
         logger.info(
-                "Registring JMS Listener: {} -> {}:{}",
-                queueName,
-                delegate.getClass().getName(),
-                methodName);
+            "Registring JMS Listener: {} -> {}:{}",
+            queueName,
+            delegate.getClass()
+                .getName(),
+            methodName);
 
         MessageListenerAdapter messageListener = new NoReplyMessageListenerAdapter(delegate);
 

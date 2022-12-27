@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -47,11 +48,11 @@ public class JobExecutor {
 
     @SuppressFBWarnings("EI2")
     public JobExecutor(
-            ContextService contextService,
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService,
-            TaskEvaluator taskEvaluator,
-            WorkflowService workflowService) {
+        ContextService contextService,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService,
+        TaskEvaluator taskEvaluator,
+        WorkflowService workflowService) {
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
@@ -72,7 +73,8 @@ public class JobExecutor {
     }
 
     private boolean hasMoreTasks(Job job, Workflow workflow) {
-        return job.getCurrentTask() < workflow.getTasks().size();
+        return job.getCurrentTask() < workflow.getTasks()
+            .size();
     }
 
     private TaskExecution nextTaskExecution(Job job, Workflow workflow) {
@@ -80,7 +82,7 @@ public class JobExecutor {
 
         WorkflowTask workflowTask = workflowTasks.get(job.getCurrentTask());
 
-        TaskExecution taskExecution = TaskExecution.of(workflowTask, job.getId(), job.getPriority());
+        TaskExecution taskExecution = new TaskExecution(workflowTask, job.getId(), job.getPriority());
 
         if (workflow.getRetry() > 0 && taskExecution.getRetry() < 1) {
             taskExecution.setRetry(workflow.getRetry());
@@ -97,7 +99,7 @@ public class JobExecutor {
 
         TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
 
-        evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+        evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
         taskDispatcher.dispatch(evaluatedTaskExecution);
     }

@@ -18,7 +18,7 @@ const EmptyAvatar = ({size = 'medium'}: Pick<AvatarProps, 'size'>) => (
     <span
         data-testid="empty-avatar"
         className={cx(
-            'inline-block overflow-hidden rounded-full bg-gray-100',
+            'inline-block overflow-hidden rounded-full bg-gray-200',
             sizes[size]
         )}
     >

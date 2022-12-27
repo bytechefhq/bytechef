@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -18,7 +19,6 @@ package com.bytechef.hermes.integration.facade.impl;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
@@ -41,23 +41,18 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public Integration add(Integration integration) {
+    public Integration initialize(Integration integration) {
         if (!integration.containsWorkflows()) {
             Workflow workflow = new Workflow();
 
-            workflow.setDefinition(
-                    """
-                {
-                    "tasks": []
-                }
-                """);
-            workflow.setFormat(WorkflowFormat.JSON);
+            workflow.setDefinition("{\"tasks\": []}");
+            workflow.setFormat(Workflow.Format.JSON);
 
-            workflow = workflowService.add(workflow);
+            workflow = workflowService.create(workflow, Workflow.ProviderType.JDBC);
 
             integration.addWorkflow(workflow.getId());
         }
 
-        return integrationService.add(integration);
+        return integrationService.create(integration);
     }
 }

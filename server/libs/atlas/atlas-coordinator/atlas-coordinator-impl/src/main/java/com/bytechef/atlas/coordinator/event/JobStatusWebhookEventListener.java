@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -23,13 +24,16 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
@@ -54,7 +58,8 @@ public class JobStatusWebhookEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (workflowEvent.getType().equals(JobStatusWorkflowEvent.JOB_STATUS)) {
+        if (workflowEvent.getType()
+            .equals(JobStatusWorkflowEvent.JOB_STATUS)) {
             handleEvent((JobStatusWorkflowEvent) workflowEvent);
         }
     }
@@ -79,35 +84,38 @@ public class JobStatusWebhookEventListener implements EventListener {
                 retryTemplate.execute(context -> {
                     if (context.getRetryCount() == 0) {
                         logger.debug(
-                                "Calling webhook {} -> {}",
-                                MapUtils.getRequiredString(webhook, WorkflowConstants.URL),
-                                webhookEvent);
+                            "Calling webhook {} -> {}",
+                            MapUtils.getRequiredString(webhook, WorkflowConstants.URL),
+                            webhookEvent);
                     } else {
                         logger.debug(
-                                "[Retry: {}] Calling webhook {} -> {}",
-                                context.getRetryCount(),
-                                MapUtils.getRequiredString(webhook, WorkflowConstants.URL),
-                                webhookEvent);
+                            "[Retry: {}] Calling webhook {} -> {}",
+                            context.getRetryCount(),
+                            MapUtils.getRequiredString(webhook, WorkflowConstants.URL),
+                            webhookEvent);
                     }
 
                     return restTemplate.postForObject(
-                            MapUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
+                        MapUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
                 });
             }
         }
     }
 
     private RetryTemplate createRetryTemplate(Map<String, Object> webhook) {
-        Map<String, Object> retryParams = MapUtils.get(webhook, "retry", Map.class, Collections.emptyMap());
+        Map<String, Object> retryParams = MapUtils.get(webhook, "retry", new ParameterizedTypeReference<>() {
+        }, Collections.emptyMap());
 
         RetryTemplate retryTemplate = new RetryTemplate();
 
         ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
 
         backOffPolicy.setInitialInterval(
-                MapUtils.getDuration(retryParams, "initialInterval", "2s").toMillis());
+            MapUtils.getDuration(retryParams, "initialInterval", Duration.of(2, ChronoUnit.SECONDS))
+                .toMillis());
         backOffPolicy.setMaxInterval(
-                MapUtils.getDuration(retryParams, "maxInterval", "30s").toMillis());
+            MapUtils.getDuration(retryParams, "maxInterval", Duration.of(30, ChronoUnit.SECONDS))
+                .toMillis());
         backOffPolicy.setMultiplier(MapUtils.getDouble(retryParams, "multiplier", 2.0));
         retryTemplate.setBackOffPolicy(backOffPolicy);
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();

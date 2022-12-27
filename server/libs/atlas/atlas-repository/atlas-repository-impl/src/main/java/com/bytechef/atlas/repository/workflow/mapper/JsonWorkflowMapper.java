@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -17,7 +18,6 @@
 package com.bytechef.atlas.repository.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -25,15 +25,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public Workflow readValue(WorkflowResource workflowResource) {
-        return readValue(workflowResource, objectMapper);
+        return readValue(workflowResource, OBJECT_MAPPER);
     }
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getWorkflowFormat() == WorkflowFormat.JSON ? this : null;
+        return workflowResource.getWorkflowFormat() == Workflow.Format.JSON ? this : null;
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -109,15 +110,15 @@ public class CoordinatorConfiguration {
     @Bean
     Coordinator coordinator() {
         return new Coordinator(
-                contextService,
-                errorHandler(),
-                eventPublisher,
-                jobExecutor(),
-                jobService,
-                messageBroker,
-                taskCompletionHandler(),
-                taskDispatcher(),
-                taskExecutionService);
+            contextService,
+            errorHandler(),
+            eventPublisher,
+            jobExecutor(),
+            jobService,
+            messageBroker,
+            taskCompletionHandler(),
+            taskDispatcher(),
+            taskExecutionService);
     }
 
     @Bean
@@ -128,13 +129,13 @@ public class CoordinatorConfiguration {
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         return new DefaultTaskCompletionHandler(
-                contextService,
-                eventPublisher,
-                jobExecutor(),
-                jobService,
-                taskEvaluator,
-                taskExecutionService,
-                workflowService);
+            contextService,
+            eventPublisher,
+            jobExecutor(),
+            jobService,
+            taskEvaluator,
+            taskExecutionService,
+            workflowService);
     }
 
     @Bean
@@ -173,7 +174,7 @@ public class CoordinatorConfiguration {
     @SuppressWarnings("unchecked")
     TaskExecutionErrorHandler taskExecutionErrorHandler() {
         return new TaskExecutionErrorHandler(
-                eventPublisher, jobService, (TaskDispatcher<TaskExecution>) taskDispatcher(), taskExecutionService);
+            eventPublisher, jobService, (TaskDispatcher<TaskExecution>) taskDispatcher(), taskExecutionService);
     }
 
     @Bean
@@ -182,12 +183,11 @@ public class CoordinatorConfiguration {
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
         taskCompletionHandlerChain.setTaskCompletionHandlers(Stream.concat(
-                        taskCompletionHandlerFactories.stream()
-                                .map(taskCompletionHandlerFactory ->
-                                        taskCompletionHandlerFactory.createTaskCompletionHandler(
-                                                taskCompletionHandlerChain, taskDispatcher())),
-                        Stream.of(defaultTaskCompletionHandler()))
-                .toList());
+            taskCompletionHandlerFactories.stream()
+                .map(taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
+                    taskCompletionHandlerChain, taskDispatcher())),
+            Stream.of(defaultTaskCompletionHandler()))
+            .toList());
 
         return taskCompletionHandlerChain;
     }
@@ -198,11 +198,10 @@ public class CoordinatorConfiguration {
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
         List<TaskDispatcherResolver> resolvers = Stream.concat(
-                        taskDispatcherResolverFactories.stream()
-                                .map(taskDispatcherFactory ->
-                                        taskDispatcherFactory.createTaskDispatcherResolver(taskDispatcherChain)),
-                        Stream.of(controlTaskDispatcher(), defaultTaskDispatcher()))
-                .toList();
+            taskDispatcherResolverFactories.stream()
+                .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(taskDispatcherChain)),
+            Stream.of(controlTaskDispatcher(), defaultTaskDispatcher()))
+            .toList();
 
         taskDispatcherChain.setTaskDispatcherResolvers(resolvers);
 

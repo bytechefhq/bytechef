@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -18,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.fork;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
@@ -35,7 +36,8 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.UUIDUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +46,13 @@ import org.springframework.util.Assert;
 /**
  * Implements a Fork/Join construct.
  *
- * <p>Fork/Join tasks are expected to have a "branches" property which contains a list of task list.</p>
+ * <p>
+ * Fork/Join tasks are expected to have a "branches" property which contains a list of task list.
+ * </p>
  *
- * <p>Each branch executes in isolation, in parallel to the other branches in the fork and has its own context
- * namespace.</p>
+ * <p>
+ * Each branch executes in isolation, in parallel to the other branches in the fork and has its own context namespace.
+ * </p>
  *
  * <pre>
  *   - type: fork
@@ -86,12 +91,12 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskExecutionService taskExecutionService;
 
     public ForkJoinTaskDispatcher(
-            ContextService contextService,
-            CounterService counterService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        CounterService counterService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
@@ -103,10 +108,14 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     public void dispatch(TaskExecution taskExecution) {
         @SuppressWarnings("unchecked")
-        List<List<WorkflowTask>> branchesWorkflowTasks = taskExecution.getList(BRANCHES, List.class).stream()
-                .map(curList -> ((List<Map<String, Object>>) curList)
-                        .stream().map(WorkflowTask::new).toList())
-                .toList();
+        List<List<WorkflowTask>> branchesWorkflowTasks = MapUtils
+            .getList(taskExecution.getParameters(), BRANCHES, List.class)
+            .stream()
+            .map(curList -> ((List<Map<String, Object>>) curList)
+                .stream()
+                .map(WorkflowTask::new)
+                .toList())
+            .toList();
 
         Assert.notNull(branchesWorkflowTasks, "'branches' property can't be null");
 
@@ -125,9 +134,9 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 Assert.isTrue(branchWorkflowTask.size() > 0, "branch " + i + " does not contain any tasks");
 
-                TaskExecution branchTaskExecution = TaskExecution.of(branchWorkflowTask.get(0), Map.of("branch", i));
+                TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask.get(0), Map.of("branch", i));
 
-                branchTaskExecution.setId(UUIDGenerator.generate());
+                branchTaskExecution.setId(UUIDUtils.generate());
                 branchTaskExecution.setJobId(taskExecution.getJobId());
                 branchTaskExecution.setParentId(taskExecution.getId());
                 branchTaskExecution.setPriority(taskExecution.getPriority());
@@ -141,7 +150,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
-                evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+                evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
                 taskDispatcher.dispatch(evaluatedTaskExecution);
             }
@@ -158,7 +167,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(FORK_JOIN + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(FORK_JOIN + "/v" + VERSION_1)) {
             return this;
         }
 
