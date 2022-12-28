@@ -27,7 +27,6 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -65,18 +64,19 @@ public class SubflowJobStatusEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (workflowEvent.getType()
-            .equals(JobStatusWorkflowEvent.JOB_STATUS)) {
+        String type = workflowEvent.getType();
+
+        if (type.equals(JobStatusWorkflowEvent.JOB_STATUS)) {
             JobStatusWorkflowEvent jobStatusWorkflowEvent = (JobStatusWorkflowEvent) workflowEvent;
 
-            JobStatus jobStatus = jobStatusWorkflowEvent.getJobStatus();
+            Job.Status status = jobStatusWorkflowEvent.getJobStatus();
             Job job = jobService.getJob(jobStatusWorkflowEvent.getJobId());
 
             if (job.getParentTaskExecutionId() == null) {
                 return; // not a subflow -- nothing to do
             }
 
-            switch (jobStatus) {
+            switch (status) {
                 case CREATED:
                 case STARTED:
                     break;
@@ -116,7 +116,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 default:
-                    throw new IllegalStateException("Unknown status: " + jobStatus);
+                    throw new IllegalStateException("Unknown status: " + status);
             }
         }
     }

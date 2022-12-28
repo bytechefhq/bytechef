@@ -21,7 +21,6 @@ package com.bytechef.atlas.domain;
 
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapListWrapper;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
@@ -43,7 +42,6 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 
 /**
  * Represents an instance of a job.
@@ -53,6 +51,14 @@ import org.springframework.util.Assert;
  */
 @Table
 public final class Job implements Errorable, Persistable<String>, Prioritizable {
+
+    public enum Status {
+        CREATED,
+        STARTED,
+        STOPPED,
+        FAILED,
+        COMPLETED,
+    }
 
     @CreatedBy
     @Column("created_by")
@@ -95,7 +101,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     private MapWrapper outputs = new MapWrapper();
 
     @Column("parent_task_execution_id")
-    private AggregateReference<TaskExecution, String> parentTaskExecution;
+    private AggregateReference<TaskExecution, String> parentTaskExecutionRef;
 
     private int priority = Prioritizable.DEFAULT_PRIORITY;
 
@@ -103,7 +109,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     private Date startTime;
 
     @Column
-    private JobStatus status;
+    private Status status;
 
     // TODO Add version
     // @Version
@@ -121,27 +127,6 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
 
     public Job(String id) {
         this.id = id;
-    }
-
-    public Job(Job job) {
-        Assert.notNull(job, "job cannot be null");
-
-        this.createdBy = job.createdBy;
-        this.createdDate = job.createdDate;
-        this.currentTask = job.currentTask;
-        this.endTime = job.endTime;
-        this.id = job.id;
-        this.inputs = new MapWrapper(job.inputs.getMap());
-        this.label = job.label;
-        this.lastModifiedBy = job.lastModifiedBy;
-        this.lastModifiedDate = job.lastModifiedDate;
-        this.outputs = new MapWrapper(job.outputs.getMap());
-        this.parentTaskExecution = job.parentTaskExecution;
-        this.priority = job.priority;
-        this.startTime = job.startTime;
-        this.status = job.status;
-        this.webhooks = new MapListWrapper(job.webhooks.getList());
-        this.workflowId = job.workflowId;
     }
 
     @Override
@@ -224,8 +209,8 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     }
 
     @JsonIgnore
-    public AggregateReference<TaskExecution, String> getParentTaskExecution() {
-        return parentTaskExecution;
+    public AggregateReference<TaskExecution, String> getParentTaskExecutionRef() {
+        return parentTaskExecutionRef;
     }
 
     /**
@@ -234,15 +219,15 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
      * @return The ID of the parent task if this is a subflow job or <code>null</code> otherwise.
      */
     public String getParentTaskExecutionId() {
-        return parentTaskExecution == null ? null : parentTaskExecution.getId();
+        return parentTaskExecutionRef == null ? null : parentTaskExecutionRef.getId();
     }
 
     /**
-     * Return the {@link JobStatus}
+     * Return the {@link Status}
      *
      * @return The job's status.
      */
-    public JobStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -300,14 +285,6 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         return isNew;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public void setCurrentTask(int currentTask) {
         this.currentTask = currentTask;
     }
@@ -332,14 +309,6 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.label = label;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
@@ -348,13 +317,13 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.outputs = new MapWrapper(outputs);
     }
 
-    public void setParentTaskExecution(AggregateReference<TaskExecution, String> parentTaskExecution) {
-        this.parentTaskExecution = parentTaskExecution;
+    public void setParentTaskExecutionRef(AggregateReference<TaskExecution, String> parentTaskExecutionRef) {
+        this.parentTaskExecutionRef = parentTaskExecutionRef;
     }
 
     public void setParentTaskExecutionId(String parentTaskExecutionId) {
         if (parentTaskExecutionId != null) {
-            this.parentTaskExecution = new AggregateReference.IdOnlyAggregateReference<>(parentTaskExecutionId);
+            this.parentTaskExecutionRef = new AggregateReference.IdOnlyAggregateReference<>(parentTaskExecutionId);
         }
     }
 
@@ -362,7 +331,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.priority = priority;
     }
 
-    public void setStatus(JobStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -393,7 +362,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
             + lastModifiedBy + '\'' + ", lastModifiedDate="
             + lastModifiedDate + ", outputs="
             + outputs + ", parentTaskExecution="
-            + parentTaskExecution + ", priority="
+            + parentTaskExecutionRef + ", priority="
             + priority + ", startTime="
             + startTime + ", status="
             + status + ", webhooks="

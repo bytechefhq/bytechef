@@ -20,7 +20,6 @@ package com.bytechef.component.script;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
@@ -56,7 +55,7 @@ public class ScriptComponentHandlerIntTest {
         Job job = workflowExecutor.execute(
             "script_v1_javascript", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
@@ -67,7 +66,7 @@ public class ScriptComponentHandlerIntTest {
     public void testPerformPython() {
         Job job = workflowExecutor.execute("script_v1_python", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
@@ -78,7 +77,7 @@ public class ScriptComponentHandlerIntTest {
     public void testPerformR() {
         Job job = workflowExecutor.execute("script_v1_r", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
@@ -89,7 +88,7 @@ public class ScriptComponentHandlerIntTest {
     public void testPerformRuby() {
         Job job = workflowExecutor.execute("script_v1_ruby", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
