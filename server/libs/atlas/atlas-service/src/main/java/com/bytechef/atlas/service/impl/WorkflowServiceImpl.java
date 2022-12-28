@@ -30,10 +30,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -65,28 +67,31 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Workflow create(Workflow workflow, Workflow.ProviderType providerType) {
-        Assert.notNull(workflow, "workflow cannot be null.");
-        Assert.notNull(providerType, "sourceType cannot be null.");
+    public Workflow create(
+        String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType) {
+        Assert.notNull(format, "'format' must not be null.");
+        Assert.notNull(sourceType, "'sourceType' must not be null.");
 
-        if (workflow.getId() != null &&
-            workflowCrudRepositories.stream()
-                .anyMatch(workflowCrudRepository -> workflowCrudRepository.findById(workflow.getId())
-                    .isPresent())) {
-            throw new IllegalArgumentException("workflow with id %s already exists".formatted(workflow.getId()));
+        Workflow workflow = new Workflow();
+
+        if (StringUtils.isEmpty(definition)) {
+            workflow.setDefinition("{\"tasks\": []}");
+        } else {
+            workflow.setDefinition(definition);
         }
 
+        workflow.setFormat(format);
+
         return workflowCrudRepositories.stream()
-            .filter(workflowCrudRepository -> Objects.equals(workflowCrudRepository.getProviderType(),
-                providerType))
+            .filter(workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType))
             .findFirst()
             .map(workflowCrudRepository -> save(workflow, workflowCrudRepository))
             .orElseThrow();
     }
 
     @Override
-    public void delete(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public void delete(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         workflowCrudRepositories.stream()
             .filter(workflowCrudRepository -> workflowCrudRepository.findById(id)
@@ -131,7 +136,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 if (workflowOptional.isPresent()) {
                     Workflow workflow = workflowOptional.get();
 
-                    workflow.setProviderType(workflowRepository.getProviderType());
+                    workflow.setSourceType(workflowRepository.getSourceType());
 
                     cacheOne.put(id, workflow);
 
@@ -162,7 +167,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     Iterable<Workflow> iterable = workflowRepository.findAll();
 
                     return StreamSupport.stream(iterable.spliterator(), false)
-                        .peek(workflow -> workflow.setProviderType(workflowRepository.getProviderType()));
+                        .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType()));
                 })
                 .sorted((a, b) -> {
                     if (a.getLabel() == null || b.getLabel() == null) {
@@ -187,8 +192,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Workflow update(Workflow workflow) {
-        Assert.notNull(workflow, "workflow cannot be null.");
+    public Workflow update(@NonNull String id, @NonNull String definition) {
+        Assert.notNull(id, "'id' must not be null.");
+        Assert.notNull(definition, "'definition' must not be null.");
+
+        Workflow workflow = getWorkflow(id);
+
+        workflow.setDefinition(definition);
 
         return workflowCrudRepositories.stream()
             .filter(workflowCrudRepository -> workflowCrudRepository.findById(workflow.getId())
