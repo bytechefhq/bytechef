@@ -31,7 +31,7 @@ import static com.bytechef.component.httpclient.constants.HttpClientConstants.HE
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HEADER_PARAMETERS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HTTP_CLIENT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.IGNORE_RESPONSE_CODE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.MIME_TYPE;
+import static com.bytechef.component.httpclient.constants.HttpClientConstants.RAW_CONTENT_MIME_TYPE;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PATCH;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.POST;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PROXY;
@@ -39,7 +39,6 @@ import static com.bytechef.component.httpclient.constants.HttpClientConstants.PU
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.QUERY_PARAMETERS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.RESPONSE_FILENAME;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.SEND_FILE;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.TIMEOUT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.URI;
 import static com.bytechef.hermes.component.constants.ComponentConstants.ADD_TO;
@@ -63,12 +62,12 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.hide;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.show;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -76,7 +75,6 @@ import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.utils.HttpClientUtils;
 import com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
@@ -86,6 +84,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -112,16 +111,16 @@ public class HttpClientComponentHandler implements ComponentHandler {
             .label("Response Format")
             .description("The format in which the data gets returned from the URL.")
             .options(
-                ComponentDSL.option(
+                option(
                     "JSON",
                     ResponseFormat.JSON.name(),
                     "The response is automatically converted to object/array."),
-                ComponentDSL.option(
+                option(
                     "XML",
                     ResponseFormat.XML.name(),
                     "The response is automatically converted to object/array."),
-                ComponentDSL.option("Text", ResponseFormat.TEXT.name(), "The response is returned as a text."),
-                ComponentDSL.option(
+                option("Text", ResponseFormat.TEXT.name(), "The response is returned as a text."),
+                option(
                     "File", ResponseFormat.FILE.name(), "The response is returned as a file object."))
             .defaultValue(ResponseFormat.JSON.name()),
         string(RESPONSE_FILENAME)
@@ -153,17 +152,16 @@ public class HttpClientComponentHandler implements ComponentHandler {
     };
 
     private static final Property<?>[] BODY_CONTENT_PROPERTIES = new Property[] {
-        bool(SEND_FILE)
-            .label("Send File")
-            .description("Send file instead of body parameters.")
-            .displayOption(show(
-                BODY_CONTENT_TYPE,
-                List.of(BodyContentType.JSON.name(), BodyContentType.RAW.name(), BodyContentType.XML.name())))
-            .defaultValue(false),
         object(BODY_PARAMETERS)
             .label("Body Parameters")
-            .description("Body parameters to send.")
+            .description("Body Parameters to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
+            .additionalProperties(oneOf())
+            .placeholder("Add Parameter"),
+        object(BODY_PARAMETERS)
+            .label("XML")
+            .description("XML content to send.")
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
             .additionalProperties(oneOf())
             .placeholder("Add Parameter"),
         object(BODY_PARAMETERS)
@@ -171,29 +169,21 @@ public class HttpClientComponentHandler implements ComponentHandler {
             .description("Body parameters to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
             .placeholder("Add Parameter")
-            .additionalProperties(string()),
+            .additionalProperties(oneOf().types(string(), fileEntry())),
         object(BODY_PARAMETERS)
             .label("Body Parameters")
             .description("Body parameters to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_URLENCODED.name()))
             .placeholder("Add Parameter")
-            .additionalProperties(oneOf().types(string(), fileEntry())),
+            .additionalProperties(string()),
         string(BODY)
             .label("Body")
             .description("The raw text to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
         fileEntry(FILE_ENTRY)
             .label("File")
-            .description("The object property which contains a reference to the file with data to upload.")
-            .displayOption(
-                hide(SEND_FILE, false),
-                show(
-                    BODY_CONTENT_TYPE,
-                    List.of(
-                        BodyContentType.BINARY.name(),
-                        BodyContentType.JSON.name(),
-                        BodyContentType.RAW.name(),
-                        BodyContentType.XML.name()))),
+            .description("The object property which contains a reference to the file to upload.")
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))
     };
 
     private static final Property<?>[] OUTPUT_PROPERTIES = {
@@ -203,7 +193,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()),
                 FULL_RESPONSE,
                 List.of(false))),
-        oneOf().types(array(), object())
+        oneOf()
+            .types(array(), object())
             .displayOption(show(
                 RESPONSE_FORMAT,
                 List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()),
@@ -241,9 +232,9 @@ public class HttpClientComponentHandler implements ComponentHandler {
                                 .label("Add to")
                                 .required(true)
                                 .options(
-                                    ComponentDSL.option(
+                                    option(
                                         "Header", ApiTokenLocation.HEADER.name()),
-                                    ComponentDSL.option(
+                                    option(
                                         "QueryParams",
                                         ApiTokenLocation.QUERY_PARAMETERS.name()))),
                 authorization(
@@ -319,10 +310,12 @@ public class HttpClientComponentHandler implements ComponentHandler {
 
                     COMMON_PROPERTIES)
                 .output(
-                    oneOf().types(array(), object())
-                        .displayOption(show(
-                            RESPONSE_FORMAT,
-                            List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
+                    oneOf()
+                        .types(array(), object())
+                        .displayOption(
+                            show(
+                                RESPONSE_FORMAT,
+                                List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
                     string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
                     fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())))
                 .perform(this::performGet),
@@ -434,21 +427,23 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .label("Body Content Type")
                 .description("Content-Type to use when sending body parameters.")
                 .options(
-                    ComponentDSL.option("JSON", BodyContentType.JSON.name()),
-                    ComponentDSL.option("Raw", BodyContentType.RAW.name()),
-                    ComponentDSL.option("Form-Data", BodyContentType.FORM_DATA.name()),
-                    ComponentDSL.option("Form-Urlencoded", BodyContentType.FORM_URLENCODED.name()),
-                    ComponentDSL.option("Binary", BodyContentType.BINARY.name()),
-                    ComponentDSL.option("XML", BodyContentType.XML.name()))
-                .defaultValue("JSON")
+                    option("None", ""),
+                    option("JSON", BodyContentType.JSON.name()),
+                    option("Form-Data", BodyContentType.FORM_DATA.name()),
+                    option("Form-Urlencoded", BodyContentType.FORM_URLENCODED.name()),
+                    option("Raw", BodyContentType.RAW.name()),
+                    option("Binary", BodyContentType.BINARY.name()))
+                .defaultValue("NONE")
                 .advancedOption(true));
         }
+
         if (includeBodyContentProperties) {
-            properties.add(string(MIME_TYPE)
-                .label("Mime Type")
+            properties.add(string(RAW_CONTENT_MIME_TYPE)
+                .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
                 .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
-                .placeholder("text/xml")
+                .defaultValue("text/plain")
+                .placeholder("text/plain")
                 .advancedOption(true));
         }
 
@@ -528,12 +523,19 @@ public class HttpClientComponentHandler implements ComponentHandler {
             : null;
 
         if (executionParameters.containsKey(BODY_PARAMETERS)) {
-            payload = HttpClientUtils.Payload.of(
-                executionParameters.getMap(BODY_PARAMETERS, List.of(FileEntry.class), Map.of()), bodyContentType);
+            if (bodyContentType == BodyContentType.FORM_DATA) {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getMap(BODY_PARAMETERS, List.of(FileEntry.class), Map.of()), bodyContentType);
+            } else {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getMap(BODY_PARAMETERS, Map.of()), bodyContentType);
+            }
         } else if (executionParameters.containsKey(BODY)) {
-            payload = HttpClientUtils.Payload.of(executionParameters.getString(BODY), bodyContentType);
+            payload = HttpClientUtils.Payload.of(
+                executionParameters.getString(BODY),
+                executionParameters.getString(RAW_CONTENT_MIME_TYPE, "text/plain"));
         } else if (executionParameters.containsKey(FILE_ENTRY)) {
-            payload = HttpClientUtils.Payload.of(executionParameters.get(FILE_ENTRY, FileEntry.class), bodyContentType);
+            payload = HttpClientUtils.Payload.of(executionParameters.get(FILE_ENTRY, FileEntry.class));
         }
 
         return HttpClientUtils.executor()
@@ -543,7 +545,6 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
                 .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
                 .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
-                .mimeType(executionParameters.getString(MIME_TYPE))
                 .proxy(executionParameters.getString(PROXY))
                 .responseFormat(
                     executionParameters.containsKey(RESPONSE_FORMAT)
