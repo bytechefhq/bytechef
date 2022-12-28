@@ -19,12 +19,16 @@ package com.bytechef.hermes.connection.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface ConnectionService {
-    Connection add(Connection connection);
+
+    Connection create(
+        String name, String componentName, int componentVersion, String authorizationName,
+        Map<String, Object> parameters);
 
     void delete(String id);
 
@@ -33,4 +37,5 @@ public interface ConnectionService {
     List<Connection> getConnections();
 
     Connection update(String id, String name);
+
 }

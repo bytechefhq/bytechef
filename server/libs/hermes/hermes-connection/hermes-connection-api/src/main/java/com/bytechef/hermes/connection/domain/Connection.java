@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -86,9 +87,9 @@ public final class Connection implements Persistable<String> {
             return false;
         }
 
-        Connection that = (Connection) o;
+        Connection connection = (Connection) o;
 
-        return id.equals(that.id);
+        return id.equals(connection.id);
     }
 
     @Override
@@ -196,14 +197,6 @@ public final class Connection implements Persistable<String> {
 
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = new EncryptedMapWrapper(parameters);
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override
