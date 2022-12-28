@@ -17,6 +17,7 @@
 
 package com.bytechef.atlas.coordinator.task.completion;
 
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 
 /**
@@ -25,5 +26,5 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 public interface TaskCompletionHandlerFactory {
 
     TaskCompletionHandler createTaskCompletionHandler(
-        TaskCompletionHandler taskCompletionHandler, TaskDispatcher<?> taskDispatcher);
+        TaskCompletionHandler taskCompletionHandler, TaskDispatcher<? super Task> taskDispatcher);
 }

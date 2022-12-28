@@ -20,7 +20,6 @@
 package com.bytechef.atlas.task.evaluator;
 
 import com.bytechef.atlas.domain.Context;
-import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,32 +96,28 @@ public class TaskEvaluator {
     }
 
     /**
-     * Evaluate the {@link TaskExecution}
+     * Evaluate the {@link WorkflowTask}
      *
-     * @param taskExecution The {@link TaskExecution} instance to evaluate
-     * @param context       The context to evaluate the task against
-     * @return the evaluate {@link TaskExecution}.
+     * @param workflowTask The {@link WorkflowTask} instance to evaluate
+     * @param context      The context to evaluate the task against
+     * @return the evaluate {@link WorkflowTask}.
      */
-    public TaskExecution evaluate(TaskExecution taskExecution, Context context) {
-        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
-
+    public WorkflowTask evaluate(WorkflowTask workflowTask, Context context) {
         Map<String, Object> map = evaluateInternal(workflowTask.toMap(), context);
 
-        taskExecution = new TaskExecution(taskExecution, new WorkflowTask(map));
-
-        return taskExecution;
+        return new WorkflowTask(map);
     }
 
-    private StandardEvaluationContext createEvaluationContext(Context aContext) {
-        StandardEvaluationContext context = new StandardEvaluationContext(aContext.getValue());
+    private StandardEvaluationContext createEvaluationContext(Context context) {
+        StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context.getValue());
 
-        context.addPropertyAccessor(new MapPropertyAccessor());
-        context.addMethodResolver(methodResolver());
+        evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
+        evaluationContext.addMethodResolver(methodResolver());
 
-        return context;
+        return evaluationContext;
     }
 
-    private String evaluate(CompositeStringExpression compositeStringExpression, Context aContext) {
+    private String evaluate(CompositeStringExpression compositeStringExpression, Context context) {
         StringBuilder stringBuilder = new StringBuilder();
         Expression[] subExpressions = compositeStringExpression.getExpressions();
 
@@ -132,7 +127,7 @@ public class TaskEvaluator {
 
                 continue;
             } else if (subExpression instanceof SpelExpression) {
-                stringBuilder.append(evaluate(PREFIX + subExpression.getExpressionString() + SUFFIX, aContext));
+                stringBuilder.append(evaluate(PREFIX + subExpression.getExpressionString() + SUFFIX, context));
 
                 continue;
             }
@@ -170,29 +165,25 @@ public class TaskEvaluator {
             }
 
             return evaluatedlist;
-        } else if (value instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) value;
-
+        } else if (value instanceof Map<?, ?> map) {
             return evaluateInternal(map, context);
         }
+
         return value;
     }
 
-    private Map<String, Object> evaluateInternal(Map<String, Object> aMap, Context aContext) {
+    private Map<String, Object> evaluateInternal(Map<?, ?> map, Context context) {
         Map<String, Object> newMap = new HashMap<>();
 
-        for (Entry<String, Object> entry : aMap.entrySet()) {
-            newMap.put(entry.getKey(), evaluate(entry.getValue(), aContext));
+        for (Entry<?, ?> entry : map.entrySet()) {
+            newMap.put((String)entry.getKey(), evaluate(entry.getValue(), context));
         }
 
         return newMap;
     }
 
     private MethodResolver methodResolver() {
-        return (ctx, target, name, args) -> {
-            return methodExecutors.get(name);
-        };
+        return (ctx, target, name, args) -> methodExecutors.get(name);
     }
 
     public static class Builder {

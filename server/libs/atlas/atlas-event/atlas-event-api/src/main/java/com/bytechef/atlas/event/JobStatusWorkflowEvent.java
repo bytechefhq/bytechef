@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.event;
 
-import com.bytechef.atlas.job.JobStatus;
+import com.bytechef.atlas.domain.Job;
 import org.springframework.util.Assert;
 
 /**
@@ -28,18 +28,18 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
     public static final String JOB_STATUS = "job.status";
 
     private String jobId;
-    private JobStatus jobStatus;
+    private Job.Status status;
 
     public JobStatusWorkflowEvent() {
         this.type = JOB_STATUS;
     }
 
-    public JobStatusWorkflowEvent(String jobId, JobStatus jobStatus) {
-        Assert.notNull(jobId, "jobId must not be null");
-        Assert.notNull(jobStatus, "status must not be null");
+    public JobStatusWorkflowEvent(String jobId, Job.Status status) {
+        Assert.notNull(jobId, "'jobId' must not be null.");
+        Assert.notNull(status, "'status' must not be null.");
 
         this.jobId = jobId;
-        this.jobStatus = jobStatus;
+        this.status = status;
         this.type = JOB_STATUS;
     }
 
@@ -47,15 +47,15 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
         return jobId;
     }
 
-    public JobStatus getJobStatus() {
-        return jobStatus;
+    public Job.Status getJobStatus() {
+        return status;
     }
 
     @Override
     public String toString() {
         return "JobStatusWorkflowEvent{" + "jobId='"
             + jobId + '\'' + ", jobStatus="
-            + jobStatus + "} "
+            + status + "} "
             + super.toString();
     }
 }

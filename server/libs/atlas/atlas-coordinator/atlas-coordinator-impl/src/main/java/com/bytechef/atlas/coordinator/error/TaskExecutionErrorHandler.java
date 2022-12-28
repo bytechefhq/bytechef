@@ -25,7 +25,6 @@ import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
@@ -69,55 +68,43 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
     public void handle(TaskExecution taskExecution) {
         ExecutionError error = taskExecution.getError();
 
-        Assert.notNull(error, "error must not be null");
+        Assert.notNull(error, "'error' must not be null.");
 
         logger.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
 
         // set task status to FAILED and persist
-        TaskExecution erroredTaskExecution = new TaskExecution(taskExecution);
-
-        erroredTaskExecution.setStatus(TaskStatus.FAILED);
-        erroredTaskExecution.setEndTime(LocalDateTime.now());
-
-        taskExecutionService.update(erroredTaskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.FAILED, null, LocalDateTime.now());
 
         // if the task is retryable, then retry it
         if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
-            TaskExecution retryTaskExecution = new TaskExecution(taskExecution);
+            taskExecution.setId(UUIDUtils.generate());
+            taskExecution.setStatus(TaskStatus.CREATED);
+            taskExecution.setError(null);
+            taskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);
 
-            retryTaskExecution.setId(UUIDUtils.generate());
-            retryTaskExecution.setStatus(TaskStatus.CREATED);
-            retryTaskExecution.setError(null);
-            retryTaskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);
+            taskExecution = taskExecutionService.create(taskExecution);
 
-            retryTaskExecution = taskExecutionService.create(retryTaskExecution);
-
-            taskDispatcher.dispatch(retryTaskExecution);
+            taskDispatcher.dispatch(taskExecution);
         }
         // if it's not retryable then we're going fail the job
         else {
-            while (erroredTaskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
-                erroredTaskExecution = new TaskExecution(
-                    taskExecutionService.getTaskExecution(erroredTaskExecution.getParentId()));
-                erroredTaskExecution.setStatus(TaskStatus.FAILED);
-                erroredTaskExecution.setEndTime(LocalDateTime.now());
+            while (taskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
+                taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+                taskExecution.setStatus(TaskStatus.FAILED);
+                taskExecution.setEndTime(LocalDateTime.now());
 
-                taskExecutionService.update(erroredTaskExecution);
+                taskExecutionService.update(taskExecution);
             }
 
-            Job job = jobService.getTaskExecutionJob(erroredTaskExecution.getId());
+            Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
-            Assert.notNull(job, "job not found for task: " + erroredTaskExecution.getId());
+            Assert.notNull(job, String.format("No job found for task %s ", taskExecution.getId()));
 
-            Job updateJob = new Job(job);
+            job.setStatus(Job.Status.FAILED);
+            job.setEndTime(new Date());
 
-            Assert.notNull(updateJob, String.format("No job found for task %s ", erroredTaskExecution.getId()));
-
-            updateJob.setStatus(JobStatus.FAILED);
-            updateJob.setEndTime(new Date());
-
-            jobService.update(updateJob);
-            eventPublisher.publishEvent(new JobStatusWorkflowEvent(updateJob.getId(), updateJob.getStatus()));
+            jobService.update(job);
+            eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
         }
     }
 }

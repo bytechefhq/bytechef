@@ -39,12 +39,13 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
-import org.springframework.util.Assert;
 
 /**
  * A {@link TaskDispatcher} implementation which implements a loop construct. The dispatcher works by executing the
@@ -74,26 +75,21 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
-        List<Object> list = MapUtils.getList(taskExecution.getParameters(), LIST, Object.class,
-            Collections.emptyList());
+        Map<String, Object> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        List<Object> list = MapUtils.getList(
+            taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
-        Assert.notNull(iteratee, "'iteratee' property can't be null");
-
-        TaskExecution loopTaskExecution = new TaskExecution(taskExecution);
-
-        loopTaskExecution.setStartTime(LocalDateTime.now());
-        loopTaskExecution.setStatus(TaskStatus.STARTED);
-
-        taskExecutionService.update(loopTaskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
 
         if (loopForever || !list.isEmpty()) {
-            TaskExecution subTaskExecution = new TaskExecution(
-                iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1);
+            TaskExecution subTaskExecution = TaskExecution.of(
+                taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
+                new WorkflowTask(iteratee));
 
-            Context context = new Context(contextService.peek(taskExecution.getId()));
+            Context context = contextService.peek(taskExecution.getId());
 
             if (!list.isEmpty()) {
                 context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
@@ -103,19 +99,17 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            taskDispatcher.dispatch(evaluatedTaskExecution);
+            taskDispatcher.dispatch(subTaskExecution);
         } else {
-            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
 
-            completionTaskExecution.setStartTime(LocalDateTime.now());
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(0);
-
-            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
         }
     }
 

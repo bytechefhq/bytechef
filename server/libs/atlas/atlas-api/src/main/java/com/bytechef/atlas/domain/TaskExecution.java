@@ -26,14 +26,15 @@ import com.bytechef.atlas.task.Progressable;
 import com.bytechef.atlas.task.Retryable;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.LocalDateTimeUtils;
 import com.bytechef.commons.utils.UUIDUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,6 +70,8 @@ import org.springframework.util.Assert;
 public final class TaskExecution
     implements Errorable, Persistable<String>, Prioritizable, Progressable, Retryable, Task {
 
+    private static final int DEFAULT_TASK_NUMBER = -1;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -93,7 +96,7 @@ public final class TaskExecution
     private boolean isNew;
 
     @Column("job_id")
-    private AggregateReference<Job, String> job;
+    private AggregateReference<Job, String> jobRef;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -107,19 +110,19 @@ public final class TaskExecution
     private Object output;
 
     @Column("parent_id")
-    private AggregateReference<TaskExecution, String> parent;
+    private AggregateReference<TaskExecution, String> parentRef;
 
     @Column
     private int priority;
 
     @Column
-    private int progress = 0;
+    private int progress;
 
     @Column
-    private int retry = 0;
+    private int retry;
 
     @Column("retry_attempts")
-    private int retryAttempts = 0;
+    private int retryAttempts;
 
     @Column("retry_delay")
     private String retryDelay = "1s";
@@ -134,7 +137,7 @@ public final class TaskExecution
     private TaskStatus status;
 
     @Column("task_number")
-    private int taskNumber = -1;
+    private int taskNumber = DEFAULT_TASK_NUMBER;
 
     // TODO Add version
     // @Version
@@ -148,103 +151,57 @@ public final class TaskExecution
     public TaskExecution() {
     }
 
-    public TaskExecution(TaskExecution taskExecution) {
-        Assert.notNull(taskExecution, "taskExecution cannot be null");
-
-        this.createdBy = taskExecution.createdBy;
-        this.createdDate = taskExecution.createdDate;
-        this.endTime = taskExecution.endTime;
-        this.error = taskExecution.error;
-        this.executionTime = taskExecution.executionTime;
-        this.id = taskExecution.id;
-        this.lastModifiedBy = taskExecution.lastModifiedBy;
-        this.lastModifiedDate = taskExecution.lastModifiedDate;
-        this.job = taskExecution.job;
-        this.output = taskExecution.output;
-        this.parent = taskExecution.parent;
-        this.priority = taskExecution.priority;
-        this.progress = taskExecution.progress;
-        this.retry = taskExecution.retry;
-        this.retryAttempts = taskExecution.retryAttempts;
-        this.retryDelay = taskExecution.retryDelay;
-        this.retryDelayFactor = taskExecution.retryDelayFactor;
-        this.startTime = taskExecution.startTime;
-        this.status = taskExecution.status;
-        this.taskNumber = taskExecution.taskNumber;
-        this.workflowTask = new WorkflowTask(taskExecution.workflowTask);
-    }
-
-    public TaskExecution(TaskExecution taskExecution, WorkflowTask workflowTask) {
-        this(taskExecution);
+    public TaskExecution(@NonNull WorkflowTask workflowTask) {
+        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
 
         this.workflowTask = workflowTask;
     }
 
-    public TaskExecution(WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "workflowTask cannot be null");
-
-        this.workflowTask = new WorkflowTask(workflowTask);
-    }
-
-    public TaskExecution(WorkflowTask workflowTask, Map<String, Object> source) {
-        Assert.notNull(workflowTask, "workflowTask cannot be null");
-        Assert.notNull(source, "source cannot be null");
-
-        Map<String, Object> map = new HashMap<>();
-
-        map.putAll(workflowTask.toMap());
-        map.putAll(source);
-
-        this.workflowTask = new WorkflowTask(map);
-    }
-
-    public TaskExecution(WorkflowTask workflowTask, String jobId) {
-        Assert.notNull(workflowTask, "workflowTask cannot be null");
-        Assert.notNull(jobId, "jobId cannot be null");
-
+    private TaskExecution(String jobId, String parentId, int priority, int taskNumber, WorkflowTask workflowTask) {
         this.id = UUIDUtils.generate();
-        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
-        this.status = TaskStatus.CREATED;
-        this.workflowTask = new WorkflowTask(workflowTask);
-    }
+        this.jobRef = new AggregateReference.IdOnlyAggregateReference<>(jobId);
 
-    public TaskExecution(WorkflowTask workflowTask, String jobId, int priority) {
-        Assert.notNull(workflowTask, "workflowTask cannot be null");
-        Assert.notNull(jobId, "jobId cannot be null");
+        if (parentId != null) {
+            this.parentRef = new AggregateReference.IdOnlyAggregateReference<>(parentId);
+        }
 
-        this.id = UUIDUtils.generate();
-        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
-        this.priority = priority;
-        this.status = TaskStatus.CREATED;
-        this.workflowTask = new WorkflowTask(workflowTask);
-    }
-
-    public TaskExecution(WorkflowTask workflowTask, String jobId, String parentId, int priority) {
-        Assert.notNull(workflowTask, "workflowTask cannot be null");
-        Assert.notNull(jobId, "jobId cannot be null");
-        Assert.notNull(parentId, "parentId cannot be null");
-
-        this.id = UUIDUtils.generate();
-        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
-        this.parent = new AggregateReference.IdOnlyAggregateReference<>(parentId);
-        this.priority = priority;
-        this.status = TaskStatus.CREATED;
-        this.workflowTask = new WorkflowTask(workflowTask);
-    }
-
-    public TaskExecution(WorkflowTask workflowTask, String jobId, String parentId, int priority, int taskNumber) {
-
-        Assert.notNull(workflowTask, "workflowTask cannot be null");
-        Assert.notNull(jobId, "jobId cannot be null");
-        Assert.notNull(parentId, "parentId cannot be null");
-
-        this.id = UUIDUtils.generate();
-        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
-        this.parent = new AggregateReference.IdOnlyAggregateReference<>(parentId);
         this.priority = priority;
         this.status = TaskStatus.CREATED;
         this.taskNumber = taskNumber;
-        this.workflowTask = new WorkflowTask(workflowTask);
+        this.workflowTask = workflowTask;
+    }
+
+    public static TaskExecution of(@NonNull String jobId, @NonNull WorkflowTask workflowTask) {
+        Assert.notNull(jobId, "'jobId' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+
+        return new TaskExecution(jobId, null, 0, DEFAULT_TASK_NUMBER, workflowTask);
+    }
+
+    public static TaskExecution of(@NonNull String jobId, int priority, WorkflowTask workflowTask) {
+        Assert.notNull(jobId, "'jobId' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+
+        return new TaskExecution(jobId, null, priority, DEFAULT_TASK_NUMBER, workflowTask);
+    }
+
+    public static TaskExecution of(
+        @NonNull String jobId, @NonNull String parentId, int priority, @NonNull WorkflowTask workflowTask) {
+        Assert.notNull(jobId, "'jobId' must not be null.");
+        Assert.notNull(parentId, "'parentId' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+
+        return new TaskExecution(jobId, parentId, priority, DEFAULT_TASK_NUMBER, workflowTask);
+    }
+
+    public static TaskExecution of(
+        @NonNull String jobId, @NonNull String parentId, int priority, int taskNumber,
+        @NonNull WorkflowTask workflowTask) {
+        Assert.notNull(jobId, "'jobId' must not be null.");
+        Assert.notNull(parentId, "'parentId' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+
+        return new TaskExecution(jobId, parentId, priority, taskNumber, workflowTask);
     }
 
     @Override
@@ -260,6 +217,10 @@ public final class TaskExecution
         TaskExecution taskExecution = (TaskExecution) o;
 
         return Objects.equals(id, taskExecution.id);
+    }
+
+    public void evaluate(TaskEvaluator taskEvaluator, Context context) {
+        this.workflowTask = taskEvaluator.evaluate(this.workflowTask, context);
     }
 
     @Override
@@ -304,6 +265,11 @@ public final class TaskExecution
         return executionTime;
     }
 
+    @JsonIgnore
+    public List<WorkflowTask> getFinalize() {
+        return workflowTask.getFinalize();
+    }
+
     /**
      * Get the unique id of the task instance.
      *
@@ -314,8 +280,8 @@ public final class TaskExecution
     }
 
     @JsonIgnore
-    public AggregateReference<Job, String> getJob() {
-        return job;
+    public AggregateReference<Job, String> getJobRef() {
+        return jobRef;
     }
 
     /**
@@ -324,7 +290,7 @@ public final class TaskExecution
      * @return String the id of the job
      */
     public String getJobId() {
-        return job == null ? null : job.getId();
+        return jobRef == null ? null : jobRef.getId();
     }
 
     public String getLastModifiedBy() {
@@ -333,6 +299,16 @@ public final class TaskExecution
 
     public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    @JsonIgnore
+    public String getName() {
+        return workflowTask.getName();
+    }
+
+    @JsonIgnore
+    public String getNode() {
+        return workflowTask.getNode();
     }
 
     /**
@@ -350,8 +326,8 @@ public final class TaskExecution
     }
 
     @JsonIgnore
-    public AggregateReference<TaskExecution, String> getParent() {
-        return parent;
+    public AggregateReference<TaskExecution, String> getParentRef() {
+        return parentRef;
     }
 
     /**
@@ -360,7 +336,17 @@ public final class TaskExecution
      * @return String the id of the parent task.
      */
     public String getParentId() {
-        return parent == null ? null : parent.getId();
+        return parentRef == null ? null : parentRef.getId();
+    }
+
+    @JsonIgnore
+    public List<WorkflowTask> getPost() {
+        return workflowTask.getPost();
+    }
+
+    @JsonIgnore
+    public List<WorkflowTask> getPre() {
+        return workflowTask.getPre();
     }
 
     @Override
@@ -433,9 +419,14 @@ public final class TaskExecution
         return taskNumber;
     }
 
+    @JsonIgnore
+    public String getTimeout() {
+        return workflowTask.getTimeout();
+    }
+
     @Override
     public String getType() {
-        Assert.notNull(workflowTask.getType(), "Type cannot be null");
+        Assert.notNull(workflowTask.getType(), "Type must not be null");
 
         return workflowTask.getType();
     }
@@ -443,14 +434,6 @@ public final class TaskExecution
     @Override
     public boolean isNew() {
         return isNew;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
     }
 
     public void setEndTime(LocalDateTime endTime) {
@@ -477,35 +460,27 @@ public final class TaskExecution
         this.isNew = isNew;
     }
 
-    public void setJob(AggregateReference<Job, String> job) {
-        this.job = job;
+    public void setJobRef(AggregateReference<Job, String> jobRef) {
+        this.jobRef = jobRef;
     }
 
     public void setJobId(String jobId) {
         if (jobId != null) {
-            this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
+            this.jobRef = new AggregateReference.IdOnlyAggregateReference<>(jobId);
         }
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setOutput(Object output) {
         this.output = output;
     }
 
-    public void setParent(AggregateReference<TaskExecution, String> parent) {
-        this.parent = parent;
+    public void setParentRef(AggregateReference<TaskExecution, String> parentRef) {
+        this.parentRef = parentRef;
     }
 
     public void setParentId(String parentId) {
         if (parentId != null) {
-            this.parent = new AggregateReference.IdOnlyAggregateReference<>(parentId);
+            this.parentRef = new AggregateReference.IdOnlyAggregateReference<>(parentId);
         }
     }
 
@@ -545,257 +520,6 @@ public final class TaskExecution
         this.taskNumber = taskNumber;
     }
 
-    // Workflow Task
-
-    @JsonIgnore
-    public List<WorkflowTask> getFinalize() {
-        return workflowTask.getFinalize();
-    }
-
-    @JsonIgnore
-    public String getName() {
-        return workflowTask.getName();
-    }
-
-    @JsonIgnore
-    public String getNode() {
-        return workflowTask.getNode();
-    }
-
-    @JsonIgnore
-    public List<WorkflowTask> getPre() {
-        return workflowTask.getPre();
-    }
-
-    @JsonIgnore
-    public List<WorkflowTask> getPost() {
-        return workflowTask.getPost();
-    }
-
-    @JsonIgnore
-    public String getTimeout() {
-        return workflowTask.getTimeout();
-    }
-
-    // WorkflowTaskParameter
-
-    // @Override
-    // public Map<String, Object> asMap() {
-    // return workflowTask.asMap();
-    // }
-    //
-    // @Override
-    // public boolean containsKey(String key) {
-    // return MapUtils.containsKey(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Object get(String key) {
-    // return MapUtils.get(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public <T> T get(String key, ParameterizedTypeReference<T> returnType) {
-    // return MapUtils.get(workflowTask.getParameters(), key, returnType);
-    // }
-    //
-    // @Override
-    // public <T> T get(String key, Class<T> returnType, T defaultValue) {
-    // return MapUtils.get(workflowTask.getParameters(), key, returnType, defaultValue);
-    // }
-    //
-    // @Override
-    // public <T> T get(String key, ParameterizedTypeReference<T> returnType, T defaultValue) {
-    // return MapUtils.get(workflowTask.getParameters(), key, returnType, defaultValue);
-    // }
-    //
-    // @Override
-    // public <T> T get(String key, Class<T> returnType) {
-    // return MapUtils.get(workflowTask.getParameters(), key, returnType);
-    // }
-    //
-    // @Override
-    // public <T> T[] getArray(String key, Class<T> elementType) {
-    // return MapUtils.getArray(workflowTask.getParameters(), key, elementType);
-    // }
-    //
-    // @Override
-    // public Boolean getBoolean(String key) {
-    // return MapUtils.getBoolean(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public boolean getBoolean(String key, boolean defaultValue) {
-    // return MapUtils.getBoolean(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public Date getDate(String key) {
-    // return MapUtils.getDate(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Date getDate(String key, Date defaultValue) {
-    // return MapUtils.getDate(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public Double getDouble(String key) {
-    // return MapUtils.getDouble(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Double getDouble(String key, double defaultValue) {
-    // return MapUtils.getDouble(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public Duration getDuration(String key) {
-    // return MapUtils.getDuration(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Duration getDuration(String key, Duration defaultDuration) {
-    // return MapUtils.getDuration(workflowTask.getParameters(), key, defaultDuration);
-    // }
-    //
-    // @Override
-    // public Float getFloat(String key) {
-    // return MapUtils.getFloat(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public float getFloat(String key, float defaultValue) {
-    // return MapUtils.getFloat(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public Integer getInteger(String key) {
-    // return MapUtils.getInteger(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public int getInteger(String key, int defaultValue) {
-    // return MapUtils.getInteger(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public <T> List<T> getList(String key, Class<T> elementType) {
-    // return MapUtils.getList(workflowTask.getParameters(), key, elementType);
-    // }
-    //
-    // @Override
-    // public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-    // return MapUtils.getList(workflowTask.getParameters(), key, elementType, defaultValue);
-    // }
-    //
-    // @Override
-    // public <T> List<T> getList(String key, ParameterizedTypeReference<T> elementType) {
-    // return MapUtils.getList(workflowTask.getParameters(), key, elementType);
-    // }
-    //
-    // @Override
-    // public <T> List<T> getList(String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
-    // return MapUtils.getList(workflowTask.getParameters(), key, elementType, defaultValue);
-    // }
-    //
-    // @Override
-    // public LocalDate getLocalDate(String key) {
-    // return MapUtils.getLocalDate(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public LocalDate getLocalDate(String key, LocalDate defaultValue) {
-    // return MapUtils.getLocalDate(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public LocalDateTime getLocalDateTime(String key) {
-    // return MapUtils.getLocalDateTime(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
-    // return MapUtils.getLocalDateTime(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public Long getLong(String key) {
-    // return MapUtils.getLong(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public long getLong(String key, long defaultValue) {
-    // return MapUtils.getLong(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // public <V> Map<String, V> getMap(String key) {
-    // return MapUtils.getMap(workflowTask.getParameters(), key);
-    // }
-    //
-    // public <V> Map<String, V> getMap(String key, Map<String, V> defaultValue) {
-    // return MapUtils.getMap(workflowTask.getParameters(), key, defaultValue);
-    // }
-    //
-    // @Override
-    // public <T> T getRequired(String key) {
-    // return MapUtils.getRequired(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public <T> T getRequired(String key, Class<T> returnType) {
-    // return MapUtils.getRequired(workflowTask.getParameters(), key, returnType);
-    // }
-    //
-    // @Override
-    // public Boolean getRequiredBoolean(String key) {
-    // return MapUtils.getRequiredBoolean(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Date getRequiredDate(String key) {
-    // return MapUtils.getRequiredDate(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Double getRequiredDouble(String key) {
-    // return MapUtils.getRequiredDouble(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Float getRequiredFloat(String key) {
-    // return MapUtils.getRequiredFloat(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public Integer getRequiredInteger(String key) {
-    // return MapUtils.getRequiredInteger(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public LocalDate getRequiredLocalDate(String key) {
-    // return MapUtils.getRequiredLocalDate(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public LocalDateTime getRequiredLocalDateTime(String key) {
-    // return MapUtils.getRequiredLocalDateTime(workflowTask.getParameters(), key);
-    // }
-    //
-    // public String getRequiredString(String key) {
-    // return MapUtils.getRequiredString(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public String getString(String key) {
-    // return MapUtils.getString(workflowTask.getParameters(), key);
-    // }
-    //
-    // @Override
-    // public String getString(String key, String defaultValue) {
-    // return MapUtils.getString(workflowTask.getParameters(), key, defaultValue);
-    // }
-
     @Override
     public String toString() {
         return "TaskExecution{" + "createdBy='"
@@ -806,11 +530,11 @@ public final class TaskExecution
             + executionTime + ", id='"
             + id + '\'' + ", isNew="
             + isNew + ", job="
-            + job + ", lastModifiedBy='"
+            + jobRef + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
             + lastModifiedDate + ", output="
             + output + ", parent="
-            + parent + ", priority="
+            + parentRef + ", priority="
             + priority + ", progress="
             + progress + ", retry="
             + retry + ", retryAttempts="

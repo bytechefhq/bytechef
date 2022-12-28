@@ -39,7 +39,7 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
     private final List<? extends ErrorHandler<? super Errorable>> errorHandlers;
 
     public ErrorHandlerChain(List<? extends ErrorHandler<? super Errorable>> errorHandlers) {
-        Assert.notNull(errorHandlers, "list of handlers must not be null");
+        Assert.notNull(errorHandlers, "'errorHandlers' must not be null.");
 
         this.errorHandlers = errorHandlers;
     }
@@ -55,8 +55,9 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
                 return;
             }
 
-            if (method.getParameters()[0].getType()
-                .isAssignableFrom(errorable.getClass())) {
+            Class<?> type = method.getParameters()[0].getType();
+
+            if (type.isAssignableFrom(errorable.getClass())) {
                 handler.handle(errorable);
             }
         }

@@ -55,25 +55,29 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    public void handle(TaskExecution aTaskExecution) {
-        TaskExecution mtask = new TaskExecution(aTaskExecution);
-        mtask.setStatus(TaskStatus.COMPLETED);
-        taskExecutionService.update(mtask);
-        long tasksLeft = counterService.decrement(aTaskExecution.getParentId());
+    public void handle(TaskExecution taskExecution) {
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+
+        long tasksLeft = counterService.decrement(taskExecution.getParentId());
+
         if (tasksLeft == 0) {
-            taskCompletionHandler.handle(taskExecutionService.getTaskExecution(aTaskExecution.getParentId()));
-            counterService.delete(aTaskExecution.getParentId());
+            taskCompletionHandler.handle(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            counterService.delete(taskExecution.getParentId());
         }
     }
 
     @Override
-    public boolean canHandle(TaskExecution aTaskExecution) {
-        String parentId = aTaskExecution.getParentId();
-        if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
-            return parentExecution.getType()
-                .equals(PARALLEL + "/v" + VERSION_1);
+    public boolean canHandle(TaskExecution taskExecution) {
+        String parentId = taskExecution.getParentId();
+
+        if (parentId == null) {
+            return false;
+        } else {
+            TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
+
+            String type = parentTaskExecution.getType();
+
+            return type.equals(PARALLEL + "/v" + VERSION_1);
         }
-        return false;
     }
 }
