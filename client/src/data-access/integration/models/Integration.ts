@@ -20,6 +20,12 @@ import { exists, mapValues } from '../runtime';
  */
 export interface Integration {
     /**
+     * The category of the integration.
+     * @type {string}
+     * @memberof Integration
+     */
+    category?: string;
+    /**
      * The created by.
      * @type {string}
      * @memberof Integration
@@ -33,16 +39,16 @@ export interface Integration {
     readonly createdDate?: Date;
     /**
      * The id of the integration.
-     * @type {string}
+     * @type {number}
      * @memberof Integration
      */
-    readonly id?: string;
+    readonly id?: number;
     /**
      * The name of the integration.
      * @type {string}
      * @memberof Integration
      */
-    name?: string;
+    name: string;
     /**
      * The description of the integration.
      * @type {string}
@@ -62,6 +68,12 @@ export interface Integration {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * 
+     * @type {Array<string>}
+     * @memberof Integration
+     */
+    tags?: Array<string>;
+    /**
      * The workflow ids belonging to this integration.
      * @type {Array<string>}
      * @memberof Integration
@@ -74,6 +86,7 @@ export interface Integration {
  */
 export function instanceOfIntegration(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "name" in value;
 
     return isInstance;
 }
@@ -88,13 +101,15 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
+        'category': !exists(json, 'category') ? undefined : json['category'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'name': json['name'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'tags': !exists(json, 'tags') ? undefined : json['tags'],
         'workflowIds': !exists(json, 'workflowIds') ? undefined : json['workflowIds'],
     };
 }
@@ -108,8 +123,10 @@ export function IntegrationToJSON(value?: Integration | null): any {
     }
     return {
         
+        'category': value.category,
         'name': value.name,
         'description': value.description,
+        'tags': value.tags,
         'workflowIds': value.workflowIds,
     };
 }
