@@ -14,11 +14,12 @@
 
 
 /**
- * A type of the editor to show in UI.
+ * A type of the control to show in UI.
  * @export
  */
 export const ControlType = {
-    Code: 'CODE'
+    Code: 'CODE',
+    Password: 'PASSWORD'
 } as const;
 export type ControlType = typeof ControlType[keyof typeof ControlType];
 
