@@ -2,6 +2,6 @@ apis/ConnectionsApi.ts
 apis/index.ts
 index.ts
 models/Connection.ts
-models/ConnectionUpdate.ts
+models/PutConnectionRequest.ts
 models/index.ts
 runtime.ts

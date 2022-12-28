@@ -30,13 +30,13 @@ export interface Connection {
      * @type {string}
      * @memberof Connection
      */
-    componentName?: string;
+    componentName: string;
     /**
      * TODO
-     * @type {string}
+     * @type {number}
      * @memberof Connection
      */
-    componentVersion?: string;
+    componentVersion: number;
     /**
      * TODO
      * @type {string}
@@ -54,7 +54,7 @@ export interface Connection {
      * @type {string}
      * @memberof Connection
      */
-    name?: string;
+    name: string;
     /**
      * TODO
      * @type {string}
@@ -78,7 +78,7 @@ export interface Connection {
      * @type {{ [key: string]: object; }}
      * @memberof Connection
      */
-    parameters?: { [key: string]: object; };
+    parameters: { [key: string]: object; };
 }
 
 /**
@@ -86,6 +86,10 @@ export interface Connection {
  */
 export function instanceOfConnection(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "componentName" in value;
+    isInstance = isInstance && "componentVersion" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "parameters" in value;
 
     return isInstance;
 }
@@ -101,15 +105,15 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'authorizationName': !exists(json, 'authorizationName') ? undefined : json['authorizationName'],
-        'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
-        'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
+        'componentName': json['componentName'],
+        'componentVersion': json['componentVersion'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'name': json['name'],
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'parameters': !exists(json, 'parameters') ? undefined : json['parameters'],
+        'parameters': json['parameters'],
     };
 }
 
