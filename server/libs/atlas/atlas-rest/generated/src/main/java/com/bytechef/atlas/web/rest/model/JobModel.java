@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-26T09:25:21.049913+01:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -179,7 +179,7 @@ public class JobModel {
    * @return currentTask
   */
   
-  @Schema(name = "currentTask", description = "The index of the step on the job's workflow on which the job is working on right now.", required = false)
+  @Schema(name = "currentTask", accessMode = Schema.AccessMode.READ_ONLY, description = "The index of the step on the job's workflow on which the job is working on right now.", required = false)
   public Integer getCurrentTask() {
     return currentTask;
   }
@@ -263,7 +263,7 @@ public class JobModel {
    * @return inputs
   */
   
-  @Schema(name = "inputs", description = "The key-value map of the inputs passed to the job when it was created.", required = false)
+  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the inputs passed to the job when it was created.", required = false)
   public Map<String, Object> getInputs() {
     return inputs;
   }
@@ -282,7 +282,7 @@ public class JobModel {
    * @return label
   */
   
-  @Schema(name = "label", description = "The job's human-readable name.", required = false)
+  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", required = false)
   public String getLabel() {
     return label;
   }
@@ -347,7 +347,7 @@ public class JobModel {
    * @return outputs
   */
   
-  @Schema(name = "outputs", description = "The key-value map of the outputs returned.", required = false)
+  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the outputs returned.", required = false)
   public Map<String, Object> getOutputs() {
     return outputs;
   }
@@ -366,7 +366,7 @@ public class JobModel {
    * @return parentTaskExecutionId
   */
   
-  @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Required for sub-flows.", required = false)
+  @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", required = false)
   public String getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
@@ -384,8 +384,8 @@ public class JobModel {
    * The priority value.
    * @return priority
   */
-  @NotNull 
-  @Schema(name = "priority", description = "The priority value.", required = true)
+  
+  @Schema(name = "priority", accessMode = Schema.AccessMode.READ_ONLY, description = "The priority value.", required = true)
   public Integer getPriority() {
     return priority;
   }
@@ -403,8 +403,8 @@ public class JobModel {
    * The time of when the job began.
    * @return startTime
   */
-  @NotNull @Valid 
-  @Schema(name = "startTime", description = "The time of when the job began.", required = true)
+  @Valid 
+  @Schema(name = "startTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", required = true)
   public LocalDateTime getStartTime() {
     return startTime;
   }
@@ -422,8 +422,8 @@ public class JobModel {
    * The job's status.
    * @return status
   */
-  @NotNull 
-  @Schema(name = "status", description = "The job's status.", required = true)
+  
+  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's status.", required = true)
   public StatusEnum getStatus() {
     return status;
   }
@@ -450,7 +450,7 @@ public class JobModel {
    * @return webhooks
   */
   @Valid 
-  @Schema(name = "webhooks", description = "The list of the webhooks configured.", required = false)
+  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", required = false)
   public List<Map<String, Object>> getWebhooks() {
     return webhooks;
   }
@@ -469,7 +469,7 @@ public class JobModel {
    * @return workflowId
   */
   
-  @Schema(name = "workflowId", required = false)
+  @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, required = false)
   public String getWorkflowId() {
     return workflowId;
   }

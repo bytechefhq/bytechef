@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-26T09:25:21.049913+01:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @JsonProperty("finalize")
@@ -252,8 +252,8 @@ public class WorkflowTaskModel {
    * Type of the task.
    * @return type
   */
-  
-  @Schema(name = "type", description = "Type of the task.", required = false)
+  @NotNull 
+  @Schema(name = "type", description = "Type of the task.", required = true)
   public String getType() {
     return type;
   }
