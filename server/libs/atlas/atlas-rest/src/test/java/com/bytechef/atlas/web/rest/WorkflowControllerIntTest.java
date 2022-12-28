@@ -17,8 +17,6 @@
 
 package com.bytechef.atlas.web.rest;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,9 +24,15 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.web.rest.config.WorkflowRestTestConfiguration;
 import com.bytechef.atlas.web.rest.model.PostWorkflowRequestModel;
+import com.bytechef.atlas.web.rest.model.PutWorkflowRequestModel;
+import com.bytechef.atlas.web.rest.model.WorkflowFormatModel;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,6 +51,19 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     })
 @WebFluxTest(WorkflowController.class)
 public class WorkflowControllerIntTest {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static final String DEFINITION = """
+        {
+            "label": "label",
+            "tasks": [
+                {
+                    "name": "name",
+                    "type": "type"
+                }
+            ]
+        }
+        """;
 
     @Autowired
     private WorkflowService workflowService;
@@ -79,7 +96,7 @@ public class WorkflowControllerIntTest {
         try {
             Workflow workflow = getWorkflow();
 
-            when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+            when(workflowService.getWorkflow("1")).thenReturn(workflow);
 
             this.webTestClient
                 .get()
@@ -95,7 +112,7 @@ public class WorkflowControllerIntTest {
     }
 
     @Test
-    public void testGetWorkflows() {
+    public void testGetWorkflows() throws JsonProcessingException {
         Workflow workflow = getWorkflow();
 
         when(workflowService.getWorkflows()).thenReturn(List.of(workflow));
@@ -115,17 +132,20 @@ public class WorkflowControllerIntTest {
 
     @Test
     @SuppressFBWarnings("NP")
-    public void testPostWorkflow() {
+    public void testPostWorkflow() throws JsonProcessingException {
         Workflow workflow = getWorkflow();
-        PostWorkflowRequestModel workflowModel = new PostWorkflowRequestModel()
-            .definition("\"tasks\": []")
-            .providerType(PostWorkflowRequestModel.ProviderTypeEnum.JDBC)
-            .format(PostWorkflowRequestModel.FormatEnum.JSON);
 
-        when(workflowService.create(any(), any())).thenReturn(workflow);
+        PostWorkflowRequestModel workflowModel = new PostWorkflowRequestModel()
+            .definition(DEFINITION)
+            .sourceType(PostWorkflowRequestModel.SourceTypeEnum.JDBC)
+            .format(WorkflowFormatModel.JSON);
+
+        when(workflowService.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC))
+            .thenReturn(workflow);
 
         try {
-            assert workflow.getId() != null;
+            Workflow.Format format = workflow.getFormat();
+
             this.webTestClient
                 .post()
                 .uri("/workflows")
@@ -136,13 +156,18 @@ public class WorkflowControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.definition")
-                .isEqualTo(workflow.getDefinition())
                 .jsonPath("$.format")
-                .isEqualTo(workflow.getFormat()
-                    .toString())
+                .isEqualTo(format.toString())
                 .jsonPath("$.id")
-                .isEqualTo(workflow.getId());
+                .isEqualTo(workflow.getId())
+                .jsonPath("$.label")
+                .isEqualTo(workflow.getLabel())
+                .jsonPath("$.tasks")
+                .isArray()
+                .jsonPath("$.tasks[0].name")
+                .isEqualTo("name")
+                .jsonPath("$.tasks[0].type")
+                .isEqualTo("type");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -150,27 +175,15 @@ public class WorkflowControllerIntTest {
 
     @Test
     @SuppressFBWarnings("NP")
-    public void testPutWorkflow() {
+    public void testPutWorkflow() throws JsonProcessingException {
         Workflow workflow = getWorkflow();
-        WorkflowModel workflowModel = new WorkflowModel()
-            .id("1")
-            .definition(
-                """
-                    {
-                        "label": "label",
-                        "tasks": []
-                    }
-                    """);
 
-        workflow.setDefinition(
-            """
-                {
-                    "label": "label",
-                    "tasks": []
-                }
-                """);
+        PutWorkflowRequestModel workflowModel = new PutWorkflowRequestModel()
+            .definition(DEFINITION);
 
-        when(workflowService.update(workflow)).thenReturn(workflow);
+        when(workflowService.update("1", DEFINITION)).thenReturn(workflow);
+
+        Workflow.Format format = workflow.getFormat();
 
         try {
             this.webTestClient
@@ -183,27 +196,27 @@ public class WorkflowControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.definition")
-                .isEqualTo(workflow.getDefinition())
                 .jsonPath("$.format")
-                .isEqualTo(workflow.getFormat()
-                    .toString())
+                .isEqualTo(format.toString())
                 .jsonPath("$.id")
-                .isEqualTo(workflow.getId());
+                .isEqualTo(workflow.getId())
+                .jsonPath("$.label")
+                .isEqualTo(workflow.getLabel())
+                .jsonPath("$.tasks")
+                .isArray()
+                .jsonPath("$.tasks[0].name")
+                .isEqualTo("name")
+                .jsonPath("$.tasks[0].type")
+                .isEqualTo("type");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
     }
 
-    private static Workflow getWorkflow() {
-        Workflow workflow = new Workflow();
+    private static Workflow getWorkflow() throws JsonProcessingException {
+        Workflow workflow = new Workflow(OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}));
 
         workflow.setId("1");
-        workflow.setDefinition("""
-            {
-                "tasks": []
-            }
-            """);
         workflow.setFormat(Workflow.Format.JSON);
 
         return workflow;
