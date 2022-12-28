@@ -205,7 +205,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private boolean isRestartable(Job job) {
-        return job.getStatus() == JobStatus.STOPPED || job.getStatus() == JobStatus.FAILED;
+        return job.getStatus() == Job.Status.STOPPED || job.getStatus() == Job.Status.FAILED;
     }
 
     private void validate(JobParameters workflowParameters, Workflow workflow) {
