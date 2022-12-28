@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ConnectionUpdate
+ * @interface PutConnectionRequest
  */
-export interface ConnectionUpdate {
+export interface PutConnectionRequest {
     /**
      * TODO
      * @type {string}
-     * @memberof ConnectionUpdate
+     * @memberof PutConnectionRequest
      */
     name?: string;
 }
 
 /**
- * Check if a given object implements the ConnectionUpdate interface.
+ * Check if a given object implements the PutConnectionRequest interface.
  */
-export function instanceOfConnectionUpdate(value: object): boolean {
+export function instanceOfPutConnectionRequest(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ConnectionUpdateFromJSON(json: any): ConnectionUpdate {
-    return ConnectionUpdateFromJSONTyped(json, false);
+export function PutConnectionRequestFromJSON(json: any): PutConnectionRequest {
+    return PutConnectionRequestFromJSONTyped(json, false);
 }
 
-export function ConnectionUpdateFromJSONTyped(json: any, ignoreDiscriminator: boolean): ConnectionUpdate {
+export function PutConnectionRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PutConnectionRequest {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function ConnectionUpdateFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function ConnectionUpdateToJSON(value?: ConnectionUpdate | null): any {
+export function PutConnectionRequestToJSON(value?: PutConnectionRequest | null): any {
     if (value === undefined) {
         return undefined;
     }
