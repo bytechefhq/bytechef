@@ -323,13 +323,10 @@ public class MapUtils {
                 .stream()
                 .map(entry -> {
                     for (Class<?> valueType : valueTypes) {
-                        if (entry.getValue() != null
-                            && conversionService.canConvert(
-                                entry.getValue()
-                                    .getClass(),
-                                valueType)) {
-                            entry = Map.entry(
-                                entry.getKey(), conversionService.convert(entry.getValue(), valueType));
+                        Object value = entry.getValue();
+
+                        if (value != null && conversionService.canConvert(value.getClass(), valueType)) {
+                            entry = Map.entry(entry.getKey(), conversionService.convert(entry.getValue(), valueType));
                         }
                     }
 
@@ -398,6 +395,23 @@ public class MapUtils {
         return value;
     }
 
+    public static <T> List<T> getRequiredList(Map<String, Object> map, String key, Class<T> elementType) {
+        List<T> value = getList(map, key, elementType);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static <T> List<T> getRequiredList(
+        Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
+        List<T> value = getList(map, key, elementType);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
     public static LocalDate getRequiredLocalDate(Map<String, Object> map, String key) {
         LocalDate value = getLocalDate(map, key);
 
@@ -408,6 +422,14 @@ public class MapUtils {
 
     public static LocalDateTime getRequiredLocalDateTime(Map<String, Object> map, String key) {
         LocalDateTime value = getLocalDateTime(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static <V> Map<String, V> getRequiredMap(Map<String, Object> map, String key) {
+        Map<String, V> value = getMap(map, key);
 
         Assert.notNull(value, "Unknown key: " + key);
 
