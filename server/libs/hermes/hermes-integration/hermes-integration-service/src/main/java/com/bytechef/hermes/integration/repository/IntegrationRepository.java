@@ -27,5 +27,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface IntegrationRepository
-    extends PagingAndSortingRepository<Integration, String>, CrudRepository<Integration, String> {
+    extends PagingAndSortingRepository<Integration, Long>, CrudRepository<Integration, Long> {
 }
