@@ -25,8 +25,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T15:17:10.759237+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:16:13.209880+01:00[Europe/Zagreb]")
 public class IntegrationModel {
+
+  @JsonProperty("category")
+  private String category;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -36,7 +39,7 @@ public class IntegrationModel {
   private LocalDateTime createdDate;
 
   @JsonProperty("id")
-  private String id;
+  private Long id;
 
   @JsonProperty("name")
   private String name;
@@ -51,9 +54,32 @@ public class IntegrationModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
+  @JsonProperty("tags")
+  @Valid
+  private List<String> tags = null;
+
   @JsonProperty("workflowIds")
   @Valid
   private List<String> workflowIds = null;
+
+  public IntegrationModel category(String category) {
+    this.category = category;
+    return this;
+  }
+
+  /**
+   * The category of the integration.
+   * @return category
+  */
+  
+  @Schema(name = "category", description = "The category of the integration.", required = false)
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
 
   public IntegrationModel createdBy(String createdBy) {
     this.createdBy = createdBy;
@@ -93,7 +119,7 @@ public class IntegrationModel {
     this.createdDate = createdDate;
   }
 
-  public IntegrationModel id(String id) {
+  public IntegrationModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -104,11 +130,11 @@ public class IntegrationModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the integration.", required = false)
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -121,8 +147,8 @@ public class IntegrationModel {
    * The name of the integration.
    * @return name
   */
-  
-  @Schema(name = "name", description = "The name of the integration.", required = false)
+  @NotNull 
+  @Schema(name = "name", description = "The name of the integration.", required = true)
   public String getName() {
     return name;
   }
@@ -188,6 +214,33 @@ public class IntegrationModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public IntegrationModel tags(List<String> tags) {
+    this.tags = tags;
+    return this;
+  }
+
+  public IntegrationModel addTagsItem(String tagsItem) {
+    if (this.tags == null) {
+      this.tags = new ArrayList<>();
+    }
+    this.tags.add(tagsItem);
+    return this;
+  }
+
+  /**
+   * Get tags
+   * @return tags
+  */
+  
+  @Schema(name = "tags", required = false)
+  public List<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(List<String> tags) {
+    this.tags = tags;
+  }
+
   public IntegrationModel workflowIds(List<String> workflowIds) {
     this.workflowIds = workflowIds;
     return this;
@@ -224,25 +277,28 @@ public class IntegrationModel {
       return false;
     }
     IntegrationModel integration = (IntegrationModel) o;
-    return Objects.equals(this.createdBy, integration.createdBy) &&
+    return Objects.equals(this.category, integration.category) &&
+        Objects.equals(this.createdBy, integration.createdBy) &&
         Objects.equals(this.createdDate, integration.createdDate) &&
         Objects.equals(this.id, integration.id) &&
         Objects.equals(this.name, integration.name) &&
         Objects.equals(this.description, integration.description) &&
         Objects.equals(this.lastModifiedBy, integration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integration.lastModifiedDate) &&
+        Objects.equals(this.tags, integration.tags) &&
         Objects.equals(this.workflowIds, integration.workflowIds);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, workflowIds);
+    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, tags, workflowIds);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationModel {\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
@@ -250,6 +306,7 @@ public class IntegrationModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workflowIds: ").append(toIndentedString(workflowIds)).append("\n");
     sb.append("}");
     return sb.toString();
