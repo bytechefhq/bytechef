@@ -23,43 +23,27 @@ import {
 /**
  * 
  * @export
- * @interface PostWorkflowRequest
+ * @interface GetWorkflow200Response
  */
-export interface PostWorkflowRequest {
+export interface GetWorkflow200Response {
     /**
      * Definition of the workflow that is executed as a job.
      * @type {string}
-     * @memberof PostWorkflowRequest
+     * @memberof GetWorkflow200Response
      */
     definition: string;
     /**
      * 
      * @type {WorkflowFormat}
-     * @memberof PostWorkflowRequest
+     * @memberof GetWorkflow200Response
      */
     format: WorkflowFormat;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostWorkflowRequest
-     */
-    sourceType?: PostWorkflowRequestSourceTypeEnum;
 }
 
-
 /**
- * @export
+ * Check if a given object implements the GetWorkflow200Response interface.
  */
-export const PostWorkflowRequestSourceTypeEnum = {
-    Jdbc: 'JDBC'
-} as const;
-export type PostWorkflowRequestSourceTypeEnum = typeof PostWorkflowRequestSourceTypeEnum[keyof typeof PostWorkflowRequestSourceTypeEnum];
-
-
-/**
- * Check if a given object implements the PostWorkflowRequest interface.
- */
-export function instanceOfPostWorkflowRequest(value: object): boolean {
+export function instanceOfGetWorkflow200Response(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "definition" in value;
     isInstance = isInstance && "format" in value;
@@ -67,11 +51,11 @@ export function instanceOfPostWorkflowRequest(value: object): boolean {
     return isInstance;
 }
 
-export function PostWorkflowRequestFromJSON(json: any): PostWorkflowRequest {
-    return PostWorkflowRequestFromJSONTyped(json, false);
+export function GetWorkflow200ResponseFromJSON(json: any): GetWorkflow200Response {
+    return GetWorkflow200ResponseFromJSONTyped(json, false);
 }
 
-export function PostWorkflowRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostWorkflowRequest {
+export function GetWorkflow200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetWorkflow200Response {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -79,11 +63,10 @@ export function PostWorkflowRequestFromJSONTyped(json: any, ignoreDiscriminator:
         
         'definition': json['definition'],
         'format': WorkflowFormatFromJSON(json['format']),
-        'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
     };
 }
 
-export function PostWorkflowRequestToJSON(value?: PostWorkflowRequest | null): any {
+export function GetWorkflow200ResponseToJSON(value?: GetWorkflow200Response | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -94,7 +77,6 @@ export function PostWorkflowRequestToJSON(value?: PostWorkflowRequest | null): a
         
         'definition': value.definition,
         'format': WorkflowFormatToJSON(value.format),
-        'sourceType': value.sourceType,
     };
 }
 
