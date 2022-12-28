@@ -19,10 +19,11 @@ package com.bytechef.hermes.connection.repository.event;
 
 import com.bytechef.commons.utils.UUIDUtils;
 import com.bytechef.hermes.connection.domain.Connection;
-import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
@@ -39,9 +40,6 @@ public class ConnectionCallback implements BeforeConvertCallback<Connection> {
             connection.setCreatedDate(LocalDateTime.now());
             connection.setId(UUIDUtils.generate());
         }
-
-        connection.setLastModifiedBy("system");
-        connection.setLastModifiedDate(LocalDateTime.now());
 
         return connection;
     }
