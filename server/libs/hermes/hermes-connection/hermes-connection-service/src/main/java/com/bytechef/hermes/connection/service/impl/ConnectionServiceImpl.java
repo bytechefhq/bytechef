@@ -22,8 +22,12 @@ import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.StreamSupport;
+
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -39,22 +43,37 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection add(Connection connection) {
-        connection.setId(null);
+    public Connection create(
+        @NonNull String name, @NonNull String componentName, int componentVersion, String authorizationName,
+        @NonNull Map<String, Object> parameters) {
 
-        connection = connectionRepository.save(connection);
+        Assert.notNull(name, "'name' must not be null.");
+        Assert.notNull(componentName, "'componentName' must not be null.");
+        Assert.notNull(parameters, "'parameters' must not be null.");
 
-        return connection;
+        Connection connection = new Connection();
+
+        connection.setAuthorizationName(authorizationName);
+        connection.setComponentName(componentName);
+        connection.setComponentVersion(componentVersion);
+        connection.setName(name);
+        connection.setParameters(parameters);
+
+        return connectionRepository.save(connection);
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
+
         connectionRepository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Connection getConnection(String id) {
+    public Connection getConnection(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
+
         return connectionRepository.findById(id)
             .orElseThrow();
     }
@@ -68,7 +87,10 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection update(String id, String name) {
+    public Connection update(@NonNull String id, @NonNull String name) {
+        Assert.notNull(id, "'id' must not be null.");
+        Assert.notNull(name, "'name' must not be null.");
+
         return connectionRepository
             .findById(id)
             .map(connection -> {
