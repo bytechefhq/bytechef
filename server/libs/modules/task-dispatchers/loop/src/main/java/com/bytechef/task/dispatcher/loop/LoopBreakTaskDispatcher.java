@@ -58,9 +58,9 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     }
 
     private TaskExecution findLoopTaskExecution(String taskExecutionId) {
-        Assert.notNull(taskExecutionId, "Cannot be null");
+        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null.");
 
-        TaskExecution taskExecution = new TaskExecution(taskExecutionService.getTaskExecution(taskExecutionId));
+        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
         if (taskExecution.getType()
             .equals(LOOP + "/v" + VERSION_1)) {

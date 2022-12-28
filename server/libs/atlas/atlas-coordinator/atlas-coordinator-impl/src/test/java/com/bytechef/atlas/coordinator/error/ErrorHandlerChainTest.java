@@ -23,6 +23,8 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ErrorHandler;
 import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,13 +35,13 @@ public class ErrorHandlerChainTest {
 
     @Test
     public void test1() {
-        ErrorHandler errorHandler = new ErrorHandler<Job>() {
-            @Override
-            public void handle(Job j) {
-                Assertions.assertEquals(Job.class, j.getClass());
-            }
-        };
-        ErrorHandlerChain chain = new ErrorHandlerChain(Arrays.asList(errorHandler));
+        ErrorHandler<Job> errorHandler = job -> Assertions.assertEquals(Job.class, job.getClass());
+
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
+        ErrorHandlerChain chain = new ErrorHandlerChain((List) List.of(errorHandler));
+
         chain.handle(new Job());
     }
 
@@ -57,7 +59,12 @@ public class ErrorHandlerChainTest {
                 Assertions.assertEquals(TaskExecution.class, jt.getClass());
             }
         };
-        ErrorHandlerChain chain = new ErrorHandlerChain(Arrays.asList(errorHandler1, errorHandler2));
+
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
+        ErrorHandlerChain chain = new ErrorHandlerChain((List) Arrays.asList(errorHandler1, errorHandler2));
+
         chain.handle(new TaskExecution());
     }
 }

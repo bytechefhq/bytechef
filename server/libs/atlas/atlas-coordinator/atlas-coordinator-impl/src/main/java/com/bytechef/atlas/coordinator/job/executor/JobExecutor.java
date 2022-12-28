@@ -23,7 +23,6 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
@@ -31,6 +30,8 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**
@@ -38,6 +39,7 @@ import java.util.List;
  * @author Ivica Cardic
  * @since Apr 24, 2017
  */
+@Transactional
 public class JobExecutor {
 
     private final ContextService contextService;
@@ -63,7 +65,7 @@ public class JobExecutor {
     public void execute(Job job) {
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        if (job.getStatus() != JobStatus.STARTED) {
+        if (job.getStatus() != Job.Status.STARTED) {
             throw new IllegalStateException("should not be here");
         } else if (hasMoreTasks(job, workflow)) {
             executeNextTask(job, workflow);
@@ -72,35 +74,36 @@ public class JobExecutor {
         }
     }
 
+    private void executeNextTask(Job job, Workflow workflow) {
+        TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
+        Context context = contextService.peek(job.getId());
+
+        contextService.push(nextTaskExecution.getId(), context);
+
+        nextTaskExecution.evaluate(taskEvaluator, context);
+
+        nextTaskExecution = taskExecutionService.create(nextTaskExecution);
+
+        taskDispatcher.dispatch(nextTaskExecution);
+    }
+
     private boolean hasMoreTasks(Job job, Workflow workflow) {
         return job.getCurrentTask() < workflow.getTasks()
             .size();
     }
 
+    @SuppressFBWarnings("NP")
     private TaskExecution nextTaskExecution(Job job, Workflow workflow) {
         List<WorkflowTask> workflowTasks = workflow.getTasks();
 
         WorkflowTask workflowTask = workflowTasks.get(job.getCurrentTask());
 
-        TaskExecution taskExecution = new TaskExecution(workflowTask, job.getId(), job.getPriority());
+        TaskExecution taskExecution = TaskExecution.of(job.getId(), job.getPriority(), workflowTask);
 
         if (workflow.getRetry() > 0 && taskExecution.getRetry() < 1) {
             taskExecution.setRetry(workflow.getRetry());
         }
 
         return taskExecution;
-    }
-
-    private void executeNextTask(Job job, Workflow workflow) {
-        TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
-        Context context = new Context(contextService.peek(job.getId()));
-
-        contextService.push(nextTaskExecution.getId(), context);
-
-        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
-
-        evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
-
-        taskDispatcher.dispatch(evaluatedTaskExecution);
     }
 }
