@@ -38,8 +38,10 @@ public class WorkflowRSocketClient implements WorkflowService {
     }
 
     @Override
-    public Workflow create(Workflow workflow, Workflow.ProviderType providerType) {
-        workflow.setProviderType(providerType);
+    public Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType) {
+        Workflow workflow = new Workflow();
+
+        workflow.setSourceType(sourceType);
 
         return rSocketRequester
             .route("createWorkflow")
@@ -74,7 +76,12 @@ public class WorkflowRSocketClient implements WorkflowService {
     }
 
     @Override
-    public Workflow update(Workflow workflow) {
+    public Workflow update(String id, String definition) {
+        Workflow workflow = new Workflow();
+
+        workflow.setDefinition(definition);
+        workflow.setId(id);
+
         return rSocketRequester
             .route("updateWorkflow")
             .data(workflow)
