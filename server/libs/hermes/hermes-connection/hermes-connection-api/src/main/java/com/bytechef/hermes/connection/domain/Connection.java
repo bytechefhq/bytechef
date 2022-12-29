@@ -37,7 +37,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Connection implements Persistable<String> {
+public final class Connection implements Persistable<Long> {
 
     @Column("authorization_name")
     private String authorizationName;
@@ -57,7 +57,7 @@ public final class Connection implements Persistable<String> {
     private LocalDateTime createdDate;
 
     @Id
-    private String id;
+    private Long id;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -131,7 +131,7 @@ public final class Connection implements Persistable<String> {
     /**
      * Return the ID of the connection.
      */
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -179,15 +179,7 @@ public final class Connection implements Persistable<String> {
         this.componentVersion = componentVersion;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

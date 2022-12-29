@@ -30,12 +30,12 @@ public interface ConnectionService {
         String name, String componentName, int componentVersion, String authorizationName,
         Map<String, Object> parameters);
 
-    void delete(String id);
+    void delete(Long id);
 
-    Connection getConnection(String id);
+    Connection getConnection(Long id);
 
     List<Connection> getConnections();
 
-    Connection update(String id, String name);
+    Connection update(Long id, String name);
 
 }
