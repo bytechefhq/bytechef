@@ -46,14 +46,14 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteConnection(String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Void>> deleteConnection(Long id, ServerWebExchange exchange) {
         connectionService.delete(id);
 
         return Mono.empty();
     }
 
     @Override
-    public Mono<ResponseEntity<ConnectionModel>> getConnection(String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<ConnectionModel>> getConnection(Long id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
             conversionService.convert(connectionService.getConnection(id), ConnectionModel.class)));
     }
@@ -79,7 +79,7 @@ public class ConnectionController implements ConnectionsApi {
 
     @Override
     public Mono<ResponseEntity<ConnectionModel>> putConnection(
-        String id, Mono<PutConnectionRequestModel> putConnectionRequestModelMono, ServerWebExchange exchange) {
+        Long id, Mono<PutConnectionRequestModel> putConnectionRequestModelMono, ServerWebExchange exchange) {
         return putConnectionRequestModelMono
             .map(putConnectionRequestModel -> ResponseEntity.ok(conversionService.convert(
                 connectionService.update(id, putConnectionRequestModel.getName()), ConnectionModel.class)));
