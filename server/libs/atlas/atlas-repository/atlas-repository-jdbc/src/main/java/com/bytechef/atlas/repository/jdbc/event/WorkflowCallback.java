@@ -74,7 +74,7 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
         newWorkflow.setDefinition(definition);
         newWorkflow.setLastModifiedBy(workflow.getLastModifiedBy());
         newWorkflow.setLastModifiedDate(workflow.getLastModifiedDate());
-//        newWorkflow.setVersion(workflow.getVersion);
+        newWorkflow.setVersion(workflow.getVersion());
 
         return newWorkflow;
     }

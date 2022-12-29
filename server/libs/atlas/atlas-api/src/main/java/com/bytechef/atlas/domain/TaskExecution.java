@@ -44,6 +44,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
@@ -140,7 +141,7 @@ public final class TaskExecution
     private int taskNumber = DEFAULT_TASK_NUMBER;
 
     // TODO Add version
-    // @Version
+    @Version
     @SuppressFBWarnings("UuF")
     private int version;
 
