@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("putConnection_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:15:03.783538+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-29T13:13:26.694393+01:00[Europe/Zagreb]")
 public class PutConnectionRequestModel {
 
   @JsonProperty("name")
