@@ -18,7 +18,10 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +30,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.web.rest.config.ConnectionRestTestConfiguration;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import com.bytechef.hermes.connection.web.rest.model.ConnectionUpdateModel;
+import com.bytechef.hermes.connection.web.rest.model.PutConnectionRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -70,11 +73,11 @@ public class ConnectionControllerIntTest {
             Assertions.fail(exception);
         }
 
-        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Long> argument = ArgumentCaptor.forClass(Long.class);
 
         verify(connectionService).delete(argument.capture());
 
-        Assertions.assertEquals("1", argument.getValue());
+        Assertions.assertEquals(1L, argument.getValue());
     }
 
     @Test
@@ -82,7 +85,7 @@ public class ConnectionControllerIntTest {
         try {
             Connection connection = getConnection();
 
-            when(connectionService.getConnection(anyString())).thenReturn(connection);
+            when(connectionService.getConnection(anyLong())).thenReturn(connection);
 
             this.webTestClient
                 .get()
@@ -120,10 +123,12 @@ public class ConnectionControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostConnection() {
         Connection connection = getConnection();
-        ConnectionModel connectionModel = new ConnectionModel().name("name")
+        ConnectionModel connectionModel = new ConnectionModel().componentName("componentName")
+            .componentVersion(1)
+            .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionService.add(any())).thenReturn(connection);
+        when(connectionService.create(anyString(), anyString(), anyInt(), isNull(), any())).thenReturn(connection);
 
         try {
             assert connection.getId() != null;
@@ -154,11 +159,11 @@ public class ConnectionControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPutConnection() {
         Connection connection = getConnection();
-        ConnectionUpdateModel connectionUpdateModel = new ConnectionUpdateModel().name("name2");
+        PutConnectionRequestModel putConnectionRequestModel = new PutConnectionRequestModel().name("name2");
 
         connection.setName("name2");
 
-        when(connectionService.update(anyString(), anyString())).thenReturn(connection);
+        when(connectionService.update(1L, putConnectionRequestModel.getName())).thenReturn(connection);
 
         try {
             this.webTestClient
@@ -166,7 +171,7 @@ public class ConnectionControllerIntTest {
                 .uri("/connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(connectionUpdateModel)
+                .bodyValue(putConnectionRequestModel)
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -183,7 +188,9 @@ public class ConnectionControllerIntTest {
     private static Connection getConnection() {
         Connection connection = new Connection();
 
-        connection.setId("1");
+        connection.setComponentName("componentName");
+        connection.setComponentVersion(1);
+        connection.setId(1L);
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
 

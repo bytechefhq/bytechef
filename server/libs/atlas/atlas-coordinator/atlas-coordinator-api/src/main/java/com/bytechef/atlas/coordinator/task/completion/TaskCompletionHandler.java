@@ -28,6 +28,7 @@ import com.bytechef.atlas.domain.TaskExecution;
  * @since Apr 23, 2017
  */
 public interface TaskCompletionHandler {
+
     void handle(TaskExecution taskExecution);
 
     boolean canHandle(TaskExecution taskExecution);

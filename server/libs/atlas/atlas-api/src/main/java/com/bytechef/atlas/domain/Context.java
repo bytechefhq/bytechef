@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  */
 @Table
-public final class Context implements Persistable<String> {
+public final class Context implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")
@@ -47,7 +47,7 @@ public final class Context implements Persistable<String> {
     private LocalDateTime createdDate;
 
     @Id
-    private String id;
+    private Long id;
 
     @Column("stack_id")
     private String stackId;
@@ -60,21 +60,13 @@ public final class Context implements Persistable<String> {
     }
 
     public Context(Map<String, Object> value) {
-        Assert.notNull(value, "id cannot be value");
+        Assert.notNull(value, "'value' must not be null.");
 
         this.value = new MapWrapper(value);
     }
 
     public Context(String key, Object value) {
         this(Collections.singletonMap(key, value));
-    }
-
-    public Context(Context context) {
-        Assert.notNull(context, "Context cannot be null");
-
-        this.id = context.getId();
-        this.stackId = context.getStackId();
-        this.value = new MapWrapper(context.getValue());
     }
 
     @Override
@@ -105,7 +97,7 @@ public final class Context implements Persistable<String> {
         return createdDate;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -134,7 +126,7 @@ public final class Context implements Persistable<String> {
         this.createdDate = createdDate;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

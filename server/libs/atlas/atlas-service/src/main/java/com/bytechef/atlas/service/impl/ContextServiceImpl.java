@@ -21,6 +21,7 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.repository.ContextRepository;
 import com.bytechef.atlas.service.ContextService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -35,9 +36,9 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(String stackId, Context context) {
-        Assert.notNull(stackId, "stackId cannot be null.");
-        Assert.notNull(context, "context cannot be null.");
+    public void push(@NonNull String stackId, @NonNull Context context) {
+        Assert.notNull(stackId, "'stackId' must not be null.");
+        Assert.notNull(context, "'context' must not be null.");
 
         context.setId(null);
         context.setStackId(stackId);
@@ -47,8 +48,8 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     @Transactional(readOnly = true)
-    public Context peek(String stackId) {
-        Assert.notNull(stackId, "stackId cannot be null.");
+    public Context peek(@NonNull String stackId) {
+        Assert.notNull(stackId, "'stackId' must not be null.");
 
         return contextRepository.findTop1ByStackIdOrderByCreatedDateDesc(stackId);
     }

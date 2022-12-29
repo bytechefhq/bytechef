@@ -1,6 +1,7 @@
 dependencies {
     api project(":server:libs:hermes:hermes-integration:hermes-integration-api")
 
+    implementation libs.commons.collections4
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-tx"
     implementation "org.springframework.data:spring-data-jdbc"
@@ -12,6 +13,8 @@ dependencies {
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     testImplementation project(":server:libs:atlas:atlas-service")
     testImplementation project(":server:libs:atlas:atlas-upgrade")
+    testImplementation project(":server:libs:core:tag:tag-service")
+    testImplementation project(":server:libs:core:tag:tag-upgrade")
     testImplementation project(":server:libs:hermes:hermes-integration:hermes-integration-upgrade")
     testImplementation project(":server:libs:test:test-int-support")
 }

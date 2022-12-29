@@ -25,7 +25,7 @@ import java.util.List;
  */
 public interface WorkflowService {
 
-    Workflow create(Workflow workflow, Workflow.ProviderType providerType);
+    Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType);
 
     void delete(String id);
 
@@ -33,5 +33,5 @@ public interface WorkflowService {
 
     List<Workflow> getWorkflows();
 
-    Workflow update(Workflow workflow);
+    Workflow update(String id, String definition);
 }

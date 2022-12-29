@@ -92,7 +92,7 @@ public class ContextImpl implements Context {
     @Override
     public Connection getConnectionParameters() {
         return new ConnectionImpl(connectionService.getConnection(
-            MapUtils.getRequiredString(taskExecution.getParameters(), CONNECTION_ID)));
+            MapUtils.getRequired(taskExecution.getParameters(), CONNECTION_ID)));
     }
 
     @Override

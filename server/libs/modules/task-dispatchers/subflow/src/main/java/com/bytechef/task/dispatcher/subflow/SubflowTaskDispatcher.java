@@ -24,6 +24,7 @@ import static com.bytechef.task.dispatcher.subflow.constants.SubflowTaskDispatch
 
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.task.Task;
@@ -31,8 +32,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.utils.MapUtils;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * a {@link TaskDispatcher} implementation which handles the 'subflow' task type. Subflows are essentially isolated job
@@ -51,23 +51,20 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        Map<String, Object> params = new HashMap<>();
+        JobParameters jobParameters = new JobParameters();
 
-        params.put(
-            WorkflowConstants.INPUTS,
+        jobParameters.setInputs(
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
-        params.put(WorkflowConstants.PARENT_TASK_EXECUTION_ID, taskExecution.getId());
-        params.put(
-            WorkflowConstants.WORKFLOW_ID,
+        jobParameters.setParentTaskExecutionId(taskExecution.getId());
+        jobParameters.setWorkflowId(
             MapUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
 
-        messageBroker.send(Queues.SUBFLOWS, params);
+        messageBroker.send(Queues.SUBFLOWS, jobParameters);
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(SUBFLOW + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), SUBFLOW + "/v" + VERSION_1)) {
             return this;
         }
 

@@ -22,11 +22,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -35,7 +37,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Connection implements Persistable<String> {
+public final class Connection implements Persistable<Long> {
 
     @Column("authorization_name")
     private String authorizationName;
@@ -55,7 +57,7 @@ public final class Connection implements Persistable<String> {
     private LocalDateTime createdDate;
 
     @Id
-    private String id;
+    private Long id;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -71,8 +73,7 @@ public final class Connection implements Persistable<String> {
     @Column("parameters")
     private EncryptedMapWrapper parameters;
 
-    // TODO Add version
-    // @Version
+    @Version
     @SuppressFBWarnings("UuF")
     private int version;
 
@@ -86,9 +87,9 @@ public final class Connection implements Persistable<String> {
             return false;
         }
 
-        Connection that = (Connection) o;
+        Connection connection = (Connection) o;
 
-        return id.equals(that.id);
+        return id.equals(connection.id);
     }
 
     @Override
@@ -130,7 +131,7 @@ public final class Connection implements Persistable<String> {
     /**
      * Return the ID of the connection.
      */
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -178,15 +179,7 @@ public final class Connection implements Persistable<String> {
         this.componentVersion = componentVersion;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -196,14 +189,6 @@ public final class Connection implements Persistable<String> {
 
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = new EncryptedMapWrapper(parameters);
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override

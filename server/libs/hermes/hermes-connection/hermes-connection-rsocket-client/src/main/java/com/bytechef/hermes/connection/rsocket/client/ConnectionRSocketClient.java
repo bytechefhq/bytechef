@@ -20,6 +20,8 @@ package com.bytechef.hermes.connection.rsocket.client;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -37,7 +39,18 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection add(Connection connection) {
+    public Connection create(
+        String name, String componentName, int componentVersion, String authorizationName,
+        Map<String, Object> parameters) {
+
+        Connection connection = new Connection();
+
+        connection.setAuthorizationName(authorizationName);
+        connection.setComponentName(componentName);
+        connection.setComponentVersion(componentVersion);
+        connection.setName(name);
+        connection.setParameters(parameters);
+
         return rSocketRequester
             .route("createConnection")
             .data(connection)
@@ -46,7 +59,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         rSocketRequester.route("removeConnection")
             .data(id)
             .send()
@@ -54,7 +67,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection getConnection(String id) {
+    public Connection getConnection(Long id) {
         return rSocketRequester
             .route("getConnection")
             .data(id)
@@ -66,13 +79,12 @@ public class ConnectionRSocketClient implements ConnectionService {
     public List<Connection> getConnections() {
         return rSocketRequester
             .route("getConnections")
-            .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {
-            })
+            .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {})
             .block();
     }
 
     @Override
-    public Connection update(String id, String name) {
+    public Connection update(Long id, String name) {
         Connection connection = new Connection();
 
         connection.setId(id);

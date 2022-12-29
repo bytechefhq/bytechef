@@ -147,8 +147,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
-        assertThat(XmlUtils.read(inputStreamArgumentCaptor.getValue(), new TypeReference<Map<String, Object>>() {
-        }))
+        assertThat(XmlUtils.read(inputStreamArgumentCaptor.getValue(), new TypeReference<Map<String, Object>>() {}))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo(FILE_XML);

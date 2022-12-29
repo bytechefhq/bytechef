@@ -33,5 +33,5 @@ public interface WorkflowRepository {
 
     Optional<Workflow> findById(String id);
 
-    Workflow.ProviderType getProviderType();
+    Workflow.SourceType getSourceType();
 }
