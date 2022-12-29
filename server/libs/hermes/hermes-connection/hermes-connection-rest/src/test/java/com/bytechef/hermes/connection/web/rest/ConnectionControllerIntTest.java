@@ -19,6 +19,7 @@ package com.bytechef.hermes.connection.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
@@ -72,11 +73,11 @@ public class ConnectionControllerIntTest {
             Assertions.fail(exception);
         }
 
-        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Long> argument = ArgumentCaptor.forClass(Long.class);
 
         verify(connectionService).delete(argument.capture());
 
-        Assertions.assertEquals("1", argument.getValue());
+        Assertions.assertEquals(1L, argument.getValue());
     }
 
     @Test
@@ -84,7 +85,7 @@ public class ConnectionControllerIntTest {
         try {
             Connection connection = getConnection();
 
-            when(connectionService.getConnection(anyString())).thenReturn(connection);
+            when(connectionService.getConnection(anyLong())).thenReturn(connection);
 
             this.webTestClient
                 .get()
@@ -162,7 +163,7 @@ public class ConnectionControllerIntTest {
 
         connection.setName("name2");
 
-        when(connectionService.update(anyString(), anyString())).thenReturn(connection);
+        when(connectionService.update(1L, putConnectionRequestModel.getName())).thenReturn(connection);
 
         try {
             this.webTestClient
@@ -189,7 +190,7 @@ public class ConnectionControllerIntTest {
 
         connection.setComponentName("componentName");
         connection.setComponentVersion(1);
-        connection.setId("1");
+        connection.setId(1L);
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
 
