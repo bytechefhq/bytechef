@@ -30,7 +30,7 @@ import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.jdbc.config.WorkflowRepositoryJdbcConfiguration;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -195,7 +195,7 @@ public class CoordinatorIntTest {
     @Import({
         WorkflowConfiguration.class,
         WorkflowRepositoryJdbcConfiguration.class,
-        WorkflowRepositoryConfiguration.class
+        WorkflowMapperConfiguration.class
     })
     @ComponentScan(
         basePackages = {

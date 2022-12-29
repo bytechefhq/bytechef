@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-public class WorkflowRepositoryConfiguration {
+public class WorkflowMapperConfiguration {
 
     @Bean
     @Primary
