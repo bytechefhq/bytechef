@@ -50,7 +50,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: TODO OK
@@ -65,7 +66,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: TODO
@@ -84,7 +86,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       requestBody:
         content:
           application/json:
@@ -136,7 +139,8 @@ components:
           type: string
         id:
           description: TODO
-          type: string
+          type: integer
+          format: int64
           readOnly: true
         lastModifiedBy:
           description: TODO
