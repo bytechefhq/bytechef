@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS context (
-    id                       VARCHAR(256) NOT NULL PRIMARY KEY,
+    id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     stack_id                 VARCHAR(256) NOT NULL,
     value                    TEXT         NOT NULL,
     created_date             TIMESTAMP    NOT NULL,
