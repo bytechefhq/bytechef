@@ -1,4 +1,4 @@
-group = "com.bytechef.worker"
+group = "com.bytechef.platform"
 description = ""
 
 springBoot {
@@ -8,6 +8,7 @@ springBoot {
 dependencies {
     implementation "org.apache.commons:commons-lang3"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
 //    implementation "org.springframework.boot:spring-boot-starter-rsocket"
@@ -16,7 +17,6 @@ dependencies {
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:atlas:atlas-config")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-git")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
