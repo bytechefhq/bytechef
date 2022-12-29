@@ -59,7 +59,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         rSocketRequester.route("removeConnection")
             .data(id)
             .send()
@@ -67,7 +67,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection getConnection(String id) {
+    public Connection getConnection(Long id) {
         return rSocketRequester
             .route("getConnection")
             .data(id)
@@ -84,7 +84,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection update(String id, String name) {
+    public Connection update(Long id, String name) {
         Connection connection = new Connection();
 
         connection.setId(id);

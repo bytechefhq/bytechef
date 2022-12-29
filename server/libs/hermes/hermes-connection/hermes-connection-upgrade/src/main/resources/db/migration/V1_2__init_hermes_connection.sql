@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS connection (
-    id                       VARCHAR(256) NOT NULL PRIMARY KEY,
+    id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     name                     VARCHAR(256) NOT NULL,
     component_name           VARCHAR(256) NOT NULL,
     component_version        INT          NOT NULL,

@@ -63,7 +63,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public void delete(@NonNull String id) {
+    public void delete(@NonNull Long id) {
         Assert.notNull(id, "'id' must not be null.");
 
         connectionRepository.deleteById(id);
@@ -71,7 +71,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Connection getConnection(@NonNull String id) {
+    public Connection getConnection(@NonNull Long id) {
         Assert.notNull(id, "'id' must not be null.");
 
         return connectionRepository.findById(id)
@@ -87,7 +87,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection update(@NonNull String id, @NonNull String name) {
+    public Connection update(@NonNull Long id, @NonNull String name) {
         Assert.notNull(id, "'id' must not be null.");
         Assert.notNull(name, "'name' must not be null.");
 
