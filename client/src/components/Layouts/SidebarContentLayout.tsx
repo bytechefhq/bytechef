@@ -99,10 +99,10 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
             </Transition.Root>
 
             <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                <nav className="flex h-full flex-col border-gray-200 bg-gray-50 px-4 dark:bg-gray-700">
+                <nav className="flex h-full flex-col border-gray-200 bg-gray-50 px-4 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                     <h1
                         aria-labelledby="primary-heading"
-                        className="p-4 text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-200"
+                        className="py-4 pr-4 text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-200"
                     >
                         {title}
                     </h1>
@@ -112,7 +112,7 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
             </aside>
 
             <div className="h-full md:pl-72">
-                <div className="flex h-full flex-col px-6">
+                <div className="flex h-full flex-col px-4">
                     <PageHeader
                         buttonLabel={headerProps.buttonLabel}
                         buttonOnClick={headerProps.buttonOnClick}
