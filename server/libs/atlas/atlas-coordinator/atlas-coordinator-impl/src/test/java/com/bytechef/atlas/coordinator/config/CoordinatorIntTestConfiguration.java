@@ -18,7 +18,7 @@
 package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.config.WorkflowConfiguration;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Optional;
@@ -47,7 +47,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Import({
     ResourceWorkflowRepositoryConfiguration.class,
     WorkflowConfiguration.class,
-    WorkflowRepositoryConfiguration.class
+    WorkflowMapperConfiguration.class
 })
 @SpringBootConfiguration
 public class CoordinatorIntTestConfiguration {
