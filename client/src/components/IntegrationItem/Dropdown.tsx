@@ -1,6 +1,8 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
-export const Dropdown = () => {
+export const Dropdown: React.FC<{
+    id: string;
+}> = ({id}) => {
     return (
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>

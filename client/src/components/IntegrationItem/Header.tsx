@@ -4,16 +4,17 @@ import {Name} from './Name';
 import {Status} from './Status';
 
 const Header: React.FC<{
+    id: string;
     name: string;
     status: string;
     dropdownTrigger: string;
-}> = ({name, status, dropdownTrigger}) => {
+}> = ({id, name, status, dropdownTrigger}) => {
     return (
         <div>
             <Name name={name} />
 
             <Status status={status} />
-            <Dropdown />
+            <Dropdown id={id} />
         </div>
     );
 };
