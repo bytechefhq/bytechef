@@ -15,22 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jira.schema;
+package com.bytechef.component.jira;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-
-import com.bytechef.hermes.definition.Property;
-import java.util.List;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * Provides schema definition.
+ * Provides the base test implementation for the REST based component.
  *
  * @generated
  */
-public class IssueUpdateMetadataSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List
-        .of(object("fields").additionalProperties(object().properties(FieldMetadataSchema.COMPONENT_SCHEMA))
-            .placeholder("Add")
-            .label("Fields")
-            .required(false));
+public abstract class AbstractJiraComponentHandlerTest {
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/pipedrive_v1.json", new JiraComponentHandler().getDefinition());
+    }
 }

@@ -23,17 +23,19 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class StatusDetailsSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("self").label("Self")
-            .description("The URL of the status.")
-            .required(false),
-        string("description")
-            .label("Description")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("self").label("Self")
+        .description("The URL of the status.")
+        .required(false),
+        string("description").label("Description")
             .description("The description of the status.")
             .required(false),
-        string("iconUrl")
-            .label("IconUrl")
+        string("iconUrl").label("IconUrl")
             .description("The URL of the icon used to represent the status.")
             .required(false),
         string("name").label("Name")
@@ -42,8 +44,7 @@ public class StatusDetailsSchema {
         string("id").label("Id")
             .description("The ID of the status.")
             .required(false),
-        object("statusCategory")
-            .properties(StatusCategorySchema.COMPONENT_SCHEMA)
+        object("statusCategory").properties(StatusCategorySchema.COMPONENT_SCHEMA)
             .label("StatusCategory")
             .description("A status category.")
             .required(false));
