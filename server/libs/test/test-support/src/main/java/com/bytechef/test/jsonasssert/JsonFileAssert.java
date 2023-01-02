@@ -31,7 +31,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
  */
 public class JsonFileAssert {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
@@ -44,7 +44,7 @@ public class JsonFileAssert {
                     .getClassLoader()
                     .getResource(path)
                     .toURI())),
-                objectMapper.writeValueAsString(object),
+                OBJECT_MAPPER.writeValueAsString(object),
                 true);
         } catch (IOException | JSONException | URISyntaxException e) {
             throw new RuntimeException(e);
