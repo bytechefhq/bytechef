@@ -1,0 +1,63 @@
+label: Liferay Object Maintenance
+
+inputs:
+  - name: apiToken
+    label: Token generated with Basic Auth Algorithm
+    type: string
+    required: true
+  - name: apiEndpointUrl
+    label: API Endpoint URL
+    type: string
+    required: true
+  - name: sourceFileUrl
+    label: Full path of file in local file system that contains data bytes
+    type: string
+    required: false
+
+outputs:
+  - name: jobResult
+    value: This would be the exit value
+
+tasks:
+  - type: logger/v1/info
+    name: loggInputs
+    description: Print received input arguments in log with INFO log level
+    text: Received ${apiEndpointUrl} to post payload in ${sourceFileUrl}
+
+  - type: filesystem/v1/readFile
+    name: jsonFileEntry
+    description: Read file at `filename` location on local file system and create `jsonFileEntry` object in memory
+    filename: ${sourceFileUrl}
+
+  - type: jsonFile/v1/read
+    name: jsonObject
+    description: Create Json object `jsonObject` by reading bytes of fileEntry `jsonFileEntry`
+    fileEntry: ${jsonFileEntry}
+    isArray: false
+
+  - type: logger/v1/info
+    name: loggJsonObject
+    description: Print created Json object `jsonObject` in log with INFO log level
+    text: Payload in the file ${jsonObject}
+
+  - type: httpClient/v1/post
+    name: liferayApiPost
+    description: >
+      Post content of `jsonFileEntry` to Liferay `apiEndpointUrl`. `sendFile` is
+      set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry`
+      and bodyContentType `JSON` creates request's `ContentType` header value application/json
+    label: Post content to Liferay REST endpoint
+    uri: ${apiEndpointUrl}
+    responseFormat: JSON
+    headerParameters:
+      -
+        key: Authorization
+        value: Basic ${apiToken}
+    bodyContentType: JSON
+    sendFile: true
+    fileEntry: ${jsonFileEntry}
+
+  - type: logger/v1/info
+    name: loggEndpointResponse
+    description: Print received response content in log with INFO log level
+    text: Result ${liferayApiPost}
