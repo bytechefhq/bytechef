@@ -5,7 +5,21 @@
   "name": "if",
   "properties": [
     {
+      "description": "Set condition as raw expression or list of conditions.",
+      "label": "Raw expression",
+      "name": "rawExpression",
+      "type": "BOOLEAN",
+      "defaultValue": false
+    },
+    {
       "description": "The type of values to compare.",
+      "displayOption": {
+        "show": {
+          "rawExpression": [
+            false
+          ]
+        }
+      },
       "label": "Conditions",
       "placeholder": "Add Condition",
       "name": "conditions",
@@ -262,6 +276,12 @@
           "value": "ANY"
         }
       ]
+    },
+    {
+      "description": "The raw expression.",
+      "label": "Expression",
+      "name": "expression",
+      "type": "STRING"
     }
   ],
   "version": 1,
