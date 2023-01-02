@@ -5,6 +5,22 @@ info:
 servers:
   - url: http://localhost:5173/api
 paths:
+  /integration-tags:
+    get:
+      description: Get integration tags.
+      summary: Get integration tags.
+      tags:
+        - integrations
+      operationId: getIntegrationTags
+      responses:
+        "200":
+          description: The list of integration tags.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
   /integrations:
     get:
       description: Get integrations.
@@ -53,7 +69,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: Successful operation.
@@ -69,7 +86,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: The integration object.
@@ -89,7 +107,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       requestBody:
         content:
           application/json:
@@ -100,15 +119,49 @@ paths:
         "200":
           description: The updated integration object.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
+  /integrations/{id}/integration-tags:
+    put:
+      description: Updates tags of an existing integration.
+      summary: Updates tags of an existing integration.
+      tags:
+        - integrations
+      operationId: putIntegrationTags
+      parameters:
+        - name: id
+          description: The id of the integration.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    type: string
+        required: true
+      responses:
+        "200":
+          description: Successful operation.
 components:
   schemas:
     Integration:
       description: A group of workflows that make one logical integration.
       type: object
+      required:
+        - name
       properties:
+        category:
+          description: The category of the integration.
+          type: string
         createdBy:
           description: The created by.
           type: string
@@ -120,7 +173,8 @@ components:
           readOnly: true
         id:
           description: The id of the integration.
-          type: string
+          type: integer
+          format: int64
           readOnly: true
         name:
           description: The name of the integration.
@@ -137,6 +191,10 @@ components:
           type: string
           format: date-time
           readOnly: true
+        tags:
+          type: array
+          items:
+            type: string
         workflowIds:
           description: The workflow ids belonging to this integration.
           type: array

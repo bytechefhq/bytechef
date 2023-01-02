@@ -46,25 +46,24 @@ public class TaskEvaluatorTest {
     public void test1() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(evaluatedTaskExecution.getWorkflowTask(), taskExecution.getWorkflowTask());
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(taskExecution.getWorkflowTask(), taskExecution.getWorkflowTask());
     }
 
     @Test
     public void test2() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "world"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(evaluatedTaskExecution.getWorkflowTask(), taskExecution.getWorkflowTask());
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(taskExecution.getWorkflowTask(), taskExecution.getWorkflowTask());
     }
 
     @Test
     public void test3() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "${name}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution,
-            new Context(Collections.singletonMap("name", "arik")));
-        Assertions.assertEquals("arik", MapUtils.getString(evaluatedTaskExecution.getParameters(), "hello"));
+        taskExecution.evaluate(evaluator, new Context(Collections.singletonMap("name", "arik")));
+        Assertions.assertEquals("arik", MapUtils.getString(taskExecution.getParameters(), "hello"));
     }
 
     @Test
@@ -74,8 +73,8 @@ public class TaskEvaluatorTest {
         Context context = new Context();
         context.put("firstName", "Arik");
         context.put("lastName", "Cohen");
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
-        Assertions.assertEquals("Arik Cohen", MapUtils.getString(evaluatedTaskExecution.getParameters(), "hello"));
+        taskExecution.evaluate(evaluator, context);
+        Assertions.assertEquals("Arik Cohen", MapUtils.getString(taskExecution.getParameters(), "hello"));
     }
 
     @Test
@@ -85,9 +84,9 @@ public class TaskEvaluatorTest {
             WorkflowTask.of("hello", "${T(java.lang.Integer).valueOf(number)}"));
         Context context = new Context();
         context.put("number", "5");
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
-            Integer.valueOf(5), (Integer) MapUtils.get(evaluatedTaskExecution.getParameters(), "hello"));
+            Integer.valueOf(5), (Integer) MapUtils.get(taskExecution.getParameters(), "hello"));
     }
 
     @Test
@@ -98,10 +97,10 @@ public class TaskEvaluatorTest {
         Context context = new Context();
         context.put("firstName", "Arik");
         context.put("lastName", "Cohen");
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
             Arrays.asList("Arik", "Cohen"),
-            MapUtils.getList(evaluatedTaskExecution.getParameters(), "list", String.class));
+            MapUtils.getList(taskExecution.getParameters(), "list", String.class));
     }
 
     @Test
@@ -111,10 +110,10 @@ public class TaskEvaluatorTest {
             WorkflowTask.of("map", Collections.singletonMap("hello", "${firstName}")));
         Context context = new Context();
         context.put("firstName", "Arik");
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
             Collections.singletonMap("hello", "Arik"),
-            MapUtils.getMap(evaluatedTaskExecution.getParameters(), "map"));
+            MapUtils.getMap(taskExecution.getParameters(), "map"));
     }
 
     @Test
@@ -124,59 +123,57 @@ public class TaskEvaluatorTest {
         Context context = new Context();
         context.put("n1", 5);
         context.put("n2", 3);
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
-            Integer.valueOf(15), MapUtils.getInteger(evaluatedTaskExecution.getParameters(), "mult"));
+            Integer.valueOf(15), MapUtils.getInteger(taskExecution.getParameters(), "mult"));
     }
 
     @Test
     public void test9() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "${name}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("${name}", MapUtils.getString(evaluatedTaskExecution.getParameters(), "message"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("${name}", MapUtils.getString(taskExecution.getParameters(), "message"));
     }
 
     @Test
     public void test10() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "yo ${name}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("yo ${name}", MapUtils.getString(evaluatedTaskExecution.getParameters(), "message"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("yo ${name}", MapUtils.getString(taskExecution.getParameters(), "message"));
     }
 
     @Test
     public void test11() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution,
-            new Context(Collections.singletonMap("number", 1)));
-        Assertions.assertEquals(Integer.valueOf(1), MapUtils.get(evaluatedTaskExecution.getParameters(), "thing"));
+        taskExecution.evaluate(evaluator, new Context(Collections.singletonMap("number", 1)));
+        Assertions.assertEquals(Integer.valueOf(1), MapUtils.get(taskExecution.getParameters(), "thing"));
     }
 
     @Test
     public void test12() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number*3}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution,
-            new Context(Collections.singletonMap("number", 1)));
-        Assertions.assertEquals(Integer.valueOf(3), MapUtils.get(evaluatedTaskExecution.getParameters(), "thing"));
+        taskExecution.evaluate(evaluator, new Context(Collections.singletonMap("number", 1)));
+        Assertions.assertEquals(Integer.valueOf(3), MapUtils.get(taskExecution.getParameters(), "thing"));
     }
 
     @Test
     public void test13() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number*3}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("${number*3}", MapUtils.get(evaluatedTaskExecution.getParameters(), "thing"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("${number*3}", MapUtils.get(taskExecution.getParameters(), "thing"));
     }
 
     @Test
     public void test14() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("list", "${range(1,3)}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), MapUtils.get(evaluatedTaskExecution.getParameters(), "list"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Arrays.asList(1, 2, 3), MapUtils.get(taskExecution.getParameters(), "list"));
     }
 
     @Test
@@ -184,10 +181,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("sub", Collections.singletonMap("list", "${range(1,3)}")));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
             Arrays.asList(1, 2, 3),
-            MapUtils.getMap(evaluatedTaskExecution.getParameters(), "sub")
+            MapUtils.getMap(taskExecution.getParameters(), "sub")
                 .get("list"));
     }
 
@@ -195,102 +192,101 @@ public class TaskEvaluatorTest {
     public void test16() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "${item1}-${item2}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution,
-            new Context(Map.of("item1", "hello", "item2", "world")));
-        Assertions.assertEquals("hello-world", MapUtils.get(evaluatedTaskExecution.getParameters(), "message"));
+        taskExecution.evaluate(evaluator, new Context(Map.of("item1", "hello", "item2", "world")));
+        Assertions.assertEquals("hello-world", MapUtils.get(taskExecution.getParameters(), "message"));
     }
 
     @Test
     public void test17() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someBoolean", "${boolean('1')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Boolean.TRUE, MapUtils.get(evaluatedTaskExecution.getParameters(), "someBoolean"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Boolean.TRUE, MapUtils.get(taskExecution.getParameters(), "someBoolean"));
     }
 
     @Test
     public void test18() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someByte", "${byte('127')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
-            Byte.valueOf(Byte.MAX_VALUE), MapUtils.get(evaluatedTaskExecution.getParameters(), "someByte"));
+            Byte.valueOf(Byte.MAX_VALUE), MapUtils.get(taskExecution.getParameters(), "someByte"));
     }
 
     @Test
     public void test19() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someChar", "${char('c')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
-            Character.valueOf('c'), MapUtils.get(evaluatedTaskExecution.getParameters(), "someChar"));
+            Character.valueOf('c'), MapUtils.get(taskExecution.getParameters(), "someChar"));
     }
 
     @Test
     public void test20() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someShort", "${short('32767')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
-            Short.valueOf(Short.MAX_VALUE), MapUtils.get(evaluatedTaskExecution.getParameters(), "someShort"));
+            Short.valueOf(Short.MAX_VALUE), MapUtils.get(taskExecution.getParameters(), "someShort"));
     }
 
     @Test
     public void test21() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someInt", "${int('1')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Integer.valueOf(1), MapUtils.get(evaluatedTaskExecution.getParameters(), "someInt"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Integer.valueOf(1), MapUtils.get(taskExecution.getParameters(), "someInt"));
     }
 
     @Test
     public void test22() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someLong", "${long('1')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals(Long.valueOf(1L), MapUtils.get(evaluatedTaskExecution.getParameters(), "someLong"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals(Long.valueOf(1L), MapUtils.get(taskExecution.getParameters(), "someLong"));
     }
 
     @Test
     public void test23() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someFloat", "${float('1.337')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
-            Float.valueOf(1.337f), MapUtils.get(evaluatedTaskExecution.getParameters(), "someFloat"));
+            Float.valueOf(1.337f), MapUtils.get(taskExecution.getParameters(), "someFloat"));
     }
 
     @Test
     public void test24() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someDouble", "${double('1.337')}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
-            Double.valueOf(1.337d), MapUtils.get(evaluatedTaskExecution.getParameters(), "someDouble"));
+            Double.valueOf(1.337d), MapUtils.get(taskExecution.getParameters(), "someDouble"));
     }
 
     @Test
     public void test25() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(',',range(1,3))}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("1,2,3", MapUtils.get(evaluatedTaskExecution.getParameters(), "joined"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("1,2,3", MapUtils.get(taskExecution.getParameters(), "joined"));
     }
 
     @Test
     public void test26() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(',',range(1,1))}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("1", MapUtils.get(evaluatedTaskExecution.getParameters(), "joined"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("1", MapUtils.get(taskExecution.getParameters(), "joined"));
     }
 
     @Test
     public void test27() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(' and ',{'a','b','c'})}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertEquals("a and b and c", MapUtils.get(evaluatedTaskExecution.getParameters(), "joined"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertEquals("a and b and c", MapUtils.get(taskExecution.getParameters(), "joined"));
     }
 
     @Test
@@ -298,10 +294,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", "d", "e", "f"),
-            MapUtils.get(evaluatedTaskExecution.getParameters(), "concatenated"));
+            MapUtils.get(taskExecution.getParameters(), "concatenated"));
     }
 
     @Test
@@ -309,10 +305,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("concatenated", "${concat({'a','b','c'}, range(1,3))}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", 1, 2, 3),
-            MapUtils.get(evaluatedTaskExecution.getParameters(), "concatenated"));
+            MapUtils.get(taskExecution.getParameters(), "concatenated"));
     }
 
     @Test
@@ -320,10 +316,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", "d", "e", "f"),
-            MapUtils.get(evaluatedTaskExecution.getParameters(), "flattened"));
+            MapUtils.get(taskExecution.getParameters(), "flattened"));
     }
 
     @Test
@@ -331,10 +327,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("flattened", "${flatten({{'a','b','c'},range(1,3)})}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", 1, 2, 3),
-            MapUtils.get(evaluatedTaskExecution.getParameters(), "flattened"));
+            MapUtils.get(taskExecution.getParameters(), "flattened"));
     }
 
     @Test
@@ -343,20 +339,20 @@ public class TaskEvaluatorTest {
             .methodExecutor("tempDir", new TempDir())
             .build();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("tempDir", "${tempDir()}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir.endsWith(File.separator)) {
             tmpDir = FilenameUtils.getFullPathNoEndSeparator(tmpDir);
         }
-        Assertions.assertEquals(tmpDir, MapUtils.get(evaluatedTaskExecution.getParameters(), "tempDir"));
+        Assertions.assertEquals(tmpDir, MapUtils.get(taskExecution.getParameters(), "tempDir"));
     }
 
     @Test
     public void test33() {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("uuid", "${uuid()}"));
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, new Context(Collections.emptyMap()));
-        Assertions.assertNotNull(MapUtils.get(evaluatedTaskExecution.getParameters(), "uuid"));
+        taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
+        Assertions.assertNotNull(MapUtils.get(taskExecution.getParameters(), "uuid"));
     }
 
     @Test
@@ -365,9 +361,9 @@ public class TaskEvaluatorTest {
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("fullName", "${firstName} ${lastName}"));
         Context context = new Context();
         context.put("firstName", "Arik");
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
-            "Arik ${lastName}", MapUtils.getString(evaluatedTaskExecution.getParameters(), "fullName"));
+            "Arik ${lastName}", MapUtils.getString(taskExecution.getParameters(), "fullName"));
     }
 
     @Test
@@ -377,8 +373,8 @@ public class TaskEvaluatorTest {
         Context context = new Context();
         context.put("num", 5.0);
         context.put("den", 10.0);
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
-        Assertions.assertEquals(0.5d, MapUtils.getDouble(evaluatedTaskExecution.getParameters(), "result"));
+        taskExecution.evaluate(evaluator, context);
+        Assertions.assertEquals(0.5d, MapUtils.getDouble(taskExecution.getParameters(), "result"));
     }
 
     @Test
@@ -386,8 +382,8 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("number", "${stringf('%03d',5)}"));
         Context context = new Context();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
-        Assertions.assertEquals("005", MapUtils.getString(evaluatedTaskExecution.getParameters(), "number"));
+        taskExecution.evaluate(evaluator, context);
+        Assertions.assertEquals("005", MapUtils.getString(taskExecution.getParameters(), "number"));
     }
 
     @Test
@@ -396,8 +392,8 @@ public class TaskEvaluatorTest {
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("number", "${stringf('%s %s','hello','world')}"));
         Context context = new Context();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
-        Assertions.assertEquals("hello world", MapUtils.getString(evaluatedTaskExecution.getParameters(), "number"));
+        taskExecution.evaluate(evaluator, context);
+        Assertions.assertEquals("hello world", MapUtils.getString(taskExecution.getParameters(), "number"));
     }
 
     @Test
@@ -405,10 +401,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("sorted", "${sort({3,1,2})}"));
         Context context = new Context();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
             Arrays.asList(1, 2, 3),
-            MapUtils.getList(evaluatedTaskExecution.getParameters(), "sorted", Integer.class));
+            MapUtils.getList(taskExecution.getParameters(), "sorted", Integer.class));
     }
 
     @Test
@@ -416,10 +412,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("sorted", "${sort({'C','A','B'})}"));
         Context context = new Context();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
             Arrays.asList("A", "B", "C"),
-            MapUtils.getList(evaluatedTaskExecution.getParameters(), "sorted", String.class));
+            MapUtils.getList(taskExecution.getParameters(), "sorted", String.class));
     }
 
     @Test
@@ -427,10 +423,10 @@ public class TaskEvaluatorTest {
         TaskEvaluator evaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("date", "${dateFormat(now(),'yyyyMMdd')}"));
         Context context = new Context();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         Assertions.assertEquals(
-            sdf.format(new Date()), MapUtils.getString(evaluatedTaskExecution.getParameters(), "date"));
+            sdf.format(new Date()), MapUtils.getString(taskExecution.getParameters(), "date"));
     }
 
     @Test
@@ -442,8 +438,8 @@ public class TaskEvaluatorTest {
             .build();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("myValue", "${config('my.property')}"));
         Context context = new Context();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
-        Assertions.assertEquals("something", MapUtils.getString(evaluatedTaskExecution.getParameters(), "myValue"));
+        taskExecution.evaluate(evaluator, context);
+        Assertions.assertEquals("something", MapUtils.getString(taskExecution.getParameters(), "myValue"));
     }
 
     @Test
@@ -454,8 +450,8 @@ public class TaskEvaluatorTest {
             .build();
         TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("myValue", "${config('no.such.property')}"));
         Context context = new Context();
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(taskExecution, context);
+        taskExecution.evaluate(evaluator, context);
         Assertions.assertEquals(
-            "${config('no.such.property')}", MapUtils.getString(evaluatedTaskExecution.getParameters(), "myValue"));
+            "${config('no.such.property')}", MapUtils.getString(taskExecution.getParameters(), "myValue"));
     }
 }

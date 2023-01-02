@@ -46,6 +46,17 @@ public class WorkflowServiceIntTest {
     private WorkflowService workflowService;
 
     @Test
+    public void testCreate() {
+        Workflow workflow = getWorkflow();
+
+        workflow = workflowService.create(workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC);
+
+        Assertions.assertEquals(
+            workflow, workflowCrudRepository.findById(workflow.getId())
+                .orElseThrow());
+    }
+
+    @Test
     public void testDelete() {
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
@@ -53,15 +64,6 @@ public class WorkflowServiceIntTest {
 
         Assertions.assertFalse(workflowCrudRepository.findById(workflow.getId())
             .isPresent());
-    }
-
-    @Test
-    public void testCreate() {
-        Workflow workflow = workflowService.create(getWorkflow(), Workflow.ProviderType.JDBC);
-
-        Assertions.assertEquals(
-            workflow, workflowCrudRepository.findById(workflow.getId())
-                .orElseThrow());
     }
 
     @Test
@@ -87,26 +89,19 @@ public class WorkflowServiceIntTest {
     public void testUpdate() {
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
-        workflow.setDefinition(
-            """
-                {
-                     "label": "Label,
-                    "tasks": []
-                }
-                """);
+        String definition = "{\"label\": \"Label\",\"tasks\": []}";
 
-        Assertions.assertEquals(workflow, workflowService.update(workflow));
+        Workflow updatedWorkflow = workflowService.update(workflow.getId(), definition);
+
+        Assertions.assertEquals(definition, updatedWorkflow.getDefinition());
     }
 
     private static Workflow getWorkflow() {
         Workflow workflow = new Workflow();
 
-        workflow.setDefinition("""
-            {
-                "tasks": []
-            }
-            """);
+        workflow.setDefinition("{\"tasks\": []}");
         workflow.setFormat(Workflow.Format.JSON);
+        workflow.setNew(true);
 
         return workflow;
     }

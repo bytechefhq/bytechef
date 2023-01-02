@@ -28,6 +28,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
@@ -38,6 +39,7 @@ import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -204,9 +206,12 @@ public class WorkflowExecutor {
             Stream.of(defaultTaskCompletionHandler))
             .toList());
 
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
         Coordinator coordinator = new Coordinator(
             contextService,
-            getTaskExecutionErrorHandler(taskDispatcherChain),
+            (ErrorHandler) getTaskExecutionErrorHandler(taskDispatcherChain),
             eventPublisher,
             jobExecutor,
             jobService,
@@ -231,17 +236,16 @@ public class WorkflowExecutor {
         return jobService.getJob(jobId);
     }
 
-    @SuppressWarnings("unchecked")
-    private TaskExecutionErrorHandler getTaskExecutionErrorHandler(TaskDispatcher<?> taskDispatcher) {
+    private TaskExecutionErrorHandler getTaskExecutionErrorHandler(TaskDispatcher<? super Task> taskDispatcher) {
         return new TaskExecutionErrorHandler(
-            eventPublisher, jobService, (TaskDispatcher<TaskExecution>) taskDispatcher, taskExecutionService);
+            eventPublisher, jobService, taskDispatcher, taskExecutionService);
     }
 
     public interface GetTaskCompletionHandlersFunction {
         List<TaskCompletionHandler> apply(
             CounterService counterService,
             TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher<?> taskDispatcher,
+            TaskDispatcher<? super Task> taskDispatcher,
             TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService);
     }
@@ -251,7 +255,7 @@ public class WorkflowExecutor {
             ContextService contextService,
             CounterService counterService,
             MessageBroker messageBroker,
-            TaskDispatcher<?> taskDispatcher,
+            TaskDispatcher<? super Task> taskDispatcher,
             TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService);
     }

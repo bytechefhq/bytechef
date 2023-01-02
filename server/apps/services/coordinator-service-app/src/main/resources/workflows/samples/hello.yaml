@@ -1,0 +1,46 @@
+label: Hello Demo
+
+inputs:
+  - name: yourName
+    label: Your Name
+    type: string
+    required: true
+
+outputs:
+  - name: myMagicNumber
+    value: ${randomNumber}
+
+tasks:
+  - name: tempDirOperation
+    label: Do something with temp dir
+    type: logger/v1/info
+    text: "Temp dir: ${workDir}"
+    pre:
+      - name: workDir
+        type: var/v1/set
+        value: "${tempDir()}/${uuid()}"
+      - type: filesystem/v1/mkdir
+        path: "${workDir}"
+    post:
+      - name: workDirLog
+        type: var/v1/set
+        value: "Deleting temp dir: ${workDir}"
+    finalize:
+      - type: logger/v1/info
+        text: ${workDirLog}
+      - type: filesystem/v1/rm
+        path: ${workDir}
+      - name: randomNumber
+        label: Generate a random number
+        type: randomHelper/v1/randomInt
+        startInclusive: 0
+        endInclusive: 5000
+      - label: Print a greeting
+        type: logger/v1/info
+        text: Hello ${yourName}
+      - label: Sleep a little
+        type: delay/v1/delay
+        millis: ${randomNumber}
+      - label: Print a farewell
+        type: logger/v1/info
+        text: Goodbye ${yourName}

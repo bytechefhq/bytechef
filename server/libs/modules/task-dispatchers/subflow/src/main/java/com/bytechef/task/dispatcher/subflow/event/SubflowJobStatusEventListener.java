@@ -27,7 +27,6 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -65,18 +64,19 @@ public class SubflowJobStatusEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (workflowEvent.getType()
-            .equals(JobStatusWorkflowEvent.JOB_STATUS)) {
+        String type = workflowEvent.getType();
+
+        if (type.equals(JobStatusWorkflowEvent.JOB_STATUS)) {
             JobStatusWorkflowEvent jobStatusWorkflowEvent = (JobStatusWorkflowEvent) workflowEvent;
 
-            JobStatus jobStatus = jobStatusWorkflowEvent.getJobStatus();
+            Job.Status status = jobStatusWorkflowEvent.getJobStatus();
             Job job = jobService.getJob(jobStatusWorkflowEvent.getJobId());
 
             if (job.getParentTaskExecutionId() == null) {
                 return; // not a subflow -- nothing to do
             }
 
-            switch (jobStatus) {
+            switch (status) {
                 case CREATED:
                 case STARTED:
                     break;
@@ -89,8 +89,8 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 case FAILED: {
-                    TaskExecution erroredTaskExecution = new TaskExecution(
-                        taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
+                    TaskExecution erroredTaskExecution = taskExecutionService
+                        .getTaskExecution(job.getParentTaskExecutionId());
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
@@ -99,25 +99,24 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 case COMPLETED: {
-                    TaskExecution completionTaskExecution = new TaskExecution(
-                        taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
+                    TaskExecution completionTaskExecution = taskExecutionService
+                        .getTaskExecution(job.getParentTaskExecutionId());
                     Object output = job.getOutputs();
 
-                    if (completionTaskExecution.getOutput() != null) {
-                        // TODO check, it seems wrong
-                        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
-                            completionTaskExecution, new Context("execution", new Context("output", output)));
-
-                        completionTaskExecution = new TaskExecution(evaluatedTaskExecution);
-                    } else {
+                    if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(output);
+                    } else {
+                        // TODO check, it seems wrong
+                        completionTaskExecution.evaluate(
+                            taskEvaluator, new Context("execution", new Context("output", output)));
                     }
+
                     coordinatorManager.complete(completionTaskExecution);
 
                     break;
                 }
                 default:
-                    throw new IllegalStateException("Unknown status: " + jobStatus);
+                    throw new IllegalStateException("Unknown status: " + status);
             }
         }
     }

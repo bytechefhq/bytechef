@@ -45,11 +45,11 @@ import {
  */
 export interface ObjectProperty extends ValueProperty {
     /**
-     * 
-     * @type {Property}
+     * Types of dynamically defined properties.
+     * @type {Array<Property>}
      * @memberof ObjectProperty
      */
-    additionalProperties?: Property;
+    additionalProperties?: Array<Property>;
     /**
      * The object type.
      * @type {string}
@@ -90,7 +90,7 @@ export function ObjectPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
-        'additionalProperties': !exists(json, 'additionalProperties') ? undefined : PropertyFromJSON(json['additionalProperties']),
+        'additionalProperties': !exists(json, 'additionalProperties') ? undefined : ((json['additionalProperties'] as Array<any>).map(PropertyFromJSON)),
         'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'type': json['type'],
@@ -106,7 +106,7 @@ export function ObjectPropertyToJSON(value?: ObjectProperty | null): any {
     }
     return {
         ...ValuePropertyToJSON(value),
-        'additionalProperties': PropertyToJSON(value.additionalProperties),
+        'additionalProperties': value.additionalProperties === undefined ? undefined : ((value.additionalProperties as Array<any>).map(PropertyToJSON)),
         'objectType': value.objectType,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyToJSON)),
         'type': value.type,

@@ -30,7 +30,7 @@ public class ClassPathResourceWorkflowRepository extends AbstractResourceWorkflo
     }
 
     @Override
-    public Workflow.ProviderType getProviderType() {
-        return Workflow.ProviderType.CLASSPATH;
+    public Workflow.SourceType getSourceType() {
+        return Workflow.SourceType.CLASSPATH;
     }
 }

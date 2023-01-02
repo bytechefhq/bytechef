@@ -17,15 +17,8 @@
 
 package com.bytechef.hermes.integration.domain;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
 import java.util.Objects;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -34,32 +27,10 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("integration_workflow")
-public final class IntegrationWorkflow implements Persistable<String> {
-
-    @CreatedBy
-    @Column("created_by")
-    private String createdBy;
-
-    @Column("created_date")
-    @CreatedDate
-    private LocalDateTime createdDate;
+public final class IntegrationWorkflow implements Persistable<Long> {
 
     @Id
-    private String id;
-
-    @Transient
-    private Integration integration;
-
-    @Column("last_modified_by")
-    @LastModifiedBy
-    private String lastModifiedBy;
-
-    @Column("last_modified_date")
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
-
-    // @Version
-    private int version;
+    private Long id;
 
     @Column("workflow_id")
     private String workflowId;
@@ -69,12 +40,6 @@ public final class IntegrationWorkflow implements Persistable<String> {
 
     public IntegrationWorkflow(String workflowId) {
         this.workflowId = workflowId;
-    }
-
-    @SuppressFBWarnings("EI2")
-    public IntegrationWorkflow(String workflowId, Integration integration) {
-        this.workflowId = workflowId;
-        this.integration = integration;
     }
 
     @Override
@@ -89,7 +54,7 @@ public final class IntegrationWorkflow implements Persistable<String> {
 
         IntegrationWorkflow integrationWorkflow = (IntegrationWorkflow) o;
 
-        return Objects.equals(id, integrationWorkflow.id);
+        return Objects.equals(id, integrationWorkflow.id) && Objects.equals(workflowId, integrationWorkflow.workflowId);
     }
 
     @Override
@@ -97,29 +62,9 @@ public final class IntegrationWorkflow implements Persistable<String> {
         return getClass().hashCode();
     }
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
-    }
-
-    public Integration getIntegration() {
-        return new Integration(integration);
-    }
-
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public LocalDateTime getLastModifiedDate() {
-        return lastModifiedDate;
     }
 
     public String getWorkflowId() {
@@ -131,24 +76,8 @@ public final class IntegrationWorkflow implements Persistable<String> {
         return id == null;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setWorkflowId(String workflowId) {
@@ -157,14 +86,8 @@ public final class IntegrationWorkflow implements Persistable<String> {
 
     @Override
     public String toString() {
-        return "IntegrationWorkflow{" + "createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", id='"
-            + id + '\'' + ", integration="
-            + integration + ", lastModifiedBy='"
-            + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + ", version="
-            + version + ", workflowId='"
+        return "IntegrationWorkflow{" + ", id='"
+            + id + '\'' + ", workflowId='"
             + workflowId + '\'' + '}';
     }
 }

@@ -54,8 +54,8 @@ public final class Counter implements Persistable<String> {
     }
 
     public Counter(String id, Long value) {
-        Assert.notNull(id, "id cannot be null");
-        Assert.notNull(value, "value cannot be null");
+        Assert.notNull(id, "'id' must not be null.");
+        Assert.notNull(value, "'value' must not be null.");
 
         this.id = id;
         this.value = value;
@@ -100,14 +100,6 @@ public final class Counter implements Persistable<String> {
     @Override
     public boolean isNew() {
         return isNew;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
     }
 
     public void setId(String id) {

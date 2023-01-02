@@ -1,4 +1,4 @@
-group = "com.bytechef.worker"
+group = "com.bytechef.platform"
 description = ""
 
 springBoot {
@@ -8,25 +8,27 @@ springBoot {
 dependencies {
     implementation "org.apache.commons:commons-lang3"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
-    implementation "org.springframework.boot:spring-boot-starter-rsocket"
+//    implementation "org.springframework.boot:spring-boot-starter-rsocket"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation libs.springdoc.openapi.starter.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:atlas:atlas-config")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-amqp")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-git")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":server:libs:atlas:atlas-rest")
-    implementation project(":server:libs:atlas:atlas-rsocket")
+//    implementation project(":server:libs:atlas:atlas-rsocket")
     implementation project(":server:libs:atlas:atlas-upgrade")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
+    implementation project(":server:libs:core:tag:tag-service")
+    implementation project(":server:libs:core:tag:tag-upgrade")
     implementation project(":server:libs:core:discovery:discovery-config")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")

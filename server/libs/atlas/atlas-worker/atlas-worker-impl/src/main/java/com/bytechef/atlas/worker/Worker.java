@@ -93,7 +93,6 @@ public class Worker {
      * Handle the execution of a {@link TaskExecution}. Implementors are expected to execute the task asynchronously.
      *
      * @param taskExecution The task to execute.
-     * @throws InterruptedException
      */
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
@@ -174,26 +173,25 @@ public class Worker {
             // pre tasks
             executeSubTasks(taskExecution, taskExecution.getPre(), context);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(taskExecution, context);
+            taskExecution.evaluate(taskEvaluator, context);
 
-            TaskHandler<?> taskHandler = taskHandlerResolver.resolve(evaluatedTaskExecution);
+            TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
-            Object output = taskHandler.handle(evaluatedTaskExecution);
-            TaskExecution completionTaskExecution = new TaskExecution(evaluatedTaskExecution);
+            Object output = taskHandler.handle(taskExecution);
 
             if (output != null) {
-                completionTaskExecution.setOutput(output);
+                taskExecution.setOutput(output);
             }
 
-            completionTaskExecution.setStatus(TaskStatus.COMPLETED);
-            completionTaskExecution.setProgress(100);
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
+            taskExecution.setStatus(TaskStatus.COMPLETED);
+            taskExecution.setProgress(100);
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
 
             // post tasks
             executeSubTasks(taskExecution, taskExecution.getPost(), context);
 
-            return completionTaskExecution;
+            return taskExecution;
         } finally {
             // finalize tasks
             executeSubTasks(taskExecution, taskExecution.getFinalize(), context);
@@ -203,11 +201,11 @@ public class Worker {
     private void executeSubTasks(TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Context context)
         throws Exception {
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
-            TaskExecution subTaskExecution = new TaskExecution(subWorkflowTask, taskExecution.getJobId());
+            TaskExecution subTaskExecution = TaskExecution.of(taskExecution.getJobId(), subWorkflowTask);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            TaskExecution completionTaskExecution = doExecuteTask(evaluatedTaskExecution);
+            TaskExecution completionTaskExecution = doExecuteTask(subTaskExecution);
 
             if (completionTaskExecution.getName() != null) {
                 context.put(completionTaskExecution.getName(), completionTaskExecution.getOutput());
@@ -218,13 +216,11 @@ public class Worker {
     private void handleException(TaskExecution taskExecution, Exception exception) {
         logger.error(exception.getMessage(), exception);
 
-        TaskExecution updatedTaskExecution = new TaskExecution(taskExecution);
-
-        updatedTaskExecution.setError(
+        taskExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
-        updatedTaskExecution.setStatus(TaskStatus.FAILED);
+        taskExecution.setStatus(TaskStatus.FAILED);
 
-        messageBroker.send(Queues.ERRORS, updatedTaskExecution);
+        messageBroker.send(Queues.ERRORS, taskExecution);
     }
 
     private long calculateTimeout(TaskExecution taskExecution) {
@@ -309,8 +305,9 @@ public class Worker {
         }
 
         @Override
-        public T get(long aTimeout, TimeUnit aUnit) throws InterruptedException, ExecutionException, TimeoutException {
-            return future.get(aTimeout, aUnit);
+        public T get(long timeout, TimeUnit timeUnit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+            return future.get(timeout, timeUnit);
         }
     }
 }

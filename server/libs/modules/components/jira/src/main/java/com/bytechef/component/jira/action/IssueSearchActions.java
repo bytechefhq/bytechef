@@ -55,7 +55,7 @@ public class IssueSearchActions {
                         "The [JQL](https://confluence.atlassian.com/x/egORLQ) that defines the search. Note:\n"
                             + "\n"
                             + " *  If no JQL expression is provided, all issues are returned.\n"
-                            + " *  `username` and `userkey` cannot be used as search terms due to privacy reasons. Use `accountId` instead.\n"
+                            + " *  `username` and `userkey` must not be used as search terms due to privacy reasons. Use `accountId` instead.\n"
                             + " *  If a user has hidden their email address in their user profile, partial matches of the email address will not find the user. An exact match is required.")
                     .required(false)
                     .exampleValue("project = HSP")

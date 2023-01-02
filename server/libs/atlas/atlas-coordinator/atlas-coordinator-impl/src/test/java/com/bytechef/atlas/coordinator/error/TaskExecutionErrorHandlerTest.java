@@ -31,6 +31,7 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,8 @@ public class TaskExecutionErrorHandlerTest {
 
     private final JobService jobService = mock(JobService.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private final TaskDispatcher<TaskExecution> taskDispatcher = mock(TaskDispatcher.class);
+    @SuppressWarnings("unchecked")
+    private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final EventPublisher eventPublisher = mock(EventPublisher.class);
 
     @Test

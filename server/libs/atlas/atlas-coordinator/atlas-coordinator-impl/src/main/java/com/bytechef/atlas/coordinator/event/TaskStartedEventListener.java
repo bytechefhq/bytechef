@@ -23,10 +23,10 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.CancelControlTask;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,14 +41,14 @@ import org.slf4j.LoggerFactory;
 public class TaskStartedEventListener implements EventListener {
 
     private final TaskExecutionService taskExecutionService;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final JobService jobService;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @SuppressFBWarnings("EI2")
     public TaskStartedEventListener(
-        TaskExecutionService taskExecutionService, TaskDispatcher taskDispatcher, JobService jobService) {
+        TaskExecutionService taskExecutionService, TaskDispatcher<? super Task> taskDispatcher, JobService jobService) {
         this.taskExecutionService = taskExecutionService;
         this.taskDispatcher = taskDispatcher;
         this.jobService = jobService;
@@ -62,27 +62,25 @@ public class TaskStartedEventListener implements EventListener {
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskId);
 
             if (taskExecution == null) {
-                logger.error("Unkown task: {}", taskId);
+                logger.error("Unknown task: {}", taskId);
 
                 return;
             }
 
             Job job = jobService.getTaskExecutionJob(taskId);
 
-            if (taskExecution.getStatus() == TaskStatus.CANCELLED || job.getStatus() != JobStatus.STARTED) {
+            if (taskExecution.getStatus() == TaskStatus.CANCELLED || job.getStatus() != Job.Status.STARTED) {
                 taskDispatcher.dispatch(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId()));
             } else {
-                TaskExecution updatedTaskExecution = new TaskExecution(taskExecution);
+                if (taskExecution.getStartTime() == null && taskExecution.getStatus() != TaskStatus.STARTED) {
+                    taskExecution.setStartTime(workflowEvent.getCreatedDate());
+                    taskExecution.setStatus(TaskStatus.STARTED);
 
-                if (updatedTaskExecution.getStartTime() == null
-                    && updatedTaskExecution.getStatus() != TaskStatus.STARTED) {
-                    updatedTaskExecution.setStartTime(workflowEvent.getCreatedDate());
-                    updatedTaskExecution.setStatus(TaskStatus.STARTED);
-
-                    taskExecutionService.update(updatedTaskExecution);
+                    taskExecutionService.update(taskExecution);
                 }
-                if (updatedTaskExecution.getParentId() != null) {
-                    onApplicationEvent(new TaskStartedWorkflowEvent(updatedTaskExecution.getParentId()));
+
+                if (taskExecution.getParentId() != null) {
+                    onApplicationEvent(new TaskStartedWorkflowEvent(taskExecution.getParentId()));
                 }
             }
         }

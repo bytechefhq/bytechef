@@ -132,6 +132,7 @@ public class RestComponentGenerator {
         writeRestComponentHandlerServiceTemplate();
     }
 
+    @SuppressWarnings("rawtypes")
     private void checkComponentSchemaClasses(Set<String> schemas) {
         Components components = openAPI.getComponents();
 
@@ -912,6 +913,7 @@ public class RestComponentGenerator {
         return requestBodyPropertiesEntry;
     }
 
+    @SuppressWarnings("rawtypes")
     private String getAdditionalPropertiesItemType(Schema additionalPropertiesSchema) {
         String additionalPropertiesSchemaType = additionalPropertiesSchema.getType() == null ? "object"
             : additionalPropertiesSchema.getType();
@@ -956,7 +958,9 @@ public class RestComponentGenerator {
         return getPropertiesSchemaCodeBlock(allOfProperties, allOfRequired, openAPI);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     private CodeBlock getPropertiesSchemaCodeBlock(
         Map<String, Schema> properties, List<String> required, OpenAPI openAPI) {
         List<CodeBlock> codeBlocks = new ArrayList<>();
@@ -1322,10 +1326,8 @@ public class RestComponentGenerator {
         javaFile.writeTo(componentHandlerDirPath);
     }
 
-    private List<ClassName> writeComponentSchemaClasses(Set<String> schemas, Path componentHandlerDirPath)
-        throws IOException {
-        List<ClassName> classNames = new ArrayList<>();
-
+    @SuppressWarnings("rawtypes")
+    private void writeComponentSchemaClasses(Set<String> schemas, Path componentHandlerDirPath) throws IOException {
         Components components = openAPI.getComponents();
 
         if (components != null) {
@@ -1339,8 +1341,6 @@ public class RestComponentGenerator {
 
                     ClassName className = ClassName.get(getPackageName() + ".schema", entry.getKey() + "Schema");
 
-                    classNames.add(className);
-
                     writeComponentSchemaClass(
                         className,
                         getObjectPropertiesCodeBlock(null, entry.getValue(), openAPI),
@@ -1348,8 +1348,6 @@ public class RestComponentGenerator {
                 }
             }
         }
-
-        return classNames;
     }
 
     private void writeRestComponentHandlerServiceTemplate() throws IOException {

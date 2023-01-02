@@ -26,11 +26,14 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -44,14 +47,14 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final ContextService contextService;
     private final TaskEvaluator taskEvaluator;
 
     public SequenceTaskCompletionHandler(
         ContextService contextService,
         TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -68,28 +71,23 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentTaskExecution.getType()
-                .equals(SEQUENCE + "/v" + VERSION_1);
+            String type = parentTaskExecution.getType();
+
+            return type.equals(SEQUENCE + "/v" + VERSION_1);
         }
 
         return false;
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 
-        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
-
-        taskExecutionService.update(completedSubTaskExecution);
-
-        TaskExecution sequenceTaskExecution = new TaskExecution(
-            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution sequenceTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context context = contextService.peek(sequenceTaskExecution.getId());
-
-            Context newContext = new Context(context);
+            Context newContext = contextService.peek(sequenceTaskExecution.getId());
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -105,22 +103,22 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = new TaskExecution(
-                subWorkflowTask,
+            TaskExecution subTaskExecution = TaskExecution.of(
                 sequenceTaskExecution.getJobId(),
                 sequenceTaskExecution.getId(),
                 sequenceTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1);
+                taskExecution.getTaskNumber() + 1,
+                subWorkflowTask);
 
-            Context context = new Context(contextService.peek(sequenceTaskExecution.getId()));
+            Context context = contextService.peek(sequenceTaskExecution.getId());
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            taskDispatcher.dispatch(evaluatedTaskExecution);
+            taskDispatcher.dispatch(subTaskExecution);
         } else {
             sequenceTaskExecution.setEndTime(LocalDateTime.now());
 

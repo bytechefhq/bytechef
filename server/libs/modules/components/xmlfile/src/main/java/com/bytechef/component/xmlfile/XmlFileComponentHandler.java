@@ -135,8 +135,7 @@ public class XmlFileComponentHandler implements ComponentHandler {
                     items = stream.toList();
                 }
             } else {
-                items = XmlUtils.read(inputStream, path, new TypeReference<>() {
-                });
+                items = XmlUtils.read(inputStream, path, new TypeReference<>() {});
             }
 
             Integer pageSize = executionParameters.getInteger(PAGE_SIZE);

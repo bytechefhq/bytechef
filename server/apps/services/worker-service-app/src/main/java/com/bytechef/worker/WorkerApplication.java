@@ -26,8 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.core.env.Environment;
 
@@ -35,9 +33,6 @@ import org.springframework.core.env.Environment;
  * @author Ivica Cardic
  */
 @SpringBootApplication(
-    exclude = {
-        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
-    },
     scanBasePackages = "com.bytechef")
 public class WorkerApplication {
 

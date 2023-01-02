@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { WorkflowTask } from './WorkflowTask';
+import type { WorkflowFormat } from './WorkflowFormat';
 import {
-    WorkflowTaskFromJSON,
-    WorkflowTaskFromJSONTyped,
-    WorkflowTaskToJSON,
-} from './WorkflowTask';
+    WorkflowFormatFromJSON,
+    WorkflowFormatFromJSONTyped,
+    WorkflowFormatToJSON,
+} from './WorkflowFormat';
 
 /**
  * 
@@ -31,99 +31,29 @@ export interface PostWorkflowRequest {
      * @type {string}
      * @memberof PostWorkflowRequest
      */
-    definition?: string;
+    definition: string;
     /**
-     * The created by.
-     * @type {string}
+     * 
+     * @type {WorkflowFormat}
      * @memberof PostWorkflowRequest
      */
-    readonly createdBy?: string;
-    /**
-     * The created date.
-     * @type {Date}
-     * @memberof PostWorkflowRequest
-     */
-    readonly createdDate?: Date;
-    /**
-     * The format of the workflow definition.
-     * @type {string}
-     * @memberof PostWorkflowRequest
-     */
-    format?: PostWorkflowRequestFormatEnum;
-    /**
-     * The id of the workflow.
-     * @type {string}
-     * @memberof PostWorkflowRequest
-     */
-    readonly id?: string;
-    /**
-     * The workflow's expected list of inputs.
-     * @type {Array<{ [key: string]: object; }>}
-     * @memberof PostWorkflowRequest
-     */
-    inputs?: Array<{ [key: string]: object; }>;
-    /**
-     * The descriptive name for the workflow
-     * @type {string}
-     * @memberof PostWorkflowRequest
-     */
-    label?: string;
-    /**
-     * The last modified by.
-     * @type {string}
-     * @memberof PostWorkflowRequest
-     */
-    readonly lastModifiedBy?: string;
-    /**
-     * The last modified date.
-     * @type {Date}
-     * @memberof PostWorkflowRequest
-     */
-    readonly lastModifiedDate?: Date;
+    format: WorkflowFormat;
     /**
      * 
      * @type {string}
      * @memberof PostWorkflowRequest
      */
-    providerType?: PostWorkflowRequestProviderTypeEnum;
-    /**
-     * The workflow's list of expected outputs.
-     * @type {Array<{ [key: string]: object; }>}
-     * @memberof PostWorkflowRequest
-     */
-    outputs?: Array<{ [key: string]: object; }>;
-    /**
-     * The maximum number of times a task may retry.
-     * @type {number}
-     * @memberof PostWorkflowRequest
-     */
-    retry?: number;
-    /**
-     * The steps that make up the workflow.
-     * @type {Array<WorkflowTask>}
-     * @memberof PostWorkflowRequest
-     */
-    tasks?: Array<WorkflowTask>;
+    sourceType?: PostWorkflowRequestSourceTypeEnum;
 }
 
 
 /**
  * @export
  */
-export const PostWorkflowRequestFormatEnum = {
-    Json: 'JSON',
-    Yml: 'YML',
-    Yaml: 'YAML'
-} as const;
-export type PostWorkflowRequestFormatEnum = typeof PostWorkflowRequestFormatEnum[keyof typeof PostWorkflowRequestFormatEnum];
-
-/**
- * @export
- */
-export const PostWorkflowRequestProviderTypeEnum = {
+export const PostWorkflowRequestSourceTypeEnum = {
     Jdbc: 'JDBC'
 } as const;
-export type PostWorkflowRequestProviderTypeEnum = typeof PostWorkflowRequestProviderTypeEnum[keyof typeof PostWorkflowRequestProviderTypeEnum];
+export type PostWorkflowRequestSourceTypeEnum = typeof PostWorkflowRequestSourceTypeEnum[keyof typeof PostWorkflowRequestSourceTypeEnum];
 
 
 /**
@@ -131,6 +61,8 @@ export type PostWorkflowRequestProviderTypeEnum = typeof PostWorkflowRequestProv
  */
 export function instanceOfPostWorkflowRequest(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "definition" in value;
+    isInstance = isInstance && "format" in value;
 
     return isInstance;
 }
@@ -145,19 +77,9 @@ export function PostWorkflowRequestFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'definition': !exists(json, 'definition') ? undefined : json['definition'],
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'format': !exists(json, 'format') ? undefined : json['format'],
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'providerType': !exists(json, 'providerType') ? undefined : json['providerType'],
-        'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
-        'retry': !exists(json, 'retry') ? undefined : json['retry'],
-        'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskFromJSON)),
+        'definition': json['definition'],
+        'format': WorkflowFormatFromJSON(json['format']),
+        'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
     };
 }
 
@@ -171,13 +93,8 @@ export function PostWorkflowRequestToJSON(value?: PostWorkflowRequest | null): a
     return {
         
         'definition': value.definition,
-        'format': value.format,
-        'inputs': value.inputs,
-        'label': value.label,
-        'providerType': value.providerType,
-        'outputs': value.outputs,
-        'retry': value.retry,
-        'tasks': value.tasks === undefined ? undefined : ((value.tasks as Array<any>).map(WorkflowTaskToJSON)),
+        'format': WorkflowFormatToJSON(value.format),
+        'sourceType': value.sourceType,
     };
 }
 

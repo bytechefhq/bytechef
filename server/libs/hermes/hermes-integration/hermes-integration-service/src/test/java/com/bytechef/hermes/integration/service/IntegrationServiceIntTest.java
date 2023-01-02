@@ -19,15 +19,21 @@ package com.bytechef.hermes.integration.service;
 
 import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.hermes.integration.domain.Integration;
-import com.bytechef.hermes.integration.domain.IntegrationWorkflow;
 import com.bytechef.hermes.integration.repository.IntegrationRepository;
+import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
+
+import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
@@ -42,17 +48,33 @@ public class IntegrationServiceIntTest {
     @Autowired
     private IntegrationRepository integrationRepository;
 
-    @Test
-    public void testAdd() {
-        Integration integration = integrationService.create(getIntegration());
+    @Autowired
+    private TagRepository tagRepository;
 
-        Assertions.assertEquals(
-            List.of("workflow1"),
-            integration.getIntegrationWorkflows()
-                .stream()
-                .map(IntegrationWorkflow::getWorkflowId)
-                .toList());
+    @BeforeEach
+    @SuppressFBWarnings("NP")
+    public void beforeEach() {
+        for (Integration integration : integrationRepository.findAll()) {
+            integrationRepository.deleteById(integration.getId());
+        }
+
+        for (Tag tag : tagRepository.findAll()) {
+            tagRepository.deleteById(tag.getId());
+        }
+    }
+
+    @Test
+    public void testCreate() {
+        Tag tag = tagRepository.save(new Tag("tag1"));
+
+        Integration integration = integrationService.create("name", "description", "category", Set.of("workflow1"),
+            Set.of(tag));
+
+        Assertions.assertEquals("category", integration.getCategory());
+        Assertions.assertEquals("description", integration.getDescription());
         Assertions.assertEquals("name", integration.getName());
+        Assertions.assertEquals(Set.of(tag.getId()), integration.getTagIds());
+        Assertions.assertEquals(Set.of("workflow1"), integration.getWorkflowIds());
     }
 
     @Test
@@ -77,28 +99,45 @@ public class IntegrationServiceIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testGetIntegrations() {
-        for (Integration integration : integrationRepository.findAll()) {
-            integrationRepository.deleteById(integration.getId());
-        }
-
         integrationRepository.save(getIntegration());
 
-        Assertions.assertEquals(1, integrationService.getIntegrations()
-            .size());
+        assertThat(integrationService.getIntegrations()).hasSize(1);
     }
 
     @Test
     public void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration());
 
-        integration.setName("name2");
+        Integration updatedIntegration = integrationService.update(integration.getId(), null, null, null, null, null);
 
-        Integration updatedConnection = integrationService.update(integration);
+        Assertions.assertEquals("category", updatedIntegration.getCategory());
+        Assertions.assertEquals("description", updatedIntegration.getDescription());
+        Assertions.assertEquals("name", updatedIntegration.getName());
+        Assertions.assertTrue(updatedIntegration.getTagIds()
+            .isEmpty());
+        Assertions.assertEquals(Set.of("workflow1"), updatedIntegration.getWorkflowIds());
 
-        Assertions.assertEquals("name2", updatedConnection.getName());
+        Tag tag = tagRepository.save(new Tag("tag2"));
+
+        updatedIntegration = integrationService.update(integration.getId(), "name2", "description2", "category2",
+            Set.of("workflow2"), Set.of(tag));
+
+        Assertions.assertEquals("category2", updatedIntegration.getCategory());
+        Assertions.assertEquals("description2", updatedIntegration.getDescription());
+        Assertions.assertEquals("name2", updatedIntegration.getName());
+        Assertions.assertEquals(Set.of(tag.getId()), updatedIntegration.getTagIds());
+        Assertions.assertEquals(Set.of("workflow2"), updatedIntegration.getWorkflowIds());
     }
 
     private static Integration getIntegration() {
-        return new Integration("name", "description", List.of("workflow1"));
+        Integration integration = new Integration();
+
+        integration.addWorkflow("workflow1");
+
+        integration.setCategory("category");
+        integration.setDescription("description");
+        integration.setName("name");
+
+        return integration;
     }
 }

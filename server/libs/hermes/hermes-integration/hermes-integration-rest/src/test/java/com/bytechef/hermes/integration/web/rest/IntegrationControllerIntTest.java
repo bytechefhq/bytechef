@@ -17,8 +17,9 @@
 
 package com.bytechef.hermes.integration.web.rest;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,8 +28,10 @@ import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -52,6 +55,9 @@ public class IntegrationControllerIntTest {
     @MockBean
     private IntegrationService integrationService;
 
+    @MockBean
+    private TagService tagService;
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -68,11 +74,11 @@ public class IntegrationControllerIntTest {
             Assertions.fail(exception);
         }
 
-        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Long> argument = ArgumentCaptor.forClass(Long.class);
 
-        verify(integrationService).delete(argument.capture());
+        verify(integrationFacade).delete(argument.capture());
 
-        Assertions.assertEquals("1", argument.getValue());
+        Assertions.assertEquals(1L, argument.getValue());
     }
 
     @Test
@@ -80,7 +86,7 @@ public class IntegrationControllerIntTest {
         try {
             Integration integration = getIntegration();
 
-            when(integrationService.getIntegration(anyString())).thenReturn(integration);
+            when(integrationService.getIntegration(anyLong())).thenReturn(integration);
 
             this.webTestClient
                 .get()
@@ -121,7 +127,7 @@ public class IntegrationControllerIntTest {
         IntegrationModel integrationModel = new IntegrationModel().name("name")
             .description("description");
 
-        when(integrationFacade.initialize(any())).thenReturn(integration);
+        when(integrationFacade.create(anyString(), anyString(), isNull(), isNull(), isNull())).thenReturn(integration);
 
         try {
             assert integration.getId() != null;
@@ -152,12 +158,13 @@ public class IntegrationControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPutIntegration() {
         Integration integration = getIntegration();
-        IntegrationModel integrationModel = new IntegrationModel().id("1")
+        IntegrationModel integrationModel = new IntegrationModel().id(1L)
             .name("name");
 
         integration.setName("name2");
 
-        when(integrationService.update(integration)).thenReturn(integration);
+        when(integrationFacade.update(
+            anyLong(), anyString(), isNull(), isNull(), isNull(), isNull())).thenReturn(integration);
 
         try {
             this.webTestClient
@@ -184,9 +191,13 @@ public class IntegrationControllerIntTest {
     }
 
     private static Integration getIntegration() {
-        Integration integration = new Integration("name", "description", List.of("workflow1"));
+        Integration integration = new Integration();
 
-        integration.setId("1");
+        integration.addWorkflow("workflow1");
+
+        integration.setId(1L);
+        integration.setDescription("name");
+        integration.setName("name");
 
         return integration;
     }

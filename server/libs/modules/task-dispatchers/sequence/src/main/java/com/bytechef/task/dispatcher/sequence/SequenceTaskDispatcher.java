@@ -33,9 +33,12 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -46,14 +49,14 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     public static final String TASKS = "tasks";
     private final ContextService contextService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public SequenceTaskDispatcher(
         ContextService contextService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -64,51 +67,44 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        TaskExecution sequenceTaskExecution = new TaskExecution(taskExecution);
-
-        sequenceTaskExecution.setStartTime(LocalDateTime.now());
-        sequenceTaskExecution.setStatus(TaskStatus.STARTED);
-
-        taskExecutionService.update(sequenceTaskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
 
         List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
-            sequenceTaskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
+            taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
-        if (subWorkflowTasks.size() > 0) {
+        if (subWorkflowTasks.isEmpty()) {
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
+
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+        } else {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            TaskExecution subTaskExecution = new TaskExecution(
-                subWorkflowTask,
-                sequenceTaskExecution.getJobId(),
-                sequenceTaskExecution.getId(),
-                sequenceTaskExecution.getPriority(),
-                1);
+            TaskExecution subTaskExecution = TaskExecution.of(
+                taskExecution.getJobId(),
+                taskExecution.getId(),
+                taskExecution.getPriority(),
+                1,
+                subWorkflowTask);
 
-            Context context = new Context(contextService.peek(sequenceTaskExecution.getId()));
+            Context context = contextService.peek(taskExecution.getId());
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            taskDispatcher.dispatch(evaluatedTaskExecution);
-        } else {
-            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
-
-            completionTaskExecution.setStartTime(LocalDateTime.now());
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(0);
-
-            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+            taskDispatcher.dispatch(subTaskExecution);
         }
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(SEQUENCE + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), SEQUENCE + "/v" + VERSION_1)) {
             return this;
         }
 

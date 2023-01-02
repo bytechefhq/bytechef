@@ -27,5 +27,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ConnectionRepository
-    extends PagingAndSortingRepository<Connection, String>, CrudRepository<Connection, String> {
+    extends PagingAndSortingRepository<Connection, Long>, CrudRepository<Connection, Long> {
 }

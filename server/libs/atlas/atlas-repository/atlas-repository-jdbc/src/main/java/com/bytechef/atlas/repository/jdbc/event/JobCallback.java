@@ -19,7 +19,6 @@ package com.bytechef.atlas.repository.jdbc.event;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.commons.utils.UUIDUtils;
-import java.time.LocalDateTime;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
 import org.springframework.stereotype.Component;
@@ -33,18 +32,9 @@ public class JobCallback implements BeforeConvertCallback<Job> {
 
     @Override
     public Job onBeforeConvert(Job job) {
-        // TODO check why Auditing does not populate auditing fields
-        if (job.isNew()) {
-            job.setCreatedBy("system");
-            job.setCreatedDate(LocalDateTime.now());
-
-            if (job.getId() == null) {
-                job.setId(UUIDUtils.generate());
-            }
+        if (job.isNew() && job.getId() == null) {
+            job.setId(UUIDUtils.generate());
         }
-
-        job.setLastModifiedBy("system");
-        job.setLastModifiedDate(LocalDateTime.now());
 
         return job;
     }

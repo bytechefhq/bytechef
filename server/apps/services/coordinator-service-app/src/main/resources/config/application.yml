@@ -112,19 +112,21 @@ spring:
 bytechef:
   discovery-service:
     provider: redis
-
   workflow:
     context-repository:
       provider: jdbc
-    # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
     message-broker:
+      # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: amqp
       provider: amqp
     persistence:
       provider: jdbc
     serialization:
       date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
     workflow-repository:
-      database:
-        enabled: true
       classpath:
+        enabled: true
+      filesystem:
+        enabled: true
+        location-pattern: ${user.home}/bytechef/**/*.yaml
+      jdbc:
         enabled: true

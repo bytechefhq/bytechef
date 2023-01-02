@@ -22,37 +22,91 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
+import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
 @Service
+@Transactional
 public class IntegrationFacadeImpl implements IntegrationFacade {
 
     private final IntegrationService integrationService;
+    private final TagService tagService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationFacadeImpl(IntegrationService integrationService, WorkflowService workflowService) {
+    public IntegrationFacadeImpl(IntegrationService integrationService, TagService tagService,
+        WorkflowService workflowService) {
         this.integrationService = integrationService;
+        this.tagService = tagService;
         this.workflowService = workflowService;
     }
 
     @Override
-    public Integration initialize(Integration integration) {
-        if (!integration.containsWorkflows()) {
-            Workflow workflow = new Workflow();
+    public Integration create(
+        String name, String description, String category, List<String> workflowIds, List<String> tagNames) {
 
-            workflow.setDefinition("{\"tasks\": []}");
-            workflow.setFormat(Workflow.Format.JSON);
+        if (CollectionUtils.isEmpty(workflowIds)) {
+            Workflow workflow = workflowService.create(null, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
-            workflow = workflowService.create(workflow, Workflow.ProviderType.JDBC);
-
-            integration.addWorkflow(workflow.getId());
+            workflowIds = List.of(workflow.getId());
         }
 
-        return integrationService.create(integration);
+        Set<Tag> tags = null;
+
+        if (!CollectionUtils.isEmpty(tagNames)) {
+            tags = tagService.create(new HashSet<>(tagNames));
+        }
+
+        return integrationService.create(name, description, category, new HashSet<>(workflowIds), tags);
+    }
+
+    @Override
+    public void delete(Long id) {
+//        Integration integration = integrationService.getIntegration(id);
+
+        integrationService.delete(id);
+
+// TODO find a way to delete ll tags not referenced anymore
+//        integration.getTagIds()
+//            .forEach(tagService::delete);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getIntegrationTags() {
+        List<Integration> integrations = integrationService.getIntegrations();
+
+        Set<Long> tagIds = integrations.stream()
+            .map(Integration::getTagIds)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+
+        return tagService.getTags(tagIds)
+            .stream()
+            .map(Tag::getName)
+            .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Integration update(
+        Long id, String name, String description, String category, List<String> workflowIds, List<String> tagNames) {
+
+        Set<Tag> tags = CollectionUtils.isEmpty(tagNames) ? null : tagService.create(new HashSet<>(tagNames));
+
+        return integrationService.update(
+            id, name, description, category, workflowIds == null ? null : new HashSet<>(workflowIds), tags);
     }
 }
