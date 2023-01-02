@@ -36,10 +36,13 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -49,14 +52,14 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
     private final ContextService contextService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public IfTaskDispatcher(
         ContextService contextService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -67,25 +70,21 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        TaskExecution ifTaskExecution = new TaskExecution(taskExecution);
-
-        ifTaskExecution.setStartTime(LocalDateTime.now());
-        ifTaskExecution.setStatus(TaskStatus.STARTED);
-
-        taskExecutionService.update(ifTaskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
 
         List<WorkflowTask> subWorkflowTasks;
 
-        if (IfTaskUtils.resolveCase(ifTaskExecution)) {
+        if (IfTaskUtils.resolveCase(taskExecution)) {
             subWorkflowTasks = MapUtils
-                .getList(ifTaskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
+                .getList(taskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
                 .stream()
                 .map(WorkflowTask::new)
                 .toList();
         } else {
             subWorkflowTasks = MapUtils
-                .getList(ifTaskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
+                .getList(taskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
                 .stream()
                 .map(WorkflowTask::new)
                 .toList();
@@ -94,37 +93,34 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            TaskExecution subTaskExecution = new TaskExecution(
-                subWorkflowTask,
-                ifTaskExecution.getJobId(),
-                ifTaskExecution.getId(),
-                ifTaskExecution.getPriority(),
-                1);
+            TaskExecution subTaskExecution = TaskExecution.of(
+                taskExecution.getJobId(),
+                taskExecution.getId(),
+                taskExecution.getPriority(),
+                1,
+                subWorkflowTask);
 
-            Context context = new Context(contextService.peek(ifTaskExecution.getId()));
+            Context context = contextService.peek(taskExecution.getId());
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            taskDispatcher.dispatch(evaluatedTaskExecution);
+            taskDispatcher.dispatch(subTaskExecution);
         } else {
-            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
 
-            completionTaskExecution.setStartTime(LocalDateTime.now());
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(0);
-
-            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
         }
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(IF + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), IF + "/v" + VERSION_1)) {
             return this;
         }
 

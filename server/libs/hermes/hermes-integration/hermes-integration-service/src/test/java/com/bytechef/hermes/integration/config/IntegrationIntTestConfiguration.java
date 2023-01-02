@@ -19,7 +19,7 @@ package com.bytechef.hermes.integration.config;
 
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
 
@@ -44,11 +44,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"
+        "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration", "com.bytechef.tag"
     })
 @EnableAutoConfiguration
 @Import({
-    WorkflowRepositoryConfiguration.class
+    WorkflowMapperConfiguration.class
 })
 @SpringBootConfiguration
 public class IntegrationIntTestConfiguration {
@@ -68,7 +68,8 @@ public class IntegrationIntTestConfiguration {
     @EnableJdbcAuditing
     @EnableJdbcRepositories(
         basePackages = {
-            "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository"
+            "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository",
+            "com.bytechef.tag.repository"
         })
     @TestConfiguration
     public static class JdbcRepositoriesConfiguration {

@@ -41,9 +41,12 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.util.Assert;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A {@link TaskDispatcher} implementation which implements a parallel for-each construct. The dispatcher works by
@@ -54,7 +57,7 @@ import org.springframework.util.Assert;
  */
 public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
     private final MessageBroker messageBroker;
@@ -62,7 +65,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final CounterService counterService;
 
     public EachTaskDispatcher(
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService,
         MessageBroker messageBroker,
         ContextService contextService,
@@ -77,56 +80,47 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
-        List<Object> list = MapUtils.getList(taskExecution.getParameters(), LIST, Object.class);
+        Map<String, Object> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
-        Assert.notNull(iteratee, "'iteratee' property can't be null");
-        Assert.notNull(list, "'list' property can't be null");
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
 
-        TaskExecution eachTaskExecution = new TaskExecution(taskExecution);
+        if (list.isEmpty()) {
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
 
-        eachTaskExecution.setStartTime(LocalDateTime.now());
-        eachTaskExecution.setStatus(TaskStatus.STARTED);
-
-        taskExecutionService.update(eachTaskExecution);
-
-        if (!list.isEmpty()) {
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+        } else {
             counterService.set(taskExecution.getId(), list.size());
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
-                TaskExecution iterateeTaskExecution = new TaskExecution(
-                    iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
+                TaskExecution iterateeTaskExecution = TaskExecution.of(
+                    taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1,
+                    new WorkflowTask(iteratee));
 
-                Context context = new Context(contextService.peek(taskExecution.getId()));
+                Context context = contextService.peek(taskExecution.getId());
 
                 context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
                 context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
                 contextService.push(iterateeTaskExecution.getId(), context);
 
-                TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(iterateeTaskExecution, context);
+                iterateeTaskExecution.evaluate(taskEvaluator, context);
 
-                evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 
-                taskDispatcher.dispatch(evaluatedTaskExecution);
+                taskDispatcher.dispatch(iterateeTaskExecution);
             }
-        } else {
-            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
-
-            completionTaskExecution.setStartTime(LocalDateTime.now());
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(0);
-
-            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
         }
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends TaskExecution> resolve(Task task) {
+        if (Objects.equals(task.getType(), EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
             return this;
         }
         return null;

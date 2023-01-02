@@ -27,7 +27,7 @@ public class HttpClientConstants {
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String RESPONSE_FILENAME = "responseFilename";
     public static final String BODY_CONTENT_TYPE = "bodyContentType";
-    public static final String MIME_TYPE = "mimeType";
+    public static final String RAW_CONTENT_MIME_TYPE = "rawContentMimeType";
     public static final String FULL_RESPONSE = "fullResponse";
     public static final String FOLLOW_ALL_REDIRECTS = "followAllRedirects";
     public static final String FOLLOW_REDIRECT = "followRedirect";
@@ -45,6 +45,5 @@ public class HttpClientConstants {
     public static final String PATCH = "patch";
     public static final String DELETE = "delete";
     public static final String HEAD = "head";
-    public static final String SEND_FILE = "sendFile";
     public static final String FILE_ENTRY = "fileEntry";
 }

@@ -52,19 +52,14 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
-
-        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
-
-        taskExecutionService.update(completedSubTaskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 
         long subtasksLeft = counterService.decrement(taskExecution.getParentId());
 
         if (subtasksLeft == 0) {
             List<TaskExecution> childTaskExecutions = taskExecutionService
                 .getParentTaskExecutions(taskExecution.getParentId());
-            TaskExecution mapTaskExecution = new TaskExecution(
-                taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            TaskExecution mapTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
             mapTaskExecution.setEndTime(LocalDateTime.now());
 

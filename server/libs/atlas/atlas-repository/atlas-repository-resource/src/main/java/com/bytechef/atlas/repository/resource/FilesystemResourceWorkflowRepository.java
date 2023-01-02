@@ -30,7 +30,7 @@ public class FilesystemResourceWorkflowRepository extends AbstractResourceWorkfl
     }
 
     @Override
-    public Workflow.ProviderType getProviderType() {
-        return Workflow.ProviderType.FILESYSTEM;
+    public Workflow.SourceType getSourceType() {
+        return Workflow.SourceType.FILESYSTEM;
     }
 }

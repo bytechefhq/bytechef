@@ -41,9 +41,12 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.util.Assert;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -68,56 +71,47 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<Object> list = MapUtils.getList(taskExecution.getParameters(), LIST, Object.class);
-        WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
+        List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
+        Map<String, Object> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
 
-        Assert.notNull(list, "'list' property can't be null");
-        Assert.notNull(iteratee, "'iteratee' property can't be null");
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
 
-        TaskExecution mapTaskExecution = new TaskExecution(taskExecution);
+        if (list.isEmpty()) {
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
 
-        mapTaskExecution.setStartTime(LocalDateTime.now());
-        mapTaskExecution.setStatus(TaskStatus.STARTED);
-
-        taskExecutionService.update(mapTaskExecution);
-
-        if (list.size() > 0) {
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+        } else {
             counterService.set(taskExecution.getId(), list.size());
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
-                TaskExecution iterateeTaskExecution = new TaskExecution(
-                    iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
+                TaskExecution iterateeTaskExecution = TaskExecution.of(
+                    taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1,
+                    new WorkflowTask(iteratee));
 
-                Context context = new Context(contextService.peek(taskExecution.getId()));
+                Context context = contextService.peek(taskExecution.getId());
 
                 context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
                 context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
                 contextService.push(iterateeTaskExecution.getId(), context);
 
-                TaskExecution evaluatedEachTask = taskEvaluator.evaluate(iterateeTaskExecution, context);
+                iterateeTaskExecution.evaluate(taskEvaluator, context);
 
-                evaluatedEachTask = taskExecutionService.create(evaluatedEachTask);
+                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 
-                taskDispatcher.dispatch(evaluatedEachTask);
+                taskDispatcher.dispatch(iterateeTaskExecution);
             }
-        } else {
-            TaskExecution completion = new TaskExecution(taskExecution);
-
-            completion.setStartTime(LocalDateTime.now());
-            completion.setEndTime(LocalDateTime.now());
-            completion.setExecutionTime(0);
-
-            messageBroker.send(Queues.COMPLETIONS, completion);
         }
     }
 
     @Override
-    public TaskDispatcher<?> resolve(Task task) {
-        if (task.getType()
-            .equals(MAP + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), MAP + "/v" + VERSION_1)) {
             return this;
         }
 

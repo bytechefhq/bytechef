@@ -49,7 +49,7 @@ export interface TaskExecution {
      * @type {Date}
      * @memberof TaskExecution
      */
-    endTime?: Date;
+    readonly endTime?: Date;
     /**
      * 
      * @type {ExecutionError}
@@ -61,7 +61,7 @@ export interface TaskExecution {
      * @type {number}
      * @memberof TaskExecution
      */
-    executionTime?: number;
+    readonly executionTime?: number;
     /**
      * Id of the task execution.
      * @type {string}
@@ -73,7 +73,7 @@ export interface TaskExecution {
      * @type {string}
      * @memberof TaskExecution
      */
-    jobId: string;
+    readonly jobId: string;
     /**
      * The last modified by.
      * @type {string}
@@ -91,73 +91,73 @@ export interface TaskExecution {
      * @type {object}
      * @memberof TaskExecution
      */
-    output?: object;
+    readonly output?: object;
     /**
      * The id of the parent task, if this is a sub-task.
      * @type {string}
      * @memberof TaskExecution
      */
-    parentId?: string;
+    readonly parentId?: string;
     /**
      * The priority value.
      * @type {number}
      * @memberof TaskExecution
      */
-    priority: number;
+    readonly priority: number;
     /**
      * The current progress value, a number between 0 and 100.
      * @type {number}
      * @memberof TaskExecution
      */
-    progress?: number;
+    readonly progress?: number;
     /**
      * The maximum number of times that this task may retry.
      * @type {number}
      * @memberof TaskExecution
      */
-    retry?: number;
+    readonly retry?: number;
     /**
      * The number of times that this task has been retried.
      * @type {number}
      * @memberof TaskExecution
      */
-    retryAttempts?: number;
+    readonly retryAttempts?: number;
     /**
      * The delay to introduce between each retry. Values are to be specified using the ISO-8601 format (excluding the PT prefix). e.g. 10s (ten seconds), 1m (one minute) etc.
      * @type {string}
      * @memberof TaskExecution
      */
-    retryDelay?: string;
+    readonly retryDelay?: string;
     /**
      * The factor to use in order to calculate the actual delay time between each successive retry -- multiplying by the value of the retryDelay.
      * @type {number}
      * @memberof TaskExecution
      */
-    retryDelayFactor?: number;
+    readonly retryDelayFactor?: number;
     /**
      * The time when this task instance was started.
      * @type {Date}
      * @memberof TaskExecution
      */
-    startTime: Date;
+    readonly startTime: Date;
     /**
      * The current status of this task.
      * @type {string}
      * @memberof TaskExecution
      */
-    status: TaskExecutionStatusEnum;
+    readonly status: TaskExecutionStatusEnum;
     /**
      * The numeric order of the task in the workflow.
      * @type {number}
      * @memberof TaskExecution
      */
-    taskNumber?: number;
+    readonly taskNumber?: number;
     /**
      * The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.
      * @type {number}
      * @memberof TaskExecution
      */
-    retryDelayMillis?: number;
+    readonly retryDelayMillis?: number;
     /**
      * 
      * @type {WorkflowTask}
@@ -169,7 +169,7 @@ export interface TaskExecution {
      * @type {string}
      * @memberof TaskExecution
      */
-    type?: string;
+    readonly type?: string;
 }
 
 
@@ -244,24 +244,8 @@ export function TaskExecutionToJSON(value?: TaskExecution | null): any {
     }
     return {
         
-        'endTime': value.endTime === undefined ? undefined : (value.endTime.toISOString()),
         'error': ExecutionErrorToJSON(value.error),
-        'executionTime': value.executionTime,
-        'jobId': value.jobId,
-        'output': value.output,
-        'parentId': value.parentId,
-        'priority': value.priority,
-        'progress': value.progress,
-        'retry': value.retry,
-        'retryAttempts': value.retryAttempts,
-        'retryDelay': value.retryDelay,
-        'retryDelayFactor': value.retryDelayFactor,
-        'startTime': (value.startTime.toISOString()),
-        'status': value.status,
-        'taskNumber': value.taskNumber,
-        'retryDelayMillis': value.retryDelayMillis,
         'workflowTask': WorkflowTaskToJSON(value.workflowTask),
-        'type': value.type,
     };
 }
 

@@ -9,11 +9,6 @@ plugins {
 
 allprojects {
     apply plugin: "com.github.ben-manes.versions"
-
-    repositories {
-        mavenCentral()
-        maven { url 'https://repo.spring.io/milestone' }
-    }
 }
 
 subprojects {

@@ -35,7 +35,7 @@ paths:
         "200":
           description: TODO OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Connection'
   /connections/{id}:
@@ -50,7 +50,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: TODO OK
@@ -65,12 +66,13 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: TODO
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Connection'
     put:
@@ -84,18 +86,23 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConnectionUpdate'
+              type: object
+              properties:
+                name:
+                  description: TODO
+                  type: string
         required: true
       responses:
         "200":
           description: TODO
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Connection'
 components:
@@ -103,6 +110,11 @@ components:
     Connection:
       description: TODO
       type: object
+      required:
+        - name
+        - componentName
+        - componentVersion
+        - parameters
       properties:
         authorizationName:
           description: TODO
@@ -112,7 +124,7 @@ components:
           type: string
         componentVersion:
           description: TODO
-          type: string
+          type: integer
         createdBy:
           description: TODO
           type: string
@@ -127,7 +139,8 @@ components:
           type: string
         id:
           description: TODO
-          type: string
+          type: integer
+          format: int64
           readOnly: true
         lastModifiedBy:
           description: TODO
@@ -143,9 +156,3 @@ components:
           type: object
           additionalProperties:
             type: object
-    ConnectionUpdate:
-      type: object
-      properties:
-        name:
-          description: TODO
-          type: string

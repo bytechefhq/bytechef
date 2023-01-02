@@ -44,6 +44,9 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
@@ -57,14 +60,14 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     private final ContextService contextService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public SwitchTaskDispatcher(
         ContextService contextService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService,
         TaskEvaluator taskEvaluator) {
         this.contextService = contextService;
@@ -75,13 +78,9 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        TaskExecution switchTaskExecution = new TaskExecution(taskExecution);
-
-        switchTaskExecution.setStartTime(LocalDateTime.now());
-        switchTaskExecution.setStatus(TaskStatus.STARTED);
-
-        taskExecutionService.update(switchTaskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
 
         Map<String, Object> selectedCase = resolveCase(taskExecution);
 
@@ -89,51 +88,46 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             List<WorkflowTask> subWorkflowTasks = MapUtils.getList(selectedCase, TASKS, WorkflowTask.class,
                 Collections.emptyList());
 
-            if (!subWorkflowTasks.isEmpty()) {
+            if (subWorkflowTasks.isEmpty()) {
+                taskExecution.setStartTime(LocalDateTime.now());
+                taskExecution.setEndTime(LocalDateTime.now());
+                taskExecution.setExecutionTime(0);
+
+                messageBroker.send(Queues.COMPLETIONS, taskExecution);
+            } else {
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-                TaskExecution subTaskExecution = new TaskExecution(
-                    subWorkflowTask,
-                    switchTaskExecution.getJobId(),
-                    switchTaskExecution.getId(),
-                    switchTaskExecution.getPriority(),
-                    1);
+                TaskExecution subTaskExecution = TaskExecution.of(
+                    taskExecution.getJobId(),
+                    taskExecution.getId(),
+                    taskExecution.getPriority(),
+                    1,
+                    subWorkflowTask);
 
-                Context context = new Context(contextService.peek(switchTaskExecution.getId()));
+                Context context = contextService.peek(taskExecution.getId());
 
                 contextService.push(subTaskExecution.getId(), context);
 
-                TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+                subTaskExecution.evaluate(taskEvaluator, context);
 
-                evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+                subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-                taskDispatcher.dispatch(evaluatedTaskExecution);
-            } else {
-                TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
-
-                completionTaskExecution.setStartTime(LocalDateTime.now());
-                completionTaskExecution.setEndTime(LocalDateTime.now());
-                completionTaskExecution.setExecutionTime(0);
-
-                messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+                taskDispatcher.dispatch(subTaskExecution);
             }
         } else {
-            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
-
-            completionTaskExecution.setStartTime(LocalDateTime.now());
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(0);
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
             // TODO check, it seems wrong
-            completionTaskExecution.setOutput(selectedCase.get("value"));
+            taskExecution.setOutput(selectedCase.get("value"));
 
-            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
         }
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(SWITCH + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), SWITCH + "/v" + VERSION_1)) {
             return this;
         }
 
@@ -142,9 +136,8 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     private Map<String, Object> resolveCase(TaskExecution taskExecution) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = MapUtils.getList(taskExecution.getParameters(), CASES,
-            new ParameterizedTypeReference<>() {
-            });
+        List<Map<String, Object>> cases = MapUtils.getList(
+            taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
 
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
 

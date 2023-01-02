@@ -43,7 +43,7 @@ export interface Job {
      * @type {number}
      * @memberof Job
      */
-    currentTask?: number;
+    readonly currentTask?: number;
     /**
      * The time execution entered end status COMPLETED, STOPPED, FAILED
      * @type {Date}
@@ -67,13 +67,13 @@ export interface Job {
      * @type {{ [key: string]: object; }}
      * @memberof Job
      */
-    inputs?: { [key: string]: object; };
+    readonly inputs?: { [key: string]: object; };
     /**
      * The job's human-readable name.
      * @type {string}
      * @memberof Job
      */
-    label?: string;
+    readonly label?: string;
     /**
      * The last modified by.
      * @type {string}
@@ -91,43 +91,43 @@ export interface Job {
      * @type {{ [key: string]: object; }}
      * @memberof Job
      */
-    outputs?: { [key: string]: object; };
+    readonly outputs?: { [key: string]: object; };
     /**
      * The id of the parent task that created this job. Required for sub-flows.
      * @type {string}
      * @memberof Job
      */
-    parentTaskExecutionId?: string;
+    readonly parentTaskExecutionId?: string;
     /**
      * The priority value.
      * @type {number}
      * @memberof Job
      */
-    priority: number;
+    readonly priority: number;
     /**
      * The time of when the job began.
      * @type {Date}
      * @memberof Job
      */
-    startTime: Date;
+    readonly startTime: Date;
     /**
      * The job's status.
      * @type {string}
      * @memberof Job
      */
-    status: JobStatusEnum;
+    readonly status: JobStatusEnum;
     /**
      * The list of the webhooks configured.
      * @type {Array<{ [key: string]: object; }>}
      * @memberof Job
      */
-    webhooks?: Array<{ [key: string]: object; }>;
+    readonly webhooks?: Array<{ [key: string]: object; }>;
     /**
      * 
      * @type {string}
      * @memberof Job
      */
-    workflowId?: string;
+    readonly workflowId?: string;
 }
 
 
@@ -195,18 +195,8 @@ export function JobToJSON(value?: Job | null): any {
     }
     return {
         
-        'currentTask': value.currentTask,
         'endTime': value.endTime === undefined ? undefined : (value.endTime.toISOString()),
         'error': ExecutionErrorToJSON(value.error),
-        'inputs': value.inputs,
-        'label': value.label,
-        'outputs': value.outputs,
-        'parentTaskExecutionId': value.parentTaskExecutionId,
-        'priority': value.priority,
-        'startTime': (value.startTime.toISOString()),
-        'status': value.status,
-        'webhooks': value.webhooks,
-        'workflowId': value.workflowId,
     };
 }
 

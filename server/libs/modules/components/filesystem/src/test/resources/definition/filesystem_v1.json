@@ -7,7 +7,7 @@
   "actions": [
     {
       "display": {
-        "label": "Read to file"
+        "label": "Read from file"
       },
       "name": "readFile",
       "output": [
@@ -51,7 +51,7 @@
     },
     {
       "display": {
-        "label": "Write from file"
+        "label": "Write to file"
       },
       "name": "writeFile",
       "output": [

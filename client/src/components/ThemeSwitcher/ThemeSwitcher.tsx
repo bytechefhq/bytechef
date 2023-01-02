@@ -6,7 +6,6 @@ import {
     Trigger,
 } from '@radix-ui/react-dropdown-menu';
 import {Half2Icon, MoonIcon, SunIcon} from '@radix-ui/react-icons';
-import cx from 'classnames';
 import React, {useEffect, useState} from 'react';
 
 const availableThemes = [
@@ -59,14 +58,7 @@ const ThemeSwitcher: React.FC = () => {
     return (
         <div className="relative inline-block text-left">
             <Root>
-                <Trigger
-                    className={cx(
-                        'inline-flex select-none justify-center rounded-md px-2.5 py-2 text-sm font-medium',
-                        'bg-white text-gray-900 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-100 hover:dark:bg-gray-600',
-                        'border border-gray-300 dark:border-transparent',
-                        'focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75'
-                    )}
-                >
+                <Trigger className="inline-flex select-none justify-center rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 dark:border-transparent dark:bg-gray-700 dark:text-gray-100 hover:dark:bg-gray-600">
                     {currentTheme.icon}
 
                     <span className="px-2">{currentTheme.label}</span>
@@ -76,11 +68,8 @@ const ThemeSwitcher: React.FC = () => {
                     <Content
                         align="start"
                         sideOffset={5}
-                        className={cx(
-                            ' radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down',
-                            'w-48 rounded-lg px-1.5 py-1 shadow-md md:w-56',
-                            'bg-gray-50 dark:bg-gray-700'
-                        )}
+                        // eslint-disable-next-line tailwindcss/no-custom-classname
+                        className="w-48 rounded-lg bg-gray-50 px-1.5 py-1 shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-700 md:w-56"
                     >
                         {availableThemes.map((theme) => {
                             const {key, label, icon} = theme;
@@ -88,10 +77,7 @@ const ThemeSwitcher: React.FC = () => {
                             return (
                                 <Item
                                     key={key}
-                                    className={cx(
-                                        'flex w-full cursor-default select-none items-center rounded-md px-2 py-2 text-xs outline-none',
-                                        'text-gray-500 focus:bg-gray-200 dark:text-gray-400 dark:focus:bg-gray-800'
-                                    )}
+                                    className="flex w-full cursor-default select-none items-center rounded-md p-2 text-xs text-gray-500 outline-none focus:bg-gray-200 dark:text-gray-400 dark:focus:bg-gray-800"
                                     onClick={() => {
                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         (window as any).__setPreferredTheme(

@@ -22,7 +22,7 @@ import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.utils.UUIDUtils;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.relational.core.mapping.event.AfterConvertCallback;
@@ -44,31 +44,34 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
 
     @Override
     public Workflow onAfterConvert(Workflow workflow) {
-        workflow = readWorkflowDefinition(workflow);
-
-        return workflow;
+        return readWorkflowDefinition(workflow);
     }
 
     @Override
     public Workflow onBeforeConvert(Workflow workflow) {
-        // TODO check why Auditing does not populate auditing fields
         if (workflow.isNew()) {
-            workflow.setCreatedBy("system");
-            workflow.setCreatedDate(LocalDateTime.now());
             workflow.setId(UUIDUtils.generate());
         }
-
-        workflow.setLastModifiedBy("system");
-        workflow.setLastModifiedDate(LocalDateTime.now());
 
         return workflow;
     }
 
     private Workflow readWorkflowDefinition(Workflow workflow) {
-        return workflowMapper.readValue(new WorkflowResource(
-            workflow.getId(),
-            new ByteArrayResource(workflow.getDefinition()
-                .getBytes(StandardCharsets.UTF_8)),
-            workflow.getFormat()));
+        String definition = workflow.getDefinition();
+
+        Workflow newWorkflow = workflowMapper.readValue(
+            new WorkflowResource(
+                workflow.getId(),
+                new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
+                workflow.getFormat()));
+
+        newWorkflow.setCreatedBy(workflow.getCreatedBy());
+        newWorkflow.setCreatedDate(workflow.getCreatedDate());
+        newWorkflow.setDefinition(definition);
+        newWorkflow.setLastModifiedBy(workflow.getLastModifiedBy());
+        newWorkflow.setLastModifiedDate(workflow.getLastModifiedDate());
+        newWorkflow.setVersion(workflow.getVersion());
+
+        return newWorkflow;
     }
 }

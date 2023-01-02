@@ -53,6 +53,7 @@ public class JdbcWorkflowRepositoryIntTest {
                     value: "1234"
                 """);
         workflow.setFormat(Workflow.Format.YAML);
+        workflow.setNew(true);
 
         workflow = workflowCrudRepository.save(workflow);
 

@@ -81,8 +81,8 @@ spring:
     time-zone: UTC
   jmx:
     enabled: false
-  main:
-    allow-bean-definition-overriding: true
+#  main:
+#    allow-bean-definition-overriding: true
   output:
     ansi:
       console-available: true
@@ -117,12 +117,11 @@ spring:
 bytechef:
   discovery-service:
     provider: redis
-
   workflow:
     context-repository:
       provider: jdbc
-    # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
     message-broker:
+      # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: amqp
       provider: amqp
     persistence:
       provider: jdbc

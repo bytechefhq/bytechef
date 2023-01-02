@@ -27,7 +27,7 @@ import {
 } from './Property';
 
 /**
- * A one property type.
+ * A one of property type.
  * @export
  * @interface OneOfProperty
  */

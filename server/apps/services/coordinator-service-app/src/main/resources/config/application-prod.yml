@@ -4,9 +4,9 @@ logging:
     com.bytechef: INFO
 
 management:
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: false
 
 server:
@@ -18,6 +18,13 @@ server:
     min-response-size: 1024
 
 spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/bytechef
+    username: root
+    password:
+    hikari:
+      poolName: Hikari
   devtools:
     restart:
       enabled: false

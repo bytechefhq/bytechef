@@ -28,15 +28,15 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.jdbc.config.WorkflowRepositoryJdbcConfiguration;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
@@ -90,14 +90,14 @@ public class CoordinatorIntTest {
     public void testExecuteWorkflowJson() {
         Job completedJob = executeWorkflow("hello1");
 
-        Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
+        Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
     }
 
     @Test
     public void testExecuteWorkflowYaml() {
         Job completedJob = executeWorkflow("hello2");
 
-        Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
+        Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
     }
 
     @Test
@@ -160,6 +160,9 @@ public class CoordinatorIntTest {
             taskExecutionService,
             workflowService);
 
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
         Coordinator coordinator = new Coordinator(
             contextService,
             e -> {
@@ -170,7 +173,7 @@ public class CoordinatorIntTest {
             jobService,
             messageBroker,
             taskCompletionHandler,
-            taskDispatcher,
+            (TaskDispatcher) taskDispatcher,
             taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
@@ -192,7 +195,7 @@ public class CoordinatorIntTest {
     @Import({
         WorkflowConfiguration.class,
         WorkflowRepositoryJdbcConfiguration.class,
-        WorkflowRepositoryConfiguration.class
+        WorkflowMapperConfiguration.class
     })
     @ComponentScan(
         basePackages = {

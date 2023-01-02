@@ -9,8 +9,9 @@ dependencies {
     implementation "org.apache.commons:commons-lang3"
     implementation "org.springframework.boot:spring-boot-starter-amqp"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
-    implementation "org.springframework.boot:spring-boot-starter-rsocket"
+//    implementation "org.springframework.boot:spring-boot-starter-rsocket"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation "org.springframework.kafka:spring-kafka"
     implementation libs.springdoc.openapi.starter.webflux.ui
@@ -24,9 +25,10 @@ dependencies {
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
-    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket-client")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-rest")
+//    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket-client")
+    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
     implementation project(":server:libs:modules:components:aws:aws-s3")
@@ -53,5 +55,5 @@ dependencies {
     testImplementation "org.apache.activemq:artemis-jakarta-server"
     testImplementation "org.springframework.boot:spring-boot-starter-artemis"
     testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
-    testImplementation project(":server:libs:test:test-support")
+    testImplementation project(":server:libs:test:test-int-support")
 }

@@ -36,17 +36,17 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
 
     private static final Logger logger = LoggerFactory.getLogger(ErrorHandlerChain.class);
 
-    private final List<ErrorHandler> errorHandlers;
+    private final List<? extends ErrorHandler<? super Errorable>> errorHandlers;
 
-    public ErrorHandlerChain(List<ErrorHandler> errorHandlers) {
-        Assert.notNull(errorHandlers, "list of handlers must not be null");
+    public ErrorHandlerChain(List<? extends ErrorHandler<? super Errorable>> errorHandlers) {
+        Assert.notNull(errorHandlers, "'errorHandlers' must not be null.");
 
         this.errorHandlers = errorHandlers;
     }
 
     @Override
     public void handle(Errorable errorable) {
-        for (ErrorHandler handler : errorHandlers) {
+        for (ErrorHandler<? super Errorable> handler : errorHandlers) {
             Method method = BeanUtils.findDeclaredMethodWithMinimalParameters(handler.getClass(), "handle");
 
             if (method == null) {
@@ -55,8 +55,9 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
                 return;
             }
 
-            if (method.getParameters()[0].getType()
-                .isAssignableFrom(errorable.getClass())) {
+            Class<?> type = method.getParameters()[0].getType();
+
+            if (type.isAssignableFrom(errorable.getClass())) {
                 handler.handle(errorable);
             }
         }

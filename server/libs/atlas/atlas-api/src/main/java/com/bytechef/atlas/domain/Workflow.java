@@ -40,6 +40,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -56,20 +57,20 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     public enum Format {
         JSON,
-        YML,
         YAML;
 
         public static Format parse(String fileName) {
-            Assert.notNull(fileName, "Filename %s can not be null".formatted(fileName));
+            Assert.notNull(fileName, "Filename '%s' can not be null".formatted(fileName));
 
             String extension = FilenameUtils.getExtension(fileName);
 
             return Objects.equals(extension.toLowerCase(), "json") ? JSON : YAML;
         }
+
     }
 
-    public enum ProviderType {
-        CLASSPATH, FILESYSTEM, GIT, JDBC
+    public enum SourceType {
+        CLASSPATH, FILESYSTEM, GIT, JDBC;
     }
 
     @Column
@@ -93,10 +94,13 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private String id;
 
     @Transient
-    private List<Map<String, Object>> inputs;
+    private final List<Map<String, Object>> inputs;
 
     @Transient
-    private String label;
+    private boolean isNew;
+
+    @Transient
+    private final String label;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -107,19 +111,18 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private LocalDateTime lastModifiedDate;
 
     @Transient
-    private List<Map<String, Object>> outputs;
+    private final List<Map<String, Object>> outputs;
 
     @Transient
-    private ProviderType providerType;
+    private SourceType sourceType;
 
     @Transient
-    private int retry;
+    private final int retry;
 
     @Transient
-    private List<WorkflowTask> tasks;
+    private final List<WorkflowTask> tasks;
 
-    // TODO Add version
-    // @Version
+    @Version
     @SuppressFBWarnings("UuF")
     private int version;
 
@@ -128,18 +131,17 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     }
 
     public Workflow(Map<String, Object> source) {
-        Assert.notNull(source, "source cannot be null");
+        Assert.notNull(source, "'source' must not be null.");
 
         id = MapUtils.getString(source, WorkflowConstants.ID);
         inputs = MapUtils.getList(
-            source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {
-            }, Collections.emptyList());
+            source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
         label = MapUtils.getString(source, WorkflowConstants.LABEL);
         outputs = MapUtils.getList(
-            source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {
-            }, Collections.emptyList());
+            source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
         retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, 0);
-        tasks = MapUtils.getList(source, WorkflowConstants.TASKS, Map.class)
+        tasks = MapUtils
+            .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
             .stream()
             .map(WorkflowTask::new)
             .toList();
@@ -214,8 +216,8 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return Collections.unmodifiableList(outputs);
     }
 
-    public ProviderType getProviderType() {
-        return providerType;
+    public SourceType getSourceType() {
+        return sourceType;
     }
 
     /**
@@ -232,9 +234,13 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return tasks;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
     @Override
     public boolean isNew() {
-        return id == null;
+        return isNew;
     }
 
     public void setDefinition(String definition) {
@@ -261,6 +267,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.id = id;
     }
 
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
@@ -269,25 +279,32 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public void setProviderType(ProviderType providerType) {
-        this.providerType = providerType;
+    public void setSourceType(SourceType sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override
     public String toString() {
-        return "Workflow{" + "content='"
-            + definition + '\'' + ", createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", error="
-            + error + ", format="
-            + format + ", id='"
-            + id + '\'' + ", inputs="
-            + inputs + ", label='"
-            + label + '\'' + ", lastModifiedBy='"
-            + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + ", outputs="
-            + outputs + ", tasks="
-            + tasks + ", retry="
-            + retry + '}';
+        return "Workflow{" +
+            "definition='" + definition + '\'' +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", error=" + error +
+            ", format=" + format +
+            ", id='" + id + '\'' +
+            ", inputs=" + inputs +
+            ", label='" + label + '\'' +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", outputs=" + outputs +
+            ", sourceType=" + sourceType +
+            ", retry=" + retry +
+            ", tasks=" + tasks +
+            ", version=" + version +
+            '}';
     }
 }
