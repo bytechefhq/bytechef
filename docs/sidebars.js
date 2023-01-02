@@ -65,7 +65,8 @@ const sidebars = {
         id: 'how-to/index',
       },
       items: [
-        'how-to/simple-hello-world-workflow',
+        'how-to/hello-world-workflow',
+        'how-to/get-rest-response-workflow',
         'how-to/git-as-a-workflow-repository'
       ],
     },
