@@ -23,53 +23,47 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class HistoryMetadataSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("type")
-            .label("Type")
-            .description("The type of the history record.")
-            .required(false),
-        string("description")
-            .label("Description")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("type").label("Type")
+        .description("The type of the history record.")
+        .required(false),
+        string("description").label("Description")
             .description("The description of the history record.")
             .required(false),
-        string("descriptionKey")
-            .label("DescriptionKey")
+        string("descriptionKey").label("DescriptionKey")
             .description("The description key of the history record.")
             .required(false),
-        string("activityDescription")
-            .label("ActivityDescription")
+        string("activityDescription").label("ActivityDescription")
             .description("The activity described in the history record.")
             .required(false),
-        string("activityDescriptionKey")
-            .label("ActivityDescriptionKey")
+        string("activityDescriptionKey").label("ActivityDescriptionKey")
             .description("The key of the activity described in the history record.")
             .required(false),
-        string("emailDescription")
-            .label("EmailDescription")
+        string("emailDescription").label("EmailDescription")
             .description("The description of the email address associated the history record.")
             .required(false),
-        string("emailDescriptionKey")
-            .label("EmailDescriptionKey")
+        string("emailDescriptionKey").label("EmailDescriptionKey")
             .description("The description key of the email address associated the history record.")
             .required(false),
-        object("actor")
-            .properties(HistoryMetadataParticipantSchema.COMPONENT_SCHEMA)
+        object("actor").properties(HistoryMetadataParticipantSchema.COMPONENT_SCHEMA)
             .label("Actor")
             .description("Details of user or system associated with a issue history metadata item.")
             .required(false),
-        object("generator")
-            .properties(HistoryMetadataParticipantSchema.COMPONENT_SCHEMA)
+        object("generator").properties(HistoryMetadataParticipantSchema.COMPONENT_SCHEMA)
             .label("Generator")
             .description("Details of user or system associated with a issue history metadata item.")
             .required(false),
-        object("cause")
-            .properties(HistoryMetadataParticipantSchema.COMPONENT_SCHEMA)
+        object("cause").properties(HistoryMetadataParticipantSchema.COMPONENT_SCHEMA)
             .label("Cause")
             .description("Details of user or system associated with a issue history metadata item.")
             .required(false),
-        object("extraData")
-            .additionalProperties(string())
+        object("extraData").additionalProperties(string())
+            .placeholder("Add")
             .label("ExtraData")
             .description("Additional arbitrary information about the history record.")
             .required(false));

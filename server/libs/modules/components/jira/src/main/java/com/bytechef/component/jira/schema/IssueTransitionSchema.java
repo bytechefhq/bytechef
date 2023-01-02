@@ -24,50 +24,45 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class IssueTransitionSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("id")
-            .label("Id")
-            .description("The ID of the issue transition. Required when specifying a transition to undertake.")
-            .required(false),
-        string("name")
-            .label("Name")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("id").label("Id")
+        .description("The ID of the issue transition. Required when specifying a transition to undertake.")
+        .required(false),
+        string("name").label("Name")
             .description("The name of the issue transition.")
             .required(false),
-        object("to")
-            .properties(StatusDetailsSchema.COMPONENT_SCHEMA)
+        object("to").properties(StatusDetailsSchema.COMPONENT_SCHEMA)
             .label("To")
             .description("A status.")
             .required(false),
-        bool("hasScreen")
-            .label("HasScreen")
+        bool("hasScreen").label("HasScreen")
             .description("Whether there is a screen associated with the issue transition.")
             .required(false),
-        bool("isGlobal")
-            .label("IsGlobal")
+        bool("isGlobal").label("IsGlobal")
             .description(
                 "Whether the issue transition is global, that is, the transition is applied to issues regardless of their status.")
             .required(false),
-        bool("isInitial")
-            .label("IsInitial")
+        bool("isInitial").label("IsInitial")
             .description("Whether this is the initial issue transition for the workflow.")
             .required(false),
-        bool("isAvailable")
-            .label("IsAvailable")
+        bool("isAvailable").label("IsAvailable")
             .description("Whether the transition is available to be performed.")
             .required(false),
-        bool("isConditional")
-            .label("IsConditional")
+        bool("isConditional").label("IsConditional")
             .description("Whether the issue has to meet criteria before the issue transition is applied.")
             .required(false),
-        object("fields")
-            .additionalProperties(object())
+        object("fields").additionalProperties(object().properties(FieldMetadataSchema.COMPONENT_SCHEMA))
+            .placeholder("Add")
             .label("Fields")
             .description(
                 "Details of the fields associated with the issue transition screen. Use this information to populate `fields` and `update` in a transition request.")
             .required(false),
-        string("expand")
-            .label("Expand")
+        string("expand").label("Expand")
             .description("Expand options that include additional transition details in the response.")
             .required(false),
         bool("looped").label("Looped")
