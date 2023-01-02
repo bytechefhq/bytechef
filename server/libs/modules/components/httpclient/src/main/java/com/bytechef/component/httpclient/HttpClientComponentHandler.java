@@ -94,9 +94,11 @@ import org.apache.commons.lang3.StringUtils;
 public class HttpClientComponentHandler implements ComponentHandler {
 
     private static final Property<?>[] COMMON_PROPERTIES = {
+
         //
         // General properties
         //
+
         string(URI)
             .label("URI")
             .description("The URI to make the request to")
@@ -127,6 +129,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
             .label("Response Filename")
             .description("The name of the file if the response is returned as a file object.")
             .displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())),
+
         //
         // Header properties
         //
