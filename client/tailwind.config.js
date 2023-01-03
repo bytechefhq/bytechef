@@ -153,6 +153,6 @@ module.exports = {
     plugins: [
         require('@headlessui/tailwindcss'),
         require('@tailwindcss/forms'),
-        require('tailwindcss-radix')(),
+        require('tailwindcss-radix'),
     ],
 };
