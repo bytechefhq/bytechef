@@ -22,28 +22,26 @@ package com.bytechef.component.httpclient.constants;
  */
 public class HttpClientConstants {
 
-    public static final String URI = "uri";
     public static final String ALLOW_UNAUTHORIZED_CERTS = "allowUnauthorizedCerts";
-    public static final String RESPONSE_FORMAT = "responseFormat";
-    public static final String RESPONSE_FILENAME = "responseFilename";
+    public static final String BODY_CONTENT = "bodyContent";
+    public static final String BODY_CONTENT_RAW_MIME_TYPE = "bodyContentRawMimeType";
     public static final String BODY_CONTENT_TYPE = "bodyContentType";
-    public static final String RAW_CONTENT_MIME_TYPE = "rawContentMimeType";
-    public static final String FULL_RESPONSE = "fullResponse";
+    public static final String DELETE = "delete";
     public static final String FOLLOW_ALL_REDIRECTS = "followAllRedirects";
     public static final String FOLLOW_REDIRECT = "followRedirect";
-    public static final String IGNORE_RESPONSE_CODE = "ignoreResponseCode";
-    public static final String PROXY = "proxy";
-    public static final String TIMEOUT = "timeout";
+    public static final String FULL_RESPONSE = "fullResponse";
+    public static final String HEAD = "head";
     public static final String HEADER_PARAMETERS = "headerParameters";
-    public static final String QUERY_PARAMETERS = "queryParameters";
-    public static final String BODY = "body";
-    public static final String BODY_PARAMETERS = "bodyParameters";
     public static final String HTTP_CLIENT = "httpClient";
     public static final String GET = "get";
-    public static final String POST = "post";
-    public static final String PUT = "put";
+    public static final String IGNORE_RESPONSE_CODE = "ignoreResponseCode";
     public static final String PATCH = "patch";
-    public static final String DELETE = "delete";
-    public static final String HEAD = "head";
-    public static final String FILE_ENTRY = "fileEntry";
+    public static final String POST = "post";
+    public static final String PROXY = "proxy";
+    public static final String PUT = "put";
+    public static final String QUERY_PARAMETERS = "queryParameters";
+    public static final String RESPONSE_FILENAME = "responseFilename";
+    public static final String RESPONSE_FORMAT = "responseFormat";
+    public static final String TIMEOUT = "timeout";
+    public static final String URI = "uri";
 }
