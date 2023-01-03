@@ -3,6 +3,5 @@ dependencies {
     api project(":server:libs:atlas:atlas-api")
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation libs.commons.io
-    implementation "org.apache.commons:commons-lang3"
+    implementation project(":server:libs:core:commons:commons-utils")
 }

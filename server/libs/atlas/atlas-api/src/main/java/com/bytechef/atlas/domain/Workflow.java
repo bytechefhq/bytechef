@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -59,10 +59,13 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         JSON,
         YAML;
 
-        public static Format parse(String fileName) {
-            Assert.notNull(fileName, "Filename '%s' can not be null".formatted(fileName));
+        public static Format parse(String filename) {
+            Assert.notNull(filename, "Filename '%s' can not be null".formatted(filename));
 
-            String extension = FilenameUtils.getExtension(fileName);
+            String extension = Optional.ofNullable(filename)
+                .filter(f -> f.contains("."))
+                .map(f -> f.substring(filename.lastIndexOf(".") + 1))
+                .orElse("");
 
             return Objects.equals(extension.toLowerCase(), "json") ? JSON : YAML;
         }

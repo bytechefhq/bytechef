@@ -46,17 +46,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author Ivica Cardic
@@ -67,7 +68,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
         .display(display("Local File").description("Reads or writes a binary file from/to disk"))
         .actions(
             action(READ_FILE)
-                .display(display("Read to file"))
+                .display(display("Read from file"))
                 .properties(string(FILENAME)
                     .label("Filename")
                     .description("The path of the file to read.")
@@ -76,7 +77,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
                 .output(ComponentDSL.fileEntry())
                 .perform(this::performReadFile),
             action(WRITE_FILE)
-                .display(display("Write from file"))
+                .display(display("Write to file"))
                 .properties(
                     fileEntry(FILE_ENTRY)
                         .label("File")
@@ -159,11 +160,11 @@ public class FilesystemComponentHandler implements ComponentHandler {
     protected Object performDelete(Context context, ExecutionParameters executionParameters) {
         File file = new File(executionParameters.getRequiredString("path"));
 
-        if (!file.exists()) {
-            return null;
+        try {
+            return deleteRecursively(file.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        return FileUtils.deleteQuietly(file);
     }
 
     /**
@@ -175,7 +176,9 @@ public class FilesystemComponentHandler implements ComponentHandler {
      * the text before the last forward or backslash.
      */
     protected String performGetFilePath(Context context, ExecutionParameters executionParameters) {
-        return FilenameUtils.getFullPathNoEndSeparator(executionParameters.getRequiredString("filename"));
+        String filename = executionParameters.getRequiredString("filename");
+
+        return filename.substring(0, filename.lastIndexOf(File.separator));
     }
 
     protected List<FileInfo> performList(Context context, ExecutionParameters executionParameters) {
@@ -247,5 +250,29 @@ public class FilesystemComponentHandler implements ComponentHandler {
         public long getSize() {
             return size;
         }
+    }
+
+    private boolean deleteRecursively(Path root) throws IOException {
+        if (root == null || !Files.exists(root)) {
+            return false;
+        }
+
+        Files.walkFileTree(root, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return true;
     }
 }

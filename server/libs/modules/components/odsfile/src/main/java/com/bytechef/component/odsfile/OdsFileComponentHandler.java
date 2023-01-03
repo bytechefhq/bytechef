@@ -46,6 +46,7 @@ import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.utils.ObjectUtils;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -60,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * @author Ivica Cardic

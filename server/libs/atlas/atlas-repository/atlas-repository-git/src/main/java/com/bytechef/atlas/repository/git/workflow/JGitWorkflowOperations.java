@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
@@ -46,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.Assert;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * @author Arik Cohen
@@ -167,7 +167,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
     private void clear() {
         if (repositoryDir != null) {
-            FileUtils.deleteQuietly(repositoryDir);
+            FileSystemUtils.deleteRecursively(repositoryDir);
         }
 
         Path path = null;
