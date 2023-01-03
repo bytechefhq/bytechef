@@ -3,57 +3,57 @@
 @tailwind base;
 
 :root {
-	@apply scroll-smooth font-display antialiased;
-	@apply h-full;
+    @apply scroll-smooth font-display antialiased;
+    @apply h-full;
 }
 
 html {
-	@apply bg-white;
-	scrollbar-color: #00000080 transparent;
-	scrollbar-width: auto;
+    @apply bg-white;
+    scrollbar-color: #00000080 transparent;
+    scrollbar-width: auto;
 }
 
 html[class*='dark'] {
-	@apply bg-gray-900;
-	scrollbar-color: #ffffffb3 transparent;
-	scrollbar-width: auto;
+    @apply bg-gray-900;
+    scrollbar-color: #ffffffb3 transparent;
+    scrollbar-width: auto;
 }
 
 body {
-	@apply h-full;
-	@apply overflow-hidden;
+    @apply h-full;
+    @apply overflow-hidden;
 }
 
 body #root {
-	@apply h-full;
+    @apply h-full;
 }
 
 ::-webkit-scrollbar {
-	height: 8px;
-	width: 8px;
+    height: 8px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-	@apply bg-transparent;
+    @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply rounded-full bg-black/50 dark:bg-white/70;
+    @apply rounded-full bg-black/50 dark:bg-white/70;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	@apply bg-black/60 dark:hover:bg-white/80;
+    @apply bg-black/60 dark:hover:bg-white/80;
 }
 
 button {
-	/* Disables tap highlight color on Chrome */
-	-webkit-tap-highlight-color: transparent;
+    /* Disables tap highlight color on Chrome */
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Input darkmode fix for checkbox / radio */
 .dark [type='checkbox']:checked,
 .dark [type='radio']:checked {
-	background-color: currentColor;
+    background-color: currentColor;
 }
 
 @tailwind components;
