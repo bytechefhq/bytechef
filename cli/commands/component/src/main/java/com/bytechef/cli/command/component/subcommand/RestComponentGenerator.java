@@ -857,7 +857,7 @@ public class RestComponentGenerator {
 
                 Schema schema = mediaType.getSchema();
 
-                builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, openAPI));
+                builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, openAPI, true));
                 builder.add(
                     """
                         .metadata(
@@ -890,12 +890,8 @@ public class RestComponentGenerator {
                 CodeBlock.Builder builder = CodeBlock.builder();
 
                 builder.add(getSchemaCodeBlock(
-                    parameter.getName(),
-                    parameter.getDescription(),
-                    parameter.getRequired(),
-                    null,
-                    parameter.getSchema(),
-                    openAPI));
+                    parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
+                    parameter.getSchema(), openAPI, false));
                 builder.add(CodeBlock.of(
                     """
                         .metadata(
@@ -979,7 +975,7 @@ public class RestComponentGenerator {
 
                 Schema schema = mediaType.getSchema();
 
-                builder.add(getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, openAPI));
+                builder.add(getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, openAPI, false));
                 builder.add(
                     """
                         .metadata(
@@ -1031,6 +1027,7 @@ public class RestComponentGenerator {
     })
     private CodeBlock getAllOfSchemaCodeBlock(
         String name, String description, List<Schema> allOfSchemas, OpenAPI openAPI) {
+
         Map<String, Schema> allOfProperties = getAllOfSchemaProperties(name, description, allOfSchemas);
         List<String> allOfRequired = new ArrayList<>();
 
@@ -1056,12 +1053,8 @@ public class RestComponentGenerator {
 
             if (schema.getAllOf() == null) {
                 codeBlock = getSchemaCodeBlock(
-                    entry.getKey(),
-                    schema.getDescription(),
-                    required.contains(entry.getKey()),
-                    null,
-                    schema,
-                    openAPI);
+                    entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, openAPI,
+                    false);
             } else {
                 codeBlock = getAllOfSchemaCodeBlock(entry.getKey(), schema.getDescription(), schema.getAllOf(),
                     openAPI);
@@ -1082,23 +1075,26 @@ public class RestComponentGenerator {
         "rawtypes"
     })
     private CodeBlock getSchemaCodeBlock(
-        String propertyName,
-        String propertyDescription,
-        Boolean required,
-        String schemaName,
-        Schema<?> schema,
-        OpenAPI openAPI) {
+        String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
+        OpenAPI openAPI, boolean outputEntry) {
+
         CodeBlock.Builder builder = CodeBlock.builder();
 
         if (schema.get$ref() == null) {
             String type = schema.getType() == null ? "object" : schema.getType();
 
             switch (type) {
-                case "array" -> builder.add(
-                    "array($S).items($L)",
-                    propertyName,
-                    getSchemaCodeBlock(
-                        schema.getTitle(), schema.getDescription(), null, null, schema.getItems(), openAPI));
+                case "array" -> {
+                    builder.add(
+                        "array($S).items($L)",
+                        propertyName,
+                        getSchemaCodeBlock(
+                            schema.getTitle(), schema.getDescription(), null, null, schema.getItems(), openAPI, false));
+
+                    if (!outputEntry) {
+                        builder.add(".placeholder($S)", "Add");
+                    }
+                }
                 case "boolean" -> builder.add("bool($S)", propertyName);
                 case "integer" -> {
                     builder.add("integer($S)", propertyName);
@@ -1155,9 +1151,6 @@ public class RestComponentGenerator {
                                     getAdditionalPropertiesItemType(additionalPropertiesSchema));
                             } else {
                                 String $ref = additionalPropertiesSchema.get$ref();
-                                Components components = openAPI.getComponents();
-
-                                Map<String, Schema> schemaMap = components.getSchemas();
 
                                 String curSchemaName = $ref.replace("#/components/schemas/", "");
 
@@ -1172,6 +1165,9 @@ public class RestComponentGenerator {
                             }
                         }
 
+                        if (!outputEntry) {
+                            builder.add(".placeholder($S)", "Add");
+                        }
                     } else {
                         builder.add("object($S)", propertyName);
                     }
@@ -1240,7 +1236,7 @@ public class RestComponentGenerator {
             schema = schemaMap.get(curSchemaName);
 
             builder.add(getSchemaCodeBlock(
-                propertyName, schema.getDescription(), required, curSchemaName, schema, openAPI));
+                propertyName, schema.getDescription(), required, curSchemaName, schema, openAPI, false));
         }
 
         return builder.build();
