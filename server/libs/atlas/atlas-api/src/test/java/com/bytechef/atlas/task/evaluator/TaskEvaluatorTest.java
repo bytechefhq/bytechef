@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
@@ -342,7 +341,7 @@ public class TaskEvaluatorTest {
         taskExecution.evaluate(evaluator, new Context(Collections.emptyMap()));
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir.endsWith(File.separator)) {
-            tmpDir = FilenameUtils.getFullPathNoEndSeparator(tmpDir);
+            tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
         }
         Assertions.assertEquals(tmpDir, MapUtils.get(taskExecution.getParameters(), "tempDir"));
     }

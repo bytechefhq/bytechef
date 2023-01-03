@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,7 +263,7 @@ public class CsvFileComponentHandler implements ComponentHandler {
     private Object processValue(String valueString, boolean includeEmptyCells, boolean readAsString) {
         Object value = null;
 
-        if (StringUtils.isEmpty(valueString)) {
+        if (valueString == null || valueString.length() == 0) {
             if (includeEmptyCells) {
                 value = "";
             }

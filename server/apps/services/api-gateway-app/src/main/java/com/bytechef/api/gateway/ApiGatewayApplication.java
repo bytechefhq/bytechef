@@ -19,9 +19,8 @@ package com.bytechef.api.gateway;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Optional;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -30,6 +29,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.core.env.Environment;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -65,7 +65,7 @@ public class ApiGatewayApplication {
             .orElse("http");
         String serverPort = environment.getProperty("server.port");
         String contextPath = Optional.ofNullable(environment.getProperty("server.servlet.context-path"))
-            .filter(StringUtils::isNotBlank)
+            .filter(StringUtils::hasText)
             .orElse("/");
         String hostAddress = "localhost";
 
@@ -94,9 +94,10 @@ public class ApiGatewayApplication {
             hostAddress,
             serverPort,
             contextPath,
-            ArrayUtils.contains(environment.getActiveProfiles(), "api-docs")
-                ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
-                : "",
+            Arrays.asList(environment.getActiveProfiles())
+                .contains("api-docs")
+                    ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
+                    : "",
             environment.getActiveProfiles());
     }
 }

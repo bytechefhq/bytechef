@@ -39,10 +39,12 @@ import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import com.bytechef.commons.utils.ExceptionUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 

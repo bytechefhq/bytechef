@@ -45,6 +45,7 @@ import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.utils.ObjectUtils;
 import com.bytechef.hermes.component.utils.ValueUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -57,8 +58,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -209,7 +208,9 @@ public class XlsxFileComponentHandler implements ComponentHandler {
     }
 
     private String getaDefaultFileName() {
-        return "file." + StringUtils.lowerCase(FileFormat.XLSX.name());
+        String xlsxName = FileFormat.XLSX.name();
+
+        return "file." + xlsxName.toLowerCase();
     }
 
     private Workbook getWorkbook() {

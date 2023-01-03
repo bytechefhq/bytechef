@@ -78,13 +78,13 @@ import com.bytechef.hermes.component.utils.HttpClientUtils;
 import com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
+
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -319,8 +319,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performGet),
             action(POST)
                 .display(display("POST").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
-                    ArrayUtils.addAll(
+                .properties(addAll(
+                    addAll(
                         //
                         // Common properties
                         //
@@ -346,8 +346,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performPost),
             action(PUT)
                 .display(display("PUT").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
-                    ArrayUtils.addAll(
+                .properties(addAll(
+                    addAll(
                         //
                         // Common properties
                         //
@@ -367,8 +367,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performPut),
             action(PATCH)
                 .display(display("PATCH").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
-                    ArrayUtils.addAll(
+                .properties(addAll(
+                    addAll(
                         //
                         // Common properties
                         //
@@ -388,7 +388,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performPatch),
             action(DELETE)
                 .display(display("DELETE").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
+                .properties(addAll(
                     //
                     // Common properties
                     //
@@ -403,7 +403,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performDelete),
             action(HEAD)
                 .display(display("HEAD").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
+                .properties(addAll(
                     //
                     // Common properties
                     //
@@ -512,13 +512,20 @@ public class HttpClientComponentHandler implements ComponentHandler {
         return execute(context, executionParameters, HttpClientUtils.RequestMethod.PUT);
     }
 
+    private Property<?>[] addAll(Property<?>[] array1, Property<?>[] array2) {
+        return Stream.concat(Arrays.stream(array1), Arrays.stream(array2))
+            .toArray(size -> new Property<?>[size]);
+    }
+
     private Object execute(
         Context context, ExecutionParameters executionParameters, HttpClientUtils.RequestMethod requestMethod) {
         HttpClientUtils.Payload payload = null;
 
-        BodyContentType bodyContentType = executionParameters.containsKey(BODY_CONTENT_TYPE)
-            ? BodyContentType.valueOf(StringUtils.upperCase(executionParameters.getString(BODY_CONTENT_TYPE)))
-            : null;
+        String bodyContentTypeParameter = executionParameters.getString(BODY_CONTENT_TYPE);
+
+        BodyContentType bodyContentType = bodyContentTypeParameter == null
+            ? null
+            : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
 
         if (executionParameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {

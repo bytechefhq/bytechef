@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,6 +38,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Ivica Cardic
@@ -76,7 +76,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         Workflow workflow = new Workflow();
 
-        if (StringUtils.isEmpty(definition)) {
+        if (ObjectUtils.isEmpty(definition)) {
             workflow.setDefinition("{\"tasks\": []}");
         } else {
             workflow.setDefinition(definition);
