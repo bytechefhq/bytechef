@@ -947,7 +947,7 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object, ModifiableObjectProperty, ObjectProperty>
             implements Property.ObjectProperty {
 
-            private List<Property<?>> additionalProperties;
+            private List<? extends Property<?>> additionalProperties;
             private String objectType;
             private List<? extends Property<?>> properties;
 
@@ -975,6 +975,17 @@ public class DefinitionDSL {
                 return this;
             }
 
+            @SuppressWarnings("rawtypes")
+            public ModifiableObjectProperty additionalProperties(List<Property> additionalProperties) {
+                if (additionalProperties != null) {
+                    this.additionalProperties = additionalProperties.stream()
+                        .map(property -> (Property<?>) property)
+                        .toList();
+                }
+
+                return this;
+            }
+
             public ModifiableObjectProperty objectType(String objectType) {
                 this.objectType = objectType;
 
@@ -989,7 +1000,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("rawtypes")
             public ModifiableObjectProperty properties(List<Property> properties) {
                 if (properties != null) {
                     this.properties = properties.stream()
@@ -1001,8 +1012,8 @@ public class DefinitionDSL {
             }
 
             @Override
-            public List<Property<?>> getAdditionalProperties() {
-                return additionalProperties;
+            public List<? extends Property<?>> getAdditionalProperties() {
+                return additionalProperties == null ? null : new ArrayList<>(additionalProperties);
             }
 
             @Override
