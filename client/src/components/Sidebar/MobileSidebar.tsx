@@ -2,6 +2,7 @@ import {Fragment, SVGProps} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import reactLogo from '../../assets/logo.svg';
 import {XMarkIcon} from '@heroicons/react/24/outline';
+import Button from 'components/Button/Button';
 
 type Props = {
     user: {name: string; email: string; imageUrl: string};
@@ -60,20 +61,21 @@ export function MobileSidebar({
                                 leaveTo="opacity-0"
                             >
                                 <div className="absolute top-0 right-0 -mr-12 pt-4">
-                                    <button
-                                        type="button"
-                                        className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                                    <Button
+                                        className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                                        displayType="icon"
+                                        icon={
+                                            <XMarkIcon
+                                                className="h-6 w-6 text-white"
+                                                aria-hidden="true"
+                                            />
+                                        }
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <span className="sr-only">
                                             Close sidebar
                                         </span>
-
-                                        <XMarkIcon
-                                            className="h-6 w-6 text-white"
-                                            aria-hidden="true"
-                                        />
-                                    </button>
+                                    </Button>
                                 </div>
                             </Transition.Child>
 
