@@ -14,33 +14,33 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * The request object that contains the array of tags.
+ * The response object that contains the array of tags.
  * @export
- * @interface PutIntegrationTagsRequest
+ * @interface GetIntegrationTags200Response
  */
-export interface PutIntegrationTagsRequest {
+export interface GetIntegrationTags200Response {
     /**
      * 
      * @type {Array<string>}
-     * @memberof PutIntegrationTagsRequest
+     * @memberof GetIntegrationTags200Response
      */
     tags?: Array<string>;
 }
 
 /**
- * Check if a given object implements the PutIntegrationTagsRequest interface.
+ * Check if a given object implements the GetIntegrationTags200Response interface.
  */
-export function instanceOfPutIntegrationTagsRequest(value: object): boolean {
+export function instanceOfGetIntegrationTags200Response(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function PutIntegrationTagsRequestFromJSON(json: any): PutIntegrationTagsRequest {
-    return PutIntegrationTagsRequestFromJSONTyped(json, false);
+export function GetIntegrationTags200ResponseFromJSON(json: any): GetIntegrationTags200Response {
+    return GetIntegrationTags200ResponseFromJSONTyped(json, false);
 }
 
-export function PutIntegrationTagsRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PutIntegrationTagsRequest {
+export function GetIntegrationTags200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetIntegrationTags200Response {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function PutIntegrationTagsRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function PutIntegrationTagsRequestToJSON(value?: PutIntegrationTagsRequest | null): any {
+export function GetIntegrationTags200ResponseToJSON(value?: GetIntegrationTags200Response | null): any {
     if (value === undefined) {
         return undefined;
     }
