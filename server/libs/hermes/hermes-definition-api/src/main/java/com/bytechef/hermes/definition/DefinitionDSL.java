@@ -322,7 +322,7 @@ public class DefinitionDSL {
         private String category;
         private String description;
         private String icon;
-        private String label;
+        private final String label;
         private String subtitle;
         private String[] tags;
 
@@ -621,7 +621,7 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object[], ModifiableArrayProperty, ArrayProperty>
             implements Property.ArrayProperty {
 
-            protected List<Property<?>> items;
+            private List<Property<?>> items;
             private Boolean multipleValues; // default true
 
             private ModifiableArrayProperty(String name) {
@@ -854,7 +854,7 @@ public class DefinitionDSL {
         public static final class ModifiableNullProperty
             extends ModifiableProperty<ModifiableNullProperty, NullProperty> implements Property.NullProperty {
 
-            protected ModifiableNullProperty(String name) {
+            private ModifiableNullProperty(String name) {
                 super(name, Type.NULL);
             }
         }
