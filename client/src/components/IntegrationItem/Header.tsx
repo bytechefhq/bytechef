@@ -5,17 +5,23 @@ import {Status} from './Status';
 
 const Header: React.FC<{
     name: string;
-    status: string;
+    status: boolean;
     dropdownTrigger: string;
 }> = ({name, status, dropdownTrigger}) => {
     return (
-        <div>
-            <Name name={name} />
-
-            <Status status={status} />
-
-            <DropdownTrigger dropdownTrigger={dropdownTrigger} />
-        </div>
+        <>
+            <div className="... flex flex-row">
+                <div className="w-24">
+                    <Name name={name} />
+                </div>
+                <div className="w-96">
+                    <Status status={status} />
+                </div>
+                <div className="w-96">
+                    <DropdownTrigger dropdownTrigger={dropdownTrigger} />
+                </div>
+            </div>
+        </>
     );
 };
 

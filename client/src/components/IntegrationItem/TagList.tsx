@@ -2,15 +2,14 @@ import React from 'react';
 import {AddTagButton} from './AddTagButton';
 import {Tag} from './Tag';
 
-export const TagList: React.FC<{tag: string; button: string}> = ({
-    tag,
-    button,
-}) => {
+export const TagList: React.FC<{tags: string[]}> = ({tags}) => {
     return (
         <div>
-            <Tag tag={tag} />
+            {tags.map((tag) => (
+                <Tag tag={tag} />
+            ))}
 
-            <AddTagButton button={button} />
+            <AddTagButton label={'+'} />
         </div>
     );
 };
