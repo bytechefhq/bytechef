@@ -1,0 +1,35 @@
+@tailwind components;
+
+@layer components {
+    .btn {
+        @apply border-2 border-transparent  text-sm font-medium text-white shadow-sm inline-flex items-center;
+    }
+
+    .btn-primary {
+        @apply px-4 py-2 rounded-md bg-teal-500 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-sky-500 dark:hover:bg-sky-400;
+    }
+
+    .btn-secondary {
+        @apply px-4 py-2 rounded-md bg-white border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white;
+    }
+
+    .btn-danger {
+        @apply px-4 py-2 rounded-md bg-red-500 hover:bg-red-800 hover:text-white;
+    }
+
+    .btn-unstyled {
+        @apply px-4 py-2 rounded-md bg-transparent shadow-none text-gray-800;
+    }
+
+    .btn-small {
+        @apply px-2 py-1 text-sm;
+    }
+
+    .btn-large {
+        @apply px-6 py-3 text-lg;
+    }
+
+    .btn-icon {
+        @apply shadow-none items-center justify-center text-black hover:bg-gray-100;
+    }
+}

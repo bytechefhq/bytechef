@@ -1,6 +1,8 @@
 /*@import url("https://rsms.me/inter/inter.css");*/
 
 @tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
     @apply scroll-smooth font-display antialiased;
@@ -55,6 +57,3 @@ button {
 .dark [type='radio']:checked {
     background-color: currentColor;
 }
-
-@tailwind components;
-@tailwind utilities;
