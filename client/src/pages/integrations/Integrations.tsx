@@ -8,6 +8,8 @@ import React from 'react';
 import Input from '../../components/Input/Input';
 import TextArea from '../../components/TextArea/TextArea';
 import MultiSelect from '../../components/MultiSelect/MultiSelect';
+import Header from 'components/IntegrationItem/Header';
+import Footer from 'components/IntegrationItem/Footer';
 
 const options = [
     {value: 'chocolate', label: 'Chocolate'},

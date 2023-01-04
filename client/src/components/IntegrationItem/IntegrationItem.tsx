@@ -3,23 +3,19 @@ import Footer from './Footer';
 import Header from './Header';
 
 export const IntegrationItem: React.FC<{
+    id: string;
     name: string;
-    status: string;
-    dropdownTrigger: string;
+    status: boolean;
+    description: string;
     category: string;
-    tag: string;
-    button: string;
+    tags: string[];
     date: string;
-}> = ({name, status, dropdownTrigger, category, tag, button, date}) => {
+    workflowIds: string[];
+}> = ({id, name, status, category, tags, date}) => {
     return (
         <div>
-            <Header
-                name={name}
-                status={status}
-                dropdownTrigger={dropdownTrigger}
-            />
-
-            <Footer category={category} tag={tag} button={button} date={date} />
+            <Header name={name} status={status} dropdownTrigger={id} />
+            <Footer category={category} tags={tags} date={date} />
         </div>
     );
 };

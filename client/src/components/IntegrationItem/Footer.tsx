@@ -5,18 +5,17 @@ import {TagList} from './TagList';
 
 const Footer: React.FC<{
     category: string;
-    tag: string;
-    button: string;
+    tags: string[];
     date: string;
-}> = ({category, tag, button, date}) => {
+}> = ({category, tags, date}) => {
     return (
-        <div>
+        <span className="w-96 rounded bg-white shadow">
             <Category category={category} />
-
-            <TagList tag={tag} button={button} />
-
+            
+                <TagList tags={tags} />
+        
             <Date date={date} />
-        </div>
+        </span>
     );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
 
-export const AddTagButton: React.FC<{button: string}> = ({button}) => {
-    return <div>{button}</div>;
+export const AddTagButton: React.FC<{label: string}> = ({label}) => {
+    return <div>{label}</div>;
 };
