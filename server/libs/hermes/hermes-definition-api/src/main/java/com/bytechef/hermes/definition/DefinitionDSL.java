@@ -622,6 +622,7 @@ public class DefinitionDSL {
             implements Property.ArrayProperty {
 
             protected List<Property<?>> items;
+            private Boolean multipleValues; // default true
 
             private ModifiableArrayProperty(String name) {
                 super(name, Type.ARRAY);
@@ -719,9 +720,20 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableArrayProperty multipleValues(boolean multipleValues) {
+                this.multipleValues = multipleValues;
+
+                return this;
+            }
+
             @Override
             public List<Property<?>> getItems() {
                 return items;
+            }
+
+            @Override
+            public Boolean getMultipleValues() {
+                return multipleValues;
             }
         }
 
@@ -948,6 +960,7 @@ public class DefinitionDSL {
             implements Property.ObjectProperty {
 
             private List<? extends Property<?>> additionalProperties;
+            private Boolean multipleValues; // default true
             private String objectType;
             private List<? extends Property<?>> properties;
 
@@ -986,6 +999,12 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableObjectProperty multipleValues(boolean multipleValues) {
+                this.multipleValues = multipleValues;
+
+                return this;
+            }
+
             public ModifiableObjectProperty objectType(String objectType) {
                 this.objectType = objectType;
 
@@ -1014,6 +1033,10 @@ public class DefinitionDSL {
             @Override
             public List<? extends Property<?>> getAdditionalProperties() {
                 return additionalProperties == null ? null : new ArrayList<>(additionalProperties);
+            }
+
+            public Boolean getMultipleValues() {
+                return multipleValues;
             }
 
             @Override
