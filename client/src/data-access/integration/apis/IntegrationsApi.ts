@@ -268,7 +268,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/integrations/{id}/integration-tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/integrations/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
