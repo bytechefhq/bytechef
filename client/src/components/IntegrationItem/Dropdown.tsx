@@ -1,42 +1,40 @@
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import {
+    Arrow,
+    Content,
+    Item,
+    Portal,
+    Root,
+    Separator,
+    Trigger,
+} from '@radix-ui/react-dropdown-menu';
+import {DotsHorizontalIcon} from '@radix-ui/react-icons';
 
 export const Dropdown: React.FC<{
     id: string;
 }> = ({id}) => {
     return (
-        <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-                <button className="IconButton" aria-label="Customise options">
-                    ...
-                </button>
-            </DropdownMenu.Trigger>
+        <Root>
+            <Trigger asChild>
+                <DotsHorizontalIcon />
+            </Trigger>
 
-            <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                    className="DropdownMenuContent"
-                    sideOffset={5}
-                >
-                    <DropdownMenu.Item className="DropdownMenuItem">
-                        Edit
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item className="DropdownMenuItem">
-                        Enable
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item className="DropdownMenuItem">
-                        Duplicate
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item className="DropdownMenuItem">
-                        New Workflow
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Separator className="DropdownMenuSeparator" />
+            <Portal>
+                <Content className="DropdownMenuContent" sideOffset={5}>
+                    <Item className="DropdownMenuItem">Edit</Item>
 
-                    <DropdownMenu.Item className="DropdownMenuItem">
-                        Delete
-                    </DropdownMenu.Item>
+                    <Item className="DropdownMenuItem">Enable</Item>
 
-                    <DropdownMenu.Arrow className="DropdownMenuArrow" />
-                </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+                    <Item className="DropdownMenuItem">Duplicate</Item>
+
+                    <Item className="DropdownMenuItem">New Workflow</Item>
+
+                    <Separator className="DropdownMenuSeparator" />
+
+                    <Item className="DropdownMenuItem">Delete</Item>
+
+                    <Arrow className="DropdownMenuArrow" />
+                </Content>
+            </Portal>
+        </Root>
     );
 };
