@@ -1,5 +1,6 @@
 import reactLogo from '../../assets/logo.svg';
 import {Bars3Icon} from '@heroicons/react/24/outline';
+import Button from 'components/Button/Button';
 
 export function MobileTopNavigation({
     setMobileMenuOpen,
@@ -18,15 +19,15 @@ export function MobileTopNavigation({
                 </div>
 
                 <div>
-                    <button
-                        type="button"
-                        className="-mr-3 inline-flex h-12 w-12 items-center justify-center rounded-md bg-white text-black hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                    <Button
+                        displayType="icon"
+                        icon={
+                            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+                        }
                         onClick={() => setMobileMenuOpen(true)}
                     >
                         <span className="sr-only">Open sidebar</span>
-
-                        <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

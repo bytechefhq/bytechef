@@ -1,21 +1,76 @@
-import {forwardRef} from 'react';
+import {forwardRef, ReactNode} from 'react';
+import cx from 'classnames';
+import './style.css';
 
-const Button = forwardRef<
-    HTMLButtonElement,
-    {
-        label: string;
-        onClick?: () => void;
-    }
->(({label, onClick, ...props}, ref) => (
-    <button
-        className="inline-flex items-center rounded-md border border-transparent bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-sky-500 dark:hover:bg-sky-400"
-        onClick={onClick}
-        ref={ref}
-        {...props}
-    >
-        {label}
-    </button>
-));
+type Size = 'small' | 'large';
+type DisplayType = 'danger' | 'icon' | 'primary' | 'secondary' | 'unstyled';
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    displayType?: DisplayType;
+    icon?: ReactNode;
+    iconPosition?: 'left' | 'right';
+    label?: string;
+    onClick?: () => void;
+    size?: Size;
+}
+
+const sizes: Record<Size, string> = {
+    small: 'btn-small',
+    large: 'btn-large',
+};
+
+const displayTypes: Record<DisplayType, string> = {
+    danger: 'btn-danger',
+    icon: 'btn-icon',
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    unstyled: 'btn-unstyled',
+};
+
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+    (
+        {
+            children,
+            className,
+            displayType = 'primary',
+            icon,
+            iconPosition,
+            label,
+            onClick,
+            size,
+            ...props
+        },
+        ref
+    ) => (
+        <button
+            className={cx(
+                'btn',
+                displayTypes[displayType],
+                size && sizes[size],
+                className
+            )}
+            onClick={onClick}
+            ref={ref}
+            {...props}
+        >
+            <>
+                {iconPosition === 'left' &&
+                    displayType === 'icon' &&
+                    !!icon && <span className="mr-2">{icon}</span>}
+
+                {!iconPosition && !label && icon}
+
+                {label}
+
+                {children}
+
+                {iconPosition === 'right' &&
+                    displayType === 'icon' &&
+                    !!icon && <span className="ml-2">{icon}</span>}
+            </>
+        </button>
+    )
+);
 
 Button.displayName = 'Button';
 
