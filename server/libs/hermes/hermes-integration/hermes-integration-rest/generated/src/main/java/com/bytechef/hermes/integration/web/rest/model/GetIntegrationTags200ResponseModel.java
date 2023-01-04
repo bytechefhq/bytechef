@@ -18,24 +18,24 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The request object that contains the array of tags.
+ * The response object that contains the array of tags.
  */
 
-@Schema(name = "putIntegrationTags_request", description = "The request object that contains the array of tags.")
-@JsonTypeName("putIntegrationTags_request")
+@Schema(name = "getIntegrationTags_200_response", description = "The response object that contains the array of tags.")
+@JsonTypeName("getIntegrationTags_200_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-04T10:26:43.691521+01:00[Europe/Zagreb]")
-public class PutIntegrationTagsRequestModel {
+public class GetIntegrationTags200ResponseModel {
 
   @JsonProperty("tags")
   @Valid
   private List<String> tags = null;
 
-  public PutIntegrationTagsRequestModel tags(List<String> tags) {
+  public GetIntegrationTags200ResponseModel tags(List<String> tags) {
     this.tags = tags;
     return this;
   }
 
-  public PutIntegrationTagsRequestModel addTagsItem(String tagsItem) {
+  public GetIntegrationTags200ResponseModel addTagsItem(String tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -65,8 +65,8 @@ public class PutIntegrationTagsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PutIntegrationTagsRequestModel putIntegrationTagsRequest = (PutIntegrationTagsRequestModel) o;
-    return Objects.equals(this.tags, putIntegrationTagsRequest.tags);
+    GetIntegrationTags200ResponseModel getIntegrationTags200Response = (GetIntegrationTags200ResponseModel) o;
+    return Objects.equals(this.tags, getIntegrationTags200Response.tags);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class PutIntegrationTagsRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PutIntegrationTagsRequestModel {\n");
+    sb.append("class GetIntegrationTags200ResponseModel {\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("}");
     return sb.toString();
