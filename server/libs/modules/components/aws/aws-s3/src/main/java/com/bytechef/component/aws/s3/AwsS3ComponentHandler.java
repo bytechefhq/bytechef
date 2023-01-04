@@ -43,14 +43,19 @@ import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.io.FilenameUtils;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
@@ -142,8 +147,9 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
-        try (S3Client s3Client = S3Client.builder()
-            .build()) {
+        S3ClientBuilder builder = S3Client.builder();
+
+        try (S3Client s3Client = builder.build()) {
             return context.storeFileContent(
                 executionParameters.getRequiredString(FILENAME),
                 s3Client.getObject(
@@ -161,8 +167,9 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
-        try (S3Client s3Client = S3Client.builder()
-            .build()) {
+        S3ClientBuilder builder = S3Client.builder();
+
+        try (S3Client s3Client = builder.build()) {
             return s3Client.utilities()
                 .getUrl(GetUrlRequest.builder()
                     .bucket(bucketName)
@@ -173,9 +180,9 @@ public class AwsS3ComponentHandler implements ComponentHandler {
     }
 
     protected List<S3ObjectDescription> performListObjects(Context context, ExecutionParameters executionParameters) {
-        try (S3Client s3Client = S3Client.builder()
-            .build()) {
+        S3ClientBuilder builder = S3Client.builder();
 
+        try (S3Client s3Client = builder.build()) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
                 .bucket(executionParameters.getRequiredString(BUCKET))
                 .prefix(executionParameters.getRequiredString(PREFIX))
@@ -192,13 +199,15 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         AmazonS3Uri amazonS3Uri = new AmazonS3Uri(executionParameters.getRequiredString(URI));
 
         try (S3Presigner s3Presigner = S3Presigner.create()) {
-            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(z -> z.signatureDuration(
-                Duration.parse("PT" + executionParameters.getRequiredString("signatureDuration")))
+            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(builder -> builder
+                .signatureDuration(
+                    Duration.parse("PT" + executionParameters.getRequiredString("signatureDuration")))
                 .getObjectRequest(por -> por.bucket(amazonS3Uri.getBucket())
                     .key(amazonS3Uri.getKey())));
 
-            return presignedGetObjectRequest.url()
-                .toString();
+            URL url = presignedGetObjectRequest.url();
+
+            return url.toString();
         }
     }
 
@@ -208,10 +217,10 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
+        S3ClientBuilder builder = S3Client.builder();
         FileEntry fileEntry = executionParameters.get(FILE_ENTRY, FileEntry.class);
 
-        try (S3Client s3Client = S3Client.builder()
-            .build()) {
+        try (S3Client s3Client = builder.build()) {
             Path tempFilePath = Files.createTempFile("", ".tmp");
 
             Files.copy(context.getFileStream(fileEntry), tempFilePath);
@@ -239,8 +248,13 @@ public class AwsS3ComponentHandler implements ComponentHandler {
             return s3Object.key();
         }
 
+        @SuppressFBWarnings("NP")
         public String getSuffix() {
-            return FilenameUtils.getName(getKey());
+            Path path = Paths.get(getKey());
+
+            Path fileName = Objects.requireNonNull(path.getFileName());
+
+            return fileName.toString();
         }
 
         public String getUri() {

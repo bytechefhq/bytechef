@@ -17,9 +17,12 @@
 
 package com.bytechef.cli.command.component.subcommand;
 
+import com.bytechef.hermes.component.RestComponentHandler;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -48,6 +51,10 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,11 +72,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
-import org.apache.commons.lang3.StringUtils;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RestComponentGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestComponentGenerator.class);
 
     private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get("com.bytechef.hermes.component.definition",
         "Authorization");
@@ -78,11 +89,14 @@ public class RestComponentGenerator {
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
     public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
-    private static final Logger logger = LoggerFactory.getLogger(RestComponentGenerator.class);
-    private static final String COMPONENT_HANDLER = "ComponentHandler";
     private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME = ClassName
         .get("com.bytechef.hermes.component.constants", "ComponentConstants");
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
+        {
+            enable(SerializationFeature.INDENT_OUTPUT);
+            setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        }
+    };
 
     private final String basePackageName;
     private final String componentName;
@@ -90,11 +104,17 @@ public class RestComponentGenerator {
     private final OpenAPI openAPI;
     private final String outputPath;
     private final Set<String> schemas = new HashSet<>();
+    private final boolean internalComponent;
+    private final int version;
 
-    public RestComponentGenerator(String basePackageName, String componentName, String openApiPath, String outputPath)
-        throws IOException {
+    public RestComponentGenerator(
+        String basePackageName, String componentName, int version, boolean internalComponent, String openApiPath,
+        String outputPath) throws IOException {
+
         this.basePackageName = basePackageName;
         this.componentName = componentName;
+        this.version = version;
+        this.internalComponent = internalComponent;
         this.openAPI = parseOpenAPIFile(openApiPath);
         this.outputPath = outputPath;
 
@@ -112,28 +132,66 @@ public class RestComponentGenerator {
     }
 
     public void generate() throws Exception {
-        Path path = Files.createDirectories(
+        Path sourceMainJavaDirPath = Files.createDirectories(
             Paths.get(getAbsolutePathname("src" + File.separator + "main" + File.separator + "java")));
 
         int schemaSize = schemas.size();
 
-        writeAbstractComponentHandlerClass(path);
+        Path componentHandlerSourcePath = writeAbstractComponentHandlerSource(sourceMainJavaDirPath);
 
         while (schemaSize != schemas.size()) {
             schemaSize = schemas.size();
 
-            checkComponentSchemaClasses(schemas);
+            checkComponentSchemaSources(schemas);
         }
 
-        writeComponentSchemaClasses(schemas, path);
+        writeComponentSchemaSources(schemas, sourceMainJavaDirPath);
+        writeComponentHandlerSource(sourceMainJavaDirPath);
 
-        writeComponentHandlerClass(path);
+        if (internalComponent) {
+            Path sourceTestJavaDirPath = Files.createDirectories(
+                Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "java")));
 
-        writeRestComponentHandlerServiceTemplate();
+            writeAbstractComponentHandlerTest(sourceTestJavaDirPath);
+            writeComponentHandlerDefinition(
+                componentHandlerSourcePath, getPackageName(), getComponentHandlerClassName(componentName), version);
+            writeComponentHandlerTest(sourceTestJavaDirPath);
+        }
+
+        writeComponentHandlerServiceFile();
+    }
+
+    private String capitalize(final String str) {
+        final int strLen = str == null ? 0 : str.length();
+
+        if (strLen == 0) {
+            return str;
+        }
+
+        final int firstCodepoint = str.codePointAt(0);
+        final int newCodePoint = Character.toTitleCase(firstCodepoint);
+
+        if (firstCodepoint == newCodePoint) {
+            // already capitalized
+            return str;
+        }
+
+        final int[] newCodePoints = new int[strLen];
+        int outOffset = 0;
+        newCodePoints[outOffset++] = newCodePoint;
+
+        for (int inOffset = Character.charCount(firstCodepoint); inOffset < strLen;) {
+            final int codepoint = str.codePointAt(inOffset);
+
+            newCodePoints[outOffset++] = codepoint;
+            inOffset += Character.charCount(codepoint);
+        }
+
+        return new String(newCodePoints, 0, outOffset);
     }
 
     @SuppressWarnings("rawtypes")
-    private void checkComponentSchemaClasses(Set<String> schemas) {
+    private void checkComponentSchemaSources(Set<String> schemas) {
         Components components = openAPI.getComponents();
 
         if (components != null) {
@@ -149,6 +207,79 @@ public class RestComponentGenerator {
                 }
             }
         }
+    }
+
+    private Path compileComponentHandlerSource(Path sourcePath, String simpleClassName) {
+        JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+        List<String> javacOpts = new ArrayList<>();
+
+        javacOpts.add("-classpath");
+        javacOpts.add("libs/hermes-component-api-1.0.jar:libs/hermes-definition-api-1.0.jar");
+
+        Path parentPath = sourcePath.getParent();
+
+        for (String dirName : new String[] {
+            "action", "schema"
+        }) {
+            Path dirPath = parentPath.resolve(dirName);
+
+            File dirFile = dirPath.toFile();
+
+            File[] files = dirFile.listFiles((curDir, name) -> {
+                name = name.toLowerCase();
+
+                return name.endsWith(".java");
+            });
+
+            if (files != null) {
+                for (File file : files) {
+                    javacOpts.add(dirFile.getAbsolutePath() + "/" + file.getName());
+                }
+            }
+        }
+
+        Path tempDirPath;
+
+        try {
+            tempDirPath = Files.createTempDirectory("rest_component");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        javacOpts.add("-d");
+        javacOpts.add(tempDirPath.toString());
+        javacOpts.add(sourcePath.getParent() + "/Abstract" + simpleClassName + ".java");
+        javacOpts.add(sourcePath.getParent() + "/" + simpleClassName + ".java");
+
+        javaCompiler.run(null, null, null, javacOpts.toArray(new String[0]));
+
+        return tempDirPath;
+    }
+
+    private String deleteWhitespace(final String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        final int sz = str.length();
+        final char[] chs = new char[sz];
+
+        int count = 0;
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                chs[count++] = str.charAt(i);
+            }
+        }
+
+        if (count == sz) {
+            return str;
+        }
+
+        if (count == 0) {
+            return "";
+        }
+
+        return new String(chs, 0, count);
     }
 
     private Map<String, List<OperationItem>> filterOperationItemsMap(Map<String, List<OperationItem>> operationsMap) {
@@ -261,13 +392,15 @@ public class RestComponentGenerator {
             CodeBlock actionsCodeBlock = getActionsCodeBlock(operationItemsEntry.getValue(), openAPI);
 
             if (generatorConfig.openApi.useTags) {
-                String prefix = Arrays.stream(StringUtils.split(operationItemsEntry.getKey(), " "))
-                    .map(StringUtils::capitalize)
+                String key = operationItemsEntry.getKey();
+
+                String prefix = Arrays.stream(key.split(" "))
+                    .map(this::capitalize)
                     .collect(Collectors.joining());
 
                 ClassName className = ClassName.get(getPackageName() + ".action", prefix + "Actions");
 
-                writeActionsClass(className, actionsCodeBlock, componentHandlerDirPath);
+                writeComponentActionsSource(className, actionsCodeBlock, componentHandlerDirPath);
 
                 codeBlocks.add(CodeBlock.of("$T.ACTIONS", className));
             } else {
@@ -601,7 +734,7 @@ public class RestComponentGenerator {
                     .actions($L)
                 """,
             componentName,
-            StringUtils.capitalize(componentName),
+            capitalize(componentName),
             openAPI.getInfo()
                 .getDescription(),
             getActionsCodeBlock(componentHandlerDirPath, openAPI));
@@ -613,6 +746,10 @@ public class RestComponentGenerator {
         }
 
         return builder.build();
+    }
+
+    private String getComponentHandlerClassName(String componentName) {
+        return capitalize(componentName) + "ComponentHandler";
     }
 
     private CodeBlock getConnectionCodeBlock(OpenAPI openAPI) {
@@ -652,6 +789,7 @@ public class RestComponentGenerator {
         if (schema.getAllOf() != null) {
             codeBlocks.add(getAllOfSchemaCodeBlock(name, schema.getDescription(), schema.getAllOf(), openAPI));
         }
+
         return codeBlocks.stream()
             .collect(CodeBlock.joining(","));
     }
@@ -773,7 +911,7 @@ public class RestComponentGenerator {
 
                 Schema schema = mediaType.getSchema();
 
-                builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, openAPI));
+                builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, openAPI, true));
                 builder.add(
                     """
                         .metadata(
@@ -793,8 +931,8 @@ public class RestComponentGenerator {
     }
 
     private String getPackageName() {
-        return StringUtils.deleteWhitespace(basePackageName == null ? "" : basePackageName + ".")
-            + StringUtils.replaceChars(componentName, "-_", ".");
+        return deleteWhitespace(basePackageName == null ? "" : basePackageName + ".") +
+            replaceChars(componentName, "-_", ".");
     }
 
     private CodeBlock getParametersPropertiesCodeBlock(Operation operation, OpenAPI openAPI) {
@@ -806,12 +944,8 @@ public class RestComponentGenerator {
                 CodeBlock.Builder builder = CodeBlock.builder();
 
                 builder.add(getSchemaCodeBlock(
-                    parameter.getName(),
-                    parameter.getDescription(),
-                    parameter.getRequired(),
-                    null,
-                    parameter.getSchema(),
-                    openAPI));
+                    parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
+                    parameter.getSchema(), openAPI, false));
                 builder.add(CodeBlock.of(
                     """
                         .metadata(
@@ -821,7 +955,8 @@ public class RestComponentGenerator {
                         )
                         """,
                     Map.class,
-                    StringUtils.upperCase(parameter.getIn())));
+                    parameter.getIn()
+                        .toUpperCase()));
 
                 codeBlocks.add(builder.build());
             }
@@ -894,7 +1029,7 @@ public class RestComponentGenerator {
 
                 Schema schema = mediaType.getSchema();
 
-                builder.add(getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, openAPI));
+                builder.add(getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, openAPI, false));
                 builder.add(
                     """
                         .metadata(
@@ -911,6 +1046,45 @@ public class RestComponentGenerator {
         }
 
         return requestBodyPropertiesEntry;
+    }
+
+    private CodeBlock getAdditionalPropertiesCodeBlock(String propertyName, Schema<?> schema, boolean outputEntry) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        if (schema.getAdditionalProperties() instanceof Boolean) {
+            builder.add(
+                "object($S).additionalProperties($L)",
+                propertyName,
+                schema.getAdditionalProperties());
+        } else {
+            Schema additionalPropertiesSchema = (Schema) schema.getAdditionalProperties();
+
+            if (additionalPropertiesSchema.get$ref() == null) {
+                builder.add(
+                    "object($S).additionalProperties($L())",
+                    propertyName,
+                    getAdditionalPropertiesItemType(additionalPropertiesSchema));
+            } else {
+                String ref = additionalPropertiesSchema.get$ref();
+
+                String curSchemaName = ref.replace("#/components/schemas/", "");
+
+                schemas.add(curSchemaName);
+
+                builder.add(
+                    "object($S).additionalProperties(object().properties($L))",
+                    propertyName,
+                    CodeBlock.of(
+                        "$T.COMPONENT_SCHEMA",
+                        ClassName.get(getPackageName() + ".schema", curSchemaName + "Schema")));
+            }
+        }
+
+        if (!outputEntry) {
+            builder.add(".placeholder($S)", "Add");
+        }
+
+        return builder.build();
     }
 
     @SuppressWarnings("rawtypes")
@@ -946,6 +1120,7 @@ public class RestComponentGenerator {
     })
     private CodeBlock getAllOfSchemaCodeBlock(
         String name, String description, List<Schema> allOfSchemas, OpenAPI openAPI) {
+
         Map<String, Schema> allOfProperties = getAllOfSchemaProperties(name, description, allOfSchemas);
         List<String> allOfRequired = new ArrayList<>();
 
@@ -971,12 +1146,8 @@ public class RestComponentGenerator {
 
             if (schema.getAllOf() == null) {
                 codeBlock = getSchemaCodeBlock(
-                    entry.getKey(),
-                    schema.getDescription(),
-                    required.contains(entry.getKey()),
-                    null,
-                    schema,
-                    openAPI);
+                    entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, openAPI,
+                    false);
             } else {
                 codeBlock = getAllOfSchemaCodeBlock(entry.getKey(), schema.getDescription(), schema.getAllOf(),
                     openAPI);
@@ -997,49 +1168,57 @@ public class RestComponentGenerator {
         "rawtypes"
     })
     private CodeBlock getSchemaCodeBlock(
-        String propertyName,
-        String propertyDescription,
-        Boolean required,
-        String schemaName,
-        Schema<?> schema,
-        OpenAPI openAPI) {
+        String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
+        OpenAPI openAPI, boolean outputEntry) {
+
         CodeBlock.Builder builder = CodeBlock.builder();
 
         if (schema.get$ref() == null) {
             String type = schema.getType() == null ? "object" : schema.getType();
 
             switch (type) {
-                case "array" -> builder.add(
-                    "array($S).items($L)",
-                    propertyName,
-                    getSchemaCodeBlock(
-                        schema.getTitle(), schema.getDescription(), null, null, schema.getItems(), openAPI));
+                case "array" -> {
+                    builder.add(
+                        "array($S).items($L)",
+                        propertyName,
+                        getSchemaCodeBlock(
+                            schema.getTitle(), schema.getDescription(), null, null, schema.getItems(), openAPI, false));
+
+                    if (!outputEntry) {
+                        builder.add(".placeholder($S)", "Add");
+                    }
+                }
                 case "boolean" -> builder.add("bool($S)", propertyName);
                 case "integer" -> {
                     builder.add("integer($S)", propertyName);
                     if (schema.getMinimum() != null) {
-                        builder.add(".minValue($L)", schema.getMinimum()
-                            .intValue());
+                        BigDecimal minimum = schema.getMinimum();
+
+                        builder.add(".minValue($L)", minimum.intValue());
                     }
                     if (schema.getMaximum() != null) {
-                        builder.add(".maxValue($L)", schema.getMaximum()
-                            .intValue());
+                        BigDecimal maximum = schema.getMaximum();
+
+                        builder.add(".maxValue($L)", maximum.intValue());
                     }
                 }
                 case "number" -> {
                     builder.add("number($S)", propertyName);
                     if (schema.getMinimum() != null) {
-                        builder.add(".minValue($L)", schema.getMinimum()
-                            .doubleValue());
+                        BigDecimal minimum = schema.getMinimum();
+
+                        builder.add(".minValue($L)", minimum.doubleValue());
                     }
                     if (schema.getMaximum() != null) {
-                        builder.add(".maxValue($L)", schema.getMaximum()
-                            .doubleValue());
+                        BigDecimal maximum = schema.getMaximum();
+
+                        builder.add(".maxValue($L)", maximum.doubleValue());
                     }
                 }
                 case "object" -> {
                     if (schema.getProperties() != null || schema.getAllOf() != null) {
                         CodeBlock propertiesCodeBlock;
+
                         if (schemas.contains(schemaName)) {
                             propertiesCodeBlock = CodeBlock.of(
                                 "$T.COMPONENT_SCHEMA",
@@ -1050,17 +1229,7 @@ public class RestComponentGenerator {
 
                         builder.add("object($S).properties($L)", propertyName, propertiesCodeBlock);
                     } else if (schema.getAdditionalProperties() != null) {
-                        if (schema.getAdditionalProperties() instanceof Boolean) {
-                            builder.add(
-                                "object($S).additionalProperties($L)",
-                                propertyName,
-                                schema.getAdditionalProperties());
-                        } else {
-                            builder.add(
-                                "object($S).additionalProperties($L())",
-                                propertyName,
-                                getAdditionalPropertiesItemType((Schema) schema.getAdditionalProperties()));
-                        }
+                        builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputEntry));
                     } else {
                         builder.add("object($S)", propertyName);
                     }
@@ -1079,7 +1248,7 @@ public class RestComponentGenerator {
             }
 
             if (propertyName != null) {
-                builder.add(".label($S)", StringUtils.capitalize(propertyName));
+                builder.add(".label($S)", capitalize(propertyName));
             }
 
             if (propertyDescription != null) {
@@ -1095,9 +1264,9 @@ public class RestComponentGenerator {
 
                 for (Object item : enums) {
                     if (item instanceof String) {
-                        codeBlocks.add(CodeBlock.of("option($S, $S)", StringUtils.capitalize(item.toString()), item));
+                        codeBlocks.add(CodeBlock.of("option($S, $S)", capitalize(item.toString()), item));
                     } else {
-                        codeBlocks.add(CodeBlock.of("option($S, $L)", StringUtils.capitalize(item.toString()), item));
+                        codeBlocks.add(CodeBlock.of("option($S, $L)", capitalize(item.toString()), item));
                     }
                 }
 
@@ -1117,18 +1286,19 @@ public class RestComponentGenerator {
                 }
             }
         } else {
+            String ref = schema.get$ref();
             Components components = openAPI.getComponents();
 
             Map<String, Schema> schemaMap = components.getSchemas();
 
-            String curSchemaName = StringUtils.remove(schema.get$ref(), "#/components/schemas/");
+            String curSchemaName = ref.replace("#/components/schemas/", "");
 
             schemas.add(curSchemaName);
 
             schema = schemaMap.get(curSchemaName);
 
             builder.add(getSchemaCodeBlock(
-                propertyName, schema.getDescription(), required, curSchemaName, schema, openAPI));
+                propertyName, schema.getDescription(), required, curSchemaName, schema, openAPI, false));
         }
 
         return builder.build();
@@ -1148,12 +1318,159 @@ public class RestComponentGenerator {
         return openAPI;
     }
 
-    private void writeActionsClass(ClassName className, CodeBlock actionsCodeBlock, Path componentHandlerDirPath)
-        throws IOException {
+    private String replaceChars(final String str, final String searchChars, String replaceChars) {
+        if (str == null || str.isEmpty() || searchChars == null || searchChars.isEmpty()) {
+            return str;
+        }
+
+        if (replaceChars == null) {
+            replaceChars = "";
+        }
+
+        boolean modified = false;
+        final int replaceCharsLength = replaceChars.length();
+        final int strLength = str.length();
+
+        final StringBuilder buf = new StringBuilder(strLength);
+
+        for (int i = 0; i < strLength; i++) {
+            final char ch = str.charAt(i);
+            final int index = searchChars.indexOf(ch);
+
+            if (index >= 0) {
+                modified = true;
+
+                if (index < replaceCharsLength) {
+                    buf.append(replaceChars.charAt(index));
+                }
+            } else {
+                buf.append(ch);
+            }
+        }
+
+        if (modified) {
+            return buf.toString();
+        }
+
+        return str;
+    }
+
+    private RestComponentHandler runComponentHandlerClass(Path classPath, String className) throws Exception {
+        File classFile = classPath.toFile();
+
+        URI classURI = classFile.toURI();
+
+        URL[] classUrls = new URL[] {
+            classURI.toURL()
+        };
+
+        URLClassLoader classLoader = URLClassLoader.newInstance(classUrls);
+
+        @SuppressWarnings("unchecked")
+        Class<RestComponentHandler> clazz = (Class<RestComponentHandler>) Class.forName(className, true, classLoader);
+
+        return clazz.getDeclaredConstructor()
+            .newInstance();
+    }
+
+    private Path writeAbstractComponentHandlerSource(Path sourceDirPath) throws IOException {
+        JavaFile javaFile = JavaFile.builder(
+            getPackageName(),
+            TypeSpec.classBuilder("Abstract" + getComponentHandlerClassName(componentName))
+                .addJavadoc("""
+                    Provides the base implementation for the REST based component.
+
+                    @generated
+                    """)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addSuperinterface(
+                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
+                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                    .initializer(getComponentCodeBlock(sourceDirPath))
+                    .build())
+                .addMethod(MethodSpec.methodBuilder("getDefinition")
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(COMPONENT_DEFINITION_CLASS_NAME)
+                    .addStatement("return componentDefinition")
+                    .build())
+                .build())
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .build();
+
+        return javaFile.writeToPath(sourceDirPath);
+    }
+
+    private void writeAbstractComponentHandlerTest(Path testDirPath) throws IOException {
+        String componentHandlerClassName = getComponentHandlerClassName(componentName);
+
+        JavaFile javaFile = JavaFile.builder(
+            getPackageName(),
+            TypeSpec.classBuilder("Abstract" + componentHandlerClassName + "Test")
+                .addJavadoc("""
+                    Provides the base test implementation for the REST based component.
+
+                    @generated
+                    """)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addMethod(MethodSpec.methodBuilder("testGetDefinition")
+                    .addAnnotation(ClassName.get("org.junit.jupiter.api", "Test"))
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement(
+                        "$T.assertEquals(\"definition/pipedrive_v1.json\", new $T().getDefinition())",
+                        ClassName.get("com.bytechef.test.jsonasssert", "JsonFileAssert"),
+                        ClassName.get(getPackageName(),
+                            componentHandlerClassName))
+                    .build())
+                .build())
+            .build();
+
+        javaFile.writeToPath(testDirPath);
+    }
+
+    private void writeComponentActionsSource(
+        ClassName className, CodeBlock actionsCodeBlock, Path componentHandlerDirPath) throws IOException {
 
         JavaFile javaFile = JavaFile.builder(
             className.packageName(),
             TypeSpec.classBuilder(className.simpleName())
+                .addJavadoc("""
+                    Provides a list of the component actions.
+
+                    @generated
+                    """)
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
                     ParameterizedTypeName.get(
@@ -1199,91 +1516,104 @@ public class RestComponentGenerator {
         javaFile.writeTo(componentHandlerDirPath);
     }
 
-    private void writeAbstractComponentHandlerClass(Path componentHandlerDirPath) throws IOException {
-        JavaFile javaFile = JavaFile.builder(
-            getPackageName(),
-            TypeSpec.classBuilder("Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
-                .addJavadoc("""
-                    Provides the base implementation for the REST based component.
+    private void writeComponentHandlerServiceFile() throws IOException {
+        String servicesDirPathname = getAbsolutePathname(
+            "src" + File.separator + "main" + File.separator + "resources" + File.separator + "META-INF" +
+                File.separator + "services");
 
-                    @generated
-                    """)
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addSuperinterface(
-                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
-                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
-                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-                    .initializer(getComponentCodeBlock(componentHandlerDirPath))
-                    .build())
-                .addMethod(MethodSpec.methodBuilder("getDefinition")
-                    .addAnnotation(Override.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(COMPONENT_DEFINITION_CLASS_NAME)
-                    .addStatement("return componentDefinition")
-                    .build())
-                .build())
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-            .build();
+        Files.createDirectories(Paths.get(servicesDirPathname));
 
-        javaFile.writeTo(componentHandlerDirPath);
+        String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".RestComponentHandler";
+
+        try (PrintWriter printWriter = new PrintWriter(
+            servicesDirPathname + File.separator + serviceName, StandardCharsets.UTF_8)) {
+
+            printWriter.println(getPackageName() + "." + getComponentHandlerClassName(componentName));
+        }
     }
 
-    private void writeComponentHandlerClass(Path componentHandlerDirPath) throws IOException {
-        String filename = componentHandlerDirPath + File.separator
-            + StringUtils.replaceChars(getPackageName(), ".", File.separator) + File.separator
-            + StringUtils.capitalize(componentName) + COMPONENT_HANDLER + ".java";
+    private void writeComponentHandlerSource(Path sourceDirPath) throws IOException {
+        String packageName = getPackageName();
+
+        String filename = sourceDirPath
+            .resolve(packageName.replace(".", File.separator))
+            .resolve(getComponentHandlerClassName(componentName) + ".java")
+            .toFile()
+            .getAbsolutePath();
 
         if (!new File(filename).exists()) {
             JavaFile javaFile = JavaFile.builder(
                 getPackageName(),
-                TypeSpec.classBuilder(StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
+                TypeSpec.classBuilder(getComponentHandlerClassName(componentName))
+                    .addJavadoc("@generated")
                     .addModifiers(Modifier.PUBLIC)
                     .superclass(ClassName.get(
                         getPackageName(),
-                        "Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER))
+                        "Abstract" + getComponentHandlerClassName(componentName)))
                     .build())
                 .build();
-            javaFile.writeTo(componentHandlerDirPath);
+            javaFile.writeToPath(sourceDirPath);
         }
     }
 
-    private void writeComponentSchemaClass(
+    private void writeComponentHandlerTest(Path testDirPath) throws IOException {
+        String packageName = getPackageName();
+
+        String componentHandlerTestClassname = getComponentHandlerClassName(componentName) + "Test";
+
+        String filename = testDirPath
+            .resolve(packageName.replace(".", File.separator))
+            .resolve(componentHandlerTestClassname + ".java")
+            .toFile()
+            .getAbsolutePath();
+
+        if (!new File(filename).exists()) {
+            JavaFile javaFile = JavaFile.builder(
+                getPackageName(),
+                TypeSpec.classBuilder(componentHandlerTestClassname)
+                    .addJavadoc("@generated")
+                    .addModifiers(Modifier.PUBLIC)
+                    .superclass(ClassName.get(
+                        getPackageName(),
+                        "Abstract" + componentHandlerTestClassname))
+                    .build())
+                .build();
+            javaFile.writeToPath(testDirPath);
+        }
+    }
+
+    private void writeComponentHandlerDefinition(
+        Path componentHandlerSourcePath, String packageName, String simpleClassName, int version) throws Exception {
+
+        Path definitionDirPath = Files.createDirectories(
+            Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources")
+                + File.separator + "definition"));
+
+        Path defintionFilePath = definitionDirPath.resolve(componentName + "_v" + version + ".json");
+
+        File definitionFile = defintionFilePath.toFile();
+
+        if (!definitionFile.exists()) {
+            Path classPath = compileComponentHandlerSource(componentHandlerSourcePath, simpleClassName);
+
+            RestComponentHandler restComponentHandler = runComponentHandlerClass(
+                classPath, packageName + "." + simpleClassName);
+
+            OBJECT_MAPPER.writeValue(definitionFile, restComponentHandler.getDefinition());
+        }
+    }
+
+    private void writeComponentSchemaSource(
         ClassName className, CodeBlock componentSchemaCodeBlock, Path componentHandlerDirPath) throws IOException {
 
         JavaFile javaFile = JavaFile.builder(
             className.packageName(),
             TypeSpec.classBuilder(className.simpleName())
+                .addJavadoc("""
+                    Provides schema definition.
+
+                    @generated
+                    """)
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
                     ParameterizedTypeName.get(
@@ -1327,7 +1657,7 @@ public class RestComponentGenerator {
     }
 
     @SuppressWarnings("rawtypes")
-    private void writeComponentSchemaClasses(Set<String> schemas, Path componentHandlerDirPath) throws IOException {
+    private void writeComponentSchemaSources(Set<String> schemas, Path sourceDirPath) throws IOException {
         Components components = openAPI.getComponents();
 
         if (components != null) {
@@ -1341,26 +1671,12 @@ public class RestComponentGenerator {
 
                     ClassName className = ClassName.get(getPackageName() + ".schema", entry.getKey() + "Schema");
 
-                    writeComponentSchemaClass(
+                    writeComponentSchemaSource(
                         className,
                         getObjectPropertiesCodeBlock(null, entry.getValue(), openAPI),
-                        componentHandlerDirPath);
+                        sourceDirPath);
                 }
             }
-        }
-    }
-
-    private void writeRestComponentHandlerServiceTemplate() throws IOException {
-        String servicesDirPathname = getAbsolutePathname("src" + File.separator + "main" + File.separator + "resources"
-            + File.separator + "META-INF" + File.separator + "services");
-
-        Files.createDirectories(Paths.get(servicesDirPathname));
-
-        String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".Rest" + COMPONENT_HANDLER;
-
-        try (PrintWriter printWriter = new PrintWriter(servicesDirPathname + File.separator + serviceName,
-            StandardCharsets.UTF_8)) {
-            printWriter.println(getPackageName() + "." + StringUtils.capitalize(componentName) + COMPONENT_HANDLER);
         }
     }
 

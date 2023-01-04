@@ -120,6 +120,9 @@ public sealed interface Property<P extends Property<P>> permits Property.OneOfPr
 
         @Schema(name = "items", description = "Types of the array items.")
         List<Property<?>> getItems();
+
+        @Schema(name = "multipleValues", description = "If the array can contain multiple items.")
+        Boolean getMultipleValues();
     }
 
     @Schema(name = "BooleanProperty", description = "A boolean property type.")
@@ -171,7 +174,10 @@ public sealed interface Property<P extends Property<P>> permits Property.OneOfPr
         extends ValueProperty<Object, ObjectProperty>permits ModifiableObjectProperty {
 
         @Schema(name = "additionalProperties", description = "Types of dynamically defined properties.")
-        List<Property<?>> getAdditionalProperties();
+        List<? extends Property<?>> getAdditionalProperties();
+
+        @Schema(name = "multipleValues", description = "If the object can contain multiple additional properties.")
+        Boolean getMultipleValues();
 
         @Schema(name = "objectType", description = "The object type.")
         String getObjectType();

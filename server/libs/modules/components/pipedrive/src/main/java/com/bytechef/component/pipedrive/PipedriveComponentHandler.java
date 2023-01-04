@@ -17,5 +17,8 @@
 
 package com.bytechef.component.pipedrive;
 
+/**
+ * @author Ivica Cardic
+ */
 public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {
 }

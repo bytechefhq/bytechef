@@ -19,7 +19,8 @@ package com.bytechef.cli.command.component.subcommand;
 
 import java.io.File;
 import java.util.concurrent.Callable;
-import org.apache.commons.lang3.StringUtils;
+
+import com.bytechef.cli.command.component.ComponentCommand;
 import picocli.CommandLine;
 
 /**
@@ -56,21 +57,34 @@ public class InitSubcommand implements Callable<Integer> {
         defaultValue = "")
     private transient String outputPath;
 
-    @CommandLine.Option(
-        names = {
-            "--standard-component"
-        },
-        paramLabel = "standard component",
-        description = "if a component is the standard one(ships with the platform) or the custom one",
-        defaultValue = "false")
-    private transient boolean standardComponent;
+    @CommandLine.ParentCommand
+    private ComponentCommand componentCommand;
 
     @CommandLine.Parameters(paramLabel = "COMPONENT", description = "component name")
     private transient String componentName;
 
+    @CommandLine.Option(
+        hidden = true,
+        names = {
+            "--internal-component"
+        },
+        paramLabel = "internal component",
+        description = "if a component is the internal one(ships with the platform) or the custom one",
+        defaultValue = "false")
+    private transient boolean internalComponent;
+
+    @CommandLine.Option(
+        names = {
+            "--version"
+        },
+        paramLabel = "component version",
+        description = "the component version",
+        defaultValue = "1")
+    private transient int version = 1;
+
     @Override
     public Integer call() throws Exception {
-        if (StringUtils.isNotEmpty(openApiPath)) {
+        if (openApiPath != null && !openApiPath.isEmpty()) {
             generateOpenAPIComponent();
         }
 
@@ -83,6 +97,8 @@ public class InitSubcommand implements Callable<Integer> {
                 commandSpec.commandLine(), "The OpenAPI file is not found: " + openApiPath);
         }
 
-        new RestComponentGenerator(basePackageName, componentName, openApiPath, outputPath).generate();
+        new RestComponentGenerator(basePackageName, componentName.toLowerCase(), version, internalComponent,
+            openApiPath, outputPath)
+                .generate();
     }
 }
