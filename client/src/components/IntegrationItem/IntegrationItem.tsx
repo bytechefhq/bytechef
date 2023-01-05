@@ -3,13 +3,14 @@ import Footer from './Footer';
 import Header from './Header';
 
 export const IntegrationItem: React.FC<{
+    button: string;
+    category: string;
+    date: string;
     id: string;
     name: string;
     status: boolean;
     description: string;
-    category: string;
     tags: string[];
-    date: string;
     workflowIds: string[];
 }> = ({id, name, status, category, tags, date}) => {
     return (
