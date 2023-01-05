@@ -19,9 +19,17 @@ const Modal: React.FC<{
     children: React.ReactNode;
     confirmButtonLabel: string;
     description: string;
-    triggerLabel: string;
+    handleConfirmButtonClick: () => void;
     title: string;
-}> = ({children, confirmButtonLabel, description, triggerLabel, title}) => {
+    triggerLabel: string;
+}> = ({
+    children,
+    confirmButtonLabel,
+    description,
+    handleConfirmButtonClick,
+    title,
+    triggerLabel,
+}) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -72,7 +80,10 @@ const Modal: React.FC<{
 
                             <div className="mt-4 flex justify-end">
                                 <Close asChild>
-                                    <Button label={confirmButtonLabel} />
+                                    <Button
+                                        label={confirmButtonLabel}
+                                        onClick={handleConfirmButtonClick}
+                                    />
                                 </Close>
                             </div>
 
