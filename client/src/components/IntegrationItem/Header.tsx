@@ -1,16 +1,16 @@
 import React from 'react';
-import {DropdownTrigger} from './DropdownTrigger';
+import {Dropdown} from './Dropdown';
 import {Name} from './Name';
 import {Status} from './Status';
 
 const Header: React.FC<{
+    id: string;
     name: string;
     status: boolean;
-    dropdownTrigger: string;
-}> = ({name, status, dropdownTrigger}) => {
+}> = ({id, name, status}) => {
     return (
         <>
-            <div className="... flex flex-row">
+            <div className="flex flex-row">
                 <div className="w-24">
                     <Name name={name} />
                 </div>
@@ -18,7 +18,7 @@ const Header: React.FC<{
                     <Status status={status} />
                 </div>
                 <div className="w-96">
-                    <DropdownTrigger dropdownTrigger={dropdownTrigger} />
+                    <Dropdown id={id} />
                 </div>
             </div>
         </>
