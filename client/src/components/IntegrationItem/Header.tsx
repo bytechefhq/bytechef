@@ -7,13 +7,13 @@ const Header: React.FC<{
     id: string;
     name: string;
     status: string;
-    dropdownTrigger: string;
-}> = ({id, name, status, dropdownTrigger}) => {
+}> = ({id, name, status}) => {
     return (
         <div>
             <Name name={name} />
 
             <Status status={status} />
+
             <Dropdown id={id} />
         </div>
     );
