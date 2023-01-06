@@ -54,9 +54,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             {...props}
         >
             <>
-                {iconPosition === 'left' &&
-                    displayType === 'icon' &&
-                    !!icon && <span className="mr-2">{icon}</span>}
+                {iconPosition === 'left' && !!icon && (
+                    <span className="mr-2">{icon}</span>
+                )}
 
                 {!iconPosition && !label && icon}
 
@@ -64,9 +64,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
                 {children}
 
-                {iconPosition === 'right' &&
-                    displayType === 'icon' &&
-                    !!icon && <span className="ml-2">{icon}</span>}
+                {iconPosition === 'right' && !!icon && (
+                    <span className="ml-2">{icon}</span>
+                )}
             </>
         </button>
     )
