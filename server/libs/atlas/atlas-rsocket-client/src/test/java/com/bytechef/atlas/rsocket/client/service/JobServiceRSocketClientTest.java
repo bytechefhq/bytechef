@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket.client;
+package com.bytechef.atlas.rsocket.client.service;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,23 +23,59 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class CounterRSocketClientTest {
+public class JobServiceRSocketClientTest {
 
     @Disabled
     @Test
-    public void testDelete() {
+    void testCreate() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testDecrement() {
+    void testGetJob() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testSet() {
+    void testGetJobs() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testGetLatestJob() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testGetTaskExecutionJob() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testResume() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testStart() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testStop() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    void testUpdate() {
         // TODO
     }
 }
