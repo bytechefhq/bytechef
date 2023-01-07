@@ -98,19 +98,15 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
                 TaskExecution subTaskExecution = TaskExecution.of(
-                    taskExecution.getJobId(),
-                    taskExecution.getId(),
-                    taskExecution.getPriority(),
-                    1,
-                    subWorkflowTask);
-
-                Context context = contextService.peek(taskExecution.getId());
-
-                contextService.push(subTaskExecution.getId(), context);
-
-                subTaskExecution.evaluate(taskEvaluator, context);
+                    taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1, subWorkflowTask);
 
                 subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+                Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+
+                contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+
+                subTaskExecution.evaluate(taskEvaluator, context);
 
                 taskDispatcher.dispatch(subTaskExecution);
             }
