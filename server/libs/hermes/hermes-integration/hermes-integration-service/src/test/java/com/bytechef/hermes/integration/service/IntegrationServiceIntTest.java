@@ -105,6 +105,7 @@ public class IntegrationServiceIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration());
 
