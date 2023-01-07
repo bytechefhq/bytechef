@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket;
+package com.bytechef.atlas.rsocket.service;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
@@ -31,22 +31,22 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @Controller
-public class JobRSocketController {
+public class JobServiceRSocketController {
 
     private final JobService jobService;
 
     @SuppressFBWarnings("EI2")
-    public JobRSocketController(JobService jobService) {
+    public JobServiceRSocketController(JobService jobService) {
         this.jobService = jobService;
     }
 
     @MessageMapping("createJob")
-    public Mono<Job> createJob(JobParameters workflowParameters) {
-        return Mono.create(sink -> sink.success(jobService.create(workflowParameters)));
+    public Mono<Job> createJob(JobParameters jobParameters) {
+        return Mono.create(sink -> sink.success(jobService.create(jobParameters)));
     }
 
     @MessageMapping("getJob")
-    public Mono<Job> getJob(String id) {
+    public Mono<Job> getJob(Long id) {
         return Mono.create(sink -> sink.success(jobService.getJob(id)));
     }
 
@@ -67,22 +67,22 @@ public class JobRSocketController {
     }
 
     @MessageMapping("getTaskExecutionJob")
-    public Mono<Job> getTaskExecutionJob(String taskExecutionId) {
+    public Mono<Job> getTaskExecutionJob(Long taskExecutionId) {
         return Mono.create(sink -> sink.success(jobService.getTaskExecutionJob(taskExecutionId)));
     }
 
     @MessageMapping("resumeJob")
-    public Mono<Job> resumeJob(String jobId) {
+    public Mono<Job> resumeJob(Long jobId) {
         return Mono.create(sink -> sink.success(jobService.resume(jobId)));
     }
 
     @MessageMapping("startJob")
-    public Mono<Job> startJob(String jobId) {
+    public Mono<Job> startJob(Long jobId) {
         return Mono.create(sink -> sink.success(jobService.start(jobId)));
     }
 
     @MessageMapping("stopJob")
-    public Mono<Job> stopJob(String jobId) {
+    public Mono<Job> stopJob(Long jobId) {
         return Mono.create(sink -> sink.success(jobService.stop(jobId)));
     }
 

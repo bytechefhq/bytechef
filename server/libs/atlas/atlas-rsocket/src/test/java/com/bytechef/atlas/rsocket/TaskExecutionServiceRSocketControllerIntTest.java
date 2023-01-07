@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowRSocketControllerIntTest {
+public class TaskExecutionServiceRSocketControllerIntTest {
 
     @Disabled
     @Test
@@ -33,13 +33,13 @@ public class WorkflowRSocketControllerIntTest {
 
     @Disabled
     @Test
-    void testGetWorkflow() {
+    void testGetTaskExecution() {
         // TODO
     }
 
     @Disabled
     @Test
-    void testGetWorkflows() {
+    void testGetParentTaskExecutions() {
         // TODO
     }
 
