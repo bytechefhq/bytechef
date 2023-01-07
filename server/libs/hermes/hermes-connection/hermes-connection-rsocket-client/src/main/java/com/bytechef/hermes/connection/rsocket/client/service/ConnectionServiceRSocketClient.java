@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.rsocket.client;
+package com.bytechef.hermes.connection.rsocket.client.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -30,11 +30,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ConnectionRSocketClient implements ConnectionService {
+public class ConnectionServiceRSocketClient implements ConnectionService {
 
     private final RSocketRequester rSocketRequester;
 
-    public ConnectionRSocketClient(RSocketRequester rSocketRequester) {
+    public ConnectionServiceRSocketClient(RSocketRequester rSocketRequester) {
         this.rSocketRequester = rSocketRequester;
     }
 
@@ -59,7 +59,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
         rSocketRequester.route("removeConnection")
             .data(id)
             .send()
@@ -67,7 +67,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection getConnection(Long id) {
+    public Connection getConnection(long id) {
         return rSocketRequester
             .route("getConnection")
             .data(id)
@@ -84,7 +84,7 @@ public class ConnectionRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection update(Long id, String name) {
+    public Connection update(long id, String name) {
         Connection connection = new Connection();
 
         connection.setId(id);
