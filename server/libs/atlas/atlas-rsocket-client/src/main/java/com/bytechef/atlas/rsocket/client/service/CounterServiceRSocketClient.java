@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket.client;
+package com.bytechef.atlas.rsocket.client.service;
 
 import com.bytechef.atlas.service.CounterService;
 import java.util.Map;
+
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
 
@@ -26,16 +27,16 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class CounterRSocketClient implements CounterService {
+public class CounterServiceRSocketClient implements CounterService {
 
     private final RSocketRequester rSocketRequester;
 
-    public CounterRSocketClient(RSocketRequester rSocketRequester) {
+    public CounterServiceRSocketClient(RSocketRequester rSocketRequester) {
         this.rSocketRequester = rSocketRequester;
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(long id) {
         rSocketRequester.route("deleteCounter")
             .data(id)
             .send()
@@ -43,7 +44,7 @@ public class CounterRSocketClient implements CounterService {
     }
 
     @Override
-    public long decrement(String id) {
+    public long decrement(long id) {
         Long counter = rSocketRequester
             .route("decrementCounter")
             .data(id)
@@ -54,7 +55,7 @@ public class CounterRSocketClient implements CounterService {
     }
 
     @Override
-    public void set(String id, long value) {
+    public void set(long id, long value) {
         rSocketRequester
             .route("setCounter")
             .data(Map.of("id", id, "value", value))
