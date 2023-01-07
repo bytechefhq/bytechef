@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.rsocket;
+package com.bytechef.hermes.connection.rsocket.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -29,12 +29,12 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @Controller
-public class ConnectionRSocketController {
+public class ConnectionServiceRSocketController {
 
     private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI2")
-    public ConnectionRSocketController(ConnectionService connectionService) {
+    public ConnectionServiceRSocketController(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
 
@@ -46,7 +46,7 @@ public class ConnectionRSocketController {
     }
 
     @MessageMapping("getConnection")
-    public Mono<Connection> getConnection(Long id) {
+    public Mono<Connection> getConnection(long id) {
         return Mono.create(sink -> sink.success(connectionService.getConnection(id)));
     }
 
@@ -56,7 +56,7 @@ public class ConnectionRSocketController {
     }
 
     @MessageMapping("removeConnection")
-    public Mono<List<Connection>> removeConnection(Long id) {
+    public Mono<List<Connection>> removeConnection(long id) {
         connectionService.delete(id);
 
         return Mono.empty();
