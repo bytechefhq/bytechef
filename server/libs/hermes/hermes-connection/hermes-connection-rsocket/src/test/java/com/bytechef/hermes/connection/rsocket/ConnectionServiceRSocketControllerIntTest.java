@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ConnectionRSocketControllerIntTest {
+public class ConnectionServiceRSocketControllerIntTest {
 
     @Disabled
     @Test
