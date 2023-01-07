@@ -20,6 +20,7 @@
 package com.bytechef.atlas.coordinator.task.completion;
 
 import com.bytechef.atlas.domain.TaskExecution;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A strategy interface for handling {@link TaskExecution} completions.
@@ -29,6 +30,7 @@ import com.bytechef.atlas.domain.TaskExecution;
  */
 public interface TaskCompletionHandler {
 
+    @Transactional
     void handle(TaskExecution taskExecution);
 
     boolean canHandle(TaskExecution taskExecution);
