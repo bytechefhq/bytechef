@@ -27,6 +27,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * A {@link TaskCompletionHandler} implementation which handles completions of parallel construct tasks.
@@ -55,20 +56,8 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    public void handle(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
-
-        long tasksLeft = counterService.decrement(taskExecution.getParentId());
-
-        if (tasksLeft == 0) {
-            taskCompletionHandler.handle(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
-            counterService.delete(taskExecution.getParentId());
-        }
-    }
-
-    @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        String parentId = taskExecution.getParentId();
+        Long parentId = taskExecution.getParentId();
 
         if (parentId == null) {
             return false;
@@ -78,6 +67,19 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
             String type = parentTaskExecution.getType();
 
             return type.equals(PARALLEL + "/v" + VERSION_1);
+        }
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
+    public void handle(TaskExecution taskExecution) {
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+
+        long tasksLeft = counterService.decrement(taskExecution.getParentId());
+
+        if (tasksLeft == 0) {
+            taskCompletionHandler.handle(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            counterService.delete(taskExecution.getParentId());
         }
     }
 }

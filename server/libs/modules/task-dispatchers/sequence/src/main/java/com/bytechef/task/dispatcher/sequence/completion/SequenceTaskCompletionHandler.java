@@ -66,7 +66,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution aTaskExecution) {
-        String parentId = aTaskExecution.getParentId();
+        Long parentId = aTaskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
@@ -87,11 +87,11 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution sequenceTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context newContext = contextService.peek(sequenceTaskExecution.getId());
+            Context newContext = contextService.peek(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextService.push(sequenceTaskExecution.getId(), newContext);
+            contextService.push(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
         }
 
         List<WorkflowTask> subWorkflowTasks = MapUtils
@@ -104,19 +104,16 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution subTaskExecution = TaskExecution.of(
-                sequenceTaskExecution.getJobId(),
-                sequenceTaskExecution.getId(),
-                sequenceTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1,
-                subWorkflowTask);
-
-            Context context = contextService.peek(sequenceTaskExecution.getId());
-
-            contextService.push(subTaskExecution.getId(), context);
-
-            subTaskExecution.evaluate(taskEvaluator, context);
+                sequenceTaskExecution.getJobId(), sequenceTaskExecution.getId(), sequenceTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1, subWorkflowTask);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            Context context = contextService.peek(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+
+            subTaskExecution.evaluate(taskEvaluator, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

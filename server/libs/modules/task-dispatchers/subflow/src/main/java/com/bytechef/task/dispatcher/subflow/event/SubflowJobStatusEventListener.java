@@ -81,8 +81,8 @@ public class SubflowJobStatusEventListener implements EventListener {
                 case STARTED:
                     break;
                 case STOPPED: {
-                    TaskExecution subflowTaskExecution = taskExecutionService
-                        .getTaskExecution(job.getParentTaskExecutionId());
+                    TaskExecution subflowTaskExecution = taskExecutionService.getTaskExecution(
+                        job.getParentTaskExecutionId());
 
                     coordinatorManager.stop(subflowTaskExecution.getJobId());
 
@@ -108,7 +108,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     } else {
                         // TODO check, it seems wrong
                         completionTaskExecution.evaluate(
-                            taskEvaluator, new Context("execution", new Context("output", output)));
+                            taskEvaluator, Context.of("execution", Context.of("output", output)));
                     }
 
                     coordinatorManager.complete(completionTaskExecution);

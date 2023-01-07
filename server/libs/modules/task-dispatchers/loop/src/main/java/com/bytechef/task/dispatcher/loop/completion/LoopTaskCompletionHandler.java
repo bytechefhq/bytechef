@@ -70,13 +70,14 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        String parentId = taskExecution.getParentId();
+        Long parentId = taskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType()
-                .equals(LOOP + "/v" + VERSION_1);
+            String type = parentExecution.getType();
+
+            return type.equals(LOOP + "/v" + VERSION_1);
         }
 
         return false;
@@ -98,13 +99,12 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
             TaskExecution subTaskExecution = TaskExecution.of(
-                loopTaskExecution.getJobId(),
-                loopTaskExecution.getId(),
-                loopTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1,
-                new WorkflowTask(iteratee));
+                loopTaskExecution.getJobId(), loopTaskExecution.getId(), loopTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1, new WorkflowTask(iteratee));
 
-            Context context = contextService.peek(loopTaskExecution.getId());
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            Context context = contextService.peek(loopTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             if (!list.isEmpty()) {
                 context.put(
@@ -116,11 +116,9 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
                 taskExecution.getTaskNumber());
 
-            contextService.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             subTaskExecution.evaluate(taskEvaluator, context);
-
-            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
