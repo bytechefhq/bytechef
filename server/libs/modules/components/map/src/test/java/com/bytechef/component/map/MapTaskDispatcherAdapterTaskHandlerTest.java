@@ -47,8 +47,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(
             Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"))));
 
-        taskExecution.setId("1234");
-        taskExecution.setJobId("4567");
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
 
         List<?> results = taskHandler.handle(taskExecution);
 
@@ -64,12 +64,11 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver,
                 TaskEvaluator.create());
 
-            TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                "list", List.of(1, 2, 3),
-                "iteratee", Map.of("type", "rogue"))));
+            TaskExecution taskExecution = new TaskExecution(
+                new WorkflowTask(Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue"))));
 
-            taskExecution.setId("1234");
-            taskExecution.setJobId("4567");
+            taskExecution.setId(1234L);
+            taskExecution.setJobId(4567L);
 
             taskHandler.handle(taskExecution);
         });
@@ -157,8 +156,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             "type",
             "pass")));
 
-        taskExecution.setId("1234");
-        taskExecution.setJobId("4567");
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
 
         worker.handle(taskExecution);
     }
