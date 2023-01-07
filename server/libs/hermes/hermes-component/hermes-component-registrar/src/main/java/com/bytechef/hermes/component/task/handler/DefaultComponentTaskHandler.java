@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.task.handler;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -60,7 +59,7 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
+    public Object handle(TaskExecution taskExecution) {
         Context context = new ContextImpl(
             connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
 
