@@ -44,6 +44,7 @@ import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -95,16 +96,15 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 
-                Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+                Map<String, Object> newContext = new HashMap<>(
+                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
-                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
-                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
-                contextService.push(iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+                contextService.push(iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
-                iterateeTaskExecution.evaluate(taskEvaluator, context);
-
-                taskDispatcher.dispatch(iterateeTaskExecution);
+                taskDispatcher.dispatch(iterateeTaskExecution.evaluate(taskEvaluator, newContext));
             }
         }
     }

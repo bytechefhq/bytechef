@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -88,7 +89,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, Object> context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
