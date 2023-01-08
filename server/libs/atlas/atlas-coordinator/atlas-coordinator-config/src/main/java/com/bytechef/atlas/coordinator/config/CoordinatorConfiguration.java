@@ -21,7 +21,7 @@ package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.Coordinator;
 import com.bytechef.atlas.coordinator.CoordinatorManager;
-import com.bytechef.atlas.coordinator.CoordinatorManagerImpl;
+import com.bytechef.atlas.coordinator.impl.CoordinatorManagerImpl;
 import com.bytechef.atlas.coordinator.error.ErrorHandlerChain;
 import com.bytechef.atlas.coordinator.error.TaskExecutionErrorHandler;
 import com.bytechef.atlas.coordinator.event.EventListener;
