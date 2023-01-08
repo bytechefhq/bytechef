@@ -109,9 +109,9 @@ public class Worker {
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
-                TaskExecutionFuture<?> myFuture = taskExecutions.get(taskExecution.getId());
+                TaskExecutionFuture<?> taskExecutionFuture = taskExecutions.get(taskExecution.getId());
 
-                if (myFuture == null || !myFuture.isCancelled()) {
+                if (taskExecutionFuture == null || !taskExecutionFuture.isCancelled()) {
                     handleException(taskExecution, e);
                 }
             } finally {
@@ -183,10 +183,10 @@ public class Worker {
                 taskExecution.setOutput(output);
             }
 
-            taskExecution.setStatus(TaskStatus.COMPLETED);
-            taskExecution.setProgress(100);
             taskExecution.setEndTime(LocalDateTime.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
+            taskExecution.setProgress(100);
+            taskExecution.setStatus(TaskStatus.COMPLETED);
 
             // post tasks
             executeSubTasks(taskExecution, taskExecution.getPost(), context);
