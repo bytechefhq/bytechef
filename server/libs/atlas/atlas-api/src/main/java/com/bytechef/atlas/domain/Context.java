@@ -22,6 +22,7 @@ package com.bytechef.atlas.domain;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -98,17 +99,26 @@ public final class Context implements Persistable<Long> {
         this.value = new MapWrapper(value);
     }
 
-    public Context(long stackId, Classname classname, Map<String, Object> value) {
-        this.stackId = stackId;
-        this.classnameId = classname.getId();
-        this.value = new MapWrapper(value);
+    public Context(long stackId, Classname classname) {
+        this(stackId, null, classname, new HashMap<>());
     }
 
-    public static Context of(String key, Object value) {
-        Assert.notNull(key, "'key' must not be null.");
+    public Context(long stackId, Classname classname, Map<String, Object> value) {
+        this(stackId, null, classname, value);
+    }
+
+    public Context(long stackId, int subStackId, Classname classname) {
+        this(stackId, subStackId, classname, new HashMap<>());
+    }
+
+    public Context(long stackId, Integer subStackId, Classname classname, Map<String, Object> value) {
+        Assert.notNull(classname, "'classname' must not be null.");
         Assert.notNull(value, "'value' must not be null.");
 
-        return new Context(Collections.singletonMap(key, value));
+        this.stackId = stackId;
+        this.subStackId = subStackId;
+        this.classnameId = classname.getId();
+        this.value = new MapWrapper(value);
     }
 
     @Override
@@ -164,14 +174,6 @@ public final class Context implements Persistable<Long> {
         return isNew;
     }
 
-    public void put(String key, Object value) {
-        this.value.put(key, value);
-    }
-
-    public void setClassnameId(Integer classnameId) {
-        this.classnameId = classnameId;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -180,25 +182,17 @@ public final class Context implements Persistable<Long> {
         this.isNew = isNew;
     }
 
-    public void setSubStackId(Integer subStackId) {
-        this.subStackId = subStackId;
-    }
-
-    public void setStackId(Long stackId) {
-        this.stackId = stackId;
-    }
-
-    public void setValue(Map<String, Object> value) {
-        this.value = new MapWrapper(value);
-    }
-
     @Override
     public String toString() {
-        return "Context{" + "createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", id='"
-            + id + '\'' + ", stackId='"
-            + stackId + '\'' + ", value="
-            + value + '}';
+        return "Context{" +
+            "classnameId=" + classnameId +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", id=" + id +
+            ", isNew=" + isNew +
+            ", subStackId=" + subStackId +
+            ", stackId=" + stackId +
+            ", value=" + value +
+            '}';
     }
 }
