@@ -149,10 +149,11 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
-                Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+                Map<String, Object> context = contextService.peek(
+                    taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-                contextService.push(taskExecution.getId(), i, Context.Classname.TASK_EXECUTION, context);
                 contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+                contextService.push(taskExecution.getId(), i, Context.Classname.TASK_EXECUTION, context);
 
                 branchTaskExecution.evaluate(taskEvaluator, context);
 

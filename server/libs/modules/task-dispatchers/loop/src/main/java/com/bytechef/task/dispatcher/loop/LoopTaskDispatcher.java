@@ -43,6 +43,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,17 +92,18 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             if (!list.isEmpty()) {
-                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
             }
 
-            context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
+            newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution.evaluate(taskEvaluator, newContext);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

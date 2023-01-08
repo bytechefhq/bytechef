@@ -35,6 +35,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,8 +90,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
-            Context newContext = contextService.peek(
-                taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION));
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -110,8 +111,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 .toList())
             .toList();
 
-        List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks
-            .get(MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
+        List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
+            MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
 
         if (taskExecution.getTaskNumber() < branchWorkflowTasks.size()) {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
@@ -127,7 +128,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
-            Context context = contextService.peek(
+            Map<String, Object> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);
 
             contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);

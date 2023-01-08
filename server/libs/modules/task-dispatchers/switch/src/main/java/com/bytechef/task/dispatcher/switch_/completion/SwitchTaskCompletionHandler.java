@@ -40,6 +40,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +96,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution switchTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context newContext = contextService.peek(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -113,7 +115,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            Context context = contextService.peek(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, Object> context = contextService.peek(
+                switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
