@@ -95,7 +95,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-                Context newContext = contextService.peek(job.getId(), Context.Classname.JOB);
+                Map<String, Object> newContext = new HashMap<>(contextService.peek(job.getId(), Context.Classname.JOB));
 
                 newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -115,7 +115,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("NP")
     private void complete(Job job) {
-        Context context = contextService.peek(job.getId(), Context.Classname.JOB);
+        Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         Map<String, Object> source = new HashMap<>();
