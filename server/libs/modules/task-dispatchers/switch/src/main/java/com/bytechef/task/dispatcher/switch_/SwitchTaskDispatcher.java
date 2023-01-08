@@ -80,7 +80,10 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
+        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         Map<String, Object> selectedCase = resolveCase(taskExecution);
 
