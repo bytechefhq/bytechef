@@ -76,7 +76,7 @@ public class TaskStartedEventListener implements EventListener {
                     taskExecution.setStartTime(workflowEvent.getCreatedDate());
                     taskExecution.setStatus(TaskStatus.STARTED);
 
-                    taskExecutionService.update(taskExecution);
+                    taskExecution = taskExecutionService.update(taskExecution);
                 }
 
                 if (taskExecution.getParentId() != null) {

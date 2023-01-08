@@ -83,7 +83,10 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         List<Object> list = MapUtils.getList(
             taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
+        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         if (loopForever || !list.isEmpty()) {
             TaskExecution subTaskExecution = TaskExecution.of(

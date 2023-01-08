@@ -122,7 +122,10 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                 .toList())
             .toList();
 
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
+        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         if (branchesWorkflowTasks.isEmpty()) {
             taskExecution.setStartTime(LocalDateTime.now());

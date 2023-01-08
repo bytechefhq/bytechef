@@ -23,7 +23,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,38 +77,20 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     public TaskExecution update(@NonNull TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null.");
 
-        Optional<TaskExecution> currentTaskExecutionOptional = taskExecutionRepository
-            .findByIdForUpdate(taskExecution.getId());
+        TaskExecution currentTaskExecution = taskExecutionRepository.findByIdForUpdate(taskExecution.getId())
+            .orElseThrow();
 
-        if (currentTaskExecutionOptional.isPresent()) {
-            TaskExecution currentTaskExecution = currentTaskExecutionOptional.get();
+        TaskStatus currentTaskStatus = currentTaskExecution.getStatus();
+        TaskStatus taskStatus = taskExecution.getStatus();
 
-            TaskStatus taskStatus = currentTaskExecution.getStatus();
+        if (currentTaskStatus.isTerminated() && taskStatus == TaskStatus.STARTED) {
+            currentTaskExecution.setStartTime(taskExecution.getStartTime());
 
-            if (taskStatus.isTerminated() && taskExecution.getStatus() == TaskStatus.STARTED) {
-                taskExecution = currentTaskExecution;
-
-                taskExecution.setStartTime(taskExecution.getStartTime());
-            } else if (taskStatus.isTerminated() && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
-                taskExecution.setStartTime(currentTaskExecution.getStartTime());
-            }
+            taskExecution = currentTaskExecution;
+        } else if (taskStatus.isTerminated() && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
+            taskExecution.setStartTime(currentTaskExecution.getStartTime());
         }
 
         return taskExecutionRepository.save(taskExecution);
-    }
-
-    @Override
-    public void updateStatus(
-        long id, @NonNull TaskStatus taskStatus, LocalDateTime startTime, LocalDateTime endTime) {
-
-        if (startTime == null && endTime == null) {
-            taskExecutionRepository.updateStatus(id, taskStatus);
-        } else if (startTime != null) {
-            taskExecutionRepository.updateStatusAndStartTime(id, taskStatus, startTime);
-        } else if (endTime != null) {
-            taskExecutionRepository.updateStatusAndEndTime(id, taskStatus, endTime);
-        } else {
-            throw new IllegalArgumentException();
-        }
     }
 }

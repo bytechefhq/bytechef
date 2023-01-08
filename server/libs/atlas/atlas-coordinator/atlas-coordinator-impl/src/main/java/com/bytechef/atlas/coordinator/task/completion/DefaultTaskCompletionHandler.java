@@ -92,7 +92,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         if (job == null) {
             log.error("Unknown job: {}", taskExecution.getJobId());
         } else {
-            taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+            taskExecution.setStatus(TaskStatus.COMPLETED);
+
+            taskExecution = taskExecutionService.update(taskExecution);
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
                 Map<String, Object> newContext = new HashMap<>(contextService.peek(job.getId(), Context.Classname.JOB));

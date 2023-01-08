@@ -90,33 +90,4 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
         return taskExecution;
     }
-
-    @Override
-    public void updateStatus(long id, TaskStatus status) {
-        TaskExecution taskExecution = taskExecutions.get(id);
-
-        taskExecution.setStatus(status);
-
-        taskExecutions.put(id, taskExecution);
-    }
-
-    @Override
-    public void updateStatusAndStartTime(long id, TaskStatus status, LocalDateTime startTime) {
-        TaskExecution taskExecution = taskExecutions.get(id);
-
-        taskExecution.setStatus(status);
-        taskExecution.setStartTime(startTime);
-
-        taskExecutions.put(id, taskExecution);
-    }
-
-    @Override
-    public void updateStatusAndEndTime(long id, TaskStatus status, LocalDateTime endTime) {
-        TaskExecution taskExecution = taskExecutions.get(id);
-
-        taskExecution.setEndTime(endTime);
-        taskExecution.setStatus(status);
-
-        taskExecutions.put(id, taskExecution);
-    }
 }

@@ -20,10 +20,8 @@ package com.bytechef.atlas.rsocket.client.service;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.TaskExecutionService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import com.bytechef.atlas.task.execution.TaskStatus;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -80,23 +78,6 @@ public class TaskExecutionServiceRSocketClient implements TaskExecutionService {
     public TaskExecution update(TaskExecution taskExecution) {
         return rSocketRequester
             .route("updateTaskExecution")
-            .data(taskExecution)
-            .retrieveMono(TaskExecution.class)
-            .block();
-    }
-
-    @Override
-    public void updateStatus(
-        long id, TaskStatus status, LocalDateTime startTime, LocalDateTime endTime) {
-        TaskExecution taskExecution = new TaskExecution();
-
-        taskExecution.setEndTime(endTime);
-        taskExecution.setId(id);
-        taskExecution.setStatus(status);
-        taskExecution.setStartTime(startTime);
-
-        rSocketRequester
-            .route("updateTaskExecutionStatus")
             .data(taskExecution)
             .retrieveMono(TaskExecution.class)
             .block();

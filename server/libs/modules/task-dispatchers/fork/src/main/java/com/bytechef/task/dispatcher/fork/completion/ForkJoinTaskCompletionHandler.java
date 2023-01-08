@@ -85,7 +85,9 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+        taskExecution.setStatus(TaskStatus.COMPLETED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
@@ -99,10 +101,10 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION, newContext);
         }
 
-        TaskExecution forkTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+        TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
-            forkTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
+            forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(curList -> curList
@@ -140,9 +142,9 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             long branchesLeft = counterService.decrement(taskExecution.getParentId());
 
             if (branchesLeft == 0) {
-                forkTaskExecution.setEndTime(LocalDateTime.now());
+                forkJoinTaskExecution.setEndTime(LocalDateTime.now());
 
-                taskCompletionHandler.handle(forkTaskExecution);
+                taskCompletionHandler.handle(forkJoinTaskExecution);
             }
         }
     }
