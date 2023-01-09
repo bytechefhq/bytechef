@@ -10,14 +10,14 @@ const Header: React.FC<{
 }> = ({id, name, status}) => {
     return (
         <>
-            <div className="flex flex-row">
-                <div className="w-24">
+            <div className="grid grid-cols-3 gap-4">
+                <span className="... col-span-2 flex flex-row space-x-4 ">
                     <Name name={name} />
-                </div>
-                <div className="w-96">
+
                     <Status status={status} />
-                </div>
-                <div className="w-96">
+                </span>
+
+                <div className="... grid justify-items-end">
                     <Dropdown id={id} />
                 </div>
             </div>
