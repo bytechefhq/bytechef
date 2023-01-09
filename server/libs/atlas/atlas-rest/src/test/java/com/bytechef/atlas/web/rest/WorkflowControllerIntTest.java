@@ -52,7 +52,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WebFluxTest(WorkflowController.class)
 public class WorkflowControllerIntTest {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     public static final String DEFINITION = """
         {
             "label": "label",
@@ -64,6 +63,7 @@ public class WorkflowControllerIntTest {
             ]
         }
         """;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     private WorkflowService workflowService;
@@ -94,9 +94,7 @@ public class WorkflowControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            Workflow workflow = getWorkflow();
-
-            when(workflowService.getWorkflow("1")).thenReturn(workflow);
+            when(workflowService.getWorkflow("1")).thenReturn(getWorkflow());
 
             this.webTestClient
                 .get()
@@ -113,9 +111,7 @@ public class WorkflowControllerIntTest {
 
     @Test
     public void testGetWorkflows() throws JsonProcessingException {
-        Workflow workflow = getWorkflow();
-
-        when(workflowService.getWorkflows()).thenReturn(List.of(workflow));
+        when(workflowService.getWorkflows()).thenReturn(List.of(getWorkflow()));
 
         try {
             this.webTestClient
@@ -214,11 +210,7 @@ public class WorkflowControllerIntTest {
     }
 
     private static Workflow getWorkflow() throws JsonProcessingException {
-        Workflow workflow = new Workflow(OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}));
-
-        workflow.setId("1");
-        workflow.setFormat(Workflow.Format.JSON);
-
-        return workflow;
+        return new Workflow(
+            "1", Workflow.Format.JSON, DEFINITION, OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}));
     }
 }

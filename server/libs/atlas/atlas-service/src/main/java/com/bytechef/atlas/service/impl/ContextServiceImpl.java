@@ -25,6 +25,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.Map;
+
 @Transactional
 public class ContextServiceImpl implements ContextService {
 
@@ -36,21 +38,49 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(@NonNull String stackId, @NonNull Context context) {
-        Assert.notNull(stackId, "'stackId' must not be null.");
+    public void push(long stackId, Context.Classname classname, @NonNull Context context) {
         Assert.notNull(context, "'context' must not be null.");
 
+        context.setClassnameId(classname.getId());
         context.setId(null);
+        context.setNew(true);
         context.setStackId(stackId);
 
         contextRepository.save(context);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Context peek(@NonNull String stackId) {
-        Assert.notNull(stackId, "'stackId' must not be null.");
+    public void push(
+        @NonNull long stackId, @NonNull int subStackId, Context.Classname classname, @NonNull Context context) {
+        Assert.notNull(context, "'context' must not be null.");
 
-        return contextRepository.findTop1ByStackIdOrderByCreatedDateDesc(stackId);
+        context.setClassnameId(classname.getId());
+        context.setId(null);
+        context.setNew(true);
+        context.setSubStackId(subStackId);
+        context.setStackId(stackId);
+
+        contextRepository.save(context);
+    }
+
+    @Override
+    public Context push(long stackId, Context.Classname classname, Map<String, Object> value) {
+        Context context = new Context(stackId, classname, value);
+
+        context.setNew(true);
+
+        return contextRepository.save(context);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Context peek(long stackId, Context.Classname classname) {
+        return contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(stackId, classname.getId());
+    }
+
+    @Override
+    public Context peek(long stackId, int subStackId, Context.Classname classname) {
+        return contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(stackId, subStackId,
+            classname.getId());
     }
 }

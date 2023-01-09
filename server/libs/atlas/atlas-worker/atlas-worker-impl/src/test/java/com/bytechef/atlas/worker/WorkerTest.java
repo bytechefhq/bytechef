@@ -25,10 +25,10 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.commons.utils.MapUtils;
-import com.bytechef.commons.utils.UUIDUtils;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,8 +43,7 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(
             Queues.COMPLETIONS,
-            t -> Assertions.assertTrue(((TaskExecution) t).getOutput()
-                .equals("done")));
+            t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
         messageBroker.receive(Queues.EVENTS, t -> {
         });
 
@@ -57,8 +56,8 @@ public class WorkerTest {
             .build();
 
         TaskExecution task = new TaskExecution();
-        task.setId("1234");
-        task.setJobId("4567");
+        task.setId(1234L);
+        task.setJobId(4567L);
         worker.handle(task);
     }
 
@@ -67,10 +66,8 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         messageBroker.receive(
             Queues.ERRORS,
-            t -> Assertions.assertTrue(
-                ((TaskExecution) t).getError()
-                    .getMessage()
-                    .equals("bad input")));
+            t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
+                .getMessage()));
         messageBroker.receive(Queues.EVENTS, t -> {
         });
         Worker worker = Worker.builder()
@@ -83,8 +80,8 @@ public class WorkerTest {
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
         TaskExecution task = new TaskExecution();
-        task.setId("1234");
-        task.setJobId("4567");
+        task.setId(1234L);
+        task.setJobId(4567L);
         worker.handle(task);
     }
 
@@ -122,15 +119,17 @@ public class WorkerTest {
             "type", "var",
             "value", "${myVar}")));
 
-        task.setId("1234");
-        task.setJobId("4567");
+        task.setId(1234L);
+        task.setJobId(4567L);
 
         worker.handle(task);
     }
 
     @Test
     public void test4() {
-        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate())
+        UUID uuid = UUID.randomUUID();
+
+        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString())
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
@@ -168,15 +167,17 @@ public class WorkerTest {
             "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
             "type", "pass")));
 
-        taskExecution.setId("1234");
-        taskExecution.setJobId("4567");
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
 
         worker.handle(taskExecution);
     }
 
     @Test
     public void test5() {
-        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), UUIDUtils.generate())
+        UUID uuid = UUID.randomUUID();
+
+        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString())
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
@@ -216,8 +217,8 @@ public class WorkerTest {
             "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
             "type", "rogue")));
 
-        taskExecution.setId("1234");
-        taskExecution.setJobId("4567");
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
 
         worker.handle(taskExecution);
     }
@@ -228,7 +229,7 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(jt -> t -> {
+            .withTaskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException interruptedException) {
@@ -238,14 +239,14 @@ public class WorkerTest {
                 return null;
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
+            .withEventPublisher(event -> {
             })
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution task = new TaskExecution();
-        task.setId("1234");
-        task.setJobId("4567");
+        task.setId(1234L);
+        task.setJobId(4567L);
         // execute the task
         executors.submit(() -> worker.handle(task));
         // give it a second to start executing
@@ -265,8 +266,8 @@ public class WorkerTest {
         ExecutorService executors = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        Worker worker = (Worker) Worker.builder()
-            .withTaskHandlerResolver(jt -> t -> {
+        Worker worker = Worker.builder()
+            .withTaskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException interruptedException) {
@@ -276,20 +277,24 @@ public class WorkerTest {
                 return null;
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
+            .withEventPublisher(event -> {
             })
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution task1 = new TaskExecution();
-        task1.setId("1111");
-        task1.setJobId("2222");
+
+        task1.setId(1111L);
+        task1.setJobId(2222L);
+
         // execute the task
         executors.submit(() -> worker.handle(task1));
 
         TaskExecution task2 = new TaskExecution();
-        task2.setId("3333");
-        task2.setJobId("4444");
+
+        task2.setId(3333L);
+        task2.setJobId(4444L);
+
         // execute the task
         executors.submit(() -> worker.handle(task2));
 
@@ -298,10 +303,12 @@ public class WorkerTest {
 
         Assertions.assertEquals(2, worker.getTaskExecutions()
             .size());
+
         // cancel the execution of the task
         worker.handle(new CancelControlTask(task1.getJobId(), task1.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
+
         Assertions.assertEquals(1, worker.getTaskExecutions()
             .size());
     }
@@ -310,8 +317,8 @@ public class WorkerTest {
     public void test8() throws InterruptedException {
         ExecutorService executors = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        Worker worker = (Worker) Worker.builder()
-            .withTaskHandlerResolver(jt -> t -> {
+        Worker worker = Worker.builder()
+            .withTaskHandlerResolver(task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException interruptedException) {
@@ -321,20 +328,20 @@ public class WorkerTest {
                 return null;
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
+            .withEventPublisher(event -> {
             })
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
         TaskExecution task1 = new TaskExecution();
-        task1.setId("1111");
-        task1.setJobId("2222");
+        task1.setId(1111L);
+        task1.setJobId(2222L);
         // execute the task
         executors.submit(() -> worker.handle(task1));
 
         TaskExecution task2 = new TaskExecution();
-        task2.setId("3333");
-        task2.setJobId("2222");
+        task2.setId(3333L);
+        task2.setJobId(2222L);
         task2.setParentId(task1.getId());
         // execute the task
         executors.submit(() -> worker.handle(task2));

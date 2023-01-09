@@ -38,6 +38,8 @@ import com.bytechef.commons.utils.MapUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +83,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         log.debug("Completing task {}", taskExecution.getId());
 
@@ -92,11 +95,11 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-                Context newContext = contextService.peek(job.getId());
+                Context newContext = contextService.peek(job.getId(), Context.Classname.JOB);
 
                 newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-                contextService.push(job.getId(), newContext);
+                contextService.push(job.getId(), Context.Classname.JOB, newContext);
             }
 
             if (hasMoreTasks(job)) {
@@ -110,8 +113,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
+    @SuppressFBWarnings("NP")
     private void complete(Job job) {
-        Context context = contextService.peek(job.getId());
+        Context context = contextService.peek(job.getId(), Context.Classname.JOB);
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         Map<String, Object> source = new HashMap<>();

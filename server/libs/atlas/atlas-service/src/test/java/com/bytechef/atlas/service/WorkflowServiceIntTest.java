@@ -19,7 +19,7 @@ package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
-import com.bytechef.atlas.service.config.WorkflowServiceIntTestConfiguration;
+import com.bytechef.atlas.service.config.WorkflowIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @EmbeddedSql
 @SpringBootTest(
-    classes = WorkflowServiceIntTestConfiguration.class,
+    classes = WorkflowIntTestConfiguration.class,
     properties = {
         "bytechef.workflow.context-repository.provider=jdbc",
         "bytechef.workflow.persistence.provider=jdbc",
@@ -87,9 +87,8 @@ public class WorkflowServiceIntTest {
 
     @Test
     public void testUpdate() {
-        Workflow workflow = workflowCrudRepository.save(getWorkflow());
-
         String definition = "{\"label\": \"Label\",\"tasks\": []}";
+        Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
         Workflow updatedWorkflow = workflowService.update(workflow.getId(), definition);
 
@@ -97,10 +96,8 @@ public class WorkflowServiceIntTest {
     }
 
     private static Workflow getWorkflow() {
-        Workflow workflow = new Workflow();
+        Workflow workflow = new Workflow("{\"tasks\": []}", Workflow.Format.JSON);
 
-        workflow.setDefinition("{\"tasks\": []}");
-        workflow.setFormat(Workflow.Format.JSON);
         workflow.setNew(true);
 
         return workflow;

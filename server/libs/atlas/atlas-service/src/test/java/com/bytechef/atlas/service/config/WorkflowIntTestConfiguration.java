@@ -18,12 +18,15 @@
 package com.bytechef.atlas.service.config;
 
 import com.bytechef.atlas.config.WorkflowConfiguration;
+import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -46,7 +49,13 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     WorkflowConfiguration.class, WorkflowMapperConfiguration.class
 })
 @SpringBootConfiguration
-public class WorkflowServiceIntTestConfiguration {
+public class WorkflowIntTestConfiguration {
+
+    @MockBean
+    private EventPublisher eventPublisher;
+
+    @MockBean
+    private MessageBroker messageBroker;
 
     @Bean
     ObjectMapper objectMapper() {

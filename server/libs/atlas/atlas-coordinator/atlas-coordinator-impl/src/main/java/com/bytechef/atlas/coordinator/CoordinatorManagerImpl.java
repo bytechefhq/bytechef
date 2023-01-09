@@ -43,7 +43,7 @@ public class CoordinatorManagerImpl implements CoordinatorManager {
     }
 
     @Override
-    public Job stop(String jobId) {
+    public Job stop(Long jobId) {
         return coordinator.stop(jobId);
     }
 }

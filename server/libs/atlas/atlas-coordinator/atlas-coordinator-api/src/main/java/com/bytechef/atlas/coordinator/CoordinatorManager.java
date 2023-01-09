@@ -25,9 +25,10 @@ import com.bytechef.atlas.error.Errorable;
  * @author Ivica Cardic
  */
 public interface CoordinatorManager {
+
     void complete(TaskExecution taskExecution);
 
     void handleError(Errorable errorable);
 
-    Job stop(String jobId);
+    Job stop(Long jobId);
 }
