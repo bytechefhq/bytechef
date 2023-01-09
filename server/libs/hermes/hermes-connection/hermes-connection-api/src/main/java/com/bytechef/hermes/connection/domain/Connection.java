@@ -18,7 +18,6 @@
 package com.bytechef.hermes.connection.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -74,7 +73,6 @@ public final class Connection implements Persistable<Long> {
     private EncryptedMapWrapper parameters;
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     @Override
@@ -160,6 +158,10 @@ public final class Connection implements Persistable<Long> {
      */
     public Map<String, Object> getParameters() {
         return Collections.unmodifiableMap(parameters.getMap());
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     @Override
