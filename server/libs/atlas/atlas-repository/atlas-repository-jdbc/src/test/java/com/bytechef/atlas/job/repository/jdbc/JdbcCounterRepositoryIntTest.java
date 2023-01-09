@@ -101,7 +101,6 @@ public class JdbcCounterRepositoryIntTest {
     private static Job getJob() {
         Job job = new Job();
 
-        job.setNew(true);
         job.setStatus(Job.Status.CREATED);
         job.setWorkflowId("demo:1234");
 
@@ -109,9 +108,6 @@ public class JdbcCounterRepositoryIntTest {
     }
 
     private static TaskExecution getTaskExecution(long jobId) {
-        TaskExecution taskExecution = TaskExecution.of(jobId, new WorkflowTask());
-
-        taskExecution.setNew(true);
-        return taskExecution;
+        return TaskExecution.of(jobId, new WorkflowTask());
     }
 }

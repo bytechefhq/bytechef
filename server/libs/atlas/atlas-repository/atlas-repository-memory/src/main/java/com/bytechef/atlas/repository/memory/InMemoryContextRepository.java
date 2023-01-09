@@ -74,7 +74,6 @@ public class InMemoryContextRepository implements ContextRepository {
 
         if (context.isNew()) {
             context.setId(RANDOM.nextLong());
-            context.setNew(false);
         }
 
         stack.push(context.getValue());

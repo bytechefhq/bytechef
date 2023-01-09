@@ -23,7 +23,6 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
-import com.bytechef.atlas.task.execution.TaskStatus;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 /**
@@ -84,7 +82,9 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public TaskExecution save(TaskExecution taskExecution) {
-        taskExecution.setId(RANDOM.nextLong());
+        if (taskExecution.isNew()) {
+            taskExecution.setId(RANDOM.nextLong());
+        }
 
         taskExecutions.put(taskExecution.getId(), taskExecution);
 
