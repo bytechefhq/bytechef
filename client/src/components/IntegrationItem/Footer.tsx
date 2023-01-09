@@ -10,16 +10,16 @@ const Footer: React.FC<{
 }> = ({category, tags, date}) => {
     return (
         <>
-            <div className="... flex flex-row">
-                <div className="w-24">
+            <div className="grid grid-cols-3 gap-4">
+                <div className="w-96">
                     <Category category={category} />
                 </div>
 
-                <div className="w-96">
+                <div className="... flex justify-start">
                     <TagList tags={tags} />
                 </div>
 
-                <div className="w-96">
+                <div className=" ... grid  justify-items-end">
                     <Date date={date} />
                 </div>
             </div>

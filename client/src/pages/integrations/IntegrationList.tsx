@@ -29,7 +29,7 @@ export const IntegrationList: React.FC = () => {
             description: 'string',
             lastModifiedBy: 'string',
             lastModifiedDate: 'Last modified 16.05.2023.',
-            tags: ['Tag1', 'Tag2'],
+            tags: ['Tag1'],
             workflowIds: ['string'],
             status: true,
         },
@@ -42,7 +42,7 @@ export const IntegrationList: React.FC = () => {
             description: 'string',
             lastModifiedBy: 'string',
             lastModifiedDate: 'Last modified 16.05.2023.',
-            tags: ['Tag1'],
+            tags: ['Tag1', 'Tag2', 'Tag3'],
             workflowIds: ['string'],
             status: false,
         },
@@ -60,6 +60,7 @@ export const IntegrationList: React.FC = () => {
                     workflowIds={integration.workflowIds}
                     date={integration.lastModifiedDate}
                     status={integration.status}
+                    button={''}
                 />
             ))}
             <div>
