@@ -68,6 +68,7 @@ public class AmqpMessageBroker implements MessageBroker {
     private String determineRoutingKey(String routingKey) {
         String[] routingKeyItems = routingKey.split("/");
         Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + routingKey);
+
         return routingKeyItems.length == 2 ? routingKeyItems[1] : routingKey;
     }
 

@@ -128,6 +128,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         if (Objects.equals(task.getType(), EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
             return this;
         }
+
         return null;
     }
 }
