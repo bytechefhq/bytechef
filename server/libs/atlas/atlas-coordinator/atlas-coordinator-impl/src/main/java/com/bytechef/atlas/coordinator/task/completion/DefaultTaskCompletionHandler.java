@@ -107,7 +107,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             if (hasMoreTasks(job)) {
                 job.setCurrentTask(job.getCurrentTask() + 1);
 
-                jobService.update(job);
+                job = jobService.update(job);
+
                 jobExecutor.execute(job);
             } else {
                 complete(job);
@@ -128,16 +129,17 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
                 MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
         }
 
-        TaskExecution evaluatedTaskExecution = new TaskExecution(
-            taskEvaluator.evaluate(new WorkflowTask(source), context));
-
         job.setStatus(Job.Status.COMPLETED);
         job.setEndTime(new Date());
         job.setCurrentTask(-1);
 
+        TaskExecution evaluatedTaskExecution = new TaskExecution(
+            taskEvaluator.evaluate(new WorkflowTask(source), context));
+
         job.setOutputs(evaluatedTaskExecution.getParameters());
 
-        jobService.update(job);
+        job = jobService.update(job);
+
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
         log.debug("Job {} completed successfully", job.getId());

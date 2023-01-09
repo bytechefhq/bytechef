@@ -39,8 +39,9 @@ public class KafkaMessageBroker implements MessageBroker {
         Assert.notNull(routingKey, "'routingKey' key must not be null");
 
         if (message instanceof Retryable) {
-            Retryable r = (Retryable) message;
-            delay(r.getRetryDelayMillis());
+            Retryable retryable = (Retryable) message;
+
+            delay(retryable.getRetryDelayMillis());
         }
 
         kafkaTemplate.send(MessageBuilder.withPayload(message)
