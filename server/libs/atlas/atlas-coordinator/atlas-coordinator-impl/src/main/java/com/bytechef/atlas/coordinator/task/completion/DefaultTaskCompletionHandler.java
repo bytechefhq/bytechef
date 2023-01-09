@@ -133,8 +133,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setEndTime(new Date());
         job.setCurrentTask(-1);
 
-        TaskExecution evaluatedTaskExecution = new TaskExecution(
-            taskEvaluator.evaluate(new WorkflowTask(source), context));
+        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
+            new TaskExecution(new WorkflowTask(source)), context);
 
         job.setOutputs(evaluatedTaskExecution.getParameters());
 

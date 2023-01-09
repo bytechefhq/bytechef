@@ -103,7 +103,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
-                iterateeTaskExecution.evaluate(taskEvaluator, newContext);
+                iterateeTaskExecution = taskEvaluator.evaluate(iterateeTaskExecution, newContext);
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 

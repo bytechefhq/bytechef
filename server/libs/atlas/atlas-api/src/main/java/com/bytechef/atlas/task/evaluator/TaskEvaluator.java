@@ -19,6 +19,7 @@
 
 package com.bytechef.atlas.task.evaluator;
 
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,14 +98,18 @@ public class TaskEvaluator {
     /**
      * Evaluate the {@link WorkflowTask}
      *
-     * @param workflowTask The {@link WorkflowTask} instance to evaluate
-     * @param context      The context to evaluate the task against
-     * @return the evaluate {@link WorkflowTask}.
+     * @param taskExecution The {@link TaskExecution} instance to evaluate
+     * @param context       The context value to evaluate the task against
+     * @return the evaluated {@link TaskExecution} instance.
      */
-    public WorkflowTask evaluate(WorkflowTask workflowTask, Map<String, Object> context) {
+    public TaskExecution evaluate(TaskExecution taskExecution, Map<String, Object> context) {
+        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
         Map<String, Object> map = evaluateInternal(workflowTask.toMap(), context);
 
-        return new WorkflowTask(map);
+        workflowTask.putAll(map);
+
+        return taskExecution;
     }
 
     private StandardEvaluationContext createEvaluationContext(Map<String, Object> context) {

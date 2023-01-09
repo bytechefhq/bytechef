@@ -116,7 +116,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
                 taskExecution.getTaskNumber());
 
-            subTaskExecution.evaluate(taskEvaluator, newContext);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, newContext);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
