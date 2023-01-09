@@ -106,17 +106,17 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                     taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1,
                     new WorkflowTask(iteratee));
 
-                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
-
                 Map<String, Object> newContext = new HashMap<>(
                     contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
-                contextService.push(iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
-
                 iterateeTaskExecution.evaluate(taskEvaluator, newContext);
+
+                iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
+
+                contextService.push(iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
                 taskDispatcher.dispatch(iterateeTaskExecution);
             }

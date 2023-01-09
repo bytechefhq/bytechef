@@ -128,14 +128,14 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             branchTaskExecution.setStatus(TaskStatus.CREATED);
             branchTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
 
-            branchTaskExecution = taskExecutionService.create(branchTaskExecution);
-
             Map<String, Object> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);
 
-            contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
-
             branchTaskExecution.evaluate(taskEvaluator, context);
+
+            branchTaskExecution = taskExecutionService.create(branchTaskExecution);
+
+            contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(branchTaskExecution);
         } else {
