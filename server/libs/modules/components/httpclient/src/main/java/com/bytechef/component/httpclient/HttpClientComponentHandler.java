@@ -18,11 +18,9 @@
 package com.bytechef.component.httpclient;
 
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY;
+import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT_TYPE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_PARAMETERS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.DELETE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.FILE_ENTRY;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.FOLLOW_REDIRECT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.FULL_RESPONSE;
@@ -31,7 +29,7 @@ import static com.bytechef.component.httpclient.constants.HttpClientConstants.HE
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HEADER_PARAMETERS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HTTP_CLIENT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.IGNORE_RESPONSE_CODE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.RAW_CONTENT_MIME_TYPE;
+import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT_RAW_MIME_TYPE;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PATCH;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.POST;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PROXY;
@@ -80,13 +78,13 @@ import com.bytechef.hermes.component.utils.HttpClientUtils;
 import com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
+
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -94,9 +92,11 @@ import org.apache.commons.lang3.StringUtils;
 public class HttpClientComponentHandler implements ComponentHandler {
 
     private static final Property<?>[] COMMON_PROPERTIES = {
+
         //
         // General properties
         //
+
         string(URI)
             .label("URI")
             .description("The URI to make the request to")
@@ -127,61 +127,59 @@ public class HttpClientComponentHandler implements ComponentHandler {
             .label("Response Filename")
             .description("The name of the file if the response is returned as a file object.")
             .displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())),
+
         //
         // Header properties
         //
 
-        array(HEADER_PARAMETERS)
+        object(HEADER_PARAMETERS)
             .label("Header Parameters")
             .description("Header parameters to send.")
-            .defaultValue("")
             .placeholder("Add Parameter")
-            .items(object().label("Parameter")
-                .additionalProperties(string())),
+            .additionalProperties(string()),
+
         //
         // Query parameters properties
         //
 
-        array(QUERY_PARAMETERS)
+        object(QUERY_PARAMETERS)
             .label("Query Parameters")
             .description("Query parameters to send.")
-            .defaultValue("")
             .placeholder("Add Parameter")
-            .items(object().label("Parameter")
-                .additionalProperties(string()))
+            .additionalProperties(string())
     };
 
     private static final Property<?>[] BODY_CONTENT_PROPERTIES = new Property[] {
-        object(BODY_PARAMETERS)
-            .label("Body Parameters")
+        object(BODY_CONTENT)
+            .label("JSON")
             .description("Body Parameters to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
             .additionalProperties(oneOf())
             .placeholder("Add Parameter"),
-        object(BODY_PARAMETERS)
+        object(BODY_CONTENT)
             .label("XML")
             .description("XML content to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
             .additionalProperties(oneOf())
             .placeholder("Add Parameter"),
-        object(BODY_PARAMETERS)
-            .label("Body Parameters")
+        object(BODY_CONTENT)
+            .label("Form Data")
             .description("Body parameters to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
             .placeholder("Add Parameter")
             .additionalProperties(oneOf().types(string(), fileEntry())),
-        object(BODY_PARAMETERS)
-            .label("Body Parameters")
+        object(BODY_CONTENT)
+            .label("Form URL-Encoded")
             .description("Body parameters to send.")
-            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_URLENCODED.name()))
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
             .placeholder("Add Parameter")
             .additionalProperties(string()),
-        string(BODY)
-            .label("Body")
+        string(BODY_CONTENT)
+            .label("Raw")
             .description("The raw text to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
-        fileEntry(FILE_ENTRY)
-            .label("File")
+        fileEntry(BODY_CONTENT)
+            .label("Binary")
             .description("The object property which contains a reference to the file to upload.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))
     };
@@ -321,8 +319,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performGet),
             action(POST)
                 .display(display("POST").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
-                    ArrayUtils.addAll(
+                .properties(addAll(
+                    addAll(
                         //
                         // Common properties
                         //
@@ -348,8 +346,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performPost),
             action(PUT)
                 .display(display("PUT").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
-                    ArrayUtils.addAll(
+                .properties(addAll(
+                    addAll(
                         //
                         // Common properties
                         //
@@ -369,8 +367,8 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performPut),
             action(PATCH)
                 .display(display("PATCH").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
-                    ArrayUtils.addAll(
+                .properties(addAll(
+                    addAll(
                         //
                         // Common properties
                         //
@@ -390,7 +388,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performPatch),
             action(DELETE)
                 .display(display("DELETE").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
+                .properties(addAll(
                     //
                     // Common properties
                     //
@@ -405,7 +403,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 .perform(this::performDelete),
             action(HEAD)
                 .display(display("HEAD").description("The request method to use."))
-                .properties(ArrayUtils.addAll(
+                .properties(addAll(
                     //
                     // Common properties
                     //
@@ -430,7 +428,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                     option("None", ""),
                     option("JSON", BodyContentType.JSON.name()),
                     option("Form-Data", BodyContentType.FORM_DATA.name()),
-                    option("Form-Urlencoded", BodyContentType.FORM_URLENCODED.name()),
+                    option("Form-Urlencoded", BodyContentType.FORM_URL_ENCODED.name()),
                     option("Raw", BodyContentType.RAW.name()),
                     option("Binary", BodyContentType.BINARY.name()))
                 .defaultValue("NONE")
@@ -438,7 +436,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
         }
 
         if (includeBodyContentProperties) {
-            properties.add(string(RAW_CONTENT_MIME_TYPE)
+            properties.add(string(BODY_CONTENT_RAW_MIME_TYPE)
                 .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
                 .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
@@ -514,28 +512,41 @@ public class HttpClientComponentHandler implements ComponentHandler {
         return execute(context, executionParameters, HttpClientUtils.RequestMethod.PUT);
     }
 
+    private Property<?>[] addAll(Property<?>[] array1, Property<?>[] array2) {
+        return Stream.concat(Arrays.stream(array1), Arrays.stream(array2))
+            .toArray(size -> new Property<?>[size]);
+    }
+
     private Object execute(
         Context context, ExecutionParameters executionParameters, HttpClientUtils.RequestMethod requestMethod) {
         HttpClientUtils.Payload payload = null;
 
-        BodyContentType bodyContentType = executionParameters.containsKey(BODY_CONTENT_TYPE)
-            ? BodyContentType.valueOf(StringUtils.upperCase(executionParameters.getString(BODY_CONTENT_TYPE)))
-            : null;
+        String bodyContentTypeParameter = executionParameters.getString(BODY_CONTENT_TYPE);
 
-        if (executionParameters.containsKey(BODY_PARAMETERS)) {
-            if (bodyContentType == BodyContentType.FORM_DATA) {
+        BodyContentType bodyContentType = bodyContentTypeParameter == null
+            ? null
+            : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
+
+        if (executionParameters.containsKey(BODY_CONTENT)) {
+            if (bodyContentType == BodyContentType.BINARY) {
+                payload = HttpClientUtils.Payload.of(executionParameters.get(BODY_CONTENT, FileEntry.class));
+            } else if (bodyContentType == BodyContentType.FORM_DATA) {
                 payload = HttpClientUtils.Payload.of(
-                    executionParameters.getMap(BODY_PARAMETERS, List.of(FileEntry.class), Map.of()), bodyContentType);
+                    executionParameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.JSON) {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.RAW) {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getString(BODY_CONTENT),
+                    executionParameters.getString(BODY_CONTENT_RAW_MIME_TYPE, "text/plain"));
             } else {
                 payload = HttpClientUtils.Payload.of(
-                    executionParameters.getMap(BODY_PARAMETERS, Map.of()), bodyContentType);
+                    executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             }
-        } else if (executionParameters.containsKey(BODY)) {
-            payload = HttpClientUtils.Payload.of(
-                executionParameters.getString(BODY),
-                executionParameters.getString(RAW_CONTENT_MIME_TYPE, "text/plain"));
-        } else if (executionParameters.containsKey(FILE_ENTRY)) {
-            payload = HttpClientUtils.Payload.of(executionParameters.get(FILE_ENTRY, FileEntry.class));
         }
 
         return HttpClientUtils.executor()

@@ -18,11 +18,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * PutIntegrationTagsRequestModel
+ * The request object that contains the array of tags.
  */
 
+@Schema(name = "putIntegrationTags_request", description = "The request object that contains the array of tags.")
 @JsonTypeName("putIntegrationTags_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:16:13.209880+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-04T13:43:16.437907+01:00[Europe/Zagreb]")
 public class PutIntegrationTagsRequestModel {
 
   @JsonProperty("tags")

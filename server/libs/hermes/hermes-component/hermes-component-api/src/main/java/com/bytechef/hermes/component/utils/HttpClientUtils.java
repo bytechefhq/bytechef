@@ -50,7 +50,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypes;
 
@@ -65,7 +64,7 @@ public class HttpClientUtils {
     public enum BodyContentType {
         BINARY,
         FORM_DATA,
-        FORM_URLENCODED,
+        FORM_URL_ENCODED,
         JSON,
         RAW,
         XML
@@ -155,7 +154,7 @@ public class HttpClientUtils {
                 }
 
                 bodyPublisher = builder.build();
-            } else if (payload.bodyContentType == BodyContentType.FORM_URLENCODED) {
+            } else if (payload.bodyContentType == BodyContentType.FORM_URL_ENCODED) {
                 Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
 
                 FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
@@ -263,7 +262,7 @@ public class HttpClientUtils {
             if (responseFormat == ResponseFormat.FILE) {
                 String filename = configuration.getFilename();
 
-                if (StringUtils.isEmpty(filename)) {
+                if (filename == null || filename.length() == 0) {
                     Map<String, List<String>> headersMap = httpResponse.headers()
                         .map();
 

@@ -15,10 +15,13 @@
 
 import * as runtime from '../runtime';
 import type {
+  GetIntegrationTags200Response,
   Integration,
   PutIntegrationTagsRequest,
 } from '../models';
 import {
+    GetIntegrationTags200ResponseFromJSON,
+    GetIntegrationTags200ResponseToJSON,
     IntegrationFromJSON,
     IntegrationToJSON,
     PutIntegrationTagsRequestFromJSON,
@@ -119,7 +122,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Get integration tags.
      * Get integration tags.
      */
-    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetIntegrationTags200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -131,14 +134,14 @@ export class IntegrationsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetIntegrationTags200ResponseFromJSON(jsonValue));
     }
 
     /**
      * Get integration tags.
      * Get integration tags.
      */
-    async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+    async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetIntegrationTags200Response> {
         const response = await this.getIntegrationTagsRaw(initOverrides);
         return await response.value();
     }
@@ -265,7 +268,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/integrations/{id}/integration-tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/integrations/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

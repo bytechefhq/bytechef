@@ -1,6 +1,7 @@
 apis/IntegrationsApi.ts
 apis/index.ts
 index.ts
+models/GetIntegrationTags200Response.ts
 models/Integration.ts
 models/PutIntegrationTagsRequest.ts
 models/index.ts

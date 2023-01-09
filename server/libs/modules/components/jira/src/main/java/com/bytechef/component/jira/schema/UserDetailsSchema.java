@@ -24,51 +24,46 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class UserDetailsSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("self").label("Self")
-            .description("The URL of the user.")
-            .required(false),
-        string("name")
-            .label("Name")
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("self").label("Self")
+        .description("The URL of the user.")
+        .required(false),
+        string("name").label("Name")
             .description(
                 "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.")
             .required(false),
-        string("key")
-            .label("Key")
+        string("key").label("Key")
             .description(
                 "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.")
             .required(false),
-        string("accountId")
-            .label("AccountId")
+        string("accountId").label("AccountId")
             .description(
                 "The account ID of the user, which uniquely identifies the user across all Atlassian products. For example, *5b10ac8d82e05b22cc7d4ef5*.")
             .required(false),
-        string("emailAddress")
-            .label("EmailAddress")
+        string("emailAddress").label("EmailAddress")
             .description(
                 "The email address of the user. Depending on the user’s privacy settings, this may be returned as null.")
             .required(false),
-        object("avatarUrls")
-            .properties(AvatarUrlsBeanSchema.COMPONENT_SCHEMA)
+        object("avatarUrls").properties(AvatarUrlsBeanSchema.COMPONENT_SCHEMA)
             .label("AvatarUrls")
             .required(false),
-        string("displayName")
-            .label("DisplayName")
+        string("displayName").label("DisplayName")
             .description(
                 "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.")
             .required(false),
-        bool("active")
-            .label("Active")
+        bool("active").label("Active")
             .description("Whether the user is active.")
             .required(false),
-        string("timeZone")
-            .label("TimeZone")
+        string("timeZone").label("TimeZone")
             .description(
                 "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.")
             .required(false),
-        string("accountType")
-            .label("AccountType")
+        string("accountType").label("AccountType")
             .description(
                 "The type of account represented by this user. This will be one of 'atlassian' (normal users), 'app' (application user) or 'customer' (Jira Service Desk customer user)")
             .required(false));

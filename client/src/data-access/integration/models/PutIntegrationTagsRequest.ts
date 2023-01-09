@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * 
+ * The request object that contains the array of tags.
  * @export
  * @interface PutIntegrationTagsRequest
  */

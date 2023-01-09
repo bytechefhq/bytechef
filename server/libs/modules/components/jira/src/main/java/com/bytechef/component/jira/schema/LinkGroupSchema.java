@@ -25,23 +25,25 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class LinkGroupSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        string("id").label("Id")
-            .required(false),
+    public static final List<Property> COMPONENT_SCHEMA = List.of(string("id").label("Id")
+        .required(false),
         string("styleClass").label("StyleClass")
             .required(false),
-        object("header")
-            .properties(SimpleLinkSchema.COMPONENT_SCHEMA)
+        object("header").properties(SimpleLinkSchema.COMPONENT_SCHEMA)
             .label("Header")
             .description("Details about the operations available in this version.")
             .required(false),
         integer("weight").label("Weight")
             .required(false),
-        array("links")
-            .items(object(null)
-                .properties(SimpleLinkSchema.COMPONENT_SCHEMA)
-                .description("Details about the operations available in this version."))
+        array("links").items(object(null).properties(SimpleLinkSchema.COMPONENT_SCHEMA)
+            .description("Details about the operations available in this version."))
+            .placeholder("Add")
             .label("Links")
             .required(false));
 }

@@ -22,9 +22,15 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 
+/**
+ * Provides schema definition.
+ *
+ * @generated
+ */
 public class IssueUpdateMetadataSchema {
-    public static final List<Property> COMPONENT_SCHEMA = List.of(
-        object("fields").additionalProperties(object())
+    public static final List<Property> COMPONENT_SCHEMA = List
+        .of(object("fields").additionalProperties(object().properties(FieldMetadataSchema.COMPONENT_SCHEMA))
+            .placeholder("Add")
             .label("Fields")
             .required(false));
 }

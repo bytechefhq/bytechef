@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:16:13.209880+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-04T13:43:16.437907+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "the integrations API")
 public interface IntegrationsApi {
@@ -231,7 +231,7 @@ public interface IntegrationsApi {
 
 
     /**
-     * PUT /integrations/{id}/integration-tags : Updates tags of an existing integration.
+     * PUT /integrations/{id}/tags : Updates tags of an existing integration.
      * Updates tags of an existing integration.
      *
      * @param id The id of the integration. (required)
@@ -248,7 +248,7 @@ public interface IntegrationsApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/integrations/{id}/integration-tags",
+        value = "/integrations/{id}/tags",
         consumes = { "application/json" }
     )
     default Mono<ResponseEntity<Void>> putIntegrationTags(

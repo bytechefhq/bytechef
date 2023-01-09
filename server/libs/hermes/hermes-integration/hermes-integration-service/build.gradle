@@ -1,7 +1,6 @@
 dependencies {
     api project(":server:libs:hermes:hermes-integration:hermes-integration-api")
 
-    implementation libs.commons.collections4
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-tx"
     implementation "org.springframework.data:spring-data-jdbc"

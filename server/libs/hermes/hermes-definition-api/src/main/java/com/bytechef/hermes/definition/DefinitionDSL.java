@@ -322,7 +322,7 @@ public class DefinitionDSL {
         private String category;
         private String description;
         private String icon;
-        private String label;
+        private final String label;
         private String subtitle;
         private String[] tags;
 
@@ -621,7 +621,8 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object[], ModifiableArrayProperty, ArrayProperty>
             implements Property.ArrayProperty {
 
-            protected List<Property<?>> items;
+            private List<Property<?>> items;
+            private Boolean multipleValues; // default true
 
             private ModifiableArrayProperty(String name) {
                 super(name, Type.ARRAY);
@@ -719,9 +720,20 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableArrayProperty multipleValues(boolean multipleValues) {
+                this.multipleValues = multipleValues;
+
+                return this;
+            }
+
             @Override
             public List<Property<?>> getItems() {
                 return items;
+            }
+
+            @Override
+            public Boolean getMultipleValues() {
+                return multipleValues;
             }
         }
 
@@ -842,7 +854,7 @@ public class DefinitionDSL {
         public static final class ModifiableNullProperty
             extends ModifiableProperty<ModifiableNullProperty, NullProperty> implements Property.NullProperty {
 
-            protected ModifiableNullProperty(String name) {
+            private ModifiableNullProperty(String name) {
                 super(name, Type.NULL);
             }
         }
@@ -947,7 +959,8 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object, ModifiableObjectProperty, ObjectProperty>
             implements Property.ObjectProperty {
 
-            private List<Property<?>> additionalProperties;
+            private List<? extends Property<?>> additionalProperties;
+            private Boolean multipleValues; // default true
             private String objectType;
             private List<? extends Property<?>> properties;
 
@@ -975,6 +988,23 @@ public class DefinitionDSL {
                 return this;
             }
 
+            @SuppressWarnings("rawtypes")
+            public ModifiableObjectProperty additionalProperties(List<Property> additionalProperties) {
+                if (additionalProperties != null) {
+                    this.additionalProperties = additionalProperties.stream()
+                        .map(property -> (Property<?>) property)
+                        .toList();
+                }
+
+                return this;
+            }
+
+            public ModifiableObjectProperty multipleValues(boolean multipleValues) {
+                this.multipleValues = multipleValues;
+
+                return this;
+            }
+
             public ModifiableObjectProperty objectType(String objectType) {
                 this.objectType = objectType;
 
@@ -989,7 +1019,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("rawtypes")
             public ModifiableObjectProperty properties(List<Property> properties) {
                 if (properties != null) {
                     this.properties = properties.stream()
@@ -1001,8 +1031,12 @@ public class DefinitionDSL {
             }
 
             @Override
-            public List<Property<?>> getAdditionalProperties() {
-                return additionalProperties;
+            public List<? extends Property<?>> getAdditionalProperties() {
+                return additionalProperties == null ? null : new ArrayList<>(additionalProperties);
+            }
+
+            public Boolean getMultipleValues() {
+                return multipleValues;
             }
 
             @Override

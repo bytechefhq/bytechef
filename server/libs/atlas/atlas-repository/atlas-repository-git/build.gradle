@@ -1,7 +1,6 @@
 dependencies {
     api project(":server:libs:atlas:atlas-repository:atlas-repository-api")
 
-    implementation libs.commons.io
     implementation "org.eclipse.jgit:org.eclipse.jgit"
     implementation "org.springframework:spring-core"
     implementation "org.springframework.boot:spring-boot-autoconfigure"

@@ -14,7 +14,7 @@ export const IntegrationItem: React.FC<{
 }> = ({id, name, status, category, tags, date}) => {
     return (
         <div>
-            <Header name={name} status={status} dropdownTrigger={id} />
+            <Header id={id} name={name} status={status} />
             <Footer category={category} tags={tags} date={date} />
         </div>
     );

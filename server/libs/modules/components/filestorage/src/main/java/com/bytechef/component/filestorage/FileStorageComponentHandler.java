@@ -29,7 +29,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static org.apache.commons.io.IOUtils.copy;
 
 import com.bytechef.component.filestorage.constants.FileStorageConstants;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -43,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -174,7 +174,7 @@ public class FileStorageComponentHandler implements ComponentHandler {
             report();
         }
 
-        void report() {
+        private void report() {
             if (totalSize != -1 && totalSize != -0) {
                 long time = System.currentTimeMillis();
 
@@ -191,5 +191,17 @@ public class FileStorageComponentHandler implements ComponentHandler {
                 }
             }
         }
+    }
+
+    private long copy(final InputStream inputStream, final OutputStream outputStream) throws IOException {
+        byte[] buffer = new byte[8192];
+        long count = 0;
+        int n;
+
+        while (-1 != (n = inputStream.read(buffer))) {
+            outputStream.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
     }
 }
