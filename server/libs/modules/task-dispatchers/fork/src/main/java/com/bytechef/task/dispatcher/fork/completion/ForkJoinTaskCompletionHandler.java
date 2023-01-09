@@ -119,8 +119,11 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < branchWorkflowTasks.size()) {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
-            TaskExecution branchTaskExecution = new TaskExecution(
-                WorkflowTask.of(Map.of(BRANCH, branch), branchWorkflowTasks.get(taskExecution.getTaskNumber())));
+            WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(taskExecution.getTaskNumber());
+
+            branchWorkflowTask.put(BRANCH, branch);
+
+            TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask);
 
             branchTaskExecution.setJobId(taskExecution.getJobId());
             branchTaskExecution.setParentId(taskExecution.getParentId());
@@ -131,7 +134,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             Map<String, Object> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);
 
-            branchTaskExecution.evaluate(taskEvaluator, context);
+            branchTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 

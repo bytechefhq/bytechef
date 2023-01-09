@@ -102,7 +102,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
-            subTaskExecution.evaluate(taskEvaluator, newContext);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, newContext);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 

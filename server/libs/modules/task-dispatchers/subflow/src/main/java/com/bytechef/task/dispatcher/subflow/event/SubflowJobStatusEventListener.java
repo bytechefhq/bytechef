@@ -107,8 +107,8 @@ public class SubflowJobStatusEventListener implements EventListener {
                         completionTaskExecution.setOutput(output);
                     } else {
                         // TODO check, it seems wrong
-                        completionTaskExecution.evaluate(
-                            taskEvaluator, Map.of("execution", Map.of("output", output)));
+                        completionTaskExecution = taskEvaluator.evaluate(
+                            completionTaskExecution, Map.of("execution", Map.of("output", output)));
                     }
 
                     coordinatorManager.complete(completionTaskExecution);
