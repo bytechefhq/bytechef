@@ -114,14 +114,14 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
                 ifTaskExecution.getJobId(), ifTaskExecution.getId(), ifTaskExecution.getPriority(),
                 taskExecution.getTaskNumber() + 1, subWorkflowTask);
 
-            subTaskExecution = taskExecutionService.create(subTaskExecution);
-
             Map<String, Object> context = contextService.peek(
                 ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
-
             subTaskExecution.evaluate(taskEvaluator, context);
+
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         }

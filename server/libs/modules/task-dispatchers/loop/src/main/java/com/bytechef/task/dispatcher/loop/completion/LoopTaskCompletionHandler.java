@@ -103,8 +103,6 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 loopTaskExecution.getJobId(), loopTaskExecution.getId(), loopTaskExecution.getPriority(),
                 taskExecution.getTaskNumber() + 1, new WorkflowTask(iteratee));
 
-            subTaskExecution = taskExecutionService.create(subTaskExecution);
-
             Map<String, Object> newContext = new HashMap<>(
                 contextService.peek(loopTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
@@ -118,9 +116,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
                 taskExecution.getTaskNumber());
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
-
             subTaskExecution.evaluate(taskEvaluator, newContext);
+
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
