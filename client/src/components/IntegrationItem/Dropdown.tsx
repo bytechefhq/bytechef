@@ -8,6 +8,7 @@ import {
     Trigger,
 } from '@radix-ui/react-dropdown-menu';
 import {DotsHorizontalIcon} from '@radix-ui/react-icons';
+import './dropdown.css';
 
 export const Dropdown: React.FC<{
     id: string;
@@ -19,7 +20,7 @@ export const Dropdown: React.FC<{
             </Trigger>
 
             <Portal>
-                <Content className="DropdownMenuContent" sideOffset={5}>
+                <Content className="DropdownMenuContent" id={id} sideOffset={5}>
                     <Item className="DropdownMenuItem">Edit</Item>
 
                     <Item className="DropdownMenuItem">Enable</Item>

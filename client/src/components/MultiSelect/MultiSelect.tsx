@@ -1,23 +1,15 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import cx from 'classnames';
-import Select from 'react-select';
-import React from 'react';
+import CreatableSelect from 'react-select/creatable';
 import './MultiSelect.css';
 
 type MultiSelectProps = {
     label: string;
     name: string;
-    options: {label: string; value: string}[];
     error?: string | undefined;
 };
 
-const MultiSelect = ({
-    label,
-    name,
-    options,
-    error,
-    ...props
-}: MultiSelectProps) => (
+const MultiSelect = ({error, label, name, ...props}: MultiSelectProps) => (
     <fieldset>
         <label
             htmlFor={name}
@@ -32,10 +24,9 @@ const MultiSelect = ({
                 error ? 'relative rounded-md shadow-sm' : null,
             ])}
         >
-            <Select
+            <CreatableSelect
                 classNamePrefix="react-select"
-                options={options}
-                isMulti={true}
+                isMulti
                 {...props}
             />
 

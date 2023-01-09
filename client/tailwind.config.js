@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
+const plugin = require('tailwindcss/plugin');
+
 module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
     darkMode: 'class',
@@ -145,6 +147,10 @@ module.exports = {
                     'toast-slide-in-bottom 150ms cubic-bezier(0.16, 1, 0.3, 1)',
                 'toast-swipe-out': 'toast-swipe-out 100ms ease-out forwards',
             },
+            gridColumn: {
+                'span-24': 'span 24 / span 24',
+                24: '24 / 24',
+            },
         },
     },
     variants: {
@@ -154,5 +160,12 @@ module.exports = {
         require('@headlessui/tailwindcss'),
         require('@tailwindcss/forms'),
         require('tailwindcss-radix'),
+        plugin(function ({addBase, theme}) {
+            addBase({
+                h1: {fontSize: theme('fontSize.2xl')},
+                h2: {fontSize: theme('fontSize.xl')},
+                h3: {fontSize: theme('fontSize.lg')},
+            });
+        }),
     ],
 };

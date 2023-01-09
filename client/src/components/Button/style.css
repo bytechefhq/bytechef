@@ -30,6 +30,6 @@
     }
 
     .btn-icon {
-        @apply shadow-none items-center justify-center text-black hover:bg-gray-100;
+        @apply shadow-none items-center justify-center text-black hover:bg-transparent  hover:text-teal-500;
     }
 }
