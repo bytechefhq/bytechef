@@ -125,7 +125,7 @@ const IntegrationModal: React.FC = () => {
                     setIntegrationData({
                         ...integrationData,
                         // @ts-expect-error expects an Array<Tag> but receives a single Tag
-                        tags: newTag,
+                        tags: [...integrationData.tags, newTag],
                     });
 
                     setTagsInputValue(newTag);
