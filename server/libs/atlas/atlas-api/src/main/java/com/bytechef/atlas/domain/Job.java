@@ -25,7 +25,6 @@ import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapListWrapper;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
@@ -114,7 +113,6 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     private Status status;
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     @Column
@@ -261,6 +259,10 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     /**
