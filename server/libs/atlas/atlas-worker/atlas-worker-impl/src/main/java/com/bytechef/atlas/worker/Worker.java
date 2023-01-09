@@ -19,7 +19,6 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
@@ -39,6 +38,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Worker {
 
-    private final Map<String, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
+    private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
     private final TaskEvaluator taskEvaluator;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -109,9 +109,9 @@ public class Worker {
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
-                TaskExecutionFuture<?> myFuture = taskExecutions.get(taskExecution.getId());
+                TaskExecutionFuture<?> taskExecutionFuture = taskExecutions.get(taskExecution.getId());
 
-                if (myFuture == null || !myFuture.isCancelled()) {
+                if (taskExecutionFuture == null || !taskExecutionFuture.isCancelled()) {
                     handleException(taskExecution, e);
                 }
             } finally {
@@ -146,7 +146,7 @@ public class Worker {
         logger.debug("received control task: {}", controlTask);
 
         if (CancelControlTask.TYPE_CANCEL.equals(controlTask.getType())) {
-            String jobId = ((CancelControlTask) controlTask).getJobId();
+            Long jobId = ((CancelControlTask) controlTask).getJobId();
 
             for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutions.values()) {
                 if (Objects.equals(taskExecutionFuture.taskExecution.getJobId(), jobId)) {
@@ -158,12 +158,12 @@ public class Worker {
         }
     }
 
-    Map<String, TaskExecutionFuture<?>> getTaskExecutions() {
+    Map<Long, TaskExecutionFuture<?>> getTaskExecutions() {
         return Collections.unmodifiableMap(taskExecutions);
     }
 
     private TaskExecution doExecuteTask(TaskExecution taskExecution) throws Exception {
-        Context context = new Context();
+        Map<String, Object> context = new HashMap<>();
 
         try {
             long startTime = System.currentTimeMillis();
@@ -173,7 +173,7 @@ public class Worker {
             // pre tasks
             executeSubTasks(taskExecution, taskExecution.getPre(), context);
 
-            taskExecution.evaluate(taskEvaluator, context);
+            taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
@@ -183,10 +183,10 @@ public class Worker {
                 taskExecution.setOutput(output);
             }
 
-            taskExecution.setStatus(TaskStatus.COMPLETED);
-            taskExecution.setProgress(100);
             taskExecution.setEndTime(LocalDateTime.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
+            taskExecution.setProgress(100);
+            taskExecution.setStatus(TaskStatus.COMPLETED);
 
             // post tasks
             executeSubTasks(taskExecution, taskExecution.getPost(), context);
@@ -198,12 +198,14 @@ public class Worker {
         }
     }
 
-    private void executeSubTasks(TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Context context)
+    private void executeSubTasks(
+        TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Map<String, Object> context)
         throws Exception {
+
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
             TaskExecution subTaskExecution = TaskExecution.of(taskExecution.getJobId(), subWorkflowTask);
 
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
             TaskExecution completionTaskExecution = doExecuteTask(subTaskExecution);
 

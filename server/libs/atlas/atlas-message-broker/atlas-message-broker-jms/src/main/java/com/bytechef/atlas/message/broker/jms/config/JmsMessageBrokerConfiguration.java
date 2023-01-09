@@ -72,15 +72,18 @@ public class JmsMessageBrokerConfiguration
     JmsMessageBroker jmsMessageBroker(JmsTemplate aJmsTemplate) {
         JmsMessageBroker jmsMessageBroker = new JmsMessageBroker();
         jmsMessageBroker.setJmsTemplate(aJmsTemplate);
+
         return jmsMessageBroker;
     }
 
     @Bean
-    public MessageConverter jacksonJmsMessageConverter(ObjectMapper aObjectMapper) {
+    public MessageConverter jacksonJmsMessageConverter(ObjectMapper objectMapper) {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-        converter.setObjectMapper(aObjectMapper);
+
+        converter.setObjectMapper(objectMapper);
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
+
         return converter;
     }
 
@@ -88,7 +91,9 @@ public class JmsMessageBrokerConfiguration
     public JmsListenerContainerFactory<?> jmsListenerContainerFactory(
         ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+
         configurer.configure(factory, connectionFactory);
+
         return factory;
     }
 
@@ -102,22 +107,14 @@ public class JmsMessageBrokerConfiguration
 
     @Override
     public void registerListenerEndpoint(
-        JmsListenerEndpointRegistrar listenerEndpointRegistrar,
-        String queueName,
-        int concurrency,
-        Object delegate,
+        JmsListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
 
         if (Objects.equals(queueName, Queues.CONTROL)) {
             queueName = Exchanges.CONTROL + "/" + Exchanges.CONTROL;
         }
 
-        logger.info(
-            "Registring JMS Listener: {} -> {}:{}",
-            queueName,
-            delegate.getClass()
-                .getName(),
-            methodName);
+        logger.info("Registering JMS Listener: {} -> {}:{}", queueName, delegate.getClass(), methodName);
 
         MessageListenerAdapter messageListener = new NoReplyMessageListenerAdapter(delegate);
 
@@ -135,8 +132,10 @@ public class JmsMessageBrokerConfiguration
 
     private DefaultJmsListenerContainerFactory createContainerFactory(int aConcurrency) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+
         factory.setConcurrency(String.valueOf(aConcurrency));
         factory.setConnectionFactory(connectionFactory);
+
         return factory;
     }
 

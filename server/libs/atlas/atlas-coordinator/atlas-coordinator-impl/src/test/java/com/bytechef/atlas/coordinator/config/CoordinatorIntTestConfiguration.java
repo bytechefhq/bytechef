@@ -18,6 +18,8 @@
 package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.config.WorkflowConfiguration;
+import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -51,6 +54,14 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 })
 @SpringBootConfiguration
 public class CoordinatorIntTestConfiguration {
+
+    @MockBean
+    private EventPublisher eventPublisher;
+
+    @Bean
+    SyncMessageBroker messageBroker() {
+        return new SyncMessageBroker();
+    }
 
     @EnableCaching
     @TestConfiguration

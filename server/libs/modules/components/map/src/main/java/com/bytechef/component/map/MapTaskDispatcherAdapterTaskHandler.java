@@ -38,6 +38,8 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,6 +60,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public List<?> handle(TaskExecution taskExecution) {
         List<Object> result = new ArrayList<>();
 
@@ -88,13 +91,13 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             .withTaskEvaluator(taskEvaluator)
             .build();
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
-
-        contextService.push(taskExecution.getId(), new Context());
-
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
 
-        taskExecutionService.create(taskExecution);
+        taskExecution = taskExecutionService.create(taskExecution);
+
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+
+        contextService.push(taskExecution.getId(), Context.Classname.TASK_EXECUTION, Collections.emptyMap());
 
         MapTaskDispatcher dispatcher = MapTaskDispatcher.builder()
             .contextService(contextService)

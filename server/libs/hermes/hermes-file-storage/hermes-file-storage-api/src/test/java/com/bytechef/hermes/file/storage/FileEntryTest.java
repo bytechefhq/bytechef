@@ -19,7 +19,6 @@ package com.bytechef.hermes.file.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -54,13 +53,13 @@ public class FileEntryTest {
 
     @Test
     public void testSpelEvaluation() {
-        TaskEvaluator evaluator = TaskEvaluator.create();
+        TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
 
-        taskExecution.evaluate(
-            evaluator,
-            new Context(Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt"))));
+        taskEvaluator.evaluate(
+            taskExecution,
+            Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt")));
 
         assertEquals(
             "sample.txt /tmp/fileName.txt", MapUtils.getString(taskExecution.getParameters(), "result"));

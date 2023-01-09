@@ -27,6 +27,8 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,8 +53,25 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    public boolean canHandle(TaskExecution taskExecution) {
+        Long parentId = taskExecution.getParentId();
+
+        if (parentId != null) {
+            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
+
+            String type = parentExecution.getType();
+
+            return type.equals(MAP + "/v" + VERSION_1);
+        }
+        return false;
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+        taskExecution.setStatus(TaskStatus.COMPLETED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         long subtasksLeft = counterService.decrement(taskExecution.getParentId());
 
@@ -71,16 +90,5 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
             taskCompletionHandler.handle(mapTaskExecution);
             counterService.delete(taskExecution.getParentId());
         }
-    }
-
-    @Override
-    public boolean canHandle(TaskExecution aTaskExecution) {
-        String parentId = aTaskExecution.getParentId();
-        if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
-            return parentExecution.getType()
-                .equals(MAP + "/v" + VERSION_1);
-        }
-        return false;
     }
 }

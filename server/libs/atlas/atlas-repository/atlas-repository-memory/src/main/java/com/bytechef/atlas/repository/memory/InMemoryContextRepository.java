@@ -25,6 +25,8 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
+
 import org.springframework.util.Assert;
 
 /**
@@ -33,12 +35,9 @@ import org.springframework.util.Assert;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
-    private final Map<String, Deque<Map<String, Object>>> contexts = new HashMap<>();
+    private static final Random RANDOM = new Random();
 
-    @Override
-    public void deleteById(String id) {
-        contexts.remove(id);
-    }
+    private final Map<String, Deque<Map<String, Object>>> contexts = new HashMap<>();
 
     @Override
     public Iterable<Context> findAll() {
@@ -50,8 +49,19 @@ public class InMemoryContextRepository implements ContextRepository {
     }
 
     @Override
-    public Context findTop1ByStackIdOrderByCreatedDateDesc(String stackId) {
-        Deque<Map<String, Object>> linkedList = contexts.get(stackId);
+    public Context findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
+        Deque<Map<String, Object>> linkedList = contexts.get(getKey(stackId, null, classnameId));
+
+        Assert.notNull(linkedList, "unknown stack: " + stackId);
+
+        return new Context(linkedList.peek());
+    }
+
+    @Override
+    public Context findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+        long stackId, int subStackId, int classnameId) {
+        Deque<Map<String, Object>> linkedList = contexts.get(getKey(stackId, subStackId, classnameId));
+
         Assert.notNull(linkedList, "unknown stack: " + stackId);
 
         return new Context(linkedList.peek());
@@ -59,16 +69,19 @@ public class InMemoryContextRepository implements ContextRepository {
 
     @Override
     public Context save(Context context) {
-        Deque<Map<String, Object>> stack = contexts.get(context.getStackId());
+        Deque<Map<String, Object>> stack = contexts.computeIfAbsent(
+            getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId()), k -> new LinkedList<>());
 
-        if (stack == null) {
-            stack = new LinkedList<>();
-
-            contexts.put(context.getStackId(), stack);
+        if (context.isNew()) {
+            context.setId(RANDOM.nextLong());
         }
 
         stack.push(context.getValue());
 
         return context;
+    }
+
+    private static String getKey(long stackId, Integer subStackId, int classnameId) {
+        return "" + stackId + subStackId + classnameId;
     }
 }

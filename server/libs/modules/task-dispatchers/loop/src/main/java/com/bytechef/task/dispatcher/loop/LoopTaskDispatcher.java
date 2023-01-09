@@ -43,6 +43,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -82,26 +83,30 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         List<Object> list = MapUtils.getList(
             taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
+        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         if (loopForever || !list.isEmpty()) {
             TaskExecution subTaskExecution = TaskExecution.of(
                 taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
                 new WorkflowTask(iteratee));
 
-            Context context = contextService.peek(taskExecution.getId());
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             if (!list.isEmpty()) {
-                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
             }
 
-            context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
+            newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
-            contextService.push(subTaskExecution.getId(), context);
-
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, newContext);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

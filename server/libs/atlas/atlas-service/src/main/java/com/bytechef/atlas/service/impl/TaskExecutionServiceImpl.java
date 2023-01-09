@@ -23,9 +23,7 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.lang.NonNull;
@@ -49,72 +47,49 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     public TaskExecution create(TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null.");
 
-        taskExecution.setNew(true);
+        taskExecution.setId(null);
 
         return taskExecutionRepository.save(taskExecution);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TaskExecution getTaskExecution(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
-
+    public TaskExecution getTaskExecution(long id) {
         return taskExecutionRepository.findById(id)
             .orElseThrow();
     }
 
     @Override
-    public List<TaskExecution> getJobTaskExecutions(@NonNull String jobId) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
-
+    public List<TaskExecution> getJobTaskExecutions(long jobId) {
         return taskExecutionRepository.findAllByJobRefOrderByCreatedDate(
             new AggregateReference.IdOnlyAggregateReference<>(jobId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskExecution> getParentTaskExecutions(@NonNull String parentId) {
-        Assert.notNull(parentId, "'parentId' must not be null.");
-
+    public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return taskExecutionRepository.findAllByParentRef(new AggregateReference.IdOnlyAggregateReference<>(parentId));
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public TaskExecution update(@NonNull TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null.");
 
-        Optional<TaskExecution> currentTaskExecutionOptional = taskExecutionRepository
-            .findByIdForUpdate(taskExecution.getId());
+        TaskExecution currentTaskExecution = taskExecutionRepository.findByIdForUpdate(taskExecution.getId())
+            .orElseThrow();
 
-        if (currentTaskExecutionOptional.isPresent()) {
-            TaskExecution currentTaskExecution = currentTaskExecutionOptional.get();
+        TaskStatus currentTaskStatus = currentTaskExecution.getStatus();
+        TaskStatus taskStatus = taskExecution.getStatus();
 
-            TaskStatus taskStatus = currentTaskExecution.getStatus();
+        if (currentTaskStatus.isTerminated() && taskStatus == TaskStatus.STARTED) {
+            currentTaskExecution.setStartTime(taskExecution.getStartTime());
 
-            if (taskStatus.isTerminated() && taskExecution.getStatus() == TaskStatus.STARTED) {
-                taskExecution = currentTaskExecution;
-
-                taskExecution.setStartTime(taskExecution.getStartTime());
-            } else if (taskStatus.isTerminated() && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
-                taskExecution.setStartTime(currentTaskExecution.getStartTime());
-            }
+            taskExecution = currentTaskExecution;
+        } else if (taskStatus.isTerminated() && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
+            taskExecution.setStartTime(currentTaskExecution.getStartTime());
         }
 
         return taskExecutionRepository.save(taskExecution);
-    }
-
-    @Override
-    public void updateStatus(
-        @NonNull String id, @NonNull TaskStatus taskStatus, LocalDateTime startTime, LocalDateTime endTime) {
-
-        if (startTime == null && endTime == null) {
-            taskExecutionRepository.updateStatus(id, taskStatus);
-        } else if (startTime != null) {
-            taskExecutionRepository.updateStatusAndStartTime(id, taskStatus, startTime);
-        } else if (endTime != null) {
-            taskExecutionRepository.updateStatusAndEndTime(id, taskStatus, endTime);
-        } else {
-            throw new IllegalArgumentException();
-        }
     }
 }

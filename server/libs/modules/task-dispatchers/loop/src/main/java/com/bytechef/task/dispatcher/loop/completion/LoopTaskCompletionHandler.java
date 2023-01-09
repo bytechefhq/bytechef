@@ -41,6 +41,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,13 +71,14 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        String parentId = taskExecution.getParentId();
+        Long parentId = taskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType()
-                .equals(LOOP + "/v" + VERSION_1);
+            String type = parentExecution.getType();
+
+            return type.equals(LOOP + "/v" + VERSION_1);
         }
 
         return false;
@@ -87,7 +89,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.update(taskExecution);
+        taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
@@ -98,29 +100,27 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
             TaskExecution subTaskExecution = TaskExecution.of(
-                loopTaskExecution.getJobId(),
-                loopTaskExecution.getId(),
-                loopTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1,
-                new WorkflowTask(iteratee));
+                loopTaskExecution.getJobId(), loopTaskExecution.getId(), loopTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1, new WorkflowTask(iteratee));
 
-            Context context = contextService.peek(loopTaskExecution.getId());
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(loopTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             if (!list.isEmpty()) {
-                context.put(
+                newContext.put(
                     MapUtils.getString(loopTaskExecution.getParameters(), ITEM_VAR, ITEM),
                     list.get(taskExecution.getTaskNumber()));
             }
 
-            context.put(
+            newContext.put(
                 MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
                 taskExecution.getTaskNumber());
 
-            contextService.push(subTaskExecution.getId(), context);
-
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, newContext);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

@@ -19,6 +19,7 @@ package com.bytechef.atlas.domain;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -26,13 +27,12 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
 @Table
-public final class Counter implements Persistable<String> {
+public final class Counter implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")
@@ -43,7 +43,7 @@ public final class Counter implements Persistable<String> {
     private LocalDateTime createdDate;
 
     @Id
-    private String id;
+    private Long id;
 
     @Transient
     private boolean isNew;
@@ -53,10 +53,7 @@ public final class Counter implements Persistable<String> {
     public Counter() {
     }
 
-    public Counter(String id, Long value) {
-        Assert.notNull(id, "'id' must not be null.");
-        Assert.notNull(value, "'value' must not be null.");
-
+    public Counter(long id, long value) {
         this.id = id;
         this.value = value;
     }
@@ -89,7 +86,7 @@ public final class Counter implements Persistable<String> {
         return createdDate;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -102,7 +99,7 @@ public final class Counter implements Persistable<String> {
         return isNew;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

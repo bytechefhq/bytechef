@@ -44,14 +44,12 @@ public class JdbcContextRepositoryIntTest {
 
     @Test
     public void testFindByStackId() {
-        Context context = new Context();
-
-        context.setStackId("1");
-        context.setValue(Map.of("key", "value"));
+        Context context = new Context(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value"));
 
         context = contextRepository.save(context);
 
-        Context resultContext = contextRepository.findTop1ByStackIdOrderByCreatedDateDesc("1");
+        Context resultContext = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
+            1L, Context.Classname.TASK_EXECUTION.getId());
 
         Assertions.assertEquals(context.getValue(), resultContext.getValue());
     }

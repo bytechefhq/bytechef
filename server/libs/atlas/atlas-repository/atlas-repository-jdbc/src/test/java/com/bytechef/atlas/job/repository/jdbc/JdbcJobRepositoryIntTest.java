@@ -73,7 +73,6 @@ public class JdbcJobRepositoryIntTest {
             .orElseThrow();
 
         resultJob.setId(null);
-        resultJob.setNew(true);
         resultJob.setStatus(Job.Status.FAILED);
 
         // test immutability
@@ -95,7 +94,6 @@ public class JdbcJobRepositoryIntTest {
 
         job.setEndTime(Date.from(Instant.now()
             .minus(1, DAYS)));
-        job.setNew(false);
 
         jobRepository.save(job);
 
@@ -103,7 +101,6 @@ public class JdbcJobRepositoryIntTest {
             Job completedJobToday = jobRepository.save(getJob(Job.Status.COMPLETED));
 
             completedJobToday.setEndTime(new Date());
-            completedJobToday.setNew(false);
 
             jobRepository.save(completedJobToday);
         }
@@ -111,7 +108,6 @@ public class JdbcJobRepositoryIntTest {
         Job runningJobToday = new Job();
 
         runningJobToday.setStatus(Job.Status.STARTED);
-        runningJobToday.setNew(true);
         runningJobToday.setWorkflowId("demo:1234");
 
         jobRepository.save(runningJobToday);
@@ -132,27 +128,24 @@ public class JdbcJobRepositoryIntTest {
 
             completedJobYesterday.setEndTime(Date.from(Instant.now()
                 .minus(1, DAYS)));
-            completedJobYesterday.setNew(false);
 
             jobRepository.save(completedJobYesterday);
         }
 
         Job runningJobYesterday = jobRepository.save(getJob(Job.Status.STARTED));
 
-        runningJobYesterday.setNew(false);
-
         jobRepository.save(runningJobYesterday);
 
         Job completedJobToday = new Job();
 
-        completedJobToday.setNew(true);
+        completedJobToday.setId(null);
         completedJobToday.setStatus(Job.Status.COMPLETED);
         completedJobToday.setWorkflowId("demo:1234");
 
         completedJobToday = jobRepository.save(completedJobToday);
 
         completedJobToday.setEndTime(new Date());
-        completedJobToday.setNew(false);
+        completedJobToday.setId(null);
 
         jobRepository.save(completedJobToday);
 
@@ -166,7 +159,6 @@ public class JdbcJobRepositoryIntTest {
     private static Job getJob(Job.Status status) {
         Job job = new Job();
 
-        job.setNew(true);
         job.setStatus(status);
         job.setWorkflowId("demo:1234");
 

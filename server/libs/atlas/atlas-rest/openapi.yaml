@@ -51,7 +51,8 @@ paths:
                 type: object
                 properties:
                   jobId:
-                    type: string
+                    type: integer
+                    format: int64
   /jobs/latest:
     get:
       description: Get the latest job.
@@ -79,7 +80,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: The job.
@@ -100,7 +102,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: Successful operation.
@@ -117,7 +120,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: Successful operation.
@@ -134,7 +138,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: List of task executions.
@@ -157,7 +162,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         "200":
           description: The task execution.
@@ -360,7 +366,8 @@ components:
           readOnly: true
         parentTaskExecutionId:
           description: The id of the parent task that created this job. Required for sub-flows.
-          type: string
+          type: integer
+          format: int64
           readOnly: true
         priority:
           description: The priority value.

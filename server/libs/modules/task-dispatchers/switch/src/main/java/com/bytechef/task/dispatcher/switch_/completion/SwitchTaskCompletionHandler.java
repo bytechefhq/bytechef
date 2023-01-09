@@ -40,6 +40,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,13 +75,14 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        String parentId = taskExecution.getParentId();
+        Long parentId = taskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType()
-                .equals(SWITCH + "/v" + VERSION_1);
+            String type = parentExecution.getType();
+
+            return type.equals(SWITCH + "/v" + VERSION_1);
         }
 
         return false;
@@ -89,16 +91,19 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+        taskExecution.setStatus(TaskStatus.COMPLETED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution switchTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context newContext = contextService.peek(switchTaskExecution.getId());
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextService.push(switchTaskExecution.getId(), newContext);
+            contextService.push(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
         }
 
         List<WorkflowTask> subWorkflowTasks = resolveCase(switchTaskExecution);
@@ -107,19 +112,17 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution subTaskExecution = TaskExecution.of(
-                switchTaskExecution.getJobId(),
-                switchTaskExecution.getId(),
-                switchTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1,
-                workflowTask);
+                switchTaskExecution.getJobId(), switchTaskExecution.getId(), switchTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1, workflowTask);
 
-            Context context = contextService.peek(switchTaskExecution.getId());
+            Map<String, Object> context = contextService.peek(
+                switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            contextService.push(subTaskExecution.getId(), context);
-
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         }

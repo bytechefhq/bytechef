@@ -30,7 +30,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.UUIDUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -65,6 +64,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         ExecutionError error = taskExecution.getError();
 
@@ -73,11 +73,14 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         logger.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
 
         // set task status to FAILED and persist
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.FAILED, null, LocalDateTime.now());
+
+        taskExecution.setEndTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.FAILED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         // if the task is retryable, then retry it
         if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
-            taskExecution.setId(UUIDUtils.generate());
             taskExecution.setStatus(TaskStatus.CREATED);
             taskExecution.setError(null);
             taskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);
@@ -90,10 +93,11 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         else {
             while (taskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
                 taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
-                taskExecution.setStatus(TaskStatus.FAILED);
-                taskExecution.setEndTime(LocalDateTime.now());
 
-                taskExecutionService.update(taskExecution);
+                taskExecution.setEndTime(LocalDateTime.now());
+                taskExecution.setStatus(TaskStatus.FAILED);
+
+                taskExecution = taskExecutionService.update(taskExecution);
             }
 
             Job job = jobService.getTaskExecutionJob(taskExecution.getId());
@@ -104,6 +108,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             job.setEndTime(new Date());
 
             jobService.update(job);
+
             eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
         }
     }

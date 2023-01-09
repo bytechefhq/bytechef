@@ -31,10 +31,10 @@ import java.util.Map;
  */
 public class InMemoryCounterRepository implements CounterRepository {
 
-    private final Map<String, Long> counters = new HashMap<>();
+    private final Map<Long, Long> counters = new HashMap<>();
 
     @Override
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         counters.remove(id);
     }
 
@@ -47,7 +47,7 @@ public class InMemoryCounterRepository implements CounterRepository {
     }
 
     @Override
-    public Long findValueByIdForUpdate(String id) {
+    public Long findValueByIdForUpdate(Long id) {
         return counters.get(id);
     }
 
@@ -59,7 +59,7 @@ public class InMemoryCounterRepository implements CounterRepository {
     }
 
     @Override
-    public void update(String id, long value) {
+    public void update(Long id, long value) {
         counters.put(id, value);
     }
 }
