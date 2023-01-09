@@ -2,6 +2,7 @@ import React from 'react';
 
 export const Status: React.FC<{status: boolean}> = ({status}) => {
     let color = status ? 'green' : 'red';
+
     let label = status ? 'Enabled' : 'Disabled';
 
     return (

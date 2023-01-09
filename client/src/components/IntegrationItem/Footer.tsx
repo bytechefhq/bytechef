@@ -9,13 +9,21 @@ const Footer: React.FC<{
     date: string;
 }> = ({category, tags, date}) => {
     return (
-        <span className="w-96 rounded bg-white shadow">
-            <Category category={category} />
-            
-                <TagList tags={tags} />
-        
-            <Date date={date} />
-        </span>
+        <>
+            <div className="... flex flex-row">
+                <div className="w-24">
+                    <Category category={category} />
+                </div>
+
+                <div className="w-96">
+                    <TagList tags={tags} />
+                </div>
+
+                <div className="w-96">
+                    <Date date={date} />
+                </div>
+            </div>
+        </>
     );
 };
 

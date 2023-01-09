@@ -3,13 +3,19 @@ import {AddTagButton} from './AddTagButton';
 import {Tag} from './Tag';
 
 export const TagList: React.FC<{tags: string[]}> = ({tags}) => {
+    const handleDeleteTag = (tagName: string) => {
+        let handleDelete = [...tags];
+
+        handleDelete.find;
+    };
+
     return (
-        <div>
+        <span>
             {tags.map((tag) => (
-                <Tag tag={tag} />
+                <Tag tag={tag} handleDeleteTag={handleDeleteTag} />
             ))}
 
             <AddTagButton label={'+'} />
-        </div>
+        </span>
     );
 };
