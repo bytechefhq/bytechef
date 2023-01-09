@@ -46,8 +46,6 @@ public class JdbcContextRepositoryIntTest {
     public void testFindByStackId() {
         Context context = new Context(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value"));
 
-        context.setNew(true);
-
         context = contextRepository.save(context);
 
         Context resultContext = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(

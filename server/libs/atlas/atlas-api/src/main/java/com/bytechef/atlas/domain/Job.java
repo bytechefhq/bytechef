@@ -37,7 +37,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -80,9 +79,6 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     @Id
     private Long id;
-
-    @Transient
-    private boolean isNew;
 
     @Column
     private MapWrapper inputs = new MapWrapper();
@@ -285,7 +281,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     @Override
     public boolean isNew() {
-        return isNew;
+        return id == null;
     }
 
     public void setCurrentTask(int currentTask) {
@@ -310,10 +306,6 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public void setNew(boolean isNew) {
-        this.isNew = isNew;
     }
 
     public void setOutputs(Map<String, Object> outputs) {
@@ -358,8 +350,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
             + currentTask + ", endTime="
             + endTime + ", error="
             + error + ", id='"
-            + id + '\'' + ", isNew="
-            + isNew + ", inputs="
+            + id + '\'' + ", inputs="
             + inputs + ", label='"
             + label + '\'' + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="

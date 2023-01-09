@@ -108,7 +108,6 @@ public class InMemoryJobRepository implements JobRepository {
     public Job save(Job job) {
         if (job.isNew()) {
             job.setId(RANDOM.nextLong());
-            job.setNew(false);
         }
 
         try {
