@@ -24,9 +24,11 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -37,6 +39,31 @@ import org.springframework.util.Assert;
  */
 @Table
 public final class Context implements Persistable<Long> {
+
+    public enum Classname {
+        JOB(1), TASK_EXECUTION(2);
+
+        private final int id;
+
+        Classname(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Classname valueOf(int id) {
+            return switch (id) {
+                case 1 -> Classname.JOB;
+                case 2 -> Classname.TASK_EXECUTION;
+                default -> throw new IllegalStateException("Unexpected value: " + id);
+            };
+        }
+    }
+
+    @Column
+    private Integer classnameId;
 
     @CreatedBy
     @Column("created_by")
@@ -49,14 +76,20 @@ public final class Context implements Persistable<Long> {
     @Id
     private Long id;
 
+    @Transient
+    private boolean isNew;
+
+    @Column("sub_stack_id")
+    private Integer subStackId;
+
     @Column("stack_id")
-    private String stackId;
+    private Long stackId;
 
     @Column("value")
     private MapWrapper value;
 
     public Context() {
-        value = new MapWrapper();
+        this.value = new MapWrapper();
     }
 
     public Context(Map<String, Object> value) {
@@ -65,8 +98,17 @@ public final class Context implements Persistable<Long> {
         this.value = new MapWrapper(value);
     }
 
-    public Context(String key, Object value) {
-        this(Collections.singletonMap(key, value));
+    public Context(long stackId, Classname classname, Map<String, Object> value) {
+        this.stackId = stackId;
+        this.classnameId = classname.getId();
+        this.value = new MapWrapper(value);
+    }
+
+    public static Context of(String key, Object value) {
+        Assert.notNull(key, "'key' must not be null.");
+        Assert.notNull(value, "'value' must not be null.");
+
+        return new Context(Collections.singletonMap(key, value));
     }
 
     @Override
@@ -89,6 +131,10 @@ public final class Context implements Persistable<Long> {
         return getClass().hashCode();
     }
 
+    public Integer getClassnameId() {
+        return classnameId;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -101,7 +147,11 @@ public final class Context implements Persistable<Long> {
         return id;
     }
 
-    public String getStackId() {
+    public Integer getSubStackId() {
+        return subStackId;
+    }
+
+    public Long getStackId() {
         return stackId;
     }
 
@@ -111,26 +161,30 @@ public final class Context implements Persistable<Long> {
 
     @Override
     public boolean isNew() {
-        return id == null;
+        return isNew;
     }
 
     public void put(String key, Object value) {
         this.value.put(key, value);
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
+    public void setClassnameId(Integer classnameId) {
+        this.classnameId = classnameId;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setStackId(String stackId) {
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
+    public void setSubStackId(Integer subStackId) {
+        this.subStackId = subStackId;
+    }
+
+    public void setStackId(Long stackId) {
         this.stackId = stackId;
     }
 

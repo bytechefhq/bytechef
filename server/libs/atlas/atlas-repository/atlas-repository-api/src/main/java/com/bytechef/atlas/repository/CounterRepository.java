@@ -34,11 +34,11 @@ public interface CounterRepository {
      *
      * @param id the id of the counter
      */
-    void deleteById(String id);
+    void deleteById(Long id);
 
     Iterable<Counter> findAll();
 
-    Long findValueByIdForUpdate(String id);
+    Long findValueByIdForUpdate(Long id);
 
     Counter save(Counter counter);
 
@@ -48,5 +48,5 @@ public interface CounterRepository {
      * @param id    the id of the counter
      * @param value the value to set the counter to.
      */
-    void update(String id, long value);
+    void update(Long id, long value);
 }

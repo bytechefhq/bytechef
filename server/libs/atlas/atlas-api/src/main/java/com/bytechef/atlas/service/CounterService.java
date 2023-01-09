@@ -22,9 +22,9 @@ package com.bytechef.atlas.service;
  */
 public interface CounterService {
 
-    void delete(String id);
+    void delete(long id);
 
-    long decrement(String id);
+    long decrement(long id);
 
-    void set(String id, long value);
+    void set(long id, long value);
 }

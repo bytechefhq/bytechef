@@ -27,18 +27,18 @@ public class TaskProgressedWorkflowEvent extends WorkflowEvent {
     public static final String TASK_PROGRESSED = "task.progressed";
 
     private int progress;
-    private String taskId;
+    private Long taskExecutionId;
 
     public TaskProgressedWorkflowEvent() {
         this.type = TASK_PROGRESSED;
     }
 
-    public TaskProgressedWorkflowEvent(String taskId, int progress) {
-        Assert.notNull(taskId, "'taskId' must not be null.");
+    public TaskProgressedWorkflowEvent(Long taskExecutionId, int progress) {
+        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null.");
         Assert.notNull(progress, "'progress' must not be null.");
 
         this.progress = progress;
-        this.taskId = taskId;
+        this.taskExecutionId = taskExecutionId;
         this.type = TASK_PROGRESSED;
     }
 
@@ -46,15 +46,15 @@ public class TaskProgressedWorkflowEvent extends WorkflowEvent {
         return progress;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public Long getTaskExecutionId() {
+        return taskExecutionId;
     }
 
     @Override
     public String toString() {
         return "TaskProgressedWorkflowEvent{" + "progress="
-            + progress + ", taskId='"
-            + taskId + '\'' + "} "
+            + progress + ", taskExecutionId='"
+            + taskExecutionId + '\'' + "} "
             + super.toString();
     }
 }

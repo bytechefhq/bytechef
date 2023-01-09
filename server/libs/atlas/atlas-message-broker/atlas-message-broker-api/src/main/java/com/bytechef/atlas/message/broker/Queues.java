@@ -19,22 +19,21 @@
 
 package com.bytechef.atlas.message.broker;
 
-import com.bytechef.commons.utils.UUIDUtils;
+import java.util.UUID;
 
 /**
  * @author Arik Cohen
  */
 public interface Queues {
+
     String COMPLETIONS = "completions";
-    String ERRORS = "errors";
-    String JOBS = "jobs";
-    String STOPS = "stops";
-    String SUBFLOWS = "subflows";
-    String EXECUTE = "execute";
+    String CONTROL = "x.control." + UUID.randomUUID();
     String DLQ = "dlq";
-    String CONTROL = "x.control." + UUIDUtils.generate();
-    String RESTARTS = "restarts";
-    String REQUESTS = "requests";
-    String TASKS = "tasks";
+    String ERRORS = "errors";
     String EVENTS = "events";
+    String EXECUTE = "execute";
+    String JOBS = "jobs";
+    String RESTARTS = "restarts";
+    String STOPS = "stops";
+    String TASKS = "tasks";
 }

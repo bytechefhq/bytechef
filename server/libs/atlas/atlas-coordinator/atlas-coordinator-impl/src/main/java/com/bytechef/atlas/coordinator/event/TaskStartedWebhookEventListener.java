@@ -28,6 +28,7 @@ import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -59,12 +60,13 @@ public class TaskStartedWebhookEventListener implements EventListener {
     }
 
     private void handleEvent(TaskStartedWorkflowEvent workflowEvent) {
-        String jobId = workflowEvent.getJobId();
+        Long jobId = workflowEvent.getJobId();
 
         Job job = jobService.getJob(jobId);
 
         if (job == null) {
             logger.warn("Unknown job: {}", jobId);
+
             return;
         }
 

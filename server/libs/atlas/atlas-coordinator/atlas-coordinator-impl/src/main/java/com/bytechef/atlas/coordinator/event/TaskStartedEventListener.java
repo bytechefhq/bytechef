@@ -57,7 +57,7 @@ public class TaskStartedEventListener implements EventListener {
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
         if (TaskStartedWorkflowEvent.TASK_STARTED.equals(workflowEvent.getType())) {
-            String taskId = ((TaskStartedWorkflowEvent) workflowEvent).getTaskId();
+            Long taskId = ((TaskStartedWorkflowEvent) workflowEvent).getTaskExecutionId();
 
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskId);
 
