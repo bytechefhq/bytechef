@@ -40,8 +40,9 @@ tasks:
     uri: ${objectEndpointUrl}/openapi.json
     responseFormat: JSON
     headerParameters:
-      - key: Authorization
-        value: Basic ${apiToken}
+      Authorization:
+        - Basic ${apiToken}
+    fullResponse: true
 
   - type: logger/v1/info
     name: loggLiferayObjectApiGet
@@ -51,7 +52,7 @@ tasks:
   - type: if/v1
     conditions:
       - string:
-          value1: ${liferayObjectApiGet.code}
+          value1: ${liferayObjectApiGet.statusCode}
           operation: NOT_EQUALS
           value2: "200"
     combineOperation: ANY
@@ -65,7 +66,7 @@ tasks:
         name: jsonObject1
         description: Create Json object `jsonObject1` by reading bytes of fileEntry `jsonFileEntry1`
         fileEntry: ${jsonFileEntry1}
-        isArray: false
+        isArray: true
 
       - type: logger/v1/info
         name: loggJsonObject1
@@ -79,14 +80,12 @@ tasks:
           set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry1`
           and bodyContentType `JSON` creates request's `ContentType` header value application/json
         label: Post content to Liferay Batch Engine REST endpoint
-        uri: ${batchEngineEndpointUrl}
+        uri: ${batchEngineEndpointUrl}/com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition
         responseFormat: JSON
         headerParameters:
-          - key: Authorization
-            value: Basic ${apiToken}
-        bodyContentType: JSON
-        sendFile: true
-        fileEntry: ${jsonFileEntry1}
+          Authorization: Basic ${apiToken}
+        bodyContentType: BINARY
+        bodyContent: ${jsonFileEntry1}
 
       - type: logger/v1/info
         name: loggEndpointResponse1
@@ -94,7 +93,7 @@ tasks:
         text: Result ${liferayApiPost1}
     caseFalse:
       - type: logger/v1/info
-        name: loggDefinitionExistis
+        name: loggDefinitionExists
         text: "Custom Object Definition Exists"
 
   - type: filesystem/v1/readFile
@@ -109,14 +108,16 @@ tasks:
       set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry2`
       and bodyContentType `JSON` creates request's `ContentType` header value application/json
     label: Post content to Liferay Batch Engine REST endpoint
-    uri: ${batchEngineEndpointUrl}
+    uri: ${batchEngineEndpointUrl}/com.liferay.object.rest.dto.v1_0.ObjectEntry
     responseFormat: JSON
     headerParameters:
-      - key: Authorization
-        value: Basic ${apiToken}
-    bodyContentType: JSON
-    sendFile: true
-    fileEntry: ${jsonFileEntry2}
+      Authorization:
+        - Basic ${apiToken}
+    queryParameters:
+      taskItemDelegateName:
+        - C_Stock
+    bodyContentType: BINARY
+    bodyContent: ${jsonFileEntry2}
 
   - type: logger/v1/info
     name: loggEndpointResponse1
