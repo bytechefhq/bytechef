@@ -23,14 +23,13 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
-import com.bytechef.atlas.task.execution.TaskStatus;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 /**
@@ -39,10 +38,12 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
-    private final Map<String, TaskExecution> taskExecutions = new HashMap<>();
+    private static final Random RANDOM = new Random();
+
+    private final Map<Long, TaskExecution> taskExecutions = new HashMap<>();
 
     @Override
-    public List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, String> jobRef) {
+    public List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, Long> jobRef) {
         return taskExecutions.values()
             .stream()
             .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobRef.getId()))
@@ -50,12 +51,12 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
-    public List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, String> parentRef) {
+    public List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, Long> parentRef) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, String> jobRef) {
+    public List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, Long> jobRef) {
         return taskExecutions.values()
             .stream()
             .filter(taskExecution -> Objects.equals(taskExecution.getJobRef(), jobRef))
@@ -63,55 +64,30 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
-    public List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, String>> jobRefs) {
+    public List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, Long>> jobRefs) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<TaskExecution> findById(String id) {
+    public Optional<TaskExecution> findById(long id) {
         TaskExecution taskExecution = taskExecutions.get(id);
 
         return Optional.ofNullable(taskExecution);
     }
 
     @Override
-    public Optional<TaskExecution> findByIdForUpdate(String id) {
+    public Optional<TaskExecution> findByIdForUpdate(long id) {
         return findById(id);
     }
 
     @Override
     public TaskExecution save(TaskExecution taskExecution) {
+        if (taskExecution.isNew()) {
+            taskExecution.setId(RANDOM.nextLong());
+        }
+
         taskExecutions.put(taskExecution.getId(), taskExecution);
 
         return taskExecution;
-    }
-
-    @Override
-    public void updateStatus(String id, TaskStatus status) {
-        TaskExecution taskExecution = taskExecutions.get(id);
-
-        taskExecution.setStatus(status);
-
-        taskExecutions.put(id, taskExecution);
-    }
-
-    @Override
-    public void updateStatusAndStartTime(String id, TaskStatus status, LocalDateTime startTime) {
-        TaskExecution taskExecution = taskExecutions.get(id);
-
-        taskExecution.setStatus(status);
-        taskExecution.setStartTime(startTime);
-
-        taskExecutions.put(id, taskExecution);
-    }
-
-    @Override
-    public void updateStatusAndEndTime(String id, TaskStatus status, LocalDateTime endTime) {
-        TaskExecution taskExecution = taskExecutions.get(id);
-
-        taskExecution.setEndTime(endTime);
-        taskExecution.setStatus(status);
-
-        taskExecutions.put(id, taskExecution);
     }
 }

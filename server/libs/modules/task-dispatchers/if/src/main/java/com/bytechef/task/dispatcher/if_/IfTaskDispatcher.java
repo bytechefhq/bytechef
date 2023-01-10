@@ -72,7 +72,10 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
+        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         List<WorkflowTask> subWorkflowTasks;
 
@@ -94,19 +97,15 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
             TaskExecution subTaskExecution = TaskExecution.of(
-                taskExecution.getJobId(),
-                taskExecution.getId(),
-                taskExecution.getPriority(),
-                1,
-                subWorkflowTask);
+                taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1, subWorkflowTask);
 
-            Context context = contextService.peek(taskExecution.getId());
+            Map<String, Object> context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            contextService.push(subTaskExecution.getId(), context);
-
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

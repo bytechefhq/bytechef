@@ -31,7 +31,7 @@
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcContextRepository" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
             <Class name="com.bytechef.atlas.coordinator.Coordinator" />
-            <Class name="com.bytechef.atlas.coordinator.CoordinatorManagerImpl(" />
+            <Class name="com.bytechef.atlas.coordinator.impl.CoordinatorManagerImpl(" />
             <Class name="com.bytechef.atlas.coordinator.error.ErrorHandlerChain" />
             <Class name="com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler" />
             <Class name="com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain" />
@@ -94,15 +94,12 @@
             <Class name="com.bytechef.atlas.domain.Workflow" />
             <Class name="com.bytechef.atlas.domain.TaskExecution"/>
             <Class name="com.bytechef.atlas.domain.Job"/>
-            <Class name="com.bytechef.atlas.coordinator.CoordinatorManagerImpl"/>
+            <Class name="com.bytechef.atlas.coordinator.impl.CoordinatorManagerImpl"/>
             <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties"/>
             <Class name="com.bytechef.atlas.domain.JobSummary"/>
             <Class name="com.bytechef.hermes.component.impl.FileEntryImpl"/>
             <Class name="com.bytechef.atlas.service.ContextService"/>
             <Class name="com.bytechef.atlas.service.WorkflowService"/>
-            <Class name="com.bytechef.atlas.repository.jdbc.event.JobCallback"/>
-            <Class name="com.bytechef.atlas.repository.jdbc.event.ContextCallback"/>
-            <Class name="com.bytechef.hermes.connection.event.ConnectionCallback"/>
         </Or>
     </Match>
     <Match>

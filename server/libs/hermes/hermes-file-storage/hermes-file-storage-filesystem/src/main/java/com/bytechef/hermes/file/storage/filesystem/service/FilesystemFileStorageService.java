@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.file.storage.filesystem.service;
 
-import com.bytechef.commons.utils.UUIDUtils;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.exception.FileStorageException;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -31,6 +30,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Ivica Cardic
@@ -124,6 +124,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     private String generate() {
-        return UUIDUtils.generate();
+        UUID uuid = UUID.randomUUID();
+
+        return uuid.toString();
     }
 }

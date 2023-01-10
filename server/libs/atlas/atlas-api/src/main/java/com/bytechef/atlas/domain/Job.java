@@ -25,19 +25,18 @@ import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapListWrapper;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -51,14 +50,14 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Job implements Errorable, Persistable<String>, Prioritizable {
+public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public enum Status {
-        CREATED,
-        STARTED,
-        STOPPED,
-        FAILED,
         COMPLETED,
+        CREATED,
+        FAILED,
+        STOPPED,
+        STARTED,
     }
 
     @CreatedBy
@@ -79,10 +78,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     private ExecutionError error;
 
     @Id
-    private String id;
-
-    @Transient
-    private boolean isNew;
+    private Long id;
 
     @Column
     private MapWrapper inputs = new MapWrapper();
@@ -102,7 +98,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     private MapWrapper outputs = new MapWrapper();
 
     @Column("parent_task_execution_id")
-    private AggregateReference<TaskExecution, String> parentTaskExecutionRef;
+    private AggregateReference<TaskExecution, Long> parentTaskExecutionRef;
 
     private int priority = Prioritizable.DEFAULT_PRIORITY;
 
@@ -113,7 +109,6 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     private Status status;
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     @Column
@@ -125,7 +120,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     public Job() {
     }
 
-    public Job(String id) {
+    public Job(long id) {
         this.id = id;
     }
 
@@ -172,7 +167,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     }
 
     /** Return the ID of the job. */
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -209,7 +204,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     }
 
     @JsonIgnore
-    public AggregateReference<TaskExecution, String> getParentTaskExecutionRef() {
+    public AggregateReference<TaskExecution, Long> getParentTaskExecutionRef() {
         return parentTaskExecutionRef;
     }
 
@@ -218,7 +213,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
      *
      * @return The ID of the parent task if this is a subflow job or <code>null</code> otherwise.
      */
-    public String getParentTaskExecutionId() {
+    public Long getParentTaskExecutionId() {
         return parentTaskExecutionRef == null ? null : parentTaskExecutionRef.getId();
     }
 
@@ -262,6 +257,10 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         return lastModifiedDate;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
     /**
      * Get the list of webhooks configured for this job.
      *
@@ -282,7 +281,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
 
     @Override
     public boolean isNew() {
-        return isNew;
+        return id == null;
     }
 
     public void setCurrentTask(int currentTask) {
@@ -297,7 +296,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.error = error;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -309,19 +308,15 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.label = label;
     }
 
-    public void setNew(boolean isNew) {
-        this.isNew = isNew;
-    }
-
     public void setOutputs(Map<String, Object> outputs) {
         this.outputs = new MapWrapper(outputs);
     }
 
-    public void setParentTaskExecutionRef(AggregateReference<TaskExecution, String> parentTaskExecutionRef) {
+    public void setParentTaskExecutionRef(AggregateReference<TaskExecution, Long> parentTaskExecutionRef) {
         this.parentTaskExecutionRef = parentTaskExecutionRef;
     }
 
-    public void setParentTaskExecutionId(String parentTaskExecutionId) {
+    public void setParentTaskExecutionId(Long parentTaskExecutionId) {
         if (parentTaskExecutionId != null) {
             this.parentTaskExecutionRef = new AggregateReference.IdOnlyAggregateReference<>(parentTaskExecutionId);
         }
@@ -331,12 +326,12 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.priority = priority;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public void setWebhooks(List<Map<String, Object>> webhooks) {
@@ -355,8 +350,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
             + currentTask + ", endTime="
             + endTime + ", error="
             + error + ", id='"
-            + id + '\'' + ", isNew="
-            + isNew + ", inputs="
+            + id + '\'' + ", inputs="
             + inputs + ", label='"
             + label + '\'' + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="

@@ -27,14 +27,14 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
 
     public static final String JOB_STATUS = "job.status";
 
-    private String jobId;
+    private Long jobId;
     private Job.Status status;
 
     public JobStatusWorkflowEvent() {
         this.type = JOB_STATUS;
     }
 
-    public JobStatusWorkflowEvent(String jobId, Job.Status status) {
+    public JobStatusWorkflowEvent(Long jobId, Job.Status status) {
         Assert.notNull(jobId, "'jobId' must not be null.");
         Assert.notNull(status, "'status' must not be null.");
 
@@ -43,7 +43,7 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
         this.type = JOB_STATUS;
     }
 
-    public String getJobId() {
+    public Long getJobId() {
         return jobId;
     }
 

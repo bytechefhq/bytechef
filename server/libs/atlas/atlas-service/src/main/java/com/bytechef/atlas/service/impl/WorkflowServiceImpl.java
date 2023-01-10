@@ -74,15 +74,12 @@ public class WorkflowServiceImpl implements WorkflowService {
         Assert.notNull(format, "'format' must not be null.");
         Assert.notNull(sourceType, "'sourceType' must not be null.");
 
-        Workflow workflow = new Workflow();
-
         if (ObjectUtils.isEmpty(definition)) {
-            workflow.setDefinition("{\"tasks\": []}");
-        } else {
-            workflow.setDefinition(definition);
+            definition = "{\"tasks\": []}";
         }
 
-        workflow.setFormat(format);
+        Workflow workflow = new Workflow(definition, format);
+
         workflow.setNew(true);
 
         return workflowCrudRepositories.stream()

@@ -21,10 +21,10 @@ import { exists, mapValues } from '../runtime';
 export interface PostJob200Response {
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof PostJob200Response
      */
-    jobId?: string;
+    jobId?: number;
 }
 
 /**

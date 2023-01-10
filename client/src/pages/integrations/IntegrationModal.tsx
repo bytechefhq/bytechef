@@ -20,9 +20,7 @@ interface IntegrationData {
 
 const IntegrationModal: React.FC = () => {
     const [availableTags, setAvailableTags] = useState([]);
-    const [tagsInputValue, setTagsInputValue] = useState<Array<Tag> | Tag | []>(
-        []
-    );
+    const [tagsInputValue, setTagsInputValue] = useState<Array<Tag>>([]);
     const [integrationData, setIntegrationData] = useState<IntegrationData>({
         category: '',
         description: '',
@@ -121,14 +119,13 @@ const IntegrationModal: React.FC = () => {
             <MultiSelect
                 label="Tags"
                 name="tags"
-                onChange={(newTag: Tag) => {
+                onChange={(inputValues: Tag[]) => {
                     setIntegrationData({
                         ...integrationData,
-                        // @ts-expect-error expects an Array<Tag> but receives a single Tag
-                        tags: newTag,
+                        tags: inputValues as Tag[],
                     });
 
-                    setTagsInputValue(newTag);
+                    setTagsInputValue(inputValues as Tag[]);
                 }}
                 onCreateOption={(inputValue: string) => {
                     const newOption = {
@@ -136,7 +133,6 @@ const IntegrationModal: React.FC = () => {
                         value: inputValue.toLowerCase().replace(/\W/g, ''),
                     };
 
-                    // @ts-expect-error tagsInputValue can be not an array
                     setTagsInputValue([...tagsInputValue, newOption]);
 
                     setIntegrationData({

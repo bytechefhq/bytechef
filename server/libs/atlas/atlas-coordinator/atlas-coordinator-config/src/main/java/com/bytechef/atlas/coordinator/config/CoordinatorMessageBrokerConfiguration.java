@@ -87,25 +87,11 @@ public class CoordinatorMessageBrokerConfiguration implements ApplicationContext
                 "resume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.REQUESTS,
-                coordinatorProperties.getSubscriptions()
-                    .getRequests(),
-                coordinator,
-                "create");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
                 Queues.STOPS,
                 coordinatorProperties.getSubscriptions()
                     .getRequests(),
                 coordinator,
                 "stop");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                Queues.SUBFLOWS,
-                coordinatorProperties.getSubscriptions()
-                    .getSubflows(),
-                coordinator,
-                "create");
         };
     }
 

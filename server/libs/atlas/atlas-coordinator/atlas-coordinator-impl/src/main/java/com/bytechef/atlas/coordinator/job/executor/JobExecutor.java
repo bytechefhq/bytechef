@@ -33,6 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Arik Cohen
@@ -74,15 +75,16 @@ public class JobExecutor {
         }
     }
 
+    @SuppressFBWarnings("NP")
     private void executeNextTask(Job job, Workflow workflow) {
+        Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
-        Context context = contextService.peek(job.getId());
 
-        contextService.push(nextTaskExecution.getId(), context);
-
-        nextTaskExecution.evaluate(taskEvaluator, context);
+        nextTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
 
         nextTaskExecution = taskExecutionService.create(nextTaskExecution);
+
+        contextService.push(nextTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
         taskDispatcher.dispatch(nextTaskExecution);
     }

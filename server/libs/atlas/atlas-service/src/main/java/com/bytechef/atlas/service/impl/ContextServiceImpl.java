@@ -25,6 +25,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.Map;
+
 @Transactional
 public class ContextServiceImpl implements ContextService {
 
@@ -36,21 +38,40 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(@NonNull String stackId, @NonNull Context context) {
-        Assert.notNull(stackId, "'stackId' must not be null.");
-        Assert.notNull(context, "'context' must not be null.");
+    public void push(long stackId, Context.Classname classname, Map<String, Object> value) {
+        Assert.notNull(classname, "'classname' must not be null.");
+        Assert.notNull(value, "'value' must not be null.");
 
-        context.setId(null);
-        context.setStackId(stackId);
+        Context context = new Context(stackId, classname, value);
+
+        contextRepository.save(context);
+    }
+
+    @Override
+    public void push(
+        long stackId, int subStackId, Context.Classname classname, @NonNull Map<String, Object> value) {
+        Assert.notNull(classname, "'classname' must not be null.");
+        Assert.notNull(value, "'value' must not be null.");
+
+        Context context = new Context(stackId, subStackId, classname, value);
 
         contextRepository.save(context);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Context peek(@NonNull String stackId) {
-        Assert.notNull(stackId, "'stackId' must not be null.");
+    public Map<String, Object> peek(long stackId, Context.Classname classname) {
+        Context context = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
+            stackId, classname.getId());
 
-        return contextRepository.findTop1ByStackIdOrderByCreatedDateDesc(stackId);
+        return context.getValue();
+    }
+
+    @Override
+    public Map<String, Object> peek(long stackId, int subStackId, Context.Classname classname) {
+        Context context = contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+            stackId, subStackId, classname.getId());
+
+        return context.getValue();
     }
 }

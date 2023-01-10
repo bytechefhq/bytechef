@@ -23,11 +23,11 @@ import {
 } from '../models';
 
 export interface GetJobTaskExecutionsRequest {
-    id: string;
+    id: number;
 }
 
 export interface GetTaskExecutionRequest {
-    id: string;
+    id: number;
 }
 
 /**

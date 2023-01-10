@@ -44,6 +44,7 @@ import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,7 +86,10 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         Map<String, Object> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
         List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
+        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         if (list.isEmpty()) {
             taskExecution.setStartTime(LocalDateTime.now());
@@ -102,16 +106,17 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                     taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1,
                     new WorkflowTask(iteratee));
 
-                Context context = contextService.peek(taskExecution.getId());
+                Map<String, Object> newContext = new HashMap<>(
+                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
-                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
-                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
+                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
-                contextService.push(iterateeTaskExecution.getId(), context);
-
-                iterateeTaskExecution.evaluate(taskEvaluator, context);
+                iterateeTaskExecution = taskEvaluator.evaluate(iterateeTaskExecution, newContext);
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
+
+                contextService.push(iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
                 taskDispatcher.dispatch(iterateeTaskExecution);
             }
@@ -123,6 +128,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         if (Objects.equals(task.getType(), EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
             return this;
         }
+
         return null;
     }
 }

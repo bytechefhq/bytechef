@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -35,8 +37,10 @@ import org.springframework.data.domain.Pageable;
  */
 public class InMemoryJobRepository implements JobRepository {
 
+    private static final Random RANDOM = new Random();
+
     private final InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
-    private final Map<String, Job> jobs = new HashMap<>();
+    private final Map<Long, Job> jobs = new HashMap<>();
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
@@ -62,7 +66,7 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         throw new UnsupportedOperationException();
     }
 
@@ -77,7 +81,7 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public Optional<Job> findById(String id) {
+    public Optional<Job> findById(Long id) {
         Job job = jobs.get(id);
 
         return Optional.ofNullable(job);
@@ -89,7 +93,7 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public Job findByTaskExecutionId(String taskExecutionId) {
+    public Job findByTaskExecutionId(Long taskExecutionId) {
         TaskExecution taskExecution = inMemoryTaskExecutionRepository.findById(taskExecutionId)
             .orElseThrow();
 
@@ -102,6 +106,10 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Job save(Job job) {
+        if (job.isNew()) {
+            job.setId(RANDOM.nextLong());
+        }
+
         try {
             // Emulate identical behaviour when storing in db by serialization and deserialization
 

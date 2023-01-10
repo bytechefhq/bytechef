@@ -28,29 +28,29 @@ public class CancelControlTask extends AbstractControlTask {
 
     public static final String TYPE_CANCEL = "cancel";
 
-    private String jobId;
-    private String taskId;
+    private Long jobId;
+    private Long taskExecutionId;
 
     public CancelControlTask() {
     }
 
-    public CancelControlTask(String jobId, String taskId) {
+    public CancelControlTask(Long jobId, Long taskExecutionId) {
         super(TYPE_CANCEL);
 
-        this.taskId = taskId;
         this.jobId = jobId;
+        this.taskExecutionId = taskExecutionId;
     }
 
-    public String getJobId() {
+    public Long getJobId() {
         return jobId;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public Long getTaskExecutionId() {
+        return taskExecutionId;
     }
 
     @Override
     public String toString() {
-        return "CancelControlTask{" + "jobId='" + jobId + '\'' + ", taskId='" + taskId + '\'' + '}';
+        return "CancelControlTask{" + "jobId='" + jobId + '\'' + ", taskExecutionId='" + taskExecutionId + '\'' + '}';
     }
 }

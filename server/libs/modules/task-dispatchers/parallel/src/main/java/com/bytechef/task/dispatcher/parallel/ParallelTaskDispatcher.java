@@ -97,12 +97,13 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                 TaskExecution parallelTaskExecution = TaskExecution.of(
                     taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), workflowTask);
 
-                Context context = contextService.peek(taskExecution.getId());
+                parallelTaskExecution = taskExecutionService.create(parallelTaskExecution);
 
-                TaskExecution evaluatedTaskExecution = taskExecutionService.create(parallelTaskExecution);
+                Map<String, Object> context = contextService.peek(
+                    taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-                contextService.push(evaluatedTaskExecution.getId(), context);
-                taskDispatcher.dispatch(evaluatedTaskExecution);
+                contextService.push(parallelTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+                taskDispatcher.dispatch(parallelTaskExecution);
             }
         }
     }

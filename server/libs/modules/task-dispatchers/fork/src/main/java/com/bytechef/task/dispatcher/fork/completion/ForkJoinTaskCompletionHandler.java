@@ -31,10 +31,11 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
-import com.bytechef.commons.utils.UUIDUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,24 +78,33 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    public boolean canHandle(TaskExecution taskExecution) {
+        return taskExecution.getParentId() != null && MapUtils.get(taskExecution.getParameters(), BRANCH) != null;
+    }
+
+    @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+        taskExecution.setStatus(TaskStatus.COMPLETED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context newContext = contextService.peek(
-                taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
+            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
+
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION));
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
             contextService.push(
-                taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), BRANCH),
-                newContext);
+                taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION, newContext);
         }
 
-        TaskExecution forkTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+        TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
-            forkTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
+            forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(curList -> curList
@@ -103,44 +113,42 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 .toList())
             .toList();
 
-        List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks
-            .get(MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
+        List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
+            MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
 
         if (taskExecution.getTaskNumber() < branchWorkflowTasks.size()) {
-            TaskExecution branchTaskExecution = new TaskExecution(
-                WorkflowTask.of(Map.of(BRANCH, MapUtils.getInteger(taskExecution.getParameters(), BRANCH)),
-                    branchWorkflowTasks.get(taskExecution.getTaskNumber())));
+            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
-            branchTaskExecution.setId(UUIDUtils.generate());
-            branchTaskExecution.setStatus(TaskStatus.CREATED);
-            branchTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
+            WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(taskExecution.getTaskNumber());
+
+            branchWorkflowTask.put(BRANCH, branch);
+
+            TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask);
+
             branchTaskExecution.setJobId(taskExecution.getJobId());
             branchTaskExecution.setParentId(taskExecution.getParentId());
             branchTaskExecution.setPriority(taskExecution.getPriority());
+            branchTaskExecution.setStatus(TaskStatus.CREATED);
+            branchTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
 
-            Context context = contextService.peek(
-                taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
+            Map<String, Object> context = contextService.peek(
+                taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);
 
-            contextService.push(branchTaskExecution.getId(), context);
-
-            branchTaskExecution.evaluate(taskEvaluator, context);
+            branchTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
+
+            contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(branchTaskExecution);
         } else {
             long branchesLeft = counterService.decrement(taskExecution.getParentId());
 
             if (branchesLeft == 0) {
-                forkTaskExecution.setEndTime(LocalDateTime.now());
+                forkJoinTaskExecution.setEndTime(LocalDateTime.now());
 
-                taskCompletionHandler.handle(forkTaskExecution);
+                taskCompletionHandler.handle(forkJoinTaskExecution);
             }
         }
-    }
-
-    @Override
-    public boolean canHandle(TaskExecution taskExecution) {
-        return taskExecution.getParentId() != null && MapUtils.get(taskExecution.getParameters(), BRANCH) != null;
     }
 }

@@ -28,6 +28,7 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
+import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
@@ -42,12 +43,12 @@ import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
-import com.bytechef.commons.utils.UUIDUtils;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -78,7 +79,13 @@ public class CoordinatorIntTest {
     private ContextService contextService;
 
     @Autowired
+    private JobFacade jobFacade;
+
+    @Autowired
     private JobService jobService;
+
+    @Autowired
+    private SyncMessageBroker messageBroker;
 
     @Autowired
     private TaskExecutionService taskExecutionService;
@@ -104,19 +111,13 @@ public class CoordinatorIntTest {
     public void testRequiredParameters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Coordinator coordinator = new Coordinator(
-                contextService, null, null, null, jobService, null, null, null, taskExecutionService);
+                null, null, null, jobFacade, jobService, null, null, taskExecutionService);
 
-            JobParameters jobParameters = new JobParameters();
-
-            jobParameters.setWorkflowId("hello1");
-
-            coordinator.create(jobParameters);
+            coordinator.create(new JobParameters("hello1"));
         });
     }
 
     public Job executeWorkflow(String workflowId) {
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
-
         messageBroker.receive(Queues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
@@ -151,43 +152,23 @@ public class CoordinatorIntTest {
             contextService, taskDispatcher, taskExecutionService, TaskEvaluator.create(), workflowService);
 
         DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService,
-            e -> {
-            },
-            jobExecutor,
-            jobService,
-            TaskEvaluator.create(),
-            taskExecutionService,
+            contextService, e -> {
+            }, jobExecutor, jobService, TaskEvaluator.create(), taskExecutionService,
             workflowService);
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
         Coordinator coordinator = new Coordinator(
-            contextService,
             e -> {
-            },
-            e -> {
-            },
-            jobExecutor,
-            jobService,
-            messageBroker,
-            taskCompletionHandler,
-            (TaskDispatcher) taskDispatcher,
-            taskExecutionService);
+            }, e -> {
+            }, jobExecutor, jobFacade, jobService, taskCompletionHandler,
+            (TaskDispatcher) taskDispatcher, taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((String) jobId));
+        messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
-        String jobId = UUIDUtils.generate();
-
-        JobParameters jobParameters = new JobParameters();
-
-        jobParameters.setJobId(jobId);
-        jobParameters.setInputs(Collections.singletonMap("yourName", "me"));
-        jobParameters.setWorkflowId(workflowId);
-
-        coordinator.create(jobParameters);
+        long jobId = jobFacade.create(new JobParameters(Collections.singletonMap("yourName", "me"), workflowId));
 
         return jobService.getJob(jobId);
     }

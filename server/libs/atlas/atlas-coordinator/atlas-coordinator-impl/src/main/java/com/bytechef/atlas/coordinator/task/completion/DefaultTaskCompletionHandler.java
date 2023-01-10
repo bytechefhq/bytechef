@@ -38,6 +38,8 @@ import com.bytechef.commons.utils.MapUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +83,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         log.debug("Completing task {}", taskExecution.getId());
 
@@ -89,20 +92,23 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         if (job == null) {
             log.error("Unknown job: {}", taskExecution.getJobId());
         } else {
-            taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+            taskExecution.setStatus(TaskStatus.COMPLETED);
+
+            taskExecution = taskExecutionService.update(taskExecution);
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-                Context newContext = contextService.peek(job.getId());
+                Map<String, Object> newContext = new HashMap<>(contextService.peek(job.getId(), Context.Classname.JOB));
 
                 newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-                contextService.push(job.getId(), newContext);
+                contextService.push(job.getId(), Context.Classname.JOB, newContext);
             }
 
             if (hasMoreTasks(job)) {
                 job.setCurrentTask(job.getCurrentTask() + 1);
 
-                jobService.update(job);
+                job = jobService.update(job);
+
                 jobExecutor.execute(job);
             } else {
                 complete(job);
@@ -110,8 +116,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         }
     }
 
+    @SuppressFBWarnings("NP")
     private void complete(Job job) {
-        Context context = contextService.peek(job.getId());
+        Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         Map<String, Object> source = new HashMap<>();
@@ -122,16 +129,17 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
                 MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
         }
 
-        TaskExecution evaluatedTaskExecution = new TaskExecution(
-            taskEvaluator.evaluate(new WorkflowTask(source), context));
-
         job.setStatus(Job.Status.COMPLETED);
         job.setEndTime(new Date());
         job.setCurrentTask(-1);
 
+        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
+            new TaskExecution(new WorkflowTask(source)), context);
+
         job.setOutputs(evaluatedTaskExecution.getParameters());
 
-        jobService.update(job);
+        job = jobService.update(job);
+
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
         log.debug("Job {} completed successfully", job.getId());

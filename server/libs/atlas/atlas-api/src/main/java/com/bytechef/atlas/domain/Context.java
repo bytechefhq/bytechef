@@ -22,8 +22,10 @@ package com.bytechef.atlas.domain;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -38,6 +40,31 @@ import org.springframework.util.Assert;
 @Table
 public final class Context implements Persistable<Long> {
 
+    public enum Classname {
+        JOB(1), TASK_EXECUTION(2);
+
+        private final int id;
+
+        Classname(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Classname valueOf(int id) {
+            return switch (id) {
+                case 1 -> Classname.JOB;
+                case 2 -> Classname.TASK_EXECUTION;
+                default -> throw new IllegalStateException("Unexpected value: " + id);
+            };
+        }
+    }
+
+    @Column
+    private Integer classnameId;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -49,14 +76,17 @@ public final class Context implements Persistable<Long> {
     @Id
     private Long id;
 
+    @Column("sub_stack_id")
+    private Integer subStackId;
+
     @Column("stack_id")
-    private String stackId;
+    private Long stackId;
 
     @Column("value")
     private MapWrapper value;
 
     public Context() {
-        value = new MapWrapper();
+        this.value = new MapWrapper();
     }
 
     public Context(Map<String, Object> value) {
@@ -65,8 +95,26 @@ public final class Context implements Persistable<Long> {
         this.value = new MapWrapper(value);
     }
 
-    public Context(String key, Object value) {
-        this(Collections.singletonMap(key, value));
+    public Context(long stackId, Classname classname) {
+        this(stackId, null, classname, new HashMap<>());
+    }
+
+    public Context(long stackId, Classname classname, Map<String, Object> value) {
+        this(stackId, null, classname, value);
+    }
+
+    public Context(long stackId, int subStackId, Classname classname) {
+        this(stackId, subStackId, classname, new HashMap<>());
+    }
+
+    public Context(long stackId, Integer subStackId, Classname classname, Map<String, Object> value) {
+        Assert.notNull(classname, "'classname' must not be null.");
+        Assert.notNull(value, "'value' must not be null.");
+
+        this.stackId = stackId;
+        this.subStackId = subStackId;
+        this.classnameId = classname.getId();
+        this.value = new MapWrapper(value);
     }
 
     @Override
@@ -89,6 +137,10 @@ public final class Context implements Persistable<Long> {
         return getClass().hashCode();
     }
 
+    public Integer getClassnameId() {
+        return classnameId;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -101,7 +153,11 @@ public final class Context implements Persistable<Long> {
         return id;
     }
 
-    public String getStackId() {
+    public Integer getSubStackId() {
+        return subStackId;
+    }
+
+    public Long getStackId() {
         return stackId;
     }
 
@@ -114,37 +170,20 @@ public final class Context implements Persistable<Long> {
         return id == null;
     }
 
-    public void put(String key, Object value) {
-        this.value.put(key, value);
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setStackId(String stackId) {
-        this.stackId = stackId;
-    }
-
-    public void setValue(Map<String, Object> value) {
-        this.value = new MapWrapper(value);
-    }
-
     @Override
     public String toString() {
-        return "Context{" + "createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", id='"
-            + id + '\'' + ", stackId='"
-            + stackId + '\'' + ", value="
-            + value + '}';
+        return "Context{" +
+            "classnameId=" + classnameId +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", id=" + id +
+            ", subStackId=" + subStackId +
+            ", stackId=" + stackId +
+            ", value=" + value +
+            '}';
     }
 }

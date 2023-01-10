@@ -60,16 +60,12 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public void delete(@NonNull Long id) {
-        Assert.notNull(id, "'id' must not be null.");
-
+    public void delete(long id) {
         integrationRepository.deleteById(id);
     }
 
     @Override
-    public Integration getIntegration(@NonNull Long id) {
-        Assert.notNull(id, "'id' must not be null.");
-
+    public Integration getIntegration(long id) {
         return integrationRepository.findById(id)
             .orElseThrow();
     }
@@ -83,7 +79,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration update(
-        @NonNull Long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags) {
+        long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags) {
 
         Integration integration = getIntegration(id);
 

@@ -37,7 +37,7 @@ public class MapWrapper {
     }
 
     public Map<String, Object> getMap() {
-        return new HashMap(map);
+        return new HashMap<>(map);
     }
 
     public void put(String key, Object value) {

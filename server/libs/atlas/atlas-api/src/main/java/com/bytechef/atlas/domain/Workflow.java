@@ -24,7 +24,6 @@ import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.utils.MapUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -62,7 +61,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         public static Format parse(String filename) {
             Assert.notNull(filename, "Filename '%s' can not be null".formatted(filename));
 
-            String extension = Optional.ofNullable(filename)
+            String extension = Optional.of(filename)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1))
                 .orElse("");
@@ -97,13 +96,13 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private String id;
 
     @Transient
-    private final List<Map<String, Object>> inputs;
+    private List<Map<String, Object>> inputs = Collections.emptyList();
 
     @Transient
     private boolean isNew;
 
     @Transient
-    private final String label;
+    private String label;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -114,40 +113,71 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private LocalDateTime lastModifiedDate;
 
     @Transient
-    private final List<Map<String, Object>> outputs;
+    private List<Map<String, Object>> outputs = Collections.emptyList();
 
     @Transient
     private SourceType sourceType;
 
     @Transient
-    private final int retry;
+    private int retry;
 
     @Transient
-    private final List<WorkflowTask> tasks;
+    private List<WorkflowTask> tasks = Collections.emptyList();
 
     @Version
-    @SuppressFBWarnings("UuF")
     private int version;
 
     public Workflow() {
-        this(Collections.emptyMap());
     }
 
-    public Workflow(Map<String, Object> source) {
+    public Workflow(String id, Format format, String definition, Map<String, Object> source) {
+        Assert.notNull(id, "'id' must not be null.");
+        Assert.notNull(format, "'format' must not be null.");
         Assert.notNull(source, "'source' must not be null.");
 
-        id = MapUtils.getString(source, WorkflowConstants.ID);
-        inputs = MapUtils.getList(
+        this.id = id;
+        this.format = format;
+        this.definition = definition;
+        this.inputs = MapUtils.getList(
             source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
-        label = MapUtils.getString(source, WorkflowConstants.LABEL);
-        outputs = MapUtils.getList(
+        this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
+        this.outputs = MapUtils.getList(
             source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
-        retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, 0);
-        tasks = MapUtils
+        this.retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, 0);
+        this.tasks = MapUtils
             .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
             .stream()
             .map(WorkflowTask::new)
             .toList();
+    }
+
+    public Workflow(String definition, Format format) {
+        this.definition = definition;
+        this.format = format;
+    }
+
+    public Workflow(String definition, Format format, SourceType sourceType) {
+        this.definition = definition;
+        this.format = format;
+        this.sourceType = sourceType;
+    }
+
+    public Workflow(String id, String definition) {
+        this.id = id;
+        this.definition = definition;
+    }
+
+    public Workflow(String id, ExecutionError error) {
+        this.id = id;
+        this.error = error;
+    }
+
+    public void update(Workflow workflow) {
+        createdBy = workflow.getCreatedBy();
+        createdDate = workflow.getCreatedDate();
+        lastModifiedBy = workflow.getLastModifiedBy();
+        lastModifiedDate = workflow.getLastModifiedDate();
+        version = workflow.getVersion();
     }
 
     @Override
@@ -250,22 +280,6 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.definition = definition;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public void setError(ExecutionError error) {
-        this.error = error;
-    }
-
-    public void setFormat(Format format) {
-        this.format = format;
-    }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -274,20 +288,8 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.isNew = isNew;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
     public void setSourceType(SourceType sourceType) {
         this.sourceType = sourceType;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
     }
 
     @Override

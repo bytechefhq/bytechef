@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,13 +68,14 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        String parentId = taskExecution.getParentId();
+        Long parentId = taskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentTaskExecution.getType()
-                .equals(IF + "/v" + VERSION_1);
+            String type = parentTaskExecution.getType();
+
+            return type.equals(IF + "/v" + VERSION_1);
         }
 
         return false;
@@ -82,16 +84,19 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
+        taskExecution.setStatus(TaskStatus.COMPLETED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution ifTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context newContext = contextService.peek(ifTaskExecution.getId());
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextService.push(ifTaskExecution.getId(), newContext);
+            contextService.push(ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
         }
 
         List<WorkflowTask> subWorkflowTasks;
@@ -106,19 +111,17 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution subTaskExecution = TaskExecution.of(
-                ifTaskExecution.getJobId(),
-                ifTaskExecution.getId(),
-                ifTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1,
-                subWorkflowTask);
+                ifTaskExecution.getJobId(), ifTaskExecution.getId(), ifTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1, subWorkflowTask);
 
-            Context context = contextService.peek(ifTaskExecution.getId());
+            Map<String, Object> context = contextService.peek(
+                ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            contextService.push(subTaskExecution.getId(), context);
-
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         }
