@@ -30,6 +30,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.utils.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -65,6 +66,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Table
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public final class TaskExecution
     implements Errorable, Persistable<Long>, Prioritizable, Progressable, Retryable, Task {
 
