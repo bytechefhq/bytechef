@@ -74,17 +74,19 @@ public class KafkaMessageBrokerConfiguration
     private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
 
     @Autowired
-    MessageHandlerMethodFactory messageHandlerMethodFactory;
+    private MessageHandlerMethodFactory messageHandlerMethodFactory;
 
     @Autowired
-    Map<String, Object> consumerConfigs;
+    private Map<String, Object> consumerConfigs;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Bean
     KafkaMessageBroker kafkaMessageBroker(KafkaTemplate akafkaTemplate) {
         KafkaMessageBroker kafkaMessageBroker = new KafkaMessageBroker();
+
         kafkaMessageBroker.setKafkaTemplate(akafkaTemplate);
+
         return kafkaMessageBroker;
     }
 
@@ -99,6 +101,7 @@ public class KafkaMessageBrokerConfiguration
     @Bean
     public ProducerFactory<String, Object> producerFactory(
         ObjectMapper aObjectMapper, KafkaProperties aKafkaProperties) {
+
         return new DefaultKafkaProducerFactory<>(
             producerConfigs(aKafkaProperties), new StringSerializer(), new JsonSerializer<>(aObjectMapper));
     }
@@ -127,6 +130,7 @@ public class KafkaMessageBrokerConfiguration
             protected Object convertFromInternal(Message<?> message, Class<?> targetClass, Object conversionHint) {
                 String type = (String) message.getHeaders()
                     .get("_type");
+
                 if (type != null) {
                     try {
                         targetClass = Class.forName(type);
@@ -134,9 +138,11 @@ public class KafkaMessageBrokerConfiguration
                         logger.warn("Class not found: " + type, e);
                     }
                 }
+
                 JavaType javaType = getObjectMapper().constructType(targetClass);
                 Object payload = message.getPayload();
                 Class<?> view = getSerializationView(conversionHint);
+
                 // Note: in the view case, calling withType instead of forType for
                 // compatibility with Jackson <2.5
                 try {
@@ -164,6 +170,7 @@ public class KafkaMessageBrokerConfiguration
                 }
             }
         };
+
         converter.setObjectMapper(aObjectMapper);
 
         return converter;
@@ -181,28 +188,23 @@ public class KafkaMessageBrokerConfiguration
     @SuppressWarnings("unchecked")
     public void configureKafkaListeners(KafkaListenerEndpointRegistrar listenerEndpointRegistrar) {
         for (MessageBrokerConfigurer<KafkaListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
+
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }
 
     @Override
     public void registerListenerEndpoint(
-        KafkaListenerEndpointRegistrar listenerEndpointRegistrar,
-        String queueName,
-        int concurrency,
-        Object delegate,
+        KafkaListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
 
         if (Objects.equals(queueName, Queues.CONTROL)) {
             queueName = Exchanges.CONTROL;
         }
 
-        logger.info(
-            "Registring KAFKA Listener: {} -> {}:{}",
-            queueName,
-            delegate.getClass()
-                .getName(),
-            methodName);
+        Class<?> delegateClass = delegate.getClass();
+
+        logger.info("Registering KAFKA Listener: {} -> {}:{}", queueName, delegateClass.getName(), methodName);
 
         Method listenerMethod = Stream.of(delegate.getClass()
             .getMethods())
@@ -211,14 +213,15 @@ public class KafkaMessageBrokerConfiguration
             .orElseThrow(
                 () -> new IllegalArgumentException("No method found: " + methodName + " on " + delegate.getClass()));
 
-        final MethodKafkaListenerEndpoint<String, String> endpoint = createListenerEndpoint(queueName, delegate,
-            listenerMethod);
+        MethodKafkaListenerEndpoint<String, String> endpoint = createListenerEndpoint(
+            queueName, delegate, listenerMethod);
 
         listenerEndpointRegistrar.registerEndpoint(endpoint);
     }
 
     private MethodKafkaListenerEndpoint<String, String> createListenerEndpoint(
         String aQueueName, Object aListener, Method listenerMethod) {
+
         final MethodKafkaListenerEndpoint<String, String> endpoint = new MethodKafkaListenerEndpoint<>();
 
         endpoint.setBeanFactory(beanFactory);
@@ -233,6 +236,7 @@ public class KafkaMessageBrokerConfiguration
 
     private KafkaListenerContainerFactory createContainerFactory(int aConcurrency) {
         ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
+
         factory.setConcurrency(aConcurrency);
 
         return factory;

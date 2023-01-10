@@ -21,6 +21,7 @@ package com.bytechef.atlas.message.broker.config;
  * @author Ivica Cardic
  */
 public interface MessageBrokerListenerRegistrar<T> {
+
     void registerListenerEndpoint(
         T listenerEndpointRegistrar, String queueName, int concurrency, Object delegate, String methodName);
 }
