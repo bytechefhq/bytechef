@@ -120,9 +120,9 @@ public class JobServiceImpl implements JobService {
         job.setWebhooks(jobParameters.getWebhooks());
         job.setWorkflowId(workflow.getId());
 
-        log.debug("Job {} started", job.getId());
-
         job = jobRepository.save(job);
+
+        log.debug("Job '{}' with id {} created", job.getLabel(), job.getId());
 
         return job;
     }
