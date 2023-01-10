@@ -37,19 +37,16 @@ public class GitWorkflowRepository implements WorkflowRepository {
     private final GitWorkflowOperations gitWorkflowOperations;
     private final WorkflowMapper workflowMapper;
 
-    public GitWorkflowRepository(GitWorkflowOperations aGitWorkflowOperations, WorkflowMapper workflowMapper) {
-        gitWorkflowOperations = aGitWorkflowOperations;
+    public GitWorkflowRepository(GitWorkflowOperations gitWorkflowOperations, WorkflowMapper workflowMapper) {
+        this.gitWorkflowOperations = gitWorkflowOperations;
         this.workflowMapper = workflowMapper;
     }
 
     public GitWorkflowRepository(
-        String url,
-        String branch,
-        String[] searchPaths,
-        String username,
-        String password,
+        String url, String branch, String[] searchPaths, String username, String password,
         WorkflowMapper workflowMapper) {
-        gitWorkflowOperations = new JGitWorkflowOperations(url, branch, searchPaths, username, password);
+
+        this.gitWorkflowOperations = new JGitWorkflowOperations(url, branch, searchPaths, username, password);
         this.workflowMapper = workflowMapper;
     }
 

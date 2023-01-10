@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.core.io.Resource;
@@ -78,8 +79,7 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         List<Workflow> workflows = findAll();
 
         return workflows.stream()
-            .filter(workflow -> workflow.getId()
-                .equals(id))
+            .filter(workflow -> Objects.equals(workflow.getId(), id))
             .findFirst();
     }
 }
