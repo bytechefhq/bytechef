@@ -27,12 +27,12 @@ import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
-@Component
+@Configuration
 public class SequenceTaskDispatcherConfiguration {
 
     @Autowired
