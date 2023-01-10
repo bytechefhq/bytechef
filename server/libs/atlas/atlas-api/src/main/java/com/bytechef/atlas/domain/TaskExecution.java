@@ -27,6 +27,7 @@ import com.bytechef.atlas.task.Retryable;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.utils.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -41,7 +42,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
@@ -101,8 +101,8 @@ public final class TaskExecution
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @Transient
-    private Object output;
+    @Column
+    private MapWrapper output;
 
     @Column("parent_id")
     private AggregateReference<TaskExecution, Long> parentRef;
@@ -306,7 +306,15 @@ public final class TaskExecution
      * @return Object the output of the task
      */
     public Object getOutput() {
-        return output;
+        Object outputValue = null;
+
+        if (output != null) {
+            Map<String, Object> map = output.getMap();
+
+            outputValue = map.get("output");
+        }
+
+        return outputValue;
     }
 
     @JsonIgnore
@@ -458,7 +466,9 @@ public final class TaskExecution
     }
 
     public void setOutput(Object output) {
-        this.output = output;
+        if (output != null) {
+            this.output = new MapWrapper(Map.of("output", output));
+        }
     }
 
     public void setParentRef(AggregateReference<TaskExecution, Long> parentRef) {
