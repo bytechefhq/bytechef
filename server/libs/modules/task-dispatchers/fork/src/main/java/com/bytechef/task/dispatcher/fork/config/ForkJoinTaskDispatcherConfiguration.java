@@ -52,12 +52,7 @@ public class ForkJoinTaskDispatcherConfiguration {
     @Bean("forkJoinTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-            taskExecutionService,
-            taskCompletionHandler,
-            counterService,
-            taskDispatcher,
-            contextService,
-            taskEvaluator);
+            taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService, taskEvaluator);
     }
 
     @Bean("forkJoinTaskDispatcherFactory_v1")

@@ -53,8 +53,8 @@ public class EachTaskDispatcherConfiguration {
 
     @Bean("eachTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory eachTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(taskExecutionService,
-            taskCompletionHandler, counterService);
+        return (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
+            taskExecutionService, taskCompletionHandler, counterService);
     }
 
     @Bean("eachTaskDispatcherFactory_v1")

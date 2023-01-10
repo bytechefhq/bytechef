@@ -37,6 +37,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,13 +62,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final WorkflowService workflowService;
 
     public DefaultTaskCompletionHandler(
-        ContextService contextService,
-        EventPublisher eventPublisher,
-        JobExecutor jobExecutor,
-        JobService jobService,
-        TaskEvaluator taskEvaluator,
-        TaskExecutionService taskExecutionService,
-        WorkflowService workflowService) {
+        ContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
+        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
@@ -148,7 +145,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private boolean hasMoreTasks(Job job) {
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        return job.getCurrentTask() + 1 < workflow.getTasks()
-            .size();
+        List<WorkflowTask> workflowTasks = workflow.getTasks();
+
+        return job.getCurrentTask() + 1 < workflowTasks.size();
     }
 }

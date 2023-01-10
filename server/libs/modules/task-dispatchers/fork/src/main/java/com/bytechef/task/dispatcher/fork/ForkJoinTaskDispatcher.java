@@ -145,13 +145,9 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 branchWorkflowTask.put(BRANCH, i);
 
-                TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask);
-
-                branchTaskExecution.setJobId(taskExecution.getJobId());
-                branchTaskExecution.setParentId(taskExecution.getId());
-                branchTaskExecution.setPriority(taskExecution.getPriority());
-                branchTaskExecution.setStatus(TaskStatus.CREATED);
-                branchTaskExecution.setTaskNumber(1);
+                TaskExecution branchTaskExecution = TaskExecution.of(
+                    taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
+                    branchWorkflowTask);
 
                 Map<String, Object> context = contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION);

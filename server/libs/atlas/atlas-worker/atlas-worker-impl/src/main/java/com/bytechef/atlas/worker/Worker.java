@@ -227,8 +227,9 @@ public class Worker {
 
     private long calculateTimeout(TaskExecution taskExecution) {
         if (taskExecution.getTimeout() != null) {
-            return Duration.parse("PT" + taskExecution.getTimeout())
-                .toMillis();
+            Duration duration = Duration.parse("PT" + taskExecution.getTimeout());
+
+            return duration.toMillis();
         }
 
         return DEFAULT_TIME_OUT;
@@ -248,26 +249,31 @@ public class Worker {
 
         public Builder withTaskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
             this.taskHandlerResolver = taskHandlerResolver;
+
             return this;
         }
 
         public Builder withTaskEvaluator(TaskEvaluator taskEvaluator) {
             this.taskEvaluator = taskEvaluator;
+
             return this;
         }
 
         public Builder withMessageBroker(MessageBroker messageBroker) {
             this.messageBroker = messageBroker;
+
             return this;
         }
 
         public Builder withEventPublisher(EventPublisher eventPublisher) {
             this.eventPublisher = eventPublisher;
+
             return this;
         }
 
         public Builder withExecutors(ExecutorService executorService) {
             executors = executorService;
+
             return this;
         }
 
@@ -309,6 +315,7 @@ public class Worker {
         @Override
         public T get(long timeout, TimeUnit timeUnit)
             throws InterruptedException, ExecutionException, TimeoutException {
+
             return future.get(timeout, timeUnit);
         }
     }
