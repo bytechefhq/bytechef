@@ -137,8 +137,7 @@ public class CoordinatorIntTest {
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(taskHandlerResolver)
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
-            })
+            .withEventPublisher(e -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
@@ -152,17 +151,14 @@ public class CoordinatorIntTest {
             contextService, taskDispatcher, taskExecutionService, TaskEvaluator.create(), workflowService);
 
         DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, e -> {
-            }, jobExecutor, jobService, TaskEvaluator.create(), taskExecutionService,
+            contextService, e -> {}, jobExecutor, jobService, TaskEvaluator.create(), taskExecutionService,
             workflowService);
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
         Coordinator coordinator = new Coordinator(
-            e -> {
-            }, e -> {
-            }, jobExecutor, jobFacade, jobService, taskCompletionHandler,
+            e -> {}, e -> {}, jobExecutor, jobFacade, jobService, taskCompletionHandler,
             (TaskDispatcher) taskDispatcher, taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));

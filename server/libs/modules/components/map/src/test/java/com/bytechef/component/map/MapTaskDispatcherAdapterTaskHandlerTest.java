@@ -90,8 +90,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             Assertions.assertNull(taskExecution.getError());
         });
 
-        messageBroker.receive(Queues.EVENTS, t -> {
-        });
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];
 
@@ -114,8 +113,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(taskHandlerResolver)
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
-            })
+            .withEventPublisher(e -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
