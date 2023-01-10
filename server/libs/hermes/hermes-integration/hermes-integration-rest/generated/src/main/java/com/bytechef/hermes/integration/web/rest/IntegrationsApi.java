@@ -6,6 +6,7 @@
 package com.bytechef.hermes.integration.web.rest;
 
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
 import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-04T13:43:16.437907+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-10T12:28:55.699686+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "the integrations API")
 public interface IntegrationsApi {
@@ -183,6 +184,49 @@ public interface IntegrationsApi {
             }
         }
         return result.then(integrationModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /integrations/{id}/workflows : Creates new workflow and adds it to an existing integration.
+     * Creates new workflow and adds it to an existing integration.
+     *
+     * @param id The id of the integration. (required)
+     * @param postIntegrationWorkflowRequestModel  (required)
+     * @return The updated integration object. (status code 200)
+     */
+    @Operation(
+        operationId = "postIntegrationWorkflow",
+        summary = "Creates new workflow and adds it to an existing integration.",
+        tags = { "integrations" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/integrations/{id}/workflows",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<IntegrationModel>> postIntegrationWorkflow(
+        @Parameter(name = "id", description = "The id of the integration.", required = true) @PathVariable("id") Long id,
+        @Parameter(name = "PostIntegrationWorkflowRequestModel", description = "", required = true) @Valid @RequestBody Mono<PostIntegrationWorkflowRequestModel> postIntegrationWorkflowRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"workflowIds\" : [ \"workflowIds\", \"workflowIds\" ], \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 0, \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(postIntegrationWorkflowRequestModel).then(Mono.empty());
 
     }
 

@@ -30,7 +30,6 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,6 @@ import java.util.Map;
  * @author Ivica Cardic
  * @since Apr 24, 2017
  */
-@Transactional
 public class JobExecutor {
 
     private final ContextService contextService;
@@ -51,11 +49,9 @@ public class JobExecutor {
 
     @SuppressFBWarnings("EI2")
     public JobExecutor(
-        ContextService contextService,
-        TaskDispatcher<? super TaskExecution> taskDispatcher,
-        TaskExecutionService taskExecutionService,
-        TaskEvaluator taskEvaluator,
-        WorkflowService workflowService) {
+        ContextService contextService, TaskDispatcher<? super TaskExecution> taskDispatcher,
+        TaskExecutionService taskExecutionService, TaskEvaluator taskEvaluator, WorkflowService workflowService) {
+
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
@@ -90,8 +86,9 @@ public class JobExecutor {
     }
 
     private boolean hasMoreTasks(Job job, Workflow workflow) {
-        return job.getCurrentTask() < workflow.getTasks()
-            .size();
+        List<WorkflowTask> workflowTasks = workflow.getTasks();
+
+        return job.getCurrentTask() < workflowTasks.size();
     }
 
     @SuppressFBWarnings("NP")

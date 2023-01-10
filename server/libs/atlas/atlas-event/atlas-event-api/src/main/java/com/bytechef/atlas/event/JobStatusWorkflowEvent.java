@@ -53,9 +53,11 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
 
     @Override
     public String toString() {
-        return "JobStatusWorkflowEvent{" + "jobId='"
-            + jobId + '\'' + ", jobStatus="
-            + status + "} "
-            + super.toString();
+        return "JobStatusWorkflowEvent{" +
+            "jobId=" + jobId +
+            ", status=" + status +
+            ", createdDate=" + createdDate +
+            ", type='" + type + '\'' +
+            "} ";
     }
 }

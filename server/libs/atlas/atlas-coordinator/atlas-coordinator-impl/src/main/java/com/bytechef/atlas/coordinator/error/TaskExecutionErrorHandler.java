@@ -53,10 +53,9 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
     @SuppressFBWarnings("EI2")
     public TaskExecutionErrorHandler(
-        EventPublisher eventPublisher,
-        JobService jobService,
-        TaskDispatcher<? super Task> taskDispatcher,
+        EventPublisher eventPublisher, JobService jobService, TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {
+
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.taskDispatcher = taskDispatcher;

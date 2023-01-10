@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
@@ -34,6 +36,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTask implements Serializable {
 
     static {
@@ -126,8 +129,6 @@ public class WorkflowTask implements Serializable {
         if (source.containsKey(WorkflowConstants.TYPE)) {
             this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
         }
-
-        parameters = new HashMap<>();
 
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             if (!STATIC_FIELDS.contains(entry.getKey())) {

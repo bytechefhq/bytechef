@@ -33,6 +33,7 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -44,6 +45,7 @@ import java.util.Map;
  * @author Ivica Cardic
  * @author Matija Petanjek
  */
+@Configuration
 public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
     private final TaskExecutionService taskExecutionService;
@@ -53,11 +55,10 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskEvaluator taskEvaluator;
 
     public SequenceTaskCompletionHandler(
-        ContextService contextService,
-        TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskEvaluator taskEvaluator,
+        ContextService contextService, TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher<? super Task> taskDispatcher, TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
+
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -66,8 +67,8 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    public boolean canHandle(TaskExecution aTaskExecution) {
-        Long parentId = aTaskExecution.getParentId();
+    public boolean canHandle(TaskExecution taskExecution) {
+        Long parentId = taskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);

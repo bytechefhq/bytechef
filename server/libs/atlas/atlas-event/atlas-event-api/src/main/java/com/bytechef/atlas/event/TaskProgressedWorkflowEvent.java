@@ -52,9 +52,11 @@ public class TaskProgressedWorkflowEvent extends WorkflowEvent {
 
     @Override
     public String toString() {
-        return "TaskProgressedWorkflowEvent{" + "progress="
-            + progress + ", taskExecutionId='"
-            + taskExecutionId + '\'' + "} "
-            + super.toString();
+        return "TaskProgressedWorkflowEvent{" +
+            "progress=" + progress +
+            ", taskExecutionId=" + taskExecutionId +
+            ", createdDate=" + createdDate +
+            ", type='" + type + '\'' +
+            "} ";
     }
 }
