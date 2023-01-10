@@ -56,9 +56,11 @@ public class TaskStartedWorkflowEvent extends WorkflowEvent {
 
     @Override
     public String toString() {
-        return "TaskStartedWorkflowEvent{" + "jobId='"
-            + jobId + '\'' + ", taskExecutionId='"
-            + taskExecutionId + '\'' + "} "
-            + super.toString();
+        return "TaskStartedWorkflowEvent{" +
+            "jobId=" + jobId +
+            ", taskExecutionId=" + taskExecutionId +
+            ", createdDate=" + createdDate +
+            ", type='" + type + '\'' +
+            "} ";
     }
 }

@@ -82,7 +82,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        log.debug("Completing task {}", taskExecution.getId());
+        log.debug("Completing task '{}' with id {}", taskExecution.getType(), taskExecution.getId());
 
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
@@ -139,7 +139,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        log.debug("Job {} completed successfully", job.getId());
+        log.debug("Job '{}' with id {} completed successfully", job.getLabel(), job.getId());
     }
 
     private boolean hasMoreTasks(Job job) {

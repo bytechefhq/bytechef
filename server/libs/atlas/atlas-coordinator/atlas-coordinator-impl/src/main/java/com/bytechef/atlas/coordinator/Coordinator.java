@@ -43,6 +43,8 @@ import java.util.List;
 
 import com.bytechef.commons.utils.ExceptionUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The central class responsible for coordinating and executing jobs.
@@ -53,6 +55,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class Coordinator {
+
+    private static final Logger log = LoggerFactory.getLogger(Coordinator.class);
 
     private final ErrorHandler<? super Errorable> errorHandler;
     private final EventPublisher eventPublisher;
@@ -91,6 +95,8 @@ public class Coordinator {
         Job job = jobService.start(jobId);
 
         jobExecutor.execute(job);
+
+        log.debug("Job '{}' with id {} started", job.getLabel(), job.getId());
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
     }
