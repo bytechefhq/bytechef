@@ -127,8 +127,6 @@ public class WorkflowTask implements Serializable {
             this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
         }
 
-        parameters = new HashMap<>();
-
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             if (!STATIC_FIELDS.contains(entry.getKey())) {
                 parameters.put(entry.getKey(), entry.getValue());
