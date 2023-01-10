@@ -172,14 +172,6 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.error = error;
     }
 
-    public void update(Workflow workflow) {
-        createdBy = workflow.getCreatedBy();
-        createdDate = workflow.getCreatedDate();
-        lastModifiedBy = workflow.getLastModifiedBy();
-        lastModifiedDate = workflow.getLastModifiedDate();
-        version = workflow.getVersion();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -276,6 +268,14 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return isNew;
     }
 
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public void setDefinition(String definition) {
         this.definition = definition;
     }
@@ -284,12 +284,24 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.id = id;
     }
 
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
 
     public void setSourceType(SourceType sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override
