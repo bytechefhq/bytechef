@@ -23,6 +23,7 @@ package com.bytechef.atlas.message.broker;
  * @author Arik Cohen
  */
 public interface Exchanges {
+
     String TASKS = "workflow.tasks";
     String CONTROL = "workflow.control";
 }
