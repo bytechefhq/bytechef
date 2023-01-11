@@ -1,12 +1,7 @@
 import React from 'react';
 import {Cross1Icon} from '@radix-ui/react-icons';
 
-export const Tag: React.FC<{tag: string; handleDeleteTag: {}}> = ({tag}) => {
-    function handleDeleteTag(tag: string): void {
-        let handleDelete = [...tag];
-        handleDelete.find;
-    }
-
+export const Tag: React.FC<{tag?: string}> = ({tag}) => {
     return (
         <div className="leading-sm ml-4 inline-flex items-center rounded-full border bg-gray-200 px-3 py-1 text-xs font-bold text-gray-700">
             <line x1="22" y1="12" x2="2" y2="12"></line>
@@ -15,9 +10,7 @@ export const Tag: React.FC<{tag: string; handleDeleteTag: {}}> = ({tag}) => {
             <line x1="10" y1="16" x2="10.01" y2="16"></line>
             {tag}
 
-            <span onClick={() => handleDeleteTag(tag)}>
-                <Cross1Icon />
-            </span>
+            <Cross1Icon />
         </div>
     );
 };

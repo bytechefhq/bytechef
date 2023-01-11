@@ -14,6 +14,7 @@ export const IntegrationList: React.FC = () => {
                 {error &&
                     !isLoading &&
                     `An error has occurred: ${error.message}`}
+
                 {items &&
                     items.map((integration) => (
                         <IntegrationItem
@@ -24,7 +25,7 @@ export const IntegrationList: React.FC = () => {
                             tags={integration.tags}
                             workflowIds={integration.workflowIds}
                             date={integration.lastModifiedDate}
-                            status={integration.status}
+                            status={false} // missing api
                             button={''}
                         />
                     ))}
@@ -65,7 +66,7 @@ export const IntegrationList: React.FC = () => {
                                         </div>
 
                                         <div>
-                                            <Dropdown id={item.id + ''} />
+                                            <Dropdown id={item.id} />
                                         </div>
                                     </div>
                                 </a>
