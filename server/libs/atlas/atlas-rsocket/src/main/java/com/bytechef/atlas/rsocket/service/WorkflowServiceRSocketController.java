@@ -38,6 +38,13 @@ public class WorkflowServiceRSocketController {
         this.workflowService = workflowService;
     }
 
+    @MessageMapping("clearCache")
+    public Mono<Void> clearCache() {
+        workflowService.clearCache();
+
+        return Mono.empty();
+    }
+
     @MessageMapping("createWorkflow")
     public Mono<Workflow> createWorkflow(Workflow workflow) {
         return Mono.create(sink -> sink.success(
