@@ -1,6 +1,6 @@
 import {forwardRef, ReactNode} from 'react';
 import cx from 'classnames';
-import './style.css';
+import './button.css';
 
 type Size = 'small' | 'large';
 type DisplayType = 'danger' | 'icon' | 'primary' | 'secondary' | 'unstyled';

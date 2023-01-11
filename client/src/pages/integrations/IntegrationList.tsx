@@ -1,75 +1,33 @@
-import {EllipsisVerticalIcon} from '@heroicons/react/20/solid';
 import {useGetIntegrations} from '../../queries/integrations.queries';
 import React from 'react';
 import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
+import {Dropdown} from '../../components/IntegrationItem/Dropdown';
 
 export const IntegrationList: React.FC = () => {
     const {isLoading, error, data: items} = useGetIntegrations();
 
-    const integrations = [
-        {
-            category: 'Category: CRM',
-            createdBy: 'Comp',
-            createdDate: '2022-12-22T21:28:07.051Z',
-            id: '888',
-            name: 'Pipedrive',
-            description: 'string',
-            lastModifiedBy: 'string',
-            lastModifiedDate: 'Last modified 16.05.2023.',
-            tags: ['Tag1', 'Tag2'],
-            workflowIds: ['string'],
-            status: true,
-        },
-        {
-            category: 'Category: CRM',
-            createdBy: 'Com',
-            createdDate: '2022-12-22T21:28:07.051Z',
-            id: '777',
-            name: 'Salesforce',
-            description: 'string',
-            lastModifiedBy: 'string',
-            lastModifiedDate: 'Last modified 16.05.2023.',
-            tags: ['Tag1'],
-            workflowIds: ['string'],
-            status: true,
-        },
-        {
-            category: 'Category: Marketing',
-            createdBy: 'Copm',
-            createdDate: '2022-12-22T21:28:07.051Z',
-            id: '666',
-            name: 'Pipedrive',
-            description: 'string',
-            lastModifiedBy: 'string',
-            lastModifiedDate: 'Last modified 16.05.2023.',
-            tags: ['Tag1', 'Tag2', 'Tag3'],
-            workflowIds: ['string'],
-            status: false,
-        },
-    ];
-
     return (
         <>
-            {integrations.map((integration) => (
-                <IntegrationItem
-                    category={integration.category}
-                    id={integration.id}
-                    name={integration.name}
-                    description={integration.description}
-                    tags={integration.tags}
-                    workflowIds={integration.workflowIds}
-                    date={integration.lastModifiedDate}
-                    status={integration.status}
-                    button={''}
-                />
-            ))}
             <div>
                 {isLoading && 'Loading...'}
 
                 {error &&
                     !isLoading &&
                     `An error has occurred: ${error.message}`}
-
+                {items &&
+                    items.map((integration) => (
+                        <IntegrationItem
+                            category={integration.category}
+                            id={integration.id}
+                            name={integration.name}
+                            description={integration.description}
+                            tags={integration.tags}
+                            workflowIds={integration.workflowIds}
+                            date={integration.lastModifiedDate}
+                            status={integration.status}
+                            button={''}
+                        />
+                    ))}
                 {!isLoading && !error && (
                     <ul
                         role="list"
@@ -107,10 +65,7 @@ export const IntegrationList: React.FC = () => {
                                         </div>
 
                                         <div>
-                                            <EllipsisVerticalIcon
-                                                className="h-5 w-5 text-gray-400"
-                                                aria-hidden="true"
-                                            />
+                                            <Dropdown id={item.id + ''} />
                                         </div>
                                     </div>
                                 </a>
