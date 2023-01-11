@@ -17,17 +17,23 @@
 
 package com.bytechef.task.dispatcher.subflow.configuration;
 
+import com.bytechef.atlas.coordinator.CoordinatorManager;
 import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
+import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
+import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
-@Component
+@Configuration
 public class SubflowTaskDispatcherConfiguration {
 
     @Autowired
@@ -36,5 +42,28 @@ public class SubflowTaskDispatcherConfiguration {
     @Bean
     TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade);
+    }
+
+    @Configuration
+    @ConditionalOnCoordinator
+    public static class SubflowJobStatusEventListenerConfiguration {
+
+        @Autowired
+        private CoordinatorManager coordinatorManager;
+
+        @Autowired
+        private JobService jobService;
+
+        @Autowired
+        private TaskEvaluator taskEvaluator;
+
+        @Autowired
+        private TaskExecutionService taskExecutionService;
+
+        @Bean
+        SubflowJobStatusEventListener subflowJobStatusEventListener() {
+            return new SubflowJobStatusEventListener(
+                jobService, taskExecutionService, coordinatorManager, taskEvaluator);
+        }
     }
 }

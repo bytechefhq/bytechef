@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-04T13:43:16.437907+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-10T12:28:55.699686+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("category")

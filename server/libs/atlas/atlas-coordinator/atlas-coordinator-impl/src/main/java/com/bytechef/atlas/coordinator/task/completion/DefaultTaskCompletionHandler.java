@@ -37,6 +37,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,13 +62,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final WorkflowService workflowService;
 
     public DefaultTaskCompletionHandler(
-        ContextService contextService,
-        EventPublisher eventPublisher,
-        JobExecutor jobExecutor,
-        JobService jobService,
-        TaskEvaluator taskEvaluator,
-        TaskExecutionService taskExecutionService,
-        WorkflowService workflowService) {
+        ContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
+        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
@@ -85,7 +82,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        log.debug("Completing task {}", taskExecution.getId());
+        log.debug("Completing task '{}' with id {}", taskExecution.getType(), taskExecution.getId());
 
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
@@ -142,13 +139,14 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        log.debug("Job {} completed successfully", job.getId());
+        log.debug("Job '{}' with id {} completed successfully", job.getLabel(), job.getId());
     }
 
     private boolean hasMoreTasks(Job job) {
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        return job.getCurrentTask() + 1 < workflow.getTasks()
-            .size();
+        List<WorkflowTask> workflowTasks = workflow.getTasks();
+
+        return job.getCurrentTask() + 1 < workflowTasks.size();
     }
 }

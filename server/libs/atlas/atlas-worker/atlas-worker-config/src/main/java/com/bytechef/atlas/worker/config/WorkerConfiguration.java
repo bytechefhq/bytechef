@@ -58,7 +58,7 @@ public class WorkerConfiguration {
     List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
 
     @Autowired(required = false)
-    private List<TaskHandlerRegistrar> taskHandlerRegistrars = List.of();
+    private List<TaskHandlerRegistrar> taskHandlerRegistrars = Collections.emptyList();
 
     @Autowired
     private TaskEvaluator taskEvaluator;
@@ -86,9 +86,10 @@ public class WorkerConfiguration {
     TaskHandlerResolver taskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
-        taskHandlerResolverChain.setTaskHandlerResolvers(List.of(
-            taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-            defaultTaskHandlerResolver(taskHandlers)));
+        taskHandlerResolverChain.setTaskHandlerResolvers(
+            List.of(
+                taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
+                defaultTaskHandlerResolver(taskHandlers)));
 
         return taskHandlerResolverChain;
     }

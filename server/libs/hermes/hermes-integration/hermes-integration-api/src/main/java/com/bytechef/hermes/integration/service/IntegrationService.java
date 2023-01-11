@@ -36,6 +36,8 @@ public interface IntegrationService {
 
     List<Integration> getIntegrations();
 
+    Integration update(Integration integration);
+
     Integration update(
         long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
 }

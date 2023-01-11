@@ -28,6 +28,7 @@ import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
 import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -165,6 +166,40 @@ public class IntegrationControllerIntTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(integrationModel)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.description")
+                .isEqualTo(integration.getDescription())
+                .jsonPath("$.id")
+                .isEqualTo(integration.getId())
+                .jsonPath("$.name")
+                .isEqualTo(integration.getName())
+                .jsonPath("$.workflowIds[0]")
+                .isEqualTo("workflow1");
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    @SuppressFBWarnings("NP")
+    public void testPostIntegrationWorkflows() {
+        Integration integration = getIntegration();
+        PostIntegrationWorkflowRequestModel postIntegrationWorkflowRequestModel = new PostIntegrationWorkflowRequestModel()
+            .workflowName("workflowName");
+
+        when(integrationFacade.addWorkflow(anyLong(), anyString())).thenReturn(integration);
+
+        try {
+            assert integration.getId() != null;
+            this.webTestClient
+                .post()
+                .uri("/integrations/1/workflows")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(postIntegrationWorkflowRequestModel)
                 .exchange()
                 .expectStatus()
                 .isOk()
