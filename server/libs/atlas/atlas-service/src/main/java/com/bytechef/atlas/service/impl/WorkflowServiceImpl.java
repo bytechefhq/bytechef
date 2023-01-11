@@ -69,6 +69,16 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
+    public void clearCache() {
+        for(String cacheName : cacheManager.getCacheNames()) {
+             Cache cache = cacheManager.getCache(cacheName);
+
+             Objects.requireNonNull(cache).clear();
+        }
+    }
+
+    @Override
     public Workflow create(
         String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType) {
         Assert.notNull(format, "'format' must not be null.");
