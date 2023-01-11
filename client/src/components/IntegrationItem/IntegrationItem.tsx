@@ -4,14 +4,14 @@ import Header from './Header';
 
 export const IntegrationItem: React.FC<{
     button: string;
-    category: string;
-    date: string;
-    id: string;
+    category?: string;
+    date?: Date;
+    id?: number;
     name: string;
     status: boolean;
-    description: string;
-    tags: string[];
-    workflowIds: string[];
+    description?: string;
+    tags?: string[];
+    workflowIds?: string[];
 }> = ({id, name, status, category, tags, date}) => {
     return (
         <ul role="list" className="space-y-3">

@@ -1,7 +1,7 @@
 import {useGetIntegrations} from '../../queries/integrations.queries';
 import React from 'react';
 import {Dropdown} from '../../components/IntegrationItem/Dropdown';
-import { IntegrationItem } from 'components/IntegrationItem/IntegrationItem';
+import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
 
 export const IntegrationList: React.FC = () => {
     const {isLoading, error, data: items} = useGetIntegrations();
@@ -70,6 +70,20 @@ export const IntegrationList: React.FC = () => {
                     !isLoading &&
                     `An error has occurred: ${error.message}`}
 
+                {items &&
+                    items.map((integration) => (
+                        <IntegrationItem
+                            category={integration.category}
+                            id={integration.id}
+                            name={integration.name}
+                            description={integration.description}
+                            tags={integration.tags}
+                            workflowIds={integration.workflowIds}
+                            date={integration.lastModifiedDate}
+                            status={false} // missing api
+                            button={''}
+                        />
+                    ))}
                 {!isLoading && !error && (
                     <ul
                         role="list"
@@ -106,8 +120,9 @@ export const IntegrationList: React.FC = () => {
                                             </div>
                                         </div>
 
-                                    <div>
-                                        <Dropdown id={item.id + ''} />
+                                        <div>
+                                            <Dropdown id={item.id} />
+                                        </div>
                                     </div>
                                 </a>
                             </li>
