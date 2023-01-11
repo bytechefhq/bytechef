@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.parallel;
+package com.bytechef.task.dispatcher.loop;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ParallelTaskDispatcherFactoryTest {
+public class LoopBreakTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/parallel_v1.json", new ParallelTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/loop-break_v1.json", new LoopBreakTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

@@ -30,7 +30,7 @@ import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatche
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.TASKS;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class SwitchTaskDispatcherFactory implements TaskDispatcherFactory {
+public class SwitchTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SWITCH)
         .display(display("Switch")

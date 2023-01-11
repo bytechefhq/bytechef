@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.subflow;
+package com.bytechef.task.dispatcher.loop;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class SubflowTaskDispatcherFactoryTest {
+public class LoopTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/subflow_v1.json", new SubflowTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/loop_v1.json", new LoopTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

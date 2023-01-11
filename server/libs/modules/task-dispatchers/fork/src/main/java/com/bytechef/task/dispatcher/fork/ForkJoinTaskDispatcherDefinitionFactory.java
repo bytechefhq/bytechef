@@ -24,7 +24,7 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.t
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ForkJoinTaskDispatcherFactory implements TaskDispatcherFactory {
+public class ForkJoinTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(FORK_JOIN)
         .display(
