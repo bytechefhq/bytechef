@@ -188,9 +188,10 @@ public class IntegrationControllerIntTest {
     public void testPostIntegrationWorkflows() {
         Integration integration = getIntegration();
         PostIntegrationWorkflowRequestModel postIntegrationWorkflowRequestModel = new PostIntegrationWorkflowRequestModel()
-            .workflowName("workflowName");
+            .workflowName("workflowName")
+            .workflowDescription("workflowDescription");
 
-        when(integrationFacade.addWorkflow(anyLong(), anyString())).thenReturn(integration);
+        when(integrationFacade.addWorkflow(anyLong(), anyString(), anyString())).thenReturn(integration);
 
         try {
             assert integration.getId() != null;
@@ -215,6 +216,15 @@ public class IntegrationControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+
+        ArgumentCaptor<String> nameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(integrationFacade).addWorkflow(anyLong(), nameArgumentCaptor.capture(),
+            descriptionArgumentCaptor.capture());
+
+        Assertions.assertEquals("workflowName", nameArgumentCaptor.getValue());
+        Assertions.assertEquals("workflowDescription", descriptionArgumentCaptor.getValue());
     }
 
     @Test
@@ -287,7 +297,7 @@ public class IntegrationControllerIntTest {
         integration.addWorkflow("workflow1");
 
         integration.setId(1L);
-        integration.setDescription("name");
+        integration.setDescription("description");
         integration.setName("name");
 
         return integration;

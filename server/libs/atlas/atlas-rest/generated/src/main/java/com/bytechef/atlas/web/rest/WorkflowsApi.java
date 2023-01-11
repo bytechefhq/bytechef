@@ -34,10 +34,38 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-06T21:22:56.917741+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-10T15:10:10.566850+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflows", description = "the workflows API")
 public interface WorkflowsApi {
+
+    /**
+     * GET /workflows/clear-cache : Clear workflows cache.
+     * Clear workflows cache.
+     *
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "clearCache",
+        summary = "Clear workflows cache.",
+        tags = { "workflows" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workflows/clear-cache"
+    )
+    default Mono<ResponseEntity<Void>> clearCache(
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        return result.then(Mono.empty());
+
+    }
+
 
     /**
      * DELETE /workflows/{id} : Delete a workflow.

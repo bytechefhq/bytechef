@@ -25,6 +25,12 @@ export interface PostIntegrationWorkflowRequest {
      * @memberof PostIntegrationWorkflowRequest
      */
     workflowName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PostIntegrationWorkflowRequest
+     */
+    workflowDescription?: string;
 }
 
 /**
@@ -48,6 +54,7 @@ export function PostIntegrationWorkflowRequestFromJSONTyped(json: any, ignoreDis
     return {
         
         'workflowName': json['workflowName'],
+        'workflowDescription': !exists(json, 'workflowDescription') ? undefined : json['workflowDescription'],
     };
 }
 
@@ -61,6 +68,7 @@ export function PostIntegrationWorkflowRequestToJSON(value?: PostIntegrationWork
     return {
         
         'workflowName': value.workflowName,
+        'workflowDescription': value.workflowDescription,
     };
 }
 

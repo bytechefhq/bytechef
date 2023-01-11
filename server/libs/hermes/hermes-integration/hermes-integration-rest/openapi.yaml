@@ -151,6 +151,8 @@ paths:
               properties:
                 workflowName:
                   type: string
+                workflowDescription:
+                  type: string
         required: true
       responses:
         "200":
