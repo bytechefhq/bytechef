@@ -71,10 +71,11 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @SuppressFBWarnings("NP")
     public void clearCache() {
-        for(String cacheName : cacheManager.getCacheNames()) {
-             Cache cache = cacheManager.getCache(cacheName);
+        for (String cacheName : cacheManager.getCacheNames()) {
+            Cache cache = cacheManager.getCache(cacheName);
 
-             Objects.requireNonNull(cache).clear();
+            Objects.requireNonNull(cache)
+                .clear();
         }
     }
 
