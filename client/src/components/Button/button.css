@@ -6,15 +6,15 @@
     }
 
     .btn-primary {
-        @apply px-4 py-2 rounded-md bg-teal-500 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-sky-500 dark:hover:bg-sky-400;
+        @apply px-4 py-2 rounded-md bg-gray-900 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-sky-500 dark:hover:bg-sky-400;
     }
 
     .btn-secondary {
-        @apply px-4 py-2 rounded-md bg-white border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white;
+        @apply px-4 py-2 rounded-md bg-white border-gray-900 text-gray-900 hover:bg-gray-700 hover:text-white;
     }
 
     .btn-danger {
-        @apply px-4 py-2 rounded-md bg-red-500 hover:bg-red-800 hover:text-white;
+        @apply px-4 py-2 rounded-md bg-rose-500 hover:bg-rose-800 hover:text-white;
     }
 
     .btn-unstyled {
