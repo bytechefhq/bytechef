@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.parallel;
+package com.bytechef.task.dispatcher.sequence;
 
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
-import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
-import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.TASKS;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
+import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -32,14 +32,10 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ParallelTaskDispatcherFactory implements TaskDispatcherFactory {
+public class SequenceTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = TaskDispatcherDSL.taskDispatcher(
-        PARALLEL)
-        .display(
-            display("Parallel")
-                .description(
-                    "Run collection of tasks in parallel, without waiting until the previous function has completed."))
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SEQUENCE)
+        .display(display("Sequence").description("Executes list of tasks in a sequence."))
         .taskProperties(array(TASKS)
             .description("The task to use in each iteration.")
             .items(task()));

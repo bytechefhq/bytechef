@@ -22,7 +22,7 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.s
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.task.dispatcher.subflow.constants.SubflowTaskDispatcherConstants;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class SubflowTaskDispatcherFactory implements TaskDispatcherFactory {
+public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(
         SubflowTaskDispatcherConstants.SUBFLOW)

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.map;
+package com.bytechef.task.dispatcher.if_;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class MapTaskDispatcherFactoryTest {
+public class IfTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/map_v1.json", new MapTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/if_v1.json", new IfTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

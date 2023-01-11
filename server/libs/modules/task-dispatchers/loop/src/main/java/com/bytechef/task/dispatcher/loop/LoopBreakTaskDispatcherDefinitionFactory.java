@@ -15,16 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.sequence;
+package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
-import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
+import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_BREAK;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -32,13 +29,10 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class SequenceTaskDispatcherFactory implements TaskDispatcherFactory {
+public class LoopBreakTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SEQUENCE)
-        .display(display("Sequence").description("Executes list of tasks in a sequence."))
-        .taskProperties(array(TASKS)
-            .description("The task to use in each iteration.")
-            .items(task()));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP_BREAK)
+        .display(display("Loop Break").description("Breaks the loop execution."));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

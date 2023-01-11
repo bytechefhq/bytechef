@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.if_;
+package com.bytechef.task.dispatcher.fork;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDispatcherFactoryTest {
+public class ForkJoinTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/if_v1.json", new IfTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/fork-join_v1.json", new ForkJoinTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

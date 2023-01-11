@@ -31,7 +31,7 @@ import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherCons
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.LIST;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class EachTaskDispatcherFactory implements TaskDispatcherFactory {
+public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(EACH)
         .display(
