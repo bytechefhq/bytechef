@@ -1,7 +1,7 @@
-import {EllipsisVerticalIcon} from '@heroicons/react/20/solid';
 import {useGetIntegrations} from '../../queries/integrations.queries';
 import React from 'react';
-import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
+import {Dropdown} from '../../components/IntegrationItem/Dropdown';
+import { IntegrationItem } from 'components/IntegrationItem/IntegrationItem';
 
 export const IntegrationList: React.FC = () => {
     const {isLoading, error, data: items} = useGetIntegrations();
@@ -106,12 +106,8 @@ export const IntegrationList: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        <div>
-                                            <EllipsisVerticalIcon
-                                                className="h-5 w-5 text-gray-400"
-                                                aria-hidden="true"
-                                            />
-                                        </div>
+                                    <div>
+                                        <Dropdown id={item.id + ''} />
                                     </div>
                                 </a>
                             </li>
