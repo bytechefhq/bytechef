@@ -67,7 +67,7 @@ dependencies {
     implementation project(":server:libs:modules:components:xmlfile")
     implementation project(":server:libs:modules:components:xmlhelper")
     implementation project(":server:libs:modules:task-dispatchers:each")
-    implementation project(":server:libs:modules:task-dispatchers:fork")
+    implementation project(":server:libs:modules:task-dispatchers:forkjoin")
     implementation project(":server:libs:modules:task-dispatchers:if")
     implementation project(":server:libs:modules:task-dispatchers:loop")
     implementation project(":server:libs:modules:task-dispatchers:map")

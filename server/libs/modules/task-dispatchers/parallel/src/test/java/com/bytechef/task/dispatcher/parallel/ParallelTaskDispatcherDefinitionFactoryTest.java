@@ -27,6 +27,7 @@ public class ParallelTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/parallel_v1.json", new ParallelTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/parallel_v1.json",
+            new ParallelTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

@@ -17,12 +17,12 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.task.dispatcher.fork;
+package com.bytechef.task.dispatcher.forkjoin;
 
 import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
-import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCH;
-import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
-import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
+import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.BRANCH;
+import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
+import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -83,7 +83,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @author Ivica Cardic
  * @since May 11, 2017
- * @see com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler
+ * @see com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler
  */
 public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 

@@ -27,6 +27,7 @@ public class LoopTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/loop_v1.json", new LoopTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/loop_v1.json",
+            new LoopTaskDispatcherDefinitionFactory().getDefinition());
     }
 }
