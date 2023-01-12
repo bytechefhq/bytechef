@@ -27,6 +27,7 @@ public class SequenceTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/sequence_v1.json", new SequenceTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/sequence_v1.json",
+            new SequenceTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

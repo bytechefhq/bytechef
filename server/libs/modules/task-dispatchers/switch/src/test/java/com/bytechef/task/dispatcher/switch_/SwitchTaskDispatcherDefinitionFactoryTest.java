@@ -30,6 +30,7 @@ public class SwitchTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/switch_v1.json", new SwitchTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/switch_v1.json",
+            new SwitchTaskDispatcherDefinitionFactory().getDefinition());
     }
 }
