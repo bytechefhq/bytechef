@@ -33,7 +33,7 @@ dependencies {
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-rest")
     implementation project(":server:libs:modules:task-dispatchers:each")
-    implementation project(":server:libs:modules:task-dispatchers:fork")
+    implementation project(":server:libs:modules:task-dispatchers:forkjoin")
     implementation project(":server:libs:modules:task-dispatchers:if")
     implementation project(":server:libs:modules:task-dispatchers:loop")
     implementation project(":server:libs:modules:task-dispatchers:map")
