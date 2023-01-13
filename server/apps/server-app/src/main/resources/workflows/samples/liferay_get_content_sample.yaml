@@ -17,9 +17,8 @@ tasks:
     uri: ${apiEndpointUrl}
     responseFormat: JSON
     headerParameters:
-      -
-        key: Authorization
-        value: Basic ${apiToken}
+      Authorization:
+        - Basic ${apiToken}
 
   - type: logger/v1/info
     name: loggHttpResponse
