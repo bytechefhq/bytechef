@@ -10,17 +10,23 @@ const Footer: React.FC<{
 }> = ({category, tags, date}) => {
     return (
         <div className="grid grid-cols-3 gap-4">
-            <div className="w-96">
-                <Category category={category} />
-            </div>
+            {category && (
+                <div className="w-96">
+                    <Category category={category} />
+                </div>
+            )}
 
-            <div className="flex justify-start">
-                <TagList tags={tags} />
-            </div>
+            {tags && (
+                <div className="flex justify-start">
+                    <TagList tags={tags} />
+                </div>
+            )}
 
-            <div className="grid justify-items-end">
-                <Date date={date} />
-            </div>
+            {date && (
+                <div className="grid justify-items-end">
+                    <Date date={date} />
+                </div>
+            )}
         </div>
     );
 };

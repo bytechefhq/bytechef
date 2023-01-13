@@ -4,11 +4,11 @@ import Header from './Header';
 
 export const IntegrationItem: React.FC<{
     button: string;
+    name: string;
+    status: boolean;
     category?: string;
     date?: Date;
     id?: number;
-    name: string;
-    status: boolean;
     description?: string;
     tags?: string[];
     workflowIds?: string[];
