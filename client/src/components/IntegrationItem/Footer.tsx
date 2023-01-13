@@ -14,11 +14,11 @@ const Footer: React.FC<{
                 <Category category={category} />
             </div>
 
-            <div className="... flex justify-start">
+            <div className="flex justify-start">
                 <TagList tags={tags} />
             </div>
 
-            <div className="... grid justify-items-end">
+            <div className="grid justify-items-end">
                 <Date date={date} />
             </div>
         </div>
