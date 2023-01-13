@@ -34,11 +34,6 @@ management:
     rabbit:
       enabled: false # When using Rabbit, set this to true
   metrics:
-    export:
-      # Prometheus is the default metrics backend
-      prometheus:
-        enabled: true
-        step: 60
     enable:
       http: true
       jvm: true
@@ -57,6 +52,12 @@ management:
         request:
           autotime:
             enabled: true
+  # Prometheus is the default metrics backend
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
 
 openapi:
   openAPIDefinition:
