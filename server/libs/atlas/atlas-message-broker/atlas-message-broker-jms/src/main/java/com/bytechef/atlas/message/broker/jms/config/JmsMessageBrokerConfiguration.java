@@ -68,39 +68,9 @@ public class JmsMessageBrokerConfiguration
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Bean
-    JmsMessageBroker jmsMessageBroker(JmsTemplate aJmsTemplate) {
-        JmsMessageBroker jmsMessageBroker = new JmsMessageBroker();
-        jmsMessageBroker.setJmsTemplate(aJmsTemplate);
-
-        return jmsMessageBroker;
-    }
-
-    @Bean
-    public MessageConverter jacksonJmsMessageConverter(ObjectMapper objectMapper) {
-        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-
-        converter.setObjectMapper(objectMapper);
-        converter.setTargetType(MessageType.TEXT);
-        converter.setTypeIdPropertyName("_type");
-
-        return converter;
-    }
-
-    @Bean
-    public JmsListenerContainerFactory<?> jmsListenerContainerFactory(
-        ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer) {
-        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-
-        configurer.configure(factory, connectionFactory);
-
-        return factory;
-    }
-
     @Override
-    @SuppressWarnings("unchecked")
     public void configureJmsListeners(JmsListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer<JmsListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }
@@ -116,27 +86,55 @@ public class JmsMessageBrokerConfiguration
 
         logger.info("Registering JMS Listener: {} -> {}:{}", queueName, delegate.getClass(), methodName);
 
-        MessageListenerAdapter messageListener = new NoReplyMessageListenerAdapter(delegate);
+        MessageListenerAdapter messageListenerAdapter = new NoReplyMessageListenerAdapter(delegate);
 
-        messageListener.setMessageConverter(jacksonJmsMessageConverter(objectMapper));
-        messageListener.setDefaultListenerMethod(methodName);
+        messageListenerAdapter.setMessageConverter(jacksonJmsMessageConverter(objectMapper));
+        messageListenerAdapter.setDefaultListenerMethod(methodName);
 
-        SimpleJmsListenerEndpoint endpoint = new SimpleJmsListenerEndpoint();
+        SimpleJmsListenerEndpoint simpleJmsListenerEndpoint = new SimpleJmsListenerEndpoint();
 
-        endpoint.setId(queueName + "Endpoint");
-        endpoint.setDestination(queueName);
-        endpoint.setMessageListener(messageListener);
+        simpleJmsListenerEndpoint.setId(queueName + "Endpoint");
+        simpleJmsListenerEndpoint.setDestination(queueName);
+        simpleJmsListenerEndpoint.setMessageListener(messageListenerAdapter);
 
-        listenerEndpointRegistrar.registerEndpoint(endpoint, createContainerFactory(concurrency));
+        listenerEndpointRegistrar.registerEndpoint(simpleJmsListenerEndpoint, createContainerFactory(concurrency));
+    }
+
+    @Bean
+    MessageConverter jacksonJmsMessageConverter(ObjectMapper objectMapper) {
+        MappingJackson2MessageConverter mappingJackson2MessageConverter = new MappingJackson2MessageConverter();
+
+        mappingJackson2MessageConverter.setObjectMapper(objectMapper);
+        mappingJackson2MessageConverter.setTargetType(MessageType.TEXT);
+        mappingJackson2MessageConverter.setTypeIdPropertyName("_type");
+
+        return mappingJackson2MessageConverter;
+    }
+
+    @Bean
+    JmsListenerContainerFactory<?> jmsListenerContainerFactory(
+        ConnectionFactory connectionFactory,
+        DefaultJmsListenerContainerFactoryConfigurer jmsListenerContainerFactoryConfigurer) {
+
+        DefaultJmsListenerContainerFactory jmsListenerContainerFactory = new DefaultJmsListenerContainerFactory();
+
+        jmsListenerContainerFactoryConfigurer.configure(jmsListenerContainerFactory, connectionFactory);
+
+        return jmsListenerContainerFactory;
+    }
+
+    @Bean
+    JmsMessageBroker jmsMessageBroker(JmsTemplate jmsTemplate) {
+        return new JmsMessageBroker(jmsTemplate);
     }
 
     private DefaultJmsListenerContainerFactory createContainerFactory(int aConcurrency) {
-        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        DefaultJmsListenerContainerFactory jmsListenerContainerFactory = new DefaultJmsListenerContainerFactory();
 
-        factory.setConcurrency(String.valueOf(aConcurrency));
-        factory.setConnectionFactory(connectionFactory);
+        jmsListenerContainerFactory.setConcurrency(String.valueOf(aConcurrency));
+        jmsListenerContainerFactory.setConnectionFactory(connectionFactory);
 
-        return factory;
+        return jmsListenerContainerFactory;
     }
 
     private static class NoReplyMessageListenerAdapter extends MessageListenerAdapter {
@@ -146,7 +144,7 @@ public class JmsMessageBrokerConfiguration
         }
 
         @Override
-        protected void handleResult(Object aResult, Message aRequest, Session aSession) {
+        protected void handleResult(Object result, Message request, Session session) {
             // ignore
         }
     }

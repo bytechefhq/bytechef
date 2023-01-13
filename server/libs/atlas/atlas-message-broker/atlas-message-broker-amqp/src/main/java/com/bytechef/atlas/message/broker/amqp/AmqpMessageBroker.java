@@ -24,6 +24,7 @@ import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.task.Retryable;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.util.Assert;
 
 /**
@@ -38,23 +39,26 @@ public class AmqpMessageBroker implements MessageBroker {
     public void send(String routingKey, Object message) {
         Assert.notNull(routingKey, "'routingKey' must not be null");
 
-        amqpTemplate.convertAndSend(determineExchange(routingKey), determineRoutingKey(routingKey), message, m -> {
-            if (message instanceof Retryable) {
-                Retryable r = (Retryable) message;
+        amqpTemplate.convertAndSend(determineExchange(routingKey), determineRoutingKey(routingKey), message,
+            amqpMessage -> {
+                if (message instanceof Retryable) {
+                    Retryable retryable = (Retryable) message;
 
-                m.getMessageProperties()
-                    .setDelay((int) r.getRetryDelayMillis());
-            }
+                    MessageProperties messageProperties = amqpMessage.getMessageProperties();
 
-            if (message instanceof Prioritizable) {
-                Prioritizable p = (Prioritizable) message;
+                    messageProperties.setDelay((int) retryable.getRetryDelayMillis());
+                }
 
-                m.getMessageProperties()
-                    .setPriority(p.getPriority());
-            }
+                if (message instanceof Prioritizable) {
+                    Prioritizable prioritizable = (Prioritizable) message;
 
-            return m;
-        });
+                    MessageProperties messageProperties = amqpMessage.getMessageProperties();
+
+                    messageProperties.setPriority(prioritizable.getPriority());
+                }
+
+                return amqpMessage;
+            });
     }
 
     private String determineExchange(String routingKey) {
@@ -67,6 +71,7 @@ public class AmqpMessageBroker implements MessageBroker {
 
     private String determineRoutingKey(String routingKey) {
         String[] routingKeyItems = routingKey.split("/");
+
         Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + routingKey);
 
         return routingKeyItems.length == 2 ? routingKeyItems[1] : routingKey;
