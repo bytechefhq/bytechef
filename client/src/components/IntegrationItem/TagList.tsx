@@ -1,16 +1,16 @@
 import React from 'react';
-import {AddTagButton} from './AddTagButton';
+
 import {Tag} from './Tag';
+import {PlusIcon} from '@radix-ui/react-icons';
 
-export const TagList: React.FC<{tag: string; button: string}> = ({
-    tag,
-    button,
-}) => {
+export const TagList: React.FC<{tags?: string[]}> = ({tags}) => {
     return (
-        <div>
-            <Tag tag={tag} />
+        <span className="flex flex-row space-x-2">
+            {tags && tags.map((tag) => <Tag tag={tag} />)}
 
-            <AddTagButton button={button} />
-        </div>
+            <div className="self-center">
+                <PlusIcon />
+            </div>
+        </span>
     );
 };
