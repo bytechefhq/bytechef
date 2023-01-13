@@ -2,6 +2,7 @@ import {useGetIntegrations} from '../../queries/integrations.queries';
 import React from 'react';
 import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
 import {Dropdown} from '../../components/IntegrationItem/Dropdown';
+import {Tag} from 'components/IntegrationItem/Tag';
 
 export const IntegrationList: React.FC = () => {
     const {isLoading, error, data: items} = useGetIntegrations();
