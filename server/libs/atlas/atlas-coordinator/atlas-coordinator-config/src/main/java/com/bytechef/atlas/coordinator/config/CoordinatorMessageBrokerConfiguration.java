@@ -21,6 +21,7 @@ import com.bytechef.atlas.coordinator.Coordinator;
 import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
+import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.BeansException;
@@ -46,52 +47,57 @@ public class CoordinatorMessageBrokerConfiguration implements ApplicationContext
     }
 
     @Bean
-    MessageBrokerConfigurer<?> coordinatorMessageBrokerConfigurer() {
-        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            Coordinator coordinator = applicationContext.getBean(Coordinator.class);
+    MessageBrokerConfigurer coordinatorMessageBrokerConfigurer() {
+        return new MessageBrokerConfigurer() {
 
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                Queues.COMPLETIONS,
-                coordinatorProperties.getSubscriptions()
-                    .getCompletions(),
-                coordinator,
-                "complete");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                Queues.ERRORS,
-                coordinatorProperties.getSubscriptions()
-                    .getErrors(),
-                coordinator,
-                "handleError");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                Queues.EVENTS,
-                coordinatorProperties.getSubscriptions()
-                    .getEvents(),
-                applicationContext.getBean(EventListener.class),
-                "onApplicationEvent");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                Queues.JOBS,
-                coordinatorProperties.getSubscriptions()
-                    .getJobs(),
-                coordinator,
-                "start");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                Queues.RESTARTS,
-                coordinatorProperties.getSubscriptions()
-                    .getRequests(),
-                coordinator,
-                "resume");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                Queues.STOPS,
-                coordinatorProperties.getSubscriptions()
-                    .getRequests(),
-                coordinator,
-                "stop");
+            @Override
+            public <T> void configure(
+                T listenerEndpointRegistrar, MessageBrokerListenerRegistrar<T> messageBrokerListenerRegistrar) {
+                Coordinator coordinator = applicationContext.getBean(Coordinator.class);
+
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar,
+                    Queues.COMPLETIONS,
+                    coordinatorProperties.getSubscriptions()
+                        .getCompletions(),
+                    coordinator,
+                    "complete");
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar,
+                    Queues.ERRORS,
+                    coordinatorProperties.getSubscriptions()
+                        .getErrors(),
+                    coordinator,
+                    "handleError");
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar,
+                    Queues.EVENTS,
+                    coordinatorProperties.getSubscriptions()
+                        .getEvents(),
+                    applicationContext.getBean(EventListener.class),
+                    "onApplicationEvent");
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar,
+                    Queues.JOBS,
+                    coordinatorProperties.getSubscriptions()
+                        .getJobs(),
+                    coordinator,
+                    "start");
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar,
+                    Queues.RESTARTS,
+                    coordinatorProperties.getSubscriptions()
+                        .getRequests(),
+                    coordinator,
+                    "resume");
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar,
+                    Queues.STOPS,
+                    coordinatorProperties.getSubscriptions()
+                        .getRequests(),
+                    coordinator,
+                    "stop");
+            }
         };
     }
 

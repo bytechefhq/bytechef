@@ -60,65 +60,25 @@ import org.springframework.context.annotation.Configuration;
 public class AmqpMessageBrokerConfiguration
     implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);
 
     @Autowired
     private ConnectionFactory connectionFactory;
 
+    @SuppressWarnings("rawtypes")
     @Autowired(required = false)
     private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private RabbitProperties rabbitProperties;
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Bean
-    RabbitAdmin admin(ConnectionFactory connectionFactory) {
-        return new RabbitAdmin(connectionFactory);
-    }
-
-    @Bean
-    AmqpMessageBroker amqpMessageBroker(AmqpTemplate amqpTemplate) {
-        AmqpMessageBroker amqpMessageBroker = new AmqpMessageBroker();
-        amqpMessageBroker.setAmqpTemplate(amqpTemplate);
-        return amqpMessageBroker;
-    }
-
-    @Bean
-    MessageConverter jacksonAmqpMessageConverter(ObjectMapper objectMapper) {
-        return new Jackson2JsonMessageConverter(objectMapper);
-    }
-
-    @Bean
-    Queue dlqQueue() {
-        return new Queue(Queues.DLQ);
-    }
-
-    @Bean
-    Queue controlQueue() {
-        return new Queue(Queues.CONTROL, true, true, true);
-    }
-
-    @Bean
-    Exchange tasksExchange() {
-        return ExchangeBuilder.directExchange(Exchanges.TASKS)
-            .durable(true)
-            .build();
-    }
-
-    @Bean
-    Exchange controlExchange() {
-        return ExchangeBuilder.fanoutExchange(Exchanges.CONTROL)
-            .durable(true)
-            .build();
-    }
 
     @Override
     @SuppressWarnings("unchecked")
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer<RabbitListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }
@@ -151,13 +111,67 @@ public class AmqpMessageBrokerConfiguration
         registerListenerEndpoint(listenerEndpointRegistrar, queue, exchange, concurrency, delegate, methodName);
     }
 
+    @Bean
+    RabbitAdmin admin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
+    }
+
+    @Bean
+    AmqpMessageBroker amqpMessageBroker(AmqpTemplate amqpTemplate) {
+        AmqpMessageBroker amqpMessageBroker = new AmqpMessageBroker();
+
+        amqpMessageBroker.setAmqpTemplate(amqpTemplate);
+
+        return amqpMessageBroker;
+    }
+
+    @Bean
+    MessageConverter jacksonAmqpMessageConverter(ObjectMapper objectMapper) {
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    @Bean
+    Queue dlqQueue() {
+        return new Queue(Queues.DLQ);
+    }
+
+    @Bean
+    Queue controlQueue() {
+        return new Queue(Queues.CONTROL, true, true, true);
+    }
+
+    @Bean
+    Exchange tasksExchange() {
+        return ExchangeBuilder.directExchange(Exchanges.TASKS)
+            .durable(true)
+            .build();
+    }
+
+    @Bean
+    Exchange controlExchange() {
+        return ExchangeBuilder.fanoutExchange(Exchanges.CONTROL)
+            .durable(true)
+            .build();
+    }
+
+    private SimpleRabbitListenerContainerFactory createContainerFactory(int aConcurrency) {
+        SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory = new SimpleRabbitListenerContainerFactory();
+
+        simpleRabbitListenerContainerFactory.setConcurrentConsumers(aConcurrency);
+        simpleRabbitListenerContainerFactory.setConnectionFactory(connectionFactory);
+        simpleRabbitListenerContainerFactory.setDefaultRequeueRejected(false);
+        simpleRabbitListenerContainerFactory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
+        simpleRabbitListenerContainerFactory.setPrefetchCount(rabbitProperties.getListener()
+            .getDirect()
+            .getPrefetch());
+
+        return simpleRabbitListenerContainerFactory;
+    }
+
     private void registerListenerEndpoint(
-        RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
-        Queue queue,
-        Exchange exchange,
-        int concurrency,
-        Object delegate,
-        String methodName) {
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, Queue queue, Exchange exchange, int concurrency,
+        Object delegate, String methodName) {
+
         admin(connectionFactory).declareQueue(queue);
         admin(connectionFactory)
             .declareBinding(BindingBuilder.bind(queue)
@@ -170,24 +184,12 @@ public class AmqpMessageBrokerConfiguration
         messageListenerAdapter.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
         messageListenerAdapter.setDefaultListenerMethod(methodName);
 
-        SimpleRabbitListenerEndpoint listenerEndpoint = new SimpleRabbitListenerEndpoint();
+        SimpleRabbitListenerEndpoint simpleRabbitListenerEndpoint = new SimpleRabbitListenerEndpoint();
 
-        listenerEndpoint.setId(queue.getName() + "Endpoint");
-        listenerEndpoint.setQueueNames(queue.getName());
-        listenerEndpoint.setMessageListener(messageListenerAdapter);
+        simpleRabbitListenerEndpoint.setId(queue.getName() + "Endpoint");
+        simpleRabbitListenerEndpoint.setQueueNames(queue.getName());
+        simpleRabbitListenerEndpoint.setMessageListener(messageListenerAdapter);
 
-        listenerEndpointRegistrar.registerEndpoint(listenerEndpoint, createContainerFactory(concurrency));
-    }
-
-    private SimpleRabbitListenerContainerFactory createContainerFactory(int aConcurrency) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConcurrentConsumers(aConcurrency);
-        factory.setConnectionFactory(connectionFactory);
-        factory.setDefaultRequeueRejected(false);
-        factory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
-        factory.setPrefetchCount(rabbitProperties.getListener()
-            .getDirect()
-            .getPrefetch());
-        return factory;
+        listenerEndpointRegistrar.registerEndpoint(simpleRabbitListenerEndpoint, createContainerFactory(concurrency));
     }
 }

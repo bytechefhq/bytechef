@@ -20,7 +20,7 @@ package com.bytechef.atlas.message.broker.config;
 /**
  * @author Ivica Cardic
  */
-public interface MessageBrokerConfigurer<T> {
+public interface MessageBrokerConfigurer {
 
-    void configure(T listenerEndpointRegistrar, MessageBrokerListenerRegistrar<T> messageBrokerListenerRegistrar);
+    <T> void configure(T listenerEndpointRegistrar, MessageBrokerListenerRegistrar<T> messageBrokerListenerRegistrar);
 }

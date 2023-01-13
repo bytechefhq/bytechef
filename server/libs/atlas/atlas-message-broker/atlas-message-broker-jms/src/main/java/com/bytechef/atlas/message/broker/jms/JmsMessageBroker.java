@@ -30,26 +30,29 @@ import org.springframework.util.Assert;
  */
 public class JmsMessageBroker implements MessageBroker {
 
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
+
+    public JmsMessageBroker(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
     @Override
     public void send(String routingKey, Object message) {
         Assert.notNull(routingKey, "'routingKey' must not be null");
+
         if (message instanceof Retryable) {
-            Retryable r = (Retryable) message;
-            delay(r.getRetryDelayMillis());
+            Retryable retryable = (Retryable) message;
+
+            delay(retryable.getRetryDelayMillis());
         }
+
         jmsTemplate.convertAndSend(routingKey, message);
     }
 
-    private void delay(long aValue) {
+    private void delay(long value) {
         try {
-            TimeUnit.MILLISECONDS.sleep(aValue);
+            TimeUnit.MILLISECONDS.sleep(value);
         } catch (InterruptedException e) {
         }
-    }
-
-    public void setJmsTemplate(JmsTemplate aJmsTemplate) {
-        jmsTemplate = aJmsTemplate;
     }
 }
