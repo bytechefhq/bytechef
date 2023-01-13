@@ -55,11 +55,12 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public Integration addWorkflow(long id, String workflowName) {
+    public Integration addWorkflow(long id, String workflowName, String workflowDescription) {
         Integration integration = integrationService.getIntegration(id);
 
         Workflow workflow = workflowService.create(
-            "{\"label\": \"" + workflowName + "\", \"tasks\": []}", Workflow.Format.JSON, Workflow.SourceType.JDBC);
+            "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}".formatted(workflowName, workflowDescription),
+            Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         integration.addWorkflow(workflow.getId());
 

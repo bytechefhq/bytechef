@@ -60,19 +60,56 @@ import org.springframework.context.annotation.Configuration;
 public class AmqpMessageBrokerConfiguration
     implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);
 
     @Autowired
     private ConnectionFactory connectionFactory;
 
+    @SuppressWarnings("rawtypes")
     @Autowired(required = false)
     private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private RabbitProperties rabbitProperties;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @Override
+    @SuppressWarnings("unchecked")
+    public void configureRabbitListeners(RabbitListenerEndpointRegistrar listenerEndpointRegistrar) {
+        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+            messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
+        }
+    }
+
+    @Override
+    public void registerListenerEndpoint(
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
+        String methodName) {
+
+        Class<?> delegateClass = delegate.getClass();
+
+        logger.info("Registering AMQP Listener: {} -> {}:{}", queueName, delegateClass.getName(), methodName);
+
+        Exchange exchange;
+        Queue queue;
+
+        if (Objects.equals(queueName, Queues.CONTROL)) {
+            exchange = controlExchange();
+            queue = controlQueue();
+        } else {
+            exchange = tasksExchange();
+
+            Map<String, Object> args = new HashMap<String, Object>();
+            args.put("x-dead-letter-exchange", "");
+            args.put("x-dead-letter-routing-key", Queues.DLQ);
+
+            queue = new Queue(queueName, true, false, false, args);
+        }
+
+        registerListenerEndpoint(listenerEndpointRegistrar, queue, exchange, concurrency, delegate, methodName);
+    }
 
     @Bean
     RabbitAdmin admin(ConnectionFactory connectionFactory) {
@@ -82,7 +119,9 @@ public class AmqpMessageBrokerConfiguration
     @Bean
     AmqpMessageBroker amqpMessageBroker(AmqpTemplate amqpTemplate) {
         AmqpMessageBroker amqpMessageBroker = new AmqpMessageBroker();
+
         amqpMessageBroker.setAmqpTemplate(amqpTemplate);
+
         return amqpMessageBroker;
     }
 
@@ -115,54 +154,24 @@ public class AmqpMessageBrokerConfiguration
             .build();
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void configureRabbitListeners(RabbitListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer<RabbitListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
-            messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
-        }
-    }
+    private SimpleRabbitListenerContainerFactory createContainerFactory(int aConcurrency) {
+        SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory = new SimpleRabbitListenerContainerFactory();
 
-    @Override
-    public void registerListenerEndpoint(
-        RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
-        String queueName,
-        int concurrency,
-        Object delegate,
-        String methodName) {
-        logger.info(
-            "Registring AMQP Listener: {} -> {}:{}",
-            queueName,
-            delegate.getClass()
-                .getName(),
-            methodName);
+        simpleRabbitListenerContainerFactory.setConcurrentConsumers(aConcurrency);
+        simpleRabbitListenerContainerFactory.setConnectionFactory(connectionFactory);
+        simpleRabbitListenerContainerFactory.setDefaultRequeueRejected(false);
+        simpleRabbitListenerContainerFactory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
+        simpleRabbitListenerContainerFactory.setPrefetchCount(rabbitProperties.getListener()
+            .getDirect()
+            .getPrefetch());
 
-        Exchange exchange;
-        Queue queue;
-
-        if (Objects.equals(queueName, Queues.CONTROL)) {
-            exchange = controlExchange();
-            queue = controlQueue();
-        } else {
-            exchange = tasksExchange();
-
-            Map<String, Object> args = new HashMap<String, Object>();
-            args.put("x-dead-letter-exchange", "");
-            args.put("x-dead-letter-routing-key", Queues.DLQ);
-
-            queue = new Queue(queueName, true, false, false, args);
-        }
-
-        registerListenerEndpoint(listenerEndpointRegistrar, queue, exchange, concurrency, delegate, methodName);
+        return simpleRabbitListenerContainerFactory;
     }
 
     private void registerListenerEndpoint(
-        RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
-        Queue queue,
-        Exchange exchange,
-        int concurrency,
-        Object delegate,
-        String methodName) {
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, Queue queue, Exchange exchange, int concurrency,
+        Object delegate, String methodName) {
+
         admin(connectionFactory).declareQueue(queue);
         admin(connectionFactory)
             .declareBinding(BindingBuilder.bind(queue)
@@ -175,24 +184,12 @@ public class AmqpMessageBrokerConfiguration
         messageListenerAdapter.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
         messageListenerAdapter.setDefaultListenerMethod(methodName);
 
-        SimpleRabbitListenerEndpoint listenerEndpoint = new SimpleRabbitListenerEndpoint();
+        SimpleRabbitListenerEndpoint simpleRabbitListenerEndpoint = new SimpleRabbitListenerEndpoint();
 
-        listenerEndpoint.setId(queue.getName() + "Endpoint");
-        listenerEndpoint.setQueueNames(queue.getName());
-        listenerEndpoint.setMessageListener(messageListenerAdapter);
+        simpleRabbitListenerEndpoint.setId(queue.getName() + "Endpoint");
+        simpleRabbitListenerEndpoint.setQueueNames(queue.getName());
+        simpleRabbitListenerEndpoint.setMessageListener(messageListenerAdapter);
 
-        listenerEndpointRegistrar.registerEndpoint(listenerEndpoint, createContainerFactory(concurrency));
-    }
-
-    private SimpleRabbitListenerContainerFactory createContainerFactory(int aConcurrency) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConcurrentConsumers(aConcurrency);
-        factory.setConnectionFactory(connectionFactory);
-        factory.setDefaultRequeueRejected(false);
-        factory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));
-        factory.setPrefetchCount(rabbitProperties.getListener()
-            .getDirect()
-            .getPrefetch());
-        return factory;
+        listenerEndpointRegistrar.registerEndpoint(simpleRabbitListenerEndpoint, createContainerFactory(concurrency));
     }
 }

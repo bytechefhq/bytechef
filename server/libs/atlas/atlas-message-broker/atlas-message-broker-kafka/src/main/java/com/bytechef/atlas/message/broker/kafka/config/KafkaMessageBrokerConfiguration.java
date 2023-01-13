@@ -53,6 +53,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.converter.MessageConverter;
@@ -67,6 +68,8 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
 public class KafkaMessageBrokerConfiguration
     implements KafkaListenerConfigurer, MessageBrokerListenerRegistrar<KafkaListenerEndpointRegistrar> {
 
+    private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBrokerConfiguration.class);
+
     @Autowired
     private BeanFactory beanFactory;
 
@@ -74,37 +77,72 @@ public class KafkaMessageBrokerConfiguration
     private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
 
     @Autowired
-    MessageHandlerMethodFactory messageHandlerMethodFactory;
+    private MessageHandlerMethodFactory messageHandlerMethodFactory;
 
     @Autowired
-    Map<String, Object> consumerConfigs;
+    private Map<String, Object> consumerConfigs;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @Override
+    @SuppressWarnings("unchecked")
+    public void configureKafkaListeners(KafkaListenerEndpointRegistrar listenerEndpointRegistrar) {
+        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+            messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
+        }
+    }
+
+    @Override
+    public void registerListenerEndpoint(
+        KafkaListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
+        String methodName) {
+
+        if (Objects.equals(queueName, Queues.CONTROL)) {
+            queueName = Exchanges.CONTROL;
+        }
+
+        Class<?> delegateClass = delegate.getClass();
+
+        logger.info("Registering KAFKA Listener: {} -> {}:{}", queueName, delegateClass.getName(), methodName);
+
+        Method listenerMethod = Stream.of(delegate.getClass()
+            .getMethods())
+            .filter(it -> methodName.equals(it.getName()))
+            .findFirst()
+            .orElseThrow(
+                () -> new IllegalArgumentException("No method found: " + methodName + " on " + delegate.getClass()));
+
+        MethodKafkaListenerEndpoint<String, String> endpoint = createListenerEndpoint(
+            queueName, delegate, listenerMethod);
+
+        listenerEndpointRegistrar.registerEndpoint(endpoint);
+    }
 
     @Bean
-    KafkaMessageBroker kafkaMessageBroker(KafkaTemplate akafkaTemplate) {
+    KafkaMessageBroker kafkaMessageBroker(KafkaTemplate kafkaTemplate) {
         KafkaMessageBroker kafkaMessageBroker = new KafkaMessageBroker();
-        kafkaMessageBroker.setKafkaTemplate(akafkaTemplate);
+
+        kafkaMessageBroker.setKafkaTemplate(kafkaTemplate);
+
         return kafkaMessageBroker;
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate(ObjectMapper aObjectMapper, KafkaProperties aKafkaProperties) {
+    KafkaTemplate<String, Object> kafkaTemplate(ObjectMapper objectMapper, KafkaProperties kafkaProperties) {
         KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(
-            producerFactory(aObjectMapper, aKafkaProperties));
+            producerFactory(objectMapper, kafkaProperties));
 
         return kafkaTemplate;
     }
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory(
+    ProducerFactory<String, Object> producerFactory(
         ObjectMapper aObjectMapper, KafkaProperties aKafkaProperties) {
+
         return new DefaultKafkaProducerFactory<>(
             producerConfigs(aKafkaProperties), new StringSerializer(), new JsonSerializer<>(aObjectMapper));
     }
 
     @Bean
-    public Map<String, Object> producerConfigs(KafkaProperties aKafkaProperties) {
+    Map<String, Object> producerConfigs(KafkaProperties aKafkaProperties) {
         Map<String, Object> props = aKafkaProperties.buildProducerProperties();
 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -114,19 +152,22 @@ public class KafkaMessageBrokerConfiguration
     }
 
     @Bean
-    public Map<String, Object> consumerConfigs(KafkaProperties kafkaProperties) {
+    Map<String, Object> consumerConfigs(KafkaProperties kafkaProperties) {
         Map<String, Object> props = kafkaProperties.buildConsumerProperties();
 
         return props;
     }
 
     @Bean
-    public MessageConverter jacksonMessageConverter(ObjectMapper aObjectMapper) {
-        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter() {
+    MessageConverter jacksonMessageConverter(ObjectMapper aObjectMapper) {
+        MappingJackson2MessageConverter mappingJackson2MessageConverter = new MappingJackson2MessageConverter() {
+
             @Override
             protected Object convertFromInternal(Message<?> message, Class<?> targetClass, Object conversionHint) {
-                String type = (String) message.getHeaders()
-                    .get("_type");
+                MessageHeaders messageHeaders = message.getHeaders();
+
+                String type = (String) messageHeaders.get("_type");
+
                 if (type != null) {
                     try {
                         targetClass = Class.forName(type);
@@ -134,9 +175,11 @@ public class KafkaMessageBrokerConfiguration
                         logger.warn("Class not found: " + type, e);
                     }
                 }
+
                 JavaType javaType = getObjectMapper().constructType(targetClass);
                 Object payload = message.getPayload();
                 Class<?> view = getSerializationView(conversionHint);
+
                 // Note: in the view case, calling withType instead of forType for
                 // compatibility with Jackson <2.5
                 try {
@@ -164,9 +207,10 @@ public class KafkaMessageBrokerConfiguration
                 }
             }
         };
-        converter.setObjectMapper(aObjectMapper);
 
-        return converter;
+        mappingJackson2MessageConverter.setObjectMapper(aObjectMapper);
+
+        return mappingJackson2MessageConverter;
     }
 
     @Bean
@@ -177,48 +221,17 @@ public class KafkaMessageBrokerConfiguration
         return messageHandlerMethodFactory;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void configureKafkaListeners(KafkaListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer<KafkaListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
-            messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
-        }
-    }
+    private KafkaListenerContainerFactory createContainerFactory(int aConcurrency) {
+        ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
 
-    @Override
-    public void registerListenerEndpoint(
-        KafkaListenerEndpointRegistrar listenerEndpointRegistrar,
-        String queueName,
-        int concurrency,
-        Object delegate,
-        String methodName) {
+        factory.setConcurrency(aConcurrency);
 
-        if (Objects.equals(queueName, Queues.CONTROL)) {
-            queueName = Exchanges.CONTROL;
-        }
-
-        logger.info(
-            "Registring KAFKA Listener: {} -> {}:{}",
-            queueName,
-            delegate.getClass()
-                .getName(),
-            methodName);
-
-        Method listenerMethod = Stream.of(delegate.getClass()
-            .getMethods())
-            .filter(it -> methodName.equals(it.getName()))
-            .findFirst()
-            .orElseThrow(
-                () -> new IllegalArgumentException("No method found: " + methodName + " on " + delegate.getClass()));
-
-        final MethodKafkaListenerEndpoint<String, String> endpoint = createListenerEndpoint(queueName, delegate,
-            listenerMethod);
-
-        listenerEndpointRegistrar.registerEndpoint(endpoint);
+        return factory;
     }
 
     private MethodKafkaListenerEndpoint<String, String> createListenerEndpoint(
         String aQueueName, Object aListener, Method listenerMethod) {
+
         final MethodKafkaListenerEndpoint<String, String> endpoint = new MethodKafkaListenerEndpoint<>();
 
         endpoint.setBeanFactory(beanFactory);
@@ -229,12 +242,5 @@ public class KafkaMessageBrokerConfiguration
         endpoint.setMessageHandlerMethodFactory(messageHandlerMethodFactory);
 
         return endpoint;
-    }
-
-    private KafkaListenerContainerFactory createContainerFactory(int aConcurrency) {
-        ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
-        factory.setConcurrency(aConcurrency);
-
-        return factory;
     }
 }

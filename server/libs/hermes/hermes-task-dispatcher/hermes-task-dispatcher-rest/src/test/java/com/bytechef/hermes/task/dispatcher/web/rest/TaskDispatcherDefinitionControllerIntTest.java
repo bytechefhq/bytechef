@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.web.rest.config.TaskDispatcherDefinitionRestTestConfiguration;
 import java.util.List;
@@ -38,7 +38,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WebFluxTest(TaskDispatcherDefinitionController.class)
 public class TaskDispatcherDefinitionControllerIntTest {
 
-    private static final List<TaskDispatcherFactory> TASK_DISPATCHER_FACTORIES = List.of(
+    private static final List<TaskDispatcherDefinitionFactory> TASK_DISPATCHER_DEFINITION_FACTORIES = List.of(
         () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher1"),
         () -> TaskDispatcherDSL.taskDispatcher("task-dispatcher2"));
 
@@ -78,8 +78,8 @@ public class TaskDispatcherDefinitionControllerIntTest {
     static class TaskDispatcherFactoryConfiguration {
 
         @Bean
-        public List<TaskDispatcherFactory> taskDispatcherFactories() {
-            return TASK_DISPATCHER_FACTORIES;
+        public List<TaskDispatcherDefinitionFactory> taskDispatcherFactories() {
+            return TASK_DISPATCHER_DEFINITION_FACTORIES;
         }
     }
 }

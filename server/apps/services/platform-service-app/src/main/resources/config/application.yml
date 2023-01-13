@@ -1,3 +1,4 @@
+---
 # Conditionally disable springdoc on missing api-docs profile
 spring:
   config:
@@ -12,8 +13,7 @@ management:
   endpoints:
     web:
       exposure:
-        include:
-          '*'
+        include: '*'
   endpoint:
     health:
       show-details: when_authorized
@@ -31,14 +31,9 @@ management:
     env:
       enabled: true
   health:
-    mail:
-      enabled: false # When using the MailService, configure an SMTP server and set this to true
+    rabbit:
+      enabled: false # When using Rabbit, set this to true
   metrics:
-    export:
-      # Prometheus is the default metrics backend
-      prometheus:
-        enabled: true
-        step: 60
     enable:
       http: true
       jvm: true
@@ -57,6 +52,12 @@ management:
         request:
           autotime:
             enabled: true
+  # Prometheus is the default metrics backend
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
 
 openapi:
   openAPIDefinition:
@@ -121,8 +122,8 @@ bytechef:
     context-repository:
       provider: jdbc
     message-broker:
-      # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: amqp
-      provider: amqp
+      # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
+      provider: redis
     persistence:
       provider: jdbc
     serialization:

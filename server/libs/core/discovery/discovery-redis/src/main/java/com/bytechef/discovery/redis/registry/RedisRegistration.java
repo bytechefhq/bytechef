@@ -61,7 +61,9 @@ public class RedisRegistration implements Registration {
     public String getHost() {
         try {
             if (host == null) {
-                return getLocalHostLANAddress().getHostAddress();
+                InetAddress inetAddress = getLocalHostLANAddress();
+
+                return inetAddress.getHostAddress();
             } else {
                 return host;
             }
@@ -91,7 +93,7 @@ public class RedisRegistration implements Registration {
     }
 
     private InetAddress getLocalHostLANAddress() throws Exception {
-        InetAddress candidateAddress = null;
+        InetAddress inetAddress = null;
 
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
 
@@ -101,24 +103,26 @@ public class RedisRegistration implements Registration {
             Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
 
             while (inetAddresses.hasMoreElements()) {
-                InetAddress inetAddress = inetAddresses.nextElement();
+                InetAddress curInetAddress = inetAddresses.nextElement();
 
-                if (!inetAddress.isLoopbackAddress()) {
-                    if (inetAddress.isSiteLocalAddress()) {
-                        candidateAddress = inetAddress;
+                if (curInetAddress.isLoopbackAddress()) {
+                    continue;
+                }
 
-                        break;
-                    } else if (candidateAddress == null) {
-                        candidateAddress = inetAddress;
-                    }
+                if (curInetAddress.isSiteLocalAddress()) {
+                    inetAddress = curInetAddress;
+
+                    break;
+                } else if (inetAddress == null) {
+                    inetAddress = curInetAddress;
                 }
             }
         }
 
-        if (candidateAddress == null) {
-            candidateAddress = InetAddress.getLocalHost();
+        if (inetAddress == null) {
+            inetAddress = InetAddress.getLocalHost();
         }
 
-        return candidateAddress;
+        return inetAddress;
     }
 }
