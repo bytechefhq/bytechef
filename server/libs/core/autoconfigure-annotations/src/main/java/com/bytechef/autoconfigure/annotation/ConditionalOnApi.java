@@ -25,8 +25,8 @@ import java.lang.annotation.Target;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
- * Configuration annotation for a conditional element that depends on the property <code>workflow.api.enabled</code>
- * containing the value <code>true</code>
+ * Configuration annotation for a conditional element that depends on the property
+ * <code>bytechef.workflow.api.enabled</code> containing the value <code>true</code>.
  *
  * @author Ivica Cardic
  */

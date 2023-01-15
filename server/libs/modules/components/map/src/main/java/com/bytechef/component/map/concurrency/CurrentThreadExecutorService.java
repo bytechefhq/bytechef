@@ -41,6 +41,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     @Override
     public void execute(Runnable command) {
         startTask();
+
         try {
             command.run();
         } finally {
@@ -83,6 +84,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         long nanos = unit.toNanos(timeout);
+
         synchronized (lock) {
             while (true) {
                 if (shutdown && runningTasks == 0) {
@@ -118,6 +120,7 @@ public class CurrentThreadExecutorService extends AbstractExecutorService {
     private void endTask() {
         synchronized (lock) {
             int numRunning = --runningTasks;
+
             if (numRunning == 0) {
                 lock.notifyAll();
             }

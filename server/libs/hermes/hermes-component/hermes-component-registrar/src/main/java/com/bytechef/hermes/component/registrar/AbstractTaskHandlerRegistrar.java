@@ -56,16 +56,13 @@ public abstract class AbstractTaskHandlerRegistrar<T extends ComponentDefinition
         for (ActionDefinition actionDefinition : componentDefinition.getActions()) {
             beanFactory.registerSingleton(
                 getBeanName(
-                    componentDefinition.getName(),
-                    componentDefinition.getVersion(),
-                    actionDefinition.getName()),
+                    componentDefinition.getName(), componentDefinition.getVersion(), actionDefinition.getName()),
                 createTaskHandler(actionDefinition, componentDefinition.getConnection(), componentFactory));
         }
 
         beanFactory.registerSingleton(
             getBeanName(
-                componentDefinition.getName(),
-                componentDefinition.getVersion(),
+                componentDefinition.getName(), componentDefinition.getVersion(),
                 ComponentDefinitionFactory.class.getSimpleName()),
             componentFactory);
     }

@@ -49,15 +49,11 @@ public class RestComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegist
 
     @Override
     protected TaskHandler<?> createTaskHandler(
-        ActionDefinition actionDefinition,
-        ConnectionDefinition connectionDefinition,
+        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition,
         RestComponentHandler restComponentHandler) {
+
         return new RestComponentTaskHandler(
-            actionDefinition,
-            connectionDefinition,
-            connectionService,
-            restComponentHandler,
-            eventPublisher,
+            actionDefinition, connectionDefinition, connectionService, restComponentHandler, eventPublisher,
             fileStorageService);
     }
 }

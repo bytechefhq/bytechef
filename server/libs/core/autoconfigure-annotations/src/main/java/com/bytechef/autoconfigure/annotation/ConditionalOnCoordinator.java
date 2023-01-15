@@ -28,7 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Configuration annotation for a conditional element that depends on the property
- * <code>workflow.coordinator.enabled</code> containing the value <code>true</code>
+ * <code>bytechef.workflow.coordinator.enabled</code> containing the value <code>true</code>.
  *
  * @author Arik Cohen
  * @author Ivica Cardic
@@ -40,9 +40,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
     ElementType.TYPE, ElementType.METHOD
 })
 @ConditionalOnProperty(
-    prefix = "bytechef.workflow",
-    name = "coordinator.enabled",
-    havingValue = "true",
-    matchIfMissing = true)
+    prefix = "bytechef.workflow", name = "coordinator.enabled", havingValue = "true", matchIfMissing = true)
 public @interface ConditionalOnCoordinator {
 }
