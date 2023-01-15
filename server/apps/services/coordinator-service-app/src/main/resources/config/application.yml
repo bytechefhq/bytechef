@@ -69,7 +69,7 @@ spring:
   cache:
     type: simple
   cloud:
-    consul:
+    redis:
       discovery:
         instanceId: ${spring.application.name}:${random.value}
   jackson:
