@@ -17,13 +17,47 @@
 
 package com.bytechef.worker.config;
 
+import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
+@DependsOn("workerConfiguration")
 @Configuration
 @EnableDiscoveryClient
-public class DiscoveryClientConfiguration {
+public class DiscoveryClientConfiguration implements InitializingBean {
+
+    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
+    private final ServiceMetadataRegistry serviceMetadataRegistry;
+
+    @SuppressFBWarnings("EI2")
+    public DiscoveryClientConfiguration(
+        List<ComponentDefinitionFactory> componentDefinitionFactories,
+        ServiceMetadataRegistry serviceMetadataRegistry) {
+
+        this.componentDefinitionFactories = componentDefinitionFactories;
+        this.serviceMetadataRegistry = serviceMetadataRegistry;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        serviceMetadataRegistry.registerMetadata(
+            Map.of(
+                "componentNames",
+                componentDefinitionFactories.stream()
+                    .map(ComponentDefinitionFactory::getDefinition)
+                    .map(ComponentDefinition::getName)
+                    .collect(Collectors.joining(","))));
+    }
 }
