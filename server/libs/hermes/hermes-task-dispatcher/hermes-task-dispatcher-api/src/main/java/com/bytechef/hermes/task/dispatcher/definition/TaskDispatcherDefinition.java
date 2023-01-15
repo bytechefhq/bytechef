@@ -20,6 +20,7 @@ package com.bytechef.hermes.task.dispatcher.definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = TaskDispatcherDSL.ModifiableTaskDispatcherDefinition.class)
 @SuppressFBWarnings("EI")
 @Schema(
     name = "TaskDispatcherDefinition",
