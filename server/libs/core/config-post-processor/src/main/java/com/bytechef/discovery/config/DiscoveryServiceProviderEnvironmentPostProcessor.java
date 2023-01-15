@@ -24,6 +24,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.MutablePropertySources;
 
 /**
  * @author Ivica Cardic
@@ -34,8 +35,19 @@ public class DiscoveryServiceProviderEnvironmentPostProcessor implements Environ
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        String discoveryServiceProvider = environment.getProperty("bytechef.discovery-service.provider", String.class);
+        processDiscoveryServiceProvider(
+            environment.getProperty("bytechef.discovery-service.provider", String.class), source);
+        processWorkflowMessageBrokerProvider(
+            environment.getProperty("bytechef.workflow.message-broker.provider", String.class), source);
 
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Config", source);
+
+        MutablePropertySources mutablePropertySources = environment.getPropertySources();
+
+        mutablePropertySources.addFirst(mapPropertySource);
+    }
+
+    private static void processDiscoveryServiceProvider(String discoveryServiceProvider, Map<String, Object> source) {
         source.put("spring.cloud.consul.enabled", false);
         source.put("spring.cloud.redis.enabled", false);
 
@@ -44,10 +56,15 @@ public class DiscoveryServiceProviderEnvironmentPostProcessor implements Environ
         } else {
             source.put("spring.cloud.redis.enabled", true);
         }
+    }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Config", source);
+    private static void processWorkflowMessageBrokerProvider(
+        String workflowMessageBrokerProvider, Map<String, Object> source) {
 
-        environment.getPropertySources()
-            .addFirst(mapPropertySource);
+        source.put("management.health.rabbit.enabled", false);
+
+        if (!Objects.equals(workflowMessageBrokerProvider, "redis")) {
+            source.put("management.health.rabbit.enabled", true);
+        }
     }
 }
