@@ -46,10 +46,10 @@ class RedisListenerEndpointRegistrar {
     public void registerListenerEndpoint(String queueName, int concurrency, Object delegate, String methodName) {
         ListOperations<String, RedisMessage> listOperations = redisTemplate.opsForList();
 
-        executorService.submit(() -> execute(queueName, delegate, methodName, listOperations));
+        executorService.submit(() -> periodicallyCheckForMessage(queueName, delegate, methodName, listOperations));
     }
 
-    private void execute(
+    private void periodicallyCheckForMessage(
         String queueName, Object delegate, String methodName, ListOperations<String, RedisMessage> listOperations) {
 
         while (!stopped) {

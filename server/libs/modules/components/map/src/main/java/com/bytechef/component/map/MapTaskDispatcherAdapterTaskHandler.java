@@ -51,8 +51,8 @@ import java.util.Objects;
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
-    private final TaskHandlerResolver taskHandlerResolver;
     private final TaskEvaluator taskEvaluator;
+    private final TaskHandlerResolver taskHandlerResolver;
 
     public MapTaskDispatcherAdapterTaskHandler(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator) {
         this.taskHandlerResolver = Objects.requireNonNull(taskHandlerResolver);
@@ -98,7 +98,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         contextService.push(taskExecution.getId(), Context.Classname.TASK_EXECUTION, Collections.emptyMap());
 
-        MapTaskDispatcher dispatcher = MapTaskDispatcher.builder()
+        MapTaskDispatcher mapTaskDispatcher = MapTaskDispatcher.builder()
             .contextService(contextService)
             .counterService(new CounterServiceImpl(new InMemoryCounterRepository()))
             .messageBroker(messageBroker)
@@ -107,7 +107,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             .taskEvaluator(taskEvaluator)
             .build();
 
-        dispatcher.dispatch(taskExecution);
+        mapTaskDispatcher.dispatch(taskExecution);
 
         if (errors.size() > 0) {
             StringBuilder errorMessage = new StringBuilder();

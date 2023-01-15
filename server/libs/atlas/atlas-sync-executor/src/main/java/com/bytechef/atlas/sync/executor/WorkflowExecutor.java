@@ -122,8 +122,7 @@ public class WorkflowExecutor {
     }
 
     public Job execute(
-        String workflowId,
-        Map<String, Object> inputs,
+        String workflowId, Map<String, Object> inputs,
         GetTaskCompletionHandlersFunction getTaskCompletionHandlersFunction,
         GetTaskDispatcherResolversFunction getTaskDispatcherResolversFunction,
         GetTaskHandlerMapSupplier getTaskHandlerMapSupplier) {

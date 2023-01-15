@@ -49,15 +49,11 @@ public class DefaultComponentTaskHandlerRegistrar extends AbstractTaskHandlerReg
 
     @Override
     protected TaskHandler<?> createTaskHandler(
-        ActionDefinition actionDefinition,
-        ConnectionDefinition connectionDefinition,
+        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition,
         ComponentHandler componentHandler) {
+
         return new DefaultComponentTaskHandler(
-            actionDefinition,
-            connectionDefinition,
-            componentHandler,
-            connectionService,
-            eventPublisher,
+            actionDefinition, connectionDefinition, componentHandler, connectionService, eventPublisher,
             fileStorageService);
     }
 }
