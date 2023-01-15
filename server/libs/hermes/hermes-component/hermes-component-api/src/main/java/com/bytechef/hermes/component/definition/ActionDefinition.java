@@ -21,6 +21,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.function.BiFunction;
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = ComponentDSL.ModifiableActionDefinition.class)
 @Schema(
     name = "ActionDefinition",
     description = "An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")

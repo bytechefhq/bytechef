@@ -98,6 +98,9 @@ public final class ComponentDSL extends DefinitionDSL {
         @JsonIgnore
         private BiFunction<Context, ExecutionParameters, Object> performFunction;
 
+        private ModifiableActionDefinition() {
+        }
+
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
         }
@@ -228,8 +231,11 @@ public final class ComponentDSL extends DefinitionDSL {
         private Function<Connection, String> tokenUrlFunction = connectionParameters -> connectionParameters
             .getParameter(ComponentConstants.TOKEN_URL);
 
-        private final String name;
-        private final AuthorizationType type;
+        private String name;
+        private AuthorizationType type;
+
+        private ModifiableAuthorization() {
+        }
 
         private ModifiableAuthorization(String name, AuthorizationType type) {
             this.name = Objects.requireNonNull(name);
@@ -408,6 +414,9 @@ public final class ComponentDSL extends DefinitionDSL {
         private String name;
         private Resources resources;
         private int version = ComponentConstants.Versions.VERSION_1;
+
+        private ModifiableComponentDefinition() {
+        }
 
         private ModifiableComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
