@@ -67,7 +67,7 @@ spring:
   application:
     name: worker-service-app
   cloud:
-    consul:
+    redis:
       discovery:
         instanceId: ${spring.application.name}:${random.value}
   jackson:

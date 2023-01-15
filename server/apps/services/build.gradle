@@ -2,8 +2,5 @@ bootJar.enabled = false
 
 subprojects {
     dependencies {
-        //    if (project.hasProperty("consul")) {
-        implementation "org.springframework.cloud:spring-cloud-starter-consul-discovery"
-        //    }
     }
 }
