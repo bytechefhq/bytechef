@@ -79,7 +79,7 @@ schemas:
         additionalProperties:
           type: object
       name:
-        description: The connection name.
+        description: The component name.
         type: string
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
@@ -116,7 +116,7 @@ schemas:
         type: integer
         format: int32
   JdbcComponentDefinition:
-    description: A definition of component used for building JDBC based components. The deinition is transformed into fully component definition.
+    description: A definition of component used for building JDBC based components. The definition is transformed into fully component definition.
     type: object
     properties:
       databaseJdbcName:
