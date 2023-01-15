@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = DefinitionDSL.ModifiableDisplayOption.class)
 @Schema(name = "DisplayOption", description = "Defines rules when a property should be shown or hidden.")
 public sealed interface DisplayOption permits DefinitionDSL.ModifiableDisplayOption {
 
