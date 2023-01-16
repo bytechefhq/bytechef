@@ -1,0 +1,5 @@
+dependencies {
+    api project(":server:libs:hermes:hermes-component:hermes-component-service:hermes-component-service-api")
+
+    implementation "org.springframework:spring-context"
+}
