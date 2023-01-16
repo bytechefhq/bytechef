@@ -12,12 +12,17 @@ task generateOpenAPI(type: org.openapitools.generator.gradle.plugin.tasks.Genera
 }
 
 dependencies {
-    api project(":server:libs:hermes:hermes-component:hermes-component-api")
+    annotationProcessor libs.mapstruct.processor
+    annotationProcessor libs.mapstruct.spring.extensions
+
+    api project(":server:libs:hermes:hermes-component:hermes-component-service:hermes-component-service-api")
 
     implementation libs.jackson.databind.nullable
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "jakarta.annotation:jakarta.annotation-api"
     implementation "jakarta.validation:jakarta.validation-api"
+    implementation libs.mapstruct
+    implementation libs.mapstruct.spring.annotations
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-webflux"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
