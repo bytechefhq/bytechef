@@ -12,7 +12,7 @@ task generateOpenAPI(type: org.openapitools.generator.gradle.plugin.tasks.Genera
 }
 
 dependencies {
-    api project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-api")
+    api project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-service:hermes-task-dispatcher-service-api")
 
     implementation libs.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
