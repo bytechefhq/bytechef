@@ -22,7 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -32,31 +36,47 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
 
     private static final Logger logger = LoggerFactory.getLogger(RedisServiceRegistry.class);
 
-    private final StringRedisTemplate redisTemplate;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private RedisRegistration redisRegistration;
+    private final RedisTemplate<String, RedisRegistration> redisTemplate;
+    private boolean stopped;
 
     @SuppressFBWarnings("EI2")
-    public RedisServiceRegistry(StringRedisTemplate redisTemplate) {
+    public RedisServiceRegistry(RedisTemplate<String, RedisRegistration> redisTemplate) {
         this.redisTemplate = redisTemplate;
+
+        executorService.submit(this::periodicallyRegisterService);
     }
 
     @Override
+    @SuppressFBWarnings("EI2")
     public void register(RedisRegistration redisRegistration) {
-        String serviceId = redisRegistration.getServiceId();
+        registerService(redisRegistration);
 
-        ListOperations<String, String> listOperations = redisTemplate.opsForList();
-
-        listOperations.leftPush(serviceId, redisRegistration.getHost() + ":" + redisRegistration.getPort());
+        this.redisRegistration = redisRegistration;
     }
 
     @Override
-    public void deregister(RedisRegistration registration) {
-        ListOperations<String, String> listOperations = redisTemplate.opsForList();
+    public void deregister(RedisRegistration redisRegistration) {
+        ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
 
-        listOperations.remove(registration.getServiceId(), 1, registration.getHost() + ":" + registration.getPort());
+        listOperations.remove(redisRegistration.getServiceId(), 1, redisRegistration);
+
+        this.redisRegistration = null;
     }
 
     @Override
     public void close() {
+        stopped = true;
+
+        executorService.shutdownNow();
+
+        try {
+            executorService.awaitTermination(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+
         logger.info("Redis Service Registry is closed.");
     }
 
@@ -67,5 +87,46 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
     @Override
     public <T> T getStatus(RedisRegistration registration) {
         return null;
+    }
+
+    private void periodicallyRegisterService() {
+        while (!stopped) {
+            try {
+                if (redisRegistration == null) {
+                    TimeUnit.SECONDS.sleep(1);
+
+                    continue;
+                }
+
+                registerService(redisRegistration);
+
+                TimeUnit.SECONDS.sleep(10);
+            } catch (Exception e) {
+                if (!stopped) {
+                    logger.error(e.getMessage(), e);
+
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException ex) {
+                        // ignore
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressFBWarnings("RCN")
+    private void registerService(RedisRegistration redisRegistration) {
+        String serviceId = redisRegistration.getServiceId();
+
+        ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
+
+        Long index = listOperations.indexOf(serviceId, redisRegistration);
+
+        if (index == null) {
+            listOperations.leftPush(serviceId, redisRegistration);
+        }
+
+        redisTemplate.expire(serviceId, 15, TimeUnit.SECONDS);
     }
 }

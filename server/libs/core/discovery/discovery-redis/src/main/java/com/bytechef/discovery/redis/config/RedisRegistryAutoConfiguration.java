@@ -17,11 +17,14 @@
 
 package com.bytechef.discovery.redis.config;
 
+import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.discovery.redis.client.RedisDiscoveryClient;
 import com.bytechef.discovery.redis.client.RedisReactiveDiscoveryClient;
+import com.bytechef.discovery.redis.metadata.RedisServiceMetadataRegistry;
 import com.bytechef.discovery.redis.registry.RedisAutoServiceRegistration;
 import com.bytechef.discovery.redis.registry.RedisRegistration;
 import com.bytechef.discovery.redis.registry.RedisServiceRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,7 +34,10 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationP
 import org.springframework.cloud.client.serviceregistry.ServiceRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
  * @author Ivica Cardic
@@ -47,17 +53,22 @@ public class RedisRegistryAutoConfiguration {
     @Bean
     RedisAutoServiceRegistration redisAutoServiceRegistration(
         RedisServiceRegistry redisServiceRegistry, AutoServiceRegistrationProperties properties) {
-        return new RedisAutoServiceRegistration(redisServiceRegistry, properties);
+        return new RedisAutoServiceRegistration(redisServiceRegistry, properties, redisRegistration());
     }
 
     @Bean
-    RedisReactiveDiscoveryClient redisReactiveDiscoveryClient(StringRedisTemplate redisTemplate) {
+    RedisReactiveDiscoveryClient redisReactiveDiscoveryClient(RedisTemplate<String, RedisRegistration> redisTemplate) {
         return new RedisReactiveDiscoveryClient(redisTemplate);
     }
 
     @Bean
-    RedisDiscoveryClient redisDiscoveryClient(StringRedisTemplate redisTemplate) {
+    RedisDiscoveryClient redisDiscoveryClient(RedisTemplate<String, RedisRegistration> redisTemplate) {
         return new RedisDiscoveryClient(redisTemplate);
+    }
+
+    @Bean
+    ServiceMetadataRegistry serviceMetadataRegistrar() {
+        return new RedisServiceMetadataRegistry(redisRegistration());
     }
 
     @Bean
@@ -66,7 +77,19 @@ public class RedisRegistryAutoConfiguration {
     }
 
     @Bean
-    RedisServiceRegistry redisServiceRegistry(StringRedisTemplate redisTemplate) {
+    RedisServiceRegistry redisServiceRegistry(RedisTemplate<String, RedisRegistration> redisTemplate) {
         return new RedisServiceRegistry(redisTemplate);
+    }
+
+    @Bean
+    RedisTemplate<String, RedisRegistration> redisRegistrationRedisTemplate(
+        ObjectMapper objectMapper, RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, RedisRegistration> redisTemplate = new RedisTemplate<>();
+
+        redisTemplate.setConnectionFactory(connectionFactory);
+        redisTemplate.setKeySerializer(RedisSerializer.string());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, RedisRegistration.class));
+
+        return redisTemplate;
     }
 }

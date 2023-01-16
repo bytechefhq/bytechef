@@ -20,9 +20,12 @@ package com.bytechef.discovery.redis.registry;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.serviceregistry.Registration;
@@ -36,25 +39,43 @@ public class RedisRegistration implements Registration {
     private Integer port;
 
     @Value("${spring.application.name}")
-    private String applicationName;
+    private String serviceId;
 
     private String host;
 
-    public void setHost(String host) {
-        this.host = host;
+    @Value("${spring.cloud.redis.discovery.instanceId:null}")
+    private String instanceId;
+
+    private Map<String, String> metadata = Collections.emptyMap();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RedisRegistration that = (RedisRegistration) o;
+
+        return serviceId.equals(that.serviceId) && Objects.equals(instanceId, that.instanceId);
     }
 
-    public void setPort(Integer port) {
-        this.port = port;
+    @Override
+    public int hashCode() {
+        return Objects.hash(serviceId, instanceId);
     }
 
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
+    @Override
+    public String getInstanceId() {
+        return instanceId;
     }
 
     @Override
     public String getServiceId() {
-        return applicationName;
+        return serviceId;
     }
 
     @Override
@@ -78,18 +99,13 @@ public class RedisRegistration implements Registration {
     }
 
     @Override
-    public boolean isSecure() {
-        return false;
-    }
-
-    @Override
     public URI getUri() {
         return DefaultServiceInstance.getUri(this);
     }
 
     @Override
     public Map<String, String> getMetadata() {
-        return new HashMap<>();
+        return Collections.unmodifiableMap(metadata);
     }
 
     private InetAddress getLocalHostLANAddress() throws Exception {
@@ -124,5 +140,14 @@ public class RedisRegistration implements Registration {
         }
 
         return inetAddress;
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = new HashMap<>(metadata);
     }
 }

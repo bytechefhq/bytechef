@@ -17,7 +17,7 @@
 
 package com.bytechef.discovery.redis.registry;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegistration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
@@ -27,12 +27,16 @@ import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
  */
 public class RedisAutoServiceRegistration extends AbstractAutoServiceRegistration<RedisRegistration> {
 
-    @Autowired
-    private RedisRegistration redisRegistration;
+    private final RedisRegistration redisRegistration;
 
+    @SuppressFBWarnings("EI2")
     public RedisAutoServiceRegistration(
-        ServiceRegistry<RedisRegistration> serviceRegistry, AutoServiceRegistrationProperties properties) {
+        ServiceRegistry<RedisRegistration> serviceRegistry, AutoServiceRegistrationProperties properties,
+        RedisRegistration redisRegistration) {
+
         super(serviceRegistry, properties);
+
+        this.redisRegistration = redisRegistration;
     }
 
     @Override
