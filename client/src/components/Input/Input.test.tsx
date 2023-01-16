@@ -50,7 +50,7 @@ describe('Input', async () => {
                 placeholder="Email"
                 label="Email Address"
                 aria-label="Email Address"
-                error="Please enter your email"
+                error={true}
             />
         );
         expect(
@@ -59,7 +59,7 @@ describe('Input', async () => {
             })
         ).toBeInTheDocument();
         expect(screen.getByRole('alert')).toHaveTextContent(
-            'Please enter your email'
+            'This field is required'
         );
     });
 });
