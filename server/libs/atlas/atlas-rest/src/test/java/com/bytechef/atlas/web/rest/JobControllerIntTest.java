@@ -34,6 +34,16 @@ public class JobControllerIntTest {
     }
 
     @Test
+    public void testGetJobTaskExecutions() {
+        // TODO
+    }
+
+    @Test
+    public void testGetJobs() {
+        // TODO
+    }
+
+    @Test
     public void testGetLatestJob() {
         // TODO
     }
