@@ -41,8 +41,7 @@ public class ConnectionServiceRSocketController {
     @MessageMapping("createConnection")
     public Mono<Connection> createConnection(Connection connection) {
         return Mono
-            .create(sink -> sink.success(connectionService.create(connection.getName(), connection.getComponentName(),
-                connection.getComponentVersion(), connection.getAuthorizationName(), connection.getParameters())));
+            .create(sink -> sink.success(connectionService.create(connection)));
     }
 
     @MessageMapping("getConnection")
@@ -64,6 +63,6 @@ public class ConnectionServiceRSocketController {
 
     @MessageMapping("updateConnection")
     public Mono<Connection> updateConnection(Connection connection) {
-        return Mono.create(sink -> sink.success(connectionService.update(connection.getId(), connection.getName())));
+        return Mono.create(sink -> sink.success(connectionService.update(connection)));
     }
 }
