@@ -6,6 +6,8 @@ import MultiSelect from 'components/MultiSelect/MultiSelect';
 import TextArea from 'components/TextArea/TextArea';
 import {Controller, useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
+import {ServerStateKeysEnum} from '../../queries/integrations.queries';
+import {useQueryClient} from '@tanstack/react-query';
 
 interface Tag {
     readonly label: string;
@@ -24,6 +26,8 @@ const IntegrationModal: React.FC = () => {
             tags: [],
         },
     });
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         fetch('http://localhost:5173/api/integration-tags', {
@@ -45,6 +49,8 @@ const IntegrationModal: React.FC = () => {
             headers: {'Content-Type': 'application/json'},
             method: 'POST',
         }).then(() => {
+            queryClient.invalidateQueries([ServerStateKeysEnum.Integrations]);
+
             setIsOpen(false);
 
             reset();
