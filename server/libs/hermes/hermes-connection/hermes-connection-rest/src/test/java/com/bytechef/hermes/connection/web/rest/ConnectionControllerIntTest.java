@@ -18,10 +18,6 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +26,6 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.web.rest.config.ConnectionRestTestConfiguration;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import com.bytechef.hermes.connection.web.rest.model.PutConnectionRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +80,7 @@ public class ConnectionControllerIntTest {
         try {
             Connection connection = getConnection();
 
-            when(connectionService.getConnection(anyLong())).thenReturn(connection);
+            when(connectionService.getConnection(1L)).thenReturn(connection);
 
             this.webTestClient
                 .get()
@@ -128,7 +123,7 @@ public class ConnectionControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionService.create(anyString(), anyString(), anyInt(), isNull(), any())).thenReturn(connection);
+        when(connectionService.create(any())).thenReturn(getConnection());
 
         try {
             assert connection.getId() != null;
@@ -153,17 +148,29 @@ public class ConnectionControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+
+        ArgumentCaptor<Connection> connectionArgumentCaptor = ArgumentCaptor.forClass(Connection.class);
+
+        verify(connectionService).create(connectionArgumentCaptor.capture());
+
+        connection.setId(null);
+
+        org.assertj.core.api.Assertions.assertThat(connectionArgumentCaptor.getValue())
+            .hasFieldOrPropertyWithValue("componentName", "componentName")
+            .hasFieldOrPropertyWithValue("componentVersion", 1)
+            .hasFieldOrPropertyWithValue("name", "name")
+            .hasFieldOrPropertyWithValue("parameters", Map.of("key1", "value1"));
     }
 
     @Test
     @SuppressFBWarnings("NP")
     public void testPutConnection() {
         Connection connection = getConnection();
-        PutConnectionRequestModel putConnectionRequestModel = new PutConnectionRequestModel().name("name2");
+        ConnectionModel connectionModel = new ConnectionModel().name("name2");
 
         connection.setName("name2");
 
-        when(connectionService.update(1L, putConnectionRequestModel.getName())).thenReturn(connection);
+        when(connectionService.update(connection)).thenReturn(connection);
 
         try {
             this.webTestClient
@@ -171,7 +178,7 @@ public class ConnectionControllerIntTest {
                 .uri("/connections/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(putConnectionRequestModel)
+                .bodyValue(connectionModel)
                 .exchange()
                 .expectStatus()
                 .isOk()
