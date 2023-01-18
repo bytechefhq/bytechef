@@ -198,20 +198,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - definition
-                - format
-              properties:
-                definition:
-                  description: Definition of the workflow that is executed as a job.
-                  type: string
-                format:
-                  $ref: '#/components/schemas/WorkflowFormat'
-                sourceType:
-                  type: string
-                  enum:
-                    - JDBC
+              $ref: '#/components/schemas/Workflow'
         required: true
       responses:
         "200":
@@ -285,16 +272,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - definition
-                - format
-              properties:
-                definition:
-                  description: Definition of the workflow that is executed as a job.
-                  type: string
-                format:
-                  $ref: '#/components/schemas/WorkflowFormat'
+              $ref: '#/components/schemas/Workflow'
         required: true
       responses:
         "200":
@@ -597,6 +575,9 @@ components:
           type: string
           format: date-time
           readOnly: true
+        definition:
+          type: string
+          writeOnly: true
         format:
           $ref: '#/components/schemas/WorkflowFormat'
         id:
@@ -640,7 +621,6 @@ components:
             - FILESYSTEM
             - GIT
             - JDBC
-          readOnly: true
         retry:
           description: The maximum number of times a task may retry.
           type: integer
@@ -652,6 +632,9 @@ components:
           items:
             $ref: '#/components/schemas/WorkflowTask'
           readOnly: true
+        version:
+          type: integer
+          format: int32
     WorkflowFormat:
       type: string
       enum:
