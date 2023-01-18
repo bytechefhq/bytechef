@@ -1,9 +1,9 @@
 apis/IntegrationsApi.ts
 apis/index.ts
 index.ts
-models/GetIntegrationTags200Response.ts
-models/Integration.ts
-models/PostIntegrationWorkflowRequest.ts
-models/PutIntegrationTagsRequest.ts
+models/CategoryModel.ts
+models/IntegrationModel.ts
+models/PostIntegrationWorkflowRequestModel.ts
+models/TagModel.ts
 models/index.ts
 runtime.ts

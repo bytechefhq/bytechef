@@ -1,4 +1,3 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './Connection';
-export * from './PutConnectionRequest';
+export * from './ConnectionModel';
