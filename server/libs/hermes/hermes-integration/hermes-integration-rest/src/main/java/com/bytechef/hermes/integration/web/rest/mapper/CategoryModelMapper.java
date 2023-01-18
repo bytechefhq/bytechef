@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.integration.web.rest.mapper;
 
-import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.hermes.integration.domain.Category;
 import com.bytechef.hermes.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
-import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfig.class)
-public interface IntegrationMapper extends Converter<Integration, IntegrationModel> {
+public interface CategoryModelMapper extends Converter<CategoryModel, Category> {
 
-    IntegrationModel convert(Integration integration);
+    Category convert(CategoryModel categoryModel);
 }

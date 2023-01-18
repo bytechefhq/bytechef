@@ -18,12 +18,15 @@
 package com.bytechef.hermes.integration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
+import com.bytechef.hermes.integration.service.CategoryService;
 import com.bytechef.hermes.integration.service.IntegrationService;
-import com.bytechef.hermes.integration.web.rest.model.GetIntegrationTags200ResponseModel;
+import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
 import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
-import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
+import com.bytechef.hermes.integration.web.rest.model.TagModel;
+import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +37,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -42,17 +45,19 @@ import java.util.ArrayList;
 @RestController
 @ConditionalOnApi
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class IntegrationController implements IntegrationsApi, IntegrationTagsApi {
+public class IntegrationController implements IntegrationsApi {
 
+    private final CategoryService categoryService;
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
     private final IntegrationService integrationService;
 
     @SuppressFBWarnings("EI2")
     public IntegrationController(
-        ConversionService conversionService,
-        IntegrationFacade integrationFacade,
+        CategoryService categoryService, ConversionService conversionService, IntegrationFacade integrationFacade,
         IntegrationService integrationService) {
+
+        this.categoryService = categoryService;
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;
         this.integrationService = integrationService;
@@ -62,32 +67,49 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
     public Mono<ResponseEntity<Void>> deleteIntegration(Long id, ServerWebExchange exchange) {
         integrationFacade.delete(id);
 
-        return Mono.just(ResponseEntity.ok()
-            .build());
+        return Mono.just(
+            ResponseEntity.ok()
+                .build());
     }
 
     @Override
     public Mono<ResponseEntity<IntegrationModel>> getIntegration(Long id, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
-            conversionService.convert(integrationService.getIntegration(id), IntegrationModel.class)));
+        return Mono.just(
+            ResponseEntity.ok(
+                conversionService.convert(integrationService.getIntegration(id), IntegrationModel.class)));
     }
 
     @Override
-    public Mono<ResponseEntity<GetIntegrationTags200ResponseModel>> getIntegrationTags(ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<CategoryModel>>> getIntegrationCategories(ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
-                new GetIntegrationTags200ResponseModel()
-                    .tags(new ArrayList<>(integrationFacade.getIntegrationTags()))));
+                Flux.fromIterable(
+                    categoryService.getCategories()
+                        .stream()
+                        .map(category -> conversionService.convert(category, CategoryModel.class))
+                        .toList())));
     }
 
     @Override
     public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
-                Flux.fromIterable(integrationService.getIntegrations()
-                    .stream()
-                    .map(integration -> conversionService.convert(integration, IntegrationModel.class))
-                    .toList())));
+                Flux.fromIterable(
+                    integrationService.getIntegrations()
+                        .stream()
+                        .map(integration -> conversionService.convert(integration, IntegrationModel.class))
+                        .toList())));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<TagModel>>> getIntegrationTags(ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                Flux.fromIterable(
+                    integrationFacade.getIntegrationTags()
+                        .stream()
+                        .map(tag -> conversionService.convert(tag, TagModel.class))
+                        .toList())));
     }
 
     @Override
@@ -98,8 +120,7 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.create(
-                    integrationModel.getName(), integrationModel.getDescription(), integrationModel.getCategory(),
-                    integrationModel.getWorkflowIds(), integrationModel.getTags()),
+                    conversionService.convert(integrationModel, Integration.class)),
                 IntegrationModel.class)));
     }
 
@@ -111,7 +132,7 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
         return postIntegrationWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.addWorkflow(
-                    id, requestModel.getWorkflowName(), requestModel.getWorkflowDescription()),
+                    id, requestModel.getName(), requestModel.getDescription(), requestModel.getDefinition()),
                 IntegrationModel.class)));
     }
 
@@ -121,21 +142,24 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
 
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
             conversionService.convert(
-                integrationFacade.update(
-                    id, integrationModel.getName(), integrationModel.getDescription(),
-                    integrationModel.getCategory(), integrationModel.getWorkflowIds(), integrationModel.getTags()),
+                integrationFacade.update(conversionService.convert(integrationModel.id(id), Integration.class)),
                 IntegrationModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<Void>> putIntegrationTags(
-        Long id, Mono<PutIntegrationTagsRequestModel> putIntegrationTagsRequestModelMono, ServerWebExchange exchange) {
+        Long id, Flux<TagModel> tagModelFlux, ServerWebExchange exchange) {
 
-        return putIntegrationTagsRequestModelMono.map(putIntegrationTagsRequestModel -> {
-            integrationFacade.update(id, null, null, null, null, putIntegrationTagsRequestModel.getTags());
+        return tagModelFlux.collectList()
+            .map(tagModels -> {
+                integrationFacade.update(
+                    id,
+                    tagModels.stream()
+                        .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+                        .collect(Collectors.toSet()));
 
-            return ResponseEntity.noContent()
-                .build();
-        });
+                return ResponseEntity.noContent()
+                    .build();
+            });
     }
 }
