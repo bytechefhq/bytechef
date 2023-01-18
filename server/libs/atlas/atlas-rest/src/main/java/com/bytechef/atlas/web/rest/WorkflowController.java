@@ -21,8 +21,6 @@ package com.bytechef.atlas.web.rest;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.web.rest.model.PostWorkflowRequestModel;
-import com.bytechef.atlas.web.rest.model.PutWorkflowRequestModel;
 import com.bytechef.atlas.web.rest.model.WorkflowFormatModel;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
@@ -85,15 +83,15 @@ public class WorkflowController implements WorkflowsApi {
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> postWorkflow(
-        Mono<PostWorkflowRequestModel> postWorkflowRequestModelMono, ServerWebExchange exchange) {
-        return postWorkflowRequestModelMono.map(postWorkflowRequestModel -> {
-            WorkflowFormatModel workflowFormatModel = postWorkflowRequestModel.getFormat();
-            PostWorkflowRequestModel.SourceTypeEnum sourceTypeEnum = postWorkflowRequestModel.getSourceType();
+        Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
+        return workflowModelMono.map(workflowModel -> {
+            WorkflowFormatModel workflowFormatModel = workflowModel.getFormat();
+            WorkflowModel.SourceTypeEnum sourceTypeEnum = workflowModel.getSourceType();
 
             return ResponseEntity.ok(
                 conversionService.convert(
                     workflowService.create(
-                        postWorkflowRequestModel.getDefinition(),
+                        workflowModel.getDefinition(),
                         Workflow.Format.valueOf(workflowFormatModel.name()),
                         Workflow.SourceType.valueOf(sourceTypeEnum.name())),
                     WorkflowModel.class));
@@ -102,9 +100,9 @@ public class WorkflowController implements WorkflowsApi {
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> putWorkflow(
-        String id, Mono<PutWorkflowRequestModel> putWorkflowRequestModelMono, ServerWebExchange exchange) {
-        return putWorkflowRequestModelMono.map(putWorkflowRequestModel -> ResponseEntity.ok(
-            conversionService.convert(workflowService.update(id, putWorkflowRequestModel.getDefinition()),
+        String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
+        return workflowModelMono.map(workflowModel -> ResponseEntity.ok(
+            conversionService.convert(workflowService.update(id, workflowModel.getDefinition()),
                 WorkflowModel.class)));
     }
 }
