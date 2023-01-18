@@ -20,51 +20,73 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("postIntegrationWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-11T09:43:32.875615+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-18T09:51:05.328763+01:00[Europe/Zagreb]")
 public class PostIntegrationWorkflowRequestModel {
 
-  @JsonProperty("workflowName")
-  private String workflowName;
+  @JsonProperty("name")
+  private String name;
 
-  @JsonProperty("workflowDescription")
-  private String workflowDescription;
+  @JsonProperty("description")
+  private String description;
 
-  public PostIntegrationWorkflowRequestModel workflowName(String workflowName) {
-    this.workflowName = workflowName;
+  @JsonProperty("definition")
+  private String definition;
+
+  public PostIntegrationWorkflowRequestModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * Get workflowName
-   * @return workflowName
+   * The workflow name.
+   * @return name
   */
   @NotNull 
-  @Schema(name = "workflowName", required = true)
-  public String getWorkflowName() {
-    return workflowName;
+  @Schema(name = "name", description = "The workflow name.", required = true)
+  public String getName() {
+    return name;
   }
 
-  public void setWorkflowName(String workflowName) {
-    this.workflowName = workflowName;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public PostIntegrationWorkflowRequestModel workflowDescription(String workflowDescription) {
-    this.workflowDescription = workflowDescription;
+  public PostIntegrationWorkflowRequestModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get workflowDescription
-   * @return workflowDescription
+   * The workflow description.
+   * @return description
   */
   
-  @Schema(name = "workflowDescription", required = false)
-  public String getWorkflowDescription() {
-    return workflowDescription;
+  @Schema(name = "description", description = "The workflow description.", required = false)
+  public String getDescription() {
+    return description;
   }
 
-  public void setWorkflowDescription(String workflowDescription) {
-    this.workflowDescription = workflowDescription;
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public PostIntegrationWorkflowRequestModel definition(String definition) {
+    this.definition = definition;
+    return this;
+  }
+
+  /**
+   * The workflow definition.
+   * @return definition
+  */
+  
+  @Schema(name = "definition", description = "The workflow definition.", required = false)
+  public String getDefinition() {
+    return definition;
+  }
+
+  public void setDefinition(String definition) {
+    this.definition = definition;
   }
 
   @Override
@@ -76,21 +98,23 @@ public class PostIntegrationWorkflowRequestModel {
       return false;
     }
     PostIntegrationWorkflowRequestModel postIntegrationWorkflowRequest = (PostIntegrationWorkflowRequestModel) o;
-    return Objects.equals(this.workflowName, postIntegrationWorkflowRequest.workflowName) &&
-        Objects.equals(this.workflowDescription, postIntegrationWorkflowRequest.workflowDescription);
+    return Objects.equals(this.name, postIntegrationWorkflowRequest.name) &&
+        Objects.equals(this.description, postIntegrationWorkflowRequest.description) &&
+        Objects.equals(this.definition, postIntegrationWorkflowRequest.definition);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(workflowName, workflowDescription);
+    return Objects.hash(name, description, definition);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class PostIntegrationWorkflowRequestModel {\n");
-    sb.append("    workflowName: ").append(toIndentedString(workflowName)).append("\n");
-    sb.append("    workflowDescription: ").append(toIndentedString(workflowDescription)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("}");
     return sb.toString();
   }
