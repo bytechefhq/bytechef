@@ -193,6 +193,10 @@ public final class Connection implements Persistable<Long> {
         this.parameters = new EncryptedMapWrapper(parameters);
     }
 
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return "Connection{" + "authorizationName='"
