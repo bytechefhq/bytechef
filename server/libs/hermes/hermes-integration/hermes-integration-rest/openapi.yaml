@@ -5,26 +5,6 @@ info:
 servers:
   - url: http://localhost:5173/api
 paths:
-  /integration-tags:
-    get:
-      description: Get integration tags.
-      summary: Get integration tags.
-      tags:
-        - integrations
-      operationId: getIntegrationTags
-      responses:
-        "200":
-          description: The list of integration tags.
-          content:
-            application/json:
-              schema:
-                type: object
-                description: The response object that contains the array of tags.
-                properties:
-                  tags:
-                    type: array
-                    items:
-                      type: string
   /integrations:
     get:
       description: Get integrations.
@@ -60,6 +40,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
+  /integrations/categories:
+    get:
+      description: Get categories.
+      summary: Get categories.
+      tags:
+        - integrations
+      operationId: getIntegrationCategories
+      responses:
+        "200":
+          description: The list of categories.
+          content:
+            application/json:
+              schema:
+                description: The response object that contains the array of categories.
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /integrations/tags:
+    get:
+      description: Get integration tags.
+      summary: Get integration tags.
+      tags:
+        - integrations
+      operationId: getIntegrationTags
+      responses:
+        "200":
+          description: The list of integration tags.
+          content:
+            application/json:
+              schema:
+                description: The response object that contains the array of tags.
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
   /integrations/{id}:
     delete:
       description: Delete an integration.
@@ -147,11 +161,16 @@ paths:
             schema:
               type: object
               required:
-                - workflowName
+                - name
               properties:
-                workflowName:
+                name:
+                  description: The workflow name.
                   type: string
-                workflowDescription:
+                description:
+                  description: The workflow description.
+                  type: string
+                definition:
+                  description: The workflow definition.
                   type: string
         required: true
       responses:
@@ -180,19 +199,49 @@ paths:
         content:
           application/json:
             schema:
-              type: object
               description: The request object that contains the array of tags.
-              properties:
-                tags:
-                  type: array
-                  items:
-                    type: string
+              type: array
+              items:
+                $ref: '#/components/schemas/Tag'
         required: true
       responses:
         "200":
           description: Successful operation.
 components:
   schemas:
+    Category:
+      description: An integration category.
+      required:
+        - name
+      properties:
+        createdBy:
+          description: The created by.
+          type: string
+          readOnly: true
+        createdDate:
+          description: The created date.
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          description: The id of the category.
+          type: integer
+          format: int64
+        name:
+          description: The name of the category.
+          type: string
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        version:
+          type: integer
+          format: int32
     Integration:
       description: A group of workflows that make one logical integration.
       type: object
@@ -200,8 +249,7 @@ components:
         - name
       properties:
         category:
-          description: The category of the integration.
-          type: string
+          $ref: '#/components/schemas/Category'
         createdBy:
           description: The created by.
           type: string
@@ -234,10 +282,37 @@ components:
         tags:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/Tag'
+        version:
+          type: integer
+          format: int32
         workflowIds:
           description: The workflow ids belonging to this integration.
           type: array
           items:
             type: string
             readOnly: true
+    Tag:
+      description: An integration tag.
+      required:
+        - name
+      properties:
+        id:
+          description: The id of the tag.
+          type: integer
+          format: int64
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          description: The name of the tag.
+          type: string
+        version:
+          type: integer
+          format: int32
