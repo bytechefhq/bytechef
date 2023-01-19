@@ -15,27 +15,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.integration.facade;
+package com.bytechef.hermes.integration.service;
 
-import com.bytechef.hermes.integration.domain.Integration;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.hermes.integration.domain.Category;
 
-import java.util.Set;
+import java.util.List;
 
-/**
- * @author Ivica Cardic
- */
-public interface IntegrationFacade {
+public interface CategoryService {
 
-    Integration addWorkflow(long id, String name, String description, String definition);
+    List<Category> getCategories();
 
-    Integration create(Integration integration);
-
-    void delete(Long id);
-
-    Set<Tag> getIntegrationTags();
-
-    Integration update(Long id, Set<Tag> tags);
-
-    Integration update(Integration integration);
+    Category save(Category category);
 }

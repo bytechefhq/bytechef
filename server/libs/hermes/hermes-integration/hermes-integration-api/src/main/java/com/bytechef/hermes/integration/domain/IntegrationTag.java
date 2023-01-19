@@ -21,6 +21,7 @@ import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -36,18 +37,14 @@ public final class IntegrationTag implements Persistable<Long> {
     private Long id;
 
     @Column("tag_id")
-    private Long tagId;
+    private AggregateReference<Tag, Long> tagRef;
 
     public IntegrationTag() {
     }
 
-    public IntegrationTag(Long tagId) {
-        this.tagId = tagId;
-    }
-
-    @SuppressFBWarnings("EI2")
+    @SuppressFBWarnings("NP")
     public IntegrationTag(Tag tag) {
-        this.tagId = tag.getId();
+        this.tagRef = tag.isNew() ? null : AggregateReference.to(tag.getId());
     }
 
     @Override
@@ -55,14 +52,13 @@ public final class IntegrationTag implements Persistable<Long> {
         if (this == o) {
             return true;
         }
-
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
-        IntegrationTag integrationTag = (IntegrationTag) o;
+        IntegrationTag that = (IntegrationTag) o;
 
-        return Objects.equals(id, integrationTag.id) && Objects.equals(tagId, integrationTag.tagId);
+        return Objects.equals(id, that.id) && Objects.equals(tagRef, that.tagRef);
     }
 
     @Override
@@ -76,7 +72,7 @@ public final class IntegrationTag implements Persistable<Long> {
     }
 
     public Long getTagId() {
-        return tagId;
+        return tagRef.getId();
     }
 
     @Override
@@ -92,6 +88,6 @@ public final class IntegrationTag implements Persistable<Long> {
     public String toString() {
         return "IntegrationTag{" + ", id='"
             + id + '\'' + ", tagId='"
-            + tagId + '\'' + '}';
+            + tagRef.getId() + '\'' + '}';
     }
 }
