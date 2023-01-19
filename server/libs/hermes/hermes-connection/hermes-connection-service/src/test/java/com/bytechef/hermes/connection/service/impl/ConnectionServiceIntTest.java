@@ -45,8 +45,7 @@ public class ConnectionServiceIntTest {
     public void testCreate() {
         Connection connection = getConnection();
 
-        connection = connectionService.create(connection.getName(), connection.getComponentName(),
-            connection.getComponentVersion(), connection.getAuthorizationName(), connection.getParameters());
+        connection = connectionService.create(connection);
 
         Assertions.assertEquals("name", connection.getName());
         Assertions.assertEquals(Map.of("key1", "value1"), connection.getParameters());
@@ -85,7 +84,9 @@ public class ConnectionServiceIntTest {
     public void testUpdate() {
         Connection connection = connectionRepository.save(getConnection());
 
-        Connection updatedConnection = connectionService.update(connection.getId(), "name2");
+        connection.setName("name2");
+
+        Connection updatedConnection = connectionService.update(connection);
 
         Assertions.assertEquals("name2", updatedConnection.getName());
     }
