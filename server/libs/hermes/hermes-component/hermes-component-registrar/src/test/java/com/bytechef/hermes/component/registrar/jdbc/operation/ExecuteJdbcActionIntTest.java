@@ -28,7 +28,6 @@ import com.bytechef.hermes.component.registrar.config.JdbcComponentRegistrarIntT
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,15 +51,13 @@ public class ExecuteJdbcActionIntTest {
     @Autowired
     private ExecuteJdbcOperation executeJdbcOperation;
 
+    @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    public void afterEach() {
-        jdbcTemplate.execute("DROP TABLE IF EXISTS test;");
-    }
 
     @BeforeEach
     public void beforeEach() {
+        jdbcTemplate.execute("DROP TABLE IF EXISTS test;");
+
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

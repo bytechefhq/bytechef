@@ -55,4 +55,14 @@ public class FileEntryImpl implements FileEntry {
     public String getUrl() {
         return url;
     }
+
+    @Override
+    public String toString() {
+        return "FileEntryImpl{" +
+            "extension='" + extension + '\'' +
+            ", mimeType='" + mimeType + '\'' +
+            ", name='" + name + '\'' +
+            ", url='" + url + '\'' +
+            '}';
+    }
 }
