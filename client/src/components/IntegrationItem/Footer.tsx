@@ -2,10 +2,11 @@ import React from 'react';
 import {Category} from './Category';
 import {Date} from './Date';
 import {TagList} from './TagList';
+import {CategoryModel, TagModel} from '../../data-access/integration';
 
 const Footer: React.FC<{
-    category?: string;
-    tags?: string[];
+    category?: CategoryModel;
+    tags?: TagModel[];
     date?: Date;
 }> = ({category, tags, date}) => {
     return (
