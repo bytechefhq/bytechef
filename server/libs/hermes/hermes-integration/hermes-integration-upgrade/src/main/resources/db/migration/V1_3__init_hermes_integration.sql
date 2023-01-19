@@ -37,3 +37,5 @@ ALTER TABLE integration ADD CONSTRAINT fk_integration_category FOREIGN KEY (cate
 ALTER TABLE integration_tag ADD CONSTRAINT fk_integration_tag_integration FOREIGN KEY (integration_id) REFERENCES integration (id);
 ALTER TABLE integration_tag ADD CONSTRAINT fk_integration_tag_tag FOREIGN KEY (tag_id) REFERENCES tag (id);
 ALTER TABLE integration_workflow ADD CONSTRAINT fk_integration_workflow_integration FOREIGN KEY (integration_id) REFERENCES integration (id);
+
+ALTER TABLE category ADD CONSTRAINT uk_category_name UNIQUE (name);
