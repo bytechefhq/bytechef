@@ -28,7 +28,9 @@ import java.util.Set;
  */
 public interface IntegrationService {
 
-    Integration create(String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
+    Integration addWorkflow(Long id, String workflowId);
+
+    Integration create(Integration integration);
 
     void delete(long id);
 
@@ -36,8 +38,7 @@ public interface IntegrationService {
 
     List<Integration> getIntegrations();
 
-    Integration update(Integration integration);
+    Integration update(Long id, Set<Tag> tags);
 
-    Integration update(
-        long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
+    Integration update(Integration integration);
 }
