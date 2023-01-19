@@ -14,7 +14,7 @@ type InputProps = {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     ({label, name, type = 'text', error, ...props}, ref) => (
-        <div>
+        <fieldset className="mb-3">
             <label
                 htmlFor={name}
                 className="block text-sm font-medium text-gray-700 dark:text-gray-400"
@@ -61,7 +61,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     This field is required
                 </p>
             )}
-        </div>
+        </fieldset>
     )
 );
 
