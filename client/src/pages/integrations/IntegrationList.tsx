@@ -1,9 +1,9 @@
-import {useGetIntegrations} from '../../queries/integrations.queries';
+import {useGetIntegrationsQuery} from '../../queries/integrations.queries';
 import React from 'react';
 import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
 
 export const IntegrationList: React.FC = () => {
-    const {isLoading, error, data: items} = useGetIntegrations();
+    const {isLoading, error, data: items} = useGetIntegrationsQuery();
 
     return (
         <div>

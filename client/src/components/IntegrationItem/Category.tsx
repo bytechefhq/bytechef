@@ -1,5 +1,6 @@
 import React from 'react';
+import {CategoryModel} from '../../data-access/integration';
 
-export const Category: React.FC<{category?: string}> = ({category}) => {
-    return <div>{category}</div>;
+export const Category: React.FC<{category?: CategoryModel}> = ({category}) => {
+    return <div>{category?.name}</div>;
 };

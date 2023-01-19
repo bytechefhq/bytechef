@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 
 import Input from 'components/Input/Input';
 import Modal from 'components/Modal/Modal';
@@ -6,55 +6,68 @@ import MultiSelect from 'components/MultiSelect/MultiSelect';
 import TextArea from 'components/TextArea/TextArea';
 import {Controller, useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
-import {ServerStateKeysEnum} from '../../queries/integrations.queries';
+import {
+    ServerStateKeysEnum,
+    useGetIntegrationCategoriesQuery,
+    useGetIntegrationTagsQuery,
+} from '../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-
-interface Tag {
-    readonly label: string;
-    readonly value: string;
-}
+import {
+    CategoryModel,
+    IntegrationModel,
+    TagModel,
+} from '../../data-access/integration';
+import {useIntegrationMutation} from '../../mutations/integrations.mutations';
 
 const IntegrationModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [availableTags, setAvailableTags] = useState([]);
 
-    const {control, getValues, handleSubmit, reset} = useForm({
+    const {control, getValues, setValue, handleSubmit, reset} = useForm({
         defaultValues: {
             name: '',
             description: '',
-            category: '',
+            category: undefined,
             tags: [],
+        },
+    });
+
+    const {
+        isLoading: categoriesIsLoading,
+        error: categoriesError,
+        data: categories,
+    } = useGetIntegrationCategoriesQuery();
+    const {
+        isLoading: tagsIsLoading,
+        error: tagsError,
+        data: tags,
+    } = useGetIntegrationTagsQuery();
+
+    const mutation = useIntegrationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries([
+                ServerStateKeysEnum.IntegrationCategories,
+            ]);
+            queryClient.invalidateQueries([ServerStateKeysEnum.Integrations]);
+            queryClient.invalidateQueries([
+                ServerStateKeysEnum.IntegrationTags,
+            ]);
+
+            setIsOpen(false);
+
+            reset();
         },
     });
 
     const queryClient = useQueryClient();
 
-    useEffect(() => {
-        fetch('http://localhost:5173/api/integration-tags', {
-            credentials: 'same-origin',
-            headers: {'Content-Type': 'application/json'},
-        })
-            .then((response) => response.json())
-            .then((response) => setAvailableTags(response.tags));
-    }, []);
-
     function createIntegration() {
         const formData = getValues();
 
-        const tagValues = formData.tags.map((tag: Tag) => tag.value);
-
-        fetch('http://localhost:5173/api/integrations', {
-            body: JSON.stringify({...formData, tags: tagValues}),
-            credentials: 'same-origin',
-            headers: {'Content-Type': 'application/json'},
-            method: 'POST',
-        }).then(() => {
-            queryClient.invalidateQueries([ServerStateKeysEnum.Integrations]);
-
-            setIsOpen(false);
-
-            reset();
+        const tagValues = formData.tags?.map((tag: TagModel) => {
+            return {id: tag.id, name: tag.name, version: tag.version};
         });
+
+        mutation.mutate({...formData, tags: tagValues} as IntegrationModel);
     }
 
     return (
@@ -68,6 +81,13 @@ const IntegrationModal: React.FC = () => {
             isOpen={isOpen}
             setIsOpen={setIsOpen}
         >
+            {categoriesError &&
+                !categoriesIsLoading &&
+                `An error has occurred: ${categoriesError.message}`}
+            {tagsError &&
+                !tagsIsLoading &&
+                `An error has occurred: ${tagsError.message}`}
+
             <Controller
                 name="name"
                 control={control}
@@ -94,34 +114,74 @@ const IntegrationModal: React.FC = () => {
                 )}
             />
 
-            <Controller
-                control={control}
-                name="category"
-                render={({field}) => (
-                    <Input
-                        label="Category"
-                        placeholder="Marketing, Sales, Social Media..."
-                        {...field}
-                    />
-                )}
-            />
+            {!categoriesIsLoading && (
+                <Controller
+                    control={control}
+                    name="category"
+                    render={({field}) => (
+                        <MultiSelect
+                            isMulti={false}
+                            label="Category"
+                            options={categories!.map(
+                                (category: CategoryModel) => ({
+                                    label: `${category.name
+                                        .charAt(0)
+                                        .toUpperCase()}${category.name.slice(
+                                        1
+                                    )}`,
+                                    value: category.name
+                                        .toLowerCase()
+                                        .replace(/\W/g, ''),
+                                    ...category,
+                                })
+                            )}
+                            placeholder="Marketing, Sales, Social Media..."
+                            onCreateOption={(inputValue: string) => {
+                                setValue('category', {
+                                    label: inputValue,
+                                    value: inputValue,
+                                    name: inputValue,
+                                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                                } as any);
+                            }}
+                            {...field}
+                        />
+                    )}
+                />
+            )}
 
-            <Controller
-                control={control}
-                name="tags"
-                render={({field}) => (
-                    <MultiSelect
-                        label="Tags"
-                        options={availableTags.map((tag: string) => ({
-                            label: `${tag.charAt(0).toUpperCase()}${tag.slice(
-                                1
-                            )}`,
-                            value: tag.toLowerCase().replace(/\W/g, ''),
-                        }))}
-                        {...field}
-                    />
-                )}
-            />
+            {!tagsIsLoading && (
+                <Controller
+                    control={control}
+                    name="tags"
+                    render={({field}) => (
+                        <MultiSelect
+                            isMulti={true}
+                            label="Tags"
+                            options={tags!.map((tag: TagModel) => ({
+                                label: `${tag.name
+                                    .charAt(0)
+                                    .toUpperCase()}${tag.name.slice(1)}`,
+                                value: tag.name
+                                    .toLowerCase()
+                                    .replace(/\W/g, ''),
+                                ...tag,
+                            }))}
+                            onCreateOption={(inputValue: string) => {
+                                setValue('tags', [
+                                    ...getValues().tags!,
+                                    {
+                                        label: inputValue,
+                                        value: inputValue,
+                                        name: inputValue,
+                                    },
+                                ] as never[]);
+                            }}
+                            {...field}
+                        />
+                    )}
+                />
+            )}
 
             <div className="mt-4 flex justify-end">
                 <Button
