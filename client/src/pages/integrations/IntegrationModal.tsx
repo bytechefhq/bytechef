@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import Input from 'components/Input/Input';
 import Modal from 'components/Modal/Modal';
-import MultiSelect from 'components/MultiSelect/MultiSelect';
+import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import TextArea from 'components/TextArea/TextArea';
 import {Controller, useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
@@ -119,7 +119,7 @@ const IntegrationModal: React.FC = () => {
                     control={control}
                     name="category"
                     render={({field}) => (
-                        <MultiSelect
+                        <CreatableSelect
                             isMulti={false}
                             label="Category"
                             options={categories!.map(
@@ -155,7 +155,7 @@ const IntegrationModal: React.FC = () => {
                     control={control}
                     name="tags"
                     render={({field}) => (
-                        <MultiSelect
+                        <CreatableSelect
                             isMulti={true}
                             label="Tags"
                             options={tags!.map((tag: TagModel) => ({
