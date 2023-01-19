@@ -24,7 +24,8 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
 
 import java.util.List;
-import java.util.Optional;
+
+import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -33,10 +34,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
-import org.springframework.data.auditing.DateTimeProvider;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -57,6 +54,7 @@ public class IntegrationIntTestConfiguration {
     public WorkflowService workflowService(
         CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
+
         return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 
@@ -65,23 +63,11 @@ public class IntegrationIntTestConfiguration {
     public static class CacheConfiguration {
     }
 
-    @EnableJdbcAuditing
     @EnableJdbcRepositories(
         basePackages = {
             "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository",
             "com.bytechef.tag.repository"
         })
-    @TestConfiguration
-    public static class JdbcRepositoriesConfiguration {
-
-        @Bean
-        AuditorAware<String> auditorProvider() {
-            return () -> Optional.of("system");
-        }
-
-        @Bean
-        public DateTimeProvider auditingDateTimeProvider() {
-            return CurrentDateTimeProvider.INSTANCE;
-        }
+    public static class IntegrationJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
     }
 }
