@@ -24,7 +24,6 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
@@ -32,8 +31,4 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface TagRepository extends PagingAndSortingRepository<Tag, Long>, CrudRepository<Tag, Long> {
     Optional<Tag> findByName(String name);
-
-    @Override
-    @Transactional(noRollbackFor = RuntimeException.class)
-    void deleteById(Long id);
 }

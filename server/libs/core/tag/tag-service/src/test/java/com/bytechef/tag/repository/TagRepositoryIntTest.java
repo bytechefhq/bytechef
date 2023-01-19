@@ -15,20 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.tag.service;
+package com.bytechef.tag.repository;
 
 import com.bytechef.tag.config.TagIntTestConfiguration;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Set;
-import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,47 +33,60 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EmbeddedSql
 @SpringBootTest(classes = TagIntTestConfiguration.class)
-class TagServiceIntTest {
-
-    private Tag tag;
+public class TagRepositoryIntTest {
 
     @Autowired
     private TagRepository tagRepository;
-
-    @Autowired
-    private TagService tagService;
 
     @BeforeEach
     @SuppressFBWarnings("NP")
     public void beforeEach() {
         tagRepository.deleteAll();
+    }
 
-        tag = tagRepository.save(new Tag("name"));
+    @Test
+    @SuppressFBWarnings("NP")
+    public void testCreate() {
+        Tag tag = tagRepository.save(new Tag("name"));
+
+        assertThat(tag).isEqualTo(tagRepository.findById(tag.getId())
+            .get());
     }
 
     @Test
     @SuppressFBWarnings("NP")
     public void testDelete() {
-        tagService.delete(tag.getId());
+        Tag tag = tagRepository.save(new Tag("name"));
+
+        Tag resultTag = tagRepository.findById(tag.getId())
+            .orElseThrow();
+
+        assertThat(resultTag).isEqualTo(tag);
+
+        tagRepository.deleteById(resultTag.getId());
 
         assertThat(tagRepository.findById(tag.getId())).isEmpty();
     }
 
     @Test
     @SuppressFBWarnings("NP")
-    public void testGetTags() {
-        assertThat(tagService.getTags(Set.of(tag.getId()))).isEqualTo(Set.of(tag));
+    public void testFindById() {
+        Tag tag = tagRepository.save(new Tag("name"));
+
+        assertThat(tagRepository.findById(tag.getId())).hasValue(tag);
     }
 
     @Test
-    public void testSave() {
-        tag.setName("name1");
+    @SuppressFBWarnings("NP")
+    public void testUpdate() {
+        Tag tag = tagRepository.save(new Tag("name"));
 
-        assertThat(tagService.save(Set.of(tag, new Tag(-1, "name2"), new Tag(-2, "name3")))).hasSize(3);
-        assertThat(StreamSupport.stream(tagRepository.findAll()
-            .spliterator(), false)
-            .map(Tag::getName)
-            .toList()).contains("name1", "name2", "name3");
+        assertThat(tagRepository.findById(tag.getId())).hasValue(tag);
+
+        tag.setName("name2");
+
+        tag = tagRepository.save(tag);
+
+        assertThat(tagRepository.findById(tag.getId())).hasValue(tag);
     }
-
 }
