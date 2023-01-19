@@ -21,9 +21,8 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.bytechef.tag.service.TagService;
@@ -48,41 +47,41 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<Tag> create(@NonNull Set<String> tagNames) {
-        Assert.notNull(tagNames, "'tags' must not be null.");
+    public void delete(Long id) {
+        tagRepository.deleteById(id);
+    }
 
-        Set<Tag> tags = new HashSet<>();
+    @Override
+    public Set<Tag> getTags(@NonNull Set<Long> ids) {
+        return StreamSupport.stream(tagRepository.findAllById(ids)
+            .spliterator(), false)
+            .collect(Collectors.toSet());
+    }
 
-        for (String tagName : tagNames) {
-            Optional<Tag> tagOptional = tagRepository.findByName(tagName);
+    @Override
+    @SuppressFBWarnings("NP")
+    public Set<Tag> save(@NonNull Set<Tag> tags) {
+        Set<Tag> resultTags = new HashSet<>();
 
-            if (tagOptional.isPresent()) {
-                tags.add(tagOptional.get());
+        Assert.notNull(tags, "'tags' must not be null.");
+
+        for (Tag tag : tags) {
+            if (tag.isNew()) {
+                tag.setId(null);
+
+                tagRepository.findByName(tag.getName())
+                    .ifPresentOrElse(resultTags::add, () -> resultTags.add(tagRepository.save(tag)));
             } else {
-                tags.add(tagRepository.save(new Tag(tagName)));
+                Tag curTag = tagRepository.findById(tag.getId())
+                    .orElseThrow();
+
+                curTag.setName(tag.getName());
+                curTag.setVersion(tag.getVersion());
+
+                resultTags.add(tagRepository.save(curTag));
             }
         }
 
-        return tags;
-    }
-
-    @Override
-    public boolean delete(Long id) {
-        try {
-            tagRepository.deleteById(id);
-        } catch (Exception e) {
-            // ignore
-
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public List<Tag> getTags(@NonNull Set<Long> ids) {
-        return StreamSupport.stream(tagRepository.findAllById(ids)
-            .spliterator(), false)
-            .toList();
+        return resultTags;
     }
 }
