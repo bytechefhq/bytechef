@@ -28,7 +28,7 @@ import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +91,7 @@ public class IntegrationServiceIntTest {
 
         Tag tag = tagRepository.save(new Tag("tag1"));
 
-        integration.setTags(Set.of(tag));
+        integration.setTags(List.of(tag));
 
         integration = integrationService.create(integration);
 
@@ -99,8 +99,8 @@ public class IntegrationServiceIntTest {
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("tagIds", Set.of(tag.getId()))
-            .hasFieldOrPropertyWithValue("workflowIds", Set.of("workflow1"));
+            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
+            .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow1"));
     }
 
     @Test
@@ -140,15 +140,15 @@ public class IntegrationServiceIntTest {
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("tags", Collections.emptySet())
-            .hasFieldOrPropertyWithValue("workflowIds", Set.of("workflow1"));
+            .hasFieldOrPropertyWithValue("tags", Collections.emptyList())
+            .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow1"));
 
         Tag tag = tagRepository.save(new Tag("tag2"));
 
         integration.setDescription("description2");
         integration.setName("name2");
-        integration.setTags(Set.of(tag));
-        integration.setWorkflowIds(Set.of("workflow2"));
+        integration.setTags(List.of(tag));
+        integration.setWorkflowIds(List.of("workflow2"));
 
         Category category2 = categoryRepository.save(new Category("name2"));
 
@@ -160,8 +160,8 @@ public class IntegrationServiceIntTest {
             .hasFieldOrPropertyWithValue("category", category2)
             .hasFieldOrPropertyWithValue("description", "description2")
             .hasFieldOrPropertyWithValue("name", "name2")
-            .hasFieldOrPropertyWithValue("tags", Set.of(tag))
-            .hasFieldOrPropertyWithValue("workflowIds", Set.of("workflow2"));
+            .hasFieldOrPropertyWithValue("tags", List.of(tag))
+            .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow2"));
     }
 
     private Integration getIntegration() {

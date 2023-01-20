@@ -88,6 +88,6 @@ public final class IntegrationTag implements Persistable<Long> {
     public String toString() {
         return "IntegrationTag{" + ", id='"
             + id + '\'' + ", tagId='"
-            + tagRef.getId() + '\'' + '}';
+            + getTagId() + '\'' + '}';
     }
 }
