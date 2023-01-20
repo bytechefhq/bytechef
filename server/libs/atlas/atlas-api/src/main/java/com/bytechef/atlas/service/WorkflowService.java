@@ -36,4 +36,6 @@ public interface WorkflowService {
     List<Workflow> getWorkflows();
 
     Workflow update(String id, String definition);
+
+    List<Workflow> getWorkflows(List<String> workflowIds);
 }
