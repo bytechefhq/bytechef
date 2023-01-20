@@ -1,0 +1,12 @@
+src/main/java/com/bytechef/atlas/web/rest/ApiUtil.java
+src/main/java/com/bytechef/atlas/web/rest/JobsApi.java
+src/main/java/com/bytechef/atlas/web/rest/TaskExecutionsApi.java
+src/main/java/com/bytechef/atlas/web/rest/WorkflowsApi.java
+src/main/java/com/bytechef/atlas/web/rest/model/ExecutionErrorModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/JobModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/JobParametersModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/PostJob200ResponseModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/TaskExecutionModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/WorkflowFormatModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/WorkflowModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/WorkflowTaskModel.java
