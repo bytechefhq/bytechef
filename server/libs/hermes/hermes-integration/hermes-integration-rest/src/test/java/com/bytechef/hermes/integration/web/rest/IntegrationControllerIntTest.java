@@ -47,9 +47,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -150,8 +148,7 @@ public class IntegrationControllerIntTest {
 
     @Test
     public void testGetIntegrationTags() {
-        when(integrationFacade.getIntegrationTags()).thenReturn(
-            new LinkedHashSet<>(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2"))));
+        when(integrationFacade.getIntegrationTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
             this.webTestClient
@@ -317,11 +314,11 @@ public class IntegrationControllerIntTest {
             Assertions.fail(exception);
         }
 
-        ArgumentCaptor<Set<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(Set.class);
+        ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
         verify(integrationFacade).update(anyLong(), tagsArgumentCaptor.capture());
 
-        Set<Tag> capturedTags = tagsArgumentCaptor.getValue();
+        List<Tag> capturedTags = tagsArgumentCaptor.getValue();
 
         Iterator<Tag> tagIterator = capturedTags.iterator();
 

@@ -19,11 +19,12 @@ package com.bytechef.hermes.integration.domain;
 
 import com.bytechef.tag.domain.Tag;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
@@ -46,6 +47,8 @@ import org.springframework.util.CollectionUtils;
  */
 @Table
 public final class Integration implements Persistable<Long> {
+
+    private static final Random RANDOM = new Random();
 
     @Transient
     private Category category;
@@ -85,7 +88,7 @@ public final class Integration implements Persistable<Long> {
     private LocalDateTime lastModifiedDate;
 
     @Transient
-    private Set<Tag> tags = Collections.emptySet();
+    private List<Tag> tags = new ArrayList<>();
 
     @Version
     private int version;
@@ -108,7 +111,11 @@ public final class Integration implements Persistable<Long> {
     }
 
     public void addTag(Tag tag) {
-        integrationTags.add(new IntegrationTag(tag));
+        if (tag.getId() != null) {
+            integrationTags.add(new IntegrationTag(tag));
+        }
+
+        tags.add(tag);
     }
 
     public void addWorkflow(String workflowId) {
@@ -161,12 +168,6 @@ public final class Integration implements Persistable<Long> {
         return id;
     }
 
-    public Set<String> getWorkflowIds() {
-        return integrationWorkflows.stream()
-            .map(IntegrationWorkflow::getWorkflowId)
-            .collect(Collectors.toSet());
-    }
-
     public String getName() {
         return name;
     }
@@ -179,15 +180,21 @@ public final class Integration implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public Set<Long> getTagIds() {
+    public List<Long> getTagIds() {
         return integrationTags
             .stream()
             .map(IntegrationTag::getTagId)
-            .collect(Collectors.toSet());
+            .toList();
     }
 
-    public Set<Tag> getTags() {
-        return Collections.unmodifiableSet(tags);
+    public List<Tag> getTags() {
+        return List.copyOf(tags);
+    }
+
+    public List<String> getWorkflowIds() {
+        return integrationWorkflows.stream()
+            .map(IntegrationWorkflow::getWorkflowId)
+            .toList();
     }
 
     public int getVersion() {
@@ -233,12 +240,9 @@ public final class Integration implements Persistable<Long> {
         this.name = name;
     }
 
-    public void setTags(Set<Tag> tags) {
-        if (!CollectionUtils.isEmpty(tags)) {
-            this.tags = new HashSet<>(tags);
-        }
-
+    public void setTags(List<Tag> tags) {
         this.integrationTags = new HashSet<>();
+        this.tags = new ArrayList<>();
 
         if (!CollectionUtils.isEmpty(tags)) {
             for (Tag tag : tags) {
@@ -251,7 +255,7 @@ public final class Integration implements Persistable<Long> {
         this.version = version;
     }
 
-    public void setWorkflowIds(Set<String> workflowIds) {
+    public void setWorkflowIds(List<String> workflowIds) {
         integrationWorkflows = new HashSet<>();
 
         for (String workflowId : workflowIds) {
