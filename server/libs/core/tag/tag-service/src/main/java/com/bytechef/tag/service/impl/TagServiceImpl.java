@@ -66,8 +66,6 @@ public class TagServiceImpl implements TagService {
 
         for (Tag tag : tags) {
             if (tag.isNew()) {
-                tag.setId(null);
-
                 tagRepository.findByName(tag.getName())
                     .ifPresentOrElse(resultTags::add, () -> resultTags.add(tagRepository.save(tag)));
             } else {
