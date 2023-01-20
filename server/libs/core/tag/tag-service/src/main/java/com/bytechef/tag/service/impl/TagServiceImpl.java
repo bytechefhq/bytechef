@@ -20,9 +20,8 @@ package com.bytechef.tag.service.impl;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 import com.bytechef.tag.service.TagService;
@@ -52,16 +51,16 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<Tag> getTags(@NonNull Set<Long> ids) {
+    public List<Tag> getTags(@NonNull List<Long> ids) {
         return StreamSupport.stream(tagRepository.findAllById(ids)
             .spliterator(), false)
-            .collect(Collectors.toSet());
+            .toList();
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Set<Tag> save(@NonNull Set<Tag> tags) {
-        Set<Tag> resultTags = new HashSet<>();
+    public List<Tag> save(@NonNull List<Tag> tags) {
+        List<Tag> resultTags = new ArrayList<>();
 
         Assert.notNull(tags, "'tags' must not be null.");
 
