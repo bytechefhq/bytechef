@@ -21,7 +21,6 @@ import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.repository.IntegrationRepository;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import com.bytechef.hermes.integration.service.IntegrationService;
@@ -76,7 +75,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration update(Long id, Set<Tag> tags) {
+    public Integration update(Long id, List<Tag> tags) {
         Integration integration = getIntegration(id);
 
         integration.setTags(tags);

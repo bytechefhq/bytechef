@@ -37,8 +37,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.stream.Collectors;
-
 /**
  * @author Ivica Cardic
  */
@@ -156,7 +154,7 @@ public class IntegrationController implements IntegrationsApi {
                     id,
                     tagModels.stream()
                         .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                        .collect(Collectors.toSet()));
+                        .toList());
 
                 return ResponseEntity.noContent()
                     .build();

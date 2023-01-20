@@ -20,7 +20,7 @@ package com.bytechef.hermes.integration.facade;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.tag.domain.Tag;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -33,9 +33,9 @@ public interface IntegrationFacade {
 
     void delete(Long id);
 
-    Set<Tag> getIntegrationTags();
+    List<Tag> getIntegrationTags();
 
-    Integration update(Long id, Set<Tag> tags);
+    Integration update(Long id, List<Tag> tags);
 
     Integration update(Integration integration);
 }
