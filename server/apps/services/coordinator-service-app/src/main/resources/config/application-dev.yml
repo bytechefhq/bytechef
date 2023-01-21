@@ -23,12 +23,3 @@ spring:
   jackson:
     serialization:
       indent-output: true
-
-#####
-
-bytechef:
-  workflow:
-    workflow-repository:
-      cache:
-        provider: no-op
-
