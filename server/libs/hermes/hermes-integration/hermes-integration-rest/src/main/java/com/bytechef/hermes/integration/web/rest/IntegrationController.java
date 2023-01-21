@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.integration.web.rest;
 
+import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
@@ -89,11 +90,12 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(
+        Long categoryId, Long tagId, ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    integrationService.getIntegrations()
+                    integrationService.getIntegrations(categoryId, tagId)
                         .stream()
                         .map(integration -> conversionService.convert(integration, IntegrationModel.class))
                         .toList())));
