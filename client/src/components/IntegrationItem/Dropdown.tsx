@@ -56,12 +56,9 @@ export const Dropdown: React.FC<{
                         sideOffset={5}
                     >
                         {menuItems.map(({label, separator}, i) => (
-                            <>
+                            <div key={`menu-item-${i}`}>
                                 {!separator && (
-                                    <Item
-                                        key={`${label}-${i}`}
-                                        className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900"
-                                    >
+                                    <Item className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900">
                                         <span className="grow text-gray-700 dark:text-gray-300">
                                             {label}
                                         </span>
@@ -71,7 +68,7 @@ export const Dropdown: React.FC<{
                                 {separator && (
                                     <Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
                                 )}
-                            </>
+                            </div>
                         ))}
                     </Content>
                 </Portal>
