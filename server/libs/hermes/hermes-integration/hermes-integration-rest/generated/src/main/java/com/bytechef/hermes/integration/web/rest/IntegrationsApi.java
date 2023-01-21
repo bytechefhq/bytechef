@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-18T09:51:05.328763+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-20T23:05:10.694831+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "the integrations API")
 public interface IntegrationsApi {
@@ -231,6 +231,8 @@ public interface IntegrationsApi {
      * GET /integrations : Get integrations.
      * Get integrations.
      *
+     * @param categoryId The id of the category used for filtering integrations. (optional)
+     * @param tagId The list of tag ids of used for filtering integrations. (optional)
      * @return The list of integrations. (status code 200)
      */
     @Operation(
@@ -249,6 +251,8 @@ public interface IntegrationsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(
+        @Parameter(name = "categoryId", description = "The id of the category used for filtering integrations.") @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
+        @Parameter(name = "tagId", description = "The list of tag ids of used for filtering integrations.") @Valid @RequestParam(value = "tagId", required = false) Long tagId,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -307,8 +311,8 @@ public interface IntegrationsApi {
 
 
     /**
-     * POST /integrations/{id}/workflows : Creates new workflow and adds it to an existing integration.
-     * Creates new workflow and adds it to an existing integration.
+     * POST /integrations/{id}/workflows : Create new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration.
      *
      * @param id The id of the integration. (required)
      * @param postIntegrationWorkflowRequestModel  (required)
@@ -316,7 +320,7 @@ public interface IntegrationsApi {
      */
     @Operation(
         operationId = "postIntegrationWorkflow",
-        summary = "Creates new workflow and adds it to an existing integration.",
+        summary = "Create new workflow and adds it to an existing integration.",
         tags = { "integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
