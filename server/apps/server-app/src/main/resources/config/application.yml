@@ -134,8 +134,6 @@ bytechef:
       subscriptions:
         tasks: "10"
     workflow-repository:
-      cache:
-        provider:
       # Enable classpath based workflow repository
       classpath:
         enabled: true

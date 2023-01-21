@@ -25,11 +25,3 @@ spring:
       enabled: false
   messages:
     cache-duration: PT1S
-
-#####
-
-bytechef:
-  workflow:
-    workflow-repository:
-      cache:
-        provider: no-op
