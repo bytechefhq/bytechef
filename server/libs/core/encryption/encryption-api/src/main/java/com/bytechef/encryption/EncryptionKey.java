@@ -21,5 +21,6 @@ package com.bytechef.encryption;
  * @author Ivica Cardic
  */
 public interface EncryptionKey {
+
     String getKey();
 }

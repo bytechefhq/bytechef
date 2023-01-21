@@ -26,18 +26,15 @@ import java.nio.file.Path;
  */
 public class FileSystemEncryptionKey extends AbstractEncryptionKey {
 
-    public FileSystemEncryptionKey() {
-    }
+    private String key;
 
-    @Override
-    protected String fetchKey() {
-        String key;
+    public FileSystemEncryptionKey() {
+        Path userHome = Path.of(System.getProperty("user.home"));
 
         try {
-            Path keyPath = Files.createDirectories(
-                Path.of(System.getProperty("user.home"))
-                    .resolve(".bytechef"))
-                .resolve("key");
+            Path bytechefPath = Files.createDirectories(userHome.resolve(".bytechef"));
+
+            Path keyPath = bytechefPath.resolve("key");
 
             if (Files.exists(keyPath)) {
                 key = Files.readString(keyPath);
@@ -49,7 +46,10 @@ public class FileSystemEncryptionKey extends AbstractEncryptionKey {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Override
+    protected String fetchKey() {
         return key;
     }
 }
