@@ -19,6 +19,7 @@ import type {
   IntegrationModel,
   PostIntegrationWorkflowRequestModel,
   TagModel,
+  WorkflowModel,
 } from '../models';
 import {
     CategoryModelFromJSON,
@@ -29,6 +30,8 @@ import {
     PostIntegrationWorkflowRequestModelToJSON,
     TagModelFromJSON,
     TagModelToJSON,
+    WorkflowModelFromJSON,
+    WorkflowModelToJSON,
 } from '../models';
 
 export interface DeleteIntegrationRequest {
@@ -37,6 +40,15 @@ export interface DeleteIntegrationRequest {
 
 export interface GetIntegrationRequest {
     id: number;
+}
+
+export interface GetIntegrationWorkflowsRequest {
+    id: number;
+}
+
+export interface GetIntegrationsRequest {
+    categoryId?: number;
+    tagId?: number;
 }
 
 export interface PostIntegrationRequest {
@@ -183,11 +195,51 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
+     * Get workflows for particular integration.
+     * Get workflows for particular integration.
+     */
+    async getIntegrationWorkflowsRaw(requestParameters: GetIntegrationWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowModel>>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getIntegrationWorkflows.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/integrations/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowModelFromJSON));
+    }
+
+    /**
+     * Get workflows for particular integration.
+     * Get workflows for particular integration.
+     */
+    async getIntegrationWorkflows(requestParameters: GetIntegrationWorkflowsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
+        const response = await this.getIntegrationWorkflowsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get integrations.
      * Get integrations.
      */
-    async getIntegrationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationModel>>> {
+    async getIntegrationsRaw(requestParameters: GetIntegrationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationModel>>> {
         const queryParameters: any = {};
+
+        if (requestParameters.categoryId !== undefined) {
+            queryParameters['categoryId'] = requestParameters.categoryId;
+        }
+
+        if (requestParameters.tagId !== undefined) {
+            queryParameters['tagId'] = requestParameters.tagId;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -205,8 +257,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Get integrations.
      * Get integrations.
      */
-    async getIntegrations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IntegrationModel>> {
-        const response = await this.getIntegrationsRaw(initOverrides);
+    async getIntegrations(requestParameters: GetIntegrationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IntegrationModel>> {
+        const response = await this.getIntegrationsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
