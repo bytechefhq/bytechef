@@ -25,8 +25,6 @@ import java.util.List;
  */
 public interface WorkflowService {
 
-    void clearCache();
-
     Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType);
 
     void delete(String id);
