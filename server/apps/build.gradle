@@ -27,7 +27,7 @@ subprojects {
 
     gitProperties {
         failOnNoGitDirectory = false
-        keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
+        keys = ["git.branch", "git.build.version", "git.commit.id", "git.commit.id.abbrev", "git.commit.id.describe"]
     }
 
     jib {
