@@ -2,7 +2,7 @@
 
 @layer components {
     .btn {
-        @apply border-2 border-transparent  text-sm font-medium text-white shadow-sm inline-flex items-center;
+        @apply border-2 border-transparent text-sm font-medium text-white shadow-sm inline-flex items-center hover:cursor-pointer;
     }
 
     .btn-primary {
@@ -30,6 +30,6 @@
     }
 
     .btn-icon {
-        @apply shadow-none items-center justify-center text-black hover:bg-transparent  hover:text-teal-500;
+        @apply shadow-none items-center justify-center text-black hover:bg-transparent hover:text-teal-500;
     }
 }
