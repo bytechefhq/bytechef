@@ -1,5 +1,3 @@
-/* eslint-disable tailwindcss/no-custom-classname */
-
 import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
 import IntegrationList from './IntegrationList';
 import IntegrationModal from './IntegrationModal';

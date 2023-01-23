@@ -4,18 +4,12 @@ import {
     useGetIntegrationTagsQuery,
 } from '../../queries/integrations.queries';
 import IntegrationsSidebarItem, {Type} from './IntegrationsSidebarItem';
-import {useSearchParams} from 'react-router-dom';
 
 const IntegrationsSidebar: React.FC = () => {
-    const [searchParams] = useSearchParams();
     const [current, setCurrent] = useState<{id?: number; type: Type}>({
-        id: searchParams.get('categoryId')
-            ? +searchParams.get('categoryId')!
-            : searchParams.get('tagId')
-            ? +searchParams.get('tagId')!
-            : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Category,
+        type: Type.Category,
     });
+
     const {isLoading: categoriesIsLoading, data: categories} =
         useGetIntegrationCategoriesQuery();
     const {isLoading: tagsIsLoading, data: tags} = useGetIntegrationTagsQuery();
