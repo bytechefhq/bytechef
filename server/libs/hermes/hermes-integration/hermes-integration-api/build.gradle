@@ -1,4 +1,5 @@
 dependencies {
     api "org.springframework.data:spring-data-jdbc"
+    api project(":server:libs:atlas:atlas-api")
     api project(":server:libs:core:tag:tag-api")
 }
