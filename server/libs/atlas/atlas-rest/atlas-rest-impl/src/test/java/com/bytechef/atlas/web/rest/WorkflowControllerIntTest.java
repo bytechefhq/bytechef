@@ -118,7 +118,8 @@ public class WorkflowControllerIntTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(WorkflowModel.class);
+                .expectBodyList(WorkflowModel.class)
+                .hasSize(1);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
