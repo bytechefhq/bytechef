@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.integration.facade;
 
+import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.tag.domain.Tag;
 
@@ -34,6 +35,8 @@ public interface IntegrationFacade {
     void delete(Long id);
 
     List<Tag> getIntegrationTags();
+
+    List<Workflow> getIntegrationWorkflows(Long id);
 
     Integration update(Long id, List<Tag> tags);
 
