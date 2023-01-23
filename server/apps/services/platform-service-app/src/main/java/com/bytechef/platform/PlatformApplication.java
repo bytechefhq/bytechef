@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
@@ -36,7 +37,10 @@ import org.springframework.util.StringUtils;
 public class PlatformApplication {
     private static final Logger log = LoggerFactory.getLogger(PlatformApplication.class);
 
-    public PlatformApplication() {
+    private static String gitCommitId;
+
+    public PlatformApplication(@Value("${git.commit.id}") String gitCommitId) {
+        this.gitCommitId = gitCommitId;
     }
 
     /**
@@ -81,6 +85,7 @@ public class PlatformApplication {
                 \tExternal: \t{}://{}:{}{}
                 \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
+                \tGit Commit Id: \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
             protocol,
@@ -94,6 +99,7 @@ public class PlatformApplication {
                 .contains("api-docs")
                     ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
                     : "",
-            environment.getActiveProfiles());
+            environment.getActiveProfiles(),
+            gitCommitId);
     }
 }
