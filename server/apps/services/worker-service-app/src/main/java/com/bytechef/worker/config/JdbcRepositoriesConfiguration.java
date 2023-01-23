@@ -27,6 +27,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.Optional;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
 @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
 @EnableJdbcRepositories(basePackages = "com.bytechef")
