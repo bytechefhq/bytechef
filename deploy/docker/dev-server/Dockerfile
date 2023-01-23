@@ -2,6 +2,7 @@ FROM gradle:7.5.1-jdk17-alpine AS build
 
 WORKDIR /build
 
+COPY --chown=gradle:gradle ./.git ./.git
 COPY --chown=gradle:gradle ./buildSrc ./buildSrc
 COPY --chown=gradle:gradle ./gradle ./gradle
 COPY --chown=gradle:gradle ./server ./server
