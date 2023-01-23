@@ -3,6 +3,7 @@ import React from 'react';
 import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
 import {Link} from 'react-router-dom';
 import {useSearchParams} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 const IntegrationList: React.FC = () => {
     const [searchParams] = useSearchParams();
