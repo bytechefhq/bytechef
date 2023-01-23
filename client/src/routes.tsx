@@ -17,7 +17,11 @@ export const router = createBrowserRouter([
                 element: <Integrations />,
             },
             {
-                path: 'integration',
+                loader: async ({params}) =>
+                    fetch(
+                        `http://localhost:5173/api/integrations/${params.integrationId}`
+                    ),
+                path: 'integrations/:integrationId',
                 element: <Integration />,
             },
             {
