@@ -12,7 +12,7 @@ const Footer: React.FC<{
     return (
         <div className="grid grid-cols-3 gap-4">
             {category && (
-                <div className="w-96">
+                <div className="flex flex-row space-x-4">
                     <Category category={category} />
                 </div>
             )}

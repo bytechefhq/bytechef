@@ -10,7 +10,7 @@ const Header: React.FC<{
 }> = ({id, name, status}) => {
     return (
         <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2 flex flex-row space-x-4 ">
+            <div className="col-span-2 flex flex-row space-x-4">
                 <Name name={name} />
 
                 <Status status={status} />
