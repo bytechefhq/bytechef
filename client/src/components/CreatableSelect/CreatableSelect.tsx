@@ -1,6 +1,6 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import cx from 'classnames';
-import React, {forwardRef} from 'react';
+import React from 'react';
 import ReactSelectCreatable from 'react-select/creatable';
 import {Props} from 'react-select/dist/declarations/src';
 import './CreatableSelect.css';
@@ -15,51 +15,54 @@ type CreatableSelectProps = {
     onCreateOption?: (value: string) => void;
 } & Props;
 
-const CreatableSelect = forwardRef<ReactSelectCreatable, CreatableSelectProps>(
-    ({error, label, name, ...props}) => (
-        <fieldset className="mb-3">
-            <label
-                htmlFor={name}
-                className="text-sm font-medium text-gray-700 dark:text-gray-400"
-            >
-                {label}
-            </label>
+const CreatableSelect: React.FC<CreatableSelectProps> = ({
+    error,
+    label,
+    name,
+    ...props
+}) => (
+    <fieldset className="mb-3">
+        <label
+            htmlFor={name}
+            className="text-sm font-medium text-gray-700 dark:text-gray-400"
+        >
+            {label}
+        </label>
 
-            <div
-                className={cx([
-                    'mt-1 ',
-                    error ? 'relative rounded-md shadow-sm' : null,
-                ])}
-            >
-                <ReactSelectCreatable
-                    classNamePrefix="react-select"
-                    isMulti
-                    {...props}
-                />
-
-                {error && (
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ExclamationCircleIcon
-                            className="h-5 w-5 text-red-500"
-                            aria-hidden="true"
-                        />
-                    </div>
-                )}
-            </div>
+        <div
+            className={cx([
+                'mt-1 ',
+                error ? 'relative rounded-md shadow-sm' : null,
+            ])}
+        >
+            <ReactSelectCreatable
+                classNamePrefix="react-select"
+                isMulti
+                {...props}
+            />
 
             {error && (
-                <p
-                    role="alert"
-                    className="mt-2 text-sm text-red-600"
-                    id={name + '-error'}
-                >
-                    This field is required
-                </p>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <ExclamationCircleIcon
+                        className="h-5 w-5 text-red-500"
+                        aria-hidden="true"
+                    />
+                </div>
             )}
-        </fieldset>
-    )
+        </div>
+
+        {error && (
+            <p
+                role="alert"
+                className="mt-2 text-sm text-red-600"
+                id={name + '-error'}
+            >
+                This field is required
+            </p>
+        )}
+    </fieldset>
 );
 
-CreatableSelect.displayName = 'MultiSelect';
+CreatableSelect.displayName = 'CreatableSelect';
 
 export default CreatableSelect;
