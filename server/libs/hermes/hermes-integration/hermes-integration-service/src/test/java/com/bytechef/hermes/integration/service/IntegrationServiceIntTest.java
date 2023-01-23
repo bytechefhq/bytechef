@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
 
 /**
  * @author Ivica Cardic
@@ -124,9 +125,35 @@ public class IntegrationServiceIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testGetIntegrations() {
-        integrationRepository.save(getIntegration());
+        Integration integration = integrationRepository.save(getIntegration());
 
         assertThat(integrationService.getIntegrations(null, null)).hasSize(1);
+
+        Category category = new Category("category1");
+
+        category = categoryRepository.save(category);
+
+        integration.setCategory(category);
+
+        integration = integrationRepository.save(integration);
+
+        assertThat(integrationService.getIntegrations(category.getId(), null)).hasSize(1);
+
+        assertThat(integrationService.getIntegrations(Long.MAX_VALUE, null)).hasSize(0);
+
+        Tag tag = new Tag("tag1");
+
+        tag = tagRepository.save(tag);
+
+        integration.setTags(List.of(tag));
+
+        integrationRepository.save(integration);
+
+        assertThat(integrationService.getIntegrations(null, tag.getId())).hasSize(1);
+
+        assertThat(integrationService.getIntegrations(null, Long.MAX_VALUE)).hasSize(0);
+
+        assertThatException().isThrownBy(() -> integrationService.getIntegrations(Long.MAX_VALUE, Long.MAX_VALUE));
     }
 
     @Test
