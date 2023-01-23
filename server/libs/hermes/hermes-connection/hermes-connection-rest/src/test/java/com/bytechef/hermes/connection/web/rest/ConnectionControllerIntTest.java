@@ -108,7 +108,8 @@ public class ConnectionControllerIntTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(ConnectionModel.class);
+                .expectBodyList(ConnectionModel.class)
+                .hasSize(1);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
