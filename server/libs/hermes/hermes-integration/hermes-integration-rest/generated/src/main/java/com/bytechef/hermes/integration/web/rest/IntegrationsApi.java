@@ -188,6 +188,46 @@ public interface IntegrationsApi {
 
 
     /**
+     * GET /integrations/{id}/workflows : Get workflows for particular integration.
+     * Get workflows for particular integration.
+     *
+     * @param id The id of the integration. (required)
+     * @return The updated integration object. (status code 200)
+     */
+    @Operation(
+        operationId = "getIntegrationWorkflows",
+        summary = "Get workflows for particular integration.",
+        tags = { "integrations" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.atlas.web.rest.model.WorkflowModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/integrations/{id}/workflows",
+        produces = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<com.bytechef.atlas.web.rest.model.WorkflowModel>>> getIntegrationWorkflows(
+        @Parameter(name = "id", description = "The id of the integration.", required = true) @PathVariable("id") Long id,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"outputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"label\" : \"label\", \"version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"retry\" : 0, \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" } ] }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(Mono.empty());
+
+    }
+
+
+    /**
      * GET /integrations : Get integrations.
      * Get integrations.
      *
