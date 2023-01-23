@@ -50,7 +50,7 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
             Map<String, Object> workflowMap = parse(definition, objectMapper);
 
             workflow = new Workflow(
-                workflowResource.getId(), workflowResource.getWorkflowFormat(), definition, workflowMap);
+                workflowResource.getId(), definition, workflowResource.getWorkflowFormat(), workflowMap);
         } catch (Exception e) {
             workflow = new Workflow(
                 workflowResource.getId(),
