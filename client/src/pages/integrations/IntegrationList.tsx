@@ -2,9 +2,23 @@ import {useGetIntegrationsQuery} from '../../queries/integrations.queries';
 import React from 'react';
 import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
 import {Link} from 'react-router-dom';
+import {useSearchParams} from 'react-router-dom';
 
-    const {isLoading, error, data: items} = useGetIntegrationsQuery();
 const IntegrationList: React.FC = () => {
+    const [searchParams] = useSearchParams();
+
+    const {
+        isLoading,
+        error,
+        data: items,
+    } = useGetIntegrationsQuery({
+        categoryId: searchParams.get('categoryId')
+            ? +searchParams.get('categoryId')!
+            : undefined,
+        tagId: searchParams.get('tagId')
+            ? +searchParams.get('tagId')!
+            : undefined,
+    });
 
     return (
         <div>
