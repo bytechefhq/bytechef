@@ -32,25 +32,24 @@ const IntegrationList: React.FC = () => {
                     !error &&
                     items &&
                     items.map((integration) => (
-                        <li
-                            key={integration.id}
-                            className="overflow-hidden rounded-md bg-white px-6 py-4 shadow"
-                        >
+                        <div key={integration.id}>
                             <Link to={`/integrations/${integration.id}`}>
-                                <IntegrationItem
-                                    key={integration.id}
-                                    category={integration.category}
-                                    id={integration.id}
-                                    name={integration.name}
-                                    description={integration.description}
-                                    tags={integration.tags}
-                                    workflowIds={integration.workflowIds}
-                                    date={integration.lastModifiedDate}
-                                    status={false} // missing api
-                                    button={''}
-                                />
+                                <li className=" w-4/5 overflow-hidden rounded-md bg-white px-10 py-7 shadow-2xl">
+                                    <IntegrationItem
+                                        key={integration.id}
+                                        category={integration.category}
+                                        id={integration.id}
+                                        name={integration.name}
+                                        description={integration.description}
+                                        tags={integration.tags}
+                                        workflowIds={integration.workflowIds}
+                                        date={integration.lastModifiedDate}
+                                        status={false} // missing api
+                                        button={''}
+                                    />
+                                </li>
                             </Link>
-                        </li>
+                        </div>
                     ))}
             </ul>
         </div>

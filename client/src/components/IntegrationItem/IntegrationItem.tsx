@@ -7,11 +7,11 @@ export const IntegrationItem: React.FC<{
     button: string;
     name: string;
     status: boolean;
+    tags?: TagModel[];
     category?: CategoryModel;
     date?: Date;
     id?: number;
     description?: string;
-    tags?: TagModel[];
     workflowIds?: string[];
 }> = ({id, name, status, category, tags, date}) => {
     return (
