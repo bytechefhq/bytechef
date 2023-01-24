@@ -21,6 +21,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Optional;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +43,7 @@ public class CoordinatorApplication {
 
     private static String gitCommitId;
 
+    @SuppressFBWarnings("ST")
     public CoordinatorApplication(@Value("${git.commit.id}") String gitCommitId) {
         this.gitCommitId = gitCommitId;
     }
