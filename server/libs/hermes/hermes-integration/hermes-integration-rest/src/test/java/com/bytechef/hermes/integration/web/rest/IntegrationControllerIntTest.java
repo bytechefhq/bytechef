@@ -29,6 +29,7 @@ import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.CategoryService;
 import com.bytechef.hermes.integration.service.IntegrationService;
+import com.bytechef.hermes.integration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
 import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
@@ -65,6 +66,9 @@ public class IntegrationControllerIntTest {
     @MockBean
     private IntegrationFacade integrationFacade;
 
+    @Autowired
+    private IntegrationMapper integrationMapper;
+
     @MockBean
     private IntegrationService integrationService;
 
@@ -92,11 +96,12 @@ public class IntegrationControllerIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testGetIntegration() {
         try {
             Integration integration = getIntegration();
 
-            when(integrationService.getIntegration(1L)).thenReturn(integration);
+            when(integrationFacade.getIntegration(1L)).thenReturn(integration);
 
             this.webTestClient
                 .get()
@@ -105,7 +110,8 @@ public class IntegrationControllerIntTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(IntegrationModel.class);
+                .expectBody(IntegrationModel.class)
+                .isEqualTo(integrationMapper.convert(integration));
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -156,7 +162,7 @@ public class IntegrationControllerIntTest {
     public void testGetIntegrations() {
         Integration integration = getIntegration();
 
-        when(integrationService.getIntegrations(null, null)).thenReturn(List.of(integration));
+        when(integrationFacade.getIntegrations(null, null)).thenReturn(List.of(integration));
 
         this.webTestClient
             .get()
@@ -166,9 +172,10 @@ public class IntegrationControllerIntTest {
             .expectStatus()
             .isOk()
             .expectBodyList(IntegrationModel.class)
+            .contains(integrationMapper.convert(integration))
             .hasSize(1);
 
-        when(integrationService.getIntegrations(1L, null)).thenReturn(List.of(integration));
+        when(integrationFacade.getIntegrations(1L, null)).thenReturn(List.of(integration));
 
         this.webTestClient
             .get()
@@ -180,7 +187,7 @@ public class IntegrationControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationService.getIntegrations(null, 1L)).thenReturn(List.of(integration));
+        when(integrationFacade.getIntegrations(null, 1L)).thenReturn(List.of(integration));
 
         this.webTestClient
             .get()
@@ -192,7 +199,7 @@ public class IntegrationControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationService.getIntegrations(1L, 1L)).thenThrow(new RuntimeException());
+        when(integrationFacade.getIntegrations(1L, 1L)).thenThrow(new RuntimeException());
 
         this.webTestClient
             .get()
@@ -397,9 +404,11 @@ public class IntegrationControllerIntTest {
 
         integration.addWorkflow("workflow1");
 
-        integration.setId(1L);
+        integration.setCategory(new Category(1L, "category"));
         integration.setDescription("description");
+        integration.setId(1L);
         integration.setName("name");
+        integration.setTags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         return integration;
     }

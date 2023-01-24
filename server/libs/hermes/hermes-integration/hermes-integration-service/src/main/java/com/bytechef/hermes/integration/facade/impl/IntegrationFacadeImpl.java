@@ -33,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -100,6 +101,57 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 // TODO find a way to delete ll tags not referenced anymore
 //        integration.getTagIds()
 //            .forEach(tagService::delete);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Integration getIntegration(Long id) {
+        Integration integration = integrationService.getIntegration(id);
+
+        if (integration.getCategoryId() != null) {
+            categoryService.fetchCategory(integration.getCategoryId())
+                .ifPresent(integration::setCategory);
+        }
+
+        integration.setTags(tagService.getTags(integration.getTagIds()));
+
+        return integration;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Integration> getIntegrations(Long categoryId, Long tagId) {
+        List<Integration> integrations = integrationService.getIntegrations(categoryId, tagId);
+
+        List<Long> categoryIds = integrations.stream()
+            .map(Integration::getCategoryId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        List<Category> categories = categoryService.getCategories(categoryIds);
+
+        for (Category category : categories) {
+            integrations.stream()
+                .filter(integration -> Objects.equals(integration.getCategoryId(), category.getId()))
+                .forEach(integration -> integration.setCategory(category));
+        }
+
+        List<Long> tagIds = integrations.stream()
+            .flatMap(integration -> integration.getTagIds()
+                .stream())
+            .filter(Objects::nonNull)
+            .toList();
+
+        List<Tag> tags = tagService.getTags(tagIds);
+
+        for (Integration integration : integrations) {
+            integration.setTags(
+                tags.stream()
+                    .filter(tag -> tagIds.contains(tag.getId()))
+                    .toList());
+        }
+
+        return integrations;
     }
 
     @Override
