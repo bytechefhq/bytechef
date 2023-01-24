@@ -28,10 +28,8 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -47,10 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
     classes = IntegrationIntTestConfiguration.class,
     properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IntegrationFacadeIntTest {
-
-    private Category category;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -67,15 +62,12 @@ public class IntegrationFacadeIntTest {
     @Autowired
     private WorkflowCrudRepository workflowRepository;
 
-    @BeforeAll
-    public void beforeAll() {
-        category = categoryRepository.save(new Category("name"));
-    }
-
     @BeforeEach
     @SuppressFBWarnings("NP")
     public void beforeEach() {
         integrationRepository.deleteAll();
+
+        categoryRepository.deleteAll();
         tagRepository.deleteAll();
     }
 
@@ -102,6 +94,9 @@ public class IntegrationFacadeIntTest {
 
         integration.setName("name");
         integration.setDescription("description");
+
+        Category category = categoryRepository.save(new Category("name"));
+
         integration.setCategory(category);
         integration.setTags(List.of(new Tag("tag1")));
 
@@ -155,8 +150,58 @@ public class IntegrationFacadeIntTest {
     }
 
     @Test
+    public void testGetIntegration() {
+        Integration integration = new Integration();
+
+        Category category = categoryRepository.save(new Category("category1"));
+
+        integration.setCategory(category);
+        integration.setName("name");
+
+        Tag tag1 = tagRepository.save(new Tag("tag1"));
+        Tag tag2 = tagRepository.save(new Tag("tag2"));
+
+        integration.setTags(List.of(tag1, tag2));
+
+        integration = integrationRepository.save(integration);
+
+        assertThat(integrationFacade.getIntegration(integration.getId()))
+            .isEqualTo(integration)
+            .hasFieldOrPropertyWithValue("category", category)
+            .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
+    }
+
+    @Test
+    public void testGetIntegrations() {
+        Integration integration = new Integration();
+
+        Category category = categoryRepository.save(new Category("category1"));
+
+        integration.setCategory(category);
+        integration.setName("name");
+
+        Tag tag1 = tagRepository.save(new Tag("tag1"));
+        Tag tag2 = tagRepository.save(new Tag("tag2"));
+
+        integration.setTags(List.of(tag1, tag2));
+
+        integration = integrationRepository.save(integration);
+
+        List<Integration> integrations = integrationFacade.getIntegrations(null, null);
+
+        assertThat(integrations).isEqualTo(List.of(integration));
+
+        integration = integrations.get(0);
+
+        assertThat(integrationFacade.getIntegration(integration.getId()))
+            .isEqualTo(integration)
+            .hasFieldOrPropertyWithValue("category", category)
+            .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
+    }
+
+    @Test
     @SuppressFBWarnings("NP")
-    public void testGetIntegrationTests() {
+    public void testGetIntegrationTags() {
         Integration integration = new Integration();
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -164,7 +209,7 @@ public class IntegrationFacadeIntTest {
         integration.setName("name");
         integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
-        integrationFacade.create(integration);
+        integrationRepository.save(integration);
 
         assertThat(integrationFacade.getIntegrationTags()
             .stream()

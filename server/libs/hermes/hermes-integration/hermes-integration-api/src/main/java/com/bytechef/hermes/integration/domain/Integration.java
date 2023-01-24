@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,8 +46,6 @@ import org.springframework.util.CollectionUtils;
  */
 @Table
 public final class Integration implements Persistable<Long> {
-
-    private static final Random RANDOM = new Random();
 
     @Transient
     private Category category;

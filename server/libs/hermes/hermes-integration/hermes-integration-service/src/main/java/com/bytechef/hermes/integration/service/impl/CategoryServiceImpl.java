@@ -22,8 +22,11 @@ import com.bytechef.hermes.integration.repository.CategoryRepository;
 import com.bytechef.hermes.integration.service.CategoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 /**
@@ -39,10 +42,26 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public Optional<Category> fetchCategory(Long id) {
+        return categoryRepository.findById(id);
+    }
+
+    @Override
     public List<Category> getCategories() {
         return StreamSupport.stream(categoryRepository.findAll()
             .spliterator(), false)
             .toList();
+    }
+
+    @Override
+    public List<Category> getCategories(List<Long> ids) {
+        Assert.notNull(ids, "'ids' must not be null.");
+
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            return categoryRepository.findByIdIn(ids);
+        }
     }
 
     @Override

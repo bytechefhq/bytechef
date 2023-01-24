@@ -20,10 +20,15 @@ package com.bytechef.hermes.integration.service;
 import com.bytechef.hermes.integration.domain.Category;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CategoryService {
 
     List<Category> getCategories();
 
     Category save(Category category);
+
+    List<Category> getCategories(List<Long> ids);
+
+    Optional<Category> fetchCategory(Long id);
 }
