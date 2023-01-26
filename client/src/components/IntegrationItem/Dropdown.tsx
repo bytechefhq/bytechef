@@ -9,6 +9,7 @@ import {
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import './dropdown.css';
 import {ReactNode} from 'react';
+import Button from 'components/Button/Button';
 
 interface RadixMenuItem {
     label?: string;
@@ -45,12 +46,15 @@ export const Dropdown: React.FC<{
         <div className="relative inline-block text-left">
             <Root>
                 <Trigger asChild>
-                    <DotsVerticalIcon className="dark:text-white" />
+                    <Button displayType="icon">
+                        <DotsVerticalIcon className="h-4 w-4 dark:text-white" />
+                    </Button>
                 </Trigger>
 
                 <Portal>
                     <Content
                         align="end"
+                        // eslint-disable-next-line tailwindcss/no-custom-classname
                         className="w-48 rounded-lg bg-white px-1.5 py-1 shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-800 md:w-56"
                         id={id.toString()}
                         sideOffset={5}
