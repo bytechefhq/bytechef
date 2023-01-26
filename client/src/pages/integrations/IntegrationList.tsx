@@ -21,7 +21,7 @@ const IntegrationList: React.FC = () => {
 
     return (
         <div className="flex w-4/5 place-self-center">
-            <ul role="list" className="space-y-3">
+            <ul role="list" className="w-full space-y-3">
                 {isLoading && 'Loading...'}
 
                 {error &&
@@ -34,7 +34,7 @@ const IntegrationList: React.FC = () => {
                     items.map((integration) => (
                         <div key={integration.id}>
                             <Link to={`/integrations/${integration.id}`}>
-                                <li className="overflow-hidden rounded-md bg-white px-4 py-2 shadow-2xl">
+                                <li className="overflow-hidden rounded-md bg-white px-4 py-2 shadow-lg hover:shadow-md">
                                     <IntegrationItem
                                         key={integration.id}
                                         category={integration.category}
