@@ -3,7 +3,14 @@ import cx from 'classnames';
 import './button.css';
 
 type Size = 'small' | 'large';
-type DisplayType = 'danger' | 'icon' | 'primary' | 'secondary' | 'unstyled';
+type DisplayType =
+    | 'danger'
+    | 'icon'
+    | 'primary'
+    | 'secondary'
+    | 'light'
+    | 'lightBorder'
+    | 'unstyled';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     displayType?: DisplayType;
@@ -24,6 +31,8 @@ const displayTypes: Record<DisplayType, string> = {
     icon: 'btn-icon',
     primary: 'btn-primary',
     secondary: 'btn-secondary',
+    light: 'btn-light',
+    lightBorder: 'btn-light-border',
     unstyled: 'btn-unstyled',
 };
 
@@ -51,6 +60,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             )}
             onClick={onClick}
             ref={ref}
+            type="button"
             {...props}
         >
             <>
