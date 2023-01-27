@@ -10,7 +10,7 @@ const Header: React.FC<{
     id?: number;
 }> = ({id, name, status, description = 'Description not available'}) => {
     return (
-        <div className="flex justify-between">
+        <div className="mb-3 flex items-center justify-between">
             <div className="">
                 <Name name={name} description={description} />
 
