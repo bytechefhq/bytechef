@@ -20,8 +20,10 @@ const IntegrationList: React.FC = () => {
     });
 
     return (
-        <div className="flex w-4/5 place-self-center">
-            <ul role="list" className="w-full space-y-3">
+        <div className="flex place-self-center px-4 sm:w-full xl:w-4/5">
+            {' '}
+            {/*<div className="px-4">*/}
+            <ul role="list" className="w-full divide-y divide-gray-100">
                 {isLoading && 'Loading...'}
 
                 {error &&
@@ -30,26 +32,33 @@ const IntegrationList: React.FC = () => {
 
                 {!isLoading &&
                     !error &&
-                    items &&
-                    items.map((integration) => (
-                        <div key={integration.id}>
-                            <Link to={`/integrations/${integration.id}`}>
-                                <li className="overflow-hidden rounded-md bg-white px-4 py-2 shadow-lg hover:shadow-md">
-                                    <IntegrationItem
-                                        key={integration.id}
-                                        category={integration.category}
-                                        id={integration.id}
-                                        name={integration.name}
-                                        description={integration.description}
-                                        tags={integration.tags}
-                                        workflowIds={integration.workflowIds}
-                                        date={integration.lastModifiedDate}
-                                        status={false} // missing api
-                                        button={''}
-                                    />
-                                </li>
-                            </Link>
-                        </div>
+                    (items?.length === 0 ? (
+                        <p>You do not have any Integration created yet.</p>
+                    ) : (
+                        items.map((integration) => (
+                            <div key={integration.id}>
+                                <Link to={`/integrations/${integration.id}`}>
+                                    <li className="my-3 overflow-hidden rounded-md bg-white p-3 hover:bg-gray-50">
+                                        <IntegrationItem
+                                            key={integration.id}
+                                            category={integration.category}
+                                            id={integration.id}
+                                            name={integration.name}
+                                            description={
+                                                integration.description
+                                            }
+                                            tags={integration.tags}
+                                            workflowIds={
+                                                integration.workflowIds
+                                            }
+                                            date={integration.lastModifiedDate}
+                                            status={false} // missing api
+                                            button={''}
+                                        />
+                                    </li>
+                                </Link>
+                            </div>
+                        ))
                     ))}
             </ul>
         </div>

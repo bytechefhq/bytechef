@@ -7,7 +7,7 @@ export enum Type {
     Tag,
 }
 
-const IntegrationsSidebarItem: React.FC<{
+const LeftSidebarItem: React.FC<{
     item: {
         id?: number;
         name: string;
@@ -27,7 +27,7 @@ const IntegrationsSidebarItem: React.FC<{
                 current
                     ? 'bg-gray-100 text-gray-900'
                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600',
-                'flex items-center rounded-md px-3 py-2 text-sm font-medium'
+                'flex items-center rounded-md px-2 py-2 text-sm font-medium'
             )}
             aria-current={current ? 'page' : undefined}
             onClick={() => onItemClick(type, id)}
@@ -37,4 +37,4 @@ const IntegrationsSidebarItem: React.FC<{
     );
 };
 
-export default IntegrationsSidebarItem;
+export default LeftSidebarItem;
