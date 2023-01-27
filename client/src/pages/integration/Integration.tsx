@@ -7,14 +7,19 @@ import {
     DashboardIcon,
     MagicWandIcon,
     PlusIcon,
-    PlayIcon,
-    PauseIcon,
-    TextAlignLeftIcon,
-    Cross1Icon,
 } from '@radix-ui/react-icons';
 import LeftSidebar from './LeftSidebar';
-import cx from 'classnames';
-import RightSidebar from './RightSidebar';
+import RightSlideOver from './RightSlideOver';
+import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
+import ToggleGroup, {
+    ToggleItem,
+} from '../../components/ToggleGroup/ToggleGroup';
+import Select from '../../components/Select/Select';
+import {WorkflowModel} from '../../data-access/workflow';
+import {
+    ArrowLeftOnRectangleIcon,
+    ArrowRightOnRectangleIcon,
+} from '@heroicons/react/24/solid';
 
 interface IntegrationDataType {
     category: string;
@@ -29,28 +34,35 @@ interface IntegrationDataType {
     workflowIds: string[];
 }
 
-export interface WorkflowType {
-    createdBy: string;
-    createdDate: string;
-    format: string;
-    id: string;
-    inputs: object[];
-    label: string;
-    lastModifiedBy: string;
-    lastModifiedDate: string;
-    outputs: object[];
-    sourceType: string;
-    retry: number;
-    tasks: object[];
-}
+const headerToggleItems: ToggleItem[] = [
+    {
+        value: 'designer',
+        label: 'Designer',
+    },
+    {
+        value: 'editor',
+        label: 'Editor',
+    },
+];
+
+const sidebarToggleItems: ToggleItem[] = [
+    {
+        value: 'components',
+        label: 'Components',
+    },
+    {
+        value: 'flow-controls',
+        label: 'Flow Controls',
+    },
+];
 
 const Integration: React.FC = () => {
-    const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowType>();
-    const [enabled, setEnabled] = useState(false);
-    const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
-    const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+    const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>();
+    const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
+    const [leftSidebarView, setLeftSidebarView] = useState('components');
+    const [rightSlideOverOpen, setRightSlideOverOpen] = useState(false);
     const [view, setView] = useState('designer');
-    const [workflows, setWorkflows] = useState([]);
+    const [workflows, setWorkflows] = useState<WorkflowModel[]>([]);
 
     const currentIntegration = useLoaderData() as IntegrationDataType;
 
@@ -62,7 +74,7 @@ const Integration: React.FC = () => {
 
                 setCurrentWorkflow(
                     workflows.find(
-                        (workflow: WorkflowType) =>
+                        (workflow: WorkflowModel) =>
                             workflow.id === currentIntegration.workflowIds[0]
                     )
                 );
@@ -70,104 +82,112 @@ const Integration: React.FC = () => {
     }, [currentIntegration.workflowIds]);
 
     return (
-        <div className="flex h-screen">
-            {leftSidebarOpen && <LeftSidebar />}
-
-            <div className="flex w-full flex-col">
-                <header className="flex bg-gray-100 dark:bg-gray-800">
+        <SidebarContentLayout
+            className="border-l border-gray-100 bg-gray-50"
+            header={
+                <header className="flex items-center">
                     <Button
                         className="p-4"
                         icon={
                             leftSidebarOpen ? (
-                                <Cross1Icon className="h-6 w-6" />
+                                <ArrowLeftOnRectangleIcon className="h-6 w-6" />
                             ) : (
-                                <TextAlignLeftIcon className="h-8 w-8" />
+                                <ArrowRightOnRectangleIcon className="h-6 w-6" />
                             )
                         }
                         onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
                         displayType="icon"
                     />
 
-                    <h1 className="mr-10 p-4">{currentIntegration.name}</h1>
+                    <h1 className="mr-6 py-4 pr-4">
+                        {currentIntegration.name}
+                    </h1>
 
-                    <div className="flex p-4">
-                        <label
-                            htmlFor="workflow"
-                            className="flex items-center p-2 text-sm font-medium text-gray-700"
-                        >
-                            Workflow
-                        </label>
-
-                        <div className="flex">
-                            <select
-                                id="workflow"
-                                name="workflow"
-                                className="mt-1 mr-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                                defaultValue="Canada"
-                                onChange={(event) =>
-                                    setCurrentWorkflow(
-                                        workflows.find(
-                                            (workflow: WorkflowType) =>
-                                                workflow.id ===
-                                                event.target.value
+                    <div className="flex py-4 px-2">
+                        <div className="flex rounded-md bg-white">
+                            {currentWorkflow && (
+                                <Select
+                                    defaultValue={currentWorkflow.id}
+                                    selectItems={workflows.map(
+                                        (workflow: WorkflowModel) => ({
+                                            label: workflow.label!,
+                                            value: workflow.id!,
+                                        })
+                                    )}
+                                    onValueChange={(value) =>
+                                        setCurrentWorkflow(
+                                            workflows.find(
+                                                (workflow: WorkflowModel) =>
+                                                    workflow.id === value
+                                            )
                                         )
-                                    )
-                                }
-                            >
-                                {workflows.map((workflow: WorkflowType) => (
-                                    <option
-                                        key={workflow.id}
-                                        value={workflow.id}
-                                    >
-                                        {workflow.label}
-                                    </option>
-                                ))}
-                            </select>
+                                    }
+                                />
+                            )}
 
-                            <Button
-                                displayType="icon"
-                                icon={<PlusIcon />}
-                                size="small"
-                            />
+                            <div className="flex border-l border-gray-100 align-middle">
+                                <Button
+                                    displayType="light"
+                                    icon={<PlusIcon className="h-5 w-5" />}
+                                    size="small"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex p-4">
-                        <Button
-                            className={cx(
-                                '!rounded-r-none !shadow-none',
-                                view === 'designer' && '!bg-gray-700'
-                            )}
-                            label="Designer"
-                            onClick={() => setView('designer')}
-                        />
-
-                        <Button
-                            className={cx(
-                                '!rounded-l-none !shadow-none',
-                                view === 'editor' && '!bg-gray-700'
-                            )}
-                            label="Editor"
-                            onClick={() => setView('editor')}
-                        />
-                    </div>
-
-                    <div className="ml-auto p-4">
-                        <Button
-                            className={cx(
-                                '!bg-green-500 transition-all hover:!bg-rose-500',
-                                enabled && '!bg-rose-500 hover:!bg-green-500'
-                            )}
-                            icon={enabled ? <PauseIcon /> : <PlayIcon />}
-                            iconPosition="left"
-                            label={enabled ? 'Disable' : 'Enable'}
-                            onClick={() => setEnabled(!enabled)}
+                    <div>
+                        <ToggleGroup
+                            defaultValue="designer"
+                            toggleItems={headerToggleItems}
+                            onValueChange={(value) => setView(value)}
                         />
                     </div>
                 </header>
+            }
+            leftSidebarHeader={
+                <ToggleGroup
+                    defaultValue="components"
+                    toggleItems={sidebarToggleItems}
+                    onValueChange={(value) => setLeftSidebarView(value)}
+                />
+            }
+            leftSidebarBody={<LeftSidebar view={leftSidebarView} />}
+            leftSidebarOpen={leftSidebarOpen}
+            rightToolbarBody={
+                <div className="flex flex-col items-center divide-y-8 py-4">
+                    <Button
+                        displayType="icon"
+                        onClick={() => setRightSlideOverOpen(true)}
+                    >
+                        <RocketIcon className="h-6 w-6 " />
+                    </Button>
 
-                <div className="flex h-full">
-                    <div className="mr-auto space-y-2 p-4">
+                    <Button
+                        displayType="icon"
+                        onClick={() => setRightSlideOverOpen(true)}
+                    >
+                        <BookmarkFilledIcon className="h-6 w-6" />
+                    </Button>
+
+                    <Button
+                        displayType="icon"
+                        onClick={() => setRightSlideOverOpen(true)}
+                    >
+                        <DashboardIcon className="h-6 w-6" />
+                    </Button>
+
+                    <Button
+                        displayType="icon"
+                        onClick={() => setRightSlideOverOpen(true)}
+                    >
+                        <MagicWandIcon className="h-6 w-6" />
+                    </Button>
+                </div>
+            }
+        >
+            <>
+                <div className="px-4">
+                    <div className="mr-auto space-y-2">
                         <h1>{`Current view: ${view}`}</h1>
 
                         <h2>{`Current workflow: ${currentWorkflow?.label}`}</h2>
@@ -179,49 +199,16 @@ const Integration: React.FC = () => {
                             </p>
                         </div>
                     </div>
-
-                    {rightSidebarOpen && (
-                        <RightSidebar
-                            closeSidebar={() => setRightSidebarOpen(false)}
-                        />
-                    )}
-
-                    <div className="flex flex-col items-center bg-gray-100 dark:bg-gray-800">
-                        <Button
-                            displayType="icon"
-                            onClick={() => setRightSidebarOpen(true)}
-                            className="p-4"
-                        >
-                            <RocketIcon className="h-6 w-6 " />
-                        </Button>
-
-                        <Button
-                            displayType="icon"
-                            onClick={() => setRightSidebarOpen(true)}
-                            className="p-4"
-                        >
-                            <BookmarkFilledIcon className="h-6 w-6" />
-                        </Button>
-
-                        <Button
-                            displayType="icon"
-                            onClick={() => setRightSidebarOpen(true)}
-                            className="p-4"
-                        >
-                            <DashboardIcon className="h-6 w-6" />
-                        </Button>
-
-                        <Button
-                            displayType="icon"
-                            onClick={() => setRightSidebarOpen(true)}
-                            className="p-4"
-                        >
-                            <MagicWandIcon className="h-6 w-6" />
-                        </Button>
-                    </div>
                 </div>
-            </div>
-        </div>
+
+                {rightSlideOverOpen && (
+                    <RightSlideOver
+                        open={rightSlideOverOpen}
+                        closeSidebar={() => setRightSlideOverOpen(false)}
+                    />
+                )}
+            </>
+        </SidebarContentLayout>
     );
 };
 
