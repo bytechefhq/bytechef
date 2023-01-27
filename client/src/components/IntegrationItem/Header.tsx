@@ -1,7 +1,28 @@
 import React from 'react';
-import {Dropdown} from './Dropdown';
 import {Name} from './Name';
 import {Status} from './Status';
+import {Dropdown, DropDownMenuItem} from '../DropDown/Dropdown';
+
+const menuItems: DropDownMenuItem[] = [
+    {
+        label: 'Edit',
+    },
+    {
+        label: 'Enable',
+    },
+    {
+        label: 'Duplicate',
+    },
+    {
+        label: 'New Workflow',
+    },
+    {
+        separator: true,
+    },
+    {
+        label: 'Delete',
+    },
+];
 
 const Header: React.FC<{
     name: string;
@@ -17,7 +38,7 @@ const Header: React.FC<{
                 <Status status={status} />
             </div>
 
-            <Dropdown id={id} />
+            <Dropdown id={id} menuItems={menuItems} />
         </div>
     );
 };
