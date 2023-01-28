@@ -21693,7 +21693,7 @@
       "type" : "API_KEY"
     }, {
       "display" : {
-        "label" : "OAuth2 Authorization code"
+        "label" : "OAuth2 Authorization Code"
       },
       "properties" : [ {
         "label" : "Client Id",
