@@ -250,9 +250,9 @@ public class HttpClientUtils {
         }
 
         httpRequestBuilder.uri(
-			createURI(
-				getConnectionBaseUri(context, urlString),
-				Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
+            createURI(
+                getConnectionBaseUri(context, urlString),
+                Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
 
         return httpRequestBuilder.build();
     }
