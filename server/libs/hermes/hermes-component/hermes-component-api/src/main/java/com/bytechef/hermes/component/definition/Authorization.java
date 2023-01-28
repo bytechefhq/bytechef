@@ -60,8 +60,7 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
             }
         }),
         BASIC_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-            .setUsernamePassword(
-                connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
+            .setUsernamePassword(connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
         BEARER_TOKEN(
             (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext.setHeaders(
                 Map.of("Authorization", List.of("Bearer " + connection.getParameter(TOKEN))))),
@@ -70,19 +69,17 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
             .setUsernamePassword(
                 connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
         OAUTH2_AUTHORIZATION_CODE(
-            (
-                AuthorizationContext authorizationContext,
-                Connection connection) -> authorizationContext.setHeaders(Map.of(
-                    "Authorization",
-                    List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
-                        + connection.getParameter(ACCESS_TOKEN))))),
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
+                .setHeaders(getOAuth2Headers(connection))),
         OAUTH2_CLIENT_CREDENTIALS(
-            (
-                AuthorizationContext authorizationContext,
-                Connection connection) -> authorizationContext.setHeaders(Map.of(
-                    "Authorization",
-                    List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
-                        + connection.getParameter(ACCESS_TOKEN)))));
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
+                .setHeaders(getOAuth2Headers(connection))),
+        OAUTH2_IMPLICIT_CODE(
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
+                .setHeaders(getOAuth2Headers(connection))),
+        OAUTH2_RESOURCE_OWNER_PASSWORD(
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
+                .setHeaders(getOAuth2Headers(connection)));
 
         private final BiConsumer<AuthorizationContext, Connection> defaultApplyConsumer;
 
@@ -92,6 +89,14 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         public BiConsumer<AuthorizationContext, Connection> getDefaultApplyConsumer() {
             return defaultApplyConsumer;
+        }
+
+        private static Map<String, List<String>> getOAuth2Headers(Connection connection) {
+            return Map.of(
+                "Authorization",
+                List.of(
+                    connection.getParameter(HEADER_PREFIX, "Bearer") + " " +
+                        connection.getParameter(ACCESS_TOKEN)));
         }
     }
 
