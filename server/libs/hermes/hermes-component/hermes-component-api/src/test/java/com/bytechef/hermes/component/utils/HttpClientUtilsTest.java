@@ -413,9 +413,7 @@ public class HttpClientUtilsTest {
             HttpClientUtils.RequestMethod.DELETE,
             Map.of("header1", List.of("value1")),
             Map.of("param1", List.of("value1")),
-            null,
-            HttpClientUtils.Configuration.builder()
-                .build());
+            null);
 
         Assertions.assertEquals(HttpClientUtils.RequestMethod.DELETE.name(), httpRequest.method());
         Assertions.assertEquals(
