@@ -40,7 +40,7 @@ import java.util.List;
  * @generated
  */
 public abstract class AbstractJiraComponentHandler implements RestComponentHandler {
-    private final ComponentDefinition componentDefinition = component("jira")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("jira")
         .display(
             display("Jira")
                 .description("Jira Cloud platform REST API documentation"))
@@ -81,6 +81,6 @@ public abstract class AbstractJiraComponentHandler implements RestComponentHandl
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 }
