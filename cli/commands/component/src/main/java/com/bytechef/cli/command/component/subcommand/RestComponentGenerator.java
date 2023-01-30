@@ -979,7 +979,7 @@ public class RestComponentGenerator {
                     .next()
                     .getKey();
 
-                String responseType = switch (key) {
+                String responseFormat = switch (key) {
                     case "application/json" -> "JSON";
                     case "application/xml" -> "XML";
                     default -> "TEXT";
@@ -994,12 +994,12 @@ public class RestComponentGenerator {
                     """
                         .metadata(
                            $T.of(
-                             "responseType", $S
+                             "responseFormat", $S
                            )
                         )
                         """,
                     Map.class,
-                    responseType);
+                    responseFormat);
 
                 outputEntry = new OutputEntry(builder.build(), mediaType.getExample());
             }
