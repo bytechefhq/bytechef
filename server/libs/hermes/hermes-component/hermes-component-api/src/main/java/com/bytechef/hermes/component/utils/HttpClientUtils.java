@@ -108,7 +108,7 @@ public class HttpClientUtils {
         HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
 
         HttpRequest httpRequest = createHTTPRequest(context, urlString, requestMethod, headers, queryParameters,
-            payload, configuration);
+            payload);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
@@ -187,10 +187,9 @@ public class HttpClientUtils {
     }
 
     protected HttpClient createHttpClient(
-        Context context,
-        Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters,
+        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
         Configuration configuration) {
+
         Methanol.Builder builder = Methanol.newBuilder()
             .version(java.net.http.HttpClient.Version.HTTP_1_1);
 
@@ -232,13 +231,8 @@ public class HttpClientUtils {
     }
 
     protected HttpRequest createHTTPRequest(
-        Context context,
-        final String urlString,
-        RequestMethod requestMethod,
-        Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters,
-        Payload payload,
-        Configuration configuration) {
+        Context context, String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters, Payload payload) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
             .method(requestMethod.name(), createBodyPublisher(context, payload));
@@ -509,8 +503,8 @@ public class HttpClientUtils {
     public static class Executor {
 
         private Configuration configuration = new Configuration();
-        private Map<String, List<String>> headers;
-        private Map<String, List<String>> queryParameters;
+        private Map<String, List<String>> headers = Collections.emptyMap();
+        private Map<String, List<String>> queryParameters = Collections.emptyMap();
         private Payload payload;
         private RequestMethod requestMethod;
         private String url;
