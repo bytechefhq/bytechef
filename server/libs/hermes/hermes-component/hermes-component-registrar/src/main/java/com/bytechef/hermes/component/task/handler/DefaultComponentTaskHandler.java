@@ -44,12 +44,9 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
 
     @SuppressFBWarnings("EI2")
     public DefaultComponentTaskHandler(
-        ActionDefinition actionDefinition,
-        ConnectionDefinition connectionDefinition,
-        ComponentHandler componentHandler,
-        ConnectionService connectionService,
-        EventPublisher eventPublisher,
-        FileStorageService fileStorageService) {
+        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition, ComponentHandler componentHandler,
+        ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
+
         this.actionDefinition = actionDefinition;
         this.connectionDefinition = connectionDefinition;
         this.componentHandler = componentHandler;

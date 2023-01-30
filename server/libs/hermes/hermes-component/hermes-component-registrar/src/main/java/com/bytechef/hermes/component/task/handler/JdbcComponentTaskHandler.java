@@ -81,8 +81,8 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
         this.insertJdbcOperation = new InsertJdbcOperation(jdbcExecutor);
         this.queryJdbcOperation = new QueryJdbcOperation(jdbcExecutor);
         this.updateJdbcOperation = new UpdateJdbcOperation(jdbcExecutor);
-        this.componentDefinition = getComponentDefinition(jdbcComponentDefinition.getName(),
-            jdbcComponentDefinition.getDisplay());
+        this.componentDefinition = getComponentDefinition(
+            jdbcComponentDefinition.getName(), jdbcComponentDefinition.getDisplay());
     }
 
     @Override
@@ -112,21 +112,25 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
 
     private ComponentDefinition getComponentDefinition(String name, Display display) {
         return component(name)
-            .display(display(display.getLabel()).icon(display.getIcon()))
-            .connection(connection()
-                .properties(
-                    string(HOST).label("Host")
-                        .required(true),
-                    integer(PORT).label("Port")
-                        .required(true),
-                    string(DATABASE).label("Database")
-                        .required(true),
-                    string(USERNAME).label("Username")
-                        .required(true),
-                    string(PASSWORD)
-                        .label("Password")
-                        .controlType(Property.ControlType.PASSWORD)
-                        .required(true)))
+            .display(
+                display(display.getLabel())
+                    .description(display.getDescription())
+                    .icon(display.getIcon()))
+            .connection(
+                connection()
+                    .properties(
+                        string(HOST).label("Host")
+                            .required(true),
+                        integer(PORT).label("Port")
+                            .required(true),
+                        string(DATABASE).label("Database")
+                            .required(true),
+                        string(USERNAME).label("Username")
+                            .required(true),
+                        string(PASSWORD)
+                            .label("Password")
+                            .controlType(Property.ControlType.PASSWORD)
+                            .required(true)))
             .actions(
                 action(QUERY)
                     .display(display("Query").description("Execute an SQL query."))
