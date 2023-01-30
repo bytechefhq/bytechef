@@ -63,6 +63,7 @@ dependencies {
     implementation project(":server:libs:modules:components:map")
     implementation project(":server:libs:modules:components:mysql")
     implementation project(":server:libs:modules:components:odsfile")
+    implementation project(":server:libs:modules:components:petstore")
     implementation project(":server:libs:modules:components:pipedrive")
     implementation project(":server:libs:modules:components:postgresql")
     implementation project(":server:libs:modules:components:randomhelper")
