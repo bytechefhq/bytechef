@@ -91,7 +91,7 @@ public class FiltersActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", "JSON")))
+                    "responseFormat", "JSON")))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"All open deals\",\"active_flag\":true,\"type\":\"deals\",\"temporary_flag\":null,\"user_id\":927097,\"add_time\":\"2019-10-15 11:01:53\",\"update_time\":\"2019-10-15 11:01:53\",\"visible_to\":7,\"custom_view_id\":1}]}"));
 }

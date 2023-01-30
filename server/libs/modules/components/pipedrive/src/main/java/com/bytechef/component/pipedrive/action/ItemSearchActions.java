@@ -164,7 +164,7 @@ public class ItemSearchActions {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseType", "JSON")))
+                    "responseFormat", "JSON")))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"items\":[{\"result_score\":1.22724,\"item\":{\"id\":42,\"type\":\"deal\",\"title\":\"Sample Deal\",\"value\":53883,\"currency\":\"USD\",\"status\":\"open\",\"visible_to\":3,\"owner\":{\"id\":69},\"stage\":{\"id\":3,\"name\":\"Demo Scheduled\"},\"person\":{\"id\":6,\"name\":\"Sample Person\"},\"organization\":{\"id\":9,\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\"},\"custom_fields\":[\"Sample text\"],\"notes\":[\"Sample note\"]}},{\"result_score\":0.31335002,\"item\":{\"id\":9,\"type\":\"organization\",\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\",\"visible_to\":3,\"owner\":{\"id\":69},\"custom_fields\":[],\"notes\":[]}},{\"result_score\":0.29955,\"item\":{\"id\":6,\"type\":\"person\",\"name\":\"Sample Person\",\"phones\":[\"555123123\",\"+372 (55) 123468\",\"0231632772\"],\"emails\":[\"primary@email.com\",\"secondary@email.com\"],\"visible_to\":1,\"owner\":{\"id\":69},\"organization\":{\"id\":9,\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\"},\"custom_fields\":[\"Custom Field Text\"],\"notes\":[\"Person note\"]}},{\"result_score\":0.0093,\"item\":{\"id\":4,\"type\":\"mail_attachment\",\"name\":\"Sample mail attachment.txt\",\"url\":\"/files/4/download\"}},{\"result_score\":0.0093,\"item\":{\"id\":3,\"type\":\"file\",\"name\":\"Sample file attachment.txt\",\"url\":\"/files/3/download\",\"deal\":{\"id\":42,\"title\":\"Sample Deal\"},\"person\":{\"id\":6,\"name\":\"Sample Person\"},\"organization\":{\"id\":9,\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\"}}},{\"result_score\":0.0011999999,\"item\":{\"id\":1,\"type\":\"product\",\"name\":\"Sample Product\",\"code\":\"product-code\",\"visible_to\":3,\"owner\":{\"id\":69},\"custom_fields\":[]}}],\"related_items\":[{\"result_score\":0,\"item\":{\"id\":2,\"type\":\"deal\",\"title\":\"Other deal\",\"value\":100,\"currency\":\"USD\",\"status\":\"open\",\"visible_to\":3,\"owner\":{\"id\":1},\"stage\":{\"id\":1,\"name\":\"Lead In\"},\"person\":{\"id\":1,\"name\":\"Sample Person\"}}}]},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}"),
         action("searchItemByField")
@@ -262,7 +262,7 @@ public class ItemSearchActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", "TEXT")))
+                        "responseFormat", "TEXT")))
             .exampleOutput(
                 "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Jane Doe\"},{\"id\":2,\"name\":\"John Doe\"}],\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}"));
 }

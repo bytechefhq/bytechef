@@ -198,7 +198,7 @@ public class LeadsActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", "JSON")))
+                    "responseFormat", "JSON")))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}]}"),
         action("addLead")
@@ -328,7 +328,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", "JSON")))
+                        "responseFormat", "JSON")))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}}"),
         action("deleteLead")
@@ -355,7 +355,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", "JSON")))
+                        "responseFormat", "JSON")))
             .exampleOutput("{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\"}}"),
         action("getLead")
             .display(
@@ -445,7 +445,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", "JSON")))
+                        "responseFormat", "JSON")))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}}"),
         action("updateLead")
@@ -584,7 +584,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", "JSON")))
+                        "responseFormat", "JSON")))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}}"),
         action("searchLeads")
@@ -762,7 +762,7 @@ public class LeadsActions {
                                 .required(false))
                         .metadata(
                             Map.of(
-                                "responseType", "JSON")))
+                                "responseFormat", "JSON")))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.29,\"item\":{\"id\":\"39c433f0-8a4c-11ec-8728-09968f0a1ca0\",\"type\":\"lead\",\"title\":\"John Doe lead\",\"owner\":{\"id\":1},\"person\":{\"id\":1,\"name\":\"John Doe\"},\"organization\":{\"id\":1,\"name\":\"John company\"},\"phones\":[],\"emails\":[\"john@doe.com\"],\"custom_fields\":[],\"notes\":[],\"value\":100,\"currency\":\"USD\",\"visible_to\":3,\"is_archived\":false}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}"));
 }
