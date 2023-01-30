@@ -21,8 +21,6 @@ const IntegrationList: React.FC = () => {
 
     return (
         <div className="flex place-self-center px-4 sm:w-full xl:w-4/5">
-            {' '}
-            {/*<div className="px-4">*/}
             <ul role="list" className="w-full divide-y divide-gray-100">
                 {isLoading && 'Loading...'}
 
