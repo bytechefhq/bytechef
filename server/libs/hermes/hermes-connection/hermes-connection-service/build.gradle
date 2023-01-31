@@ -8,6 +8,6 @@ dependencies {
     implementation project(":server:libs:core:commons:commons-utils")
     implementation project(":server:libs:core:encryption:encryption-api")
 
-    testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-upgrade")
+    testImplementation project(":server:libs:db-migration")
     testImplementation project(":server:libs:test:test-int-support")
 }
