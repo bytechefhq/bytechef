@@ -1,0 +1,11 @@
+.react-flow__node {
+    border: none;
+}
+
+.react-flow__node.selected {
+    border: none;
+}
+
+.react-flow__node:focus {
+    border: none;
+}

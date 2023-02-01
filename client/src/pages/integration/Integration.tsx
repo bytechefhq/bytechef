@@ -20,6 +20,7 @@ import {
     ArrowLeftOnRectangleIcon,
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
+import WorkflowEditor from './WorkflowEditor';
 
 interface IntegrationDataType {
     category: string;
@@ -57,6 +58,8 @@ const sidebarToggleItems: ToggleItem[] = [
 ];
 
 const Integration: React.FC = () => {
+    const [components, setComponents] = useState([]);
+    const [flowControls, setFlowControls] = useState([]);
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>();
     const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
     const [leftSidebarView, setLeftSidebarView] = useState('components');
@@ -79,6 +82,14 @@ const Integration: React.FC = () => {
                     )
                 );
             });
+
+        fetch('http://localhost:5173/api/definitions/components')
+            .then((response) => response.json())
+            .then((components) => setComponents(components));
+
+        fetch('http://localhost:5173/api/definitions/task-dispatchers')
+            .then((response) => response.json())
+            .then((flowControls) => setFlowControls(flowControls));
     }, [currentIntegration.workflowIds]);
 
     return (
@@ -151,7 +162,12 @@ const Integration: React.FC = () => {
                     onValueChange={(value) => setLeftSidebarView(value)}
                 />
             }
-            leftSidebarBody={<LeftSidebar view={leftSidebarView} />}
+            leftSidebarBody={
+                <LeftSidebar
+                    view={leftSidebarView}
+                    data={{components, flowControls}}
+                />
+            }
             leftSidebarOpen={leftSidebarOpen}
             rightToolbarBody={
                 <div className="flex flex-col items-center divide-y-8 py-4">
@@ -186,20 +202,7 @@ const Integration: React.FC = () => {
             }
         >
             <>
-                <div className="px-4">
-                    <div className="mr-auto space-y-2">
-                        <h1>{`Current view: ${view}`}</h1>
-
-                        <h2>{`Current workflow: ${currentWorkflow?.label}`}</h2>
-
-                        <div className="w-1/3">
-                            <p>
-                                Current Integration:{' '}
-                                {JSON.stringify(currentIntegration)}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <WorkflowEditor data={{components, flowControls}} />
 
                 {rightSlideOverOpen && (
                     <RightSlideOver
