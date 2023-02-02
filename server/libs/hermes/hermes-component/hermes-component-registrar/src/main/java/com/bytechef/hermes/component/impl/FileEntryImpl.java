@@ -36,6 +36,10 @@ public class FileEntryImpl implements FileEntry {
         this.url = url;
     }
 
+    public FileEntryImpl(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
+        this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+    }
+
     @Override
     public String getExtension() {
         return extension;
