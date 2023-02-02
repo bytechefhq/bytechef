@@ -423,6 +423,7 @@
     "componentVersion": 1,
     "authorizations": [],
     "display": {
+      "description": "Query, insert nd update data from PostgreSQL.",
       "label": "PostgreSQL"
     },
     "properties": [
@@ -460,6 +461,7 @@
     ]
   },
   "display": {
+    "description": "Query, insert nd update data from PostgreSQL.",
     "label": "PostgreSQL"
   },
   "name": "postgresql",

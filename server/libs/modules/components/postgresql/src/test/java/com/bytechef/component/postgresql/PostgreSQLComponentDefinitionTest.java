@@ -28,10 +28,9 @@ public class PostgreSQLComponentDefinitionTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/postgresql_v1.json",
-            new JdbcComponentTaskHandler(
-                null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
-                    .getDefinition());
+        JdbcComponentTaskHandler jdbcComponentTaskHandler = new JdbcComponentTaskHandler(
+            null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition());
+
+        JsonFileAssert.assertEquals("definition/postgresql_v1.json", jdbcComponentTaskHandler.getDefinition());
     }
 }

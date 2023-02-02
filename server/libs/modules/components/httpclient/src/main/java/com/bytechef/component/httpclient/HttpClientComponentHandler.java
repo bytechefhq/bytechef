@@ -29,7 +29,7 @@ import static com.bytechef.component.httpclient.constants.HttpClientConstants.HE
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HEADER_PARAMETERS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HTTP_CLIENT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.IGNORE_RESPONSE_CODE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT_RAW_MIME_TYPE;
+import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT_MIME_TYPE;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PATCH;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.POST;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PROXY;
@@ -121,12 +121,12 @@ public class HttpClientComponentHandler implements ComponentHandler {
                     "The response is automatically converted to object/array."),
                 option("Text", ResponseFormat.TEXT.name(), "The response is returned as a text."),
                 option(
-                    "File", ResponseFormat.FILE.name(), "The response is returned as a file object."))
+                    "File", ResponseFormat.BINARY.name(), "The response is returned as a file object."))
             .defaultValue(ResponseFormat.JSON.name()),
         string(RESPONSE_FILENAME)
             .label("Response Filename")
             .description("The name of the file if the response is returned as a file object.")
-            .displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())),
+            .displayOption(show(RESPONSE_FORMAT, ResponseFormat.BINARY.name())),
 
         //
         // Header properties
@@ -205,10 +205,10 @@ public class HttpClientComponentHandler implements ComponentHandler {
                 show(RESPONSE_FORMAT, List.of(ResponseFormat.TEXT.name()), FULL_RESPONSE, List.of(false))),
         fileEntry()
             .displayOption(
-                show(RESPONSE_FORMAT, List.of(ResponseFormat.FILE.name()), FULL_RESPONSE, List.of(true))),
+                show(RESPONSE_FORMAT, List.of(ResponseFormat.BINARY.name()), FULL_RESPONSE, List.of(true))),
         object().properties(fileEntry("body"), object("headers"), integer("status"))
             .displayOption(
-                show(RESPONSE_FORMAT, List.of(ResponseFormat.FILE.name()), FULL_RESPONSE, List.of(false)))
+                show(RESPONSE_FORMAT, List.of(ResponseFormat.BINARY.name()), FULL_RESPONSE, List.of(false)))
     };
 
     private final ComponentDefinition componentDefinition = component(HTTP_CLIENT)
@@ -315,7 +315,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                                 RESPONSE_FORMAT,
                                 List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
                     string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
-                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())))
+                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
                 .perform(this::performGet),
             action(POST)
                 .display(display("POST").description("The request method to use."))
@@ -342,7 +342,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                             RESPONSE_FORMAT,
                             List.of(ResponseFormat.JSON.name(), ResponseFormat.XML.name()))),
                     string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
-                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.FILE.name())))
+                    fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
                 .perform(this::performPost),
             action(PUT)
                 .display(display("PUT").description("The request method to use."))
@@ -436,10 +436,11 @@ public class HttpClientComponentHandler implements ComponentHandler {
         }
 
         if (includeBodyContentProperties) {
-            properties.add(string(BODY_CONTENT_RAW_MIME_TYPE)
+            properties.add(string(BODY_CONTENT_MIME_TYPE)
                 .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
-                .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
+                .displayOption(
+                    show(BODY_CONTENT_TYPE, List.of(BodyContentType.BINARY.name(), BodyContentType.RAW.name())))
                 .defaultValue("text/plain")
                 .placeholder("text/plain")
                 .advancedOption(true));
@@ -519,17 +520,43 @@ public class HttpClientComponentHandler implements ComponentHandler {
 
     private Object execute(
         Context context, ExecutionParameters executionParameters, HttpClientUtils.RequestMethod requestMethod) {
-        HttpClientUtils.Payload payload = null;
 
+        return HttpClientUtils.executor()
+            .configuration(HttpClientUtils.Configuration.builder()
+                .allowUnauthorizedCerts(executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                .filename(executionParameters.getString(RESPONSE_FILENAME))
+                .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
+                .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
+                .proxy(executionParameters.getString(PROXY))
+                .responseFormat(getResponseFormat(executionParameters))
+                .timeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000)))
+                .build())
+            .exchange(executionParameters.getRequiredString(URI), requestMethod)
+            .headers(executionParameters.getMap(HEADER_PARAMETERS))
+            .queryParameters(executionParameters.getMap(QUERY_PARAMETERS))
+            .payload(getPayload(executionParameters, getBodyContentType(executionParameters)))
+            .execute(context);
+    }
+
+    private static BodyContentType getBodyContentType(ExecutionParameters executionParameters) {
         String bodyContentTypeParameter = executionParameters.getString(BODY_CONTENT_TYPE);
 
-        BodyContentType bodyContentType = bodyContentTypeParameter == null
+        return bodyContentTypeParameter == null
             ? null
             : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
+    }
+
+    private static HttpClientUtils.Payload getPayload(
+        ExecutionParameters executionParameters, BodyContentType bodyContentType) {
+
+        HttpClientUtils.Payload payload = null;
 
         if (executionParameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {
-                payload = HttpClientUtils.Payload.of(executionParameters.get(BODY_CONTENT, FileEntry.class));
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.get(BODY_CONTENT, FileEntry.class),
+                    executionParameters.getString(BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == BodyContentType.FORM_DATA) {
                 payload = HttpClientUtils.Payload.of(
                     executionParameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()), bodyContentType);
@@ -542,31 +569,19 @@ public class HttpClientComponentHandler implements ComponentHandler {
             } else if (bodyContentType == BodyContentType.RAW) {
                 payload = HttpClientUtils.Payload.of(
                     executionParameters.getString(BODY_CONTENT),
-                    executionParameters.getString(BODY_CONTENT_RAW_MIME_TYPE, "text/plain"));
+                    executionParameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
             } else {
                 payload = HttpClientUtils.Payload.of(
                     executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             }
         }
 
-        return HttpClientUtils.executor()
-            .configuration(HttpClientUtils.Configuration.builder()
-                .allowUnauthorizedCerts(executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                .filename(executionParameters.getString(RESPONSE_FILENAME))
-                .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
-                .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
-                .proxy(executionParameters.getString(PROXY))
-                .responseFormat(
-                    executionParameters.containsKey(RESPONSE_FORMAT)
-                        ? ResponseFormat.valueOf(executionParameters.getString(RESPONSE_FORMAT))
-                        : null)
-                .timeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000)))
-                .build())
-            .exchange(executionParameters.getRequiredString(URI), requestMethod)
-            .headers(executionParameters.getMap(HEADER_PARAMETERS))
-            .queryParameters(executionParameters.getMap(QUERY_PARAMETERS))
-            .payload(payload)
-            .execute(context);
+        return payload;
+    }
+
+    private static ResponseFormat getResponseFormat(ExecutionParameters executionParameters) {
+        return executionParameters.containsKey(RESPONSE_FORMAT)
+            ? ResponseFormat.valueOf(executionParameters.getString(RESPONSE_FORMAT))
+            : null;
     }
 }
