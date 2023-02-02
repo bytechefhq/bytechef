@@ -342,7 +342,7 @@ public class MapUtils {
     public static <T> T getRequired(Map<String, ?> map, String key) {
         T value = (T) get(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -350,7 +350,7 @@ public class MapUtils {
     public static <T> T getRequired(Map<String, Object> map, String key, Class<T> returnType) {
         T value = get(map, key, returnType);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -358,7 +358,7 @@ public class MapUtils {
     public static Boolean getRequiredBoolean(Map<String, Object> map, String key) {
         Boolean value = getBoolean(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -366,7 +366,7 @@ public class MapUtils {
     public static Date getRequiredDate(Map<String, Object> map, String key) {
         Date value = getDate(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -374,7 +374,7 @@ public class MapUtils {
     public static Double getRequiredDouble(Map<String, Object> map, String key) {
         Double value = getDouble(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -382,7 +382,7 @@ public class MapUtils {
     public static Float getRequiredFloat(Map<String, Object> map, String key) {
         Float value = getFloat(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -390,7 +390,7 @@ public class MapUtils {
     public static Integer getRequiredInteger(Map<String, Object> map, String key) {
         Integer value = getInteger(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -398,7 +398,7 @@ public class MapUtils {
     public static <T> List<T> getRequiredList(Map<String, Object> map, String key, Class<T> elementType) {
         List<T> value = getList(map, key, elementType);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -407,7 +407,7 @@ public class MapUtils {
         Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
         List<T> value = getList(map, key, elementType);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -415,7 +415,7 @@ public class MapUtils {
     public static LocalDate getRequiredLocalDate(Map<String, Object> map, String key) {
         LocalDate value = getLocalDate(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -423,7 +423,7 @@ public class MapUtils {
     public static LocalDateTime getRequiredLocalDateTime(Map<String, Object> map, String key) {
         LocalDateTime value = getLocalDateTime(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -431,7 +431,7 @@ public class MapUtils {
     public static <V> Map<String, V> getRequiredMap(Map<String, Object> map, String key) {
         Map<String, V> value = getMap(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
@@ -439,7 +439,7 @@ public class MapUtils {
     public static String getRequiredString(Map<String, Object> map, String key) {
         String value = getString(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }
