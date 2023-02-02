@@ -414,12 +414,6 @@ paths:
                             location_formatted_address:
                               type: string
                               description: Subfield of location field. Indicates full/combined address.
-                            location_lat:
-                              type: number
-                              description: Subfield of location field. Indicates latitude.
-                            location_long:
-                              type: number
-                              description: Subfield of location field. Indicates longitude.
                             org_name:
                               description: The name of the organization this activity is associated with
                               type: string
@@ -648,8 +642,6 @@ paths:
                     location_route: Mustamäe tee
                     location_sublocality: Kristiine
                     location_locality: Tallinn
-                    location_lat: 59.4281884
-                    location_long: 24.7041378
                     location_admin_area_level_1: Harju maakond
                     location_admin_area_level_2: ''
                     location_country: Estonia
@@ -997,12 +989,6 @@ paths:
                           location_formatted_address:
                             type: string
                             description: Subfield of location field. Indicates full/combined address.
-                          location_lat:
-                            type: number
-                            description: Subfield of location field. Indicates latitude.
-                          location_long:
-                            type: number
-                            description: Subfield of location field. Indicates longitude.
                           org_name:
                             description: The name of the organization this activity is associated with
                             type: string
@@ -1231,8 +1217,6 @@ paths:
                   location_route: Mustamäe tee
                   location_sublocality: Kristiine
                   location_locality: Tallinn
-                  location_lat: 59.4281884
-                  location_long: 24.7041378
                   location_admin_area_level_1: Harju maakond
                   location_admin_area_level_2: ''
                   location_country: Estonia
@@ -1551,12 +1535,6 @@ paths:
                           location_formatted_address:
                             type: string
                             description: Subfield of location field. Indicates full/combined address.
-                          location_lat:
-                            type: number
-                            description: Subfield of location field. Indicates latitude.
-                          location_long:
-                            type: number
-                            description: Subfield of location field. Indicates longitude.
                           org_name:
                             description: The name of the organization this activity is associated with
                             type: string
@@ -1766,8 +1744,6 @@ paths:
                   location_route: Mustamäe tee
                   location_sublocality: Kristiine
                   location_locality: Tallinn
-                  location_lat: 59.4281884
-                  location_long: 24.7041378
                   location_admin_area_level_1: Harju maakond
                   location_admin_area_level_2: ''
                   location_country: Estonia
@@ -2116,12 +2092,6 @@ paths:
                           location_formatted_address:
                             type: string
                             description: Subfield of location field. Indicates full/combined address.
-                          location_lat:
-                            type: number
-                            description: Subfield of location field. Indicates latitude.
-                          location_long:
-                            type: number
-                            description: Subfield of location field. Indicates longitude.
                           org_name:
                             description: The name of the organization this activity is associated with
                             type: string
@@ -2344,8 +2314,6 @@ paths:
                   location_route: Mustamäe tee
                   location_sublocality: Kristiine
                   location_locality: Tallinn
-                  location_lat: 59.4281884
-                  location_long: 24.7041378
                   location_admin_area_level_1: Harju maakond
                   location_admin_area_level_2: ''
                   location_country: Estonia
@@ -8479,12 +8447,6 @@ paths:
                                 location_formatted_address:
                                   type: string
                                   description: Subfield of location field. Indicates full/combined address.
-                                location_lat:
-                                  type: number
-                                  description: Subfield of location field. Indicates latitude.
-                                location_long:
-                                  type: number
-                                  description: Subfield of location field. Indicates longitude.
                                 org_name:
                                   description: The name of the organization this activity is associated with
                                   type: string
@@ -8749,8 +8711,6 @@ paths:
                     location_route: Mustamäe tee
                     location_sublocality: Kristiine
                     location_locality: Tallinn
-                    location_lat: 59.4281884
-                    location_long: 24.7041378
                     location_admin_area_level_1: Harju maakond
                     location_admin_area_level_2: ''
                     location_country: Estonia
@@ -9192,6 +9152,10 @@ paths:
                             activity_id:
                               type: integer
                               description: The ID of the activity to associate the file with
+                            lead_id:
+                              type: string
+                              description: The ID of the lead to associate the file with
+                              format: uuid
                             add_time:
                               type: string
                               description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -9240,6 +9204,9 @@ paths:
                             product_name:
                               type: string
                               description: The name of the product associated with the file
+                            lead_name:
+                              type: string
+                              description: The name of the lead associated with the file
                             url:
                               type: string
                               description: The URL of the download file
@@ -9273,6 +9240,7 @@ paths:
                     org_id: 1480
                     product_id: 1
                     activity_id: 1
+                    lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                     log_id: null
                     add_time: '2020-09-16 11:19:36'
                     update_time: '2020-09-16 11:19:36'
@@ -9292,6 +9260,7 @@ paths:
                     people_name: ''
                     org_name: Pipedrive Inc.
                     product_name: ''
+                    lead_name: nice lead
                     url: 'https://app.pipedrive.com/api/v1/files/304/download'
                     name: 95781006_794143070992462_4330873630616453120_n.jpg
                     description: ''
@@ -9589,8 +9558,6 @@ paths:
                       location_route: Mustamäe tee
                       location_sublocality: Kristiine
                       location_locality: Tallinn
-                      location_lat: 59.4281884
-                      location_long: 24.7041378
                       location_admin_area_level_1: Harju maakond
                       location_admin_area_level_2: ''
                       location_country: Estonia
@@ -9630,6 +9597,7 @@ paths:
                           org_id: 1480
                           product_id: 1
                           activity_id: 1
+                          lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                           log_id: null
                           add_time: '2020-09-16 11:19:36'
                           update_time: '2020-09-16 11:19:36'
@@ -9649,6 +9617,7 @@ paths:
                           people_name: ''
                           org_name: Pipedrive Inc.
                           product_name: ''
+                          lead_name: nice lead
                           url: 'https://app.pipedrive.com/api/v1/files/304/download'
                           name: 95781006_794143070992462_4330873630616453120_n.jpg
                           description: ''
@@ -9807,9 +9776,9 @@ paths:
                             id:
                               type: integer
                               description: The ID of the user follower
-                            person_id:
+                            deal_id:
                               type: integer
-                              description: The ID of the person
+                              description: The ID of the deal which the follower was added to
                             add_time:
                               type: string
                               description: The date and time when the follower was added to the person
@@ -9831,7 +9800,7 @@ paths:
                 data:
                   - user_id: 123
                     id: 456
-                    person_id: 789
+                    deal_id: 789
                     add_time: '2020-09-09 11:36:23'
                 additional_data:
                   pagination:
@@ -12632,7 +12601,6 @@ paths:
                       active_flag: true
                       value: 10100010
                     files_count: null
-                    followers_count: 0
                     add_time: '2019-12-19 11:36:49'
                     update_time: '2019-12-26 13:35:17'
                     prices:
@@ -14021,6 +13989,10 @@ paths:
                         activity_id:
                           type: integer
                           description: The ID of the activity to associate the file with
+                        lead_id:
+                          type: string
+                          description: The ID of the lead to associate the file with
+                          format: uuid
                         add_time:
                           type: string
                           description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -14069,6 +14041,9 @@ paths:
                         product_name:
                           type: string
                           description: The name of the product associated with the file
+                        lead_name:
+                          type: string
+                          description: The name of the lead associated with the file
                         url:
                           type: string
                           description: The URL of the download file
@@ -14114,6 +14089,7 @@ paths:
                     org_id: 1
                     product_id: 1
                     activity_id: 1
+                    lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                     log_id: null
                     add_time: '2020-02-20 14:36:35'
                     update_time: '2020-02-20 14:57:33'
@@ -14130,6 +14106,7 @@ paths:
                     mail_template_id: ''
                     deal_name: ''
                     person_name: Person
+                    lead_name: Test lead name
                     org_name: ''
                     product_name: ''
                     url: 'https://2a7f.pipedrive.com/v1/files/123/download'
@@ -14142,6 +14119,7 @@ paths:
                     org_id: 1
                     product_id: 1
                     activity_id: 1
+                    lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                     log_id: null
                     add_time: '2020-02-20 14:36:35'
                     update_time: '2020-02-20 14:57:33'
@@ -14160,6 +14138,7 @@ paths:
                     person_name: Person
                     org_name: ''
                     product_name: ''
+                    lead_name: Test lead name
                     url: 'https://2a7f.pipedrive.com/v1/files/123321/download'
                     name: second test file name
                     description: second test file description
@@ -14171,7 +14150,7 @@ paths:
                     next_start: 100
     post:
       summary: Add file
-      description: 'Lets you upload a file and associate it with a deal, person, organization, activity or product. For more information, see the tutorial for <a href="https://pipedrive.readme.io/docs/adding-a-file" target="_blank" rel="noopener noreferrer">adding a file</a>.'
+      description: 'Lets you upload a file and associate it with a deal, person, organization, activity, product or lead. For more information, see the tutorial for <a href="https://pipedrive.readme.io/docs/adding-a-file" target="_blank" rel="noopener noreferrer">adding a file</a>.'
       operationId: addFile
       tags:
         - Files
@@ -14209,6 +14188,10 @@ paths:
                 activity_id:
                   type: integer
                   description: The ID of the activity to associate file(s) with
+                lead_id:
+                  type: string
+                  format: uuid
+                  description: The ID of the lead to associate file(s) with
       responses:
         '200':
           description: 'Add a file from computer or Google Drive and associate it with deal, person, organization, activity or product'
@@ -14246,6 +14229,10 @@ paths:
                       activity_id:
                         type: integer
                         description: The ID of the activity to associate the file with
+                      lead_id:
+                        type: string
+                        description: The ID of the lead to associate the file with
+                        format: uuid
                       add_time:
                         type: string
                         description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -14294,6 +14281,9 @@ paths:
                       product_name:
                         type: string
                         description: The name of the product associated with the file
+                      lead_name:
+                        type: string
+                        description: The name of the lead associated with the file
                       url:
                         type: string
                         description: The URL of the download file
@@ -14313,6 +14303,7 @@ paths:
                   org_id: 1
                   product_id: 1
                   activity_id: 1
+                  lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                   log_id: null
                   add_time: '2020-02-20 14:36:35'
                   update_time: '2020-02-20 14:36:31'
@@ -14331,6 +14322,7 @@ paths:
                   person_name: Person
                   org_name: ''
                   product_name: ''
+                  lead_name: Test lead name
                   url: 'https://2a7f.pipedrive.com/v1/files/123/download'
                   name: IMG_8189.jpg
                   description: ''
@@ -14424,6 +14416,10 @@ paths:
                       activity_id:
                         type: integer
                         description: The ID of the activity to associate the file with
+                      lead_id:
+                        type: string
+                        description: The ID of the lead to associate the file with
+                        format: uuid
                       add_time:
                         type: string
                         description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -14472,6 +14468,9 @@ paths:
                       product_name:
                         type: string
                         description: The name of the product associated with the file
+                      lead_name:
+                        type: string
+                        description: The name of the lead associated with the file
                       url:
                         type: string
                         description: The URL of the download file
@@ -14491,6 +14490,7 @@ paths:
                   org_id: 15
                   product_id: 1
                   activity_id: 1
+                  lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                   log_id: null
                   add_time: '2020-02-21 11:52:28'
                   update_time: '2020-02-21 11:52:24'
@@ -14509,6 +14509,7 @@ paths:
                   person_name: ''
                   org_name: test org
                   product_name: ''
+                  lead_name: Test lead name 1
                   url: 'https://app.pipedrive.com/api/v1/files/7195/download'
                   name: Test title for remote file
                   description: ''
@@ -14592,6 +14593,10 @@ paths:
                       activity_id:
                         type: integer
                         description: The ID of the activity to associate the file with
+                      lead_id:
+                        type: string
+                        description: The ID of the lead to associate the file with
+                        format: uuid
                       add_time:
                         type: string
                         description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -14640,6 +14645,9 @@ paths:
                       product_name:
                         type: string
                         description: The name of the product associated with the file
+                      lead_name:
+                        type: string
+                        description: The name of the lead associated with the file
                       url:
                         type: string
                         description: The URL of the download file
@@ -14659,6 +14667,7 @@ paths:
                   org_id: 1
                   product_id: 1
                   activity_id: 1
+                  lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                   log_id: null
                   add_time: '2020-02-21 12:02:37'
                   update_time: '2020-02-21 12:02:37'
@@ -14677,6 +14686,7 @@ paths:
                   person_name: Test person name
                   org_name: ''
                   product_name: ''
+                  lead_name: Test lead name
                   url: 'https://app.pipedrive.com/api/v1/files/7196/download'
                   name: Test title for remote file
                   description: ''
@@ -14781,6 +14791,10 @@ paths:
                       activity_id:
                         type: integer
                         description: The ID of the activity to associate the file with
+                      lead_id:
+                        type: string
+                        description: The ID of the lead to associate the file with
+                        format: uuid
                       add_time:
                         type: string
                         description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -14829,6 +14843,9 @@ paths:
                       product_name:
                         type: string
                         description: The name of the product associated with the file
+                      lead_name:
+                        type: string
+                        description: The name of the lead associated with the file
                       url:
                         type: string
                         description: The URL of the download file
@@ -14848,6 +14865,7 @@ paths:
                   org_id: 1
                   product_id: 1
                   activity_id: 1
+                  lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                   log_id: null
                   add_time: '2020-02-20 14:36:35'
                   update_time: '2020-02-20 14:57:33'
@@ -14866,6 +14884,7 @@ paths:
                   person_name: Person
                   org_name: ''
                   product_name: ''
+                  lead_name: Test lead name
                   url: 'https://2a7f.pipedrive.com/v1/files/123/download'
                   name: test file name
                   description: test file description
@@ -14938,6 +14957,10 @@ paths:
                       activity_id:
                         type: integer
                         description: The ID of the activity to associate the file with
+                      lead_id:
+                        type: string
+                        description: The ID of the lead to associate the file with
+                        format: uuid
                       add_time:
                         type: string
                         description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -14986,6 +15009,9 @@ paths:
                       product_name:
                         type: string
                         description: The name of the product associated with the file
+                      lead_name:
+                        type: string
+                        description: The name of the lead associated with the file
                       url:
                         type: string
                         description: The URL of the download file
@@ -15005,6 +15031,7 @@ paths:
                   org_id: 1
                   product_id: 1
                   activity_id: 1
+                  lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                   log_id: null
                   add_time: '2020-02-20 14:36:35'
                   update_time: '2020-02-20 14:57:33'
@@ -15023,6 +15050,7 @@ paths:
                   person_name: Person
                   org_name: ''
                   product_name: ''
+                  lead_name: Test lead name
                   url: 'https://2a7f.pipedrive.com/v1/files/123/download'
                   name: test file name
                   description: test file description
@@ -16875,7 +16903,7 @@ paths:
         '200':
           description: Success
           content:
-            applicatoin/json:
+            application/json:
               schema:
                 title: searchItemByFieldResponse200
                 allOf:
@@ -18443,9 +18471,6 @@ paths:
                                   allOf:
                                     - title: addTeamRequest
                                       type: object
-                                      required:
-                                        - name
-                                        - manager_id
                                       properties:
                                         name:
                                           type: string
@@ -18532,9 +18557,6 @@ paths:
             schema:
               title: addTeamRequest
               type: object
-              required:
-                - name
-                - manager_id
               properties:
                 name:
                   type: string
@@ -18550,6 +18572,9 @@ paths:
                   type: array
                   items:
                     type: integer
+              required:
+                - name
+                - manager_id
       responses:
         '200':
           description: The team data
@@ -18583,9 +18608,6 @@ paths:
                                 allOf:
                                   - title: addTeamRequest
                                     type: object
-                                    required:
-                                      - name
-                                      - manager_id
                                     properties:
                                       name:
                                         type: string
@@ -18722,9 +18744,6 @@ paths:
                                 allOf:
                                   - title: addTeamRequest
                                     type: object
-                                    required:
-                                      - name
-                                      - manager_id
                                     properties:
                                       name:
                                         type: string
@@ -18825,9 +18844,6 @@ paths:
               allOf:
                 - title: addTeamRequest
                   type: object
-                  required:
-                    - name
-                    - manager_id
                   properties:
                     name:
                       type: string
@@ -18894,9 +18910,6 @@ paths:
                                 allOf:
                                   - title: addTeamRequest
                                     type: object
-                                    required:
-                                      - name
-                                      - manager_id
                                     properties:
                                       name:
                                         type: string
@@ -19315,9 +19328,6 @@ paths:
                                   allOf:
                                     - title: addTeamRequest
                                       type: object
-                                      required:
-                                        - name
-                                        - manager_id
                                       properties:
                                         name:
                                           type: string
@@ -24553,8 +24563,6 @@ paths:
                           location_route: Mustamäe tee
                           location_sublocality: Kristiine
                           location_locality: Tallinn
-                          location_lat: 59.4281884
-                          location_long: 24.7041378
                           location_admin_area_level_1: Harju maakond
                           location_admin_area_level_2: ''
                           location_country: Estonia
@@ -25343,12 +25351,6 @@ paths:
                                 location_formatted_address:
                                   type: string
                                   description: Subfield of location field. Indicates full/combined address.
-                                location_lat:
-                                  type: number
-                                  description: Subfield of location field. Indicates latitude.
-                                location_long:
-                                  type: number
-                                  description: Subfield of location field. Indicates longitude.
                                 org_name:
                                   description: The name of the organization this activity is associated with
                                   type: string
@@ -25463,8 +25465,6 @@ paths:
                     location_route: Mustamäe tee
                     location_sublocality: Kristiine
                     location_locality: Tallinn
-                    location_lat: 59.4281884
-                    location_long: 24.7041378
                     location_admin_area_level_1: Harju maakond
                     location_admin_area_level_2: ''
                     location_country: Estonia
@@ -26322,6 +26322,10 @@ paths:
                             activity_id:
                               type: integer
                               description: The ID of the activity to associate the file with
+                            lead_id:
+                              type: string
+                              description: The ID of the lead to associate the file with
+                              format: uuid
                             add_time:
                               type: string
                               description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -26370,6 +26374,9 @@ paths:
                             product_name:
                               type: string
                               description: The name of the product associated with the file
+                            lead_name:
+                              type: string
+                              description: The name of the lead associated with the file
                             url:
                               type: string
                               description: The URL of the download file
@@ -26403,6 +26410,7 @@ paths:
                     org_id: 1480
                     product_id: 1
                     activity_id: 1
+                    lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                     log_id: null
                     add_time: '2020-09-16 11:19:36'
                     update_time: '2020-09-16 11:19:36'
@@ -26422,6 +26430,7 @@ paths:
                     people_name: ''
                     org_name: Pipedrive Inc.
                     product_name: ''
+                    lead_name: nice lead
                     url: 'https://app.pipedrive.com/api/v1/files/304/download'
                     name: 95781006_794143070992462_4330873630616453120_n.jpg
                     description: ''
@@ -26640,8 +26649,6 @@ paths:
                       location_route: Mustamäe tee
                       location_sublocality: Kristiine
                       location_locality: Tallinn
-                      location_lat: 59.4281884
-                      location_long: 24.7041378
                       location_admin_area_level_1: Harju maakond
                       location_admin_area_level_2: ''
                       location_country: Estonia
@@ -26680,6 +26687,7 @@ paths:
                       org_id: 1480
                       product_id: 1
                       activity_id: 1
+                      lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                       log_id: null
                       add_time: '2020-09-16 11:19:36'
                       update_time: '2020-09-16 11:19:36'
@@ -26699,6 +26707,7 @@ paths:
                       people_name: ''
                       org_name: Pipedrive Inc.
                       product_name: ''
+                      lead_name: nice lead
                       url: 'https://app.pipedrive.com/api/v1/files/304/download'
                       name: 95781006_794143070992462_4330873630616453120_n.jpg
                       description: ''
@@ -32466,12 +32475,6 @@ paths:
                                 location_formatted_address:
                                   type: string
                                   description: Subfield of location field. Indicates full/combined address.
-                                location_lat:
-                                  type: number
-                                  description: Subfield of location field. Indicates latitude.
-                                location_long:
-                                  type: number
-                                  description: Subfield of location field. Indicates longitude.
                                 org_name:
                                   description: The name of the organization this activity is associated with
                                   type: string
@@ -32586,8 +32589,6 @@ paths:
                     location_route: Mustamäe tee
                     location_sublocality: Kristiine
                     location_locality: Tallinn
-                    location_lat: 59.4281884
-                    location_long: 24.7041378
                     location_admin_area_level_1: Harju maakond
                     location_admin_area_level_2: ''
                     location_country: Estonia
@@ -33436,6 +33437,10 @@ paths:
                             activity_id:
                               type: integer
                               description: The ID of the activity to associate the file with
+                            lead_id:
+                              type: string
+                              description: The ID of the lead to associate the file with
+                              format: uuid
                             add_time:
                               type: string
                               description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -33484,6 +33489,9 @@ paths:
                             product_name:
                               type: string
                               description: The name of the product associated with the file
+                            lead_name:
+                              type: string
+                              description: The name of the lead associated with the file
                             url:
                               type: string
                               description: The URL of the download file
@@ -33517,6 +33525,7 @@ paths:
                     org_id: 1480
                     product_id: 1
                     activity_id: 1
+                    lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                     log_id: null
                     add_time: '2020-09-16 11:19:36'
                     update_time: '2020-09-16 11:19:36'
@@ -33536,6 +33545,7 @@ paths:
                     people_name: ''
                     org_name: Pipedrive Inc.
                     product_name: ''
+                    lead_name: nice lead
                     url: 'https://app.pipedrive.com/api/v1/files/304/download'
                     name: 95781006_794143070992462_4330873630616453120_n.jpg
                     description: ''
@@ -33834,8 +33844,6 @@ paths:
                       location_route: Mustamäe tee
                       location_sublocality: Kristiine
                       location_locality: Tallinn
-                      location_lat: 59.4281884
-                      location_long: 24.7041378
                       location_admin_area_level_1: Harju maakond
                       location_admin_area_level_2: ''
                       location_country: Estonia
@@ -33949,9 +33957,9 @@ paths:
                             id:
                               type: integer
                               description: The ID of the user follower
-                            person_id:
+                            deal_id:
                               type: integer
-                              description: The ID of the person
+                              description: The ID of the deal which the follower was added to
                             add_time:
                               type: string
                               description: The date and time when the follower was added to the person
@@ -33973,7 +33981,7 @@ paths:
                 data:
                   - user_id: 123
                     id: 456
-                    person_id: 789
+                    deal_id: 789
                     add_time: '2020-09-09 11:36:23'
                 additional_data:
                   pagination:
@@ -35311,9 +35319,6 @@ paths:
                                     files_count:
                                       type: integer
                                       description: The count of files
-                                    followers_count:
-                                      type: integer
-                                      description: The count of followers
                                     add_time:
                                       type: string
                                       description: The date and time when the product was added to the deal
@@ -35380,7 +35385,6 @@ paths:
                         products_count: 6
                         files_count: 1
                         notes_count: 0
-                        followers_count: 1
                         email_messages_count: 0
                         activities_count: 1
                         done_activities_count: 0
@@ -35405,7 +35409,6 @@ paths:
                         visible_to: '3'
                         owner_id: 967055
                         files_count: null
-                        followers_count: 0
                         add_time: '2020-01-28 11:54:41'
                         update_time: '2020-09-18 11:54:36'
                         deal_id: 5
@@ -37870,7 +37873,6 @@ paths:
                       active_flag: true
                       value: 10100010
                     files_count: null
-                    followers_count: 0
                     add_time: '2019-12-19 11:36:49'
                     update_time: '2019-12-19 11:36:49'
                     prices:
@@ -38196,7 +38198,6 @@ paths:
                     active_flag: true
                     value: 10100010
                   files_count: null
-                  followers_count: 0
                   add_time: '2019-12-19 11:36:49'
                   update_time: '2019-12-26 13:35:17'
                   prices:
@@ -38651,7 +38652,6 @@ paths:
                     active_flag: true
                     value: 10100010
                   files_count: null
-                  followers_count: 0
                   add_time: '2019-12-19 11:36:49'
                   update_time: '2019-12-26 13:35:17'
                   prices:
@@ -38972,7 +38972,6 @@ paths:
                     active_flag: true
                     value: 10100010
                   files_count: null
-                  followers_count: 0
                   add_time: '2019-12-19 11:36:49'
                   update_time: '2019-12-26 13:35:17'
                   prices:
@@ -39793,6 +39792,10 @@ paths:
                             activity_id:
                               type: integer
                               description: The ID of the activity to associate the file with
+                            lead_id:
+                              type: string
+                              description: The ID of the lead to associate the file with
+                              format: uuid
                             add_time:
                               type: string
                               description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -39841,6 +39844,9 @@ paths:
                             product_name:
                               type: string
                               description: The name of the product associated with the file
+                            lead_name:
+                              type: string
+                              description: The name of the lead associated with the file
                             url:
                               type: string
                               description: The URL of the download file
@@ -39874,6 +39880,7 @@ paths:
                     org_id: 1480
                     product_id: 1
                     activity_id: 1
+                    lead_id: adf21080-0e10-11eb-879b-05d71fb426ec
                     log_id: null
                     add_time: '2020-09-16 11:19:36'
                     update_time: '2020-09-16 11:19:36'
@@ -39893,6 +39900,7 @@ paths:
                     people_name: ''
                     org_name: Pipedrive Inc.
                     product_name: ''
+                    lead_name: nice lead
                     url: 'https://app.pipedrive.com/api/v1/files/304/download'
                     name: 95781006_794143070992462_4330873630616453120_n.jpg
                     description: ''
@@ -41170,12 +41178,6 @@ paths:
                                     location_formatted_address:
                                       type: string
                                       description: Subfield of location field. Indicates full/combined address.
-                                    location_lat:
-                                      type: number
-                                      description: Subfield of location field. Indicates latitude.
-                                    location_long:
-                                      type: number
-                                      description: Subfield of location field. Indicates longitude.
                                     org_name:
                                       description: The name of the organization this activity is associated with
                                       type: string
@@ -41512,6 +41514,10 @@ paths:
                                 activity_id:
                                   type: integer
                                   description: The ID of the activity to associate the file with
+                                lead_id:
+                                  type: string
+                                  description: The ID of the lead to associate the file with
+                                  format: uuid
                                 add_time:
                                   type: string
                                   description: 'The date and time when the file was added/created. Format: YYYY-MM-DD HH:MM:SS'
@@ -41560,6 +41566,9 @@ paths:
                                 product_name:
                                   type: string
                                   description: The name of the product associated with the file
+                                lead_name:
+                                  type: string
+                                  description: The name of the lead associated with the file
                                 url:
                                   type: string
                                   description: The URL of the download file
@@ -42253,9 +42262,6 @@ paths:
                                 files_count:
                                   type: integer
                                   description: The count of files
-                                followers_count:
-                                  type: integer
-                                  description: The count of followers
                                 add_time:
                                   type: string
                                   description: The date and time when the product was added to the deal
@@ -42469,8 +42475,6 @@ paths:
                       location_route: Mustamäe tee
                       location_sublocality: Kristiine
                       location_locality: Tallinn
-                      location_lat: 59.4281884
-                      location_long: 24.7041378
                       location_admin_area_level_1: Harju maakond
                       location_admin_area_level_2: ''
                       location_country: Estonia
@@ -43168,112 +43172,6 @@ paths:
                 data:
                   user_id: 1234567
                   role_id: 2
-  '/roles/{id}/roles':
-    get:
-      summary: List role sub-roles
-      description: Returns the direct children of a specific role.
-      operationId: getRoleSubRoles
-      deprecated: true
-      tags:
-        - Roles
-      security:
-        - api_key: []
-      parameters:
-        - in: path
-          name: id
-          description: The ID of the role
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: start
-          description: Pagination start
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: limit
-          description: Items shown per page
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: List role sub-roles
-          content:
-            application/json:
-              schema:
-                title: getRoleSubrolesResponse200
-                allOf:
-                  - title: baseResponse
-                    type: object
-                    properties:
-                      success:
-                        type: boolean
-                        description: If the response is successful or not
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          description: The details of the sub-role
-                          title: subRole
-                          allOf:
-                            - title: baseRoleRequest
-                              description: The details of the role
-                              type: object
-                              properties:
-                                parent_role_id:
-                                  type: integer
-                                  description: The ID of the parent role
-                                name:
-                                  type: string
-                                  description: The name of the role
-                            - type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  description: The ID of the role
-                                active_flag:
-                                  type: boolean
-                                  description: Whether the role is active or not
-                                assignment_count:
-                                  type: string
-                                  description: The number of users assigned to this role
-                                sub_role_count:
-                                  type: string
-                                  description: The number of sub-roles
-                        description: The array of sub-roles
-                      additional_data:
-                        description: The additional data in the role list
-                        type: object
-                        properties:
-                          pagination:
-                            description: The pagination details in the role list
-                            type: object
-                            properties:
-                              start:
-                                type: integer
-                                description: Pagination start
-                              limit:
-                                type: integer
-                                description: Items shown per page
-                              more_items_in_collection:
-                                type: boolean
-                                description: Whether there are more list items in the collection than displayed
-              example:
-                success: true
-                data:
-                  - id: 3
-                    parent_role_id: 2
-                    name: Auditors
-                    active_flag: true
-                    assignment_count: '1'
-                    sub_role_count: '0'
-                additional_data:
-                  pagination:
-                    start: 0
-                    limit: 100
-                    more_items_in_collection: false
   '/roles/{id}/settings':
     get:
       summary: List role settings
@@ -47267,7 +47165,7 @@ paths:
                   description: The type of object to receive notifications about. Wildcard will match all supported objects.
                 user_id:
                   type: integer
-                  description: 'The ID of the user this Webhook will be authorized with. If not set, current authorized user will be used. Note that this does not filter only certain user''s events — rather, this specifies the user''s permissions under which each event is checked. Events about objects the selected user is not entitled to access are not sent. If you want to receive notifications for all events, a top-level admin user should be used.'
+                  description: 'The ID of the user that this webhook will be authorized with. You have the option to use a different user''s `user_id`. If it is not set, the current user''s `user_id` will be used. As each webhook event is checked against a user’s permissions, the webhook will only be sent if the user has access to the specified object(s). If you want to receive notifications for all events, please use a top-level admin user’s `user_id`.'
                 http_auth_user:
                   type: string
                   description: The HTTP basic auth username of the subscription URL endpoint (if required)

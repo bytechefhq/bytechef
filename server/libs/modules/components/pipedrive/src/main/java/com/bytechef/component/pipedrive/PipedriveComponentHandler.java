@@ -17,8 +17,16 @@
 
 package com.bytechef.component.pipedrive;
 
+import com.bytechef.hermes.definition.DefinitionDSL;
+
 /**
  * @author Ivica Cardic
  */
 public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {
+
+    @Override
+    public DefinitionDSL.ModifiableDisplay modifyDisplay(DefinitionDSL.ModifiableDisplay modifiableDisplay) {
+        return modifiableDisplay.description(
+            "The first CRM designed by salespeople, for salespeople. Do more to grow your business.");
+    }
 }

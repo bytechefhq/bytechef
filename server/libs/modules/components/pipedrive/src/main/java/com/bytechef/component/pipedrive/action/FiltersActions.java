@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -25,6 +26,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -53,7 +55,7 @@ public class FiltersActions {
             .required(false)
             .metadata(
                 Map.of(
-                    "type", "QUERY")))
+                    "type", PropertyType.QUERY)))
         .output(object(null).properties(array("data").items(object(null).properties(integer("id").label("Id")
             .description("The ID of the filter")
             .required(false),
@@ -91,7 +93,7 @@ public class FiltersActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"All open deals\",\"active_flag\":true,\"type\":\"deals\",\"temporary_flag\":null,\"user_id\":927097,\"add_time\":\"2019-10-15 11:01:53\",\"update_time\":\"2019-10-15 11:01:53\",\"visible_to\":7,\"custom_view_id\":1}]}"));
 }

@@ -6,13 +6,14 @@
     },
     "metadata" : {
       "path" : "/pet",
-      "requestMethod" : "POST",
-      "bodyContentType" : "JSON"
+      "mimeType" : "application/json",
+      "bodyContentType" : "JSON",
+      "requestMethod" : "POST"
     },
     "name" : "addPet",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -93,10 +94,12 @@
       } ]
     } ],
     "properties" : [ {
+      "label" : "Pet",
       "metadata" : {
         "type" : "BODY"
       },
       "required" : true,
+      "name" : "pet",
       "type" : "OBJECT",
       "properties" : [ {
         "label" : "Id",
@@ -182,13 +185,14 @@
     },
     "metadata" : {
       "path" : "/pet",
-      "requestMethod" : "PUT",
-      "bodyContentType" : "JSON"
+      "mimeType" : "application/json",
+      "bodyContentType" : "JSON",
+      "requestMethod" : "PUT"
     },
     "name" : "updatePet",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -269,10 +273,12 @@
       } ]
     } ],
     "properties" : [ {
+      "label" : "Pet",
       "metadata" : {
         "type" : "BODY"
       },
       "required" : true,
+      "name" : "pet",
       "type" : "OBJECT",
       "properties" : [ {
         "label" : "Id",
@@ -363,8 +369,9 @@
     "name" : "findPetsByStatus",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
+      "name" : "array",
       "type" : "ARRAY",
       "items" : [ {
         "type" : "OBJECT",
@@ -478,8 +485,9 @@
     "name" : "findPetsByTags",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
+      "name" : "array",
       "type" : "ARRAY",
       "items" : [ {
         "type" : "OBJECT",
@@ -616,7 +624,7 @@
     "name" : "getPetById",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -751,13 +759,14 @@
     },
     "metadata" : {
       "path" : "/pet/{petId}/uploadImage",
-      "requestMethod" : "POST",
-      "bodyContentType" : "BINARY"
+      "mimeType" : "application/octet-stream",
+      "bodyContentType" : "BINARY",
+      "requestMethod" : "POST"
     },
     "name" : "uploadFile",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -799,7 +808,26 @@
       "metadata" : {
         "type" : "BODY"
       },
-      "type" : "STRING"
+      "name" : "fileEntry",
+      "type" : "OBJECT",
+      "objectType" : "FILE_ENTRY",
+      "properties" : [ {
+        "required" : true,
+        "name" : "extension",
+        "type" : "STRING"
+      }, {
+        "required" : true,
+        "name" : "mimeType",
+        "type" : "STRING"
+      }, {
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING"
+      }, {
+        "required" : true,
+        "name" : "url",
+        "type" : "STRING"
+      } ]
     } ]
   }, {
     "display" : {
@@ -813,7 +841,7 @@
     "name" : "getInventory",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "additionalProperties" : [ {
@@ -828,13 +856,14 @@
     },
     "metadata" : {
       "path" : "/store/order",
-      "requestMethod" : "POST",
-      "bodyContentType" : "JSON"
+      "mimeType" : "application/json",
+      "bodyContentType" : "JSON",
+      "requestMethod" : "POST"
     },
     "name" : "placeOrder",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -885,9 +914,11 @@
       } ]
     } ],
     "properties" : [ {
+      "label" : "Order",
       "metadata" : {
         "type" : "BODY"
       },
+      "name" : "order",
       "type" : "OBJECT",
       "properties" : [ {
         "label" : "Id",
@@ -968,7 +999,7 @@
     "name" : "getOrderById",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -1035,14 +1066,73 @@
     },
     "metadata" : {
       "path" : "/user",
-      "requestMethod" : "POST",
-      "bodyContentType" : "JSON"
+      "mimeType" : "application/json",
+      "bodyContentType" : "JSON",
+      "requestMethod" : "POST"
     },
     "name" : "createUser",
+    "output" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "type" : "OBJECT",
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Username",
+        "required" : false,
+        "name" : "username",
+        "type" : "STRING",
+        "exampleValue" : "theUser"
+      }, {
+        "label" : "FirstName",
+        "required" : false,
+        "name" : "firstName",
+        "type" : "STRING",
+        "exampleValue" : "John"
+      }, {
+        "label" : "LastName",
+        "required" : false,
+        "name" : "lastName",
+        "type" : "STRING",
+        "exampleValue" : "James"
+      }, {
+        "label" : "Email",
+        "required" : false,
+        "name" : "email",
+        "type" : "STRING",
+        "exampleValue" : "john@email.com"
+      }, {
+        "label" : "Password",
+        "required" : false,
+        "name" : "password",
+        "type" : "STRING",
+        "exampleValue" : "12345"
+      }, {
+        "label" : "Phone",
+        "required" : false,
+        "name" : "phone",
+        "type" : "STRING",
+        "exampleValue" : "12345"
+      }, {
+        "description" : "User Status",
+        "label" : "UserStatus",
+        "required" : false,
+        "name" : "userStatus",
+        "type" : "INTEGER",
+        "exampleValue" : 1
+      } ]
+    } ],
     "properties" : [ {
+      "label" : "User",
       "metadata" : {
         "type" : "BODY"
       },
+      "name" : "user",
       "type" : "OBJECT",
       "properties" : [ {
         "label" : "Id",
@@ -1102,64 +1192,69 @@
     },
     "metadata" : {
       "path" : "/user/createWithList",
-      "requestMethod" : "POST",
-      "bodyContentType" : "JSON"
+      "mimeType" : "application/json",
+      "bodyContentType" : "JSON",
+      "requestMethod" : "POST"
     },
     "name" : "createUsersWithListInput",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
-      "type" : "OBJECT",
-      "properties" : [ {
-        "label" : "Id",
-        "required" : false,
-        "name" : "id",
-        "type" : "INTEGER",
-        "exampleValue" : 10
-      }, {
-        "label" : "Username",
-        "required" : false,
-        "name" : "username",
-        "type" : "STRING",
-        "exampleValue" : "theUser"
-      }, {
-        "label" : "FirstName",
-        "required" : false,
-        "name" : "firstName",
-        "type" : "STRING",
-        "exampleValue" : "John"
-      }, {
-        "label" : "LastName",
-        "required" : false,
-        "name" : "lastName",
-        "type" : "STRING",
-        "exampleValue" : "James"
-      }, {
-        "label" : "Email",
-        "required" : false,
-        "name" : "email",
-        "type" : "STRING",
-        "exampleValue" : "john@email.com"
-      }, {
-        "label" : "Password",
-        "required" : false,
-        "name" : "password",
-        "type" : "STRING",
-        "exampleValue" : "12345"
-      }, {
-        "label" : "Phone",
-        "required" : false,
-        "name" : "phone",
-        "type" : "STRING",
-        "exampleValue" : "12345"
-      }, {
-        "description" : "User Status",
-        "label" : "UserStatus",
-        "required" : false,
-        "name" : "userStatus",
-        "type" : "INTEGER",
-        "exampleValue" : 1
+      "name" : "array",
+      "type" : "ARRAY",
+      "items" : [ {
+        "type" : "OBJECT",
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "exampleValue" : 10
+        }, {
+          "label" : "Username",
+          "required" : false,
+          "name" : "username",
+          "type" : "STRING",
+          "exampleValue" : "theUser"
+        }, {
+          "label" : "FirstName",
+          "required" : false,
+          "name" : "firstName",
+          "type" : "STRING",
+          "exampleValue" : "John"
+        }, {
+          "label" : "LastName",
+          "required" : false,
+          "name" : "lastName",
+          "type" : "STRING",
+          "exampleValue" : "James"
+        }, {
+          "label" : "Email",
+          "required" : false,
+          "name" : "email",
+          "type" : "STRING",
+          "exampleValue" : "john@email.com"
+        }, {
+          "label" : "Password",
+          "required" : false,
+          "name" : "password",
+          "type" : "STRING",
+          "exampleValue" : "12345"
+        }, {
+          "label" : "Phone",
+          "required" : false,
+          "name" : "phone",
+          "type" : "STRING",
+          "exampleValue" : "12345"
+        }, {
+          "description" : "User Status",
+          "label" : "UserStatus",
+          "required" : false,
+          "name" : "userStatus",
+          "type" : "INTEGER",
+          "exampleValue" : 1
+        } ]
       } ]
     } ],
     "properties" : [ {
@@ -1167,6 +1262,7 @@
         "type" : "BODY"
       },
       "placeholder" : "Add",
+      "name" : "array",
       "type" : "ARRAY",
       "items" : [ {
         "type" : "OBJECT",
@@ -1234,7 +1330,7 @@
     "name" : "loginUser",
     "output" : [ {
       "metadata" : {
-        "responseType" : "XML"
+        "responseFormat" : "TEXT"
       },
       "type" : "STRING"
     } ],
@@ -1300,7 +1396,7 @@
     "name" : "getUserByName",
     "output" : [ {
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -1371,10 +1467,67 @@
     },
     "metadata" : {
       "path" : "/user/{username}",
-      "requestMethod" : "PUT",
-      "bodyContentType" : "JSON"
+      "mimeType" : "application/json",
+      "bodyContentType" : "JSON",
+      "requestMethod" : "PUT"
     },
     "name" : "updateUser",
+    "output" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "type" : "OBJECT",
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Username",
+        "required" : false,
+        "name" : "username",
+        "type" : "STRING",
+        "exampleValue" : "theUser"
+      }, {
+        "label" : "FirstName",
+        "required" : false,
+        "name" : "firstName",
+        "type" : "STRING",
+        "exampleValue" : "John"
+      }, {
+        "label" : "LastName",
+        "required" : false,
+        "name" : "lastName",
+        "type" : "STRING",
+        "exampleValue" : "James"
+      }, {
+        "label" : "Email",
+        "required" : false,
+        "name" : "email",
+        "type" : "STRING",
+        "exampleValue" : "john@email.com"
+      }, {
+        "label" : "Password",
+        "required" : false,
+        "name" : "password",
+        "type" : "STRING",
+        "exampleValue" : "12345"
+      }, {
+        "label" : "Phone",
+        "required" : false,
+        "name" : "phone",
+        "type" : "STRING",
+        "exampleValue" : "12345"
+      }, {
+        "description" : "User Status",
+        "label" : "UserStatus",
+        "required" : false,
+        "name" : "userStatus",
+        "type" : "INTEGER",
+        "exampleValue" : 1
+      } ]
+    } ],
     "properties" : [ {
       "description" : "name that need to be deleted",
       "label" : "Username",
@@ -1385,9 +1538,11 @@
       "name" : "username",
       "type" : "STRING"
     }, {
+      "label" : "User",
       "metadata" : {
         "type" : "BODY"
       },
+      "name" : "user",
       "type" : "OBJECT",
       "properties" : [ {
         "label" : "Id",

@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -25,6 +26,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -52,13 +54,13 @@ public class PersonFieldsActions {
             .required(false)
             .metadata(
                 Map.of(
-                    "type", "QUERY")),
+                    "type", PropertyType.QUERY)),
             integer("limit").label("Limit")
                 .description("Items shown per page")
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")))
+                        "type", PropertyType.QUERY)))
         .output(object(null).properties(array("data").items(object(null).properties(integer("id").label("Id")
             .description("The ID of the field. Value is `null` in case of subfields.")
             .required(false),
@@ -167,7 +169,7 @@ public class PersonFieldsActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":1,\"key\":\"title\",\"name\":\"Title\",\"order_nr\":2,\"field_type\":\"varchar\",\"add_time\":\"2019-02-04 13:58:03\",\"update_time\":\"2019-02-04 13:58:03\",\"last_updated_by_user_id\":1,\"active_flag\":true,\"edit_flag\":false,\"index_visible_flag\":true,\"details_visible_flag\":true,\"add_visible_flag\":true,\"important_flag\":false,\"bulk_edit_allowed\":true,\"searchable_flag\":false,\"filtering_allowed\":true,\"sortable_flag\":true,\"options\":null,\"mandatory_flag\":true},{\"id\":2,\"key\":\"9dc80c50d78a15643bfc4ca79d76156a73a1ca0e\",\"name\":\"Customer Type\",\"order_nr\":1,\"field_type\":\"enum\",\"add_time\":\"2019-02-04 13:58:03\",\"update_time\":\"2019-02-04 13:58:03\",\"last_updated_by_user_id\":1,\"active_flag\":true,\"edit_flag\":true,\"index_visible_flag\":true,\"details_visible_flag\":true,\"add_visible_flag\":false,\"important_flag\":false,\"bulk_edit_allowed\":true,\"searchable_flag\":false,\"filtering_allowed\":true,\"sortable_flag\":true,\"options\":[{\"id\":190,\"label\":\"Private person\"},{\"id\":191,\"label\":\"Company\"},{\"id\":192,\"label\":\"Government\"}],\"mandatory_flag\":true}],\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}"));
 }
