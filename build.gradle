@@ -37,7 +37,19 @@ subprojects {
 
     spotbugs {
         toolVersion = "${spotbugsVersion}"
+        reportsDir = file("$buildDir/reports/spotbugs")
         excludeFilter = file("${rootDir}/config/spotbugs/spotbugs-exclude.xml")
+    }
+
+    [spotbugsMain, spotbugsTest].each { task ->
+        task.configure {
+            reports {
+                html {
+                    enabled = true
+                    stylesheet = 'fancy-hist.xsl'
+                }
+            }
+        }
     }
 
     spotless {
