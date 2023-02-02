@@ -75,6 +75,7 @@ import javax.lang.model.element.Modifier;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,8 +83,8 @@ public class RestComponentGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(RestComponentGenerator.class);
 
-    private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get("com.bytechef.hermes.component.definition",
-        "Authorization");
+    private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get(
+        "com.bytechef.hermes.component.definition", "Authorization");
     public static final String COM_BYTECHEF_HERMES_COMPONENT_PACKAGE = "com.bytechef.hermes.component";
     public static final ClassName COMPONENT_DEFINITION_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
@@ -91,6 +92,10 @@ public class RestComponentGenerator {
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
     private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME = ClassName
         .get("com.bytechef.hermes.component.constants", "ComponentConstants");
+    private static final ClassName HTTP_CLIENT_UTILS_CLASS = ClassName
+        .get("com.bytechef.hermes.component.utils", "HttpClientUtils");
+    private static final ClassName REST_COMPONENT_HANDLER_CLASS = ClassName
+        .get("com.bytechef.hermes.component", "RestComponentHandler");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             enable(SerializationFeature.INDENT_OUTPUT);
@@ -159,35 +164,6 @@ public class RestComponentGenerator {
         }
 
         writeComponentHandlerServiceFile();
-    }
-
-    private String capitalize(final String str) {
-        final int strLen = str == null ? 0 : str.length();
-
-        if (strLen == 0) {
-            return str;
-        }
-
-        final int firstCodepoint = str.codePointAt(0);
-        final int newCodePoint = Character.toTitleCase(firstCodepoint);
-
-        if (firstCodepoint == newCodePoint) {
-            // already capitalized
-            return str;
-        }
-
-        final int[] newCodePoints = new int[strLen];
-        int outOffset = 0;
-        newCodePoints[outOffset++] = newCodePoint;
-
-        for (int inOffset = Character.charCount(firstCodepoint); inOffset < strLen;) {
-            final int codepoint = str.codePointAt(inOffset);
-
-            newCodePoints[outOffset++] = codepoint;
-            inOffset += Character.charCount(codepoint);
-        }
-
-        return new String(newCodePoints, 0, outOffset);
     }
 
     @SuppressWarnings("rawtypes")
@@ -334,12 +310,14 @@ public class RestComponentGenerator {
                 requestMethod,
                 operationItem.path);
 
-            if (propertiesEntry.bodyContentType() != null) {
+            if (propertiesEntry.bodyContentType != null) {
                 metadataBuilder.add(
                     """
-                        ,"bodyContentType", $S
+                        ,"bodyContentType", BodyContentType.$L
+                        ,"mimeType", $S
                         """,
-                    propertiesEntry.bodyContentType());
+                    propertiesEntry.bodyContentType,
+                    propertiesEntry.mimeType);
             }
 
             builder.add(
@@ -395,7 +373,7 @@ public class RestComponentGenerator {
                 String key = operationItemsEntry.getKey();
 
                 String prefix = Arrays.stream(key.split(" "))
-                    .map(this::capitalize)
+                    .map(StringUtils::capitalize)
                     .collect(Collectors.joining());
 
                 ClassName className = ClassName.get(getPackageName() + ".action", prefix + "Actions");
@@ -806,13 +784,15 @@ public class RestComponentGenerator {
             """
                 component($S)
                     .display(
-                        display($S)
-                        .description($S)
+                        modifyDisplay(
+                            display($S)
+                                .description($S)
+                        )
                     )
-                    .actions($L)
+                    .actions(modifyActions($L))
                 """,
             componentName,
-            capitalize(componentName),
+            StringUtils.capitalize(componentName),
             openAPI.getInfo()
                 .getDescription(),
             getActionsCodeBlock(componentHandlerDirPath, openAPI));
@@ -827,7 +807,7 @@ public class RestComponentGenerator {
     }
 
     private String getComponentHandlerClassName(String componentName) {
-        return capitalize(componentName) + "ComponentHandler";
+        return StringUtils.capitalize(componentName) + "ComponentHandler";
     }
 
     private CodeBlock getConnectionCodeBlock(OpenAPI openAPI) {
@@ -844,9 +824,11 @@ public class RestComponentGenerator {
             } else {
                 builder.add(
                     """
-                        connection()
-                            $L
-                            .authorizations($L)
+                        modifyConnection(
+                            connection()
+                                $L
+                                .authorizations($L)
+                        )
                         """,
                     getBaseUriCodeBlock(servers),
                     getAuthorizationsCodeBlock(securitySchemeMap));
@@ -958,7 +940,7 @@ public class RestComponentGenerator {
         CodeBlock.Builder builder = CodeBlock.builder();
         OutputEntry outputEntry = null;
 
-        for (String responseCode : List.of("200", "201")) {
+        for (String responseCode : List.of("200", "201", "default")) {
             apiResponse = apiResponses.get(responseCode);
 
             if (apiResponse != null) {
@@ -971,30 +953,49 @@ public class RestComponentGenerator {
 
             Set<Map.Entry<String, MediaType>> entries = content.entrySet();
 
+            // Check if there is application/json as response type
+
             if (!entries.isEmpty()) {
+                String mimeType;
 
-                // Use the first response type
+                if (entries.stream()
+                    .map(Map.Entry::getKey)
+                    .anyMatch(curBodyContentType -> Objects.equals(curBodyContentType, "application/json"))) {
 
-                String key = entries.iterator()
-                    .next()
-                    .getKey();
+                    mimeType = "application/json";
+                } else {
 
-                String responseFormat = switch (key) {
-                    case "application/json" -> "JSON";
-                    case "application/xml" -> "XML";
-                    default -> "TEXT";
-                };
+                    // else use the first response type
 
-                MediaType mediaType = content.get(key);
+                    mimeType = entries.iterator()
+                        .next()
+                        .getKey();
+                }
+
+                MediaType mediaType = content.get(mimeType);
 
                 Schema schema = mediaType.getSchema();
 
                 builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, openAPI, true));
+
+                String responseFormat;
+
+                if (Objects.equals(schema.getType(), "string") && Objects.equals(schema.getFormat(), "binary")) {
+                    responseFormat = "BINARY";
+                } else {
+                    responseFormat = switch (mimeType) {
+                        case "application/json" -> "JSON";
+                        case "application/xml" -> "XML";
+                        case "application/octet-stream" -> "BINARY";
+                        default -> "TEXT";
+                    };
+                }
+
                 builder.add(
                     """
                         .metadata(
                            $T.of(
-                             "responseFormat", $S
+                             "responseFormat", ResponseFormat.$L
                            )
                         )
                         """,
@@ -1010,7 +1011,7 @@ public class RestComponentGenerator {
 
     private String getPackageName() {
         return deleteWhitespace(basePackageName == null ? "" : basePackageName + ".") +
-            replaceChars(componentName, "-_", ".");
+            StringUtils.replaceChars(componentName, "-_", ".");
     }
 
     private CodeBlock getParametersPropertiesCodeBlock(Operation operation, OpenAPI openAPI) {
@@ -1028,13 +1029,12 @@ public class RestComponentGenerator {
                     """
                         .metadata(
                            $T.of(
-                             "type", $S
+                             "type", PropertyType.$L
                            )
                         )
                         """,
                     Map.class,
-                    parameter.getIn()
-                        .toUpperCase()));
+                    StringUtils.upperCase(parameter.getIn())));
 
                 codeBlocks.add(builder.build());
             }
@@ -1053,57 +1053,67 @@ public class RestComponentGenerator {
             codeBlocks.add(codeBlock);
         }
 
-        RequestBodyPropertiesEntry requestBodyPropertiesEntry = getRequestBodyPropertiesItem(operation, openAPI);
+        PropertiesEntry requestBodyPropertiesEntry = getRequestBodyPropertiesItem(operation, openAPI);
 
         if (requestBodyPropertiesEntry != null) {
-            codeBlock = requestBodyPropertiesEntry.requestBodyPropertiesCodeBlock();
+            codeBlock = requestBodyPropertiesEntry.propertiesCodeBlock();
 
             if (!codeBlock.isEmpty()) {
                 codeBlocks.add(codeBlock);
             }
         }
 
-        return new PropertiesEntry(
-            codeBlocks.stream()
-                .collect(CodeBlock.joining(",")),
-            requestBodyPropertiesEntry == null ? null : requestBodyPropertiesEntry.bodyContentType);
+        codeBlock = codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
+
+        return new PropertiesEntry(codeBlock, requestBodyPropertiesEntry);
     }
 
     @SuppressWarnings({
         "rawtypes"
     })
-    private RequestBodyPropertiesEntry getRequestBodyPropertiesItem(Operation operation, OpenAPI openAPI) {
+    private PropertiesEntry getRequestBodyPropertiesItem(Operation operation, OpenAPI openAPI) {
         CodeBlock.Builder builder = CodeBlock.builder();
         RequestBody requestBody = operation.getRequestBody();
-        RequestBodyPropertiesEntry requestBodyPropertiesEntry = null;
+        PropertiesEntry requestBodyPropertiesEntry = null;
 
         if (requestBody != null) {
             Content content = requestBody.getContent();
 
             String bodyContentType = null;
+            String mimeType = null;
             Set<Map.Entry<String, MediaType>> entries = content.entrySet();
 
             if (!entries.isEmpty()) {
 
-                // Use the first body content type
+                // Check if there is application/json as body content type
 
-                String key = entries.iterator()
-                    .next()
-                    .getKey();
+                if (entries.stream()
+                    .map(Map.Entry::getKey)
+                    .anyMatch(curBodyContentType -> Objects.equals(curBodyContentType, "application/json"))) {
+
+                    mimeType = "application/json";
+                } else {
+
+                    // else use the first body content type
+
+                    mimeType = entries.iterator()
+                        .next()
+                        .getKey();
+                }
 
                 // CHECKSTYLE:OFF
-                bodyContentType = switch (key) {
+                bodyContentType = switch (mimeType) {
                     case "application/json" -> "JSON";
                     case "application/xml" -> "XML";
                     case "application/x-www-form-urlencoded" -> "FORM_URLENCODED";
                     case "application/octet-stream" -> "BINARY";
                     case "multipart/form-data" -> "FORM_DATA";
-                    default -> throw new IllegalArgumentException(
-                        String.format("Media type %s is not supported.", key));
+                    default -> "RAW";
                 };
                 // CHECKSTYLE:ON
 
-                MediaType mediaType = content.get(key);
+                MediaType mediaType = content.get(mimeType);
 
                 Schema schema = mediaType.getSchema();
 
@@ -1112,15 +1122,14 @@ public class RestComponentGenerator {
                     """
                         .metadata(
                            $T.of(
-                             "type", $S
+                             "type", PropertyType.BODY
                            )
                         )
                         """,
-                    Map.class,
-                    "BODY");
+                    Map.class);
             }
 
-            requestBodyPropertiesEntry = new RequestBodyPropertiesEntry(builder.build(), bodyContentType);
+            requestBodyPropertiesEntry = new PropertiesEntry(builder.build(), bodyContentType, mimeType);
         }
 
         return requestBodyPropertiesEntry;
@@ -1258,9 +1267,9 @@ public class RestComponentGenerator {
                 case "array" -> {
                     builder.add(
                         "array($S).items($L)",
-                        propertyName,
+                        propertyName == null ? "array" : propertyName,
                         getSchemaCodeBlock(
-                            schema.getTitle(), schema.getDescription(), null, null, schema.getItems(), openAPI, false));
+                            null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
 
                     if (!outputEntry) {
                         builder.add(".placeholder($S)", "Add");
@@ -1317,6 +1326,8 @@ public class RestComponentGenerator {
                         builder.add("date($S)", propertyName);
                     } else if (Objects.equals(schema.getFormat(), "date-time")) {
                         builder.add("dateTime($S)", propertyName);
+                    } else if (Objects.equals(schema.getFormat(), "binary")) {
+                        builder.add("fileEntry($S)", propertyName == null ? "fileEntry" : propertyName);
                     } else {
                         builder.add("string($S)", propertyName);
                     }
@@ -1326,7 +1337,7 @@ public class RestComponentGenerator {
             }
 
             if (propertyName != null) {
-                builder.add(".label($S)", capitalize(propertyName));
+                builder.add(".label($S)", StringUtils.capitalize(propertyName));
             }
 
             if (propertyDescription != null) {
@@ -1342,9 +1353,9 @@ public class RestComponentGenerator {
 
                 for (Object item : enums) {
                     if (item instanceof String) {
-                        codeBlocks.add(CodeBlock.of("option($S, $S)", capitalize(item.toString()), item));
+                        codeBlocks.add(CodeBlock.of("option($S, $S)", StringUtils.capitalize(item.toString()), item));
                     } else {
-                        codeBlocks.add(CodeBlock.of("option($S, $L)", capitalize(item.toString()), item));
+                        codeBlocks.add(CodeBlock.of("option($S, $L)", StringUtils.capitalize(item.toString()), item));
                     }
                 }
 
@@ -1375,8 +1386,10 @@ public class RestComponentGenerator {
 
             schema = schemaMap.get(curSchemaName);
 
-            builder.add(getSchemaCodeBlock(
-                propertyName, schema.getDescription(), required, curSchemaName, schema, openAPI, false));
+            builder.add(
+                getSchemaCodeBlock(
+                    propertyName == null && !outputEntry ? StringUtils.uncapitalize(curSchemaName) : propertyName,
+                    schema.getDescription(), required, curSchemaName, schema, openAPI, false));
         }
 
         return builder.build();
@@ -1394,43 +1407,6 @@ public class RestComponentGenerator {
         }
 
         return openAPI;
-    }
-
-    private String replaceChars(final String str, final String searchChars, String replaceChars) {
-        if (str == null || str.isEmpty() || searchChars == null || searchChars.isEmpty()) {
-            return str;
-        }
-
-        if (replaceChars == null) {
-            replaceChars = "";
-        }
-
-        boolean modified = false;
-        final int replaceCharsLength = replaceChars.length();
-        final int strLength = str.length();
-
-        final StringBuilder buf = new StringBuilder(strLength);
-
-        for (int i = 0; i < strLength; i++) {
-            final char ch = str.charAt(i);
-            final int index = searchChars.indexOf(ch);
-
-            if (index >= 0) {
-                modified = true;
-
-                if (index < replaceCharsLength) {
-                    buf.append(replaceChars.charAt(index));
-                }
-            } else {
-                buf.append(ch);
-            }
-        }
-
-        if (modified) {
-            return buf.toString();
-        }
-
-        return str;
     }
 
     private RestComponentHandler runComponentHandlerClass(Path classPath, String className) throws Exception {
@@ -1463,15 +1439,15 @@ public class RestComponentGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addSuperinterface(
                     ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
-                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "COMPONENT_DEFINITION")
-                    .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                     .initializer(getComponentCodeBlock(sourceDirPath))
                     .build())
                 .addMethod(MethodSpec.methodBuilder("getDefinition")
                     .addAnnotation(Override.class)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(COMPONENT_DEFINITION_CLASS_NAME)
-                    .addStatement("return COMPONENT_DEFINITION")
+                    .addStatement("return componentDefinition")
                     .build())
                 .build())
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
@@ -1501,11 +1477,14 @@ public class RestComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
+            .addStaticImport(REST_COMPONENT_HANDLER_CLASS, "PropertyType")
             .build();
 
         return javaFile.writeToPath(sourceDirPath);
@@ -1527,10 +1506,9 @@ public class RestComponentGenerator {
                     .addAnnotation(ClassName.get("org.junit.jupiter.api", "Test"))
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement(
-                        "$T.assertEquals(\"definition/pipedrive_v1.json\", new $T().getDefinition())",
+                        "$T.assertEquals(\"definition/" + componentName + "_v1.json\", new $T().getDefinition())",
                         ClassName.get("com.bytechef.test.jsonasssert", "JsonFileAssert"),
-                        ClassName.get(getPackageName(),
-                            componentHandlerClassName))
+                        ClassName.get(getPackageName(), componentHandlerClassName))
                     .build())
                 .build())
             .build();
@@ -1584,11 +1562,14 @@ public class RestComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
+            .addStaticImport(REST_COMPONENT_HANDLER_CLASS, "PropertyType")
             .build();
 
         javaFile.writeTo(componentHandlerDirPath);
@@ -1724,11 +1705,14 @@ public class RestComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
+            .addStaticImport(REST_COMPONENT_HANDLER_CLASS, "PropertyType")
             .build();
 
         javaFile.writeTo(componentHandlerDirPath);
@@ -1767,10 +1751,12 @@ public class RestComponentGenerator {
     private record OutputEntry(CodeBlock outputCodeBlock, Object example) {
     }
 
-    private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType) {
-    }
-
-    private record RequestBodyPropertiesEntry(CodeBlock requestBodyPropertiesCodeBlock, String bodyContentType) {
+    private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType, String mimeType) {
+        public PropertiesEntry(CodeBlock codeBlock, PropertiesEntry propertiesEntry) {
+            this(
+                codeBlock, propertiesEntry == null ? null : propertiesEntry.bodyContentType,
+                propertiesEntry == null ? null : propertiesEntry.mimeType);
+        }
     }
 
     private static class GeneratorConfig {
