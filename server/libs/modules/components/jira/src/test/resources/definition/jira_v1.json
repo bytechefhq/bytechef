@@ -13,7 +13,7 @@
     "output" : [ {
       "description" : "Details about an issue.",
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {
@@ -1153,7 +1153,7 @@
     "output" : [ {
       "description" : "The result of a JQL search.",
       "metadata" : {
-        "responseType" : "JSON"
+        "responseFormat" : "JSON"
       },
       "type" : "OBJECT",
       "properties" : [ {

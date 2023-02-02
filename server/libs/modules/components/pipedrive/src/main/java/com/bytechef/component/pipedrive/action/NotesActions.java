@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
@@ -25,6 +26,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -43,7 +46,7 @@ public class NotesActions {
         .metadata(
             Map.of(
                 "requestMethod", "POST",
-                "path", "/notes", "bodyContentType", "JSON"
+                "path", "/notes", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
         .properties(object(null).properties(number("pinned_to_organization_flag").label("Pinned_to_organization_flag")
@@ -95,7 +98,7 @@ public class NotesActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "type", "BODY")))
+                    "type", PropertyType.BODY)))
         .output(object(null).properties(bool("success").label("Success")
             .description("If the request was successful or not")
             .required(false),
@@ -178,7 +181,7 @@ public class NotesActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"id\":1,\"active_flag\":true,\"add_time\":\"2019-12-09 13:59:21\",\"content\":\"abc\",\"deal\":{\"title\":\"Deal title\"},\"lead_id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"deal_id\":1,\"last_update_user_id\":1,\"org_id\":1,\"organization\":{\"name\":\"Organization name\"},\"person\":{\"name\":\"Person name\"},\"person_id\":1,\"pinned_to_lead_flag\":false,\"pinned_to_deal_flag\":true,\"pinned_to_organization_flag\":false,\"pinned_to_person_flag\":false,\"update_time\":\"2019-12-09 14:26:11\",\"user\":{\"email\":\"user@email.com\",\"icon_url\":\"https://iconurl.net/profile_120x120_123.jpg\",\"is_you\":true,\"name\":\"User Name\"},\"user_id\":1}}"));
 }

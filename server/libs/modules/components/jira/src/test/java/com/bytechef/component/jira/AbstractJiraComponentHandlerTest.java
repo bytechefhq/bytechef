@@ -28,6 +28,6 @@ import org.junit.jupiter.api.Test;
 public abstract class AbstractJiraComponentHandlerTest {
     @Test
     public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/pipedrive_v1.json", new JiraComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/jira_v1.json", new JiraComponentHandler().getDefinition());
     }
 }
