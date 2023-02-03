@@ -7,17 +7,11 @@ const PageHeader: React.FC<{
     right?: ReactNode;
     title: string;
 }> = ({title, className, leftSidebar = false, right}) => (
-    <header
-        className={cx(
-            'mb-4 flex justify-center',
-            leftSidebar ? 'py-4 px-2' : 'p-4',
-            className
-        )}
-    >
+    <header className={cx('flex justify-center p-4', className)}>
         <div className="flex w-full items-center justify-between">
             <div
                 className={cx(
-                    'flex h-[40px] items-center text-xl tracking-tight text-gray-900 dark:text-gray-200',
+                    'flex h-[34px] items-center text-xl tracking-tight text-gray-900 dark:text-gray-200',
                     leftSidebar ? 'font-semibold' : ''
                 )}
             >

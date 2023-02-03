@@ -20,7 +20,7 @@ const IntegrationList: React.FC = () => {
     });
 
     return (
-        <div className="flex place-self-center px-4 sm:w-full xl:w-4/5">
+        <div className="flex place-self-center px-2 sm:w-full 2xl:w-4/5">
             <ul role="list" className="w-full divide-y divide-gray-100">
                 {isLoading && 'Loading...'}
 
@@ -36,7 +36,7 @@ const IntegrationList: React.FC = () => {
                         integrations.map((integration) => (
                             <div key={integration.id}>
                                 <Link to={`/integrations/${integration.id}`}>
-                                    <li className="my-3 overflow-hidden rounded-md bg-white p-3 hover:bg-gray-50">
+                                    <li className="group my-3 overflow-hidden rounded-md bg-white p-2 hover:bg-gray-50">
                                         <IntegrationItem
                                             key={integration.id}
                                             category={integration.category}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import cx from 'classnames';
 import {Link} from 'react-router-dom';
 
@@ -7,7 +7,7 @@ export enum Type {
     Tag,
 }
 
-const LeftSidebarItem: React.FC<{
+interface LeftSidebarItemProps {
     item: {
         id?: number;
         name: string;
@@ -15,7 +15,13 @@ const LeftSidebarItem: React.FC<{
         current: boolean;
         onItemClick: (type: Type, id?: number) => void;
     };
-}> = ({item: {id, name, type, current, onItemClick}}) => {
+    icon?: ReactNode;
+}
+
+const LeftSidebarItem = ({
+    item: {id, name, type, current, onItemClick},
+    icon,
+}: LeftSidebarItemProps) => {
     return (
         <Link
             to={
@@ -25,14 +31,14 @@ const LeftSidebarItem: React.FC<{
             }
             className={cx(
                 current
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600',
+                    ? 'bg-gray-200 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600',
                 'flex items-center rounded-md px-2 py-2 text-sm font-medium'
             )}
             aria-current={current ? 'page' : undefined}
             onClick={() => onItemClick(type, id)}
         >
-            <span className="truncate">{name}</span>
+            {icon} <span className="truncate">{name}</span>
         </Link>
     );
 };
