@@ -1,4 +1,4 @@
-import {Fragment, SVGProps} from 'react';
+import {Fragment} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import reactLogo from '../../assets/logo.svg';
 import {XMarkIcon} from '@heroicons/react/24/outline';
@@ -9,7 +9,7 @@ type Props = {
     navigation: {
         name: string;
         href: string;
-        icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+        icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
     }[];
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (value: boolean) => void;
@@ -94,7 +94,7 @@ export function MobileSidebar({
                                             <a
                                                 key={item.name}
                                                 href={item.href}
-                                                className="group flex items-center rounded-md p-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                                className="group flex items-center rounded-md p-2 text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                                             >
                                                 <item.icon
                                                     className="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-500"

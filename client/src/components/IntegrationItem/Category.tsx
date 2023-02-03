@@ -4,7 +4,7 @@ import {CategoryModel} from '../../data-access/integration';
 
 export const Category: React.FC<{category: CategoryModel}> = ({category}) => {
     return (
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="mr-4 flex items-center text-sm text-gray-500">
             <Squares2X2Icon
                 className="mr-1 h-5 w-5 text-gray-400"
                 aria-hidden="true"

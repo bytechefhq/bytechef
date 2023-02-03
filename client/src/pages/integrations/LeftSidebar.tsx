@@ -5,6 +5,7 @@ import {
 } from '../../queries/integrations.queries';
 import LeftSidebarItem, {Type} from './LeftSidebarItem';
 import {useSearchParams} from 'react-router-dom';
+import {TagIcon} from '@heroicons/react/20/solid';
 
 const LeftSidebar: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -73,6 +74,7 @@ const LeftSidebar: React.FC = () => {
                                         current.type === Type.Tag,
                                     onItemClick,
                                 }}
+                                icon={<TagIcon className="mr-1 h-4 w-4" />}
                             />
                         ))
                     ))}
