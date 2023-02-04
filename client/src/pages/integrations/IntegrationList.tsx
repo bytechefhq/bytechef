@@ -35,7 +35,9 @@ const IntegrationList: React.FC = () => {
                     ) : (
                         integrations.map((integration) => (
                             <div key={integration.id}>
-                                <Link to={`/integrations/${integration.id}`}>
+                                <Link
+                                    to={`/automation/integrations/${integration.id}`}
+                                >
                                     <li className="group my-3 overflow-hidden rounded-md bg-white p-2 hover:bg-gray-50">
                                         <IntegrationItem
                                             key={integration.id}
