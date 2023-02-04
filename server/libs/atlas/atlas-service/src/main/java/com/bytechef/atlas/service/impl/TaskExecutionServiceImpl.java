@@ -46,8 +46,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Override
     public TaskExecution create(TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null.");
-
-        taskExecution.setId(null);
+        Assert.isNull(taskExecution.getId(), "'taskExecution.id' must be null.");
 
         return taskExecutionRepository.save(taskExecution);
     }
@@ -74,6 +73,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @SuppressFBWarnings("NP")
     public TaskExecution update(@NonNull TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null.");
+        Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null.");
 
         TaskExecution currentTaskExecution = taskExecutionRepository.findByIdForUpdate(taskExecution.getId())
             .orElseThrow();
