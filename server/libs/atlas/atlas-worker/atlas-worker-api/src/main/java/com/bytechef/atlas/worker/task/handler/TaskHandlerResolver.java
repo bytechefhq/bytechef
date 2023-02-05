@@ -31,5 +31,6 @@ import com.bytechef.atlas.task.Task;
  * @since Jan 28, 2017
  */
 public interface TaskHandlerResolver {
+
     TaskHandler<?> resolve(Task task);
 }

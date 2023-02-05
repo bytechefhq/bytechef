@@ -20,8 +20,8 @@
 package com.bytechef.atlas.message.broker;
 
 /**
- * Abstraction for sending messages between the various componentes of the application. Implementations are responsible
- * for the guranteed delivery of the message.
+ * Abstraction for sending messages between the various components of the application. Implementations are responsible
+ * for the guaranteed delivery of the message.
  *
  * @author Arik Cohen
  * @since Jun 18, 2016
@@ -29,8 +29,8 @@ package com.bytechef.atlas.message.broker;
 public interface MessageBroker {
 
     /**
-     * @param routingKey a string representaiton used for routing the message to the appropriate destination.
-     * @param message    The message to send.
+     * @param queueName A string representation used for routing the message to the appropriate destination.
+     * @param message   The message to send.
      */
-    void send(String routingKey, Object message);
+    void send(String queueName, Object message);
 }

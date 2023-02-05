@@ -31,7 +31,6 @@ public interface Queues {
     String DLQ = "dlq";
     String ERRORS = "errors";
     String EVENTS = "events";
-    String EXECUTE = "execute";
     String JOBS = "jobs";
     String RESTARTS = "restarts";
     String STOPS = "stops";

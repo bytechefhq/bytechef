@@ -95,12 +95,10 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskExecutionService taskExecutionService;
 
     public ForkJoinTaskDispatcher(
-        ContextService contextService,
-        CounterService counterService,
-        MessageBroker messageBroker,
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskEvaluator taskEvaluator,
+        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
+        TaskDispatcher<? super Task> taskDispatcher, TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
+
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;

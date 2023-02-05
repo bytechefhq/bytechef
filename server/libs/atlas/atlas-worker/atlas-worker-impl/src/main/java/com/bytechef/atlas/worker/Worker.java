@@ -271,7 +271,7 @@ public class Worker {
             return this;
         }
 
-        public Builder withExecutors(ExecutorService executorService) {
+        public Builder withExecutorService(ExecutorService executorService) {
             this.executorService = executorService;
 
             return this;
