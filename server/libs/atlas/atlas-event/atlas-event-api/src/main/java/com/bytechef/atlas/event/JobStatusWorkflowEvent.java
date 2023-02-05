@@ -35,8 +35,8 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
     }
 
     public JobStatusWorkflowEvent(Long jobId, Job.Status status) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
-        Assert.notNull(status, "'status' must not be null.");
+        Assert.notNull(jobId, "'jobId' must not be null");
+        Assert.notNull(status, "'status' must not be null");
 
         this.jobId = jobId;
         this.status = status;
@@ -54,10 +54,10 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
     @Override
     public String toString() {
         return "JobStatusWorkflowEvent{" +
-            "jobId=" + jobId +
+            "type='" + type + '\'' +
+            ", jobId=" + jobId +
             ", status=" + status +
             ", createdDate=" + createdDate +
-            ", type='" + type + '\'' +
             "} ";
     }
 }

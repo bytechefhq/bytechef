@@ -43,7 +43,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection create(@NonNull Connection connection) {
-        Assert.notNull(connection, "'connection' must not be null.");
+        Assert.notNull(connection, "'connection' must not be null");
 
         return connectionRepository.save(connection);
     }
@@ -71,7 +71,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @SuppressFBWarnings("NP")
     public Connection update(@NonNull Connection connection) {
-        Assert.notNull(connection, "'connection' must not be null.");
+        Assert.notNull(connection, "'connection' must not be null");
 
         return connectionRepository
             .findById(connection.getId())

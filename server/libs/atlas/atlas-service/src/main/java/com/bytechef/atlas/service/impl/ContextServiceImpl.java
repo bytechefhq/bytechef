@@ -39,8 +39,8 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     public void push(long stackId, Context.Classname classname, Map<String, Object> value) {
-        Assert.notNull(classname, "'classname' must not be null.");
-        Assert.notNull(value, "'value' must not be null.");
+        Assert.notNull(classname, "'classname' must not be null");
+        Assert.notNull(value, "'value' must not be null");
 
         Context context = new Context(stackId, classname, value);
 
@@ -50,8 +50,8 @@ public class ContextServiceImpl implements ContextService {
     @Override
     public void push(
         long stackId, int subStackId, Context.Classname classname, @NonNull Map<String, Object> value) {
-        Assert.notNull(classname, "'classname' must not be null.");
-        Assert.notNull(value, "'value' must not be null.");
+        Assert.notNull(classname, "'classname' must not be null");
+        Assert.notNull(value, "'value' must not be null");
 
         Context context = new Context(stackId, subStackId, classname, value);
 

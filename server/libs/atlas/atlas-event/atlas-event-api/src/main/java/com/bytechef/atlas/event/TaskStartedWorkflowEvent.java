@@ -34,7 +34,7 @@ public class TaskStartedWorkflowEvent extends WorkflowEvent {
     }
 
     public TaskStartedWorkflowEvent(Long taskExecutionId) {
-        Assert.notNull(taskExecutionId, "'taskId' must not be null.");
+        Assert.notNull(taskExecutionId, "'taskId' must not be null");
 
         this.taskExecutionId = taskExecutionId;
         this.type = TASK_STARTED;
@@ -57,10 +57,10 @@ public class TaskStartedWorkflowEvent extends WorkflowEvent {
     @Override
     public String toString() {
         return "TaskStartedWorkflowEvent{" +
-            "jobId=" + jobId +
+            "type='" + type + '\'' +
+            ", jobId=" + jobId +
             ", taskExecutionId=" + taskExecutionId +
             ", createdDate=" + createdDate +
-            ", type='" + type + '\'' +
             "} ";
     }
 }

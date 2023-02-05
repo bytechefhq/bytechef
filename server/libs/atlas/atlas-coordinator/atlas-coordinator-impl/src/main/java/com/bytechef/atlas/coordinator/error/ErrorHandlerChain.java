@@ -39,7 +39,7 @@ public class ErrorHandlerChain implements ErrorHandler<Errorable> {
     private final List<? extends ErrorHandler<? super Errorable>> errorHandlers;
 
     public ErrorHandlerChain(List<? extends ErrorHandler<? super Errorable>> errorHandlers) {
-        Assert.notNull(errorHandlers, "'errorHandlers' must not be null.");
+        Assert.notNull(errorHandlers, "'errorHandlers' must not be null");
 
         this.errorHandlers = errorHandlers;
     }

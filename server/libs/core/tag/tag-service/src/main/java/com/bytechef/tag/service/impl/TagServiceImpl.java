@@ -62,7 +62,7 @@ public class TagServiceImpl implements TagService {
     public List<Tag> save(@NonNull List<Tag> tags) {
         List<Tag> resultTags = new ArrayList<>();
 
-        Assert.notNull(tags, "'tags' must not be null.");
+        Assert.notNull(tags, "'tags' must not be null");
 
         for (Tag tag : tags) {
             if (tag.isNew()) {
