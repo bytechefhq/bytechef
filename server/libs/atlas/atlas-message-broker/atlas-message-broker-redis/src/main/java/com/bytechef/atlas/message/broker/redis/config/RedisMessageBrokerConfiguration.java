@@ -17,23 +17,34 @@
 
 package com.bytechef.atlas.message.broker.redis.config;
 
+import com.bytechef.atlas.message.broker.Exchanges;
+import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
+import com.bytechef.atlas.message.broker.redis.listener.RedisListenerEndpointRegistrar;
 import com.bytechef.atlas.message.broker.redis.RedisMessageBroker;
+import com.bytechef.atlas.message.broker.redis.serializer.RedisMessageSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oblac.jrsmq.RedisSMQ;
+import com.oblac.jrsmq.RedisSMQConfig;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -49,32 +60,59 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private final List<MessageBrokerConfigurer> messageBrokerConfigurers;
+    private final RedisConnectionFactory redisConnectionFactory;
     private RedisListenerEndpointRegistrar redisListenerEndpointRegistrar;
-    private final RedisTemplate<String, RedisMessage> redisTemplate;
+    private RedisMessageListenerContainer redisMessageListenerContainer;
+    private final RedisMessageSerializer redisMessageSerializer;
+    private final RedisSMQ redisSMQ;
 
     @SuppressFBWarnings("EI2")
     public RedisMessageBrokerConfiguration(
         @Autowired(required = false) List<MessageBrokerConfigurer> messageBrokerConfigurers,
-        RedisTemplate<String, RedisMessage> redisTemplate) {
+        RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper,
+        RedisProperties redisProperties) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
             ? Collections.emptyList()
             : messageBrokerConfigurers;
-        this.redisTemplate = redisTemplate;
+        this.redisConnectionFactory = redisConnectionFactory;
+        this.redisMessageSerializer = new RedisMessageSerializer(objectMapper);
+        this.redisSMQ = new RedisSMQ(
+            RedisSMQConfig.createDefaultConfig()
+                .database(redisProperties.getDatabase())
+                .host(redisProperties.getHost())
+                .password(redisProperties.getPassword())
+                .port(redisProperties.getPort())
+                .ssl(redisProperties.isSsl())
+                .timeout(getTimeout(redisProperties.getTimeout())));
     }
 
     @Override
     public void afterSingletonsInstantiated() {
-        redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(executorService, redisTemplate);
+        redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
+            executorService, redisMessageSerializer, redisSMQ);
 
         for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(redisListenerEndpointRegistrar, this);
         }
+
+        redisMessageListenerContainer = new RedisMessageListenerContainer();
+
+        MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(redisListenerEndpointRegistrar);
+
+        messageListenerAdapter.afterPropertiesSet();
+
+        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, channelTopic());
+        redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
+
+        redisMessageListenerContainer.afterPropertiesSet();
+        redisMessageListenerContainer.start();
     }
 
     @Override
     public void destroy() throws InterruptedException {
         redisListenerEndpointRegistrar.stop();
+        redisMessageListenerContainer.stop();
 
         executorService.shutdownNow();
 
@@ -82,8 +120,18 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
     }
 
     @Bean
-    RedisMessageBroker redisMessageBroker(RedisTemplate<String, RedisMessage> redisTemplate) {
-        return new RedisMessageBroker(redisTemplate);
+    ChannelTopic channelTopic() {
+        return new ChannelTopic(Exchanges.CONTROL + "/" + Exchanges.CONTROL);
+    }
+
+    @Bean
+    RedisMessageBroker redisMessageBroker(StringRedisTemplate stringRedisTemplate) {
+        return new RedisMessageBroker(redisMessageSerializer, redisSMQ, stringRedisTemplate);
+    }
+
+    @Bean
+    StringRedisTemplate stringRedisTemplate() {
+        return new StringRedisTemplate(redisConnectionFactory);
     }
 
     @Override
@@ -91,27 +139,17 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
         RedisListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
 
-        listenerEndpointRegistrar.registerListenerEndpoint(queueName, concurrency, delegate, methodName);
+        Exchanges exchanges = Exchanges.TASKS;
+
+        if (Objects.equals(queueName, Queues.CONTROL)) {
+            exchanges = Exchanges.CONTROL;
+            queueName = Exchanges.CONTROL + "/" + Exchanges.CONTROL;
+        }
+
+        listenerEndpointRegistrar.registerListenerEndpoint(queueName, delegate, methodName, exchanges);
     }
 
-    @Configuration
-    static class RedisTemplateConfiguration {
-
-        private final ObjectMapper objectMapper;
-
-        RedisTemplateConfiguration(ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
-        }
-
-        @Bean
-        RedisTemplate<String, RedisMessage> redisMessageRedisTemplate(RedisConnectionFactory connectionFactory) {
-            RedisTemplate<String, RedisMessage> redisTemplate = new RedisTemplate<>();
-
-            redisTemplate.setConnectionFactory(connectionFactory);
-            redisTemplate.setKeySerializer(RedisSerializer.string());
-            redisTemplate.setValueSerializer(new RedisMessageRedisSerializer(objectMapper));
-
-            return redisTemplate;
-        }
+    private static int getTimeout(Duration timeout) {
+        return timeout == null ? 5000 : (int) timeout.toMillis();
     }
 }

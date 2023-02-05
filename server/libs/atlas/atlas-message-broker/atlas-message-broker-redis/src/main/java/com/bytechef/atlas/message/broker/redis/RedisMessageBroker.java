@@ -18,11 +18,13 @@
 package com.bytechef.atlas.message.broker.redis;
 
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.redis.config.RedisMessage;
+import com.bytechef.atlas.message.broker.redis.serializer.RedisMessageSerializer;
+import com.bytechef.atlas.task.ControlTask;
 import com.bytechef.atlas.task.Retryable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.oblac.jrsmq.RedisSMQ;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.Assert;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,24 +33,43 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisMessageBroker implements MessageBroker {
 
-    private final RedisTemplate<String, RedisMessage> redisTemplate;
+    private final RedisMessageSerializer redisMessageSerializer;
+    private final RedisSMQ redisSMQ;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @SuppressFBWarnings("EI2")
-    public RedisMessageBroker(RedisTemplate<String, RedisMessage> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+    public RedisMessageBroker(
+        RedisMessageSerializer redisMessageSerializer, RedisSMQ redisSMQ, StringRedisTemplate stringRedisTemplate) {
+
+        this.redisMessageSerializer = redisMessageSerializer;
+        this.redisSMQ = redisSMQ;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
-    public void send(String routingKey, Object message) {
-        ListOperations<String, RedisMessage> listOperations = redisTemplate.opsForList();
+    public void send(String queueName, Object message) {
+        Assert.notNull(queueName, "'queueName' must not be null");
 
         if (message instanceof Retryable retryable) {
             delay(retryable.getRetryDelayMillis());
-
-            listOperations.leftPush(routingKey, new RedisMessage(message));
-        } else {
-            listOperations.leftPush(routingKey, new RedisMessage(message));
         }
+
+        if (message instanceof ControlTask) {
+            sendMessageToTopic(queueName, message);
+        } else {
+            sendMessageToQueue(queueName, message);
+        }
+    }
+
+    private void sendMessageToQueue(String queueName, Object message) {
+        redisSMQ.sendMessage()
+            .qname(queueName)
+            .message(redisMessageSerializer.serialize(message))
+            .exec();
+    }
+
+    private void sendMessageToTopic(String queueName, Object message) {
+        stringRedisTemplate.convertAndSend(queueName, redisMessageSerializer.serialize(message));
     }
 
     private void delay(long value) {
