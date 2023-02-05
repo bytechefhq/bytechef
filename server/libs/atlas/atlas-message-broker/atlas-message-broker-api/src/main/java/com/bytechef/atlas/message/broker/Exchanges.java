@@ -22,8 +22,19 @@ package com.bytechef.atlas.message.broker;
 /**
  * @author Arik Cohen
  */
-public interface Exchanges {
+public enum Exchanges {
 
-    String TASKS = "workflow.tasks";
-    String CONTROL = "workflow.control";
+    CONTROL("workflow.control"),
+    TASKS("workflow.tasks");
+
+    Exchanges(String name) {
+        this.name = name;
+    }
+
+    private String name;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

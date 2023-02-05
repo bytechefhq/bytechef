@@ -57,6 +57,8 @@ import org.springframework.jms.support.converter.MessageType;
 public class JmsMessageBrokerConfiguration
     implements JmsListenerConfigurer, MessageBrokerListenerRegistrar<JmsListenerEndpointRegistrar> {
 
+    private static final Logger logger = LoggerFactory.getLogger(JmsMessageBrokerConfiguration.class);
+
     @Autowired
     private ConnectionFactory connectionFactory;
 
@@ -65,8 +67,6 @@ public class JmsMessageBrokerConfiguration
 
     @Autowired(required = false)
     private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void configureJmsListeners(JmsListenerEndpointRegistrar listenerEndpointRegistrar) {
@@ -128,10 +128,10 @@ public class JmsMessageBrokerConfiguration
         return new JmsMessageBroker(jmsTemplate);
     }
 
-    private DefaultJmsListenerContainerFactory createContainerFactory(int aConcurrency) {
+    private DefaultJmsListenerContainerFactory createContainerFactory(int concurrency) {
         DefaultJmsListenerContainerFactory jmsListenerContainerFactory = new DefaultJmsListenerContainerFactory();
 
-        jmsListenerContainerFactory.setConcurrency(String.valueOf(aConcurrency));
+        jmsListenerContainerFactory.setConcurrency(String.valueOf(concurrency));
         jmsListenerContainerFactory.setConnectionFactory(connectionFactory);
 
         return jmsListenerContainerFactory;
@@ -139,8 +139,8 @@ public class JmsMessageBrokerConfiguration
 
     private static class NoReplyMessageListenerAdapter extends MessageListenerAdapter {
 
-        public NoReplyMessageListenerAdapter(Object aDelegate) {
-            super(aDelegate);
+        public NoReplyMessageListenerAdapter(Object delegate) {
+            super(delegate);
         }
 
         @Override

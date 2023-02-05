@@ -26,7 +26,10 @@ import java.util.StringTokenizer;
 /**
  * @author Ivica Cardic
  */
-public class ExceptionUtils {
+public final class ExceptionUtils {
+
+    private ExceptionUtils() {
+    }
 
     public static String[] getStackFrames(final Throwable throwable) {
         if (throwable == null) {
@@ -37,22 +40,23 @@ public class ExceptionUtils {
     }
 
     public static String getStackTrace(final Throwable throwable) {
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw, true);
+        final StringWriter stringWriter = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(stringWriter, true);
 
-        throwable.printStackTrace(pw);
+        throwable.printStackTrace(printWriter);
 
-        return sw.getBuffer()
-            .toString();
+        StringBuffer stringBuffer = stringWriter.getBuffer();
+
+        return stringBuffer.toString();
     }
 
     private static String[] getStackFrames(final String stackTrace) {
         final String linebreak = System.lineSeparator();
-        final StringTokenizer frames = new StringTokenizer(stackTrace, linebreak);
+        final StringTokenizer stringTokenizer = new StringTokenizer(stackTrace, linebreak);
         final List<String> list = new ArrayList<>();
 
-        while (frames.hasMoreTokens()) {
-            list.add(frames.nextToken());
+        while (stringTokenizer.hasMoreTokens()) {
+            list.add(stringTokenizer.nextToken());
         }
 
         return list.toArray(new String[0]);

@@ -67,8 +67,8 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
         EmbeddedRedis embeddedRedis = AnnotatedElementUtils.findMergedAnnotation(testClass, EmbeddedRedis.class);
 
         if (null != embeddedRedis) {
-            logger.debug("Detected the EmbeddedRedis annotation on class {}.", testClass.getName());
-            logger.info("Warming up the Redis instance.");
+            logger.debug("Detected the EmbeddedRedis annotation on class {}", testClass.getName());
+            logger.info("Warming up the Redis instance");
 
             if (null == redisTestContainer) {
                 Class<RedisTestContainer> containerClass = RedisTestContainer.class;
@@ -92,8 +92,8 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
         EmbeddedSql embeddedSql = AnnotatedElementUtils.findMergedAnnotation(testClass, EmbeddedSql.class);
 
         if (null != embeddedSql) {
-            logger.debug("Detected the EmbeddedSql annotation on class {}.", testClass.getName());
-            logger.info("Warming up the PostgreSql database.");
+            logger.debug("Detected the EmbeddedSql annotation on class {}", testClass.getName());
+            logger.info("Warming up the PostgreSql database");
 
             if (null == postgreSqlTestContainer) {
                 Class<PostgreSqlTestContainer> containerClass = PostgreSqlTestContainer.class;

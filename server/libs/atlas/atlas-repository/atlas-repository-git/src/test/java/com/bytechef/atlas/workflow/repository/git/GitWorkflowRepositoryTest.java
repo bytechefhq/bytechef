@@ -60,7 +60,7 @@ public class GitWorkflowRepositoryTest {
         }
 
         @Override
-        public WorkflowResource getFile(String aFileId) {
+        public WorkflowResource getFile(String fileId) {
             return new WorkflowResource(
                 "hello/123", resolver.getResource("file:workflow/hello.yaml"), Workflow.Format.YAML);
         }

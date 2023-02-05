@@ -37,24 +37,31 @@ public class SyncMessageBroker implements MessageBroker {
     private final Map<String, List<Receiver>> listeners = new HashMap<>();
 
     @Override
-    public void send(String routingKey, Object message) {
-        List<Receiver> list = listeners.get(routingKey);
-        Assert.isTrue(list != null && list.size() > 0, "no listeners subscribed for: " + routingKey);
-        for (Receiver receiver : list) {
+    public void send(String queueName, Object message) {
+        Assert.notNull(queueName, "'queueName' must not be null");
+
+        List<Receiver> receivers = listeners.get(queueName);
+
+        Assert.isTrue(receivers != null && receivers.size() > 0, "no listeners subscribed for: " + queueName);
+
+        for (Receiver receiver : receivers) {
             receiver.receive(message);
         }
     }
 
-    public void receive(String aRoutingKey, Receiver aReceiver) {
-        List<Receiver> list = listeners.get(aRoutingKey);
-        if (list == null) {
-            list = new ArrayList<>();
-            listeners.put(aRoutingKey, list);
+    public void receive(String queueName, Receiver receiver) {
+        List<Receiver> receivers = listeners.get(queueName);
+
+        if (receivers == null) {
+            receivers = new ArrayList<>();
+
+            listeners.put(queueName, receivers);
         }
-        list.add(aReceiver);
+
+        receivers.add(receiver);
     }
 
     public interface Receiver {
-        void receive(Object aMessage);
+        void receive(Object message);
     }
 }

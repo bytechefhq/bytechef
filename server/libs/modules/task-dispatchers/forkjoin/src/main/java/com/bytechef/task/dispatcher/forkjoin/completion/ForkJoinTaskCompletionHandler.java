@@ -63,12 +63,10 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskEvaluator taskEvaluator;
 
     public ForkJoinTaskCompletionHandler(
-        TaskExecutionService taskExecutionService,
-        TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService,
-        TaskDispatcher<? super Task> taskDispatcher,
-        ContextService contextService,
+        TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService, TaskDispatcher<? super Task> taskDispatcher, ContextService contextService,
         TaskEvaluator taskEvaluator) {
+
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
