@@ -96,7 +96,7 @@ public class KafkaMessageBrokerConfiguration
         String methodName) {
 
         if (Objects.equals(queueName, Queues.CONTROL)) {
-            queueName = Exchanges.CONTROL;
+            queueName = Exchanges.CONTROL + "/" + Exchanges.CONTROL;
         }
 
         Class<?> delegateClass = delegate.getClass();
