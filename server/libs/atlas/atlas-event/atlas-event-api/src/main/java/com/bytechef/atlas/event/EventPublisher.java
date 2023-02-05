@@ -24,10 +24,11 @@ package com.bytechef.atlas.event;
  * @since Jun 4, 2017
  */
 public interface EventPublisher {
+
     /**
      * Notify all <strong>matching</strong> listeners registered with this application of an application event.
      *
-     * @param event the event to publish
+     * @param workflowEvent the event to publish
      */
-    void publishEvent(WorkflowEvent event);
+    void publishEvent(WorkflowEvent workflowEvent);
 }
