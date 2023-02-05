@@ -92,7 +92,7 @@ public final class Context implements Persistable<Long> {
     }
 
     public Context(Map<String, Object> value) {
-        Assert.notNull(value, "'value' must not be null.");
+        Assert.notNull(value, "'value' must not be null");
 
         this.value = new MapWrapper(value);
     }
@@ -110,8 +110,8 @@ public final class Context implements Persistable<Long> {
     }
 
     public Context(long stackId, Integer subStackId, Classname classname, Map<String, Object> value) {
-        Assert.notNull(classname, "'classname' must not be null.");
-        Assert.notNull(value, "'value' must not be null.");
+        Assert.notNull(classname, "'classname' must not be null");
+        Assert.notNull(value, "'value' must not be null");
 
         this.stackId = stackId;
         this.subStackId = subStackId;

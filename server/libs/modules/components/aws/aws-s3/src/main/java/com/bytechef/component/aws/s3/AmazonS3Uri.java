@@ -333,7 +333,7 @@ public class AmazonS3Uri {
      */
     private static void appendDecoded(final StringBuilder builder, final String str, final int index) {
         if (index > str.length() - 3) {
-            throw new IllegalStateException("Invalid percent-encoded string:" + "\"" + str + "\".");
+            throw new IllegalStateException("Invalid percent-encoded string:" + "\"" + str + "\"");
         }
 
         char first = str.charAt(index + 1);
@@ -352,7 +352,7 @@ public class AmazonS3Uri {
     private static int fromHex(final char c) {
         if (c < '0') {
             throw new IllegalStateException(
-                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
         }
         if (c <= '9') {
             return (c - '0');
@@ -360,7 +360,7 @@ public class AmazonS3Uri {
 
         if (c < 'A') {
             throw new IllegalStateException(
-                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
         }
         if (c <= 'F') {
             return (c - 'A') + 10;
@@ -368,14 +368,14 @@ public class AmazonS3Uri {
 
         if (c < 'a') {
             throw new IllegalStateException(
-                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
         }
         if (c <= 'f') {
             return (c - 'a') + 10;
         }
 
         throw new IllegalStateException(
-            "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+            "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
     }
 
     @Override

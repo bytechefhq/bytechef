@@ -84,26 +84,27 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null.");
+        Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
         if (!StringUtils.hasText(taskExecution.getName())) {
-            log.debug("Task {}: '{}' completed.", taskExecution.getId(), taskExecution.getType());
+            log.debug("Task id={}, type='{}' completed", taskExecution.getId(), taskExecution.getType());
         } else {
             log.debug(
-                "Task {}: '{}/{}' completed.", taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
+                "Task id={}, type='{}', name='{}' completed", taskExecution.getId(), taskExecution.getType(),
+                taskExecution.getName());
         }
 
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
         if (job == null) {
-            log.error("Unknown job: {}.", taskExecution.getJobId());
+            log.error("Unknown job id={}", taskExecution.getJobId());
         } else {
             taskExecution.setStatus(TaskStatus.COMPLETED);
 
             taskExecution = taskExecutionService.update(taskExecution);
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-                Assert.notNull(job.getId(), "'job.id' must not be null.");
+                Assert.notNull(job.getId(), "'job.id' must not be null");
 
                 Map<String, Object> newContext = new HashMap<>(contextService.peek(job.getId(), Context.Classname.JOB));
 
@@ -126,7 +127,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("NP")
     private void complete(Job job) {
-        Assert.notNull(job.getId(), "'job.id' must not be null.");
+        Assert.notNull(job.getId(), "'job.id' must not be null");
 
         Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
@@ -152,7 +153,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        log.debug("Job '{}: {}' completed.", job.getId(), job.getLabel());
+        log.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
     }
 
     private boolean hasMoreTasks(Job job) {

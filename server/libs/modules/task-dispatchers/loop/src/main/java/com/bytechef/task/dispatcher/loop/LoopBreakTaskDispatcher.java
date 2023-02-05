@@ -58,7 +58,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     }
 
     private TaskExecution findLoopTaskExecution(Long taskExecutionId) {
-        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null.");
+        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null");
 
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
@@ -67,7 +67,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
             return taskExecution;
         } else {
             if (taskExecution.getParentId() == null) {
-                throw new IllegalStateException("Loop must be specified.");
+                throw new IllegalStateException("Loop must be specified");
             }
 
             return findLoopTaskExecution(taskExecution.getParentId());

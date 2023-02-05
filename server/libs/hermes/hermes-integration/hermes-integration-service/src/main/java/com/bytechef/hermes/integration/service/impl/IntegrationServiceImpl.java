@@ -52,7 +52,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration create(Integration integration) {
-        Assert.notNull(integration, "'integration' must not be null.");
+        Assert.notNull(integration, "'integration' must not be null");
 
         return integrationRepository.save(integration);
     }
@@ -79,7 +79,7 @@ public class IntegrationServiceImpl implements IntegrationService {
         } else if (categoryId == null) {
             integrationIterable = integrationRepository.findByTagRef(AggregateReference.to(tagId));
         } else {
-            throw new IllegalArgumentException("categoryId and tagId are null.");
+            throw new IllegalArgumentException("categoryId and tagId are null");
         }
 
         return StreamSupport.stream(integrationIterable.spliterator(), false)
@@ -97,8 +97,8 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration update(Integration integration) {
-        Assert.notNull(integration, "'integration' must not be null.");
-        Assert.notEmpty(integration.getWorkflowIds(), "'workflowIds' must not be empty.");
+        Assert.notNull(integration, "'integration' must not be null");
+        Assert.notEmpty(integration.getWorkflowIds(), "'workflowIds' must not be empty");
 
         return integrationRepository.save(integration);
     }

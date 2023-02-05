@@ -87,11 +87,11 @@ public class RandomHelperComponentHandler implements ComponentHandler {
 
     private float nextFloat(final float startInclusive, final float endExclusive) {
         if (endExclusive < startInclusive) {
-            throw new IllegalArgumentException("Start value must be smaller or equal to end value.");
+            throw new IllegalArgumentException("Start value must be smaller or equal to end value");
         }
 
         if (startInclusive < 0) {
-            throw new IllegalArgumentException("Both range values must be non-negative.");
+            throw new IllegalArgumentException("Both range values must be non-negative");
         }
 
         if (startInclusive == endExclusive) {
@@ -103,11 +103,11 @@ public class RandomHelperComponentHandler implements ComponentHandler {
 
     private int nextInt(final int startInclusive, final int endExclusive) {
         if (endExclusive < startInclusive) {
-            throw new IllegalArgumentException("Start value must be smaller or equal to end value.");
+            throw new IllegalArgumentException("Start value must be smaller or equal to end value");
         }
 
         if (startInclusive < 0) {
-            throw new IllegalArgumentException("Both range values must be non-negative.");
+            throw new IllegalArgumentException("Both range values must be non-negative");
         }
 
         if (startInclusive == endExclusive) {
