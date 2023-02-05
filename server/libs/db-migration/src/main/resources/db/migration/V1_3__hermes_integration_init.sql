@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS category (
     version                  BIGINT       NOT NULL
 );
 
+ALTER TABLE category ADD CONSTRAINT uk_category_name UNIQUE (name);
+
 CREATE TABLE IF NOT EXISTS integration (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     name                     VARCHAR(256) NOT NULL,
@@ -20,6 +22,8 @@ CREATE TABLE IF NOT EXISTS integration (
     last_modified_by         TEXT         NOT NULL,
     version                  BIGINT       NOT NULL
 );
+
+ALTER TABLE integration ADD CONSTRAINT uk_integration_name UNIQUE (name);
 
 CREATE TABLE IF NOT EXISTS integration_tag (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
@@ -37,5 +41,3 @@ ALTER TABLE integration ADD CONSTRAINT fk_integration_category FOREIGN KEY (cate
 ALTER TABLE integration_tag ADD CONSTRAINT fk_integration_tag_integration FOREIGN KEY (integration_id) REFERENCES integration (id);
 ALTER TABLE integration_tag ADD CONSTRAINT fk_integration_tag_tag FOREIGN KEY (tag_id) REFERENCES tag (id);
 ALTER TABLE integration_workflow ADD CONSTRAINT fk_integration_workflow_integration FOREIGN KEY (integration_id) REFERENCES integration (id);
-
-ALTER TABLE category ADD CONSTRAINT uk_category_name UNIQUE (name);
