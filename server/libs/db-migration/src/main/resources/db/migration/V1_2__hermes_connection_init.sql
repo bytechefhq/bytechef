@@ -11,3 +11,5 @@ CREATE TABLE IF NOT EXISTS connection (
     last_modified_by         VARCHAR(256) NOT NULL,
     version                  BIGINT       NOT NULL
 );
+
+ALTER TABLE connection ADD CONSTRAINT uk_connection_name UNIQUE (name);
