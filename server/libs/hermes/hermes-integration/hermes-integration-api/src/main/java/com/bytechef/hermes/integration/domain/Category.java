@@ -139,13 +139,13 @@ public class Category implements Persistable<Long> {
     @Override
     public String toString() {
         return "Category{" +
-            "createdBy='" + createdBy + '\'' +
-            ", createdDate=" + createdDate +
-            ", id=" + id +
-            ", lastModifiedBy='" + lastModifiedBy + '\'' +
-            ", lastModifiedDate=" + lastModifiedDate +
+            "id=" + id +
             ", name='" + name + '\'' +
             ", version=" + version +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
             '}';
     }
 }

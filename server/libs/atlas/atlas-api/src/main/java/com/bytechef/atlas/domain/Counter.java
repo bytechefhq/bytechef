@@ -113,11 +113,11 @@ public final class Counter implements Persistable<Long> {
 
     @Override
     public String toString() {
-        return "Counter{" + "createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", id='"
-            + id + '\'' + ", isNew="
+        return "Counter{" + "id="
+            + id + ", isNew="
             + isNew + ", value="
-            + value + '}';
+            + value + ", createdBy='"
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + '}';
     }
 }
