@@ -31,6 +31,7 @@ import com.bytechef.hermes.component.task.handler.RestComponentTaskHandler;
 import com.bytechef.hermes.component.utils.HttpClientUtils.HttpResponseEntry;
 import com.bytechef.hermes.connection.ConnectionConstants;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -97,19 +98,24 @@ public class RestComponentTaskHandlerIntTest {
     };
 
     @Autowired
+    private ConnectionRepository connectionRepository;
+
+    @Autowired
     private ConnectionService connectionService;
 
     private Connection connection;
 
     @BeforeEach
     public void beforeEach() {
+        connectionRepository.deleteAll();
+
         connection = new Connection();
 
         connection.setComponentName("petshop");
         connection.setName("PetShop Connection");
         connection.setParameters(Map.of());
 
-        connection = connectionService.create(connection);
+        connection = connectionRepository.save(connection);
     }
 
     @Test
