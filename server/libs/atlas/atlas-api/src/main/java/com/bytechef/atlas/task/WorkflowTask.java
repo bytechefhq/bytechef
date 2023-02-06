@@ -20,6 +20,7 @@
 package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.commons.utils.CollectionUtils;
 import com.bytechef.commons.utils.MapUtils;
 import java.io.Serializable;
 import java.util.Collections;
@@ -52,22 +53,11 @@ public class WorkflowTask implements Serializable {
 
     public static final WorkflowTask EMPTY_WORKFLOW_TASK = new WorkflowTask();
 
-    private static final List<String> STATIC_FIELDS = List.of(
-        WorkflowConstants.FINALIZE,
-        WorkflowConstants.LABEL,
-        WorkflowConstants.NAME,
-        WorkflowConstants.NODE,
-        WorkflowConstants.POST,
-        WorkflowConstants.PRE,
-        WorkflowConstants.TASK_NUMBER,
-        WorkflowConstants.TIMEOUT,
-        WorkflowConstants.TYPE);
-
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
     private String name;
     private String node;
-    private Map<String, Object> parameters = new HashMap<>();
+    private Map<String, Object> parameters = Collections.emptyMap();
     private List<WorkflowTask> post = Collections.emptyList();
     private List<WorkflowTask> pre = Collections.emptyList();
     private String timeout;
@@ -77,23 +67,25 @@ public class WorkflowTask implements Serializable {
     }
 
     public WorkflowTask(Map<String, Object> source) {
-        Assert.notNull(source, "'source' must not be null.");
+        Assert.notNull(source, "'source' must not be null");
 
         putAll(source);
     }
 
     public void put(String key, Object value) {
-        Assert.notNull(key, "'key' must not b null.");
+        Assert.notNull(key, "'key' must not b null");
 
-        putAll(Collections.singletonMap(key, value));
+        putAll(Map.of(WorkflowConstants.PARAMETERS, Map.of(key, value)));
     }
 
     public void putAll(Map<String, Object> source) {
         if (source.containsKey(WorkflowConstants.FINALIZE)) {
-            this.finalize = MapUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList())
-                .stream()
-                .map(WorkflowTask::new)
-                .toList();
+            this.finalize = CollectionUtils.concat(
+                finalize,
+                CollectionUtils.map(
+                    MapUtils.getList(
+                        source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList()),
+                    WorkflowTask::new));
         }
 
         if (source.containsKey(WorkflowConstants.LABEL)) {
@@ -108,18 +100,28 @@ public class WorkflowTask implements Serializable {
             this.node = MapUtils.getString(source, WorkflowConstants.NODE);
         }
 
+        if (source.containsKey(WorkflowConstants.PARAMETERS)) {
+            this.parameters = CollectionUtils.concat(
+                parameters,
+                MapUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap()));
+        }
+
         if (source.containsKey(WorkflowConstants.POST)) {
-            this.post = MapUtils.getList(source, WorkflowConstants.POST, Map.class, Collections.emptyList())
-                .stream()
-                .map(WorkflowTask::new)
-                .toList();
+            this.post = CollectionUtils.concat(
+                post,
+                CollectionUtils.map(
+                    MapUtils.getList(
+                        source, WorkflowConstants.POST, Map.class, Collections.emptyList()),
+                    WorkflowTask::new));
         }
 
         if (source.containsKey(WorkflowConstants.PRE)) {
-            this.pre = MapUtils.getList(source, WorkflowConstants.PRE, Map.class, Collections.emptyList())
-                .stream()
-                .map(WorkflowTask::new)
-                .toList();
+            this.pre = CollectionUtils.concat(
+                pre,
+                CollectionUtils.map(
+                    MapUtils.getList(
+                        source, WorkflowConstants.PRE, Map.class, Collections.emptyList()),
+                    WorkflowTask::new));
         }
 
         if (source.containsKey(WorkflowConstants.TIMEOUT)) {
@@ -129,12 +131,6 @@ public class WorkflowTask implements Serializable {
         if (source.containsKey(WorkflowConstants.TYPE)) {
             this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
         }
-
-        for (Map.Entry<String, Object> entry : source.entrySet()) {
-            if (!STATIC_FIELDS.contains(entry.getKey())) {
-                parameters.put(entry.getKey(), entry.getValue());
-            }
-        }
     }
 
     /**
@@ -143,9 +139,13 @@ public class WorkflowTask implements Serializable {
      * @return The new {@link WorkflowTask}.
      */
     public static WorkflowTask of(String key, Object value) {
-        Assert.notNull(key, "'key' must not be null.");
+        Assert.notNull(key, "'key' must not be null");
 
-        return new WorkflowTask(Collections.singletonMap(key, value));
+        if (WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS.contains(key)) {
+            return new WorkflowTask(Map.of(key, value));
+        } else {
+            return new WorkflowTask(Map.of(WorkflowConstants.PARAMETERS, Collections.singletonMap(key, value)));
+        }
     }
 
     @Override
@@ -258,7 +258,7 @@ public class WorkflowTask implements Serializable {
     }
 
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>(parameters);
+        Map<String, Object> map = new HashMap<>();
 
         map.put(
             WorkflowConstants.FINALIZE,
@@ -277,6 +277,8 @@ public class WorkflowTask implements Serializable {
         if (node != null) {
             map.put(WorkflowConstants.NODE, node);
         }
+
+        map.put(WorkflowConstants.PARAMETERS, parameters);
 
         map.put(WorkflowConstants.POST, post.stream()
             .map(WorkflowTask::toMap)

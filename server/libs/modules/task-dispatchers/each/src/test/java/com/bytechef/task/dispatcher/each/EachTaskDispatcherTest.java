@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
@@ -74,7 +75,9 @@ public class EachTaskDispatcherTest {
             TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(
             new WorkflowTask(
-                Map.of("list", Arrays.asList(1, 2, 3), "iteratee", Collections.singletonMap("type", "print"))));
+                Map.of(
+                    WorkflowConstants.PARAMETERS,
+                    Map.of("list", Arrays.asList(1, 2, 3), "iteratee", Collections.singletonMap("type", "print")))));
 
         taskExecution.setId(1L);
         taskExecution.setJobId(1L);
@@ -93,7 +96,11 @@ public class EachTaskDispatcherTest {
             taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
             TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(
-            1L, new WorkflowTask(Map.of("list", List.of(), "iteratee", Collections.singletonMap("type", "print"))));
+            1L,
+            new WorkflowTask(
+                Map.of(
+                    WorkflowConstants.PARAMETERS,
+                    Map.of("list", List.of(), "iteratee", Collections.singletonMap("type", "print")))));
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
 

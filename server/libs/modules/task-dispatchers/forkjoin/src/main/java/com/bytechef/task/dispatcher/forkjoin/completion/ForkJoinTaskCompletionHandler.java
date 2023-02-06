@@ -30,9 +30,11 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.CollectionUtils;
 import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -87,6 +89,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
+        Assert.notNull(taskExecution.getParentId(), "'taskExecution.parentId' must not be null");
+
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
@@ -104,10 +108,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> curList
-                .stream()
-                .map(WorkflowTask::new)
-                .toList())
+            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
             .toList();
 
         List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
@@ -120,6 +121,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             branchWorkflowTask.put(BRANCH, branch);
 
+            Assert.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
+
             TaskExecution branchTaskExecution = TaskExecution.of(
                 taskExecution.getJobId(), taskExecution.getParentId(), taskExecution.getPriority(),
                 taskExecution.getTaskNumber() + 1, branchWorkflowTask);
@@ -130,6 +133,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             branchTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
+
+            Assert.notNull(branchTaskExecution.getId(), "'branchTaskExecution.id' must not be null");
 
             contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 

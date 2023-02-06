@@ -52,8 +52,9 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.bytechef.commons.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,13 +140,10 @@ public class WorkflowExecutor {
 
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
-        taskHandlerResolverChain.setTaskHandlerResolvers(List.of(new DefaultTaskHandlerResolver(
-            Stream.concat(getTaskHandlerMapSupplier.get()
-                .entrySet()
-                .stream(),
-                taskHandlerMap.entrySet()
-                    .stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))));
+        taskHandlerResolverChain.setTaskHandlerResolvers(
+            List.of(
+                new DefaultTaskHandlerResolver(
+                    CollectionUtils.concat(getTaskHandlerMapSupplier.get(), taskHandlerMap))));
 
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
 
@@ -162,14 +160,13 @@ public class WorkflowExecutor {
 
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
-        taskDispatcherChain.setTaskDispatcherResolvers(Stream.concat(
-            getTaskDispatcherResolversFunction
-                .apply(
-                    contextService, counterService, coordinatorMessageBroker, taskDispatcherChain, taskEvaluator,
-                    taskExecutionService)
-                .stream(),
-            Stream.of(new DefaultTaskDispatcher(coordinatorMessageBroker, List.of())))
-            .toList());
+        taskDispatcherChain.setTaskDispatcherResolvers(
+            CollectionUtils.concat(
+                getTaskDispatcherResolversFunction
+                    .apply(
+                        contextService, counterService, coordinatorMessageBroker, taskDispatcherChain, taskEvaluator,
+                        taskExecutionService),
+                Stream.of(new DefaultTaskDispatcher(coordinatorMessageBroker, List.of()))));
 
         JobExecutor jobExecutor = new JobExecutor(
             contextService, taskDispatcherChain, taskExecutionService, taskEvaluator, workflowService);
@@ -179,14 +176,13 @@ public class WorkflowExecutor {
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
-        taskCompletionHandlerChain.setTaskCompletionHandlers(Stream.concat(
-            getTaskCompletionHandlersFunction
-                .apply(
-                    counterService, taskCompletionHandlerChain, taskDispatcherChain, taskEvaluator,
-                    taskExecutionService)
-                .stream(),
-            Stream.of(defaultTaskCompletionHandler))
-            .toList());
+        taskCompletionHandlerChain.setTaskCompletionHandlers(
+            CollectionUtils.concat(
+                getTaskCompletionHandlersFunction
+                    .apply(
+                        counterService, taskCompletionHandlerChain, taskDispatcherChain, taskEvaluator,
+                        taskExecutionService),
+                Stream.of(defaultTaskCompletionHandler)));
 
         JobFacade jobFacade = new JobFacadeImpl(contextService, eventPublisher, jobService, messageBroker);
 

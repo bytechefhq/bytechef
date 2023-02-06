@@ -19,6 +19,8 @@
 
 package com.bytechef.atlas.constants;
 
+import java.util.List;
+
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
@@ -26,90 +28,43 @@ package com.bytechef.atlas.constants;
  */
 public class WorkflowConstants {
 
-    public static final String ID = "id";
-
-    public static final String PARENT_ID = "parentId";
-
-    public static final String JOB_ID = "jobId";
-
     public static final String DESCRIPTION = "description";
-
+    public static final String EVENT = "event";
+    public static final String FINALIZE = "finalize";
+    public static final String ID = "id";
+    public static final String INPUTS = "inputs";
     public static final String LABEL = "label";
-
-    public static final String NODE = "node";
-
-    public static final String TYPE = "type";
-
     public static final String NAME = "name";
-
+    public static final String NODE = "node";
+    public static final String OUTPUTS = "outputs";
+    public static final String PARAMETERS = "parameters";
+    public static final String POST = "post";
+    public static final String PRE = "pre";
     public static final String RETRY = "retry";
-
-    public static final String RETRY_ATTEMPTS = "retryAttempts";
-
-    public static final String EXECUTION_TIME = "executionTime";
-
-    public static final String CREATE_TIME = "createTime";
-
+    public static final String REQUIRED = "required";
+    public static final String TASK_NUMBER = "taskNumber";
+    public static final String TASKS = "tasks";
+    public static final String TIMEOUT = "timeout";
+    public static final String TYPE = "type";
+    public static final String URL = "url";
+    public static final String VALUE = "value";
     public static final String WORKFLOW_ID = "workflowId";
 
-    public static final String START_TIME = "startTime";
-
-    public static final String TASK_NUMBER = "taskNumber";
-
-    public static final String TIMEOUT = "timeout";
-
-    public static final String END_TIME = "endTime";
-
-    public static final String STATUS = "status";
-
-    public static final String OUTPUT = "output";
-
-    public static final String ERROR = "error";
-
-    public static final String TASKS = "tasks";
-
-    public static final String INPUTS = "inputs";
-
-    public static final String EXECUTIONS = "executions";
-
-    public static final String PRIORITY = "priority";
-
-    public static final String CURRENT_TASK = "currentTask";
-
-    public static final String PARENT_TASK_EXECUTION_ID = "parentTaskExecutionId";
-
-    public static final String URL = "url";
-
-    public static final String REQUIRED = "required";
-
-    public static final String EVENT = "event";
-
-    public static final String OUTPUTS = "outputs";
-
-    public static final String VALUE = "value";
-
-    public static final String PRE = "pre";
-
-    public static final String POST = "post";
-
-    public static final String FINALIZE = "finalize";
-
-    public static final String[] RESERVED_WORDS = new String[] {
-        ID,
-        PARENT_ID,
-        JOB_ID,
-        RETRY_ATTEMPTS,
-        EXECUTION_TIME,
-        CREATE_TIME,
-        START_TIME,
-        TASK_NUMBER,
-        END_TIME,
-        STATUS,
-        ERROR,
-        EXECUTIONS,
-        PRIORITY,
-        CURRENT_TASK,
-        PARENT_TASK_EXECUTION_ID,
-        OUTPUT,
-    };
+    public static final List<String> WORKFLOW_DEFINITION_CONSTANTS = List.of(
+        DESCRIPTION,
+        FINALIZE,
+        INPUTS,
+        LABEL,
+        NAME,
+        NODE,
+        OUTPUTS,
+        PARAMETERS,
+        POST,
+        PRE,
+        RETRY,
+        REQUIRED,
+        TASKS,
+        TIMEOUT,
+        TYPE,
+        VALUE);
 }
