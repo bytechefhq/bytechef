@@ -11,33 +11,39 @@ inputs:
 
 tasks:
   - type: if/v1
-    conditions:
-      - dateTime:
-          value1: ${value1}
-          operation: AFTER
-          value2: ${value2}
-    combineOperation: ANY
-    caseTrue:
-      - name: afterResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: afterResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - dateTime:
+            value1: ${value1}
+            operation: AFTER
+            value2: ${value2}
+      combineOperation: ANY
+      caseTrue:
+        - name: afterResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: afterResult
+          type: var
+          parameters:
+            value: "false branch"
 
   - type: if/v1
-    conditions:
-      - dateTime:
-          value1: ${value1}
-          operation: BEFORE
-          value2: ${value2}
-    combineOperation: ANY
-    caseTrue:
-      - name: beforeResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: beforeResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - dateTime:
+            value1: ${value1}
+            operation: BEFORE
+            value2: ${value2}
+      combineOperation: ANY
+      caseTrue:
+        - name: beforeResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: beforeResult
+          type: var
+          parameters:
+            value: "false branch"

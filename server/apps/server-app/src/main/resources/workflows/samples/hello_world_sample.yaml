@@ -10,4 +10,5 @@ tasks:
   - type: logger/v1/info
     name: printPractitionerName
     label: Print practitioner name in platform log
-    text: "Hello ${practitionerName}!"
+    parameters:
+      text: "Hello ${practitionerName}!"

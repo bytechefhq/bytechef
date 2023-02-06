@@ -11,13 +11,16 @@ inputs:
 
 tasks:
   - type: if/v1
-    rawExpression: true
-    expression: ${value1 == value2 or value1 gt value2}
-    caseTrue:
-      - name: equalsResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: equalsResult
-        type: var
-        value: "false branch"
+    parameters:
+      rawExpression: true
+      expression: ${value1 == value2 or value1 gt value2}
+      caseTrue:
+        - name: equalsResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: equalsResult
+          type: var
+          parameters:
+            value: "false branch"

@@ -14,56 +14,64 @@ tasks:
     endInclusive: 5000
   - name: script1
     type: script/v1/javascript
-    input:
-      randomNum : ${randomNumber}
-      randomInput: ${yourName}
-    script: >
-      function perform(input) {
-        print('My random number ' + input.randomNum);
-        print('My random input ' + input.randomInput);
-        print('My random input x ' + input.randomInputX);
+    parameters:
+      input:
+        randomNum : ${randomNumber}
+        randomInput: ${yourName}
+      script: >
+        function perform(input) {
+          print('My random number ' + input.randomNum);
+          print('My random input ' + input.randomInput);
+          print('My random input x ' + input.randomInputX);
 
-        return 2 * input.randomNum;
-      }
+          return 2 * input.randomNum;
+        }
   - label: Print result from the JavaScript script
     type: logger/v1/info
-    text: 'Result from script1: ${script1}'
+    parameters:
+      text: 'Result from script1: ${script1}'
   - name: script2
     type: script/v1/python
-    input:
-      randomNum : ${randomNumber}
-      randomInput: ${yourName}
-    script: >
-      def perform(input):
-        print('My random number ' + str(input.randomNum))
-        print('My random input ' + input.randomInput)
-        print('My random input x ' + ('undefined' if hasattr(input, 'randomInputX') == False else input.randomInputX))
+    parameters:
+      input:
+        randomNum : ${randomNumber}
+        randomInput: ${yourName}
+      script: >
+        def perform(input):
+          print('My random number ' + str(input.randomNum))
+          print('My random input ' + input.randomInput)
+          print('My random input x ' + ('undefined' if hasattr(input, 'randomInputX') == False else input.randomInputX))
 
-        return 2 * input.randomNum
+          return 2 * input.randomNum
   - label: Print result from the Python script
     type: logger/v1/info
-    text: 'Result from script2: ${script2}'
+    parameters:
+      text: 'Result from script2: ${script2}'
   - name: script3
     type: script/v1/r
-    input:
-      randomNum: ${randomNumber}
-      randomInput: ${yourName}
-    script: >
-      perform <- function(input) {
-        return (2 * input$randomNum)
-      }
+    parameters:
+      input:
+        randomNum: ${randomNumber}
+        randomInput: ${yourName}
+      script: >
+        perform <- function(input) {
+          return (2 * input$randomNum)
+        }
   - label: Print result from the R script
     type: logger/v1/info
-    text: 'Result from script3: ${script3}'
+    parameters:
+      text: 'Result from script3: ${script3}'
   - name: script4
     type: script/v1/ruby
-    input:
-      randomNum : ${randomNumber}
-      randomInput: ${yourName}
-    script: >
-      def perform(input)
-        return 2 * input.randomNum;
-      end
+    parameters:
+      input:
+        randomNum : ${randomNumber}
+        randomInput: ${yourName}
+      script: >
+        def perform(input)
+          return 2 * input.randomNum;
+        end
   - label: Print result from the Ruby script
     type: logger/v1/info
-    text: 'Result from script4: ${script4}'
+    parameters:
+      text: 'Result from script4: ${script4}'

@@ -13,8 +13,10 @@ inputs:
 tasks:
   - label: Print a greeting
     type: io/print
-    text: Hello ${yourName}
+    parameters:
+      text: Hello ${yourName}
 
   - label: Print a farewell
     type: io/print
-    text: Goodbye ${myName}
+    parameters:
+      text: Goodbye ${myName}
