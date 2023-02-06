@@ -26,6 +26,7 @@ import {
     useGetFlowControlsQuery,
     useGetIntegrationWorkflowsQuery,
 } from 'queries/integration.queries';
+import Input from 'components/Input/Input';
 
 interface IntegrationDataType {
     category: string;
@@ -68,6 +69,7 @@ const Integration: React.FC = () => {
     const [leftSidebarView, setLeftSidebarView] = useState('components');
     const [rightSlideOverOpen, setRightSlideOverOpen] = useState(false);
     const [view, setView] = useState('designer');
+    const [filter, setFilter] = useState('');
 
     const currentIntegration = useLoaderData() as IntegrationDataType;
 
@@ -180,16 +182,45 @@ const Integration: React.FC = () => {
                         </header>
                     }
                     leftSidebarHeader={
-                        <ToggleGroup
-                            defaultValue="components"
-                            toggleItems={sidebarToggleItems}
-                            onValueChange={(value) => setLeftSidebarView(value)}
-                        />
+                        <>
+                            <ToggleGroup
+                                defaultValue="components"
+                                toggleItems={sidebarToggleItems}
+                                onValueChange={(value) => {
+                                    setLeftSidebarView(value);
+
+                                    setFilter('');
+                                }}
+                            />
+
+                            {leftSidebarView === 'components' ? (
+                                <Input
+                                    fieldsetClassName="px-4"
+                                    name="componentsFilter"
+                                    placeholder="Filter components"
+                                    value={filter}
+                                    onChange={(event) =>
+                                        setFilter(event.target.value)
+                                    }
+                                />
+                            ) : (
+                                <Input
+                                    fieldsetClassName="px-4"
+                                    name="flowControlsFilter"
+                                    placeholder="Filter flow controls"
+                                    value={filter}
+                                    onChange={(event) =>
+                                        setFilter(event.target.value)
+                                    }
+                                />
+                            )}
+                        </>
                     }
                     leftSidebarBody={
                         <LeftSidebar
-                            view={leftSidebarView}
                             data={{components, flowControls}}
+                            filter={filter}
+                            view={leftSidebarView}
                         />
                     }
                     leftSidebarOpen={leftSidebarOpen}

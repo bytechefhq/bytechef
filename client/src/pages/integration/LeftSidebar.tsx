@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Provider} from '@radix-ui/react-tooltip';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {
@@ -12,11 +12,12 @@ interface DragEvent<T = Element> extends React.MouseEvent<T, DragEventInit> {
 }
 
 interface SidebarProps {
-    view: string;
     data: {
         components: Array<ComponentDefinitionModel>;
         flowControls: Array<TaskDispatcherDefinitionModel>;
     };
+    filter: string;
+    view: string;
 }
 
 const Item = ({description, label}: DisplayModel): JSX.Element => {
@@ -48,33 +49,75 @@ const Item = ({description, label}: DisplayModel): JSX.Element => {
 
 const LeftSidebar: React.FC<SidebarProps> = ({
     data,
+    filter,
     view = 'components',
-}): JSX.Element => (
-    <Provider>
-        <div className="px-2">
-            <ul role="list" className="mb-2">
-                {view === 'components'
-                    ? data.components.map(
-                          (component: ComponentDefinitionModel) => (
-                              <Item
-                                  description={component.display?.description}
-                                  key={component.name}
-                                  label={component.display?.label}
-                              />
+}): JSX.Element => {
+    const [filteredComponents, setFilteredComponents] = useState<
+        Array<ComponentDefinitionModel>
+    >([]);
+    const [filteredFlowControls, setFilteredFlowControls] = useState<
+        Array<TaskDispatcherDefinitionModel>
+    >([]);
+
+    const {components, flowControls} = data;
+
+    useEffect(() => {
+        setFilteredComponents(
+            components.filter(
+                (component) =>
+                    component.name
+                        ?.toLowerCase()
+                        .includes(filter.toLowerCase()) ||
+                    component.display?.label
+                        ?.toLowerCase()
+                        .includes(filter.toLowerCase())
+            )
+        );
+
+        setFilteredFlowControls(
+            flowControls.filter(
+                (flowControl) =>
+                    flowControl.name
+                        ?.toLowerCase()
+                        .includes(filter.toLowerCase()) ||
+                    flowControl.display?.label
+                        ?.toLowerCase()
+                        .includes(filter.toLowerCase())
+            )
+        );
+    }, [components, filter, flowControls]);
+
+    return (
+        <Provider>
+            <div className="px-2">
+                <ul role="list" className="mb-2">
+                    {view === 'components'
+                        ? filteredComponents.map(
+                              (component: ComponentDefinitionModel) => (
+                                  <Item
+                                      description={
+                                          component.display?.description
+                                      }
+                                      label={component.display?.label}
+                                      key={component.name}
+                                  />
+                              )
                           )
-                      )
-                    : data.flowControls.map(
-                          (flowControl: TaskDispatcherDefinitionModel) => (
-                              <Item
-                                  description={flowControl.display?.description}
-                                  key={flowControl.name}
-                                  label={flowControl.display?.label}
-                              />
-                          )
-                      )}
-            </ul>
-        </div>
-    </Provider>
-);
+                        : filteredFlowControls.map(
+                              (flowControl: TaskDispatcherDefinitionModel) => (
+                                  <Item
+                                      description={
+                                          flowControl.display?.description
+                                      }
+                                      label={flowControl.display?.label}
+                                      key={flowControl.name}
+                                  />
+                              )
+                          )}
+                </ul>
+            </div>
+        </Provider>
+    );
+};
 
 export default LeftSidebar;
