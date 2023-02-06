@@ -21,6 +21,11 @@ import {
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
 import WorkflowEditor from './WorkflowEditor';
+import {
+    useGetComponentsQuery,
+    useGetFlowControlsQuery,
+    useGetIntegrationWorkflowsQuery,
+} from 'queries/integration.queries';
 
 interface IntegrationDataType {
     category: string;
@@ -58,160 +63,185 @@ const sidebarToggleItems: ToggleItem[] = [
 ];
 
 const Integration: React.FC = () => {
-    const [components, setComponents] = useState([]);
-    const [flowControls, setFlowControls] = useState([]);
-    const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>();
+    const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
     const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
     const [leftSidebarView, setLeftSidebarView] = useState('components');
     const [rightSlideOverOpen, setRightSlideOverOpen] = useState(false);
     const [view, setView] = useState('designer');
-    const [workflows, setWorkflows] = useState<WorkflowModel[]>([]);
 
     const currentIntegration = useLoaderData() as IntegrationDataType;
 
+    const {
+        data: components,
+        isLoading: componentsLoading,
+        error: componentsError,
+    } = useGetComponentsQuery();
+
+    const {
+        data: flowControls,
+        isLoading: flowControlsLoading,
+        error: flowControlsError,
+    } = useGetFlowControlsQuery();
+
+    const {
+        data: integrationWorkflows,
+        isLoading: integrationWorkflowsLoading,
+        error: integrationWorkflowsError,
+    } = useGetIntegrationWorkflowsQuery({id: currentIntegration.id});
+
     useEffect(() => {
-        fetch(`http://localhost:5173/api/workflows`)
-            .then((response) => response.json())
-            .then((workflows) => {
-                setWorkflows(workflows);
-
-                setCurrentWorkflow(
-                    workflows.find(
-                        (workflow: WorkflowModel) =>
-                            workflow.id === currentIntegration.workflowIds[0]
-                    )
-                );
-            });
-
-        fetch('http://localhost:5173/api/definitions/components')
-            .then((response) => response.json())
-            .then((components) => setComponents(components));
-
-        fetch('http://localhost:5173/api/definitions/task-dispatchers')
-            .then((response) => response.json())
-            .then((flowControls) => setFlowControls(flowControls));
-    }, [currentIntegration.workflowIds]);
+        if (!integrationWorkflowsLoading && !integrationWorkflowsError) {
+            setCurrentWorkflow(integrationWorkflows[0]);
+        }
+    }, [
+        integrationWorkflows,
+        integrationWorkflowsError,
+        integrationWorkflowsLoading,
+        currentIntegration,
+    ]);
 
     return (
-        <SidebarContentLayout
-            className="border-l border-gray-100 bg-gray-50"
-            header={
-                <header className="flex items-center">
-                    <Button
-                        className="p-4"
-                        icon={
-                            leftSidebarOpen ? (
-                                <ArrowLeftOnRectangleIcon className="h-6 w-6" />
-                            ) : (
-                                <ArrowRightOnRectangleIcon className="h-6 w-6" />
-                            )
-                        }
-                        onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-                        displayType="icon"
-                    />
+        <>
+            {!componentsLoading &&
+            !flowControlsLoading &&
+            !integrationWorkflowsLoading &&
+            !componentsError &&
+            !flowControlsError &&
+            !integrationWorkflowsError ? (
+                <SidebarContentLayout
+                    className="border-l border-gray-100 bg-gray-50"
+                    header={
+                        <header className="flex items-center">
+                            <Button
+                                className="p-4"
+                                icon={
+                                    leftSidebarOpen ? (
+                                        <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+                                    ) : (
+                                        <ArrowRightOnRectangleIcon className="h-6 w-6" />
+                                    )
+                                }
+                                onClick={() =>
+                                    setLeftSidebarOpen(!leftSidebarOpen)
+                                }
+                                displayType="icon"
+                            />
 
-                    <h1 className="mr-6 py-4 pr-4">
-                        {currentIntegration.name}
-                    </h1>
+                            <h1 className="mr-6 py-4 pr-4">
+                                {currentIntegration.name}
+                            </h1>
 
-                    <div className="flex py-4 px-2">
-                        <div className="flex rounded-md bg-white">
-                            {currentWorkflow && (
-                                <Select
-                                    defaultValue={currentWorkflow.id}
-                                    selectItems={workflows.map(
-                                        (workflow: WorkflowModel) => ({
-                                            label: workflow.label!,
-                                            value: workflow.id!,
-                                        })
+                            <div className="flex py-4 px-2">
+                                <div className="flex rounded-md bg-white">
+                                    {currentWorkflow && (
+                                        <Select
+                                            defaultValue={
+                                                integrationWorkflows[0].id
+                                            }
+                                            selectItems={integrationWorkflows.map(
+                                                (workflow: WorkflowModel) => ({
+                                                    label: workflow.label!,
+                                                    value: workflow.id!,
+                                                })
+                                            )}
+                                            onValueChange={(value: string) => {
+                                                setCurrentWorkflow(
+                                                    integrationWorkflows.find(
+                                                        (
+                                                            workflow: WorkflowModel
+                                                        ) =>
+                                                            workflow.id ===
+                                                            value
+                                                    )!
+                                                );
+                                            }}
+                                        />
                                     )}
-                                    onValueChange={(value) =>
-                                        setCurrentWorkflow(
-                                            workflows.find(
-                                                (workflow: WorkflowModel) =>
-                                                    workflow.id === value
-                                            )
-                                        )
-                                    }
-                                />
-                            )}
 
-                            <div className="flex border-l border-gray-100 align-middle">
-                                <Button
-                                    displayType="light"
-                                    icon={<PlusIcon className="h-5 w-5" />}
-                                    size="small"
+                                    <div className="flex border-l border-gray-100 align-middle">
+                                        <Button
+                                            displayType="light"
+                                            icon={
+                                                <PlusIcon className="h-5 w-5" />
+                                            }
+                                            size="small"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <ToggleGroup
+                                    defaultValue="designer"
+                                    toggleItems={headerToggleItems}
+                                    onValueChange={(value) => setView(value)}
                                 />
                             </div>
-                        </div>
-                    </div>
-
-                    <div>
+                        </header>
+                    }
+                    leftSidebarHeader={
                         <ToggleGroup
-                            defaultValue="designer"
-                            toggleItems={headerToggleItems}
-                            onValueChange={(value) => setView(value)}
+                            defaultValue="components"
+                            toggleItems={sidebarToggleItems}
+                            onValueChange={(value) => setLeftSidebarView(value)}
                         />
-                    </div>
-                </header>
-            }
-            leftSidebarHeader={
-                <ToggleGroup
-                    defaultValue="components"
-                    toggleItems={sidebarToggleItems}
-                    onValueChange={(value) => setLeftSidebarView(value)}
-                />
-            }
-            leftSidebarBody={
-                <LeftSidebar
-                    view={leftSidebarView}
-                    data={{components, flowControls}}
-                />
-            }
-            leftSidebarOpen={leftSidebarOpen}
-            rightToolbarBody={
-                <div className="flex flex-col items-center divide-y-8 py-4">
-                    <Button
-                        displayType="icon"
-                        onClick={() => setRightSlideOverOpen(true)}
-                    >
-                        <RocketIcon className="h-6 w-6 " />
-                    </Button>
+                    }
+                    leftSidebarBody={
+                        <LeftSidebar
+                            view={leftSidebarView}
+                            data={{components, flowControls}}
+                        />
+                    }
+                    leftSidebarOpen={leftSidebarOpen}
+                    rightToolbarBody={
+                        <div className="flex flex-col items-center divide-y-8 py-4">
+                            <Button
+                                displayType="icon"
+                                onClick={() => setRightSlideOverOpen(true)}
+                            >
+                                <RocketIcon className="h-6 w-6 " />
+                            </Button>
 
-                    <Button
-                        displayType="icon"
-                        onClick={() => setRightSlideOverOpen(true)}
-                    >
-                        <BookmarkFilledIcon className="h-6 w-6" />
-                    </Button>
+                            <Button
+                                displayType="icon"
+                                onClick={() => setRightSlideOverOpen(true)}
+                            >
+                                <BookmarkFilledIcon className="h-6 w-6" />
+                            </Button>
 
-                    <Button
-                        displayType="icon"
-                        onClick={() => setRightSlideOverOpen(true)}
-                    >
-                        <DashboardIcon className="h-6 w-6" />
-                    </Button>
+                            <Button
+                                displayType="icon"
+                                onClick={() => setRightSlideOverOpen(true)}
+                            >
+                                <DashboardIcon className="h-6 w-6" />
+                            </Button>
 
-                    <Button
-                        displayType="icon"
-                        onClick={() => setRightSlideOverOpen(true)}
-                    >
-                        <MagicWandIcon className="h-6 w-6" />
-                    </Button>
-                </div>
-            }
-        >
-            <>
-                <WorkflowEditor data={{components, flowControls}} />
+                            <Button
+                                displayType="icon"
+                                onClick={() => setRightSlideOverOpen(true)}
+                            >
+                                <MagicWandIcon className="h-6 w-6" />
+                            </Button>
+                        </div>
+                    }
+                >
+                    <>
+                        <WorkflowEditor data={{components, flowControls}} />
 
-                {rightSlideOverOpen && (
-                    <RightSlideOver
-                        open={rightSlideOverOpen}
-                        closeSidebar={() => setRightSlideOverOpen(false)}
-                    />
-                )}
-            </>
-        </SidebarContentLayout>
+                        {rightSlideOverOpen && (
+                            <RightSlideOver
+                                open={rightSlideOverOpen}
+                                closeSidebar={() =>
+                                    setRightSlideOverOpen(false)
+                                }
+                            />
+                        )}
+                    </>
+                </SidebarContentLayout>
+            ) : (
+                <h1>Loading current view: {view}</h1>
+            )}
+        </>
     );
 };
 
