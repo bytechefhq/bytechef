@@ -17,8 +17,10 @@
 
 package com.bytechef.hermes.component.registrar;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.commons.utils.CollectionUtils;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
@@ -804,14 +806,13 @@ public class RestComponentTaskHandlerIntTest {
             connection.getId() == null
                 ? new WorkflowTask()
                 : new WorkflowTask(
-                    Stream
-                        .concat(
-                            Map.of(ConnectionConstants.CONNECTION_ID, connection.getId())
-                                .entrySet()
-                                .stream(),
-                            parameters.entrySet()
-                                .stream())
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
+                    Map.of(
+                        WorkflowConstants.PARAMETERS,
+                        Stream
+                            .concat(
+                                CollectionUtils.stream(Map.of(ConnectionConstants.CONNECTION_ID, connection.getId())),
+                                CollectionUtils.stream(parameters.entrySet()))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))));
     }
 
     @ComponentScan(

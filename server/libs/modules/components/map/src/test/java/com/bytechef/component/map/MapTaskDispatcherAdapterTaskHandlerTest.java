@@ -19,6 +19,7 @@
 
 package com.bytechef.component.map;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
@@ -45,7 +46,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             TaskEvaluator.create());
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(
-            Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"))));
+            Map.of(WorkflowConstants.PARAMETERS, Map.of("list", List.of(1, 2, 3), "iteratee",
+                Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))));
 
         taskExecution.setJobId(4567L);
 
@@ -57,14 +59,17 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     @Test
     public void test2() {
         Assertions.assertThrows(RuntimeException.class, () -> {
-            TaskHandlerResolver resolver = task -> t -> {
+            TaskHandlerResolver taskHandlerResolver = task -> taskExecution -> {
                 throw new IllegalArgumentException("i'm rogue");
             };
-            MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver,
-                TaskEvaluator.create());
+            MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
+                taskHandlerResolver, TaskEvaluator.create());
 
             TaskExecution taskExecution = new TaskExecution(
-                new WorkflowTask(Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue"))));
+                new WorkflowTask(
+                    Map.of(
+                        WorkflowConstants.PARAMETERS,
+                        Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue")))));
 
             taskExecution.setJobId(4567L);
 
@@ -125,30 +130,30 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 "output",
                 "type",
                 "map",
-                "list",
-                Arrays.asList(1, 2, 3),
-                "iteratee",
-                Map.of("type", "var", "value", "${item}"))),
+                WorkflowConstants.PARAMETERS,
+                Map.of(
+                    "list", Arrays.asList(1, 2, 3),
+                    "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
             "post",
             List.of(Map.of(
                 "name",
                 "output",
                 "type",
                 "map",
-                "list",
-                Arrays.asList(1, 2, 3),
-                "iteratee",
-                Map.of("type", "var", "value", "${item}"))),
+                WorkflowConstants.PARAMETERS,
+                Map.of(
+                    "list", Arrays.asList(1, 2, 3),
+                    "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
             "pre",
             List.of(Map.of(
                 "name",
                 "output",
                 "type",
                 "map",
-                "list",
-                Arrays.asList(1, 2, 3),
-                "iteratee",
-                Map.of("type", "var", "value", "${item}"))),
+                WorkflowConstants.PARAMETERS,
+                Map.of(
+                    "list", Arrays.asList(1, 2, 3),
+                    "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
             "type",
             "pass")));
 

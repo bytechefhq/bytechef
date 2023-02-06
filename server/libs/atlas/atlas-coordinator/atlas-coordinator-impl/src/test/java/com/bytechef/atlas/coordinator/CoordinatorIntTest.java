@@ -102,14 +102,14 @@ public class CoordinatorIntTest {
 
     @Test
     public void testExecuteWorkflowJson() {
-        Job completedJob = executeWorkflow("hello1");
+        Job completedJob = executeWorkflow("aGVsbG8x");
 
         Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
     }
 
     @Test
     public void testExecuteWorkflowYaml() {
-        Job completedJob = executeWorkflow("hello2");
+        Job completedJob = executeWorkflow("aGVsbG8y");
 
         Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
     }
@@ -120,11 +120,11 @@ public class CoordinatorIntTest {
             Coordinator coordinator = new Coordinator(
                 null, null, null, jobFacade, jobService, null, null, taskExecutionService);
 
-            coordinator.create(new JobParameters("hello1"));
+            coordinator.create(new JobParameters("aGVsbG8x"));
         });
     }
 
-    public Job executeWorkflow(String workflowId) {
+    private Job executeWorkflow(String workflowId) {
         messageBroker.receive(Queues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 

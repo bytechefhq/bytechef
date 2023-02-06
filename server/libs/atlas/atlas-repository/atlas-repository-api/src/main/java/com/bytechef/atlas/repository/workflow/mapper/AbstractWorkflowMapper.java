@@ -92,9 +92,9 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
         }
     }
 
-    private void validate(Map<String, Object> aMap) {
-        validateReservedWords(aMap);
-        validateOutputs(aMap);
+    private void validate(Map<String, Object> map) {
+        validateReservedWords(map);
+        validateOutputs(map);
     }
 
     @SuppressWarnings("unchecked")
@@ -111,17 +111,13 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     @SuppressWarnings("unchecked")
     private void validateReservedWords(Map<String, Object> workflowMap) {
-        List<String> reservedWords = Arrays.asList(WorkflowConstants.RESERVED_WORDS);
-
         for (Map.Entry<String, Object> entry : workflowMap.entrySet()) {
             String k = entry.getKey();
             Object v = entry.getValue();
 
-            Assert.isTrue(!reservedWords.contains(k), "reserved word: " + k);
-
-            if (v instanceof Map) {
-                validate((Map<String, Object>) v);
-            }
+            Assert.isTrue(
+                WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS.contains(k),
+                "unknown workflow definition property: " + k);
 
             if (v instanceof List) {
                 List<Object> items = (List<Object>) v;

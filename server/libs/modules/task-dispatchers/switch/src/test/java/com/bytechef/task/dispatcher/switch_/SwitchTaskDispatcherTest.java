@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
@@ -61,8 +62,13 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-            "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1")));
+        TaskExecution taskExecution = new TaskExecution(
+            new WorkflowTask(
+                Map.of(
+                    WorkflowConstants.PARAMETERS,
+                    Map.of(
+                        "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))),
+                        "expression", "k1"))));
 
         taskExecution.setId(1L);
         taskExecution.setJobId(2L);
@@ -88,8 +94,13 @@ public class SwitchTaskDispatcherTest {
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(
-            1L, new WorkflowTask(Map.of(
-                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2")));
+            1L,
+            new WorkflowTask(
+                Map.of(
+                    WorkflowConstants.PARAMETERS,
+                    Map.of(
+                        "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))),
+                        "expression", "k2"))));
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
@@ -105,13 +116,15 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-            "cases",
-            Arrays.asList(
-                Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
-                Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
-            "expression",
-            "k2")));
+        TaskExecution taskExecution = new TaskExecution(
+            new WorkflowTask(
+                Map.of(
+                    WorkflowConstants.PARAMETERS,
+                    Map.of(
+                        "cases", Arrays.asList(
+                            Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
+                            Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
+                        "expression", "k2"))));
 
         taskExecution.setId(1L);
         taskExecution.setJobId(2L);
@@ -138,15 +151,17 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskExecutionService, TaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(1L, new WorkflowTask(Map.of(
-            "cases",
-            Arrays.asList(
-                Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
-                Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
-            "default",
-            Collections.singletonMap("value", "1234"),
-            "expression",
-            "k99")));
+        TaskExecution taskExecution = new TaskExecution(
+            1L,
+            new WorkflowTask(
+                Map.of(
+                    WorkflowConstants.PARAMETERS,
+                    Map.of(
+                        "cases", Arrays.asList(
+                            Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
+                            Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
+                        "default", Collections.singletonMap("value", "1234"),
+                        "expression", "k99"))));
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
