@@ -12,16 +12,18 @@ tasks:
   - name: var1
     label: Set value
     type: var/v1/set
-    value: 1000
+    parameters:
+      value: 1000
   - name: script1
     type: script/v1/javascript
-    input:
-      factor: ${factor}
-      var : ${var1}
-    script: >
-      function perform(input) {
-        print('Factor: ' + input.factor);
-        print('Var: ' + input.var);
+    parameters:
+      input:
+        factor: ${factor}
+        var : ${var1}
+      script: >
+        function perform(input) {
+          print('Factor: ' + input.factor);
+          print('Var: ' + input.var);
 
-        return 2 * input.var * input.factor;
-      }
+          return 2 * input.var * input.factor;
+        }

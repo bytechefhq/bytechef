@@ -7,5 +7,6 @@ tasks:
 
   - label: Rogue task
     type: random/v1/randomFloat
-    retry: 1
-    probability: 0.75
+    parameters:
+      retry: 1
+      probability: 0.75

@@ -11,97 +11,115 @@ inputs:
 
 tasks:
   - type: if/v1
-    conditions:
-      - number:
-          value1: ${value1}
-          operation: EQUALS
-          value2: ${value2}
-    combineOperation: any
-    caseTrue:
-      - name: equalsResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: equalsResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - number:
+            value1: ${value1}
+            operation: EQUALS
+            value2: ${value2}
+      combineOperation: any
+      caseTrue:
+        - name: equalsResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: equalsResult
+          type: var
+          parameters:
+            value: "false branch"
 
   - type: if/v1
-    conditions:
-      - number:
-          value1: ${value1}
-          operation: NOT_EQUALS
-          value2: ${value2}
-    combineOperation: any
-    caseTrue:
-      - name: notEqualsResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: notEqualsResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - number:
+            value1: ${value1}
+            operation: NOT_EQUALS
+            value2: ${value2}
+      combineOperation: any
+      caseTrue:
+        - name: notEqualsResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: notEqualsResult
+          type: var
+          parameters:
+            value: "false branch"
 
   - type: if/v1
-    conditions:
-      - number:
-          value1: ${value1}
-          operation: GREATER
-          value2: ${value2}
-    combineOperation: any
-    caseTrue:
-      - name: greaterResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: greaterResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - number:
+            value1: ${value1}
+            operation: GREATER
+            value2: ${value2}
+      combineOperation: any
+      caseTrue:
+        - name: greaterResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: greaterResult
+          type: var
+          parameters:
+            value: "false branch"
 
   - type: if/v1
-    conditions:
-      - number:
-          value1: ${value1}
-          operation: LESS
-          value2: ${value2}
-    combineOperation: any
-    caseTrue:
-      - name: lessResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: lessResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - number:
+            value1: ${value1}
+            operation: LESS
+            value2: ${value2}
+      combineOperation: any
+      caseTrue:
+        - name: lessResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: lessResult
+          type: var
+          parameters:
+            value: "false branch"
 
   - type: if/v1
-    conditions:
-      - number:
-          value1: ${value1}
-          operation: GREATER_EQUALS
-          value2: ${value2}
-    combineOperation: ANY
-    caseTrue:
-      - name: greaterEqualsResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: greaterEqualsResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - number:
+            value1: ${value1}
+            operation: GREATER_EQUALS
+            value2: ${value2}
+      combineOperation: ANY
+      caseTrue:
+        - name: greaterEqualsResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: greaterEqualsResult
+          type: var
+          parameters:
+            value: "false branch"
 
   - type: if/v1
-    conditions:
-      - number:
-          value1: ${value1}
-          operation: LESS_EQUALS
-          value2: ${value2}
-    combineOperation: ANY
-    caseTrue:
-      - name: lessEqualsResult
-        type: var
-        value: "true branch"
-    caseFalse:
-      - name: lessEqualsResult
-        type: var
-        value: "false branch"
+    parameters:
+      conditions:
+        - number:
+            value1: ${value1}
+            operation: LESS_EQUALS
+            value2: ${value2}
+      combineOperation: ANY
+      caseTrue:
+        - name: lessEqualsResult
+          type: var
+          parameters:
+            value: "true branch"
+      caseFalse:
+        - name: lessEqualsResult
+          type: var
+          parameters:
+            value: "false branch"

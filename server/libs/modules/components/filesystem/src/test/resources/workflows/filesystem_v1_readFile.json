@@ -19,7 +19,9 @@
       "name": "readLocalFile",
       "label": "Read from local file",
       "type": "filesystem/v1/readFile",
-      "filename": "${filename}"
+      "parameters": {
+        "filename": "${filename}"
+      }
     }
   ]
 }

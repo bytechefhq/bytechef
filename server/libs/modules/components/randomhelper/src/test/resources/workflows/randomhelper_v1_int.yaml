@@ -8,5 +8,6 @@ tasks:
   - name: randomNumber
     label: Generate a random integer
     type: random/v1/randomInt
-    startInclusive: 0
-    endInclusive: 1000
+    parameters:
+      startInclusive: 0
+      endInclusive: 1000

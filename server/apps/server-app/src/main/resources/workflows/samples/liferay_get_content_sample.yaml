@@ -14,12 +14,14 @@ tasks:
   - type: httpClient/v1/get
     name: restApiResponseContent
     label: Get web content from Liferay DXP
-    uri: ${apiEndpointUrl}
-    responseFormat: JSON
-    headerParameters:
-      Authorization:
-        - Basic ${apiToken}
+    parameters:
+      uri: ${apiEndpointUrl}
+      responseFormat: JSON
+      headerParameters:
+        Authorization:
+          - Basic ${apiToken}
 
   - type: logger/v1/info
     name: loggHttpResponse
-    text: Result ${restApiResponseContent}
+    parameters:
+      text: Result ${restApiResponseContent}
