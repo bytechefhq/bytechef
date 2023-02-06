@@ -24,7 +24,9 @@ import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,6 +42,8 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
     private String locationPattern;
     private WorkflowMapper workflowMapper;
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
 
     private static final String PREFIX = "workflows/";
 
@@ -66,7 +70,11 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         try {
             URI resourceURI = resource.getURI();
             String uri = resourceURI.toString();
-            String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
+
+            String id = ENCODER.encodeToString(
+                uri.substring(
+                    uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'))
+                    .getBytes(StandardCharsets.UTF_8));
 
             return workflowMapper.readValue(new WorkflowResource(id, resource, Workflow.Format.parse(uri)));
         } catch (IOException e) {
