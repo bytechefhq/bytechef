@@ -23,6 +23,7 @@ import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +37,11 @@ public class ConnectionRepositoryIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
+
+    @BeforeEach
+    public void beforeEach() {
+        connectionRepository.deleteAll();
+    }
 
     @Test
     public void testCreate() {
