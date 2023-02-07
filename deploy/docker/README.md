@@ -30,50 +30,10 @@ $ docker-compose --version
 docker-compose version 1.29.2, build 5becea4c
 ```
 
-## Deployed from the Docker registry
+## Setup with Docker Compose (recommended)
 
 TODO
 
-## Built from the source code on the local machine
+## Setup with Docker run
 
-Build and start locally built server instance.
-
-Open the terminal inside the `deploy/docker` folder.
-
-### 2. Commands
-
-```bash
-docker compose -f docker-compose.dev.server.yml up -d
-```
-
-Stop locally built server instance.
-
-```bash
-docker compose -f docker-compose.dev.server.yml down
-```
-
-Rebuild a docker image of the locally built server instance.
-
-```bash
-docker compose -f docker-compose.dev.server.yml down --rmi local
-docker compose -f docker-compose.dev.server.yml up -d
-```
-
-## Local Development infrastructure
-
-Use `docker-compose.dev.infra.yml` for required infrastructure(Postgres, Redis, RabbitMQ) when doing backend development:
-
-```bash
-docker compose -f docker-compose.dev.infra.yml up
-```
-
-## Troubleshooting
-
-### Out of date schema
-
-If you see `Either revert the changes to the migration, or run repair to update the schema history` in the terminal log when experiencing errors, execute the following command which will remove the out of date schemas:
-
-```bash
-docker compose -f deploy/docker/docker-compose.dev.server.yml down -v
-
-```
+TODO
