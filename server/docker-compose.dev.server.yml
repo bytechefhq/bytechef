@@ -28,8 +28,8 @@ services:
       - cache:/data
   bytechef-server-app:
     build:
-      context: ../../
-      dockerfile: ./deploy/docker/dev-server/Dockerfile
+      context: ../
+      dockerfile: ./server/docker/dev-server/Dockerfile
     container_name: bytechef-server
     depends_on:
       - postgres

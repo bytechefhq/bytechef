@@ -51,17 +51,202 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 7. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass.
 8. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder](https://github.com/bytechefhq/bytechef/tree/master/docs). To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.
 
+
 # Setup for local development 
 
-## Server Side
+## Client Side
+
+This section explains how you can setup a development environment for ByteChef client app. ByteChef's client (UI/frontend) uses the ReactJS library and Typescript.
 
 ### Prerequisites
 
-TODO
+- Node v16+
+- [Docker](https://docs.docker.com/get-docker/)
 
 ### Steps for setup
 
-TODO
+1. Clone the ByteChef repository(if you haven't already), open terminal and `cd` into it
+
+```bash
+git clone https://github.com/bytechefhq/bytechef.git
+cd bytechef
+```
+
+2. Change your directory to the `client` folder.
+
+```bash
+cd client
+```
+
+2. Install dependencies.
+
+```bash
+npm install
+```
+
+3. Serve with hot reload.
+
+```bash
+npm run dev
+```
+
+Your ByteChef client is now running on <http://localhost:5173>.
+
+#### Note:
+By default, your client app points to the local API server - http://localhost:5173. If you don't have the API server running on your local system, your page will load with errors. To set up the API server on your local system, please follow the instructions [here](#setup-with-docker).
+
+### Running Lint
+
+```bash
+npm run lint
+```
+
+### Running Typecheck
+
+```bash
+npm run typecheck
+```
+
+### Running Build
+
+```bash
+npm run build
+```
+
+### Running Tests
+
+```bash
+npm run test
+```
+
+## Server Side
+
+This section explains how you can set up a development environment for ByteChef server instance. As the server codebase is written in Java and is powered by Spring, you need Java and Gradle installed to build the code. You also need one instance of PostgreSQL and Redis each to run ByteChef server instance.
+
+## Setup with Docker
+
+Build and run the server codebase in a Docker container. This is the easiest way to get the server instance up and running if you are more interested in contributing to the [client codebase](#client-side).
+
+### Prerequisites
+
+[Docker](https://docs.docker.com/get-docker/)
+
+### Steps for setup
+
+1. Clone the ByteChef repository(if you haven't already), open terminal and `cd` into it
+
+```bash
+git clone https://github.com/bytechefhq/bytechef.git
+cd bytechef
+```
+
+2. Change your directory to the `server` folder.
+
+```bash
+cd server
+```
+
+3. Start up the container
+
+```bash
+docker compose -f docker-compose.dev.server.yml up -d
+```
+
+#### Other useful Commands
+
+Stop locally built server instance.
+
+```bash
+docker compose -f docker-compose.dev.server.yml down
+```
+
+Rebuild a docker image of the locally built server instance.
+
+```bash
+docker compose -f docker-compose.dev.server.yml down --rmi local
+docker compose -f docker-compose.dev.server.yml up -d
+```
+
+#### Troubleshooting
+
+Out of date schema
+
+If you see `Either revert the changes to the migration, or run repair to update the schema history` in the terminal log when experiencing errors, execute the following command which will remove the out of date schemas:
+
+```bash
+docker compose -f deploy/docker/docker-compose.dev.server.yml down -v
+```
+
+
+## Local Setup
+
+This section doesn't provide instructions to install Java and Gradle because these vary between different operating systems and distributions. Please refer to the documentation of your operating system or package manager to install these tools.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- Java - OpenJDK 17.
+- Gradle - V7.6+.
+- A PostgreSQL database - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
+- A Redis instance - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
+
+### Steps for setup
+
+1. Clone the ByteChef repository, open terminal and `cd` into it
+
+```bash
+git clone https://github.com/bytechefhq/bytechef.git
+cd bytechef
+```
+
+#### Setting up local development infrastructure using Docker
+
+2. Change your directory to th `server` folder.
+
+```bash
+cd server
+```
+
+3. Use `docker-compose.dev.infra.yml` for running required infrastructure(PostgreSQL, Redis):
+
+```bash
+docker compose -f docker-compose.dev.infra.yml up -d
+```
+
+#### Building and running the code
+
+3. Run the following command to compile codebase:
+
+```bash
+../gradlew clean compileJava
+```
+
+4. Change your directory to th `apps/server-app` folder.
+
+```bash
+cd apps/server-app
+```
+
+5. Start the ByteChef server instance by running :
+
+```bash
+../../../gradlew bootRun
+```
+
+By default, the server will start on port 9555.
+
+When the server starts, it automatically runs migrations on PostgreSQL and populate it with some initial required data.
+
+You can check the status of the server by hitting the endpoint: http://localhost:9555/webjars/swagger-ui/index.html on your browser to get Swagger UI with the list of API endpoints.
+
+### Running Tests
+
+1. Run the command to execute tests
+
+```bash
+cd bytechef
+./gradlew test && gw testIntegration
+```
 
 ## Questions?
 Contact us on [Discord](https://discord.gg/PybnUM3Y) or mail us at [support@bytechef.io](mailto:support@bytechef.io).
