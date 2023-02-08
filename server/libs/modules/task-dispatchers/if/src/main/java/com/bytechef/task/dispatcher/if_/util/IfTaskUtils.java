@@ -22,7 +22,7 @@ import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.RAW_EXPRESSION;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,18 +42,19 @@ public class IfTaskUtils {
     public static boolean resolveCase(TaskExecution ifTaskExecution) {
         Boolean result;
 
-        if (MapUtils.getBoolean(ifTaskExecution.getParameters(), RAW_EXPRESSION, false)) {
+        if (MapValueUtils.getBoolean(ifTaskExecution.getParameters(), RAW_EXPRESSION, false)) {
             result = expressionParser
-                .parseExpression(MapUtils.getString(ifTaskExecution.getParameters(), EXPRESSION))
+                .parseExpression(MapValueUtils.getString(ifTaskExecution.getParameters(), EXPRESSION))
                 .getValue(Boolean.class);
         } else {
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> conditions = (List) MapUtils.getList(
+            List<Map<String, Object>> conditions = (List) MapValueUtils.getList(
                 ifTaskExecution.getParameters(),
                 IfTaskDispatcherConstants.CONDITIONS,
                 Map.class,
                 Collections.emptyList());
-            String combineOperation = MapUtils.getRequiredString(ifTaskExecution.getParameters(), COMBINE_OPERATION);
+            String combineOperation = MapValueUtils.getRequiredString(ifTaskExecution.getParameters(),
+                COMBINE_OPERATION);
 
             result = expressionParser
                 .parseExpression(
@@ -69,19 +70,19 @@ public class IfTaskUtils {
 
         for (Map<String, Object> condition : conditions) {
             for (String operandType : condition.keySet()) {
-                Map<String, Object> conditionParts = MapUtils.getMap(condition, operandType);
+                Map<String, Object> conditionParts = MapValueUtils.getMap(condition, operandType);
 
                 String conditionTemplate = conditionTemplates
                     .get(operandType)
-                    .get(MapUtils.getRequiredString(conditionParts, IfTaskDispatcherConstants.OPERATION));
+                    .get(MapValueUtils.getRequiredString(conditionParts, IfTaskDispatcherConstants.OPERATION));
 
                 conditionExpressions.add(conditionTemplate
                     .replace(
                         "${value1}",
-                        MapUtils.getRequiredString(conditionParts, IfTaskDispatcherConstants.VALUE_1))
+                        MapValueUtils.getRequiredString(conditionParts, IfTaskDispatcherConstants.VALUE_1))
                     .replace(
                         "${value2}",
-                        MapUtils.getRequiredString(conditionParts, IfTaskDispatcherConstants.VALUE_2)));
+                        MapValueUtils.getRequiredString(conditionParts, IfTaskDispatcherConstants.VALUE_2)));
             }
         }
 

@@ -21,7 +21,7 @@ package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.commons.utils.CollectionUtils;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
 public class WorkflowTask implements Serializable {
 
     static {
-        MapUtils.addConverter(new Converter<Map, WorkflowTask>() {
+        MapValueUtils.addConverter(new Converter<Map, WorkflowTask>() {
 
             @Override
             @SuppressWarnings("unchecked")
@@ -83,34 +83,34 @@ public class WorkflowTask implements Serializable {
             this.finalize = CollectionUtils.concat(
                 finalize,
                 CollectionUtils.map(
-                    MapUtils.getList(
+                    MapValueUtils.getList(
                         source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList()),
                     WorkflowTask::new));
         }
 
         if (source.containsKey(WorkflowConstants.LABEL)) {
-            this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
+            this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
         }
 
         if (source.containsKey(WorkflowConstants.NAME)) {
-            this.name = MapUtils.getString(source, WorkflowConstants.NAME);
+            this.name = MapValueUtils.getString(source, WorkflowConstants.NAME);
         }
 
         if (source.containsKey(WorkflowConstants.NODE)) {
-            this.node = MapUtils.getString(source, WorkflowConstants.NODE);
+            this.node = MapValueUtils.getString(source, WorkflowConstants.NODE);
         }
 
         if (source.containsKey(WorkflowConstants.PARAMETERS)) {
             this.parameters = CollectionUtils.concat(
                 parameters,
-                MapUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap()));
+                MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap()));
         }
 
         if (source.containsKey(WorkflowConstants.POST)) {
             this.post = CollectionUtils.concat(
                 post,
                 CollectionUtils.map(
-                    MapUtils.getList(
+                    MapValueUtils.getList(
                         source, WorkflowConstants.POST, Map.class, Collections.emptyList()),
                     WorkflowTask::new));
         }
@@ -119,17 +119,17 @@ public class WorkflowTask implements Serializable {
             this.pre = CollectionUtils.concat(
                 pre,
                 CollectionUtils.map(
-                    MapUtils.getList(
+                    MapValueUtils.getList(
                         source, WorkflowConstants.PRE, Map.class, Collections.emptyList()),
                     WorkflowTask::new));
         }
 
         if (source.containsKey(WorkflowConstants.TIMEOUT)) {
-            this.timeout = MapUtils.getString(source, WorkflowConstants.TIMEOUT);
+            this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
         }
 
         if (source.containsKey(WorkflowConstants.TYPE)) {
-            this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
+            this.type = MapValueUtils.getString(source, WorkflowConstants.TYPE);
         }
     }
 

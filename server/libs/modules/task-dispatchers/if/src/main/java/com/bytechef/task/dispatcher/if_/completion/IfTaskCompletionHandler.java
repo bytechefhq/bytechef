@@ -32,7 +32,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -134,7 +134,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution ifTaskExecution, String caseTrue) {
-        return MapUtils.getList(ifTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList())
+        return MapValueUtils.getList(ifTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList())
             .stream()
             .map(WorkflowTask::new)
             .toList();

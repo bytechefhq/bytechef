@@ -29,7 +29,7 @@ import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -51,9 +51,9 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     @Override
     public void dispatch(TaskExecution taskExecution) {
         JobParameters jobParameters = new JobParameters(
-            MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()),
+            MapValueUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()),
             taskExecution.getId(),
-            MapUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
+            MapValueUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
 
         jobFacade.create(jobParameters);
     }
