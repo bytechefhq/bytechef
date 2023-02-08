@@ -6,10 +6,10 @@ import {Props} from 'react-select/dist/declarations/src';
 import './CreatableSelect.css';
 
 type CreatableSelectProps = {
-    label: string;
     name: string;
     options: {label: string; value: string}[];
     error?: boolean;
+    label?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     onChange?: (value: any) => void;
     onCreateOption?: (value: string) => void;
@@ -22,12 +22,14 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
     ...props
 }) => (
     <fieldset className="mb-3">
-        <label
-            htmlFor={name}
-            className="text-sm font-medium text-gray-700 dark:text-gray-400"
-        >
-            {label}
-        </label>
+        {label && (
+            <label
+                htmlFor={name}
+                className="text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+                {label}
+            </label>
+        )}
 
         <div
             className={cx([
