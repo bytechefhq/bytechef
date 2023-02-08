@@ -33,6 +33,7 @@ import com.bytechef.hermes.integration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
 import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
+import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import com.bytechef.hermes.integration.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -370,7 +371,7 @@ public class IntegrationControllerIntTest {
                 .uri("/integrations/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(List.of(new TagModel().name("tag1")))
+                .bodyValue(new PutIntegrationTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();

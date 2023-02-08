@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -180,7 +181,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     public Integration update(Long id, List<Tag> tags) {
-        tags = CollectionUtils.isEmpty(tags) ? null : tagService.save(tags);
+        tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         return integrationService.update(id, tags);
     }
@@ -190,7 +191,10 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         integration
             .setCategory(integration.getCategory() == null ? null : categoryService.save(integration.getCategory()));
         integration
-            .setTags(CollectionUtils.isEmpty(integration.getTags()) ? null : tagService.save(integration.getTags()));
+            .setTags(
+                CollectionUtils.isEmpty(integration.getTags())
+                    ? Collections.emptyList()
+                    : tagService.save(integration.getTags()));
 
         return integrationService.update(integration);
     }

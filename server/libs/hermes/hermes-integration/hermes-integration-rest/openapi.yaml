@@ -238,9 +238,12 @@ paths:
           application/json:
             schema:
               description: The request object that contains the array of tags.
-              type: array
-              items:
-                $ref: '#/components/schemas/Tag'
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Tag'
         required: true
       responses:
         "200":
