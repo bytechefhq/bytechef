@@ -39,7 +39,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -83,8 +83,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        Map<String, Object> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
-        List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
+        Map<String, Object> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        List<Object> list = MapValueUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
         taskExecution.setStartTime(LocalDateTime.now());
         taskExecution.setStatus(TaskStatus.STARTED);
@@ -109,8 +109,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 Map<String, Object> newContext = new HashMap<>(
                     contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
-                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
-                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
+                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
+                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
                 iterateeTaskExecution = taskEvaluator.evaluate(iterateeTaskExecution, newContext);
 

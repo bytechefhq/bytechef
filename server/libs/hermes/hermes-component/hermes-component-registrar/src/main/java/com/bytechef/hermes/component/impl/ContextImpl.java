@@ -22,7 +22,8 @@ import static com.bytechef.hermes.connection.ConnectionConstants.CONNECTION_ID;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.CollectionUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
@@ -41,7 +42,7 @@ import org.springframework.core.convert.converter.Converter;
 public class ContextImpl implements Context {
 
     static {
-        MapUtils.addConverter(new Converter<Map<?, ?>, FileEntry>() {
+        MapValueUtils.addConverter(new Converter<Map<?, ?>, FileEntry>() {
 
             @Override
             public FileEntry convert(Map<?, ?> source) {
@@ -78,7 +79,7 @@ public class ContextImpl implements Context {
     public Optional<Connection> fetchConnectionParameters() {
         Optional<Connection> connectionParametersOptional = Optional.empty();
 
-        if (MapUtils.containsKey(taskExecution.getParameters(), CONNECTION_ID)) {
+        if (CollectionUtils.containsKey(taskExecution.getParameters(), CONNECTION_ID)) {
             connectionParametersOptional = Optional.of(getConnectionParameters());
         }
 
@@ -93,7 +94,7 @@ public class ContextImpl implements Context {
     @Override
     public Connection getConnectionParameters() {
         return new ConnectionImpl(connectionService.getConnection(
-            MapUtils.getRequired(taskExecution.getParameters(), CONNECTION_ID)));
+            MapValueUtils.getRequired(taskExecution.getParameters(), CONNECTION_ID)));
     }
 
     @Override

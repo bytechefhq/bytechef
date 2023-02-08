@@ -31,7 +31,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Configuration;
 
@@ -99,7 +99,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             contextService.push(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
         }
 
-        List<WorkflowTask> subWorkflowTasks = MapUtils
+        List<WorkflowTask> subWorkflowTasks = MapValueUtils
             .getList(sequenceTaskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
             .stream()
             .map(WorkflowTask::new)

@@ -23,7 +23,7 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -141,14 +141,14 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.id = id;
         this.format = format;
         this.definition = definition;
-        this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
-        this.inputs = MapUtils.getList(
+        this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
+        this.inputs = MapValueUtils.getList(
             source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
-        this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
-        this.outputs = MapUtils.getList(
+        this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+        this.outputs = MapValueUtils.getList(
             source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
-        this.retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, 0);
-        this.tasks = MapUtils
+        this.retry = MapValueUtils.getInteger(source, WorkflowConstants.RETRY, 0);
+        this.tasks = MapValueUtils
             .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
             .stream()
             .map(WorkflowTask::new)

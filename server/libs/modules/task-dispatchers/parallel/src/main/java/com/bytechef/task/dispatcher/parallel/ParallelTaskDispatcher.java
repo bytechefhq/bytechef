@@ -34,7 +34,7 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +76,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks = MapUtils
+        List<WorkflowTask> workflowTasks = MapValueUtils
             .getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
             .stream()
             .map(WorkflowTask::new)

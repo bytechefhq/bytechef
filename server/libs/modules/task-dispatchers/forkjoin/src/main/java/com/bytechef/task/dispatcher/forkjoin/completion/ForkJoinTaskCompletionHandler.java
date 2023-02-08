@@ -31,7 +31,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.CollectionUtils;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
@@ -79,7 +79,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        return taskExecution.getParentId() != null && MapUtils.get(taskExecution.getParameters(), BRANCH) != null;
+        return taskExecution.getParentId() != null && MapValueUtils.get(taskExecution.getParameters(), BRANCH) != null;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         Assert.notNull(taskExecution.getParentId(), "'taskExecution.parentId' must not be null");
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
+            int branch = MapValueUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
             Map<String, Object> newContext = new HashMap<>(
                 contextService.peek(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION));
@@ -104,7 +104,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
         TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-        List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
+        List<List<Map<String, Object>>> branches = MapValueUtils.getRequiredList(
             forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
@@ -112,10 +112,10 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             .toList();
 
         List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
-            MapUtils.getInteger(taskExecution.getParameters(), BRANCH));
+            MapValueUtils.getInteger(taskExecution.getParameters(), BRANCH));
 
         if (taskExecution.getTaskNumber() < branchWorkflowTasks.size()) {
-            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
+            int branch = MapValueUtils.getInteger(taskExecution.getParameters(), BRANCH);
 
             WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(taskExecution.getTaskNumber());
 
