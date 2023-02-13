@@ -27,6 +27,8 @@ import {
     useGetIntegrationWorkflowsQuery,
 } from 'queries/integration.queries';
 import Input from 'components/Input/Input';
+import useStore from './store';
+import usePersistantStore from './persistantStore';
 
 interface IntegrationDataType {
     category: string;
@@ -64,10 +66,12 @@ const sidebarToggleItems: ToggleItem[] = [
 ];
 
 const Integration: React.FC = () => {
+    const {rightSlideOverOpen, setRightSlideOverOpen} = useStore();
+
+    const {leftSidebarOpen, setLeftSidebarOpen} = usePersistantStore();
+
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
-    const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
     const [leftSidebarView, setLeftSidebarView] = useState('components');
-    const [rightSlideOverOpen, setRightSlideOverOpen] = useState(false);
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
 
@@ -257,7 +261,7 @@ const Integration: React.FC = () => {
                     }
                 >
                     <>
-                        <WorkflowEditor data={{components, flowControls}} />
+                        <WorkflowEditor />
 
                         {rightSlideOverOpen && (
                             <RightSlideOver
