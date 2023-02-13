@@ -8,34 +8,58 @@ export const IntegrationItem: React.FC<{
     button: string;
     name: string;
     status: boolean;
+    onChangeState: () => void;
     description?: string;
     category?: CategoryModel;
     date?: Date;
     id?: number;
-    tags?: TagModel[];
+    tags?: Array<TagModel>;
     workflowIds?: string[];
     remainingTags?: TagModel[];
-}> = ({id, name, status, description, category, tags, date, remainingTags}) => {
+}> = ({
+    id,
+    name,
+    status,
+    description,
+    category,
+    tags,
+    date,
+    remainingTags,
+    onChangeState,
+}) => {
     const mutation = useIntegrationTagsMutation();
-    const [reload, setReload] = useState(false);
+    const [needsRefetch, setNeedsRefetch] = useState(false);
 
     useEffect(() => {
-        if (reload) {
-            window.location.reload();
+        if (needsRefetch) {
+            setNeedsRefetch(false);
+            onChangeState();
         }
-    }, [reload]);
+    }, [needsRefetch, onChangeState]);
 
     const handleOnAddTag = (newTag: TagModel) => {
         const newTags = (tags && [...tags]) || [];
         newTags.push(newTag);
-        mutation.mutate({id: id || 0, tagModel: newTags || []});
-        setReload(true);
+        mutation.mutate({
+            id: id || 0,
+            putIntegrationTagsRequestModel: {
+                tags: newTags || [],
+            },
+        });
+
+        setNeedsRefetch(true);
     };
 
     const handleOnDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
-        mutation.mutate({id: id || 0, tagModel: newTags});
-        setReload(true);
+        mutation.mutate({
+            id: id || 0,
+            putIntegrationTagsRequestModel: {
+                tags: newTags || [],
+            },
+        });
+
+        setNeedsRefetch(true);
     };
 
     return (
