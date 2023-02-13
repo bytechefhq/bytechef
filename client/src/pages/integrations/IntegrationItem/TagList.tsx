@@ -7,9 +7,9 @@ import CreatableSelect from 'react-select/creatable';
 
 export const TagList: React.FC<{
     tags: TagModel[];
-    remainingTags?: TagModel[];
     onAddTag: (newTag: TagModel) => void;
     onDeleteTag: (deletedTag: TagModel) => void;
+    remainingTags?: TagModel[];
 }> = ({tags, remainingTags, onAddTag, onDeleteTag}) => {
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
@@ -28,8 +28,7 @@ export const TagList: React.FC<{
                 </div>
             ) : (
                 <CreatableSelect
-                    // className="m-4"
-                    name={'newTag'}
+                    name="newTag"
                     isMulti={false}
                     options={remainingTags!.map((tag: TagModel) => ({
                         label: `${tag.name
