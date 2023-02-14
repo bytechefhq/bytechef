@@ -18,7 +18,6 @@ type CreatableSelectProps = {
 const CreatableSelect: React.FC<CreatableSelectProps> = ({
     error,
     label,
-    className,
     name,
     ...props
 }) => (
@@ -40,7 +39,6 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
         >
             <ReactSelectCreatable
                 classNamePrefix="react-select"
-                className={className}
                 isMulti
                 {...props}
             />

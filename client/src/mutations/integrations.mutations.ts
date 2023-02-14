@@ -1,9 +1,5 @@
 import {useMutation} from '@tanstack/react-query';
-import {
-    IntegrationModel,
-    IntegrationsApi,
-    PutIntegrationTagsRequest,
-} from 'data-access/integration';
+import {IntegrationModel, IntegrationsApi} from 'data-access/integration';
 
 type MutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
@@ -19,11 +15,4 @@ export const useIntegrationMutation = (mutationProps?: MutationProps) =>
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
-    });
-
-export const useIntegrationTagsMutation = () =>
-    useMutation({
-        mutationFn: (request: PutIntegrationTagsRequest) => {
-            return new IntegrationsApi().putIntegrationTags(request);
-        },
     });
