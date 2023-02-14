@@ -39,6 +39,5 @@ export const useGetIntegrationsQuery = (
         () => new IntegrationsApi().getIntegrations(requestParameters),
         {
             staleTime: 1 * 60 * 1000,
-            refetchInterval: 1000,
         }
     );
