@@ -13,7 +13,7 @@ import WorkflowEdge from './edges/WorkflowEdge';
 import PlaceholderNode from './nodes/PlaceholderNode';
 import WorkflowNode from './nodes/WorkflowNode';
 
-import './workflowEditor.css';
+import './WorkflowEditor.css';
 import useLayout from './hooks/useLayout';
 import {PlayIcon} from '@heroicons/react/24/outline';
 
