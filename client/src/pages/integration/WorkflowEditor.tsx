@@ -7,7 +7,6 @@ import ReactFlow, {
     Node,
 } from 'reactflow';
 import 'reactflow/dist/base.css';
-import ContextualMenu from './nodes/ContextualMenu';
 import PlaceholderEdge from './edges/PlaceholderEdge';
 import WorkflowEdge from './edges/WorkflowEdge';
 import PlaceholderNode from './nodes/PlaceholderNode';
@@ -48,7 +47,6 @@ const Workflow = (): JSX.Element => {
 
     const nodeTypes = useMemo(
         () => ({
-            contextualMenu: ContextualMenu,
             placeholder: PlaceholderNode,
             workflow: WorkflowNode,
         }),
