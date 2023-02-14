@@ -10,8 +10,8 @@ import {
 } from '@radix-ui/react-tooltip';
 import Button from 'components/Button/Button';
 import {Dialog, Transition} from '@headlessui/react';
-import Select from '../../components/Select/Select';
-import useStore from './store';
+import Select from '../../../components/Select/Select';
+import useStore from '../store/store';
 
 type SidebarProps = {
     open: boolean;

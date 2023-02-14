@@ -8,8 +8,8 @@ import {
     MagicWandIcon,
     PlusIcon,
 } from '@radix-ui/react-icons';
-import LeftSidebar from './LeftSidebar';
-import RightSlideOver from './RightSlideOver';
+import LeftSidebar from './components/LeftSidebar';
+import RightSlideOver from './components/RightSlideOver';
 import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
 import ToggleGroup, {
     ToggleItem,
@@ -27,8 +27,8 @@ import {
     useGetIntegrationWorkflowsQuery,
 } from 'queries/integration.queries';
 import Input from 'components/Input/Input';
-import useStore from './store';
-import usePersistantStore from './persistantStore';
+import useStore from './store/store';
+import usePersistantStore from './store/persistantStore';
 
 interface IntegrationDataType {
     category: string;

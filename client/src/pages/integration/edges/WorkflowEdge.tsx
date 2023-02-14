@@ -3,7 +3,7 @@ import {EdgeProps, getBezierPath} from 'reactflow';
 
 import useEdgeClick from '../hooks/useEdgeClick';
 import styles from './EdgeTypes.module.css';
-import PopoverMenu from '../PopoverMenu';
+import PopoverMenu from '../components/PopoverMenu';
 
 export default function WorkflowEdge({
     id,
