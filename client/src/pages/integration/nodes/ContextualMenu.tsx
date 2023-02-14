@@ -73,7 +73,13 @@ const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
                         return {
                             ...node,
                             type: 'workflow',
-                            data: {label: filteredItem.display?.label},
+                            data: {
+                                label: filteredItem.display?.label,
+                                name: filteredItem?.name,
+                                icon: (
+                                    <Component1Icon className="h-8 w-8 text-gray-700" />
+                                ),
+                            },
                         };
                     }
                     return node;
@@ -135,7 +141,7 @@ const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
                                     | TaskDispatcherDefinitionModel
                             ) => (
                                 <li
-                                    className="border-t border-t-slate-300 py-2 px-4"
+                                    className="py-2 px-4"
                                     key={filteredItem.name}
                                     onClick={() =>
                                         handleItemClick(filteredItem)

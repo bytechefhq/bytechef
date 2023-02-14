@@ -199,7 +199,7 @@ const Integration: React.FC = () => {
 
                             {leftSidebarView === 'components' ? (
                                 <Input
-                                    fieldsetClassName="px-4"
+                                    fieldsetClassName="px-2"
                                     name="componentsFilter"
                                     placeholder="Filter components"
                                     value={filter}
@@ -209,7 +209,7 @@ const Integration: React.FC = () => {
                                 />
                             ) : (
                                 <Input
-                                    fieldsetClassName="px-4"
+                                    fieldsetClassName="px-2"
                                     name="flowControlsFilter"
                                     placeholder="Filter flow controls"
                                     value={filter}

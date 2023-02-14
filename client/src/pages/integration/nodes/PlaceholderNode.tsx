@@ -1,6 +1,5 @@
 import React, {memo} from 'react';
 import {Handle, Position, NodeProps} from 'reactflow';
-import cx from 'classnames';
 
 import styles from './NodeTypes.module.css';
 import usePlaceholderClick from '../hooks/usePlaceholderClick';
@@ -10,13 +9,11 @@ const PlaceholderNode = ({id, data}: NodeProps) => {
     // calling onClick turns this node and the connecting edge into a workflow node
     const onClick = usePlaceholderClick(id);
 
-    const nodeClasses = cx(styles.node, styles.placeholder);
-
     return (
         <div
             onClick={onClick}
-            className={nodeClasses}
-            title="Click to add a node"
+            className="mx-[26px] flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md border border-gray-300 bg-gray-300 font-bold text-white shadow-none hover:bg-gray-500"
+            title="Click to add a component"
         >
             {data.label}
 
