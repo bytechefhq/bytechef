@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
-import useStore from '../store';
+import useStore from '../store/store';
 
 // this hook implements the logic for clicking a workflow node
 // on workflow node click: create a new child node of the clicked node
