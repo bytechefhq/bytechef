@@ -5,10 +5,14 @@ import React from 'react';
 import LeftSidebar from './LeftSidebar';
 import PageHeader from '../../components/PageHeader/PageHeader';
 
-const Integrations: React.FC = () => (
+const Integrations = () => (
     <SidebarContentLayout
         header={
-            <PageHeader right={<IntegrationModal />} title="All Integrations" />
+            <PageHeader
+                className="flex place-self-center sm:w-full 2xl:w-4/5"
+                right={<IntegrationModal />}
+                title="All Integrations"
+            />
         }
         leftSidebarHeader={
             <PageHeader leftSidebar={true} title="Integrations" />

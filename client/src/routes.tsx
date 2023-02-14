@@ -3,7 +3,7 @@ import App from './App';
 import ErrorPage from './ErrorPage';
 import Integration from './pages/integration/Integration';
 import Integrations from './pages/integrations/Integrations';
-import {Connections} from './pages/connections/Connections';
+import Connections from './pages/connections/Connections';
 import Settings from './pages/settings/Settings';
 
 export const router = createBrowserRouter([
