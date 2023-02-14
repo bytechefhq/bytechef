@@ -1,7 +1,6 @@
-import {useEffect, useRef} from 'react';
+import {useEffect} from 'react';
 import {useReactFlow, useStore, Node, Edge, ReactFlowState} from 'reactflow';
 import {stratify, tree} from 'd3-hierarchy';
-import {timer} from 'd3-timer';
 
 // initialize the tree layout (see https://observablehq.com/@d3/tree for examples)
 const layout = tree<Node>()
@@ -9,8 +8,6 @@ const layout = tree<Node>()
     .nodeSize([200, 150])
     // this is needed for creating equal space between all nodes
     .separation(() => 1);
-
-const options = {duration: 300};
 
 // the layouting function
 // accepts current nodes and edges and returns the layouted nodes with their updated positions
@@ -30,141 +27,31 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 
     const descendants = root.descendants();
 
-    const contextualMenuNode = descendants.find(
-        (descendant) => descendant.id === 'contextualMenu'
-    );
-
-    const placeholderNodeId = contextualMenuNode?.data.data.placeholderId;
-
-    const placeholderNode = descendants.find(
-        (descendant) => descendant.id === placeholderNodeId
-    );
-
     // convert the hierarchy back to react flow nodes (the original node is stored as d.data)
     // we only extract the position from the d3 function
-    return descendants.map((descendant) => {
-        if (
-            placeholderNodeId &&
-            placeholderNode &&
-            descendant.id == 'contextualMenu'
-        ) {
-            return {
-                ...descendant.data,
-                position: {
-                    x: placeholderNode.x + 200,
-                    y: placeholderNode.y,
-                },
-            };
-        } else if (descendant.parent) {
-            return {
-                ...descendant.data,
-                position: {
-                    x: descendant.parent.x,
-                    y: descendant.y,
-                },
-            };
-        }
-
-        return {
-            ...descendant.data,
-            position: {
-                x: descendant.x,
-                y: descendant.y,
-            },
-        };
-    });
+    return descendants.map((descendant) => ({
+        ...descendant.data,
+        position: {
+            x: descendant.parent ? descendant.parent.x : descendant.x,
+            y: descendant.y,
+        },
+    }));
 }
 
 // this is the store selector that is used for triggering the layout, this returns the number of nodes once they change
 const nodeCountSelector = (state: ReactFlowState) => state.nodeInternals.size;
 
-function useLayout() {
-    // this ref is used to fit the nodes in the first run
-    // after first run, this is set to false
-    const initial = useRef(true);
-
-    // we are using nodeCount as the trigger for the re-layouting
-    // whenever the nodes length changes, we calculate the new layout
+export default function useLayout() {
     const nodeCount = useStore(nodeCountSelector);
 
-    const {getNodes, getNode, setNodes, setEdges, getEdges, fitView} =
-        useReactFlow();
+    const {getNodes, setNodes, getEdges} = useReactFlow();
 
     useEffect(() => {
-        // get the current nodes and edges
         const nodes = getNodes();
         const edges = getEdges();
 
-        // run the layout and get back the nodes with their updated positions
         const targetNodes = layoutNodes(nodes, edges);
 
-        // if you do not want to animate the nodes, you can uncomment the following line
-        // return setNodes(targetNodes);
-
-        // to interpolate and animate the new positions, we create objects that contain the current and target position of each node
-        const transitions = targetNodes.map((node) => {
-            return {
-                id: node.id,
-                // this is where the node currently is placed
-                from: getNode(node.id)?.position || node.position,
-                // this is where we want the node to be placed
-                to: node.position,
-                node,
-            };
-        });
-
-        // create a timer to animate the nodes to their new positions
-        const t = timer((elapsed: number) => {
-            const s = elapsed / options.duration;
-
-            const currNodes = transitions.map(({node, from, to}) => {
-                return {
-                    id: node.id,
-                    position: {
-                        // simple linear interpolation
-                        x: from.x + (to.x - from.x) * s,
-                        y: from.y + (to.y - from.y) * s,
-                    },
-                    data: {...node.data},
-                    type: node.type,
-                };
-            });
-
-            setNodes(currNodes);
-
-            // this is the final step of the animation
-            if (elapsed > options.duration) {
-                // we are moving the nodes to their destination
-                // this needs to happen to avoid glitches
-                const finalNodes = transitions.map(({node, to}) => {
-                    return {
-                        id: node.id,
-                        position: {
-                            x: to.x,
-                            y: to.y,
-                        },
-                        data: {...node.data},
-                        type: node.type,
-                    };
-                });
-
-                setNodes(finalNodes);
-
-                // stop the animation
-                t.stop();
-
-                // in the first run, fit the view
-                if (!initial.current) {
-                    fitView({duration: 200, padding: 0.2});
-                }
-                initial.current = false;
-            }
-        });
-
-        return () => {
-            t.stop();
-        };
-    }, [nodeCount, getEdges, getNodes, getNode, setNodes, fitView, setEdges]);
+        return setNodes(targetNodes);
+    }, [nodeCount, getEdges, getNodes, setNodes]);
 }
-
-export default useLayout;
