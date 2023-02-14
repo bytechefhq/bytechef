@@ -7,9 +7,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
 import cx from 'classnames';
 import {Cross1Icon, PlusIcon} from '@radix-ui/react-icons';
-import {LightBulbIcon} from '@heroicons/react/24/outline';
 import CreatableSelect from '../../components/CreatableSelect/CreatableSelect';
-import {Link} from 'react-router-dom';
 
 const menuItems: DropDownMenuItem[] = [
     {

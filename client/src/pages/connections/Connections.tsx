@@ -1,7 +1,16 @@
-export const Connections = () => {
+import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
+import PageHeader from '../../components/PageHeader/PageHeader';
+import React from 'react';
+
+const Connections = () => {
     return (
-        <div>
-            <div>Connections</div>
-        </div>
+        <SidebarContentLayout
+            header={<PageHeader title="All Connections" />}
+            leftSidebarHeader={
+                <PageHeader leftSidebar={true} title="Connections" />
+            }
+        />
     );
 };
+
+export default Connections;

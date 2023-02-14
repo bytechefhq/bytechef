@@ -3,10 +3,10 @@ import {
     useGetIntegrationTagsQuery,
 } from '../../queries/integrations.queries';
 import React from 'react';
-import {IntegrationItem} from 'pages/integrations/IntegrationItem/IntegrationItem';
+import IntegrationItem from 'pages/integrations/IntegrationItem';
 import {Link, useSearchParams} from 'react-router-dom';
 
-const IntegrationList: React.FC = () => {
+const IntegrationList = () => {
     const [searchParams] = useSearchParams();
 
     const {
@@ -47,24 +47,26 @@ const IntegrationList: React.FC = () => {
                                         <IntegrationItem
                                             key={integration.id}
                                             category={integration.category}
-                                            id={integration.id}
-                                            name={integration.name}
                                             description={
                                                 integration.description
                                             }
-                                            tags={integration.tags}
-                                            workflowIds={
-                                                integration.workflowIds
+                                            id={integration.id}
+                                            lastDatePublished={
+                                                undefined // missing lastDatePublished
                                             }
-                                            date={integration.lastModifiedDate}
-                                            status={false} // missing api
-                                            button={''}
+                                            name={integration.name}
+                                            published={false} // missing api
                                             remainingTags={tags?.filter(
                                                 (tag) =>
                                                     integration.tags?.findIndex(
                                                         (x) => x.id === tag.id
                                                     ) === -1
                                             )}
+                                            tags={integration.tags}
+                                            version={integration.version}
+                                            workflowIds={
+                                                integration.workflowIds
+                                            }
                                         />
                                     </li>
                                 </Link>
