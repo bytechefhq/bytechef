@@ -17,6 +17,7 @@ export default function usePlaceholderClick(id: NodeProps['id']) {
         if (!placeholderNode) {
             return;
         }
+
         const contextualMenuNode = {
             id: 'contextualMenu',
             position: {
