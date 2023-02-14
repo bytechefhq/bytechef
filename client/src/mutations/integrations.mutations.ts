@@ -5,12 +5,14 @@ import {
     PutIntegrationTagsRequest,
 } from 'data-access/integration';
 
-type MutationProps = {
+type IntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
     onError?: (error: object, variables: IntegrationModel) => void;
 };
 
-export const useIntegrationMutation = (mutationProps?: MutationProps) =>
+export const useIntegrationMutation = (
+    mutationProps?: IntegrationMutationProps
+) =>
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
             return new IntegrationsApi().postIntegration({
@@ -21,9 +23,18 @@ export const useIntegrationMutation = (mutationProps?: MutationProps) =>
         onError: mutationProps?.onError,
     });
 
-export const useIntegrationTagsMutation = () =>
+type IntegrationTagsMutationProps = {
+    onSuccess?: (result: void, variables: PutIntegrationTagsRequest) => void;
+    onError?: (error: object, variables: PutIntegrationTagsRequest) => void;
+};
+
+export const useIntegrationTagsMutation = (
+    mutationProps?: IntegrationTagsMutationProps
+) =>
     useMutation({
         mutationFn: (request: PutIntegrationTagsRequest) => {
             return new IntegrationsApi().putIntegrationTags(request);
         },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
     });
