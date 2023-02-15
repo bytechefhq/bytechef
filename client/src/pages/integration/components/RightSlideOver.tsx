@@ -11,7 +11,7 @@ import {
 import Button from 'components/Button/Button';
 import {Dialog, Transition} from '@headlessui/react';
 import Select from '../../../components/Select/Select';
-import useRightSlideOverStore from '../stores/rightSlideOver.store';
+import useRightSlideOverStore from '../stores/rightSlideOver';
 
 type SidebarProps = {
     open: boolean;
