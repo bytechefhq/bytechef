@@ -8,7 +8,7 @@ jacocoTestReport {
     sourceDirectories.from = files(sourceSets.main.java.srcDirs)
 
     reports {
-        xml.getRequired().set(true)
-        html.getRequired().set(true)
+        xml.enabled = true
+        html.enabled = true
     }
 }
