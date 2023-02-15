@@ -9,7 +9,7 @@ const uuid = (): string =>
 
 // this hook implements the logic for clicking the button on a workflow edge
 // on edge click: create a node in between the two nodes that are connected by the edge
-function useEdgeClick(id: EdgeProps['id']) {
+function useEdgeClickHook(id: EdgeProps['id']) {
     const {getEdge, setEdges, setNodes} = useReactFlow();
 
     const {data: components} = useGetComponentsQuery();
@@ -75,4 +75,4 @@ function useEdgeClick(id: EdgeProps['id']) {
     return handleEdgeClick;
 }
 
-export default useEdgeClick;
+export default useEdgeClickHook;
