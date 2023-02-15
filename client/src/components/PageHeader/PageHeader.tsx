@@ -3,18 +3,25 @@ import cx from 'classnames';
 
 interface PageHeaderProps {
     leftSidebar?: boolean;
-    className?: string;
+    position?: 'main' | 'sidebar';
     right?: ReactNode;
     title: string;
 }
 
 const PageHeader = ({
     title,
-    className,
+    position = 'sidebar',
     leftSidebar = false,
     right,
 }: PageHeaderProps) => (
-    <header className={cx('p-4', className)}>
+    <header
+        className={cx(
+            'p-4',
+            position === 'main'
+                ? 'flex place-self-center sm:w-full 2xl:w-4/5'
+                : ''
+        )}
+    >
         <div className="flex w-full items-center justify-between">
             <div
                 className={cx(
