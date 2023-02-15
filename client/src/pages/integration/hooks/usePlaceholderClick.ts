@@ -4,7 +4,7 @@ import {
 } from 'queries/integration.queries';
 import {NodeProps, useReactFlow} from 'reactflow';
 
-export default function usePlaceholderClickHook(id: NodeProps['id']) {
+export default function usePlaceholderClick(id: NodeProps['id']) {
     const {getNode, setNodes, setEdges} = useReactFlow();
 
     const {data: components} = useGetComponentsQuery();
