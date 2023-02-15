@@ -1,21 +1,24 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
-    GetIntegrationsRequest,
     IntegrationModel,
     IntegrationsApi,
     TagModel,
 } from 'data-access/integration';
 
-export enum ServerStateKeysEnum {
-    IntegrationCategories = 'integrationCategories',
-    IntegrationTags = 'integrationTags',
-    Integrations = 'integrations',
-}
+export const IntegrationsKeys = {
+    integrationCategories: ['integrationCategories'] as const,
+    integrationTags: ['integrationTags'] as const,
+    integrations: ['integrations'] as const,
+    integrationList: (filters: {categoryId?: number; tagId?: number}) => [
+        ...IntegrationsKeys.integrations,
+        filters,
+    ],
+};
 
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
-        [ServerStateKeysEnum.IntegrationCategories],
+        IntegrationsKeys.integrationCategories,
         () => new IntegrationsApi().getIntegrationCategories(),
         {
             staleTime: 1 * 60 * 1000,
@@ -24,19 +27,20 @@ export const useGetIntegrationCategoriesQuery = () =>
 
 export const useGetIntegrationTagsQuery = () =>
     useQuery<TagModel[], Error>(
-        [ServerStateKeysEnum.IntegrationTags],
+        IntegrationsKeys.integrationTags,
         () => new IntegrationsApi().getIntegrationTags(),
         {
             staleTime: 1 * 60 * 1000,
         }
     );
 
-export const useGetIntegrationsQuery = (
-    requestParameters?: GetIntegrationsRequest
-) =>
+export const useGetIntegrationsQuery = (filters: {
+    categoryId?: number;
+    tagId?: number;
+}) =>
     useQuery<IntegrationModel[], Error>(
-        [ServerStateKeysEnum.Integrations, requestParameters],
-        () => new IntegrationsApi().getIntegrations(requestParameters),
+        IntegrationsKeys.integrationList(filters),
+        () => new IntegrationsApi().getIntegrations(filters),
         {
             staleTime: 1 * 60 * 1000,
         }

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
 import {CategoryModel, TagModel} from '../../data-access/integration';
 import {useIntegrationTagsMutation} from '../../mutations/integrations.mutations';
-import {ServerStateKeysEnum} from '../../queries/integrations.queries';
+import {IntegrationsKeys} from '../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
 import cx from 'classnames';
@@ -162,10 +162,8 @@ const IntegrationItem = ({
 
     const mutation = useIntegrationTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries([ServerStateKeysEnum.Integrations]);
-            queryClient.invalidateQueries([
-                ServerStateKeysEnum.IntegrationTags,
-            ]);
+            queryClient.invalidateQueries(IntegrationsKeys.integrations);
+            queryClient.invalidateQueries(IntegrationsKeys.integrationTags);
         },
     });
 
@@ -290,7 +288,7 @@ const TagList = ({
 
     return (
         <div className="mr-4 flex items-center">
-            <div>
+            <div className="mr-1">
                 {tags.map((tag) => (
                     <Tag key={tag.id} tag={tag} onDeleteTag={onDeleteTag} />
                 ))}
@@ -309,6 +307,7 @@ const TagList = ({
                 </div>
             ) : (
                 <CreatableSelect
+                    className="w-40"
                     name="newTag"
                     isMulti={false}
                     options={remainingTags!.map((tag: TagModel) => ({
