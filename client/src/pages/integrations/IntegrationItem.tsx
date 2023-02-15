@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
 import {CategoryModel, TagModel} from '../../data-access/integration';
 import {useIntegrationTagsMutation} from '../../mutations/integrations.mutations';
-import {IntegrationsKeys} from '../../queries/integrations.queries';
+import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
 import cx from 'classnames';
@@ -162,8 +162,8 @@ const IntegrationItem = ({
 
     const mutation = useIntegrationTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(IntegrationsKeys.integrations);
-            queryClient.invalidateQueries(IntegrationsKeys.integrationTags);
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
         },
     });
 

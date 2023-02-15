@@ -1,7 +1,7 @@
 import {
     useGetIntegrationsQuery,
     useGetIntegrationTagsQuery,
-} from '../../queries/integrations.queries';
+} from '../../queries/integrations';
 import IntegrationItem from 'pages/integrations/IntegrationItem';
 import {Link, useSearchParams} from 'react-router-dom';
 

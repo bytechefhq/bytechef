@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '../../queries/integrations.queries';
+} from '../../queries/integrations';
 import LeftSidebarItem, {Type} from './LeftSidebarItem';
 import {useSearchParams} from 'react-router-dom';
 import {TagIcon} from '@heroicons/react/20/solid';
