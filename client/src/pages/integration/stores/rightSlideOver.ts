@@ -4,7 +4,7 @@ interface Node {
     label: string;
 }
 
-interface IntegrationState {
+interface RightSlideOverState {
     rightSlideOverOpen: boolean;
     setRightSlideOverOpen: (rightSlideOverOpen: boolean) => void;
 
@@ -12,7 +12,7 @@ interface IntegrationState {
     setCurrentNode: (currentNode: Node) => void;
 }
 
-export const useRightSlideOverStore = create<IntegrationState>()((set) => ({
+export const useRightSlideOverStore = create<RightSlideOverState>()((set) => ({
     rightSlideOverOpen: false,
     setRightSlideOverOpen: (rightSlideOverOpen) =>
         set((state) => ({...state, rightSlideOverOpen})),

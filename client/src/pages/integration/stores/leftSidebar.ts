@@ -1,12 +1,12 @@
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
-interface PersistantIntegrationStore {
+interface LeftSidebarState {
     leftSidebarOpen: boolean;
     setLeftSidebarOpen: (leftSidebarStatus: boolean) => void;
 }
 
-const useLeftSidebarStore = create<PersistantIntegrationStore>()(
+const useLeftSidebarStore = create<LeftSidebarState>()(
     devtools(
         persist(
             (set) => ({
