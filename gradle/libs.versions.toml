@@ -1,11 +1,11 @@
 [versions]
 ch-qos-logback = "1.4.5"
 checkstyle="10.6.0"
-com-fasterxml-jackson-core = "2.14.1"
-com-fasterxml-jackson-dataformat = "2.14.1"
+com-fasterxml-jackson-core = "2.14.2"
+com-fasterxml-jackson-dataformat = "2.14.2"
 info-picocli = "4.7.1"
 org-mapstruct = "1.5.3.Final"
-org-mapstruct-extensions-spring = "0.1.2"
+org-mapstruct-extensions-spring = "1.0.0"
 org-springframework = "6.0.4"
 org-springframework-amqp = "3.0.1"
 org-springframework-boot = "3.0.2"
@@ -25,7 +25,7 @@ com-fasterxml-jackson-core-jackson-databind = { module = "com.fasterxml.jackson.
 com-fasterxml-jackson-dataformat-jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "com-fasterxml-jackson-dataformat" }
 com-fasterxml-jackson-dataformat-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "com-fasterxml-jackson-dataformat" }
 com-fasterxml-jackson-dataformat-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "com-fasterxml-jackson-dataformat" }
-com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1"
+com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
 com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.2"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
@@ -36,29 +36,29 @@ com-zaxxer-HikariCP = "com.zaxxer:HikariCP:5.0.1"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
 io-lettuce-lettuce-core = "io.lettuce:lettuce-core:6.2.2.RELEASE"
-io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.2"
+io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.3"
 io-rsocket-rsocket-core = "io.rsocket:rsocket-core:1.1.3"
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.8"
 io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.11"
 jakarta-annotation-jakarta-annotation-api = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 jakarta-jms-jakarta-jms-api = "jakarta.jms:jakarta.jms-api:3.1.0"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
-mysql-mysql-connector-java = "mysql:mysql-connector-java:8.0.31"
-org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.26.0"
+mysql-mysql-connector-java = "mysql:mysql-connector-java:8.0.32"
+org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.28.0"
 org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.17.1"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
-org-apache-tika-tika-core = "org.apache.tika:tika-core:2.6.0"
+org-apache-tika-tika-core = "org.apache.tika:tika-core:2.7.0"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r"
-org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.5.1"
+org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.14.1"
 org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:22.3.1"
 org-json = "org.json:json:20220924"
-org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.1"
+org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.2"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct" }
-org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.4"
-org-postgresql = "org.postgresql:postgresql:42.5.1"
+org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.5"
+org-postgresql = "org.postgresql:postgresql:42.5.3"
 org-skyscreamer-jsonassert = "org.skyscreamer:jsonassert:1.5.1"
 org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.6"
 org-springdoc-springdoc-openapi-starter-webflux-ui = "org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2"
@@ -84,7 +84,7 @@ org-springframework-data-spring-data-commons = { module = "org.springframework.d
 org-springframework-data-spring-data-jdbc = { module = "org.springframework.data:spring-data-jdbc", version.ref = "org-springframework-data" }
 org-springframework-data-spring-data-redis = { module = "org.springframework.data:spring-data-redis", version.ref = "org-springframework-data" }
 org-springframework-kafka-spring-kafka = "org.springframework.kafka:spring-kafka:3.0.2"
-org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry:1.3.1"
+org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry:2.0.0"
 org-springframework-security-spring-security-core = { module = "org.springframework.security:spring-security-core", version.ref = "org-springframework-security" }
 org-springframework-security-spring-security-test = { module = "org.springframework.security:spring-security-test", version.ref = "org-springframework-security" }
 org-springframework-spring-beans = { module = "org.springframework:spring-beans", version.ref = "org-springframework" }
@@ -100,16 +100,15 @@ org-springframework-spring-webflux = { module = "org.springframework:spring-webf
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.19.26"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.4"
 
 [plugins]
-com-diffplug-spotless = "com.diffplug.spotless:6.14.0"
-com-github-ben-manes-versions = "com.github.ben-manes.versions:0.44.0"
+com-diffplug-spotless = "com.diffplug.spotless:6.15.0"
+com-github-ben-manes-versions = "com.github.ben-manes.versions:0.45.0"
 com-github-spotbugs = "com.github.spotbugs:5.0.13"
 com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.1"
 com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.7.0"
-org-openapi-generator = "org.openapi.generator:6.2.1"
-org-flywaydb-flyway = "org.flywaydb.flyway:9.12.0"
+org-openapi-generator = "org.openapi.generator:6.3.0"
 org-sonarqube = "org.sonarqube:3.5.0.2730"
 org-springframework-boot = "org.springframework.boot:3.0.2"
