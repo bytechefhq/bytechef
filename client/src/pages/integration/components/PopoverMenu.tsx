@@ -1,10 +1,8 @@
 import React, {ReactNode} from 'react';
 import {Arrow, Content, Root, Trigger} from '@radix-ui/react-popover';
-import {
-    useGetComponentsQuery,
-    useGetFlowControlsQuery,
-} from 'queries/integration.queries';
 import ContextualMenu from '../nodes/ContextualMenu';
+import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions';
 
 interface PopoverMenuProps {
     children: ReactNode;
@@ -12,9 +10,9 @@ interface PopoverMenuProps {
 }
 
 const PopoverMenu = ({children, id}: PopoverMenuProps) => {
-    const {data: components} = useGetComponentsQuery();
+    const {data: components} = useGetComponentDefinitionsQuery();
 
-    const {data: flowControls} = useGetFlowControlsQuery();
+    const {data: flowControls} = useGetTaskDispatcherDefinitionsQuery();
 
     return (
         <div className="relative inline-block text-left">
