@@ -1,6 +1,6 @@
 plugins {
-    id "org.sonarqube"
-    id "org.springframework.boot" version "${springBootVersion}" apply false
+    alias(libs.plugins.org.sonarqube)
+    alias(libs.plugins.org.springframework.boot) apply false
 }
 
 file("${projectDir}/sonar-project.properties").withReader {
@@ -24,7 +24,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${libs.versions.org.springframework.cloud.dependencies.get()}"
         }
     }
 

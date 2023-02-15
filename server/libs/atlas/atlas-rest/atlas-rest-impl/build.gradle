@@ -1,5 +1,5 @@
 plugins {
-    id "org.openapi.generator"
+    alias(libs.plugins.org.openapi.generator)
 }
 
 task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
