@@ -12,7 +12,7 @@ interface IntegrationState {
     setCurrentNode: (currentNode: Node) => void;
 }
 
-export const useStore = create<IntegrationState>()((set) => ({
+export const useRightSlideOverStore = create<IntegrationState>()((set) => ({
     rightSlideOverOpen: false,
     setRightSlideOverOpen: (rightSlideOverOpen) =>
         set((state) => ({...state, rightSlideOverOpen})),
@@ -21,4 +21,4 @@ export const useStore = create<IntegrationState>()((set) => ({
     setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
 }));
 
-export default useStore;
+export default useRightSlideOverStore;
