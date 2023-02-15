@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
 import {CategoryModel, TagModel} from '../../data-access/integration';
 import {useIntegrationTagsMutation} from '../../mutations/integrations.mutations';
@@ -271,7 +271,7 @@ const Tag = ({tag, onDeleteTag}: TagProps) => {
             {tag.name}
 
             <Cross1Icon
-                className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-400"
+                className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
                 onClick={() => onDeleteTag(tag)}
             />
         </span>
@@ -287,25 +287,14 @@ const TagList = ({
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
     return (
-        <div className="mr-4 flex items-center">
+        <div className="mr-4 flex items-center space-x-2">
             <div className="mr-1">
                 {tags.map((tag) => (
                     <Tag key={tag.id} tag={tag} onDeleteTag={onDeleteTag} />
                 ))}
             </div>
 
-            {!isNewTagWindowVisible ? (
-                <div
-                    className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
-                    onClick={(event) => {
-                        event.preventDefault();
-
-                        setIsNewTagWindowVisible(true);
-                    }}
-                >
-                    <PlusIcon />
-                </div>
-            ) : (
+            {isNewTagWindowVisible ? (
                 <CreatableSelect
                     className="w-40"
                     name="newTag"
@@ -335,6 +324,17 @@ const TagList = ({
                         setIsNewTagWindowVisible(false);
                     }}
                 />
+            ) : (
+                <div
+                    className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
+                    onClick={(event) => {
+                        event.preventDefault();
+
+                        setIsNewTagWindowVisible(true);
+                    }}
+                >
+                    <PlusIcon />
+                </div>
             )}
         </div>
     );
