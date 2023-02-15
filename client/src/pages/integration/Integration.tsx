@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useLoaderData} from 'react-router-dom';
+import {useLoaderData, useParams} from 'react-router-dom';
 import Button from 'components/Button/Button';
 import {
     RocketIcon,
@@ -24,24 +24,13 @@ import WorkflowEditor from './WorkflowEditor';
 import {
     useGetComponentsQuery,
     useGetFlowControlsQuery,
+    useGetIntegrationQuery,
     useGetIntegrationWorkflowsQuery,
 } from 'queries/integration.queries';
 import Input from 'components/Input/Input';
+import {IntegrationModel} from '../../data-access/integration';
 import useRightSlideOverStore from './stores/rightSlideOver.store';
 import useLeftSidebarStore from './stores/leftSidebar.store';
-
-interface IntegrationDataType {
-    category: string;
-    createdBy: string;
-    createdDate: string;
-    id: number;
-    name: string;
-    description: string;
-    lastModifiedBy: string;
-    lastModifiedDate: string;
-    tags: string[];
-    workflowIds: string[];
-}
 
 const headerToggleItems: ToggleItem[] = [
     {
@@ -66,17 +55,19 @@ const sidebarToggleItems: ToggleItem[] = [
 ];
 
 const Integration: React.FC = () => {
+    const {integrationId} = useParams<{integrationId: string}>();
     const {rightSlideOverOpen, setRightSlideOverOpen} =
         useRightSlideOverStore();
-
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
-
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
     const [leftSidebarView, setLeftSidebarView] = useState('components');
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
 
-    const currentIntegration = useLoaderData() as IntegrationDataType;
+    const {data: integration} = useGetIntegrationQuery(
+        +integrationId!,
+        useLoaderData() as IntegrationModel
+    );
 
     const {
         data: components,
@@ -94,7 +85,7 @@ const Integration: React.FC = () => {
         data: integrationWorkflows,
         isLoading: integrationWorkflowsLoading,
         error: integrationWorkflowsError,
-    } = useGetIntegrationWorkflowsQuery({id: currentIntegration.id});
+    } = useGetIntegrationWorkflowsQuery(integration?.id as number);
 
     useEffect(() => {
         if (!integrationWorkflowsLoading && !integrationWorkflowsError) {
@@ -104,7 +95,7 @@ const Integration: React.FC = () => {
         integrationWorkflows,
         integrationWorkflowsError,
         integrationWorkflowsLoading,
-        currentIntegration,
+        integration,
     ]);
 
     return (
@@ -135,7 +126,7 @@ const Integration: React.FC = () => {
                             />
 
                             <h1 className="mr-6 py-4 pr-4">
-                                {currentIntegration.name}
+                                {integration?.name}
                             </h1>
 
                             <div className="flex py-4 px-2">

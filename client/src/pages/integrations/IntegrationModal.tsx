@@ -7,7 +7,7 @@ import TextArea from 'components/TextArea/TextArea';
 import {Controller, useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
 import {
-    ServerStateKeysEnum,
+    IntegrationsKeys,
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
 } from '../../queries/integrations.queries';
@@ -45,13 +45,11 @@ const IntegrationModal = () => {
 
     const mutation = useIntegrationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries([
-                ServerStateKeysEnum.IntegrationCategories,
-            ]);
-            queryClient.invalidateQueries([ServerStateKeysEnum.Integrations]);
-            queryClient.invalidateQueries([
-                ServerStateKeysEnum.IntegrationTags,
-            ]);
+            queryClient.invalidateQueries(
+                IntegrationsKeys.integrationCategories
+            );
+            queryClient.invalidateQueries(IntegrationsKeys.integrations);
+            queryClient.invalidateQueries(IntegrationsKeys.integrationTags);
 
             setIsOpen(false);
 
