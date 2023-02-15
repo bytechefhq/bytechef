@@ -42,6 +42,9 @@ const IntegrationList = () => {
                             <div key={integration.id}>
                                 <Link
                                     to={`/automation/integrations/${integration.id}`}
+                                    onClick={(event) => {
+                                        event.preventDefault();
+                                    }}
                                 >
                                     <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
                                         <IntegrationItem
