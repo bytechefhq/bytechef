@@ -6,7 +6,7 @@ interface PersistantIntegrationStore {
     setLeftSidebarOpen: (leftSidebarStatus: boolean) => void;
 }
 
-const usePersistantStore = create<PersistantIntegrationStore>()(
+const useLeftSidebarStore = create<PersistantIntegrationStore>()(
     devtools(
         persist(
             (set) => ({
@@ -23,4 +23,4 @@ const usePersistantStore = create<PersistantIntegrationStore>()(
     )
 );
 
-export default usePersistantStore;
+export default useLeftSidebarStore;
