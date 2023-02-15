@@ -3,7 +3,7 @@ import {Handle, Position, NodeProps} from 'reactflow';
 import cx from 'classnames';
 
 import styles from './NodeTypes.module.css';
-import useNodeClickHandler from '../hooks/useNodeClick';
+import useNodeClickHandler from '../hooks/useNodeClick.hook';
 
 const WorkflowNode = ({id, data}: NodeProps) => {
     // see the hook implementation for details of the click handler
