@@ -38,8 +38,10 @@ const IntegrationList = () => {
                         <p>You do not have any Integration created yet.</p>
                     ) : (
                         integrations.map((integration) => {
-                            const integrationTagIds =
-                                integration.tags?.map((tag) => tag.id) || [];
+                            const integrationTagIds = integration.tags?.map(
+                                (tag) => tag.id
+                            );
+
                             return (
                                 <div key={integration.id}>
                                     <Link
@@ -61,14 +63,12 @@ const IntegrationList = () => {
                                                 }
                                                 name={integration.name}
                                                 published={false} // missing api
-                                                remainingTags={
-                                                    tags?.filter(
-                                                        (tag) =>
-                                                            !integrationTagIds?.includes(
-                                                                tag.id
-                                                            )
-                                                    ) || []
-                                                }
+                                                remainingTags={tags?.filter(
+                                                    (tag) =>
+                                                        !integrationTagIds?.includes(
+                                                            tag.id
+                                                        )
+                                                )}
                                                 tags={integration.tags}
                                                 version={integration.version}
                                                 workflowIds={
