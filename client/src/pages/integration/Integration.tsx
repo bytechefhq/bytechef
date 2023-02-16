@@ -65,7 +65,7 @@ const Integration: React.FC = () => {
     const [filter, setFilter] = useState('');
 
     const {data: integration} = useGetIntegrationQuery(
-        +integrationId!,
+        parseInt(integrationId!),
         useLoaderData() as IntegrationModel
     );
 
@@ -226,7 +226,7 @@ const Integration: React.FC = () => {
                                 displayType="icon"
                                 onClick={() => setRightSlideOverOpen(true)}
                             >
-                                <RocketIcon className="h-6 w-6 " />
+                                <RocketIcon className="h-6 w-6" />
                             </Button>
 
                             <Button

@@ -59,7 +59,7 @@ const CreatableSelect = ({
             <p
                 role="alert"
                 className="mt-2 text-sm text-red-600"
-                id={name + '-error'}
+                id={`${name}-error`}
             >
                 This field is required
             </p>

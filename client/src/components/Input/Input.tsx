@@ -71,7 +71,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 <p
                     role="alert"
                     className="mt-2 text-sm text-rose-600"
-                    id={name + '-error'}
+                    id={`${name}-error`}
                 >
                     This field is required
                 </p>

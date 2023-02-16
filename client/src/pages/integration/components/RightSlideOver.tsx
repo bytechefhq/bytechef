@@ -1,5 +1,5 @@
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import React, {Fragment} from 'react';
+import {Fragment} from 'react';
 import {
     Arrow,
     Content,
@@ -58,6 +58,7 @@ const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
                                                                     >
                                                                         <InfoCircledIcon className="h-4 w-4" />
                                                                     </Trigger>
+
                                                                     <Portal>
                                                                         <Content
                                                                             sideOffset={
@@ -88,14 +89,16 @@ const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
                                                             <span className="sr-only">
                                                                 Close panel
                                                             </span>
+
                                                             <Cross1Icon
-                                                                className="h-3 w-3 text-gray-900 hover:cursor-pointer"
+                                                                className="h-3 w-3 cursor-pointer text-gray-900"
                                                                 aria-hidden="true"
                                                             />
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div className="relative mt-6 flex-1 px-4 sm:px-4">
                                                 <div className="h-full">
                                                     <Provider>
@@ -182,6 +185,7 @@ const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div className="flex shrink-0 justify-start p-4">
                                             <Select
                                                 defaultValue={'2'}
