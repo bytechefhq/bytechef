@@ -10,7 +10,7 @@ import {
 } from '@radix-ui/react-icons';
 import LeftSidebar from './components/LeftSidebar';
 import RightSlideOver from './components/RightSlideOver';
-import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
+import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 import ToggleGroup, {
     ToggleItem,
 } from '../../components/ToggleGroup/ToggleGroup';
@@ -106,7 +106,7 @@ const Integration: React.FC = () => {
             !componentsError &&
             !flowControlsError &&
             !integrationWorkflowsError ? (
-                <SidebarContentLayout
+                <LayoutContainer
                     className="border-l border-gray-200 bg-gray-100"
                     header={
                         <header className="flex items-center">
@@ -264,7 +264,7 @@ const Integration: React.FC = () => {
                             />
                         )}
                     </>
-                </SidebarContentLayout>
+                </LayoutContainer>
             ) : (
                 <h1>Loading current view: {view}</h1>
             )}
