@@ -18,15 +18,21 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.config.ConnectionRestTestConfiguration;
+import com.bytechef.hermes.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
+import com.bytechef.hermes.connection.web.rest.model.PutConnectionTagsRequestModel;
+import com.bytechef.hermes.connection.web.rest.model.TagModel;
+import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -47,10 +53,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 public class ConnectionControllerIntTest {
 
     @MockBean
-    private ConnectionService connectionService;
+    private ConnectionFacade connectionFacade;
 
-    @MockBean
-    private EncryptionKey encryptionKey;
+    @Autowired
+    private ConnectionMapper connectionMapper;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -70,17 +76,18 @@ public class ConnectionControllerIntTest {
 
         ArgumentCaptor<Long> argument = ArgumentCaptor.forClass(Long.class);
 
-        verify(connectionService).delete(argument.capture());
+        verify(connectionFacade).delete(argument.capture());
 
         Assertions.assertEquals(1L, argument.getValue());
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testGetConnection() {
         try {
             Connection connection = getConnection();
 
-            when(connectionService.getConnection(1L)).thenReturn(connection);
+            when(connectionFacade.getConnection(1L)).thenReturn(connection);
 
             this.webTestClient
                 .get()
@@ -89,7 +96,33 @@ public class ConnectionControllerIntTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(ConnectionModel.class);
+                .expectBody(ConnectionModel.class)
+                .isEqualTo(connectionMapper.convert(connection));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    public void testGetConnectionTags() {
+        when(connectionFacade.getConnectionTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
+
+        try {
+            this.webTestClient
+                .get()
+                .uri("/connections/tags")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.[0].id")
+                .isEqualTo(1)
+                .jsonPath("$.[1].id")
+                .isEqualTo(2)
+                .jsonPath("$.[0].name")
+                .isEqualTo("tag1")
+                .jsonPath("$.[1].name")
+                .isEqualTo("tag2");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -99,20 +132,52 @@ public class ConnectionControllerIntTest {
     public void testGetConnections() {
         Connection connection = getConnection();
 
-        when(connectionService.getConnections()).thenReturn(List.of(connection));
+        when(connectionFacade.getConnections(null, null)).thenReturn(List.of(connection));
 
-        try {
-            this.webTestClient
-                .get()
-                .uri("/connections")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(ConnectionModel.class)
-                .hasSize(1);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .get()
+            .uri("/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .contains(connectionMapper.convert(connection))
+            .hasSize(1);
+
+        when(connectionFacade.getConnections(List.of("component1"), null)).thenReturn(List.of(connection));
+
+        this.webTestClient
+            .get()
+            .uri("/connections?componentNames=component1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .hasSize(1);
+
+        when(connectionFacade.getConnections(null, List.of(1L))).thenReturn(List.of(connection));
+
+        this.webTestClient
+            .get()
+            .uri("/connections?tagIds=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .hasSize(1);
+
+        when(connectionFacade.getConnections(List.of("component1"), List.of(1L))).thenReturn(List.of(connection));
+
+        this.webTestClient
+            .get()
+            .uri("/connections?componentNames=component1&tagIds=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful();
     }
 
     @Test
@@ -120,11 +185,11 @@ public class ConnectionControllerIntTest {
     public void testPostConnection() {
         Connection connection = getConnection();
         ConnectionModel connectionModel = new ConnectionModel().componentName("componentName")
-            .componentVersion(1)
+            .connectionVersion(1)
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionService.create(any())).thenReturn(getConnection());
+        when(connectionFacade.create(any())).thenReturn(getConnection());
 
         try {
             assert connection.getId() != null;
@@ -152,13 +217,13 @@ public class ConnectionControllerIntTest {
 
         ArgumentCaptor<Connection> connectionArgumentCaptor = ArgumentCaptor.forClass(Connection.class);
 
-        verify(connectionService).create(connectionArgumentCaptor.capture());
+        verify(connectionFacade).create(connectionArgumentCaptor.capture());
 
         connection.setId(null);
 
         org.assertj.core.api.Assertions.assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
-            .hasFieldOrPropertyWithValue("componentVersion", 1)
+            .hasFieldOrPropertyWithValue("connectionVersion", 1)
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("parameters", Map.of("key1", "value1"));
     }
@@ -171,7 +236,7 @@ public class ConnectionControllerIntTest {
 
         connection.setName("name2");
 
-        when(connectionService.update(connection)).thenReturn(connection);
+        when(connectionFacade.update(connection)).thenReturn(connection);
 
         try {
             this.webTestClient
@@ -193,14 +258,45 @@ public class ConnectionControllerIntTest {
         }
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    @SuppressFBWarnings("NP")
+    public void testPutConnectionTags() {
+        try {
+            this.webTestClient
+                .put()
+                .uri("/connections/1/tags")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new PutConnectionTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(connectionFacade).update(anyLong(), tagsArgumentCaptor.capture());
+
+        List<Tag> capturedTags = tagsArgumentCaptor.getValue();
+
+        Iterator<Tag> tagIterator = capturedTags.iterator();
+
+        Tag capturedTag = tagIterator.next();
+
+        Assertions.assertEquals("tag1", capturedTag.getName());
+    }
+
     private static Connection getConnection() {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setComponentVersion(1);
         connection.setId(1L);
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
+        connection.setVersion(1);
 
         return connection;
     }

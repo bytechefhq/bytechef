@@ -15,21 +15,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.web.rest.mapper;
+package com.bytechef.hermes.connection.facade;
 
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
-import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.tag.domain.Tag;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConnectionMapperSpringConfig.class)
-public interface ConnectionModelMapper extends Converter<ConnectionModel, Connection> {
+public interface ConnectionFacade {
 
-    @Mapping(target = "tagIds", ignore = true)
-    Connection convert(ConnectionModel connectionModel);
+    Connection create(Connection connection);
+
+    void delete(Long id);
+
+    Connection getConnection(Long id);
+
+    List<Connection> getConnections(List<String> componentNames, List<Long> tagIds);
+
+    List<Tag> getConnectionTags();
+
+    Connection update(Long id, List<Tag> tags);
+
+    Connection update(Connection connection);
 }

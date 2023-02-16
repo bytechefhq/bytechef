@@ -20,7 +20,9 @@ package com.bytechef.hermes.connection.rsocket.client.service;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import java.util.List;
+import java.util.Map;
 
+import com.bytechef.tag.domain.Tag;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -64,10 +66,20 @@ public class ConnectionServiceRSocketClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections() {
+    public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
         return rSocketRequester
             .route("getConnections")
+            .data(Map.of("componentNames", componentNames, "tagIds", tagIds))
             .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {})
+            .block();
+    }
+
+    @Override
+    public Connection update(Long id, List<Tag> tags) {
+        return rSocketRequester
+            .route("updateConnection")
+            .data(Map.of("id", id, "tags", tags))
+            .retrieveMono(Connection.class)
             .block();
     }
 

@@ -34,7 +34,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.hermes.connection"
+        "com.bytechef.hermes.connection",
+        "com.bytechef.tag"
     })
 @EnableAutoConfiguration
 @SpringBootConfiguration
@@ -64,7 +65,9 @@ public class ConnectionIntTestConfiguration {
         }
     }
 
-    @EnableJdbcRepositories(basePackages = "com.bytechef.hermes.connection.repository")
+    @EnableJdbcRepositories(basePackages = {
+        "com.bytechef.hermes.connection.repository", "com.bytechef.tag.repository"
+    })
     public static class ConnectionJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
     }
 }

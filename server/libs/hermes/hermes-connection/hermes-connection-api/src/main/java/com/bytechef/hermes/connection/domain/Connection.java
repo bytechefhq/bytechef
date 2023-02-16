@@ -17,20 +17,28 @@
 
 package com.bytechef.hermes.connection.domain;
 
-import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
+import com.bytechef.tag.domain.Tag;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -58,6 +66,9 @@ public final class Connection implements Persistable<Long> {
     @Id
     private Long id;
 
+    @MappedCollection(idColumn = "connection_id")
+    private Set<ConnectionTag> connectionTags = new HashSet<>();
+
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -70,10 +81,21 @@ public final class Connection implements Persistable<Long> {
     private String name;
 
     @Column("parameters")
-    private EncryptedMapWrapper parameters;
+    private MapWrapper parameters;
+
+    @Transient
+    private List<Tag> tags = new ArrayList<>();
 
     @Version
     private int version;
+
+    public void addTag(Tag tag) {
+        if (tag.getId() != null) {
+            connectionTags.add(new ConnectionTag(tag));
+        }
+
+        tags.add(tag);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -160,6 +182,17 @@ public final class Connection implements Persistable<Long> {
         return Collections.unmodifiableMap(parameters.getMap());
     }
 
+    public List<Long> getTagIds() {
+        return connectionTags
+            .stream()
+            .map(ConnectionTag::getTagId)
+            .toList();
+    }
+
+    public List<Tag> getTags() {
+        return List.copyOf(tags);
+    }
+
     public int getVersion() {
         return version;
     }
@@ -190,7 +223,18 @@ public final class Connection implements Persistable<Long> {
     }
 
     public void setParameters(Map<String, Object> parameters) {
-        this.parameters = new EncryptedMapWrapper(parameters);
+        this.parameters = new MapWrapper(parameters);
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.connectionTags = new HashSet<>();
+        this.tags = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(tags)) {
+            for (Tag tag : tags) {
+                addTag(tag);
+            }
+        }
     }
 
     public void setVersion(int version) {
@@ -204,7 +248,8 @@ public final class Connection implements Persistable<Long> {
             + name + '\'' + "authorizationName='"
             + authorizationName + '\'' + ", componentName='"
             + componentName + '\'' + ", componentVersion="
-            + componentVersion + ", parameters="
+            + componentVersion + ", connectionTags="
+            + connectionTags + ", parameters="
             + parameters + ", version="
             + version + ", createdBy='"
             + createdBy + '\'' + ", createdDate="
