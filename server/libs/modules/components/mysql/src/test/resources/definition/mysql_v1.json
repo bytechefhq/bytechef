@@ -420,7 +420,7 @@
   ],
   "connection": {
     "componentName": "mysql",
-    "componentVersion": 1,
+    "version": 1,
     "authorizations": [],
     "display": {
       "description": "Query, insert nd update data from MySQL.",

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.connection.converter;
 
-import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
+import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.encryption.Encryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-public class EncryptedMapWrapperToStringConverter implements Converter<EncryptedMapWrapper, String> {
+public class EncryptedMapWrapperToStringConverter implements Converter<MapWrapper, String> {
 
     private final Encryption encryption;
     private final ObjectMapper objectMapper;
@@ -38,7 +38,7 @@ public class EncryptedMapWrapperToStringConverter implements Converter<Encrypted
     }
 
     @Override
-    public String convert(EncryptedMapWrapper source) {
+    public String convert(MapWrapper source) {
         return encryption.encrypt(write(objectMapper, source.getMap()));
     }
 

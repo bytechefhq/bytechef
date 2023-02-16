@@ -1598,7 +1598,7 @@
   } ],
   "connection" : {
     "componentName" : "petstore",
-    "componentVersion" : 1,
+    "version" : 1,
     "authorizations" : [ {
       "display" : {
         "label" : "OAuth2 Implicit"

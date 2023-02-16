@@ -2425,7 +2425,7 @@
   } ],
   "connection" : {
     "componentName" : "jira",
-    "componentVersion" : 1,
+    "version" : 1,
     "authorizations" : [ {
       "display" : {
         "label" : "Basic Auth"

@@ -11,6 +11,24 @@ paths:
       tags:
         - connections
       operationId: getConnections
+      parameters:
+        - name: componentNames
+          description: The list of component names used for filtering connections.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: tagId
+          description: The list of tag ids of used for filtering connections.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
       responses:
         "200":
           description: TODO
@@ -38,6 +56,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Connection'
+  /connections/tags:
+    get:
+      description: Get connection tags.
+      summary: Get connection tags.
+      tags:
+        - connections
+      operationId: getConnectionTags
+      responses:
+        "200":
+          description: The list of connection tags.
+          content:
+            application/json:
+              schema:
+                description: The response object that contains the array of tags.
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
   /connections/{id}:
     delete:
       description: TODO
@@ -101,6 +136,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Connection'
+  /connections/{id}/tags:
+    put:
+      description: Updates tags of an existing connection.
+      summary: Updates tags of an existing connection.
+      tags:
+        - connections
+      operationId: putConnectionTags
+      parameters:
+        - name: id
+          description: The id of the connection.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: The request object that contains the array of tags.
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Tag'
+        required: true
+      responses:
+        "200":
+          description: Successful operation.
 components:
   schemas:
     Connection:
@@ -109,7 +174,7 @@ components:
       required:
         - name
         - componentName
-        - componentVersion
+        - connectionVersion
         - parameters
       properties:
         authorizationName:
@@ -120,7 +185,7 @@ components:
           description: TODO
           type: string
           readOnly: true
-        componentVersion:
+        connectionVersion:
           description: TODO
           type: integer
           readOnly: true
@@ -156,6 +221,34 @@ components:
           additionalProperties:
             type: object
           readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        version:
+          type: integer
+          format: int32
+    Tag:
+      description: An integration tag.
+      required:
+        - name
+      properties:
+        id:
+          description: The id of the tag.
+          type: integer
+          format: int64
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          description: The name of the tag.
+          type: string
         version:
           type: integer
           format: int32

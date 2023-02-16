@@ -18,6 +18,8 @@
 package com.bytechef.hermes.connection.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.tag.domain.Tag;
+
 import java.util.List;
 
 /**
@@ -31,8 +33,9 @@ public interface ConnectionService {
 
     Connection getConnection(long id);
 
-    List<Connection> getConnections();
+    List<Connection> getConnections(List<String> componentNames, List<Long> tagIds);
 
     Connection update(Connection connection);
 
+    Connection update(Long id, List<Tag> tags);
 }

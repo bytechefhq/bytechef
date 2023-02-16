@@ -2466,7 +2466,7 @@
   ],
   "connection": {
     "componentName": "httpClient",
-    "componentVersion": 1,
+    "version": 1,
     "authorizations": [
       {
         "display": {
