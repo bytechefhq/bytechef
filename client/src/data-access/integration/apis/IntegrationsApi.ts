@@ -50,8 +50,8 @@ export interface GetIntegrationWorkflowsRequest {
 }
 
 export interface GetIntegrationsRequest {
-    categoryId?: number;
-    tagId?: number;
+    categoryIds?: Array<number>;
+    tagIds?: Array<number>;
 }
 
 export interface PostIntegrationRequest {
@@ -236,12 +236,12 @@ export class IntegrationsApi extends runtime.BaseAPI {
     async getIntegrationsRaw(requestParameters: GetIntegrationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationModel>>> {
         const queryParameters: any = {};
 
-        if (requestParameters.categoryId !== undefined) {
-            queryParameters['categoryId'] = requestParameters.categoryId;
+        if (requestParameters.categoryIds) {
+            queryParameters['categoryIds'] = requestParameters.categoryIds;
         }
 
-        if (requestParameters.tagId !== undefined) {
-            queryParameters['tagId'] = requestParameters.tagId;
+        if (requestParameters.tagIds) {
+            queryParameters['tagIds'] = requestParameters.tagIds;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
