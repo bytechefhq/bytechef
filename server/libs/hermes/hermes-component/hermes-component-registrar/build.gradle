@@ -12,6 +12,7 @@ dependencies {
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation libs.wiremock
     testImplementation project(":server:libs:core:encryption:encryption-api")
+    testImplementation project(":server:libs:core:tag:tag-api")
     testImplementation project(":server:libs:db-migration")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     testImplementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
