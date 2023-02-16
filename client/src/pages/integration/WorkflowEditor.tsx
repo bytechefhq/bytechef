@@ -1,10 +1,12 @@
-import React, {useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
     MiniMap,
     Edge,
     Node,
+    useReactFlow,
+    useStore,
 } from 'reactflow';
 import 'reactflow/dist/base.css';
 import PlaceholderEdge from './edges/PlaceholderEdge';
@@ -17,6 +19,8 @@ import useLayout from './hooks/useLayout';
 import {PlayIcon} from '@heroicons/react/24/outline';
 
 const Workflow = (): JSX.Element => {
+    const [viewportWidth, setViewportWidth] = useState(0);
+
     const defaultEdges: Edge[] = [
         {
             id: '1=>2',
@@ -61,6 +65,23 @@ const Workflow = (): JSX.Element => {
         []
     );
 
+    const {setViewport} = useReactFlow();
+
+    const {width} = useStore((store) => ({
+        width: store.width,
+        height: store.height,
+    }));
+
+    useEffect(() => {
+        setViewportWidth(width);
+
+        setViewport({
+            x: width / 2,
+            y: 50,
+            zoom: 1,
+        });
+    }, [setViewport, width]);
+
     useLayout();
 
     return (
@@ -68,15 +89,22 @@ const Workflow = (): JSX.Element => {
             <ReactFlow
                 defaultNodes={defaultNodes}
                 defaultEdges={defaultEdges}
+                defaultViewport={{
+                    x: viewportWidth / 2,
+                    y: 50,
+                    zoom: 1,
+                }}
                 edgeTypes={edgeTypes}
-                fitView
-                fitViewOptions={{padding: 0.95}}
-                minZoom={0.2}
+                minZoom={0.6}
+                maxZoom={1.5}
                 nodeTypes={nodeTypes}
                 nodesDraggable={false}
                 nodesConnectable={false}
-                zoomOnDoubleClick={false}
+                panOnDrag={false}
+                panOnScroll={true}
                 proOptions={{hideAttribution: true}}
+                zoomOnDoubleClick={false}
+                zoomOnScroll={false}
             >
                 <MiniMap />
 
