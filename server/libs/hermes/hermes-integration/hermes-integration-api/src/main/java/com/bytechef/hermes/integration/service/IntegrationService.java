@@ -27,7 +27,7 @@ import java.util.List;
  */
 public interface IntegrationService {
 
-    Integration addWorkflow(Long id, String workflowId);
+    Integration addWorkflow(long id, String workflowId);
 
     Integration create(Integration integration);
 
@@ -35,9 +35,9 @@ public interface IntegrationService {
 
     Integration getIntegration(long id);
 
-    List<Integration> getIntegrations(Long categoryId, Long tagId);
+    List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds);
 
-    Integration update(Long id, List<Tag> tags);
+    Integration update(long id, List<Tag> tags);
 
     Integration update(Integration integration);
 }

@@ -28,7 +28,6 @@ import com.bytechef.hermes.integration.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.CategoryService;
-import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
@@ -69,9 +68,6 @@ public class IntegrationControllerIntTest {
 
     @Autowired
     private IntegrationMapper integrationMapper;
-
-    @MockBean
-    private IntegrationService integrationService;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -160,58 +156,6 @@ public class IntegrationControllerIntTest {
     }
 
     @Test
-    public void testGetIntegrations() {
-        Integration integration = getIntegration();
-
-        when(integrationFacade.getIntegrations(null, null)).thenReturn(List.of(integration));
-
-        this.webTestClient
-            .get()
-            .uri("/integrations")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBodyList(IntegrationModel.class)
-            .contains(integrationMapper.convert(integration))
-            .hasSize(1);
-
-        when(integrationFacade.getIntegrations(1L, null)).thenReturn(List.of(integration));
-
-        this.webTestClient
-            .get()
-            .uri("/integrations?categoryId=1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBodyList(IntegrationModel.class)
-            .hasSize(1);
-
-        when(integrationFacade.getIntegrations(null, 1L)).thenReturn(List.of(integration));
-
-        this.webTestClient
-            .get()
-            .uri("/integrations?tagId=1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBodyList(IntegrationModel.class)
-            .hasSize(1);
-
-        when(integrationFacade.getIntegrations(1L, 1L)).thenThrow(new RuntimeException());
-
-        this.webTestClient
-            .get()
-            .uri("/integrations?categoryId=1&tagId=1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .is5xxServerError();
-    }
-
-    @Test
     public void testGetIntegrationTags() {
         when(integrationFacade.getIntegrationTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
@@ -234,6 +178,58 @@ public class IntegrationControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+    }
+
+    @Test
+    public void testGetIntegrations() {
+        Integration integration = getIntegration();
+
+        when(integrationFacade.getIntegrations(null, null)).thenReturn(List.of(integration));
+
+        this.webTestClient
+            .get()
+            .uri("/integrations")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(IntegrationModel.class)
+            .contains(integrationMapper.convert(integration))
+            .hasSize(1);
+
+        when(integrationFacade.getIntegrations(List.of(1L), null)).thenReturn(List.of(integration));
+
+        this.webTestClient
+            .get()
+            .uri("/integrations?categoryIds=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(IntegrationModel.class)
+            .hasSize(1);
+
+        when(integrationFacade.getIntegrations(null, List.of(1L))).thenReturn(List.of(integration));
+
+        this.webTestClient
+            .get()
+            .uri("/integrations?tagIds=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(IntegrationModel.class)
+            .hasSize(1);
+
+        when(integrationFacade.getIntegrations(List.of(1L), List.of(1L))).thenReturn(List.of(integration));
+
+        this.webTestClient
+            .get()
+            .uri("/integrations?categoryIds=1&tagIds=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful();
     }
 
     @Test

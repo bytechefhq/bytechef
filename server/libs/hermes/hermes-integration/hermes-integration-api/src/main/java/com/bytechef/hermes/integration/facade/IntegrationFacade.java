@@ -36,7 +36,7 @@ public interface IntegrationFacade {
 
     Integration getIntegration(Long id);
 
-    List<Integration> getIntegrations(Long categoryId, Long tagId);
+    List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds);
 
     List<Tag> getIntegrationTags();
 

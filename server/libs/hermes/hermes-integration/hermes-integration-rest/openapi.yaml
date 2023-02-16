@@ -13,20 +13,24 @@ paths:
         - integrations
       operationId: getIntegrations
       parameters:
-        - name: categoryId
-          description: The id of the category used for filtering integrations.
+        - name: categoryIds
+          description: The list of the category ids used for filtering integrations.
           in: query
           required: false
           schema:
-            type: integer
-            format: int64
-        - name: tagId
+            type: array
+            items:
+              type: integer
+              format: int64
+        - name: tagIds
           description: The list of tag ids of used for filtering integrations.
           in: query
           required: false
           schema:
-            type: integer
-            format: int64
+            type: array
+            items:
+              type: integer
+              format: int64
       responses:
         "200":
           description: The list of integrations.

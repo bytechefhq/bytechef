@@ -51,7 +51,7 @@ public final class Integration implements Persistable<Long> {
     private Category category;
 
     @Column("category_id")
-    private AggregateReference<Category, Long> categoryRef;
+    private AggregateReference<Category, Long> categoryId;
 
     @CreatedBy
     @Column("created_by")
@@ -101,6 +101,7 @@ public final class Integration implements Persistable<Long> {
     public Integration(
         String name, String description, Set<IntegrationTag> integrationTags,
         Set<IntegrationWorkflow> integrationWorkflows) {
+
         this.name = name;
         this.description = description;
         this.integrationTags.addAll(integrationTags);
@@ -140,7 +141,7 @@ public final class Integration implements Persistable<Long> {
     }
 
     public Long getCategoryId() {
-        return categoryRef == null ? null : categoryRef.getId();
+        return categoryId == null ? null : categoryId.getId();
     }
 
     @SuppressFBWarnings("EI")
@@ -217,12 +218,12 @@ public final class Integration implements Persistable<Long> {
         this.category = category;
 
         if (category != null && !category.isNew()) {
-            this.categoryRef = AggregateReference.to(category.getId());
+            this.categoryId = AggregateReference.to(category.getId());
         }
     }
 
     public void setCategoryId(Long categoryId) {
-        this.categoryRef = AggregateReference.to(categoryId);
+        this.categoryId = AggregateReference.to(categoryId);
     }
 
     public void setDescription(String description) {
