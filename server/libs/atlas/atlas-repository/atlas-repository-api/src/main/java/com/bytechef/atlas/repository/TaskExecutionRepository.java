@@ -19,13 +19,10 @@
 
 package com.bytechef.atlas.repository;
 
-import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 /**
  * @author Arik Cohen
@@ -34,34 +31,34 @@ public interface TaskExecutionRepository {
     /**
      * Returns the execution steps of the given job
      *
-     * @param jobRef
+     * @param jobId
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, Long> jobRef);
+    List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
 
     /**
-     * Returns the execution steps of the given jobs
+     * Return the execution steps of the given jobs
      *
-     * @param jobRefs
+     * @param jobIds
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, Long>> jobRefs);
+    List<TaskExecution> findAllByJobIdInOrderByCreatedDate(List<Long> jobIds);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.
      *
-     * @param jobRef
+     * @param jobId
      * @return
      */
-    List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, Long> jobRef);
+    List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which are the children of the given parent id.
      *
-     * @param parentRef
+     * @param parentId
      * @return
      */
-    List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, Long> parentRef);
+    List<TaskExecution> findAllByParentId(Long parentId);
 
     /**
      * Find a single {@link TaskExecution} instance by its id.
