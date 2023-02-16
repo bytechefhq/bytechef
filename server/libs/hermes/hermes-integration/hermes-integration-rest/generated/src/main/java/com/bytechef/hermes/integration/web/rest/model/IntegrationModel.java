@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-08T13:23:46.808411+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-16T08:29:28.643031+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("category")
@@ -77,7 +77,7 @@ public class IntegrationModel {
    * @return category
   */
   @Valid 
-  @Schema(name = "category", required = false)
+  @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public CategoryModel getCategory() {
     return category;
   }
@@ -96,7 +96,7 @@ public class IntegrationModel {
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -115,7 +115,7 @@ public class IntegrationModel {
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -134,7 +134,7 @@ public class IntegrationModel {
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the integration.", required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -153,7 +153,7 @@ public class IntegrationModel {
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of the integration.", required = true)
+  @Schema(name = "name", description = "The name of the integration.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -172,7 +172,7 @@ public class IntegrationModel {
    * @return description
   */
   
-  @Schema(name = "description", description = "The description of the integration.", required = false)
+  @Schema(name = "description", description = "The description of the integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
   }
@@ -191,7 +191,7 @@ public class IntegrationModel {
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -210,7 +210,7 @@ public class IntegrationModel {
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -237,7 +237,7 @@ public class IntegrationModel {
    * @return tags
   */
   @Valid 
-  @Schema(name = "tags", required = false)
+  @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<TagModel> getTags() {
     return tags;
   }
@@ -256,7 +256,7 @@ public class IntegrationModel {
    * @return version
   */
   
-  @Schema(name = "version", required = false)
+  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }
@@ -283,7 +283,7 @@ public class IntegrationModel {
    * @return workflowIds
   */
   
-  @Schema(name = "workflowIds", description = "The workflow ids belonging to this integration.", required = false)
+  @Schema(name = "workflowIds", description = "The workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<String> getWorkflowIds() {
     return workflowIds;
   }
