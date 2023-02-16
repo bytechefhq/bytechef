@@ -2,11 +2,14 @@ package com.bytechef.hermes.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.hermes.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -25,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-17T19:55:44.393969+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-18T22:15:44.357328+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")
@@ -34,8 +37,8 @@ public class ConnectionModel {
   @JsonProperty("componentName")
   private String componentName;
 
-  @JsonProperty("componentVersion")
-  private Integer componentVersion;
+  @JsonProperty("connectionVersion")
+  private Integer connectionVersion;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -61,6 +64,10 @@ public class ConnectionModel {
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
+  @JsonProperty("tags")
+  @Valid
+  private List<TagModel> tags = null;
+
   @JsonProperty("version")
   private Integer version;
 
@@ -74,7 +81,7 @@ public class ConnectionModel {
    * @return authorizationName
   */
   
-  @Schema(name = "authorizationName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "authorizationName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getAuthorizationName() {
     return authorizationName;
   }
@@ -93,7 +100,7 @@ public class ConnectionModel {
    * @return componentName
   */
   
-  @Schema(name = "componentName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = true)
+  @Schema(name = "componentName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getComponentName() {
     return componentName;
   }
@@ -102,23 +109,23 @@ public class ConnectionModel {
     this.componentName = componentName;
   }
 
-  public ConnectionModel componentVersion(Integer componentVersion) {
-    this.componentVersion = componentVersion;
+  public ConnectionModel connectionVersion(Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
     return this;
   }
 
   /**
    * TODO
-   * @return componentVersion
+   * @return connectionVersion
   */
   
-  @Schema(name = "componentVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = true)
-  public Integer getComponentVersion() {
-    return componentVersion;
+  @Schema(name = "connectionVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  public Integer getConnectionVersion() {
+    return connectionVersion;
   }
 
-  public void setComponentVersion(Integer componentVersion) {
-    this.componentVersion = componentVersion;
+  public void setConnectionVersion(Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
   }
 
   public ConnectionModel createdBy(String createdBy) {
@@ -131,7 +138,7 @@ public class ConnectionModel {
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -150,7 +157,7 @@ public class ConnectionModel {
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -169,7 +176,7 @@ public class ConnectionModel {
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "TODO", required = true)
+  @Schema(name = "name", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -188,7 +195,7 @@ public class ConnectionModel {
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -207,7 +214,7 @@ public class ConnectionModel {
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -226,7 +233,7 @@ public class ConnectionModel {
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -250,13 +257,40 @@ public class ConnectionModel {
    * @return parameters
   */
   
-  @Schema(name = "parameters", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = true)
+  @Schema(name = "parameters", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
   public Map<String, Object> getParameters() {
     return parameters;
   }
 
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
+  }
+
+  public ConnectionModel tags(List<TagModel> tags) {
+    this.tags = tags;
+    return this;
+  }
+
+  public ConnectionModel addTagsItem(TagModel tagsItem) {
+    if (this.tags == null) {
+      this.tags = new ArrayList<>();
+    }
+    this.tags.add(tagsItem);
+    return this;
+  }
+
+  /**
+   * Get tags
+   * @return tags
+  */
+  @Valid 
+  @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public List<TagModel> getTags() {
+    return tags;
+  }
+
+  public void setTags(List<TagModel> tags) {
+    this.tags = tags;
   }
 
   public ConnectionModel version(Integer version) {
@@ -269,7 +303,7 @@ public class ConnectionModel {
    * @return version
   */
   
-  @Schema(name = "version", required = false)
+  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }
@@ -289,7 +323,7 @@ public class ConnectionModel {
     ConnectionModel connection = (ConnectionModel) o;
     return Objects.equals(this.authorizationName, connection.authorizationName) &&
         Objects.equals(this.componentName, connection.componentName) &&
-        Objects.equals(this.componentVersion, connection.componentVersion) &&
+        Objects.equals(this.connectionVersion, connection.connectionVersion) &&
         Objects.equals(this.createdBy, connection.createdBy) &&
         Objects.equals(this.createdDate, connection.createdDate) &&
         Objects.equals(this.name, connection.name) &&
@@ -297,12 +331,13 @@ public class ConnectionModel {
         Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, connection.lastModifiedDate) &&
         Objects.equals(this.parameters, connection.parameters) &&
+        Objects.equals(this.tags, connection.tags) &&
         Objects.equals(this.version, connection.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationName, componentName, componentVersion, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters, version);
+    return Objects.hash(authorizationName, componentName, connectionVersion, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
   }
 
   @Override
@@ -311,7 +346,7 @@ public class ConnectionModel {
     sb.append("class ConnectionModel {\n");
     sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
+    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
@@ -319,6 +354,7 @@ public class ConnectionModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
+    sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
