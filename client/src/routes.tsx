@@ -6,6 +6,7 @@ import Integrations from './pages/integrations/Integrations';
 import Connections from './pages/connections/Connections';
 import Settings from './pages/settings/Settings';
 import Instances from './pages/instances/Instances';
+import Executions from './pages/executions/Executions';
 import {QueryClient} from '@tanstack/react-query';
 import {IntegrationsApi} from './data-access/integration';
 import {IntegrationKeys} from './queries/integrations';
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
             {
                 path: 'automation/connections',
                 element: <Connections />,
+            },
+            {
+                path: 'automation/executions',
+                element: <Executions />,
             },
             {
                 path: 'settings',
