@@ -25,9 +25,10 @@ import java.util.stream.StreamSupport;
 
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +43,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration addWorkflow(Long id, String workflowId) {
+    public Integration addWorkflow(long id, String workflowId) {
         Integration integration = getIntegration(id);
 
         integration.addWorkflow(workflowId);
@@ -69,17 +70,17 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public List<Integration> getIntegrations(Long categoryId, Long tagId) {
+    public List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
         Iterable<Integration> integrationIterable;
 
-        if (categoryId == null && tagId == null) {
+        if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
             integrationIterable = integrationRepository.findAll();
-        } else if (categoryId != null && tagId == null) {
-            integrationIterable = integrationRepository.findByCategoryRef(AggregateReference.to(categoryId));
-        } else if (categoryId == null) {
-            integrationIterable = integrationRepository.findByTagRef(AggregateReference.to(tagId));
+        } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
+            integrationIterable = integrationRepository.findByCategoryIdIn(categoryIds);
+        } else if (CollectionUtils.isEmpty(categoryIds)) {
+            integrationIterable = integrationRepository.findByTagIdIn(tagIds);
         } else {
-            throw new IllegalArgumentException("categoryId and tagId are null");
+            integrationIterable = integrationRepository.findByCategoryIdsAndTagIds(categoryIds, tagIds);
         }
 
         return StreamSupport.stream(integrationIterable.spliterator(), false)
@@ -87,7 +88,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration update(Long id, List<Tag> tags) {
+    public Integration update(long id, List<Tag> tags) {
         Integration integration = getIntegration(id);
 
         integration.setTags(tags);
@@ -96,7 +97,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration update(Integration integration) {
+    public Integration update(@NonNull Integration integration) {
         Assert.notNull(integration, "'integration' must not be null");
         Assert.notEmpty(integration.getWorkflowIds(), "'workflowIds' must not be empty");
 

@@ -121,15 +121,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Integration> getIntegrations(Long categoryId, Long tagId) {
-        List<Integration> integrations = integrationService.getIntegrations(categoryId, tagId);
+    public List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
+        List<Integration> integrations = integrationService.getIntegrations(categoryIds, tagIds);
 
-        List<Long> categoryIds = integrations.stream()
+        List<Category> categories = categoryService.getCategories(integrations.stream()
             .map(Integration::getCategoryId)
             .filter(Objects::nonNull)
-            .toList();
-
-        List<Category> categories = categoryService.getCategories(categoryIds);
+            .toList());
 
         for (Category category : categories) {
             integrations.stream()
@@ -137,13 +135,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                 .forEach(integration -> integration.setCategory(category));
         }
 
-        List<Long> tagIds = integrations.stream()
+        List<Tag> tags = tagService.getTags(integrations.stream()
             .flatMap(integration -> integration.getTagIds()
                 .stream())
             .filter(Objects::nonNull)
-            .toList();
-
-        List<Tag> tags = tagService.getTags(tagIds);
+            .toList());
 
         for (Integration integration : integrations) {
             integration.setTags(

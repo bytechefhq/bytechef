@@ -17,15 +17,14 @@
 
 package com.bytechef.hermes.integration.repository;
 
-import com.bytechef.hermes.integration.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
-import com.bytechef.tag.domain.Tag;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -34,12 +33,21 @@ import org.springframework.stereotype.Repository;
 public interface IntegrationRepository
     extends PagingAndSortingRepository<Integration, Long>, CrudRepository<Integration, Long> {
 
+    Iterable<Integration> findByCategoryIdIn(List<Long> categoryIds);
+
     @Query("""
             SELECT integration.* FROM integration
             JOIN integration_tag ON integration.id = integration_tag.integration_id
-            WHERE integration_tag.tag_id = :#{#tagRef.id}
+            WHERE integration_tag.tag_id in (:tagIds)
         """)
-    Iterable<Integration> findByTagRef(@Param("tagRef") AggregateReference<Tag, Long> tagRef);
+    Iterable<Integration> findByTagIdIn(@Param("tagIds") List<Long> tagIds);
 
-    Iterable<Integration> findByCategoryRef(AggregateReference<Category, Long> categoryRef);
+    @Query("""
+            SELECT integration.* FROM integration
+            JOIN integration_tag ON integration.id = integration_tag.integration_id
+            WHERE integration.category_id IN (:categoryIds)
+            AND integration_tag.tag_id IN (:tagId)
+        """)
+    Iterable<Integration> findByCategoryIdsAndTagIds(
+        @Param("categoryIds") List<Long> categoryIds, @Param("tagIds") List<Long> tagIds);
 }
