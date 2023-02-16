@@ -13,7 +13,7 @@ type SidebarContentLayoutProps = {
     rightToolbarOpen?: boolean;
 };
 
-const SidebarContentLayout: React.FC<
+const LayoutContainer: React.FC<
     PropsWithChildren<SidebarContentLayoutProps>
 > = ({
     className,
@@ -143,4 +143,4 @@ const SidebarContentLayout: React.FC<
     );
 };
 
-export default SidebarContentLayout;
+export default LayoutContainer;

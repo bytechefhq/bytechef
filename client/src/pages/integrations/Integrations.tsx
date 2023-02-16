@@ -1,4 +1,4 @@
-import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
+import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 import IntegrationList from './IntegrationList';
 import IntegrationModal from './IntegrationModal';
 import React, {useState} from 'react';
@@ -32,7 +32,7 @@ const Integrations = () => {
     const {isLoading: tagsIsLoading, data: tags} = useGetIntegrationTagsQuery();
 
     return (
-        <SidebarContentLayout
+        <LayoutContainer
             header={
                 <PageHeader
                     position={'main'}
@@ -126,7 +126,7 @@ const Integrations = () => {
             }
         >
             <IntegrationList />
-        </SidebarContentLayout>
+        </LayoutContainer>
     );
 };
 
