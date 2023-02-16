@@ -25,7 +25,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -60,13 +59,13 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     public List<TaskExecution> getJobTaskExecutions(long jobId) {
-        return taskExecutionRepository.findAllByJobRefOrderByCreatedDate(AggregateReference.to(jobId));
+        return taskExecutionRepository.findAllByJobIdOrderByCreatedDate(jobId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
-        return taskExecutionRepository.findAllByParentRef(AggregateReference.to(parentId));
+        return taskExecutionRepository.findAllByParentId(parentId);
     }
 
     @Override
