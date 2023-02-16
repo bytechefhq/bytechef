@@ -37,6 +37,7 @@ import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -104,6 +106,9 @@ public class RestComponentTaskHandlerIntTest {
 
     @Autowired
     private ConnectionService connectionService;
+
+    @MockBean
+    private TagService tagService;
 
     private Connection connection;
 
