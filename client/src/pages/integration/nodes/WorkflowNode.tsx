@@ -15,7 +15,7 @@ const WorkflowNode = ({id, data}: NodeProps) => {
             onClick={onClick}
             className={cx(
                 styles.node,
-                'relative flex h-[72px] w-[72px] items-center justify-center rounded-md border-2 border-gray-300 bg-white shadow hover:bg-gray-200'
+                'relative flex h-[72px] w-[72px] cursor-pointer items-center justify-center rounded-md border-2 border-gray-300 bg-white shadow hover:bg-gray-200'
             )}
             title="Click to add a child node"
         >
