@@ -2,5 +2,7 @@ apis/ConnectionsApi.ts
 apis/index.ts
 index.ts
 models/ConnectionModel.ts
+models/PutConnectionTagsRequestModel.ts
+models/TagModel.ts
 models/index.ts
 runtime.ts
