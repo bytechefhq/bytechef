@@ -130,7 +130,7 @@ subprojects {
         jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
         // uncomment if the tests reports are not generated
         // ignoreFailures true
-        reports.html.enabled = false
+        reports.html.enabled = true
 
         afterSuite { desc, result ->
             if (!desc.parent) { // will match the outermost suite
@@ -160,7 +160,7 @@ subprojects {
 
         // uncomment if the tests reports are not generated
         // ignoreFailures true
-        reports.html.enabled = false
+        reports.html.enabled = true
 
         afterSuite { desc, result ->
             if (!desc.parent) { // will match the outermost suite
