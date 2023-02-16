@@ -93,7 +93,7 @@ interface WorkflowsProps {
 
 const Category = ({category}: CategoryProps) => {
     return (
-        <div className="text-sm uppercase text-gray-700">{category.name}</div>
+        <span className="text-xs uppercase text-gray-700">{category.name}</span>
     );
 };
 
