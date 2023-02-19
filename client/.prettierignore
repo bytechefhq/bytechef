@@ -1,5 +1,5 @@
 # openapi typescript fetch client
-**/data-access
+**/middleware
 coverage
 dist
 mockServiceWorker.js

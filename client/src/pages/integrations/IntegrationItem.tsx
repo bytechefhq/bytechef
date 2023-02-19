@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
-import {CategoryModel, TagModel} from '../../data-access/integration';
+import {CategoryModel, TagModel} from '../../middleware/integration';
 import {useIntegrationTagsMutation} from '../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';

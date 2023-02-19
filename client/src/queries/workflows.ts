@@ -1,5 +1,5 @@
 import {useQuery} from '@tanstack/react-query';
-import {WorkflowModel, WorkflowsApi} from '../data-access/workflow';
+import {WorkflowModel, WorkflowsApi} from '../middleware/workflow';
 
 export const WorkflowKeys = {
     workflow: (id: number) => ['workflow', id],
