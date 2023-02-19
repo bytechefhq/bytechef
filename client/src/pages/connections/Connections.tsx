@@ -24,7 +24,7 @@ const Connections = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Component,
     });
     const {isLoading: componentsIsLoading, data: components} =
-        useGetComponentDefinitionsQuery({authenticationInstances: true});
+        useGetComponentDefinitionsQuery({connectionInstances: true});
     const {isLoading: tagsIsLoading, data: tags} = useGetConnectionTagsQuery();
 
     return (
