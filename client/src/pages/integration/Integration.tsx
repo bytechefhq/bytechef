@@ -15,14 +15,14 @@ import ToggleGroup, {
     ToggleItem,
 } from '../../components/ToggleGroup/ToggleGroup';
 import Select from '../../components/Select/Select';
-import {WorkflowModel} from '../../data-access/workflow';
+import {WorkflowModel} from '../../middleware/workflow';
 import {
     ArrowLeftOnRectangleIcon,
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
 import WorkflowEditor from './WorkflowEditor';
 import Input from 'components/Input/Input';
-import {IntegrationModel} from '../../data-access/integration';
+import {IntegrationModel} from '../../middleware/integration';
 import useRightSlideOverStore from './stores/useRightSlideOverStore';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 import {useGetComponentDefinitionsQuery} from '../../queries/componentDefinitions';

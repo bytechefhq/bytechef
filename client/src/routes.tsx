@@ -8,7 +8,7 @@ import Settings from './pages/settings/Settings';
 import Instances from './pages/instances/Instances';
 import Executions from './pages/executions/Executions';
 import {QueryClient} from '@tanstack/react-query';
-import {IntegrationsApi} from './data-access/integration';
+import {IntegrationsApi} from './middleware/integration';
 import {IntegrationKeys} from './queries/integrations';
 
 const queryClient = new QueryClient();
