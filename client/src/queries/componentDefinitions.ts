@@ -1,18 +1,18 @@
 import {useQuery} from '@tanstack/react-query';
 import {
-    ComponentDefinitionModel,
+    ComponentDefinitionBasicModel,
     ComponentDefinitionsApi,
-} from '../data-access/component-definition';
+} from '../data-access/definition-registry';
 
 export const ComponentDefinitionKeys = {
     componentDefinitions: ['componentDefinitions'] as const,
 };
 
 export const useGetComponentDefinitionsQuery = (filter?: {
-    authenticationDefinitions?: boolean;
-    authenticationInstances?: boolean;
+    connectionDefinitions?: boolean;
+    connectionInstances?: boolean;
 }) =>
-    useQuery<ComponentDefinitionModel[], Error>(
+    useQuery<ComponentDefinitionBasicModel[], Error>(
         ComponentDefinitionKeys.componentDefinitions,
         () => new ComponentDefinitionsApi().getComponentDefinitions(filter),
         {
