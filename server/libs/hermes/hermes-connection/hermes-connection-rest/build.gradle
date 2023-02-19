@@ -23,7 +23,7 @@ task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plug
     generatorName = "typescript-fetch"
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    outputDir = "$rootDir/client/src/data-access/connection".toString()
+    outputDir = "$rootDir/client/src/middleware/connection".toString()
     typeMappings = [
         DateTime: "Date"
     ]
