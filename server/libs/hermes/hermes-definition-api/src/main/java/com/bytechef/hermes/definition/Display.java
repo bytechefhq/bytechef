@@ -17,9 +17,12 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = DefinitionDSL.ModifiableDisplay.class)
 public sealed interface Display permits DefinitionDSL.ModifiableDisplay {
 
     String getCategory();

@@ -17,7 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.web.rest;
 
+import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -29,11 +31,17 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = RegistryDefinitionRestTestConfiguration.class)
-@WebFluxTest(LocalConnectionDefinitionController.class)
-public class LocalConnectionDefinitionControllerIntTest {
+@WebFluxTest(ConnectionDefinitionController.class)
+public class ConnectionDefinitionControllerIntTest {
+
+    @MockBean
+    private ComponentDefinitionFacade componentDefinitionFacade;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
+
+    @MockBean
+    private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
     @Disabled
     @Test

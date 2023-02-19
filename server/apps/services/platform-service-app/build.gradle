@@ -10,7 +10,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
-//    implementation "org.springframework.boot:spring-boot-starter-rsocket"
+    implementation "org.springframework.boot:spring-boot-starter-rsocket"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation libs.springdoc.openapi.starter.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
@@ -32,6 +32,7 @@ dependencies {
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:db-migration")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rsocket-client")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")

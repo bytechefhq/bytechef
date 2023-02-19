@@ -22,7 +22,6 @@ import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServic
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,14 +35,13 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='worker-service-app'")
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class LocalConnectionDefinitionController implements ConnectionDefinitionsApi {
+public class ConnectionDefinitionController implements ConnectionDefinitionsApi {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ConversionService conversionService;
 
-    public LocalConnectionDefinitionController(
+    public ConnectionDefinitionController(
         ComponentDefinitionService componentDefinitionService, ConversionService conversionService) {
 
         this.componentDefinitionService = componentDefinitionService;
@@ -51,10 +49,13 @@ public class LocalConnectionDefinitionController implements ConnectionDefinition
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<ConnectionDefinitionModel>>> getConnectionDefinition(
+    public Mono<ResponseEntity<ConnectionDefinitionModel>> getConnectionDefinition(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
-        return ConnectionDefinitionsApi.super.getConnectionDefinition(componentName, componentVersion, exchange);
+        return componentDefinitionService.getConnectionDefinition(componentName, componentVersion)
+            .mapNotNull(componentDefinition -> conversionService.convert(
+                componentDefinition, ConnectionDefinitionModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -64,7 +65,10 @@ public class LocalConnectionDefinitionController implements ConnectionDefinition
         return Mono.just(
             ResponseEntity.ok(
                 componentDefinitionService.getConnectionDefinitions()
-                    .mapNotNull(connectionDefinition -> conversionService.convert(connectionDefinition,
-                        ConnectionDefinitionBasicModel.class))));
+                    .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
+                        .map(connectionDefinition -> conversionService.convert(
+                            connectionDefinition, ConnectionDefinitionBasicModel.class))
+                        .toList())
+                    .flatMapMany(Flux::fromIterable)));
     }
 }

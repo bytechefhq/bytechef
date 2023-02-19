@@ -17,12 +17,15 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = DefinitionDSL.ModifiableDisplayOption.class)
 public sealed interface DisplayOption permits DefinitionDSL.ModifiableDisplayOption {
 
     Map<String, List<Object>> getHide();

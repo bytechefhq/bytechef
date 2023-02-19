@@ -17,12 +17,15 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.List;
 import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = DefinitionDSL.ModifiablePropertyOptionDataSource.class)
 public sealed interface PropertyOptionDataSource permits DefinitionDSL.ModifiablePropertyOptionDataSource {
 
     List<String> getLoadOptionsDependsOn();
