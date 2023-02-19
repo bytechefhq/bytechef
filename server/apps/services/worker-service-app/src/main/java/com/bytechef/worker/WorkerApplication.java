@@ -19,7 +19,6 @@ package com.bytechef.worker;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -65,9 +64,7 @@ public class WorkerApplication {
     }
 
     private static void logApplicationStartup(Environment environment) {
-        String protocol = Optional.ofNullable(environment.getProperty("server.ssl.key-store"))
-            .map(key -> "https")
-            .orElse("http");
+        String protocol = "ws";
         String serverPort = environment.getProperty("server.port");
         String contextPath = Optional.ofNullable(environment.getProperty("server.servlet.context-path"))
             .filter(StringUtils::hasText)
@@ -88,7 +85,6 @@ public class WorkerApplication {
                 \tApplication '{}' is running! Access URLs:
                 \tLocal: \t\t{}://localhost:{}{}
                 \tExternal: \t{}://{}:{}{}
-                \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
                 \tGit Commit Id: \t{}
                 ----------------------------------------------------------""",
@@ -100,10 +96,6 @@ public class WorkerApplication {
             hostAddress,
             serverPort,
             contextPath,
-            Arrays.asList(environment.getActiveProfiles())
-                .contains("api-docs")
-                    ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
-                    : "",
             environment.getActiveProfiles(),
             gitCommitId);
     }

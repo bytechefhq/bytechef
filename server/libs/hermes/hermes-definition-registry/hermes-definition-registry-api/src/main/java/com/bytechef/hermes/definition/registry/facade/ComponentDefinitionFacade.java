@@ -18,12 +18,14 @@
 package com.bytechef.hermes.definition.registry.facade;
 
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface ComponentDefinitionFacade {
 
-    Flux<ComponentDefinition> getComponentDefinitions(Boolean connectionDefinitions, Boolean connectionInstances);
+    Mono<List<ComponentDefinition>> getComponentDefinitions(Boolean connectionDefinitions, Boolean connectionInstances);
 }

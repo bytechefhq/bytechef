@@ -25,9 +25,6 @@ import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitio
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionWithBasicActionsModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.stream.Collectors;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,16 +38,15 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='worker-service-app'")
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @SuppressFBWarnings("EI")
-public class LocalComponentDefinitionController implements ComponentDefinitionsApi {
+public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     private final ConversionService conversionService;
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
 
-    public LocalComponentDefinitionController(
+    public ComponentDefinitionController(
         ConversionService conversionService, ComponentDefinitionFacade componentDefinitionFacade,
         ComponentDefinitionService componentDefinitionService) {
 
@@ -85,9 +81,10 @@ public class LocalComponentDefinitionController implements ComponentDefinitionsA
         return Mono.just(
             ResponseEntity.ok(
                 componentDefinitionFacade.getComponentDefinitions(connectionDefinitions, connectionInstances)
-                    .mapNotNull(componentDefinition -> conversionService.convert(
-                        componentDefinition, ComponentDefinitionBasicModel.class))
-                    .collect(Collectors.toList())
+                    .mapNotNull(componentDefinitions -> componentDefinitions.stream()
+                        .map(componentDefinition -> conversionService.convert(
+                            componentDefinition, ComponentDefinitionBasicModel.class))
+                        .toList())
                     .flatMapMany(Flux::fromIterable)));
     }
 
@@ -98,9 +95,10 @@ public class LocalComponentDefinitionController implements ComponentDefinitionsA
         return Mono.just(
             ResponseEntity.ok(
                 componentDefinitionService.getComponentDefinitions(name)
-                    .mapNotNull(componentDefinition -> conversionService.convert(
-                        componentDefinition, ComponentDefinitionBasicModel.class))
-                    .collect(Collectors.toList())
+                    .mapNotNull(componentDefinitions -> componentDefinitions.stream()
+                        .map(componentDefinition -> conversionService.convert(
+                            componentDefinition, ComponentDefinitionBasicModel.class))
+                        .toList())
                     .flatMapMany(Flux::fromIterable)));
     }
 }

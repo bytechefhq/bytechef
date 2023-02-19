@@ -17,9 +17,12 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = DefinitionDSL.ModifiableResources.class)
 public sealed interface Resources permits DefinitionDSL.ModifiableResources {
 
     String getDocumentationUrl();

@@ -17,14 +17,12 @@
 
 package com.bytechef.hermes.definition.registry.web.rest;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
-
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
+import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -34,18 +32,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = RegistryDefinitionRestTestConfiguration.class)
-@WebFluxTest(
-    value = LocalComponentDefinitionController.class,
-    properties = {
-        "spring.application.name=worker-service-app"
-    })
-public class LocalComponentDefinitionControllerIntTest {
+@WebFluxTest(TaskDispatcherDefinitionController.class)
+public class TaskDispatcherDefinitionControllerIntTest {
 
     @MockBean
     private ComponentDefinitionFacade componentDefinitionFacade;
@@ -53,20 +47,25 @@ public class LocalComponentDefinitionControllerIntTest {
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
 
+    @MockBean
+    private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+
     @Autowired
     private WebTestClient webTestClient;
 
     @Test
-    public void testGetComponentDefinitions() {
-        Mockito.when(componentDefinitionFacade.getComponentDefinitions(null, null))
+    public void testGetTaskDispatcherDefinitions() {
+        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
             .thenReturn(
-                Flux.fromIterable(List.of(ComponentDSL.component("component1"),
-                    (ComponentDefinition) ComponentDSL.component("component2"))));
+                Mono.just(
+                    List.of(
+                        TaskDispatcherDSL.taskDispatcher("task-dispatcher1"),
+                        TaskDispatcherDSL.taskDispatcher("task-dispatcher2"))));
 
         try {
             webTestClient
                 .get()
-                .uri("/component-definitions")
+                .uri("/task-dispatcher-definitions")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -76,11 +75,11 @@ public class LocalComponentDefinitionControllerIntTest {
                     """
                         [
                             {
-                                "name":"component1",
+                                "name":"task-dispatcher1",
                                 "version":1.0
                             },
                             {
-                                "name":"component2",
+                                "name":"task-dispatcher2",
                                 "version":1.0
                             }
                         ]
