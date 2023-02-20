@@ -17,9 +17,11 @@
 
 package com.bytechef.component.jsonhelper;
 
-import static com.bytechef.component.jsonhelper.constants.JsonHelperConstants.SOURCE;
+import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.jsonhelper.action.JsonHelperParseAction;
+import com.bytechef.component.jsonhelper.action.JsonHelperStringifyAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.utils.JsonUtils;
@@ -35,7 +37,6 @@ import org.mockito.Mockito;
 public class JsonHelperComponentHandlerTest {
 
     private static final Context context = Mockito.mock(Context.class);
-    private static final JsonHelperComponentHandler JSON_HELPER_COMPONENT_HANDLER = new JsonHelperComponentHandler();
 
     @Test
     public void testGetComponentDefinition() {
@@ -53,7 +54,7 @@ public class JsonHelperComponentHandlerTest {
                 }
                 """);
 
-        assertThat(JSON_HELPER_COMPONENT_HANDLER.performParse(context, executionParameters))
+        assertThat(JsonHelperParseAction.performParse(context, executionParameters))
             .isEqualTo(Map.of("key", 3));
 
         executionParameters = Mockito.mock(ExecutionParameters.class);
@@ -68,7 +69,7 @@ public class JsonHelperComponentHandlerTest {
                     ]
                     """);
 
-        assertThat(JSON_HELPER_COMPONENT_HANDLER.performParse(context, executionParameters))
+        assertThat(JsonHelperParseAction.performParse(context, executionParameters))
             .isEqualTo(List.of(Map.of("key", 3)));
     }
 
@@ -81,7 +82,7 @@ public class JsonHelperComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(Map.of("key", 3));
 
-        assertThat(JSON_HELPER_COMPONENT_HANDLER.performStringify(context, executionParameters))
+        assertThat(JsonHelperStringifyAction.performStringify(context, executionParameters))
             .isEqualTo(JsonUtils.write(input));
     }
 }

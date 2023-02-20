@@ -17,7 +17,7 @@
 
 package com.bytechef.component.mysql;
 
-import static com.bytechef.component.mysql.constants.MySQLConstants.MYSQL;
+import static com.bytechef.component.mysql.constant.MySQLConstants.MYSQL;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.jdbcComponent;
 

@@ -17,7 +17,7 @@
 
 package com.bytechef.component.postgresql;
 
-import static com.bytechef.component.postgresql.constants.PostgreSQLConstants.POSTGRESQL;
+import static com.bytechef.component.postgresql.constant.PostgreSQLConstants.POSTGRESQL;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.jdbcComponent;
 

@@ -17,9 +17,11 @@
 
 package com.bytechef.component.xmlhelper;
 
-import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.SOURCE;
+import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.xmlhelper.action.XmlHelperParseAction;
+import com.bytechef.component.xmlhelper.action.XmlHelperStringifyAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.utils.XmlUtils;
@@ -35,7 +37,6 @@ import org.mockito.Mockito;
 public class XmlHelperComponentHandlerTest {
 
     private static final Context context = Mockito.mock(Context.class);
-    private static final XmlHelperComponentHandler xmlHelperComponentHandler = new XmlHelperComponentHandler();
 
     @Test
     public void testGetComponentDefinition() {
@@ -54,7 +55,7 @@ public class XmlHelperComponentHandlerTest {
                     </Flower>
                     """);
 
-        assertThat((Map<String, ?>) xmlHelperComponentHandler.performParse(context, executionParameters))
+        assertThat((Map<String, ?>) XmlHelperParseAction.performParse(context, executionParameters))
             .isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
         Mockito.when(executionParameters.getRequiredString(SOURCE))
@@ -70,7 +71,7 @@ public class XmlHelperComponentHandlerTest {
                     </Flowers>
                     """);
 
-        assertThat(xmlHelperComponentHandler.performParse(context, executionParameters))
+        assertThat(XmlHelperParseAction.performParse(context, executionParameters))
             .isEqualTo(Map.of(
                 "Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
     }
@@ -84,7 +85,7 @@ public class XmlHelperComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(source);
 
-        assertThat(xmlHelperComponentHandler.performStringify(context, executionParameters))
+        assertThat(XmlHelperStringifyAction.performStringify(context, executionParameters))
             .isEqualTo(XmlUtils.write(source));
     }
 }

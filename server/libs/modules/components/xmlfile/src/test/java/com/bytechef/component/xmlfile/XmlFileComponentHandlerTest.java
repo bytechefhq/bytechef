@@ -17,14 +17,16 @@
 
 package com.bytechef.component.xmlfile;
 
-import static com.bytechef.component.xmlfile.constants.XmlFileConstants.FILENAME;
-import static com.bytechef.component.xmlfile.constants.XmlFileConstants.FILE_ENTRY;
-import static com.bytechef.component.xmlfile.constants.XmlFileConstants.IS_ARRAY;
-import static com.bytechef.component.xmlfile.constants.XmlFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.xmlfile.constants.XmlFileConstants.PAGE_SIZE;
-import static com.bytechef.component.xmlfile.constants.XmlFileConstants.SOURCE;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILENAME;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILE_ENTRY;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.IS_ARRAY;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE;
+import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.xmlfile.action.XmlFileReadAction;
+import com.bytechef.component.xmlfile.action.XmlFileWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
@@ -86,7 +88,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(executionParameters.getBoolean(IS_ARRAY, true))
             .thenReturn(false);
 
-        assertThat((Map<String, ?>) xmlFileComponentHandler.performRead(context, executionParameters))
+        assertThat((Map<String, ?>) XmlFileReadAction.performRead(context, executionParameters))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
     }
 
@@ -108,7 +110,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(executionParameters.getInteger(PAGE_SIZE))
             .thenReturn(null);
 
-        assertThat((List<?>) xmlFileComponentHandler.performRead(context, executionParameters))
+        assertThat((List<?>) XmlFileReadAction.performRead(context, executionParameters))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
 
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
@@ -125,7 +127,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(executionParameters.getInteger(PAGE_SIZE))
             .thenReturn(2);
 
-        assertThat(((List<?>) xmlFileComponentHandler.performRead(context, executionParameters)).size())
+        assertThat(((List<?>) XmlFileReadAction.performRead(context, executionParameters)).size())
             .isEqualTo(2);
     }
 
@@ -138,7 +140,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
 
-        xmlFileComponentHandler.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -161,7 +163,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
 
-        xmlFileComponentHandler.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, executionParameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -180,7 +182,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
 
-        xmlFileComponentHandler.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -203,7 +205,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(executionParameters.getString(FILENAME))
             .thenReturn(TEST_XML);
 
-        xmlFileComponentHandler.performWrite(context, executionParameters);
+        XmlFileWriteAction.performWrite(context, executionParameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

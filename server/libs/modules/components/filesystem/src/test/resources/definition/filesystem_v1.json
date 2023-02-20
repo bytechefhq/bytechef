@@ -138,8 +138,8 @@
     },
     {
       "display": {
-        "description": "",
-        "label": "Lists a content of directory for the given path."
+        "description": "Lists a content of directory for the given path.",
+        "label": "List"
       },
       "name": "ls"
     },

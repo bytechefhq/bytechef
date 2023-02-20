@@ -22,11 +22,11 @@ import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
-import com.bytechef.component.map.constants.MapConstants;
+import com.bytechef.component.map.constant.MapConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.bytechef.hermes.component.constants.ComponentConstants.Versions.VERSION_1;
+import static com.bytechef.hermes.component.constant.ComponentConstants.Versions.VERSION_1;
 
 @Configuration
 public class MapTaskDispatcherAdapterConfiguration {
