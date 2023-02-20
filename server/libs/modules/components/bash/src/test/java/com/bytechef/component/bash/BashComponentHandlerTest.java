@@ -19,7 +19,8 @@
 
 package com.bytechef.component.bash;
 
-import com.bytechef.component.bash.constants.BashConstants;
+import com.bytechef.component.bash.action.BashExecuteAction;
+import com.bytechef.component.bash.constant.BashConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
@@ -40,8 +41,6 @@ public class BashComponentHandlerTest {
 
     @Test
     public void testPerformExecute() {
-        BashComponentHandler bashComponentHandler = new BashComponentHandler();
-
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequiredString(BashConstants.SCRIPT))
@@ -51,7 +50,7 @@ public class BashComponentHandlerTest {
                     .getResource("dependencies/test.txt")
                     .getFile());
 
-        String output = bashComponentHandler.performExecute(Mockito.mock(Context.class), executionParameters);
+        String output = BashExecuteAction.performExecute(Mockito.mock(Context.class), executionParameters);
 
         Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
     }

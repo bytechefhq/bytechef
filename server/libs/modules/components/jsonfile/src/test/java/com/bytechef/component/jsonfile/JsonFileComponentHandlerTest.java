@@ -17,17 +17,19 @@
 
 package com.bytechef.component.jsonfile;
 
-import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FILENAME;
-import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FILE_ENTRY;
-import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FILE_TYPE;
-import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.IS_ARRAY;
-import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.PAGE_NUMBER;
-import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.PAGE_SIZE;
-import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.SOURCE;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILENAME;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_ENTRY;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FILE_TYPE;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.IS_ARRAY;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_NUMBER;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FileType;
+import com.bytechef.component.jsonfile.action.JsonFileReadAction;
+import com.bytechef.component.jsonfile.action.JsonFileWriteAction;
+import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
@@ -89,7 +91,7 @@ public class JsonFileComponentHandlerTest {
 
         assertEquals(
             new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)),
-            new JSONObject((Map<String, ?>) jsonFileComponentHandler.performRead(context, executionParameters)),
+            new JSONObject((Map<String, ?>) JsonFileReadAction.performRead(context, executionParameters)),
             true);
     }
 
@@ -115,7 +117,7 @@ public class JsonFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) jsonFileComponentHandler.performRead(context, executionParameters)),
+            new JSONArray((List<?>) JsonFileReadAction.performRead(context, executionParameters)),
             true);
 
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
@@ -134,7 +136,7 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(executionParameters.getInteger(PAGE_SIZE))
             .thenReturn(2);
 
-        Assertions.assertThat(((List<?>) jsonFileComponentHandler.performRead(context, executionParameters)).size())
+        Assertions.assertThat(((List<?>) JsonFileReadAction.performRead(context, executionParameters)).size())
             .isEqualTo(2);
     }
 
@@ -160,7 +162,7 @@ public class JsonFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) jsonFileComponentHandler.performRead(context, executionParameters)),
+            new JSONArray((List<?>) JsonFileReadAction.performRead(context, executionParameters)),
             true);
 
         Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
@@ -179,7 +181,7 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(executionParameters.getInteger(PAGE_SIZE))
             .thenReturn(2);
 
-        Assertions.assertThat(((List<?>) jsonFileComponentHandler.performRead(context, executionParameters)).size())
+        Assertions.assertThat(((List<?>) JsonFileReadAction.performRead(context, executionParameters)).size())
             .isEqualTo(2);
     }
 
@@ -194,7 +196,7 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
 
-        jsonFileComponentHandler.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -223,7 +225,7 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        jsonFileComponentHandler.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -251,7 +253,7 @@ public class JsonFileComponentHandlerTest {
         Mockito.when(executionParameters.getRequired(SOURCE))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        jsonFileComponentHandler.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, executionParameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -272,7 +274,7 @@ public class JsonFileComponentHandlerTest {
             .thenReturn(
                 linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        jsonFileComponentHandler.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -301,7 +303,7 @@ public class JsonFileComponentHandlerTest {
             .thenReturn(
                 linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
-        jsonFileComponentHandler.performWrite(context, executionParameters);
+        JsonFileWriteAction.performWrite(context, executionParameters);
 
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));

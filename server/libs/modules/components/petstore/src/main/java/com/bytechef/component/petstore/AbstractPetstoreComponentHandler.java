@@ -17,12 +17,11 @@
 
 package com.bytechef.component.petstore;
 
-import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
-import static com.bytechef.hermes.component.constants.ComponentConstants.ADD_TO;
-import static com.bytechef.hermes.component.constants.ComponentConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.constants.ComponentConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.constants.ComponentConstants.KEY;
-import static com.bytechef.hermes.component.constants.ComponentConstants.VALUE;
+import static com.bytechef.hermes.component.constant.ComponentConstants.ADD_TO;
+import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
+import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
+import static com.bytechef.hermes.component.constant.ComponentConstants.KEY;
+import static com.bytechef.hermes.component.constant.ComponentConstants.VALUE;
 import static com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;

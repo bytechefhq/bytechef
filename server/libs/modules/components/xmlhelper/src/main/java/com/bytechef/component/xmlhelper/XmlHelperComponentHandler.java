@@ -17,67 +17,29 @@
 
 package com.bytechef.component.xmlhelper;
 
-import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.SOURCE;
-import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_HELPER;
-import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_PARSE;
-import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_STRINGIFY;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.XML_HELPER;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
+import com.bytechef.component.xmlhelper.action.XmlHelperParseAction;
+import com.bytechef.component.xmlhelper.action.XmlHelperStringifyAction;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.utils.XmlUtils;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class XmlHelperComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = component(XML_HELPER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(XML_HELPER)
         .display(display("XML Helper").description("Converts between XML string and object/array."))
         .actions(
-            action(XML_PARSE)
-                .display(display("Convert from XML string")
-                    .description("Converts the XML string to object/array."))
-                .properties(string(SOURCE)
-                    .label("Source")
-                    .description("The XML string to convert to the data.")
-                    .required(true))
-                .output(object())
-                .perform(this::performParse),
-            action(XML_STRINGIFY)
-                .display(display("Convert to XML string")
-                    .description("Writes the object/array to a XML string."))
-                .properties(oneOf(SOURCE)
-                    .label("Source")
-                    .description("The data to convert to XML string.")
-                    .required(true)
-                    .types(array(), object()))
-                .output(string())
-                .perform(this::performStringify));
+            XmlHelperParseAction.ACTION_DEFINITION,
+            XmlHelperStringifyAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 
-    protected Map<String, ?> performParse(Context context, ExecutionParameters executionParameters) {
-        String source = executionParameters.getRequiredString(SOURCE);
-
-        return XmlUtils.read(source);
-    }
-
-    protected String performStringify(Context context, ExecutionParameters executionParameters) {
-        Object source = executionParameters.getRequired(SOURCE);
-
-        return XmlUtils.write(source);
-    }
 }
