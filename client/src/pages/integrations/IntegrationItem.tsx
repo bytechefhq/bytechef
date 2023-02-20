@@ -6,8 +6,10 @@ import {IntegrationsKeys} from '../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
 import cx from 'classnames';
-import {Cross1Icon, PlusIcon} from '@radix-ui/react-icons';
 import CreatableSelect from '../../components/CreatableSelect/CreatableSelect';
+import Button from 'components/Button/Button';
+import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import {ChevronDownIcon} from '@radix-ui/react-icons';
 
 const menuItems: DropDownMenuItem[] = [
     {
@@ -271,7 +273,7 @@ const Tag = ({tag, onDeleteTag}: TagProps) => {
         <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200">
             {tag.name}
 
-            <Cross1Icon
+            <XMarkIcon
                 className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
                 onClick={() => onDeleteTag(tag)}
             />
@@ -285,15 +287,14 @@ const TagList = ({
     onAddTag,
     onDeleteTag,
 }: TagListProps) => {
+    const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
     return (
         <div className="mr-4 flex items-center space-x-2">
-            <div className="mr-1">
-                {tags.map((tag) => (
-                    <Tag key={tag.id} tag={tag} onDeleteTag={onDeleteTag} />
-                ))}
-            </div>
+            {tags.slice(0, 3).map((tag) => (
+                <Tag key={tag.id} tag={tag} onDeleteTag={onDeleteTag} />
+            ))}
 
             {isNewTagWindowVisible ? (
                 <CreatableSelect
@@ -327,14 +328,40 @@ const TagList = ({
                 />
             ) : (
                 <div
-                    className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
+                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
                     onClick={(event) => {
                         event.preventDefault();
-
                         setIsNewTagWindowVisible(true);
                     }}
                 >
-                    <PlusIcon />
+                    <PlusIcon className="h-3 w-3 rounded-full hover:bg-gray-300" />
+                </div>
+            )}
+
+            {tags.length > 3 && (
+                <div className="relative flex">
+                    <Button
+                        className="mr-2"
+                        size="small"
+                        displayType="unstyled"
+                        icon={<ChevronDownIcon />}
+                        onClick={() => setShowAllTags(!showAllTags)}
+                    />
+
+                    {showAllTags && (
+                        <div
+                            className="absolute left-0 top-full z-10 w-px space-y-2 border-0 bg-white shadow-lg"
+                            style={{maxHeight: '32px'}}
+                        >
+                            {tags.slice(3).map((tag) => (
+                                <Tag
+                                    key={tag.id}
+                                    tag={tag}
+                                    onDeleteTag={onDeleteTag}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>
