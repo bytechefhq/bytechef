@@ -57,7 +57,7 @@ dependencies {
 //    implementation libs.swagger.annotations
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
     implementation project(":server:libs:core:autoconfigure-annotations")
-//    implementation project(":server:libs:core:commons:commons-utils")
+//    implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
 }

@@ -17,10 +17,10 @@
 
 package com.bytechef.hermes.component.registrar;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.commons.utils.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
@@ -31,7 +31,7 @@ import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.impl.FileEntryImpl;
 import com.bytechef.hermes.component.task.handler.RestComponentTaskHandler;
 import com.bytechef.hermes.component.utils.HttpClientUtils.HttpResponseEntry;
-import com.bytechef.hermes.connection.ConnectionConstants;
+import com.bytechef.hermes.connection.constant.ConnectionConstants;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;

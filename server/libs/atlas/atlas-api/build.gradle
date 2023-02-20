@@ -5,5 +5,5 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-core"
     implementation project(":server:libs:core:commons:commons-data")
-    implementation project(":server:libs:core:commons:commons-utils")
+    implementation project(":server:libs:core:commons:commons-util")
 }

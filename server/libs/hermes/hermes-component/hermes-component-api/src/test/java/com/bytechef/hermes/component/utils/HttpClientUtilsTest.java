@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.utils;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.constants.ComponentConstants;
+import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.github.mizosoft.methanol.FormBodyPublisher;

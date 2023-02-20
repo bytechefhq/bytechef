@@ -25,13 +25,13 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.i
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_VAR;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LIST;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_FOREVER;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;

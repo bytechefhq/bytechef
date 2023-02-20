@@ -19,13 +19,13 @@
 
 package com.bytechef.task.dispatcher.switch_;
 
-import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.CASES;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.DEFAULT;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.EXPRESSION;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.KEY;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.TASKS;
+import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.CASES;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.DEFAULT;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.EXPRESSION;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.KEY;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.SWITCH;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.TASKS;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -39,7 +39,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;

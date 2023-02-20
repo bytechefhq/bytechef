@@ -30,8 +30,8 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.CollectionUtils;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
@@ -41,8 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.BRANCH;
-import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
+import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCH;
+import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCHES;
 
 /**
  * Handles {@link TaskExecution} completions which are the child execution tasks of a parent <code>
