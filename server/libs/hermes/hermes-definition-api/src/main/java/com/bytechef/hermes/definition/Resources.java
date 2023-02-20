@@ -17,16 +17,10 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiableResources.class)
-@Schema(name = "Resources", description = "A set of available resources.")
 public sealed interface Resources permits DefinitionDSL.ModifiableResources {
 
-    @Schema(name = "documentationUrl", description = "The url of available documentation.")
     String getDocumentationUrl();
 }

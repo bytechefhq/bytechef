@@ -52,8 +52,8 @@ public final class Connection implements Persistable<Long> {
     @Column("component_name")
     private String componentName;
 
-    @Column("component_version")
-    private int componentVersion;
+    @Column("connection_version")
+    private int connectionVersion;
 
     @CreatedBy
     @Column("created_by")
@@ -131,8 +131,8 @@ public final class Connection implements Persistable<Long> {
         return componentName;
     }
 
-    public int getComponentVersion() {
-        return componentVersion;
+    public int getConnectionVersion() {
+        return connectionVersion;
     }
 
     public String getCreatedBy() {
@@ -210,8 +210,8 @@ public final class Connection implements Persistable<Long> {
         this.componentName = componentName;
     }
 
-    public void setComponentVersion(int componentVersion) {
-        this.componentVersion = componentVersion;
+    public void setConnectionVersion(int connectionVersion) {
+        this.connectionVersion = connectionVersion;
     }
 
     public void setId(Long id) {
@@ -247,9 +247,9 @@ public final class Connection implements Persistable<Long> {
             + id + ", name='"
             + name + '\'' + "authorizationName='"
             + authorizationName + '\'' + ", componentName='"
-            + componentName + '\'' + ", componentVersion="
-            + componentVersion + ", connectionTags="
-            + connectionTags + ", parameters="
+            + componentName + '\'' + ", connectionTags="
+            + connectionTags + ", connectionVersion="
+            + connectionVersion + ", parameters="
             + parameters + ", version="
             + version + ", createdBy='"
             + createdBy + '\'' + ", createdDate="

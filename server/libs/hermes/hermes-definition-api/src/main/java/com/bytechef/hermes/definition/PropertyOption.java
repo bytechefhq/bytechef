@@ -17,24 +17,16 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiablePropertyOption.class)
-@Schema(name = "PropertyOption", description = "Defines valid property value.")
 public sealed interface PropertyOption permits DefinitionDSL.ModifiablePropertyOption {
 
-    @Schema(name = "description", description = "Description of the option.")
     String getDescription();
 
     DisplayOption getDisplayOption();
 
-    @Schema(name = "name", description = "Name of the option.")
     String getName();
 
-    @Schema(name = "value", description = "Value of the option")
     Object getValue();
 }
