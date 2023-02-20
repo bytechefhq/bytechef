@@ -55,9 +55,9 @@ public class ServiceInstanceUtils {
     }
 
     public static Set<ServiceInstance> filterServiceInstances(List<ServiceInstance> serviceInstances) {
-        Set<String> componentNameInstanceIds = toUniqueInstanceIds(serviceInstances);
+        Set<String> instanceIds = toUniqueInstanceIds(serviceInstances);
 
-        return componentNameInstanceIds.stream()
+        return instanceIds.stream()
             .map(instanceId -> serviceInstances.stream()
                 .filter(serviceInstance -> Objects.equals(serviceInstance.getInstanceId(), instanceId))
                 .findFirst()
