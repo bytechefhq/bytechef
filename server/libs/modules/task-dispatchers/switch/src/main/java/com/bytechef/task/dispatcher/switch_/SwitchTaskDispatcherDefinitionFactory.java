@@ -23,12 +23,12 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.o
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.CASES;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.DEFAULT;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.EXPRESSION;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.KEY;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
-import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.TASKS;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.CASES;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.DEFAULT;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.EXPRESSION;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.KEY;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.SWITCH;
+import static com.bytechef.task.dispatcher.switch_.constant.SwitchTaskDispatcherConstants.TASKS;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;

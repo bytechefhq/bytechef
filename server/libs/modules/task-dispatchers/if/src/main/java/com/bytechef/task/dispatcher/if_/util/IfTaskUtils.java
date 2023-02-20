@@ -17,13 +17,13 @@
 
 package com.bytechef.task.dispatcher.if_.util;
 
-import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.COMBINE_OPERATION;
-import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.EXPRESSION;
-import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.RAW_EXPRESSION;
+import static com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.COMBINE_OPERATION;
+import static com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.EXPRESSION;
+import static com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.RAW_EXPRESSION;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.commons.utils.MapValueUtils;
-import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants;
+import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

@@ -24,12 +24,12 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.i
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.EACH;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_VAR;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.LIST;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.EACH;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_INDEX;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;

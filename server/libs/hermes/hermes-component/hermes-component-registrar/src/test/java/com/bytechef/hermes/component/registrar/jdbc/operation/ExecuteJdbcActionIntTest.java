@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
-import com.bytechef.hermes.component.jdbc.constants.JdbcConstants;
+import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.hermes.component.registrar.config.JdbcComponentRegistrarIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;

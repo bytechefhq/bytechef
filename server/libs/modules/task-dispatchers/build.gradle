@@ -13,7 +13,7 @@ subprojects {
         implementation project(":server:libs:atlas:atlas-api")
         implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
         implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
-        implementation project(":server:libs:core:commons:commons-utils")
+        implementation project(":server:libs:core:commons:commons-util")
 
         testImplementation project(":server:libs:atlas:atlas-sync-executor")
         testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")

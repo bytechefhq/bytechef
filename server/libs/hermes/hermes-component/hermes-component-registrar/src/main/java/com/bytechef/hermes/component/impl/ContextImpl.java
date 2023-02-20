@@ -17,13 +17,13 @@
 
 package com.bytechef.hermes.component.impl;
 
-import static com.bytechef.hermes.connection.ConnectionConstants.CONNECTION_ID;
+import static com.bytechef.hermes.connection.constant.ConnectionConstants.CONNECTION_ID;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
-import com.bytechef.commons.utils.CollectionUtils;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;

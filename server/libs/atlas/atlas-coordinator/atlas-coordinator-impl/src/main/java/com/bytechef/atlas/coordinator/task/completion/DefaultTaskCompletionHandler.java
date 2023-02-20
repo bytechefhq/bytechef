@@ -19,7 +19,7 @@
 
 package com.bytechef.atlas.coordinator.task.completion;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
@@ -34,7 +34,7 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
