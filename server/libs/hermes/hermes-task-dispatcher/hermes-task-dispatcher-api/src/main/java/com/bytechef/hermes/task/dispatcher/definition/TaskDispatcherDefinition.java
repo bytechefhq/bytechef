@@ -20,9 +20,7 @@ package com.bytechef.hermes.task.dispatcher.definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
@@ -30,28 +28,20 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = TaskDispatcherDSL.ModifiableTaskDispatcherDefinition.class)
 @SuppressFBWarnings("EI")
-@Schema(
-    name = "TaskDispatcherDefinition",
-    description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.ModifiableTaskDispatcherDefinition {
 
     Display getDisplay();
 
-    @Schema(name = "name", description = "The connection name.")
     String getName();
 
-    @Schema(name = "output", description = "The output schema of a task dispatching result.")
     List<Property<? extends Property<?>>> getOutput();
 
-    @Schema(name = "properties", description = "Properties of the connection.")
     List<Property<?>> getProperties();
 
     Resources getResources();
 
     int getVersion();
 
-    @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.")
     List<Property<?>> getTaskProperties();
 }

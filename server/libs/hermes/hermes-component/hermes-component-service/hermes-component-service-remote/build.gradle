@@ -1,8 +1,0 @@
-dependencies {
-    api project(":server:libs:hermes:hermes-component:hermes-component-service:hermes-component-service-api")
-
-    implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation "org.springframework:spring-context"
-    implementation "org.springframework:spring-webflux"
-    implementation "org.springframework.cloud:spring-cloud-commons"
-}

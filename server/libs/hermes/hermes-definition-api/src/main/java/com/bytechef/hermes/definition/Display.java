@@ -17,31 +17,20 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiableDisplay.class)
-@Schema(name = "Display", description = "A display information.")
 public sealed interface Display permits DefinitionDSL.ModifiableDisplay {
 
-    @Schema(name = "category", description = "The category of the component.")
     String getCategory();
 
-    @Schema(name = "description", description = "The description.")
     String getDescription();
 
-    @Schema(name = "icon", description = " The icon.")
     String getIcon();
 
-    @Schema(name = "label", description = "The label.")
     String getLabel();
 
-    @Schema(name = "subtitle", description = "Additional explanation.")
     String getSubtitle();
 
-    @Schema(name = "tags", description = "Tags for the component.")
     String[] getTags();
 }

@@ -119,6 +119,7 @@ public class RestComponentTaskHandlerIntTest {
         connection = new Connection();
 
         connection.setComponentName("petshop");
+        connection.setConnectionVersion(1);
         connection.setName("PetShop Connection");
         connection.setParameters(Map.of());
 

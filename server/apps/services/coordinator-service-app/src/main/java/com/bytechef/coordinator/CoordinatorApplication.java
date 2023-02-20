@@ -22,6 +22,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Optional;
 
+import com.bytechef.hermes.connection.config.ConnectionConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
@@ -37,6 +40,12 @@ import org.springframework.util.StringUtils;
  */
 @SpringBootApplication(
     scanBasePackages = "com.bytechef")
+@ComponentScan(
+    excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = {
+            ConnectionConfiguration.class
+        })
+    })
 public class CoordinatorApplication {
 
     private static final Logger log = LoggerFactory.getLogger(CoordinatorApplication.class);
