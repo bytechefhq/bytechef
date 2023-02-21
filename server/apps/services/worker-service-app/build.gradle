@@ -50,7 +50,7 @@ dependencies {
     implementation project(":server:libs:modules:components:postgresql")
     implementation project(":server:libs:modules:components:randomhelper")
     implementation project(":server:libs:modules:components:script")
-    implementation project(":server:libs:modules:components:shopify")
+//    implementation project(":server:libs:modules:components:shopify")
     implementation project(":server:libs:modules:components:var")
     implementation project(":server:libs:modules:components:xlsxfile")
     implementation project(":server:libs:modules:components:xmlfile")

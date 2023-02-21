@@ -1,9 +1,0 @@
-{
-  "openApi": {
-    "operations":[
-      "get_smart_collections",
-      "get_smart_collections_count"
-    ],
-    "useTags": true
-  }
-}
