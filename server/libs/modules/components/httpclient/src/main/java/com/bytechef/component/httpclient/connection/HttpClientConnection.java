@@ -42,7 +42,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 public class HttpClientConnection {
 
-    public static final ConnectionDefinition HTTP_CLIENT_CONNECTION = connection()
+    public static final ConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(string(BASE_URI).label("Base URI"))
         .authorizations(
             authorization(Authorization.AuthorizationType.API_KEY.name()

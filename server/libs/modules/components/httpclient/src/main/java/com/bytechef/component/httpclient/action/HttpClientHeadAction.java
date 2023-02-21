@@ -32,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
  */
 public class HttpClientHeadAction {
 
-    public static final ActionDefinition HEAD_ACTION = action(HEAD)
+    public static final ActionDefinition ACTION_DEFINITION = action(HEAD)
         .display(display("HEAD").description("The request method to use."))
         .properties(HttpClientUtils.toArray(
             //

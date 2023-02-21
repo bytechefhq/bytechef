@@ -36,7 +36,7 @@ public class LoggerInfoAction {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerInfoAction.class);
 
-    public static final ActionDefinition INFO_ACTION = action(INFO)
+    public static final ActionDefinition ACTION_DEFINITION = action(INFO)
         .display(display("Info"))
         .properties(string(TEXT))
         .perform(LoggerInfoAction::performInfo);

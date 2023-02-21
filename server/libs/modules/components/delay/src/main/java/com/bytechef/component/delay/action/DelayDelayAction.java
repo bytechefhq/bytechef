@@ -35,7 +35,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.integer;
  */
 public class DelayDelayAction {
 
-    public static final ActionDefinition DELAY_ACTION = action(DELAY)
+    public static final ActionDefinition ACTION_DEFINITION = action(DELAY)
         .display(display("Delay"))
         .properties(integer(DelayConstants.MILLIS)
             .label("Millis")

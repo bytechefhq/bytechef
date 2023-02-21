@@ -52,7 +52,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class OdsFileWriteAction {
 
-    public static final ActionDefinition WRITE_ACTION = action(WRITE)
+    public static final ActionDefinition ACTION_DEFINITION = action(WRITE)
         .display(display("Write to file").description("Writes the data to a ODS file."))
         .properties(
             array(ROWS)

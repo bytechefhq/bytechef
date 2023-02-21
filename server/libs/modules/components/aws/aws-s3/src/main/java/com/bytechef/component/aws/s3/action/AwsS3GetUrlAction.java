@@ -36,7 +36,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3GetUrlAction {
 
-    public static final ActionDefinition GET_URL_ACTION = action(GET_URL)
+    public static final ActionDefinition ACTION_DEFINITION = action(GET_URL)
         .display(display("Get URL").description("Get the url of an AWS S3 object."))
         .properties(string(URI)
             .label("URI")

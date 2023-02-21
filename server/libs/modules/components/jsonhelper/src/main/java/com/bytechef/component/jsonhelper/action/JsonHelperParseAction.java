@@ -34,7 +34,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class JsonHelperParseAction {
 
-    public static final ActionDefinition PARSE_ACTION = action(PARSE)
+    public static final ActionDefinition ACTION_DEFINITION = action(PARSE)
         .display(display("Convert from JSON string")
             .description("Converts the JSON string to object/array."))
         .properties(string(SOURCE)

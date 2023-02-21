@@ -38,14 +38,14 @@ public class HttpClientComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(HTTP_CLIENT)
         .display(display("HTTP Client").description("Makes an HTTP request and returns the response data."))
-        .connection(HttpClientConnection.HTTP_CLIENT_CONNECTION)
+        .connection(HttpClientConnection.CONNECTION_DEFINITION)
         .actions(
-            HttpClientGetAction.GET_ACTION,
-            HttpClientPostAction.POST_ACTION,
-            HttpClientPutAction.PUT_ACTION,
-            HttpClientPatchAction.PATCH_ACTION,
-            HttpClientDeleteAction.DELETE_ACTION,
-            HttpClientHeadAction.HEAD_ACTION);
+            HttpClientGetAction.ACTION_DEFINITION,
+            HttpClientPostAction.ACTION_DEFINITION,
+            HttpClientPutAction.ACTION_DEFINITION,
+            HttpClientPatchAction.ACTION_DEFINITION,
+            HttpClientDeleteAction.ACTION_DEFINITION,
+            HttpClientHeadAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

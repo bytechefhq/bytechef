@@ -34,8 +34,8 @@ public class JsonHelperComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(JSON_HELPER)
         .display(display("JSON Helper").description("JSON Helper allows you to do various operations on objects."))
         .actions(
-            JsonHelperParseAction.PARSE_ACTION,
-            JsonHelperStringifyAction.STRINGIFY_ACTION);
+            JsonHelperParseAction.ACTION_DEFINITION,
+            JsonHelperStringifyAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

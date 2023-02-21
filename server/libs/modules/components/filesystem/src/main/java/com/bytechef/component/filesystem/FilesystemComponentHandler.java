@@ -39,13 +39,13 @@ public class FilesystemComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(FILESYSTEM)
         .display(display("Local File").description("Reads or writes a binary file from/to disk"))
         .actions(
-            FilesystemReadFileAction.READ_FILE_ACTION,
-            FilesystemWriteFileAction.WRITE_FILE_ACTION,
-            FilesystemCreateTempDirAction.CREATE_TEMP_DIR_ACTION,
-            FilesystemGetFilePathAction.GET_FILE_PATH_ACTION,
-            FilesystemLsAction.LS_ACTION,
-            FilesystemMkdirAction.MKDIR_ACTION,
-            FilesystemRmAction.RM_ACTION);
+            FilesystemReadFileAction.ACTION_DEFINITION,
+            FilesystemWriteFileAction.ACTION_DEFINITION,
+            FilesystemCreateTempDirAction.ACTION_DEFINITION,
+            FilesystemGetFilePathAction.ACTION_DEFINITION,
+            FilesystemLsAction.ACTION_DEFINITION,
+            FilesystemMkdirAction.ACTION_DEFINITION,
+            FilesystemRmAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

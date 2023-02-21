@@ -57,7 +57,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class OdsFileReadAction {
 
-    public static final ActionDefinition READ_ACTION = action(READ)
+    public static final ActionDefinition ACTION_DEFINITION = action(READ)
         .display(display("Read from file").description("Reads data from a ODS file."))
         .properties(
             fileEntry(FILE_ENTRY)

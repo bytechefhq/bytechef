@@ -45,7 +45,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FilesystemWriteFileAction {
 
-    public static final ActionDefinition WRITE_FILE_ACTION = action(WRITE_FILE)
+    public static final ActionDefinition ACTION_DEFINITION = action(WRITE_FILE)
         .display(display("Write to file"))
         .properties(
             fileEntry(FILE_ENTRY)
