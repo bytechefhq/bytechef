@@ -41,7 +41,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class HttpClientPostAction {
 
-    public static final ActionDefinition POST_ACTION = action(POST)
+    public static final ActionDefinition ACTION_DEFINITION = action(POST)
         .display(display("POST").description("The request method to use."))
         .properties(
             HttpClientUtils.toArray(

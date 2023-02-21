@@ -41,7 +41,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class HttpClientGetAction {
 
-    public static final ActionDefinition GET_ACTION = action(GET)
+    public static final ActionDefinition ACTION_DEFINITION = action(GET)
         .display(display("GET").description("The request method to use."))
         .properties(
             com.bytechef.component.httpclient.util.HttpClientUtils.toArray(

@@ -47,7 +47,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3ListObjectsAction {
 
-    public static final ActionDefinition LIST_OBJECTS_ACTION = action(LIST_OBJECTS)
+    public static final ActionDefinition ACTION_DEFINITION = action(LIST_OBJECTS)
         .display(display("List Objects").description("Get the list AWS S3 objects."))
         .properties(
             string(BUCKET)

@@ -38,7 +38,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class AwsS3PresignGetObjectAction {
 
-    public static final ActionDefinition PRESIGN_GET_OBJECT_ACTION = action(PRESIGN_GET_OBJECT)
+    public static final ActionDefinition ACTION_DEFINITION = action(PRESIGN_GET_OBJECT)
         .display(display("Get Pre-signed Object")
             .description("Get the url of an pre-signed AWS S3 object."))
         .properties(string(URI)

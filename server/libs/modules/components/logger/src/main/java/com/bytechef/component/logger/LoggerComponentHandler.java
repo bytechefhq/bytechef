@@ -35,8 +35,9 @@ public class LoggerComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(LOGGER)
         .display(display("Logger").description("Logs a value to the system log."))
-        .actions(LoggerDebugAction.DEBUG_ACTION, LoggerErrorAction.ERROR_ACTION, LoggerInfoAction.INFO_ACTION,
-            LoggerWarnAction.WARN_ACTION);
+        .actions(LoggerDebugAction.ACTION_DEFINITION, LoggerErrorAction.ACTION_DEFINITION,
+            LoggerInfoAction.ACTION_DEFINITION,
+            LoggerWarnAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

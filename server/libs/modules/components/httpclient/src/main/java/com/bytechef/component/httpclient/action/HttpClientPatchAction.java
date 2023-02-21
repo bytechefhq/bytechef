@@ -32,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
  */
 public class HttpClientPatchAction {
 
-    public static final ActionDefinition PATCH_ACTION = action(PATCH)
+    public static final ActionDefinition ACTION_DEFINITION = action(PATCH)
         .display(display("PATCH").description("The request method to use."))
         .properties(
             HttpClientUtils.toArray(

@@ -28,8 +28,9 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.jira.action.IssueSearchActions;
-import com.bytechef.component.jira.action.IssuesActions;
+import com.bytechef.component.jira.action.CreateIssueAction;
+import com.bytechef.component.jira.action.GetIssueAction;
+import com.bytechef.component.jira.action.SearchForIssuesUsingJqlAction;
 import com.bytechef.hermes.component.RestComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import java.util.List;
@@ -45,7 +46,8 @@ public abstract class AbstractJiraComponentHandler implements RestComponentHandl
             modifyDisplay(
                 display("Jira")
                     .description("Jira Cloud platform REST API documentation")))
-        .actions(modifyActions(IssuesActions.ACTIONS, IssueSearchActions.ACTIONS))
+        .actions(modifyActions(CreateIssueAction.ACTION_DEFINITION, GetIssueAction.ACTION_DEFINITION,
+            SearchForIssuesUsingJqlAction.ACTION_DEFINITION))
         .connection(modifyConnection(
             connection()
                 .baseUri(connection -> "https://your-domain.atlassian.net")
@@ -77,8 +79,7 @@ public abstract class AbstractJiraComponentHandler implements RestComponentHandl
                                     .required(true))
                             .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
                             .refreshUrl(connection -> null)
-                            .scopes(connection -> List.of("read:jira-user", "read:jira-work", "write:jira-work",
-                                "manage:jira-project", "manage:jira-configuration"))
+                            .scopes(connection -> List.of("read:jira-work", "write:jira-work"))
                             .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token"))));
 
     @Override

@@ -34,7 +34,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FilesystemGetFilePathAction {
 
-    public static final ActionDefinition GET_FILE_PATH_ACTION = action(GET_FILE_PATH)
+    public static final ActionDefinition ACTION_DEFINITION = action(GET_FILE_PATH)
         .display(
             display("File Path")
                 .description(

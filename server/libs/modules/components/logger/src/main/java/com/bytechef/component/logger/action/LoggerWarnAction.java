@@ -36,7 +36,7 @@ public class LoggerWarnAction {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerWarnAction.class);
 
-    public static final ActionDefinition WARN_ACTION = action(WARN)
+    public static final ActionDefinition ACTION_DEFINITION = action(WARN)
         .display(display("Warn"))
         .properties(string(TEXT))
         .perform(LoggerWarnAction::performWarn);

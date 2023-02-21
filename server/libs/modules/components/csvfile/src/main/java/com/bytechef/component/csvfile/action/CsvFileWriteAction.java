@@ -53,7 +53,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class CsvFileWriteAction {
 
-    public static final ActionDefinition WRITE_ACTION = action(WRITE)
+    public static final ActionDefinition ACTION_DEFINITION = action(WRITE)
         .display(display("Write to file").description("Writes the data to a csv file."))
         .properties(
             array(ROWS)

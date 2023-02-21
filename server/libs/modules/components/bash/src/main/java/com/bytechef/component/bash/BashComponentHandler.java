@@ -34,7 +34,7 @@ public class BashComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(BASH)
         .display(display("Bash").description("Allows you to run arbitrary Bash scripts."))
-        .actions(BashExecuteAction.EXECUTE_ACTION);
+        .actions(BashExecuteAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

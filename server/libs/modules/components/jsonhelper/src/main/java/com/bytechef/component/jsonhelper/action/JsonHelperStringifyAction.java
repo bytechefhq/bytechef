@@ -34,7 +34,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class JsonHelperStringifyAction {
 
-    public static final ActionDefinition STRINGIFY_ACTION = action(STRINGIFY)
+    public static final ActionDefinition ACTION_DEFINITION = action(STRINGIFY)
         .display(display("Convert to JSON string")
             .description("Writes the object/array to a JSON string."))
         .properties(oneOf(SOURCE)
