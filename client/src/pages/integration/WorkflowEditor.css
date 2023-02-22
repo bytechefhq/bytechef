@@ -1,11 +1,3 @@
-.react-flow__node {
-    border: none;
-}
-
-.react-flow__node.selected {
-    border: none;
-}
-
-.react-flow__node:focus {
-    border: none;
+.react-flow__node.selected > div:first-of-type {
+    border-color: #3b82f6 !important;
 }
