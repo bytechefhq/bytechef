@@ -15,8 +15,6 @@ export default function WorkflowEdge({
     style,
     markerEnd,
 }: EdgeProps) {
-    // see the hook for implementation details
-    // onClick adds a node in between the nodes that are connected by this edge
     const onClick = useEdgeClick(id);
 
     const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
