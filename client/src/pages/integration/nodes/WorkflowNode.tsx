@@ -6,8 +6,6 @@ import styles from './NodeTypes.module.css';
 import useNodeClickHandler from '../hooks/useNodeClick';
 
 const WorkflowNode = ({id, data}: NodeProps) => {
-    // see the hook implementation for details of the click handler
-    // calling onClick adds a child node to this node
     const onClick = useNodeClickHandler(data, id);
 
     return (
