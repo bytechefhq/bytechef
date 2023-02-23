@@ -17,7 +17,6 @@ interface SidebarProps {
         flowControls: Array<TaskDispatcherDefinitionModel>;
     };
     filter: string;
-    view: string;
 }
 
 const Item = ({description, label}: DisplayModel): JSX.Element => {
@@ -28,7 +27,7 @@ const Item = ({description, label}: DisplayModel): JSX.Element => {
 
     return (
         <li
-            className="my-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
+            className="mb-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
             draggable
             id={label}
             onDragStart={(event) => onDragStart(event, label!)}
@@ -47,11 +46,7 @@ const Item = ({description, label}: DisplayModel): JSX.Element => {
     );
 };
 
-const LeftSidebar: React.FC<SidebarProps> = ({
-    data,
-    filter,
-    view = 'components',
-}): JSX.Element => {
+const LeftSidebar: React.FC<SidebarProps> = ({data, filter}): JSX.Element => {
     const [filteredComponents, setFilteredComponents] = useState<
         Array<ComponentDefinitionBasicModel>
     >([]);
@@ -90,30 +85,50 @@ const LeftSidebar: React.FC<SidebarProps> = ({
     return (
         <Provider>
             <div className="px-2">
+                <span className="sticky top-0 z-10 block w-full bg-gray-100 p-2 text-center text-sm font-bold uppercase text-gray-500">
+                    Components
+                </span>
+
                 <ul role="list" className="mb-2">
-                    {view === 'components'
-                        ? filteredComponents.map(
-                              (component: ComponentDefinitionBasicModel) => (
-                                  <Item
-                                      description={
-                                          component.display?.description
-                                      }
-                                      label={component.display?.label}
-                                      key={component.name}
-                                  />
-                              )
-                          )
-                        : filteredFlowControls.map(
-                              (flowControl: TaskDispatcherDefinitionModel) => (
-                                  <Item
-                                      description={
-                                          flowControl.display?.description
-                                      }
-                                      label={flowControl.display?.label}
-                                      key={flowControl.name}
-                                  />
-                              )
-                          )}
+                    {filteredComponents.length ? (
+                        filteredComponents.map(
+                            (component: ComponentDefinitionBasicModel) => (
+                                <Item
+                                    description={component.display?.description}
+                                    label={component.display?.label}
+                                    key={component.name}
+                                />
+                            )
+                        )
+                    ) : (
+                        <span className="block py-2 px-3 text-xs text-gray-500">
+                            No components found.
+                        </span>
+                    )}
+                </ul>
+
+                <span className="sticky top-0 z-10 mt-2 block w-full bg-gray-100 p-2 text-center text-sm font-bold uppercase text-gray-500">
+                    Flow Controls
+                </span>
+
+                <ul role="list" className="mb-2">
+                    {filteredFlowControls.length ? (
+                        filteredFlowControls.map(
+                            (flowControl: TaskDispatcherDefinitionModel) => (
+                                <Item
+                                    description={
+                                        flowControl.display?.description
+                                    }
+                                    label={flowControl.display?.label}
+                                    key={flowControl.name}
+                                />
+                            )
+                        )
+                    ) : (
+                        <span className="block py-2 px-3 text-xs text-gray-500">
+                            No flow controls found.
+                        </span>
+                    )}
                 </ul>
             </div>
         </Provider>

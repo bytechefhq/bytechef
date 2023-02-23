@@ -43,24 +43,12 @@ const headerToggleItems: ToggleItem[] = [
     },
 ];
 
-const sidebarToggleItems: ToggleItem[] = [
-    {
-        value: 'components',
-        label: 'Components',
-    },
-    {
-        value: 'flow-controls',
-        label: 'Flow Controls',
-    },
-];
-
 const Integration: React.FC = () => {
     const {integrationId} = useParams<{integrationId: string}>();
     const {rightSlideOverOpen, setRightSlideOverOpen} =
         useRightSlideOverStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
-    const [leftSidebarView, setLeftSidebarView] = useState('components');
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
 
@@ -179,44 +167,25 @@ const Integration: React.FC = () => {
                     }
                     leftSidebarHeader={
                         <>
-                            <ToggleGroup
-                                defaultValue="components"
-                                toggleItems={sidebarToggleItems}
-                                onValueChange={(value) => {
-                                    setLeftSidebarView(value);
+                            <h3 className="mt-4 text-center font-bold uppercase text-gray-600">
+                                Workflow elements
+                            </h3>
 
-                                    setFilter('');
-                                }}
+                            <Input
+                                fieldsetClassName="px-4 py-2 border-b mb-0"
+                                name="workflowElementsFilter"
+                                onChange={(event) =>
+                                    setFilter(event.target.value)
+                                }
+                                placeholder="Filter workflow elements"
+                                value={filter}
                             />
-
-                            {leftSidebarView === 'components' ? (
-                                <Input
-                                    fieldsetClassName="px-2"
-                                    name="componentsFilter"
-                                    placeholder="Filter components"
-                                    value={filter}
-                                    onChange={(event) =>
-                                        setFilter(event.target.value)
-                                    }
-                                />
-                            ) : (
-                                <Input
-                                    fieldsetClassName="px-2"
-                                    name="flowControlsFilter"
-                                    placeholder="Filter flow controls"
-                                    value={filter}
-                                    onChange={(event) =>
-                                        setFilter(event.target.value)
-                                    }
-                                />
-                            )}
                         </>
                     }
                     leftSidebarBody={
                         <LeftSidebar
                             data={{components, flowControls}}
                             filter={filter}
-                            view={leftSidebarView}
                         />
                     }
                     leftSidebarOpen={leftSidebarOpen}
