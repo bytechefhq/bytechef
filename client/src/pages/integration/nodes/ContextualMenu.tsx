@@ -190,9 +190,9 @@ const ContextualMenu = ({
                             )
                         )
                     ) : (
-                        <div className="py-2 px-3 text-xs text-gray-500">
+                        <span className="block py-2 px-3 text-xs text-gray-500">
                             No items found.
-                        </div>
+                        </span>
                     )}
                 </ul>
             </main>
