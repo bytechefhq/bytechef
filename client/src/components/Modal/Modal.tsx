@@ -25,6 +25,7 @@ const Modal: React.FC<{
     setIsOpen: Dispatch<SetStateAction<boolean>>;
     title: string;
     triggerLabel: string;
+    showTriggerLabel?: boolean;
 }> = ({
     children,
     confirmButtonLabel,
@@ -35,11 +36,14 @@ const Modal: React.FC<{
     setIsOpen,
     title,
     triggerLabel,
+    showTriggerLabel = true,
 }) => (
     <Root open={isOpen} onOpenChange={setIsOpen}>
-        <Trigger asChild>
-            <Button label={triggerLabel} />
-        </Trigger>
+        {showTriggerLabel && (
+            <Trigger asChild>
+                <Button label={triggerLabel} />
+            </Trigger>
+        )}
 
         <Portal forceMount>
             <Transition.Root show={isOpen}>

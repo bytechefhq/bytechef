@@ -14,6 +14,8 @@ export interface DropDownMenuItem {
     shortcut?: string;
     icon?: ReactNode;
     separator?: boolean;
+    handleOnClick: (id: number) => void;
+    integrationId?: number;
 }
 
 export const Dropdown: React.FC<{
@@ -37,21 +39,26 @@ export const Dropdown: React.FC<{
                         id={id.toString()}
                         sideOffset={5}
                     >
-                        {menuItems.map(({label, separator}, i) => (
-                            <div key={`menu-item-${i}`}>
-                                {!separator && (
-                                    <Item className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900">
-                                        <span className="grow text-gray-700 dark:text-gray-300">
-                                            {label}
-                                        </span>
-                                    </Item>
-                                )}
+                        {menuItems.map(
+                            ({label, separator, handleOnClick}, i) => (
+                                <div key={`menu-item-${i}`}>
+                                    {!separator && (
+                                        <Item
+                                            className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900"
+                                            onClick={() => handleOnClick(id)}
+                                        >
+                                            <span className="grow text-gray-700 dark:text-gray-300">
+                                                {label}
+                                            </span>
+                                        </Item>
+                                    )}
 
-                                {separator && (
-                                    <Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
-                                )}
-                            </div>
-                        ))}
+                                    {separator && (
+                                        <Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+                                    )}
+                                </div>
+                            )
+                        )}
                     </Content>
                 </Portal>
             </Root>

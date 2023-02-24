@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import Input from 'components/Input/Input';
 import Modal from 'components/Modal/Modal';
@@ -19,8 +19,22 @@ import {
 } from '../../middleware/integration';
 import {useIntegrationMutation} from '../../mutations/integrations.mutations';
 
-const IntegrationModal = () => {
-    const [isOpen, setIsOpen] = useState(false);
+interface IntegrationModalProps {
+    id?: number;
+    openModal?: boolean;
+    onClose?: () => void;
+}
+
+const IntegrationModal = ({
+    id,
+    openModal = false,
+    onClose,
+}: IntegrationModalProps) => {
+    const [isOpen, setIsOpen] = useState(openModal);
+
+    useEffect(() => {
+        setIsOpen(openModal);
+    }, [openModal]);
 
     const {control, getValues, setValue, handleSubmit, reset} = useForm({
         defaultValues: {
@@ -69,16 +83,28 @@ const IntegrationModal = () => {
         mutation.mutate({...formData, tags: tagValues} as IntegrationModel);
     }
 
+    function handleClose() {
+        setIsOpen(false);
+
+        if (onClose) {
+            onClose();
+        }
+    }
+
     return (
         <Modal
-            confirmButtonLabel="Create"
-            description="Use this to create your integration which will contain related workflows"
+            confirmButtonLabel={(id && 'Edit') || 'Create'}
+            description={`Use this to ${
+                (id && 'edit') || 'create'
+            } your integration which will contain related workflows`}
             handleConfirmButtonClick={handleSubmit(createIntegration)}
-            triggerLabel="Create Integration"
-            title="Create Integration"
+            triggerLabel={(id && 'Edit Integration') || 'Create Integration'}
+            title={(id && 'Edit Integration') || 'Create Integration'}
             form={true}
             isOpen={isOpen}
             setIsOpen={setIsOpen}
+            showTriggerLabel={id === undefined}
+            onClose={handleClose}
         >
             {categoriesError &&
                 !categoriesIsLoading &&
@@ -184,7 +210,7 @@ const IntegrationModal = () => {
 
             <div className="mt-4 flex justify-end">
                 <Button
-                    label="Create"
+                    label={(id && 'Edit') || 'Create'}
                     onClick={handleSubmit(createIntegration)}
                     type="submit"
                 />

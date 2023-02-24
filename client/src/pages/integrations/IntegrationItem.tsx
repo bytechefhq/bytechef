@@ -1,7 +1,15 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
-import {CategoryModel, TagModel} from '../../middleware/integration';
-import {useIntegrationTagsMutation} from '../../mutations/integrations.mutations';
+import {
+    CategoryModel,
+    IntegrationModel,
+    TagModel,
+} from '../../middleware/integration';
+import {
+    useIntegrationDeleteMutation,
+    useIntegrationMutation,
+    useIntegrationTagsMutation,
+} from '../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
@@ -10,24 +18,9 @@ import CreatableSelect from '../../components/CreatableSelect/CreatableSelect';
 import Button from 'components/Button/Button';
 import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
-
-const menuItems: DropDownMenuItem[] = [
-    {
-        label: 'Edit',
-    },
-    {
-        label: 'Duplicate',
-    },
-    {
-        label: 'New Workflow',
-    },
-    {
-        separator: true,
-    },
-    {
-        label: 'Delete',
-    },
-];
+import IntegrationModal from './IntegrationModal';
+import {useGetIntegrationQuery} from 'queries/integrations';
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
 
 interface CategoryProps {
     category: CategoryModel;
@@ -160,9 +153,79 @@ const IntegrationItem = ({
     workflowIds,
     remainingTags,
 }: IntegrationItemProps) => {
+    const [showEditModal, setShowEditModal] = useState<boolean>(false);
+    // const [isEditButtonClicked, setIsEditButtonClicked] = useState<boolean>(false);
+
+    const menuItems: DropDownMenuItem[] = [
+        {
+            label: 'Edit',
+            handleOnClick: (id: number) => {
+                setShowEditModal(true);
+            },
+        },
+        {
+            label: 'Duplicate',
+            handleOnClick: (id: number) => {
+                duplicateIntegrationItem();
+            },
+        },
+        {
+            label: 'New Workflow',
+            handleOnClick: (id: number) => alert('workflow'),
+        },
+        {
+            separator: true,
+            handleOnClick: (id: number) => {
+                return;
+            },
+        },
+        {
+            label: 'Delete',
+            handleOnClick: (id: number) => alert,
+            //     setShowDeleteAlertDialog(true);
+            //     // deleteIntegrationItem();
+            // },
+        },
+    ];
+
     const queryClient = useQueryClient();
 
-    const mutation = useIntegrationTagsMutation({
+    const {data: item} = useGetIntegrationQuery(id!);
+    const duplication = useIntegrationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(
+                IntegrationKeys.integrationCategories
+            );
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+        },
+    });
+
+    const duplicateIntegrationItem = () => {
+        duplication.mutate({
+            ...item,
+            id: undefined,
+            name: `${item?.name} - duplicated`,
+        } as IntegrationModel);
+    };
+
+    const deletion = useIntegrationDeleteMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+        },
+        onError: () => {
+            console.log('neuspjelo brisanje');
+        },
+    });
+
+    const deleteIntegrationItem = () => {
+        id &&
+            deletion.mutate({
+                id: id,
+            });
+    };
+
+    const tagsMutation = useIntegrationTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(IntegrationKeys.integrations);
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
@@ -174,7 +237,7 @@ const IntegrationItem = ({
 
         newTags.push(newTag);
 
-        mutation.mutate({
+        tagsMutation.mutate({
             id: id || 0,
             putIntegrationTagsRequestModel: {
                 tags: newTags || [],
@@ -185,7 +248,7 @@ const IntegrationItem = ({
     const handleOnDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
 
-        mutation.mutate({
+        tagsMutation.mutate({
             id: id || 0,
             putIntegrationTagsRequestModel: {
                 tags: newTags || [],
@@ -194,33 +257,40 @@ const IntegrationItem = ({
     };
 
     return (
-        <div className="flex items-center justify-between">
-            <div>
-                <Header
-                    category={category}
-                    description={description}
-                    name={name}
-                />
+        <>
+            <div className="flex items-center justify-between">
+                <div>
+                    <Header
+                        category={category}
+                        description={description}
+                        name={name}
+                    />
 
-                <Footer
-                    tags={tags}
-                    workflowIds={workflowIds}
-                    remainingTags={remainingTags}
-                    onAddTag={handleOnAddTag}
-                    onDeleteTag={handleOnDeleteTag}
-                />
+                    <Footer
+                        tags={tags}
+                        workflowIds={workflowIds}
+                        remainingTags={remainingTags}
+                        onAddTag={handleOnAddTag}
+                        onDeleteTag={handleOnDeleteTag}
+                    />
+                </div>
+                <div className="flex items-center">
+                    <Status published={published} version={version} />
+
+                    <Date
+                        lastPublishDate={lastDatePublished}
+                        published={published}
+                    />
+
+                    <Dropdown id={id} menuItems={menuItems} />
+                </div>
             </div>
-            <div className="flex items-center">
-                <Status published={published} version={version} />
 
-                <Date
-                    lastPublishDate={lastDatePublished}
-                    published={published}
-                />
-
-                <Dropdown id={id} menuItems={menuItems} />
-            </div>
-        </div>
+            {showEditModal && <IntegrationModal id={id} openModal={true} />}
+            {/* {showDeleteAlertDialog && (
+                <DeleteAlertDialog handleOnConfirm={deleteIntegrationItem} />
+            )} */}
+        </>
     );
 };
 
@@ -270,7 +340,7 @@ const Status = ({published, version}: StatusProps) => {
 
 const Tag = ({tag, onDeleteTag}: TagProps) => {
     return (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
+        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200">
             {tag.name}
 
             <XMarkIcon
@@ -376,5 +446,49 @@ const Workflows = ({workflowIds}: WorkflowsProps) => {
         </div>
     );
 };
+
+// const DeleteAlertDialog: React.FC<{
+//     handleOnConfirm: () => void;
+// }> = (handleOnConfirm) => {
+//     return (
+//         <AlertDialog.Root>
+//             <AlertDialog.Trigger asChild>
+//                 <button className="Button violet">Delete account</button>
+//             </AlertDialog.Trigger>
+//             <AlertDialog.Portal>
+//                 <AlertDialog.Overlay className="AlertDialogOverlay" />
+//                 <AlertDialog.Content className="AlertDialogContent">
+//                     <AlertDialog.Title className="AlertDialogTitle">
+//                         Are you absolutely sure?
+//                     </AlertDialog.Title>
+//                     <AlertDialog.Description className="AlertDialogDescription">
+//                         This action cannot be undone. This will permanently
+//                         delete your account and remove your data from our
+//                         servers.
+//                     </AlertDialog.Description>
+//                     <div
+//                         style={{
+//                             display: 'flex',
+//                             gap: 25,
+//                             justifyContent: 'flex-end',
+//                         }}
+//                     >
+//                         <AlertDialog.Cancel asChild>
+//                             <button className="Button mauve">Cancel</button>
+//                         </AlertDialog.Cancel>
+//                         <AlertDialog.Action asChild>
+//                             <button
+//                                 className="Button red"
+//                                 onClick={handleOnConfirm}
+//                             >
+//                                 Yes, delete account
+//                             </button>
+//                         </AlertDialog.Action>
+//                     </div>
+//                 </AlertDialog.Content>
+//             </AlertDialog.Portal>
+//         </AlertDialog.Root>
+//     );
+// };
 
 export default IntegrationItem;

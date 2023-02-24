@@ -1,5 +1,6 @@
 import {useMutation} from '@tanstack/react-query';
 import {
+    DeleteIntegrationRequest,
     IntegrationModel,
     IntegrationsApi,
     PutIntegrationTagsRequest,
@@ -34,6 +35,22 @@ export const useIntegrationTagsMutation = (
     useMutation({
         mutationFn: (request: PutIntegrationTagsRequest) => {
             return new IntegrationsApi().putIntegrationTags(request);
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type IntegrationDeleteMutationProps = {
+    onSuccess?: (result: void, variables: DeleteIntegrationRequest) => void;
+    onError?: (error: object, variables: DeleteIntegrationRequest) => void;
+};
+
+export const useIntegrationDeleteMutation = (
+    mutationProps?: IntegrationDeleteMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: DeleteIntegrationRequest) => {
+            return new IntegrationsApi().deleteIntegration(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
