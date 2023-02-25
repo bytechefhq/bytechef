@@ -10,7 +10,6 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ArrayProper
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ArrayPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/AuthorizationModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/AuthorizationTypeModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/BooleanPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/BooleanPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDefinitionWithBasicActionsModel.java
@@ -32,6 +31,7 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfProper
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyOptionModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ResourcesModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/StringPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/StringPropertyModel.java

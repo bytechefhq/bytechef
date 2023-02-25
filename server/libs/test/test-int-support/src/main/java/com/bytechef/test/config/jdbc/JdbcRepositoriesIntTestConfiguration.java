@@ -21,13 +21,14 @@ import java.util.Optional;
 import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @EnableJdbcAuditing
 @TestConfiguration
-public class JdbcRepositoriesIntTestConfiguration {
+public class JdbcRepositoriesIntTestConfiguration extends AbstractJdbcConfiguration {
 
     @Bean
     AuditorAware<String> auditorProvider() {

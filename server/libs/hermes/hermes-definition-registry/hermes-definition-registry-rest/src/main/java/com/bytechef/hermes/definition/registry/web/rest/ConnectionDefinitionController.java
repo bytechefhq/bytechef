@@ -49,6 +49,20 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
     }
 
     @Override
+    public Mono<ResponseEntity<Flux<ConnectionDefinitionBasicModel>>> getComponentConnectionDefinitions(
+        String componentName, ServerWebExchange exchange) {
+
+        return Mono.just(
+            ResponseEntity.ok(
+                componentDefinitionService.getConnectionDefinitions(componentName)
+                    .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
+                        .map(connectionDefinition -> conversionService.convert(
+                            connectionDefinition, ConnectionDefinitionBasicModel.class))
+                        .toList())
+                    .flatMapMany(Flux::fromIterable)));
+    }
+
+    @Override
     public Mono<ResponseEntity<ConnectionDefinitionModel>> getConnectionDefinition(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 

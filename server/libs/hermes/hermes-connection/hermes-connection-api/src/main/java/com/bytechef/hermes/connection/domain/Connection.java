@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
+import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -81,7 +81,7 @@ public final class Connection implements Persistable<Long> {
     private String name;
 
     @Column("parameters")
-    private MapWrapper parameters;
+    private EncryptedMapWrapper parameters;
 
     @Transient
     private List<Tag> tags = new ArrayList<>();
@@ -223,7 +223,7 @@ public final class Connection implements Persistable<Long> {
     }
 
     public void setParameters(Map<String, Object> parameters) {
-        this.parameters = new MapWrapper(parameters);
+        this.parameters = new EncryptedMapWrapper(parameters);
     }
 
     public void setTags(List<Tag> tags) {
