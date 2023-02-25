@@ -14,17 +14,20 @@ export interface DropDownMenuItem {
     shortcut?: string;
     icon?: ReactNode;
     separator?: boolean;
+    onClick?: (id?: number) => void;
 }
 
-export const Dropdown: React.FC<{
+interface DropdownProps {
     id?: number;
     menuItems: DropDownMenuItem[];
-}> = ({id = 0, menuItems}) => {
+}
+
+export const Dropdown = ({id = 0, menuItems}: DropdownProps): JSX.Element => {
     return (
         <div>
             <Root>
                 <Trigger asChild>
-                    <div className="flex h-8 w-7 items-center justify-center rounded hover:bg-gray-100">
+                    <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-gray-100">
                         <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer dark:text-white" />
                     </div>
                 </Trigger>
@@ -37,10 +40,19 @@ export const Dropdown: React.FC<{
                         id={id.toString()}
                         sideOffset={5}
                     >
-                        {menuItems.map(({label, separator}, i) => (
+                        {menuItems.map(({label, separator, onClick}, i) => (
                             <div key={`menu-item-${i}`}>
                                 {!separator && (
-                                    <Item className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900">
+                                    <Item
+                                        className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900"
+                                        onClick={(event) => {
+                                            event.preventDefault();
+
+                                            if (onClick) {
+                                                onClick(id);
+                                            }
+                                        }}
+                                    >
                                         <span className="grow text-gray-700 dark:text-gray-300">
                                             {label}
                                         </span>

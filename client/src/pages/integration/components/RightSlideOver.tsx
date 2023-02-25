@@ -189,7 +189,7 @@ const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
                                         <div className="flex shrink-0 justify-start p-4">
                                             <Select
                                                 defaultValue={'2'}
-                                                selectItems={[
+                                                options={[
                                                     {label: 'v 1', value: '1'},
                                                     {label: 'v 2', value: '2'},
                                                     {label: 'v 3', value: '3'},
