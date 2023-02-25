@@ -15,7 +15,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation "org.springframework.kafka:spring-kafka"
-    implementation libs.springdoc.openapi.starter.webflux.ui
+    implementation libs.org.springdoc.springdoc.openapi.starter.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:atlas:atlas-config")
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config")

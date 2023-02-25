@@ -2,5 +2,5 @@ dependencies {
     api project(":server:libs:hermes:hermes-definition-api")
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation libs.swagger.annotations
+    implementation libs.io.swagger.core.v3.swagger.annotations
 }
