@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-18T22:15:44.357328+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-23T12:36:20.615811+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")
@@ -81,7 +81,7 @@ public class ConnectionModel {
    * @return authorizationName
   */
   
-  @Schema(name = "authorizationName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "authorizationName", description = "TODO", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getAuthorizationName() {
     return authorizationName;
   }
@@ -99,8 +99,8 @@ public class ConnectionModel {
    * TODO
    * @return componentName
   */
-  
-  @Schema(name = "componentName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull 
+  @Schema(name = "componentName", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getComponentName() {
     return componentName;
   }
@@ -118,8 +118,8 @@ public class ConnectionModel {
    * TODO
    * @return connectionVersion
   */
-  
-  @Schema(name = "connectionVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull 
+  @Schema(name = "connectionVersion", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getConnectionVersion() {
     return connectionVersion;
   }
@@ -256,8 +256,8 @@ public class ConnectionModel {
    * TODO
    * @return parameters
   */
-  
-  @Schema(name = "parameters", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull 
+  @Schema(name = "parameters", description = "TODO", requiredMode = Schema.RequiredMode.REQUIRED)
   public Map<String, Object> getParameters() {
     return parameters;
   }
