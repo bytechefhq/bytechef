@@ -32,12 +32,6 @@ export interface StringPropertyAllOfModel {
      * @memberof StringPropertyAllOfModel
      */
     controlType?: ControlTypeModel;
-    /**
-     * 
-     * @type {string}
-     * @memberof StringPropertyAllOfModel
-     */
-    type?: string;
 }
 
 /**
@@ -60,7 +54,6 @@ export function StringPropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
-        'type': !exists(json, 'type') ? undefined : json['type'],
     };
 }
 
@@ -74,7 +67,6 @@ export function StringPropertyAllOfModelToJSON(value?: StringPropertyAllOfModel 
     return {
         
         'controlType': ControlTypeModelToJSON(value.controlType),
-        'type': value.type,
     };
 }
 

@@ -50,12 +50,6 @@ export interface ObjectPropertyAllOfModel {
      * @memberof ObjectPropertyAllOfModel
      */
     properties?: Array<PropertyModel>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ObjectPropertyAllOfModel
-     */
-    type?: string;
 }
 
 /**
@@ -81,7 +75,6 @@ export function ObjectPropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimin
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'type': !exists(json, 'type') ? undefined : json['type'],
     };
 }
 
@@ -98,7 +91,6 @@ export function ObjectPropertyAllOfModelToJSON(value?: ObjectPropertyAllOfModel 
         'multipleValues': value.multipleValues,
         'objectType': value.objectType,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'type': value.type,
     };
 }
 

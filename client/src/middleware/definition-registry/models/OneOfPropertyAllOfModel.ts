@@ -27,23 +27,11 @@ import {
  */
 export interface OneOfPropertyAllOfModel {
     /**
-     * 
-     * @type {boolean}
-     * @memberof OneOfPropertyAllOfModel
-     */
-    required?: boolean;
-    /**
      * Possible types of properties that can be used.
      * @type {Array<PropertyModel>}
      * @memberof OneOfPropertyAllOfModel
      */
     types?: Array<PropertyModel>;
-    /**
-     * 
-     * @type {string}
-     * @memberof OneOfPropertyAllOfModel
-     */
-    type?: string;
 }
 
 /**
@@ -65,9 +53,7 @@ export function OneOfPropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimina
     }
     return {
         
-        'required': !exists(json, 'required') ? undefined : json['required'],
         'types': !exists(json, 'types') ? undefined : ((json['types'] as Array<any>).map(PropertyModelFromJSON)),
-        'type': !exists(json, 'type') ? undefined : json['type'],
     };
 }
 
@@ -80,9 +66,7 @@ export function OneOfPropertyAllOfModelToJSON(value?: OneOfPropertyAllOfModel | 
     }
     return {
         
-        'required': value.required,
         'types': value.types === undefined ? undefined : ((value.types as Array<any>).map(PropertyModelToJSON)),
-        'type': value.type,
     };
 }
 

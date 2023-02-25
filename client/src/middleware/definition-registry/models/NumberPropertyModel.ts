@@ -25,6 +25,12 @@ import {
     PropertyOptionModelFromJSONTyped,
     PropertyOptionModelToJSON,
 } from './PropertyOptionModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 import type { ValuePropertyModel } from './ValuePropertyModel';
 import {
     ValuePropertyModelFromJSON,
@@ -56,12 +62,6 @@ export interface NumberPropertyModel extends ValuePropertyModel {
      * @memberof NumberPropertyModel
      */
     numberPrecision?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof NumberPropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -69,7 +69,6 @@ export interface NumberPropertyModel extends ValuePropertyModel {
  */
 export function instanceOfNumberPropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -87,7 +86,6 @@ export function NumberPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
-        'type': json['type'],
     };
 }
 
@@ -103,7 +101,6 @@ export function NumberPropertyModelToJSON(value?: NumberPropertyModel | null): a
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,
-        'type': value.type,
     };
 }
 

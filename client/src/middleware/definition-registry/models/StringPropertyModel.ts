@@ -31,6 +31,12 @@ import {
     PropertyOptionModelFromJSONTyped,
     PropertyOptionModelToJSON,
 } from './PropertyOptionModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 import type { ValuePropertyModel } from './ValuePropertyModel';
 import {
     ValuePropertyModelFromJSON,
@@ -50,12 +56,6 @@ export interface StringPropertyModel extends ValuePropertyModel {
      * @memberof StringPropertyModel
      */
     controlType?: ControlTypeModel;
-    /**
-     * 
-     * @type {string}
-     * @memberof StringPropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -63,7 +63,6 @@ export interface StringPropertyModel extends ValuePropertyModel {
  */
 export function instanceOfStringPropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -79,7 +78,6 @@ export function StringPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
-        'type': json['type'],
     };
 }
 
@@ -93,7 +91,6 @@ export function StringPropertyModelToJSON(value?: StringPropertyModel | null): a
     return {
         ...ValuePropertyModelToJSON(value),
         'controlType': ControlTypeModelToJSON(value.controlType),
-        'type': value.type,
     };
 }
 

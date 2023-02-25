@@ -45,6 +45,12 @@ import {
  */
 export interface ConnectionDefinitionModel {
     /**
+     * If connection requires an authorization to be configured or not.
+     * @type {boolean}
+     * @memberof ConnectionDefinitionModel
+     */
+    authorizationRequired?: boolean;
+    /**
      * 
      * @type {Array<AuthorizationModel>}
      * @memberof ConnectionDefinitionModel
@@ -101,6 +107,7 @@ export function ConnectionDefinitionModelFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
+        'authorizationRequired': !exists(json, 'authorizationRequired') ? undefined : json['authorizationRequired'],
         'authorizations': !exists(json, 'authorizations') ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationModelFromJSON)),
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
@@ -119,6 +126,7 @@ export function ConnectionDefinitionModelToJSON(value?: ConnectionDefinitionMode
     }
     return {
         
+        'authorizationRequired': value.authorizationRequired,
         'authorizations': value.authorizations === undefined ? undefined : ((value.authorizations as Array<any>).map(AuthorizationModelToJSON)),
         'componentName': value.componentName,
         'display': DisplayModelToJSON(value.display),

@@ -25,6 +25,12 @@ import {
     PropertyOptionModelFromJSONTyped,
     PropertyOptionModelToJSON,
 } from './PropertyOptionModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 import type { ValuePropertyModel } from './ValuePropertyModel';
 import {
     ValuePropertyModelFromJSON,
@@ -38,12 +44,6 @@ import {
  * @interface BooleanPropertyModel
  */
 export interface BooleanPropertyModel extends ValuePropertyModel {
-    /**
-     * 
-     * @type {string}
-     * @memberof BooleanPropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -51,7 +51,6 @@ export interface BooleanPropertyModel extends ValuePropertyModel {
  */
 export function instanceOfBooleanPropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -61,25 +60,10 @@ export function BooleanPropertyModelFromJSON(json: any): BooleanPropertyModel {
 }
 
 export function BooleanPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): BooleanPropertyModel {
-    if ((json === undefined) || (json === null)) {
-        return json;
-    }
-    return {
-        ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'type': json['type'],
-    };
+    return json;
 }
 
 export function BooleanPropertyModelToJSON(value?: BooleanPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
-    }
-    return {
-        ...ValuePropertyModelToJSON(value),
-        'type': value.type,
-    };
+    return value;
 }
 

@@ -25,6 +25,12 @@ import {
     PropertyOptionModelFromJSONTyped,
     PropertyOptionModelToJSON,
 } from './PropertyOptionModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 import type { ValuePropertyModel } from './ValuePropertyModel';
 import {
     ValuePropertyModelFromJSON,
@@ -50,12 +56,6 @@ export interface IntegerPropertyModel extends ValuePropertyModel {
      * @memberof IntegerPropertyModel
      */
     minValue?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof IntegerPropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -63,7 +63,6 @@ export interface IntegerPropertyModel extends ValuePropertyModel {
  */
 export function instanceOfIntegerPropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -80,7 +79,6 @@ export function IntegerPropertyModelFromJSONTyped(json: any, ignoreDiscriminator
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
-        'type': json['type'],
     };
 }
 
@@ -95,7 +93,6 @@ export function IntegerPropertyModelToJSON(value?: IntegerPropertyModel | null):
         ...ValuePropertyModelToJSON(value),
         'maxValue': value.maxValue,
         'minValue': value.minValue,
-        'type': value.type,
     };
 }
 
