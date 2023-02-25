@@ -6,10 +6,13 @@ import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
 import {twMerge} from 'tailwind-merge';
-import CreatableSelect from '../../components/CreatableSelect/CreatableSelect';
+import CreatableSelect, {
+    SelectOption,
+} from '../../components/CreatableSelect/CreatableSelect';
 import Button from 'components/Button/Button';
 import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
+import {OnChangeValue} from 'react-select';
 
 const menuItems: DropDownMenuItem[] = [
     {
@@ -42,7 +45,7 @@ interface IntegrationItemProps {
     published: boolean;
     remainingTags?: TagModel[];
     tags?: TagModel[];
-    version?: number;
+    componentVersion?: number;
     workflowIds?: string[];
 }
 
@@ -156,7 +159,7 @@ const IntegrationItem = ({
     name,
     published,
     tags,
-    version,
+    componentVersion,
     workflowIds,
     remainingTags,
 }: IntegrationItemProps) => {
@@ -195,29 +198,32 @@ const IntegrationItem = ({
 
     return (
         <div className="flex items-center justify-between">
-            <div>
-                <Header
-                    category={category}
-                    description={description}
-                    name={name}
-                />
+            <div className="flex flex-1 items-center justify-between">
+                <div>
+                    <Header
+                        category={category}
+                        description={description}
+                        name={name}
+                    />
 
-                <Footer
-                    tags={tags}
-                    workflowIds={workflowIds}
-                    remainingTags={remainingTags}
-                    onAddTag={handleOnAddTag}
-                    onDeleteTag={handleOnDeleteTag}
-                />
+                    <Footer
+                        tags={tags}
+                        workflowIds={workflowIds}
+                        remainingTags={remainingTags}
+                        onAddTag={handleOnAddTag}
+                        onDeleteTag={handleOnDeleteTag}
+                    />
+                </div>
+                <div className="flex items-center">
+                    <Status published={published} version={componentVersion} />
+
+                    <Date
+                        lastPublishDate={lastDatePublished}
+                        published={published}
+                    />
+                </div>
             </div>
-            <div className="flex items-center">
-                <Status published={published} version={version} />
-
-                <Date
-                    lastPublishDate={lastDatePublished}
-                    published={published}
-                />
-
+            <div>
                 <Dropdown id={id} menuItems={menuItems} />
             </div>
         </div>
@@ -291,52 +297,10 @@ const TagList = ({
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
     return (
-        <div className="mr-4 flex items-center space-x-2">
+        <div className="mr-4 flex items-center space-x-1">
             {tags.slice(0, 3).map((tag) => (
                 <Tag key={tag.id} tag={tag} onDeleteTag={onDeleteTag} />
             ))}
-
-            {isNewTagWindowVisible ? (
-                <CreatableSelect
-                    className="w-40"
-                    name="newTag"
-                    isMulti={false}
-                    options={remainingTags!.map((tag: TagModel) => ({
-                        label: `${tag.name
-                            .charAt(0)
-                            .toUpperCase()}${tag.name.slice(1)}`,
-                        value: tag.name.toLowerCase().replace(/\W/g, ''),
-                        ...tag,
-                    }))}
-                    onCreateOption={(inputValue: string) => {
-                        onAddTag({
-                            name: inputValue,
-                        });
-                        setIsNewTagWindowVisible(false);
-                    }}
-                    onChange={(selectedOption) => {
-                        remainingTags &&
-                            onAddTag(
-                                remainingTags.filter(
-                                    (tag) =>
-                                        tag.id != null &&
-                                        tag.id === selectedOption!.id
-                                )[0]
-                            );
-                        setIsNewTagWindowVisible(false);
-                    }}
-                />
-            ) : (
-                <div
-                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
-                    onClick={(event) => {
-                        event.preventDefault();
-                        setIsNewTagWindowVisible(true);
-                    }}
-                >
-                    <PlusIcon className="h-3 w-3 rounded-full hover:bg-gray-300" />
-                </div>
-            )}
 
             {tags.length > 3 && (
                 <div className="relative flex">
@@ -362,6 +326,45 @@ const TagList = ({
                             ))}
                         </div>
                     )}
+                </div>
+            )}
+
+            {isNewTagWindowVisible ? (
+                <CreatableSelect
+                    className="w-40"
+                    name="newTag"
+                    options={remainingTags!.map((tag: TagModel) => ({
+                        label: `${tag.name
+                            .charAt(0)
+                            .toUpperCase()}${tag.name.slice(1)}`,
+                        value: tag.name.toLowerCase().replace(/\W/g, ''),
+                        tag,
+                    }))}
+                    onCreateOption={(inputValue: string) => {
+                        onAddTag({
+                            name: inputValue,
+                        });
+                        setIsNewTagWindowVisible(false);
+                    }}
+                    onChange={(
+                        selectedOption: OnChangeValue<SelectOption, false>
+                    ) => {
+                        if (selectedOption) {
+                            onAddTag(selectedOption.tag);
+                        }
+
+                        setIsNewTagWindowVisible(false);
+                    }}
+                />
+            ) : (
+                <div
+                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
+                    onClick={(event) => {
+                        event.preventDefault();
+                        setIsNewTagWindowVisible(true);
+                    }}
+                >
+                    <PlusIcon className="h-3 w-3 rounded-full hover:bg-gray-300" />
                 </div>
             )}
         </div>
