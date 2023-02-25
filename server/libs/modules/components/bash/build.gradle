@@ -1,5 +1,5 @@
 version="1.0"
 
 dependencies {
-    implementation libs.zt.exec
+    implementation libs.org.zeroturnaround.zt.exec
 }

@@ -10,7 +10,7 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
-    testImplementation libs.wiremock
+    testImplementation libs.com.github.tomakehurst.wiremock
     testImplementation project(":server:libs:core:encryption:encryption-api")
     testImplementation project(":server:libs:core:tag:tag-api")
     testImplementation project(":server:libs:db-migration")

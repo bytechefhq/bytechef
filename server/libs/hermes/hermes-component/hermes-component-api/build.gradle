@@ -8,8 +8,8 @@ dependencies {
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "com.jayway.jsonpath:json-path"
-    implementation libs.methanol
+    implementation libs.com.github.mizosoft.methanol
     implementation "org.slf4j:slf4j-api"
-    implementation libs.swagger.annotations
-    implementation libs.tika.core
+    implementation libs.io.swagger.core.v3.swagger.annotations
+    implementation libs.org.apache.tika.tika.core
 }

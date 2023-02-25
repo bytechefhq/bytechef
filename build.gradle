@@ -200,7 +200,7 @@ subprojects {
     dependencies {
         compileOnly libs.org.graalvm.sdk.graal.sdk
 
-        implementation libs.spotbugs.annotations
+        implementation libs.com.github.spotbugs.spotbugs.annotations
     }
 }
 

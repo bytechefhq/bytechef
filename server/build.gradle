@@ -35,6 +35,6 @@ subprojects {
 
         testRuntimeOnly "com.zaxxer:HikariCP"
         testRuntimeOnly "org.postgresql:postgresql"
-        testRuntimeOnly libs.testcontainers.postgresql
+        testRuntimeOnly libs.org.testcontainers.postgresql
     }
 }
