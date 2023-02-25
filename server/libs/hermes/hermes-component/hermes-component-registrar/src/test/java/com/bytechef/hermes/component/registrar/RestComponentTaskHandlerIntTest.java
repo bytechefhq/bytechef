@@ -20,6 +20,8 @@ package com.bytechef.hermes.component.registrar;
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
@@ -43,6 +45,7 @@ import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
@@ -62,6 +65,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -856,6 +860,22 @@ public class RestComponentTaskHandlerIntTest {
         @EnableJdbcRepositories(basePackages = "com.bytechef.hermes.connection.repository")
         public static class ConnectionJdbcRepositoriesIntTestConfiguration
             extends JdbcRepositoriesIntTestConfiguration {
+
+            private final Encryption encryption;
+            private final ObjectMapper objectMapper;
+
+            @SuppressFBWarnings("EI2")
+            public ConnectionJdbcRepositoriesIntTestConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+                this.encryption = encryption;
+                this.objectMapper = objectMapper;
+            }
+
+            @Override
+            protected List<?> userConverters() {
+                return Arrays.asList(
+                    new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                    new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
+            }
         }
     }
 }

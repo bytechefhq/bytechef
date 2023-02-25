@@ -42,6 +42,11 @@ public class ComponentDefinitionServiceRSocketController {
         this.componentDefinitionService = componentDefinitionService;
     }
 
+    @MessageMapping("Service.getComponentConnectionDefinitions")
+    public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitions(String componentName) {
+        return componentDefinitionService.getConnectionDefinitions(componentName);
+    }
+
     @MessageMapping("Service.getComponentDefinitions")
     public Mono<List<ComponentDefinition>> getComponentDefinitions() {
         return componentDefinitionService.getComponentDefinitions();

@@ -32,7 +32,10 @@ import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
-import com.bytechef.atlas.repository.jdbc.config.WorkflowRepositoryJdbcConfiguration;
+import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -44,13 +47,21 @@ import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
+import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.test.annotation.EmbeddedSql;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -65,6 +76,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -182,8 +194,7 @@ public class CoordinatorIntTest {
     @Import({
         ResourceWorkflowRepositoryConfiguration.class,
         WorkflowConfiguration.class,
-        WorkflowMapperConfiguration.class,
-        WorkflowRepositoryJdbcConfiguration.class,
+        WorkflowMapperConfiguration.class
     })
     @Configuration
     public static class CoordinatorIntTestConfiguration {
@@ -203,6 +214,31 @@ public class CoordinatorIntTest {
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
         public static class CoordinatorIntJdbcRepositoriesConfiguration extends JdbcRepositoriesIntTestConfiguration {
+        }
+
+        @Configuration
+        public static class JdbcConfiguration extends AbstractJdbcConfiguration {
+
+            private final ObjectMapper objectMapper;
+
+            @SuppressFBWarnings("EI2")
+            public JdbcConfiguration(ObjectMapper objectMapper) {
+                this.objectMapper = objectMapper;
+            }
+
+            @Override
+            protected List<?> userConverters() {
+                return Arrays.asList(
+                    new ExecutionErrorToStringConverter(objectMapper),
+                    new MapWrapperToStringConverter(objectMapper),
+                    new MapListWrapperToStringConverter(objectMapper),
+                    new StringToExecutionErrorConverter(objectMapper),
+                    new StringToExecutionErrorConverter(objectMapper),
+                    new StringToMapWrapperConverter(objectMapper),
+                    new StringToMapListWrapperConverter(objectMapper),
+                    new StringToWorkflowTaskConverter(objectMapper),
+                    new WorkflowTaskToStringConverter(objectMapper));
+            }
         }
     }
 }

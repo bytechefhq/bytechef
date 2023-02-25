@@ -41,4 +41,6 @@ public interface ComponentDefinitionService {
     Mono<ConnectionDefinition> getConnectionDefinition(String componentName, Integer componentVersion);
 
     Mono<List<ConnectionDefinition>> getConnectionDefinitions();
+
+    Mono<List<ConnectionDefinition>> getConnectionDefinitions(String componentName);
 }

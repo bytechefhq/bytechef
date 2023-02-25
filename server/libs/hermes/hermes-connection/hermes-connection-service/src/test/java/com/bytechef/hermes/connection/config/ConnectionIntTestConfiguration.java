@@ -17,10 +17,13 @@
 
 package com.bytechef.hermes.connection.config;
 
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -28,6 +31,9 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -69,5 +75,21 @@ public class ConnectionIntTestConfiguration {
         "com.bytechef.hermes.connection.repository", "com.bytechef.tag.repository"
     })
     public static class ConnectionJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
+
+        private final Encryption encryption;
+        private final ObjectMapper objectMapper;
+
+        @SuppressFBWarnings("EI2")
+        public ConnectionJdbcRepositoriesIntTestConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            this.encryption = encryption;
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        protected List<?> userConverters() {
+            return Arrays.asList(
+                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
+        }
     }
 }
