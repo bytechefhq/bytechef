@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ObjectProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-20T11:29:33.968820+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
 public class ObjectPropertyAllOfModel {
 
   @JsonProperty("additionalProperties")
@@ -39,9 +39,6 @@ public class ObjectPropertyAllOfModel {
   @JsonProperty("properties")
   @Valid
   private List<PropertyModel> properties = null;
-
-  @JsonProperty("type")
-  private String type;
 
   public ObjectPropertyAllOfModel additionalProperties(List<PropertyModel> additionalProperties) {
     this.additionalProperties = additionalProperties;
@@ -135,25 +132,6 @@ public class ObjectPropertyAllOfModel {
     this.properties = properties;
   }
 
-  public ObjectPropertyAllOfModel type(String type) {
-    this.type = type;
-    return this;
-  }
-
-  /**
-   * Get type
-   * @return type
-  */
-  
-  @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -166,13 +144,12 @@ public class ObjectPropertyAllOfModel {
     return Objects.equals(this.additionalProperties, objectPropertyAllOf.additionalProperties) &&
         Objects.equals(this.multipleValues, objectPropertyAllOf.multipleValues) &&
         Objects.equals(this.objectType, objectPropertyAllOf.objectType) &&
-        Objects.equals(this.properties, objectPropertyAllOf.properties) &&
-        Objects.equals(this.type, objectPropertyAllOf.type);
+        Objects.equals(this.properties, objectPropertyAllOf.properties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(additionalProperties, multipleValues, objectType, properties, type);
+    return Objects.hash(additionalProperties, multipleValues, objectType, properties);
   }
 
   @Override
@@ -183,7 +160,6 @@ public class ObjectPropertyAllOfModel {
     sb.append("    multipleValues: ").append(toIndentedString(multipleValues)).append("\n");
     sb.append("    objectType: ").append(toIndentedString(objectType)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

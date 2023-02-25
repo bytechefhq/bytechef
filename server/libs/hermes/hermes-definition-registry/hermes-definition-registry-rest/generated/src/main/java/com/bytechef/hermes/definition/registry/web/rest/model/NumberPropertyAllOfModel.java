@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("NumberProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-20T11:29:33.968820+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
 public class NumberPropertyAllOfModel {
 
   @JsonProperty("maxValue")
@@ -31,9 +31,6 @@ public class NumberPropertyAllOfModel {
 
   @JsonProperty("numberPrecision")
   private Integer numberPrecision;
-
-  @JsonProperty("type")
-  private String type;
 
   public NumberPropertyAllOfModel maxValue(Integer maxValue) {
     this.maxValue = maxValue;
@@ -92,25 +89,6 @@ public class NumberPropertyAllOfModel {
     this.numberPrecision = numberPrecision;
   }
 
-  public NumberPropertyAllOfModel type(String type) {
-    this.type = type;
-    return this;
-  }
-
-  /**
-   * Get type
-   * @return type
-  */
-  
-  @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -122,13 +100,12 @@ public class NumberPropertyAllOfModel {
     NumberPropertyAllOfModel numberPropertyAllOf = (NumberPropertyAllOfModel) o;
     return Objects.equals(this.maxValue, numberPropertyAllOf.maxValue) &&
         Objects.equals(this.minValue, numberPropertyAllOf.minValue) &&
-        Objects.equals(this.numberPrecision, numberPropertyAllOf.numberPrecision) &&
-        Objects.equals(this.type, numberPropertyAllOf.type);
+        Objects.equals(this.numberPrecision, numberPropertyAllOf.numberPrecision);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(maxValue, minValue, numberPrecision, type);
+    return Objects.hash(maxValue, minValue, numberPrecision);
   }
 
   @Override
@@ -138,7 +115,6 @@ public class NumberPropertyAllOfModel {
     sb.append("    maxValue: ").append(toIndentedString(maxValue)).append("\n");
     sb.append("    minValue: ").append(toIndentedString(minValue)).append("\n");
     sb.append("    numberPrecision: ").append(toIndentedString(numberPrecision)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }
