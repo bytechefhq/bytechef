@@ -24,36 +24,43 @@ export const router = createBrowserRouter([
                 element: <Integrations />,
             },
             {
-                loader: async ({params}) =>
-                    queryClient.ensureQueryData(
-                        IntegrationKeys.integration(+params.integrationId!),
-                        () =>
-                            new IntegrationsApi().getIntegration({
-                                id: +params.integrationId!,
-                            })
-                    ),
-                path: 'automation/integrations/:integrationId',
-                element: <Integration />,
-            },
-            {
-                path: 'automation/integrations',
-                element: <Integrations />,
-            },
-            {
-                path: 'automation/instances',
-                element: <Instances />,
-            },
-            {
-                path: 'automation/connections',
-                element: <Connections />,
-            },
-            {
-                path: 'automation/executions',
-                element: <Executions />,
-            },
-            {
-                path: 'settings',
-                element: <Settings />,
+                path: 'automation',
+                children: [
+                    {
+                        loader: async ({params}) =>
+                            queryClient.ensureQueryData(
+                                IntegrationKeys.integration(
+                                    +params.integrationId!
+                                ),
+                                () =>
+                                    new IntegrationsApi().getIntegration({
+                                        id: +params.integrationId!,
+                                    })
+                            ),
+                        path: 'integrations/:integrationId',
+                        element: <Integration />,
+                    },
+                    {
+                        path: 'integrations',
+                        element: <Integrations />,
+                    },
+                    {
+                        path: 'instances',
+                        element: <Instances />,
+                    },
+                    {
+                        path: 'connections',
+                        element: <Connections />,
+                    },
+                    {
+                        path: 'executions',
+                        element: <Executions />,
+                    },
+                    {
+                        path: 'settings',
+                        element: <Settings />,
+                    },
+                ],
             },
         ],
     },
