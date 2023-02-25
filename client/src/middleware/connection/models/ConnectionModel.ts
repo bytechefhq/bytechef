@@ -31,19 +31,19 @@ export interface ConnectionModel {
      * @type {string}
      * @memberof ConnectionModel
      */
-    readonly authorizationName?: string;
+    authorizationName?: string;
     /**
      * TODO
      * @type {string}
      * @memberof ConnectionModel
      */
-    readonly componentName: string;
+    componentName: string;
     /**
      * TODO
      * @type {number}
      * @memberof ConnectionModel
      */
-    readonly connectionVersion: number;
+    connectionVersion: number;
     /**
      * TODO
      * @type {string}
@@ -85,7 +85,7 @@ export interface ConnectionModel {
      * @type {{ [key: string]: object; }}
      * @memberof ConnectionModel
      */
-    readonly parameters: { [key: string]: object; };
+    parameters: { [key: string]: object; };
     /**
      * 
      * @type {Array<TagModel>}
@@ -147,7 +147,11 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
     }
     return {
         
+        'authorizationName': value.authorizationName,
+        'componentName': value.componentName,
+        'connectionVersion': value.connectionVersion,
         'name': value.name,
+        'parameters': value.parameters,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         'version': value.version,
     };

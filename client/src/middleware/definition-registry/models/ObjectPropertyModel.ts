@@ -31,6 +31,12 @@ import {
     PropertyOptionModelFromJSONTyped,
     PropertyOptionModelToJSON,
 } from './PropertyOptionModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 import type { ValuePropertyModel } from './ValuePropertyModel';
 import {
     ValuePropertyModelFromJSON,
@@ -68,12 +74,6 @@ export interface ObjectPropertyModel extends ValuePropertyModel {
      * @memberof ObjectPropertyModel
      */
     properties?: Array<PropertyModel>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ObjectPropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -81,7 +81,6 @@ export interface ObjectPropertyModel extends ValuePropertyModel {
  */
 export function instanceOfObjectPropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -100,7 +99,6 @@ export function ObjectPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'type': json['type'],
     };
 }
 
@@ -117,7 +115,6 @@ export function ObjectPropertyModelToJSON(value?: ObjectPropertyModel | null): a
         'multipleValues': value.multipleValues,
         'objectType': value.objectType,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'type': value.type,
     };
 }
 

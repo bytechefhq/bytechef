@@ -10,7 +10,6 @@ models/ArrayPropertyAllOfModel.ts
 models/ArrayPropertyModel.ts
 models/AuthorizationModel.ts
 models/AuthorizationTypeModel.ts
-models/BooleanPropertyAllOfModel.ts
 models/BooleanPropertyModel.ts
 models/ComponentDefinitionBasicModel.ts
 models/ComponentDefinitionWithBasicActionsModel.ts
@@ -32,6 +31,7 @@ models/OneOfPropertyAllOfModel.ts
 models/OneOfPropertyModel.ts
 models/PropertyModel.ts
 models/PropertyOptionModel.ts
+models/PropertyTypeModel.ts
 models/ResourcesModel.ts
 models/StringPropertyAllOfModel.ts
 models/StringPropertyModel.ts

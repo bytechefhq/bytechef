@@ -37,12 +37,6 @@ export interface NumberPropertyAllOfModel {
      * @memberof NumberPropertyAllOfModel
      */
     numberPrecision?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof NumberPropertyAllOfModel
-     */
-    type?: string;
 }
 
 /**
@@ -67,7 +61,6 @@ export function NumberPropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimin
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
-        'type': !exists(json, 'type') ? undefined : json['type'],
     };
 }
 
@@ -83,7 +76,6 @@ export function NumberPropertyAllOfModelToJSON(value?: NumberPropertyAllOfModel 
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,
-        'type': value.type,
     };
 }
 

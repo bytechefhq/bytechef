@@ -25,6 +25,12 @@ import {
     PropertyModelFromJSONTyped,
     PropertyModelToJSON,
 } from './PropertyModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 
 /**
  * A one of property type.
@@ -33,23 +39,11 @@ import {
  */
 export interface OneOfPropertyModel extends PropertyModel {
     /**
-     * 
-     * @type {boolean}
-     * @memberof OneOfPropertyModel
-     */
-    required?: boolean;
-    /**
      * Possible types of properties that can be used.
      * @type {Array<PropertyModel>}
      * @memberof OneOfPropertyModel
      */
     types?: Array<PropertyModel>;
-    /**
-     * 
-     * @type {string}
-     * @memberof OneOfPropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -57,7 +51,6 @@ export interface OneOfPropertyModel extends PropertyModel {
  */
 export function instanceOfOneOfPropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -72,9 +65,7 @@ export function OneOfPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'required': !exists(json, 'required') ? undefined : json['required'],
         'types': !exists(json, 'types') ? undefined : ((json['types'] as Array<any>).map(PropertyModelFromJSON)),
-        'type': json['type'],
     };
 }
 
@@ -87,9 +78,7 @@ export function OneOfPropertyModelToJSON(value?: OneOfPropertyModel | null): any
     }
     return {
         ...PropertyModelToJSON(value),
-        'required': value.required,
         'types': value.types === undefined ? undefined : ((value.types as Array<any>).map(PropertyModelToJSON)),
-        'type': value.type,
     };
 }
 
