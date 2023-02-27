@@ -18,15 +18,17 @@
 package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
+import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.utils.HttpClientUtils;
 
 import java.util.List;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.GET;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.RESPONSE_FORMAT;
+import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
@@ -44,7 +46,7 @@ public class HttpClientGetAction {
     public static final ActionDefinition ACTION_DEFINITION = action(GET)
         .display(display("GET").description("The request method to use."))
         .properties(
-            com.bytechef.component.httpclient.util.HttpClientUtils.toArray(
+            HttpClientActionUtils.toArray(
                 //
                 // Common properties
                 //
@@ -56,14 +58,14 @@ public class HttpClientGetAction {
                 .displayOption(
                     show(
                         RESPONSE_FORMAT,
-                        List.of(HttpClientUtils.ResponseFormat.JSON.name(),
-                            HttpClientUtils.ResponseFormat.XML.name()))),
-            string().displayOption(show(RESPONSE_FORMAT, HttpClientUtils.ResponseFormat.TEXT.name())),
-            fileEntry().displayOption(show(RESPONSE_FORMAT, HttpClientUtils.ResponseFormat.BINARY.name())))
+                        List.of(
+                            ResponseFormat.JSON.name(),
+                            ResponseFormat.XML.name()))),
+            string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
+            fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
         .perform(HttpClientGetAction::performGet);
 
     public static Object performGet(Context context, ExecutionParameters executionParameters) {
-        return com.bytechef.component.httpclient.util.HttpClientUtils.execute(context, executionParameters,
-            HttpClientUtils.RequestMethod.GET);
+        return HttpClientActionUtils.execute(context, executionParameters, RequestMethod.GET);
     }
 }

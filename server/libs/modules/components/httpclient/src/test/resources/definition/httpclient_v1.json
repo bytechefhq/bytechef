@@ -341,9 +341,6 @@
                   "type": "INTEGER"
                 },
                 {
-                  "type": "NULL"
-                },
-                {
                   "type": "NUMBER"
                 },
                 {
@@ -387,9 +384,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"
@@ -933,9 +927,6 @@
                   "type": "INTEGER"
                 },
                 {
-                  "type": "NULL"
-                },
-                {
                   "type": "NUMBER"
                 },
                 {
@@ -979,9 +970,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"
@@ -1525,9 +1513,6 @@
                   "type": "INTEGER"
                 },
                 {
-                  "type": "NULL"
-                },
-                {
                   "type": "NUMBER"
                 },
                 {
@@ -1571,9 +1556,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"
@@ -2465,8 +2447,6 @@
     }
   ],
   "connection": {
-    "componentName": "httpClient",
-    "version": 1,
     "authorizations": [
       {
         "display": {
@@ -2569,6 +2549,12 @@
         },
         "properties": [
           {
+            "label": "Callback URL",
+            "required": true,
+            "name": "callbackUrl",
+            "type": "STRING"
+          },
+          {
             "label": "Authorization URL",
             "required": true,
             "name": "authorizationUrl",
@@ -2608,6 +2594,49 @@
       },
       {
         "display": {
+          "label": "OAuth2 Implicit Code"
+        },
+        "properties": [
+          {
+            "label": "Callback URL",
+            "required": true,
+            "name": "callbackUrl",
+            "type": "STRING"
+          },
+          {
+            "label": "Authorization URL",
+            "required": true,
+            "name": "authorizationUrl",
+            "type": "STRING"
+          },
+          {
+            "label": "Scopes",
+            "name": "scopes",
+            "type": "ARRAY",
+            "items": [
+              {
+                "type": "STRING"
+              }
+            ]
+          },
+          {
+            "label": "Client Id",
+            "required": true,
+            "name": "clientId",
+            "type": "STRING"
+          },
+          {
+            "label": "Client Secret",
+            "required": true,
+            "name": "clientSecret",
+            "type": "STRING"
+          }
+        ],
+        "name": "oauth2_implicit_code",
+        "type": "OAUTH2_IMPLICIT_CODE"
+      },
+      {
+        "display": {
           "label": "OAuth2 Client Credentials"
         },
         "properties": [
@@ -2644,6 +2673,7 @@
         "type": "OAUTH2_CLIENT_CREDENTIALS"
       }
     ],
+    "componentName": "httpClient",
     "display": {
       "description": "Makes an HTTP request and returns the response data.",
       "label": "HTTP Client"
@@ -2654,7 +2684,9 @@
         "name": "baseUri",
         "type": "STRING"
       }
-    ]
+    ],
+    "version": 1,
+    "authorizationRequired": false
   },
   "display": {
     "description": "Makes an HTTP request and returns the response data.",
