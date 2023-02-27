@@ -6,9 +6,7 @@ export const Executions = () => {
     return (
         <LayoutContainer
             header={<PageHeader title="All Executions" />}
-            leftSidebarHeader={
-                <PageHeader leftSidebar={true} title="Executions" />
-            }
+            leftSidebarHeader={<PageHeader leftSidebar title="Executions" />}
         ></LayoutContainer>
     );
 };
