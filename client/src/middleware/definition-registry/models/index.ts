@@ -18,7 +18,6 @@ export * from './DisplayModel';
 export * from './DisplayOptionModel';
 export * from './IntegerPropertyAllOfModel';
 export * from './IntegerPropertyModel';
-export * from './NullPropertyModel';
 export * from './NumberPropertyAllOfModel';
 export * from './NumberPropertyModel';
 export * from './ObjectPropertyAllOfModel';

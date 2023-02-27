@@ -25,18 +25,18 @@ import {
     DisplayModelFromJSONTyped,
     DisplayModelToJSON,
 } from './DisplayModel';
+import type { PropertyModel } from './PropertyModel';
+import {
+    PropertyModelFromJSON,
+    PropertyModelFromJSONTyped,
+    PropertyModelToJSON,
+} from './PropertyModel';
 import type { ResourcesModel } from './ResourcesModel';
 import {
     ResourcesModelFromJSON,
     ResourcesModelFromJSONTyped,
     ResourcesModelToJSON,
 } from './ResourcesModel';
-import type { ValuePropertyModel } from './ValuePropertyModel';
-import {
-    ValuePropertyModelFromJSON,
-    ValuePropertyModelFromJSONTyped,
-    ValuePropertyModelToJSON,
-} from './ValuePropertyModel';
 
 /**
  * Definition of a connection to an outside service.
@@ -63,6 +63,12 @@ export interface ConnectionDefinitionModel {
      */
     componentName?: string;
     /**
+     * The connection version.
+     * @type {string}
+     * @memberof ConnectionDefinitionModel
+     */
+    connectionVersion?: string;
+    /**
      * 
      * @type {DisplayModel}
      * @memberof ConnectionDefinitionModel
@@ -70,10 +76,10 @@ export interface ConnectionDefinitionModel {
     display?: DisplayModel;
     /**
      * The properties of the connection.
-     * @type {Array<ValuePropertyModel>}
+     * @type {Array<PropertyModel>}
      * @memberof ConnectionDefinitionModel
      */
-    properties?: Array<ValuePropertyModel>;
+    properties?: Array<PropertyModel>;
     /**
      * 
      * @type {ResourcesModel}
@@ -81,7 +87,7 @@ export interface ConnectionDefinitionModel {
      */
     resources?: ResourcesModel;
     /**
-     * The connection version.
+     * 
      * @type {number}
      * @memberof ConnectionDefinitionModel
      */
@@ -110,8 +116,9 @@ export function ConnectionDefinitionModelFromJSONTyped(json: any, ignoreDiscrimi
         'authorizationRequired': !exists(json, 'authorizationRequired') ? undefined : json['authorizationRequired'],
         'authorizations': !exists(json, 'authorizations') ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationModelFromJSON)),
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
+        'connectionVersion': !exists(json, 'connectionVersion') ? undefined : json['connectionVersion'],
         'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(ValuePropertyModelFromJSON)),
+        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
         'version': !exists(json, 'version') ? undefined : json['version'],
     };
@@ -129,8 +136,9 @@ export function ConnectionDefinitionModelToJSON(value?: ConnectionDefinitionMode
         'authorizationRequired': value.authorizationRequired,
         'authorizations': value.authorizations === undefined ? undefined : ((value.authorizations as Array<any>).map(AuthorizationModelToJSON)),
         'componentName': value.componentName,
+        'connectionVersion': value.connectionVersion,
         'display': DisplayModelToJSON(value.display),
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(ValuePropertyModelToJSON)),
+        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
         'version': value.version,
     };

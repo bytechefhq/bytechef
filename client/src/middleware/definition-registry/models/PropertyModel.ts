@@ -32,7 +32,6 @@ import {
      DatePropertyModelFromJSONTyped,
      DateTimePropertyModelFromJSONTyped,
      IntegerPropertyModelFromJSONTyped,
-     NullPropertyModelFromJSONTyped,
      NumberPropertyModelFromJSONTyped,
      ObjectPropertyModelFromJSONTyped,
      OneOfPropertyModelFromJSONTyped,
@@ -139,9 +138,6 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         }
         if (json['modelType'] === 'INTEGER') {
             return IntegerPropertyModelFromJSONTyped(json, true);
-        }
-        if (json['modelType'] === 'NULL') {
-            return NullPropertyModelFromJSONTyped(json, true);
         }
         if (json['modelType'] === 'NUMBER') {
             return NumberPropertyModelFromJSONTyped(json, true);
