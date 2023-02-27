@@ -1,7 +1,7 @@
 import React, {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 
 type SidebarContentLayoutProps = {
     className?: string;
@@ -113,8 +113,10 @@ const LayoutContainer: React.FC<
                 </aside>
             )}
 
-            <div className={cx('h-full', leftSidebarOpen ? 'md:pl-72' : '')}>
-                <div className={cx('flex h-full', className)}>
+            <div
+                className={twMerge('h-full', leftSidebarOpen ? 'md:pl-72' : '')}
+            >
+                <div className={twMerge('flex h-full', className)}>
                     <div className="flex h-full w-full flex-col">
                         {header}
 

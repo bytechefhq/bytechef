@@ -1,5 +1,5 @@
 import React, {ReactNode} from 'react';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
 
 interface LeftSidebarItemProps {
@@ -21,7 +21,7 @@ const LeftSidebarMenuItem = ({
     return (
         <Link
             to={toLink}
-            className={cx(
+            className={twMerge(
                 current
                     ? 'bg-gray-200 text-gray-900'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600',
