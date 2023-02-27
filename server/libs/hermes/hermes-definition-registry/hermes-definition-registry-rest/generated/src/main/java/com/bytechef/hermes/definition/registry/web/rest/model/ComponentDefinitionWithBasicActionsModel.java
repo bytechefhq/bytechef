@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionWithBasicActions", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionWithBasicActions")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 public class ComponentDefinitionWithBasicActionsModel {
 
   @JsonProperty("actions")
@@ -155,11 +155,11 @@ public class ComponentDefinitionWithBasicActionsModel {
   }
 
   /**
-   * The component version.
+   * The version of a component.
    * @return version
   */
   @NotNull 
-  @Schema(name = "version", description = "The component version.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getVersion() {
     return version;
   }

@@ -22,7 +22,6 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DisplayMode
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DisplayOptionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NullPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPropertyAllOfModel.java

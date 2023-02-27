@@ -8,7 +8,6 @@ import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayOptionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.NullPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
@@ -58,7 +57,6 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DateTimeProperty"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "IntegerProperty"),
-  @JsonSubTypes.Type(value = NullPropertyModel.class, name = "NULL"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NumberProperty"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
@@ -68,7 +66,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "StringProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   @JsonProperty("defaultValue")
