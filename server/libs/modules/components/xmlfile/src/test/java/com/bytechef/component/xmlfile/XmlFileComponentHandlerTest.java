@@ -30,7 +30,7 @@ import com.bytechef.component.xmlfile.action.XmlFileWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.utils.XmlUtils;
+import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.ByteArrayInputStream;

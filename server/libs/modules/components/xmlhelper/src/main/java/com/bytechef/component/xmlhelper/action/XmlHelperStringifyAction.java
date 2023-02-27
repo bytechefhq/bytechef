@@ -20,7 +20,7 @@ package com.bytechef.component.xmlhelper.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.utils.XmlUtils;
+import com.bytechef.hermes.component.util.XmlUtils;
 
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.SOURCE;
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.STRINGIFY;

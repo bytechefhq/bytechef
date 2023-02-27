@@ -20,7 +20,7 @@ package com.bytechef.component.jsonhelper.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.utils.JsonUtils;
+import com.bytechef.hermes.component.util.JsonUtils;
 
 import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.PARSE;
 import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.SOURCE;

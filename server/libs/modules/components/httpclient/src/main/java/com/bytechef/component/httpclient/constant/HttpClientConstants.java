@@ -17,7 +17,7 @@
 
 package com.bytechef.component.httpclient.constant;
 
-import com.bytechef.hermes.component.utils.HttpClientUtils;
+import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.Arrays;

@@ -21,9 +21,9 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 
 import static com.bytechef.hermes.component.constant.ComponentConstants.ADD_TO;
-import static com.bytechef.hermes.component.constant.ComponentConstants.API_TOKEN;
 import static com.bytechef.hermes.component.constant.ComponentConstants.AUTHORIZATION_URL;
 import static com.bytechef.hermes.component.constant.ComponentConstants.BASE_URI;
+import static com.bytechef.hermes.component.constant.ComponentConstants.CALLBACK_URL;
 import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
 import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
 import static com.bytechef.hermes.component.constant.ComponentConstants.KEY;
@@ -44,6 +44,7 @@ public class HttpClientConnection {
 
     public static final ConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(string(BASE_URI).label("Base URI"))
+        .authorizationRequired(false)
         .authorizations(
             authorization(Authorization.AuthorizationType.API_KEY.name()
                 .toLowerCase(), Authorization.AuthorizationType.API_KEY)
@@ -52,7 +53,7 @@ public class HttpClientConnection {
                         string(KEY)
                             .label("Key")
                             .required(true)
-                            .defaultValue(API_TOKEN),
+                            .defaultValue(Authorization.API_TOKEN),
                         string(VALUE).label("Value")
                             .required(true),
                         string(ADD_TO)
@@ -99,10 +100,33 @@ public class HttpClientConnection {
                 Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .display(display("OAuth2 Authorization Code"))
                     .properties(
+                        string(CALLBACK_URL)
+                            .label("Callback URL")
+                            .required(true),
                         string(AUTHORIZATION_URL)
                             .label("Authorization URL")
                             .required(true),
                         string(TOKEN_URL).label("Token URL")
+                            .required(true),
+                        array(SCOPES).label("Scopes")
+                            .items(string()),
+                        string(CLIENT_ID).label("Client Id")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .required(true)),
+            authorization(
+                Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE
+                    .name()
+                    .toLowerCase(),
+                Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE)
+                    .display(display("OAuth2 Implicit Code"))
+                    .properties(
+                        string(CALLBACK_URL)
+                            .label("Callback URL")
+                            .required(true),
+                        string(AUTHORIZATION_URL)
+                            .label("Authorization URL")
                             .required(true),
                         array(SCOPES).label("Scopes")
                             .items(string()),

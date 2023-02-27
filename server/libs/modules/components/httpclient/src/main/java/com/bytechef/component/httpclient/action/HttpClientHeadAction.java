@@ -18,13 +18,14 @@
 package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
-import com.bytechef.component.httpclient.util.HttpClientUtils;
+import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.HEAD;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
@@ -34,7 +35,7 @@ public class HttpClientHeadAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(HEAD)
         .display(display("HEAD").description("The request method to use."))
-        .properties(HttpClientUtils.toArray(
+        .properties(HttpClientActionUtils.toArray(
             //
             // Common properties
             //
@@ -44,12 +45,11 @@ public class HttpClientHeadAction {
             // Options
             //
 
-            HttpClientUtils.options(false)))
-        .output(HttpClientUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
+            HttpClientActionUtils.options(false)))
+        .output(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .perform(HttpClientHeadAction::performHead);
 
     public static Object performHead(Context context, ExecutionParameters executionParameters) {
-        return HttpClientUtils.execute(context, executionParameters,
-            com.bytechef.hermes.component.utils.HttpClientUtils.RequestMethod.HEAD);
+        return HttpClientActionUtils.execute(context, executionParameters, RequestMethod.HEAD);
     }
 }
