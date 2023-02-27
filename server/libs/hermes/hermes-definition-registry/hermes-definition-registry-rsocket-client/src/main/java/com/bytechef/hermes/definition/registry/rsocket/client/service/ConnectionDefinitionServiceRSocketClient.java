@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.rsocket.client.util.ServiceInstanceUtils;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -34,14 +34,14 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class ComponentDefinitionServiceRSocketClient implements ComponentDefinitionService {
+public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefinitionService {
 
     private static final String WORKER_SERVICE_APP = "worker-service-app";
 
     private final DiscoveryClient discoveryClient;
     private final RSocketRequester.Builder rSocketRequesterBuilder;
 
-    public ComponentDefinitionServiceRSocketClient(
+    public ConnectionDefinitionServiceRSocketClient(
         DiscoveryClient discoveryClient,
         @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
 
@@ -50,40 +50,45 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
     }
 
     @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitionsMono() {
-        return Mono.zip(
-            ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("Service.getComponentDefinitions")
-                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
-                .toList(),
-            ServiceInstanceUtils::toComponentDefinitions);
-    }
-
-    @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitionsMono(String name) {
-        return Mono.zip(
-            ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("Service.getComponentDefinitionsForName")
-                    .data(name)
-                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
-                .toList(),
-            ServiceInstanceUtils::toComponentDefinitions);
-    }
-
-    @Override
-    public Mono<ComponentDefinition> getComponentDefinitionMono(String name, Integer version) {
+    public Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName, Integer componentVersion) {
         return rSocketRequesterBuilder
             .websocket(ServiceInstanceUtils.toWebSocketUri(
                 ServiceInstanceUtils.filterServiceInstance(
-                    discoveryClient.getInstances(WORKER_SERVICE_APP), name)))
-            .route("Service.getComponentDefinition")
-            .data(Map.of("name", name, "version", version))
-            .retrieveMono(ComponentDefinition.class);
+                    discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
+            .route("Service.getConnectionDefinition")
+            .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
+            .retrieveMono(ConnectionDefinition.class);
+    }
+
+    @Override
+    public Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono() {
+        return Mono.zip(
+            ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                .stream()
+                .map(serviceInstance -> rSocketRequesterBuilder
+                    .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
+                    .route("Service.getConnectionDefinitions")
+                    .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
+                .toList(),
+            ServiceInstanceUtils::toConnectionDefinitions);
+    }
+
+    @Override
+    public List<ConnectionDefinition> getConnectionDefinitions(String componentName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono(String componentName) {
+        return Mono.zip(
+            ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                .stream()
+                .map(serviceInstance -> rSocketRequesterBuilder
+                    .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
+                    .route("Service.getComponentConnectionDefinitions")
+                    .data(componentName)
+                    .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
+                .toList(),
+            ServiceInstanceUtils::toConnectionDefinitions);
     }
 }

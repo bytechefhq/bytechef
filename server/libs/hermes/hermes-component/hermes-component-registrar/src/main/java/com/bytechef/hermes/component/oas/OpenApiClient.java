@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.rest;
+package com.bytechef.hermes.component.oas;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.RestComponentHandler.PropertyType;
+import com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.utils.HttpClientUtils;
-import com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.utils.HttpClientUtils.Payload;
-import com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.HttpClientUtils;
+import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
+import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
 import org.springframework.util.StringUtils;
 
@@ -36,34 +36,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.bytechef.hermes.component.util.HttpClientUtils.exchange;
+import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
+
 /**
  * @author Ivica Cardic
  */
-public class RestClient {
+public class OpenApiClient {
 
     private static final String TYPE = "type";
 
     public Object execute(ActionDefinition actionDefinition, Context context, TaskExecution taskExecution) {
         Map<String, Object> metadata = actionDefinition.getMetadata();
 
-        return HttpClientUtils.executor()
-            .configuration(
-                HttpClientUtils.Configuration.builder()
-                    .responseFormat(getResponseFormat(actionDefinition))
-                    .fullResponse(true)
-                    .build())
-            .exchange(
-                createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
-                MapValueUtils.get(metadata, "requestMethod", HttpClientUtils.RequestMethod.class))
-            .headers(getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
-            .payload(
-                getPayload(
-                    MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
-                    MapValueUtils.getString(metadata, "mimeType"),
-                    taskExecution.getParameters(), actionDefinition.getProperties()))
-            .queryParameters(
-                getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
-            .execute(context);
+        return exchange(
+            createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
+            MapValueUtils.get(metadata, "requestMethod", RequestMethod.class))
+                .configuration(
+                    HttpClientUtils.responseFormat(getResponseFormat(actionDefinition))
+                        .fullResponse(true))
+                .headers(
+                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
+                .payload(
+                    getPayload(
+                        MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
+                        MapValueUtils.getString(metadata, "mimeType"),
+                        taskExecution.getParameters(), actionDefinition.getProperties()))
+                .queryParameters(
+                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
+                .execute();
     }
 
     private String createUri(

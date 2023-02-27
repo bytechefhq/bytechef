@@ -48,7 +48,7 @@ public interface IntegrationsApi {
      * DELETE /integrations/{id} : Delete an integration.
      * Delete an integration.
      *
-     * @param id The id of the integration. (required)
+     * @param id The id of an integration. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -65,7 +65,7 @@ public interface IntegrationsApi {
         value = "/integrations/{id}"
     )
     default Mono<ResponseEntity<Void>> deleteIntegration(
-        @Parameter(name = "id", description = "The id of the integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -79,7 +79,7 @@ public interface IntegrationsApi {
      * GET /integrations/{id} : Get an integration by id.
      * Get an integration by id.
      *
-     * @param id The id of the integration. (required)
+     * @param id The id of an integration. (required)
      * @return The integration object. (status code 200)
      */
     @Operation(
@@ -99,7 +99,7 @@ public interface IntegrationsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<IntegrationModel>> getIntegration(
-        @Parameter(name = "id", description = "The id of the integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -198,7 +198,7 @@ public interface IntegrationsApi {
      * GET /integrations/{id}/workflows : Get workflows for particular integration.
      * Get workflows for particular integration.
      *
-     * @param id The id of the integration. (required)
+     * @param id The id of an integration. (required)
      * @return The updated integration object. (status code 200)
      */
     @Operation(
@@ -218,7 +218,7 @@ public interface IntegrationsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<com.bytechef.atlas.web.rest.model.WorkflowModel>>> getIntegrationWorkflows(
-        @Parameter(name = "id", description = "The id of the integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -324,7 +324,7 @@ public interface IntegrationsApi {
      * POST /integrations/{id}/workflows : Create new workflow and adds it to an existing integration.
      * Create new workflow and adds it to an existing integration.
      *
-     * @param id The id of the integration. (required)
+     * @param id The id of an integration. (required)
      * @param postIntegrationWorkflowRequestModel  (required)
      * @return The updated integration object. (status code 200)
      */
@@ -346,7 +346,7 @@ public interface IntegrationsApi {
         consumes = { "application/json" }
     )
     default Mono<ResponseEntity<IntegrationModel>> postIntegrationWorkflow(
-        @Parameter(name = "id", description = "The id of the integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "PostIntegrationWorkflowRequestModel", description = "", required = true) @Valid @RequestBody Mono<PostIntegrationWorkflowRequestModel> postIntegrationWorkflowRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
@@ -368,7 +368,7 @@ public interface IntegrationsApi {
      * PUT /integrations/{id} : Update an existing integration.
      * Update an existing integration.
      *
-     * @param id The id of the integration. (required)
+     * @param id The id of an integration. (required)
      * @param integrationModel  (required)
      * @return The updated integration object. (status code 200)
      */
@@ -390,7 +390,7 @@ public interface IntegrationsApi {
         consumes = { "application/json" }
     )
     default Mono<ResponseEntity<IntegrationModel>> putIntegration(
-        @Parameter(name = "id", description = "The id of the integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "IntegrationModel", description = "", required = true) @Valid @RequestBody Mono<IntegrationModel> integrationModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
@@ -412,7 +412,7 @@ public interface IntegrationsApi {
      * PUT /integrations/{id}/tags : Updates tags of an existing integration.
      * Updates tags of an existing integration.
      *
-     * @param id The id of the integration. (required)
+     * @param id The id of an integration. (required)
      * @param putIntegrationTagsRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
@@ -431,7 +431,7 @@ public interface IntegrationsApi {
         consumes = { "application/json" }
     )
     default Mono<ResponseEntity<Void>> putIntegrationTags(
-        @Parameter(name = "id", description = "The id of the integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "PutIntegrationTagsRequestModel", description = "", required = true) @Valid @RequestBody Mono<PutIntegrationTagsRequestModel> putIntegrationTagsRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {

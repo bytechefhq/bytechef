@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import java.util.List;
 import java.util.Map;

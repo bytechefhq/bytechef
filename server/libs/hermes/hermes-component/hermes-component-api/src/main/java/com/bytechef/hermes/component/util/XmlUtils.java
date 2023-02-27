@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -45,7 +45,7 @@ import org.xml.sax.InputSource;
 /**
  * @author Ivica Cardic
  */
-public class XmlUtils {
+public final class XmlUtils {
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final XmlMapper XML_MAPPER = new XmlMapper();

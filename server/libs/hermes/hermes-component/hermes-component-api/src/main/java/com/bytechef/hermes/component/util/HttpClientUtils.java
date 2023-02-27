@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
@@ -54,13 +53,14 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public class HttpClientUtils {
+public final class HttpClientUtils {
 
     public enum BodyContentType {
         BINARY,
@@ -87,34 +87,102 @@ public class HttpClientUtils {
         PUT,
     }
 
-    protected HttpClientUtils() {
+    private HttpClientUtils() {
     }
 
-    public static Executor executor() {
-        return new Executor();
+    public static Configuration allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
+        Configuration configuration = new Configuration();
+
+        configuration.allowUnauthorizedCerts = allowUnauthorizedCerts;
+
+        return configuration;
     }
 
-    protected static Object execute(
-        Context context,
-        String urlString,
-        Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters,
-        Payload payload,
-        Configuration configuration,
-        RequestMethod requestMethod)
-        throws Exception {
+    public static Configuration followAllRedirects(boolean followAllRedirects) {
+        Configuration configuration = new Configuration();
 
-        HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
+        configuration.followAllRedirects = followAllRedirects;
 
-        HttpRequest httpRequest = createHTTPRequest(
-            context, urlString, requestMethod, headers, queryParameters, payload);
-
-        HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
-
-        return handleResponse(context, httpResponse, configuration);
+        return configuration;
     }
 
-    protected static HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
+    public static Configuration filename(String filename) {
+        Configuration configuration = new Configuration();
+
+        configuration.filename = filename;
+
+        return configuration;
+    }
+
+    public static Configuration followRedirect(boolean followRedirect) {
+        Configuration configuration = new Configuration();
+
+        configuration.followRedirect = followRedirect;
+
+        return configuration;
+    }
+
+    public static Configuration fullResponse(boolean fullResponse) {
+        Configuration configuration = new Configuration();
+
+        configuration.fullResponse = fullResponse;
+
+        return configuration;
+    }
+
+    public static Configuration proxy(String proxy) {
+        Configuration configuration = new Configuration();
+
+        configuration.proxy = proxy;
+
+        return configuration;
+    }
+
+    public static Configuration responseFormat(ResponseFormat responseFormat) {
+        Configuration configuration = new Configuration();
+
+        configuration.responseFormat = responseFormat;
+
+        return configuration;
+    }
+
+    public static Configuration timeout(Duration timeout) {
+        Configuration configuration = new Configuration();
+
+        configuration.timeout = timeout;
+
+        return configuration;
+    }
+
+    public static Executor delete(String uri) {
+        return new Executor().delete(uri);
+    }
+
+    public static Executor exchange(String uri, RequestMethod requestMethod) {
+        return new Executor().exchange(uri, requestMethod);
+    }
+
+    public static Executor head(String uri) {
+        return new Executor().head(uri);
+    }
+
+    public static Executor get(String uri) {
+        return new Executor().get(uri);
+    }
+
+    public static Executor patch(String uri) {
+        return new Executor().patch(uri);
+    }
+
+    public static Executor post(String uri) {
+        return new Executor().post(uri);
+    }
+
+    public static Executor put(String uri) {
+        return new Executor().put(uri);
+    }
+
+    static HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
         HttpResponse.BodyHandler<?> bodyHandler;
         ResponseFormat responseFormat = configuration.getResponseFormat();
 
@@ -131,66 +199,36 @@ public class HttpClientUtils {
         return bodyHandler;
     }
 
-    protected static HttpRequest.BodyPublisher createBodyPublisher(Context context, Payload payload) {
+    static HttpRequest.BodyPublisher createBodyPublisher(Context context, Payload payload) {
         HttpRequest.BodyPublisher bodyPublisher;
 
         if (payload == null) {
             bodyPublisher = HttpRequest.BodyPublishers.noBody();
         } else {
             if (payload.bodyContentType == BodyContentType.BINARY && payload.value instanceof FileEntry fileEntry) {
-                bodyPublisher = MoreBodyPublishers.ofMediaType(
-                    HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
-                    MediaType.parse(payload.mimeType == null ? fileEntry.getMimeType() : payload.mimeType));
+                bodyPublisher = getBinaryBodyPublisher(context, payload, fileEntry);
             } else if (payload.bodyContentType == BodyContentType.FORM_DATA) {
-                Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
-
-                MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
-
-                for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-                    if (parameter.getValue()instanceof FileEntry fileEntry) {
-                        addFileEntry(builder, (String) parameter.getKey(), fileEntry, context);
-                    } else {
-                        builder.textPart((String) parameter.getKey(), parameter.getValue());
-                    }
-                }
-
-                bodyPublisher = builder.build();
+                bodyPublisher = getFormDataBodyPublisher(context, payload);
             } else if (payload.bodyContentType == BodyContentType.FORM_URL_ENCODED) {
-                Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
-
-                FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
-
-                for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-                    Object value = parameter.getValue();
-
-                    builder.query((String) parameter.getKey(), value.toString());
-                }
-
-                bodyPublisher = builder.build();
+                bodyPublisher = getFormUrlEncodedBodyPublisher(payload);
             } else if (payload.bodyContentType == BodyContentType.JSON) {
-                bodyPublisher = MoreBodyPublishers.ofMediaType(
-                    HttpRequest.BodyPublishers.ofString(JsonUtils.write(payload.value)),
-                    MediaType.APPLICATION_JSON);
+                bodyPublisher = getJsonBodyPublisher(payload);
             } else if (payload.bodyContentType == BodyContentType.XML) {
-                bodyPublisher = MoreBodyPublishers.ofMediaType(
-                    HttpRequest.BodyPublishers.ofString(XmlUtils.write(payload.value)),
-                    MediaType.APPLICATION_XML);
+                bodyPublisher = getXmlBodyPublisher(payload);
             } else {
-                bodyPublisher = MoreBodyPublishers.ofMediaType(
-                    HttpRequest.BodyPublishers.ofString(payload.value.toString()),
-                    MediaType.parse(payload.mimeType));
+                bodyPublisher = getStringBodyPublisher(payload);
             }
         }
 
         return bodyPublisher;
     }
 
-    protected static HttpClient createHttpClient(
+    static HttpClient createHttpClient(
         Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
         Configuration configuration) {
 
         Methanol.Builder builder = Methanol.newBuilder()
-            .version(java.net.http.HttpClient.Version.HTTP_1_1);
+            .version(HttpClient.Version.HTTP_1_1);
 
         if (configuration.isAllowUnauthorizedCerts()) {
             try {
@@ -206,7 +244,7 @@ public class HttpClientUtils {
             }
         }
 
-        applyAuthorizationApplyConsumer(context, builder, headers, queryParameters);
+        acceptAuthorizationApplyConsumer(context, builder, headers, queryParameters);
 
         if (configuration.isFollowRedirect()) {
             builder.followRedirects(java.net.http.HttpClient.Redirect.NORMAL);
@@ -229,7 +267,7 @@ public class HttpClientUtils {
         return builder.build();
     }
 
-    protected static HttpRequest createHTTPRequest(
+    static HttpRequest createHTTPRequest(
         Context context, String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
         Map<String, List<String>> queryParameters, Payload payload) {
 
@@ -244,13 +282,13 @@ public class HttpClientUtils {
 
         httpRequestBuilder.uri(
             createURI(
-                getConnectionBaseUri(context, urlString),
+                getConnectionUri(context, urlString),
                 Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
 
         return httpRequestBuilder.build();
     }
 
-    protected static Object handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration)
+    static Object handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration)
         throws Exception {
 
         Object body = null;
@@ -263,22 +301,7 @@ public class HttpClientUtils {
             ResponseFormat responseFormat = configuration.getResponseFormat();
 
             if (!ObjectUtils.isEmpty(httpResponseBody) && responseFormat == ResponseFormat.BINARY) {
-                String filename = configuration.getFilename();
-
-                if (filename == null || filename.length() == 0) {
-                    if (headersMap.containsKey("Content-Type")) {
-                        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
-                        List<String> values = headersMap.get("Content-Type");
-
-                        MimeType mimeType = mimeTypes.forName(values.get(0));
-
-                        filename = "file" + mimeType.getExtension();
-                    } else {
-                        filename = "file.txt";
-                    }
-                }
-
-                body = context.storeFileContent(filename, (InputStream) httpResponseBody);
+                body = storeBinaryResponseBody(context, configuration, headersMap, (InputStream) httpResponseBody);
             } else if (responseFormat == ResponseFormat.JSON) {
                 body = ObjectUtils.isEmpty(httpResponseBody) ? null : JsonUtils.read(httpResponseBody.toString());
             } else if (responseFormat == ResponseFormat.TEXT) {
@@ -297,15 +320,44 @@ public class HttpClientUtils {
         return body;
     }
 
+    private static Object execute(
+        Context context, String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
+        Payload payload, Configuration configuration, RequestMethod requestMethod) throws Exception {
+
+        HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
+
+        HttpRequest httpRequest = createHTTPRequest(
+            context, urlString, requestMethod, headers, queryParameters, payload);
+
+        HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
+
+        return handleResponse(context, httpResponse, configuration);
+    }
+
     private static void addFileEntry(
-        MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry, Context context) {
+        Context context, MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {
+
+        Objects.requireNonNull(context, "'context' must not be null");
 
         builder.formPart(
-            name,
-            fileEntry.getName(),
+            name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
                 HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
                 MediaType.parse(fileEntry.getMimeType())));
+    }
+
+    private static void acceptAuthorizationApplyConsumer(
+        Context context, Methanol.Builder builder, Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters) {
+
+        if (context == null) {
+            return;
+        }
+
+        context.fetchConnectionAuthorization()
+            .map(Authorization::getApplyConsumer)
+            .ifPresent(applyConsumer -> applyConsumer.accept(
+                new AuthorizationContextImpl(builder, headers, queryParameters), context.getConnection()));
     }
 
     private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
@@ -327,49 +379,103 @@ public class HttpClientUtils {
         return uri;
     }
 
-    private static String getConnectionBaseUri(Context context, String uriString) {
-        String finalUriString = uriString;
-
-        ConnectionDefinition connectionDefinition = context.getConnectionDefinition();
-
-        if (connectionDefinition != null) {
-            finalUriString = context.fetchConnectionParameters()
-                .map(connectionParameters -> connectionDefinition.getBaseUriFunction()
-                    .apply(connectionParameters))
-                .map(baseUri -> baseUri + uriString)
-                .orElse(uriString);
+    private static String getConnectionUri(Context context, String uriString) {
+        if (context == null) {
+            return uriString;
         }
 
-        return finalUriString;
+        return context.fetchConnectionBaseUri()
+            .map(baseUri -> baseUri + uriString)
+            .orElse(uriString);
     }
 
-    private static void applyAuthorizationApplyConsumer(
-        Context context,
-        Methanol.Builder builder,
-        Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters) {
+    private static HttpRequest.BodyPublisher getBinaryBodyPublisher(
+        Context context, Payload payload, FileEntry fileEntry) {
 
-        ConnectionDefinition connectionDefinition = context.getConnectionDefinition();
+        Objects.requireNonNull(context, "'context' must not be null");
 
-        if (connectionDefinition != null) {
-            context.fetchConnectionParameters()
-                .ifPresent(connectionParameters -> {
-                    connectionDefinition.getAuthorizations()
-                        .stream()
-                        .filter(authorization -> Objects.equals(authorization.getName(),
-                            connectionParameters.getAuthorizationName()))
-                        .findFirst()
-                        .map(Authorization::getApplyConsumer)
-                        .ifPresent(applyConsumer -> applyConsumer.accept(
-                            new AuthorizationContextImpl(builder, headers, queryParameters), connectionParameters));
-                });
+        return MoreBodyPublishers.ofMediaType(
+            HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
+            MediaType.parse(payload.mimeType == null ? fileEntry.getMimeType() : payload.mimeType));
+    }
+
+    private static HttpRequest.BodyPublisher getFormDataBodyPublisher(Context context, Payload payload) {
+        Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
+
+        MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
+
+        for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
+            if (parameter.getValue()instanceof FileEntry fileEntry) {
+                addFileEntry(context, builder, (String) parameter.getKey(), fileEntry);
+            } else {
+                builder.textPart((String) parameter.getKey(), parameter.getValue());
+            }
         }
+
+        return builder.build();
+    }
+
+    private static HttpRequest.BodyPublisher getFormUrlEncodedBodyPublisher(Payload payload) {
+        Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
+
+        FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
+
+        for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
+            Object value = parameter.getValue();
+
+            builder.query((String) parameter.getKey(), value.toString());
+        }
+
+        return builder.build();
+    }
+
+    private static HttpRequest.BodyPublisher getJsonBodyPublisher(Payload payload) {
+        return MoreBodyPublishers.ofMediaType(
+            HttpRequest.BodyPublishers.ofString(JsonUtils.write(payload.value)),
+            MediaType.APPLICATION_JSON);
+    }
+
+    private static HttpRequest.BodyPublisher getStringBodyPublisher(Payload payload) {
+        return MoreBodyPublishers.ofMediaType(
+            HttpRequest.BodyPublishers.ofString(payload.value.toString()),
+            MediaType.parse(payload.mimeType));
+    }
+
+    private static HttpRequest.BodyPublisher getXmlBodyPublisher(Payload payload) {
+        return MoreBodyPublishers.ofMediaType(
+            HttpRequest.BodyPublishers.ofString(XmlUtils.write(payload.value)),
+            MediaType.APPLICATION_XML);
+    }
+
+    private static FileEntry storeBinaryResponseBody(
+        Context context, Configuration configuration, Map<String, List<String>> headersMap,
+        InputStream httpResponseBody) throws MimeTypeException {
+
+        Objects.requireNonNull(context, "'context' must not be null");
+
+        String filename = configuration.getFilename();
+
+        if (filename == null || filename.length() == 0) {
+            if (headersMap.containsKey("Content-Type")) {
+                MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+                List<String> values = headersMap.get("Content-Type");
+
+                MimeType mimeType = mimeTypes.forName(values.get(0));
+
+                filename = "file" + mimeType.getExtension();
+            } else {
+                filename = "file.txt";
+            }
+        }
+
+        return context.storeFileContent(filename, httpResponseBody);
     }
 
     @SuppressFBWarnings({
         "EI", "EI2"
     })
     public record HttpResponseEntry(Object body, Map<String, List<String>> headers, int statusCode) {
+
     }
 
     public static class Configuration {
@@ -386,8 +492,56 @@ public class HttpClientUtils {
         private Configuration() {
         }
 
-        public static Builder builder() {
-            return new Builder();
+        public static Configuration configuration() {
+            return new Configuration();
+        }
+
+        public Configuration allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
+            this.allowUnauthorizedCerts = allowUnauthorizedCerts;
+
+            return this;
+        }
+
+        public Configuration followAllRedirects(boolean followAllRedirects) {
+            this.followAllRedirects = followAllRedirects;
+
+            return this;
+        }
+
+        public Configuration filename(String filename) {
+            this.filename = filename;
+
+            return this;
+        }
+
+        public Configuration followRedirect(boolean followRedirect) {
+            this.followRedirect = followRedirect;
+
+            return this;
+        }
+
+        public Configuration fullResponse(boolean fullResponse) {
+            this.fullResponse = fullResponse;
+
+            return this;
+        }
+
+        public Configuration proxy(String proxy) {
+            this.proxy = proxy;
+
+            return this;
+        }
+
+        public Configuration responseFormat(ResponseFormat responseFormat) {
+            this.responseFormat = responseFormat;
+
+            return this;
+        }
+
+        public Configuration timeout(Duration timeout) {
+            this.timeout = timeout;
+
+            return this;
         }
 
         public boolean isAllowUnauthorizedCerts() {
@@ -420,81 +574,6 @@ public class HttpClientUtils {
 
         public boolean isFullResponse() {
             return fullResponse;
-        }
-
-        public static class Builder {
-
-            private boolean allowUnauthorizedCerts;
-            private String filename;
-            private boolean followAllRedirects;
-            private boolean followRedirect;
-            private boolean fullResponse;
-            private String proxy;
-            private ResponseFormat responseFormat;
-            private Duration timeout = Duration.ofMillis(1000);
-
-            public Builder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
-                this.allowUnauthorizedCerts = allowUnauthorizedCerts;
-
-                return this;
-            }
-
-            public Builder followAllRedirects(boolean followAllRedirects) {
-                this.followAllRedirects = followAllRedirects;
-
-                return this;
-            }
-
-            public Builder filename(String filename) {
-                this.filename = filename;
-
-                return this;
-            }
-
-            public Builder followRedirect(boolean followRedirect) {
-                this.followRedirect = followRedirect;
-
-                return this;
-            }
-
-            public Builder fullResponse(boolean fullResponse) {
-                this.fullResponse = fullResponse;
-
-                return this;
-            }
-
-            public Builder proxy(String proxy) {
-                this.proxy = proxy;
-
-                return this;
-            }
-
-            public Builder responseFormat(ResponseFormat responseFormat) {
-                this.responseFormat = responseFormat;
-
-                return this;
-            }
-
-            public Builder timeout(Duration timeout) {
-                this.timeout = timeout;
-
-                return this;
-            }
-
-            public Configuration build() {
-                Configuration configuration = new Configuration();
-
-                configuration.allowUnauthorizedCerts = allowUnauthorizedCerts;
-                configuration.filename = filename;
-                configuration.followAllRedirects = followAllRedirects;
-                configuration.followRedirect = followRedirect;
-                configuration.fullResponse = fullResponse;
-                configuration.proxy = proxy;
-                configuration.responseFormat = responseFormat;
-                configuration.timeout = timeout;
-
-                return configuration;
-            }
         }
     }
 
@@ -587,15 +666,10 @@ public class HttpClientUtils {
             return this;
         }
 
-        public Object execute(Context context) {
+        public Object execute() {
             try {
                 return HttpClientUtils.execute(
-                    Objects.requireNonNull(context),
-                    url,
-                    headers,
-                    queryParameters,
-                    payload,
-                    configuration,
+                    ContextThreadLocal.get(), url, headers, queryParameters, payload, configuration,
                     requestMethod);
             } catch (Exception e) {
                 throw new ActionExecutionException("Unable to execute HTTP request", e);

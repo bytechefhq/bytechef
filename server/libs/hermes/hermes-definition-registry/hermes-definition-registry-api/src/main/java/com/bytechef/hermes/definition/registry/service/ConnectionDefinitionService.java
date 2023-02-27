@@ -15,19 +15,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar;
+package com.bytechef.hermes.definition.registry.service;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class RestComponentTaskHandlerRegistrarTest {
+public interface ConnectionDefinitionService {
 
-    @Disabled
-    @Test
-    public void testCreateTaskHandler() {
-        // TODO
-    }
+    Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName, Integer componentVersion);
+
+    Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono();
+
+    List<ConnectionDefinition> getConnectionDefinitions(String componentName);
+
+    Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono(String componentName);
 }

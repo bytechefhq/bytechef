@@ -50,7 +50,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
 
         List<Connection> connections = connectionService.getConnections(null, null);
 
-        return componentDefinitionService.getComponentDefinitions()
+        return componentDefinitionService.getComponentDefinitionsMono()
             .map(componentDefinitions -> componentDefinitions.stream()
                 .filter(componentDefinition -> {
                     if (connectionDefinitions == null && connectionInstances == null) {

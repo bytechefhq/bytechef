@@ -37,12 +37,16 @@ public class EncryptedMapWrapper {
         this.map = new HashMap<>(map);
     }
 
+    public boolean containsKey(String key) {
+        return map.containsKey(key);
+    }
+
     public Map<String, Object> getMap() {
         return new HashMap<>(map);
     }
 
-    public void put(String key, Object value) {
-        this.map.put(key, value);
+    public Object get(String key) {
+        return map.get(key);
     }
 
     @Override
@@ -63,6 +67,10 @@ public class EncryptedMapWrapper {
     @Override
     public int hashCode() {
         return Objects.hash(map);
+    }
+
+    public void putAll(Map<String, Object> map) {
+        this.map.putAll(map);
     }
 
     @Override

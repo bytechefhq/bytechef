@@ -15,20 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.discovery.redis.config;
+package com.bytechef.hermes.definition.registry.service;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
  */
-@ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled")
-@Configuration
-@Import({
-    RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class
-})
-public class RedisDiscoveryClientBootstrapConfiguration {
+public interface ActionDefinitionService {
+
+    Mono<ActionDefinition> getComponentDefinitionActionMono(
+        String componentName, int componentVersion, String actionName);
 }

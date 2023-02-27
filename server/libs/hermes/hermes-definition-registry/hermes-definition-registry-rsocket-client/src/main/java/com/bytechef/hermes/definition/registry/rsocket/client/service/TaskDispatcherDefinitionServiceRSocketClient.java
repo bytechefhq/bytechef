@@ -42,7 +42,7 @@ public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatc
     }
 
     @Override
-    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
+    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono() {
         return rSocketRequester
             .route("getTaskDispatcherDefinitions")
             .retrieveMono(new ParameterizedTypeReference<>() {});

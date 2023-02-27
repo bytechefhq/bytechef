@@ -18,7 +18,9 @@
 package com.bytechef.hermes.definition.registry.web.rest;
 
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
@@ -42,10 +44,16 @@ import reactor.core.publisher.Mono;
 public class TaskDispatcherDefinitionControllerIntTest {
 
     @MockBean
+    private ActionDefinitionService actionDefinitionService;
+
+    @MockBean
     private ComponentDefinitionFacade componentDefinitionFacade;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
+
+    @MockBean
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -55,7 +63,7 @@ public class TaskDispatcherDefinitionControllerIntTest {
 
     @Test
     public void testGetTaskDispatcherDefinitions() {
-        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
+        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono())
             .thenReturn(
                 Mono.just(
                     List.of(

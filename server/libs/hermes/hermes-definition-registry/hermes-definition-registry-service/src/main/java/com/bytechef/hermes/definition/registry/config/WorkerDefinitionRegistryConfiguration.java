@@ -21,8 +21,12 @@ import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.impl.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.impl.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.impl.ComponentDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.impl.ConnectionDefinitionServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +41,11 @@ import java.util.List;
 public class WorkerDefinitionRegistryConfiguration {
 
     @Bean
+    ActionDefinitionService actionDefinitionService(List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        return new ActionDefinitionServiceImpl(componentDefinitionFactories);
+    }
+
+    @Bean
     ComponentDefinitionFacade componentDefinitionFacade(
         ConnectionService connectionService, ComponentDefinitionService componentDefinitionService) {
 
@@ -48,5 +57,12 @@ public class WorkerDefinitionRegistryConfiguration {
         List<ComponentDefinitionFactory> componentDefinitionFactories) {
 
         return new ComponentDefinitionServiceImpl(componentDefinitionFactories);
+    }
+
+    @Bean
+    ConnectionDefinitionService connectionDefinitionService(
+        List<ComponentDefinitionFactory> componentDefinitionFactories) {
+
+        return new ConnectionDefinitionServiceImpl(componentDefinitionFactories);
     }
 }

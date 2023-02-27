@@ -52,7 +52,7 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
         @Parameter(hidden = true) ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
-                taskDispatcherDefinitionService.getTaskDispatcherDefinitions()
+                taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
                     .mapNotNull(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
                         .map(taskDispatcherDefinition -> conversionService.convert(
                             taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))

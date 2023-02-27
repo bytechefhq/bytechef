@@ -18,15 +18,11 @@
 package com.bytechef.hermes.definition.registry.service.impl;
 
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,70 +40,30 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public Mono<ComponentDefinition> getComponentDefinition(String name, Integer version) {
-        return getComponentDefinitions()
-            .flatMapMany(Flux::fromIterable)
-            .filter(componentDefinition -> name.equalsIgnoreCase(componentDefinition.getName())
-                && version == componentDefinition.getVersion())
-            .next();
-    }
-
-    @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitions() {
-        return Mono.just(componentDefinitionFactories.stream()
-            .map(ComponentDefinitionFactory::getDefinition)
-            .collect(Collectors.toList()));
-    }
-
-    @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitions(String name) {
-        return Mono.just(componentDefinitionFactories.stream()
-            .map(ComponentDefinitionFactory::getDefinition)
-            .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
-            .collect(Collectors.toList()));
-    }
-
-    @Override
-    public Mono<ActionDefinition> getComponentDefinitionAction(
-        String componentName, int componentVersion, String actionName) {
-
-        return getComponentDefinitions()
-            .flatMapMany(Flux::fromIterable)
-            .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                componentVersion == componentDefinition.getVersion())
-            .next()
-            .map(ComponentDefinition::getActions)
-            .flatMapMany(Flux::fromIterable)
-            .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
-            .map(actionDefinition -> (ActionDefinition) actionDefinition)
-            .next();
-    }
-
-    @Override
-    public Mono<ConnectionDefinition> getConnectionDefinition(String componentName, Integer componentVersion) {
-        return getComponentDefinition(componentName, componentVersion).map(ComponentDefinition::getConnection);
-    }
-
-    @Override
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitions() {
+    public Mono<ComponentDefinition> getComponentDefinitionMono(String name, Integer version) {
         return Mono.just(
-            new ArrayList<>(
-                componentDefinitionFactories.stream()
-                    .map(ComponentDefinitionFactory::getDefinition)
-                    .map(ComponentDefinition::getConnection)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet())));
+            componentDefinitionFactories.stream()
+                .map(ComponentDefinitionFactory::getDefinition)
+                .filter(componentDefinition -> name.equalsIgnoreCase(componentDefinition.getName())
+                    && version == componentDefinition.getVersion())
+                .findFirst()
+                .orElseThrow());
     }
 
     @Override
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitions(String componentName) {
+    public Mono<List<ComponentDefinition>> getComponentDefinitionsMono() {
         return Mono.just(
-            new ArrayList<>(
-                componentDefinitionFactories.stream()
-                    .map(ComponentDefinitionFactory::getDefinition)
-                    .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), componentName))
-                    .map(ComponentDefinition::getConnection)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet())));
+            componentDefinitionFactories.stream()
+                .map(ComponentDefinitionFactory::getDefinition)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public Mono<List<ComponentDefinition>> getComponentDefinitionsMono(String name) {
+        return Mono.just(
+            componentDefinitionFactories.stream()
+                .map(ComponentDefinitionFactory::getDefinition)
+                .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
+                .collect(Collectors.toList()));
     }
 }

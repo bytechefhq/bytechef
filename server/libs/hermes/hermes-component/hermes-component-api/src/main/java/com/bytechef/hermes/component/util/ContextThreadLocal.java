@@ -15,20 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.discovery.redis.config;
+package com.bytechef.hermes.component.util;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import com.bytechef.hermes.component.Context;
 
 /**
  * @author Ivica Cardic
  */
-@ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled")
-@Configuration
-@Import({
-    RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class
-})
-public class RedisDiscoveryClientBootstrapConfiguration {
+final class ContextThreadLocal {
+
+    private static final ThreadLocal<Context> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
+
+    static Context get() {
+        return CONTEXT_THREAD_LOCAL.get();
+    }
+
+    static void set(Context context) {
+        CONTEXT_THREAD_LOCAL.set(context);
+    }
+
+    static void remove() {
+        CONTEXT_THREAD_LOCAL.remove();
+    }
 }

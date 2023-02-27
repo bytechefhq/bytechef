@@ -22,7 +22,7 @@ package com.bytechef.hermes.component;
  */
 public interface Connection {
 
-    boolean containsKey(String key);
+    boolean containsParameter(String name);
 
     String getAuthorizationName();
 

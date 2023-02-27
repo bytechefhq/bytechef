@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -45,24 +42,29 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
-class JsonParserStream implements Stream<Map<String, ?>> {
+final class XmlStreamReaderStream implements Stream<Map<String, ?>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonParserStream.class);
+    private static final Logger logger = LoggerFactory.getLogger(XmlStreamReaderStream.class);
 
-    private final JsonFactory jsonFactory = new JsonFactory();
-    private final JsonParser jsonParser;
+    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+
+    private final XMLStreamReader xmlStreamReader;
     private final Stream<Map<String, ?>> stream;
 
-    public JsonParserStream(InputStream inputStream, ObjectMapper objectMapper) throws IOException {
-        this.jsonParser = jsonFactory.createParser(inputStream);
+    public XmlStreamReaderStream(InputStream inputStream, XmlMapper xmlMapper) throws XMLStreamException {
+        this.xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
+
         this.stream = StreamSupport.stream(
-            Spliterators.spliteratorUnknownSize(new JsonIterator(jsonParser, objectMapper), Spliterator.ORDERED),
+            Spliterators.spliteratorUnknownSize(new XmlIterator(xmlStreamReader, xmlMapper), Spliterator.ORDERED),
             false);
     }
 
@@ -264,10 +266,10 @@ class JsonParserStream implements Stream<Map<String, ?>> {
 
     @Override
     public void close() {
-        if (jsonParser != null) {
+        if (xmlStreamReader != null) {
             try {
-                jsonParser.close();
-            } catch (IOException e) {
+                xmlStreamReader.close();
+            } catch (XMLStreamException e) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(e.getMessage(), e);
                 }

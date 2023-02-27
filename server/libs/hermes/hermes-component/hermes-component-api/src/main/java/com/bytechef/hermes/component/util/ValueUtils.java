@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-public class ValueUtils {
+public final class ValueUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ValueUtils.class);
 

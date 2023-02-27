@@ -52,7 +52,7 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String updateKey = executionParameters.getString(UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-            context.getConnectionParameters(),
+            context.getConnection(),
             "UPDATE "
                 + schema
                 + "."
