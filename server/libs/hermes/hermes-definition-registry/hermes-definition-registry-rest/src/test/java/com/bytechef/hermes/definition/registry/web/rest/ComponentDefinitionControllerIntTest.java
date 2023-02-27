@@ -19,7 +19,9 @@ package com.bytechef.hermes.definition.registry.web.rest;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
 
@@ -44,10 +46,16 @@ import reactor.core.publisher.Mono;
 public class ComponentDefinitionControllerIntTest {
 
     @MockBean
+    private ActionDefinitionService actionDefinitionService;
+
+    @MockBean
     private ComponentDefinitionFacade componentDefinitionFacade;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
+
+    @MockBean
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;

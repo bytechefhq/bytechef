@@ -20,14 +20,23 @@ package com.bytechef.hermes.connection.facade;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
+import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.service.impl.ConnectionServiceImpl;
+import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
+import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +47,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Ivica Cardic
  */
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.tag"
+    })
 @EmbeddedSql
-@SpringBootTest(classes = ConnectionIntTestConfiguration.class)
+@SpringBootTest(classes = ConnectionIntTestConfiguration.class, properties = {
+    "spring.application.name=server-app"
+})
+@Import({
+    WorkerDefinitionRegistryConfiguration.class, ConnectionFacadeIntTest.ConnectionFacadeIntTestConfiguration.class
+})
 public class ConnectionFacadeIntTest {
 
     @Autowired
@@ -49,7 +67,7 @@ public class ConnectionFacadeIntTest {
     private ConnectionRepository connectionRepository;
 
     @Autowired
-    TagRepository tagRepository;
+    private TagRepository tagRepository;
 
     @BeforeEach
     @SuppressFBWarnings("NP")
@@ -221,5 +239,22 @@ public class ConnectionFacadeIntTest {
         connection = connectionFacade.update(connection);
 
         assertThat(connection.getTagIds()).hasSize(1);
+    }
+
+    @TestConfiguration
+    public static class ConnectionFacadeIntTestConfiguration {
+
+        @Bean
+        ConnectionFacade connectionFacade(
+            ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+            TagService tagService) {
+
+            return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, tagService);
+        }
+
+        @Bean
+        ConnectionService connectionService(ConnectionRepository connectionRepository) {
+            return new ConnectionServiceImpl(connectionRepository);
+        }
     }
 }

@@ -23,7 +23,6 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.Modifiabl
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNullProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNumberProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty;
@@ -59,7 +58,7 @@ import java.util.Map;
     @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
 })
 // CHECKSTYLE:OFF
-public sealed interface Property<P extends Property<P>> permits Property.OneOfProperty,Property.NullProperty,Property.ValueProperty,ModifiableProperty {
+public sealed interface Property<P extends Property<P>> permits Property.OneOfProperty,Property.ValueProperty,ModifiableProperty {
 
     enum ControlType {
         CODE,
@@ -150,10 +149,6 @@ public sealed interface Property<P extends Property<P>> permits Property.OneOfPr
         Integer getMaxValue();
 
         Integer getMinValue();
-    }
-
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableNullProperty.class)
-    sealed interface NullProperty extends Property<NullProperty>permits ModifiableNullProperty {
     }
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableNumberProperty.class)

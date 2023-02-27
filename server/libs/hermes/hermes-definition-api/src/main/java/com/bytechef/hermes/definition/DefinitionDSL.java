@@ -20,7 +20,6 @@ package com.bytechef.hermes.definition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -136,14 +135,6 @@ public class DefinitionDSL {
 
     public static ModifiableProperty.ModifiableIntegerProperty integer(String name) {
         return new ModifiableProperty.ModifiableIntegerProperty(name);
-    }
-
-    public static Property.NullProperty nullable() {
-        return new ModifiableProperty.ModifiableNullProperty(null);
-    }
-
-    public static Property.NullProperty nullable(String name) {
-        return new ModifiableProperty.ModifiableNullProperty(name);
     }
 
     public static ModifiableProperty.ModifiableNumberProperty number() {
@@ -444,7 +435,7 @@ public class DefinitionDSL {
     // CHECKSTYLE:OFF
     public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property<P>>
         implements
-        Property<P>permits ModifiableProperty.ModifiableOneOfProperty,ModifiableProperty.ModifiableNullProperty,ModifiableProperty.ModifiableValueProperty {
+        Property<P>permits ModifiableProperty.ModifiableOneOfProperty,ModifiableProperty.ModifiableValueProperty {
 
         private Boolean advancedOption;
         private String description;
@@ -861,20 +852,6 @@ public class DefinitionDSL {
             }
         }
 
-        @JsonTypeName("NULL")
-        @Schema(name = "NullProperty", description = "A null property type.")
-        public static final class ModifiableNullProperty
-            extends ModifiableProperty<ModifiableNullProperty, NullProperty> implements Property.NullProperty {
-
-            private ModifiableNullProperty() {
-                super(null, Type.NULL);
-            }
-
-            private ModifiableNullProperty(String name) {
-                super(name, Type.NULL);
-            }
-        }
-
         @JsonTypeName("NUMBER")
         public static final class ModifiableNumberProperty
             extends ModifiableValueProperty<Double, ModifiableNumberProperty, NumberProperty>
@@ -1084,7 +1061,6 @@ public class DefinitionDSL {
                 new ModifiableDateProperty(null),
                 new ModifiableDateTimeProperty(null),
                 new ModifiableIntegerProperty(null),
-                new ModifiableNullProperty(null),
                 new ModifiableNumberProperty(null),
                 new ModifiableObjectProperty(null),
                 new ModifiableStringProperty(null));

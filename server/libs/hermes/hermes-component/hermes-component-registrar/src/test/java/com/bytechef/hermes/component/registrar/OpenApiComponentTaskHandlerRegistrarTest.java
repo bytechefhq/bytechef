@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.discovery.redis.config;
+package com.bytechef.hermes.component.registrar;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-@ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled")
-@Configuration
-@Import({
-    RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class
-})
-public class RedisDiscoveryClientBootstrapConfiguration {
+public class OpenApiComponentTaskHandlerRegistrarTest {
+
+    @Disabled
+    @Test
+    public void testCreateTaskHandler() {
+        // TODO
+    }
 }

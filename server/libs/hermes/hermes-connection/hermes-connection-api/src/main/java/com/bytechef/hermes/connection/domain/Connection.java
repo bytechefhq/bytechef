@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.tag.domain.Tag;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -95,6 +97,10 @@ public final class Connection implements Persistable<Long> {
         }
 
         tags.add(tag);
+    }
+
+    public boolean containsParameter(String name) {
+        return parameters.containsKey(name);
     }
 
     @Override
@@ -175,6 +181,10 @@ public final class Connection implements Persistable<Long> {
         return name;
     }
 
+    public <T> T getParameter(String name) {
+        return MapValueUtils.get(parameters.getMap(), name, new ParameterizedTypeReference<>() {});
+    }
+
     /**
      * Return the connection parameters.
      */
@@ -200,6 +210,10 @@ public final class Connection implements Persistable<Long> {
     @Override
     public boolean isNew() {
         return id == null;
+    }
+
+    public void putAllParameters(Map<String, Object> parameters) {
+        this.parameters.putAll(parameters);
     }
 
     public void setAuthorizationName(String authorizationName) {
@@ -241,6 +255,10 @@ public final class Connection implements Persistable<Long> {
         this.version = version;
     }
 
+    public com.bytechef.hermes.component.Connection toComponentConnection() {
+        return new ConnectionImpl(this);
+    }
+
     @Override
     public String toString() {
         return "Connection{" + ", id="
@@ -256,5 +274,52 @@ public final class Connection implements Persistable<Long> {
             + createdDate + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
             + lastModifiedDate + '}';
+    }
+
+    private static class ConnectionImpl implements com.bytechef.hermes.component.Connection {
+        private final String authorizationName;
+        private final String name;
+        private final Map<String, Object> parameters;
+
+        public ConnectionImpl(Connection connection) {
+            this.authorizationName = connection.getAuthorizationName();
+            this.name = connection.getName();
+            this.parameters = connection.getParameters();
+        }
+
+        @Override
+        public boolean containsParameter(String name) {
+            return parameters.containsKey(name);
+        }
+
+        @Override
+        public String getAuthorizationName() {
+            return authorizationName;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T getParameter(String name) {
+            return (T) parameters.get(name);
+        }
+
+        @Override
+        public <T> T getParameter(String name, T defaultValue) {
+            return MapValueUtils.get(parameters, name, new ParameterizedTypeReference<>() {}, defaultValue);
+        }
+
+        @Override
+        public String toString() {
+            return "ConnectionImpl{" +
+                "authorizationName='" + authorizationName + '\'' +
+                ", name='" + name + '\'' +
+                ", parameters=" + parameters +
+                '}';
+        }
     }
 }

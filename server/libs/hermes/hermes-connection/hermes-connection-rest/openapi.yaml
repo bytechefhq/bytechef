@@ -7,7 +7,8 @@ servers:
 paths:
   /connections:
     get:
-      description: TODO
+      description: Get connections.
+      summary: Get connections.
       tags:
         - connections
       operationId: getConnections
@@ -39,7 +40,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Connection'
     post:
-      description: TODO
+      description: Create a new connection.
+      summary: Create a new connection.
       tags:
         - connections
       operationId: postConnection
@@ -75,13 +77,14 @@ paths:
                   $ref: '#/components/schemas/Tag'
   /connections/{id}:
     delete:
-      description: TODO
+      description: Delete a connection.
+      summary: Delete a connection.
       tags:
         - connections
       operationId: deleteConnection
       parameters:
         - name: id
-          description: TODO
+          description: The id of a connection.
           in: path
           required: true
           schema:
@@ -89,15 +92,16 @@ paths:
             format: int64
       responses:
         "200":
-          description: TODO OK
+          description: Successful operation.
     get:
-      description: TODO
+      description: Get a connection by id.
+      summary: Get a connection by id.
       tags:
         - connections
       operationId: getConnection
       parameters:
         - name: id
-          description: TODO
+          description: The id of a connection.
           in: path
           required: true
           schema:
@@ -105,19 +109,20 @@ paths:
             format: int64
       responses:
         "200":
-          description: TODO
+          description: The connection object.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Connection'
     put:
-      description: TODO
+      description: Update an existing connection.
+      summary: Update an existing connection.
       tags:
         - connections
       operationId: putConnection
       parameters:
         - name: id
-          description: TODO
+          description: The id of a connection.
           in: path
           required: true
           schema:
@@ -169,7 +174,7 @@ paths:
 components:
   schemas:
     Connection:
-      description: TODO
+      description: Contains all required information to open a connection to a service defined by componentName parameter.
       type: object
       required:
         - name
@@ -178,45 +183,46 @@ components:
         - parameters
       properties:
         authorizationName:
-          description: TODO
+          description: The name of an authorization used by this connection. Used for HTTP based services.
           type: string
         componentName:
-          description: TODO
+          description: The name of a component that uses this connection.
           type: string
         connectionVersion:
-          description: TODO
+          description: The version of a connection.
           type: integer
         createdBy:
-          description: TODO
+          description: The created by.
           type: string
           readOnly: true
         createdDate:
-          description: TODO
+          description: The created date.
           type: string
           format: date-time
           readOnly: true
         name:
-          description: TODO
+          description: The name of a connection.
           type: string
         id:
-          description: TODO
+          description: The id of a connection.
           type: integer
           format: int64
           readOnly: true
         lastModifiedBy:
-          description: TODO
+          description: The last modified by.
           type: string
           readOnly: true
         lastModifiedDate:
-          description: TODO
+          description: The last modified date.
           type: string
           format: date-time
           readOnly: true
         parameters:
-          description: TODO
+          description: The parameters of a connection.
           type: object
           additionalProperties:
             type: object
+          writeOnly: true
         tags:
           type: array
           items:

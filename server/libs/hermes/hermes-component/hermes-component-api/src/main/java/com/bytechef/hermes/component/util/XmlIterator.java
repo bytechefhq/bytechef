@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * @author Ivica Cardic
  */
-class XmlIterator implements Iterator<Map<String, ?>> {
+final class XmlIterator implements Iterator<Map<String, ?>> {
 
     private final XMLStreamReader xmlStreamReader;
     private final XmlMapper xmlMapper;
