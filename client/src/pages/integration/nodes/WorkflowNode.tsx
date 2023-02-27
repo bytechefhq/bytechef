@@ -1,6 +1,6 @@
 import React, {memo} from 'react';
 import {Handle, Position, NodeProps} from 'reactflow';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 
 import styles from './NodeTypes.module.css';
 import useNodeClickHandler from '../hooks/useNodeClick';
@@ -11,7 +11,7 @@ const WorkflowNode = ({id, data}: NodeProps) => {
     return (
         <div
             onClick={onClick}
-            className={cx(
+            className={twMerge(
                 styles.node,
                 'relative flex h-[72px] w-[72px] cursor-pointer items-center justify-center rounded-md border-2 border-gray-300 bg-white shadow hover:bg-gray-200'
             )}

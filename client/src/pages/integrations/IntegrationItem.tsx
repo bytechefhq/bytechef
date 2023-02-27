@@ -5,7 +5,7 @@ import {useIntegrationTagsMutation} from '../../mutations/integrations.mutations
 import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 import CreatableSelect from '../../components/CreatableSelect/CreatableSelect';
 import Button from 'components/Button/Button';
 import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
@@ -255,7 +255,7 @@ const Status = ({published, version}: StatusProps) => {
 
     return (
         <span
-            className={cx(
+            className={twMerge(
                 'mr-4 rounded px-2.5 py-0.5 text-sm font-medium',
                 published ? 'bg-green-100' : 'bg-gray-100',
                 published ? 'text-green-800' : 'text-gray-800',

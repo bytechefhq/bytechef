@@ -1,6 +1,6 @@
 import {CogIcon} from '@heroicons/react/24/outline';
 import ThemeSwitcher from '../../components/ThemeSwitcher/ThemeSwitcher';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import React from 'react';
@@ -25,7 +25,7 @@ export default function Settings() {
                         <a
                             key={item.name}
                             href={item.href}
-                            className={cx(
+                            className={twMerge(
                                 item.current
                                     ? 'bg-gray-100 text-black dark:bg-gray-600 dark:text-gray-300'
                                     : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',

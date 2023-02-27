@@ -1,5 +1,5 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 import {forwardRef} from 'react';
 
 type TextAreaProps = {
@@ -22,13 +22,13 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             </label>
 
             <div
-                className={cx([
+                className={twMerge([
                     'mt-1',
                     error ? 'relative rounded-md shadow-sm' : null,
                 ])}
             >
                 <textarea
-                    className={cx([
+                    className={twMerge([
                         'block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800',
                         error
                             ? 'border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500 dark:text-red-500 sm:text-sm'
