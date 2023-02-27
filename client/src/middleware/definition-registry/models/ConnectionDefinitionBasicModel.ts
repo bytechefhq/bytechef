@@ -39,7 +39,7 @@ export interface ConnectionDefinitionBasicModel {
      */
     display: DisplayModel;
     /**
-     * The component version.
+     * The version of a component.
      * @type {number}
      * @memberof ConnectionDefinitionBasicModel
      */

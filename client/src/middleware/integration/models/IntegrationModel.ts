@@ -51,7 +51,7 @@ export interface IntegrationModel {
      */
     readonly createdDate?: Date;
     /**
-     * The id of the integration.
+     * The id of an integration.
      * @type {number}
      * @memberof IntegrationModel
      */

@@ -22,7 +22,6 @@ models/DisplayModel.ts
 models/DisplayOptionModel.ts
 models/IntegerPropertyAllOfModel.ts
 models/IntegerPropertyModel.ts
-models/NullPropertyModel.ts
 models/NumberPropertyAllOfModel.ts
 models/NumberPropertyModel.ts
 models/ObjectPropertyAllOfModel.ts
