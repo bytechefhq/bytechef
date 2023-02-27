@@ -85,19 +85,19 @@ public class InitSubcommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (openApiPath != null && !openApiPath.isEmpty()) {
-            generateOpenAPIComponent();
+            generateOpenApiComponent();
         }
 
         return null;
     }
 
-    private void generateOpenAPIComponent() throws Exception {
+    private void generateOpenApiComponent() throws Exception {
         if (!openApiPath.matches("^http(s)?://.*") && !new File(openApiPath).exists()) {
             throw new CommandLine.ParameterException(
                 commandSpec.commandLine(), "The OpenAPI file is not found: " + openApiPath);
         }
 
-        new RestComponentGenerator(basePackageName, componentName.toLowerCase(), version, internalComponent,
+        new OpenApiComponentGenerator(basePackageName, componentName.toLowerCase(), version, internalComponent,
             openApiPath, outputPath)
                 .generate();
     }
