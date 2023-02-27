@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OneOfProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 public class OneOfPropertyAllOfModel {
 
   @JsonProperty("types")

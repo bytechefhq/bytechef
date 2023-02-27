@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-definitions", description = "the connection-definitions API")
 public interface ConnectionDefinitionsApi {
@@ -46,7 +46,7 @@ public interface ConnectionDefinitionsApi {
      * Get all connection definitions for a component.
      *
      * @param componentName The name of the component. (required)
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getComponentConnectionDefinitions",
@@ -54,7 +54,7 @@ public interface ConnectionDefinitionsApi {
         description = "Get all connection definitions for a component.",
         tags = { "connection-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectionDefinitionBasicModel.class)))
             })
         }
@@ -88,7 +88,7 @@ public interface ConnectionDefinitionsApi {
      *
      * @param componentName The name of the component. (required)
      * @param componentVersion The version of the component to get. (required)
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getConnectionDefinition",
@@ -96,7 +96,7 @@ public interface ConnectionDefinitionsApi {
         description = "Get a connection definition of a component definition.",
         tags = { "connection-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionDefinitionModel.class))
             })
         }
@@ -115,7 +115,7 @@ public interface ConnectionDefinitionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"authorizationRequired\" : true, \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"authorizations\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ null, null ] }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ null, null ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"version\" : 0.8008281904610115, \"properties\" : [ null, null ] }";
+                String exampleString = "{ \"authorizationRequired\" : true, \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"authorizations\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true }, { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true } ] }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true }, { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true } ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"version\" : 0.8008281904610115, \"connectionVersion\" : \"connectionVersion\", \"properties\" : [ { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true }, { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true } ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -129,7 +129,7 @@ public interface ConnectionDefinitionsApi {
      * GET /connection-definitions : Get all connection definitions.
      * Get all connection definitions.
      *
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getConnectionDefinitions",
@@ -137,7 +137,7 @@ public interface ConnectionDefinitionsApi {
         description = "Get all connection definitions.",
         tags = { "connection-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectionDefinitionBasicModel.class)))
             })
         }

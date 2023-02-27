@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 @JsonTypeName("Authorization")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 public class AuthorizationModel {
 
   @JsonProperty("display")
@@ -38,7 +38,7 @@ public class AuthorizationModel {
 
   @JsonProperty("properties")
   @Valid
-  private List<ValuePropertyModel> properties = null;
+  private List<PropertyModel> properties = null;
 
   @JsonProperty("type")
   private AuthorizationTypeModel type;
@@ -81,12 +81,12 @@ public class AuthorizationModel {
     this.name = name;
   }
 
-  public AuthorizationModel properties(List<ValuePropertyModel> properties) {
+  public AuthorizationModel properties(List<PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
 
-  public AuthorizationModel addPropertiesItem(ValuePropertyModel propertiesItem) {
+  public AuthorizationModel addPropertiesItem(PropertyModel propertiesItem) {
     if (this.properties == null) {
       this.properties = new ArrayList<>();
     }
@@ -100,11 +100,11 @@ public class AuthorizationModel {
   */
   @Valid 
   @Schema(name = "properties", description = "Properties of the connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<ValuePropertyModel> getProperties() {
+  public List<PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<ValuePropertyModel> properties) {
+  public void setProperties(List<PropertyModel> properties) {
     this.properties = properties;
   }
 
