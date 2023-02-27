@@ -66,8 +66,10 @@
 		"reactflow": "^11.5.6",
 		"tailwind-merge": "^1.10.0",
 		"tailwindcss-radix": "^2.7.0",
-		"yup": "^1.0.0",
-		"zustand": "^4.3.3"
+		"yup": "^1.0.1",
+		"zustand": "^4.3.3",
+
+        "use-local-storage-state": "18.1.2"
 	},
 	"devDependencies": {
 		"@storybook/addon-actions": "^6.5.16",
@@ -88,10 +90,10 @@
 		"@typescript-eslint/eslint-plugin": "^5.53.0",
 		"@typescript-eslint/parser": "^5.53.0",
 		"@vitejs/plugin-react": "^3.1.0",
-		"@vitest/coverage-c8": "^0.28.5",
+		"@vitest/coverage-c8": "^0.29.1",
 		"autoprefixer": "^10.4.13",
 		"c8": "^7.13.0",
-		"eslint": "^8.34.0",
+		"eslint": "^8.35.0",
 		"eslint-config-prettier": "^8.6.0",
 		"eslint-plugin-prettier": "^4.2.1",
 		"eslint-plugin-react": "^7.32.2",
@@ -107,7 +109,7 @@
 		"typescript": "^4.9.5",
 		"vite": "^4.1.4",
 		"vite-tsconfig-paths": "^4.0.5",
-		"vitest": "^0.28.5"
+		"vitest": "^0.29.1"
 	},
 	"msw": {
 		"workerDirectory": "public"
