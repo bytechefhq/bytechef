@@ -4,17 +4,22 @@ import {
     ComponentDefinitionsApi,
 } from '../middleware/definition-registry';
 
-export const ComponentDefinitionKeys = {
-    componentDefinitions: ['componentDefinitions'] as const,
-};
-
-export const useGetComponentDefinitionsQuery = (filter?: {
+interface Request {
     connectionDefinitions?: boolean;
     connectionInstances?: boolean;
-}) =>
+}
+
+export const ComponentDefinitionKeys = {
+    componentDefinitions: (request?: Request) => [
+        'componentDefinitions',
+        request,
+    ],
+};
+
+export const useGetComponentDefinitionsQuery = (request?: Request) =>
     useQuery<ComponentDefinitionBasicModel[], Error>(
-        ComponentDefinitionKeys.componentDefinitions,
-        () => new ComponentDefinitionsApi().getComponentDefinitions(filter),
+        ComponentDefinitionKeys.componentDefinitions(request),
+        () => new ComponentDefinitionsApi().getComponentDefinitions(request),
         {
             staleTime: 1 * 60 * 1000,
         }
