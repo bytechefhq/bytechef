@@ -6,9 +6,7 @@ export const Instances = () => {
     return (
         <LayoutContainer
             header={<PageHeader title="All Instances" />}
-            leftSidebarHeader={
-                <PageHeader leftSidebar={true} title="Instances" />
-            }
+            leftSidebarHeader={<PageHeader leftSidebar title="Instances" />}
         ></LayoutContainer>
     );
 };

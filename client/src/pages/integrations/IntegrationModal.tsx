@@ -76,7 +76,7 @@ const IntegrationModal = () => {
             handleConfirmButtonClick={handleSubmit(createIntegration)}
             triggerLabel="Create Integration"
             title="Create Integration"
-            form={true}
+            form
             isOpen={isOpen}
             setIsOpen={setIsOpen}
         >
@@ -155,7 +155,7 @@ const IntegrationModal = () => {
                     name="tags"
                     render={({field}) => (
                         <CreatableSelect
-                            isMulti={true}
+                            isMulti
                             label="Tags"
                             options={tags!.map((tag: TagModel) => ({
                                 label: `${tag.name

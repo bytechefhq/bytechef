@@ -60,9 +60,7 @@ const Integrations = () => {
                     title={title}
                 />
             }
-            leftSidebarHeader={
-                <PageHeader leftSidebar={true} title="Integrations" />
-            }
+            leftSidebarHeader={<PageHeader leftSidebar title="Integrations" />}
             leftSidebarBody={
                 <LeftSidebarMenu
                     topTitle="Components"
