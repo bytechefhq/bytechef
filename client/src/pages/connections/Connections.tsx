@@ -20,9 +20,9 @@ const Connections = () => {
 
     const defaultCurrentState = {
         id: searchParams.get('componentName')
-            ? +searchParams.get('componentName')!
+            ? parseInt(searchParams.get('componentName')!)
             : searchParams.get('tagId')
-            ? +searchParams.get('tagId')!
+            ? parseInt(searchParams.get('tagId')!)
             : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Component,
     };

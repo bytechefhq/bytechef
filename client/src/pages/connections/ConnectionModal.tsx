@@ -96,6 +96,12 @@ const ConnectionModal = () => {
         },
     });
 
+    const authorizationsExists =
+        !connectionDefinitionIsLoading &&
+        connectionDefinition &&
+        connectionDefinition?.authorizations &&
+        connectionDefinition.authorizations.length > 0;
+
     function closeForm() {
         setIsOpen(false);
 
@@ -137,27 +143,16 @@ const ConnectionModal = () => {
         ];
     }
 
-    function authorizationsExists() {
-        return (
-            !connectionDefinitionIsLoading &&
-            connectionDefinition &&
-            connectionDefinition?.authorizations &&
-            connectionDefinition.authorizations.length > 0
-        );
-    }
-
     return (
         <Modal
             confirmButtonLabel="Create Connection"
             description="Create your connection to connect to the chosen service"
-            form={true}
+            form
             isOpen={isOpen}
             setIsOpen={setIsOpen}
             title="Create Connection"
             triggerLabel="Create Connection"
-            onCloseClick={() => {
-                closeForm();
-            }}
+            onCloseClick={closeForm}
             onConfirmButtonClick={handleSubmit(createConnection)}
         >
             {componentDefinitionsError &&
@@ -217,7 +212,7 @@ const ConnectionModal = () => {
                 {...register('name', {required: true})}
             />
 
-            {authorizationsExists() && (
+            {authorizationsExists && (
                 <NativeSelect
                     error={
                         touchedFields.authorizationName &&
@@ -231,7 +226,7 @@ const ConnectionModal = () => {
                 />
             )}
 
-            {authorizationsExists() && authorizationName && (
+            {authorizationsExists && authorizationName && (
                 <fieldset className="mb-3">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Authorization
