@@ -31,7 +31,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.component.jira.action.CreateIssueAction;
 import com.bytechef.component.jira.action.GetIssueAction;
 import com.bytechef.component.jira.action.SearchForIssuesUsingJqlAction;
-import com.bytechef.hermes.component.RestComponentHandler;
+import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import java.util.List;
 
@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @generated
  */
-public abstract class AbstractJiraComponentHandler implements RestComponentHandler {
+public abstract class AbstractJiraComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = component("jira")
         .display(
             modifyDisplay(
@@ -78,7 +78,6 @@ public abstract class AbstractJiraComponentHandler implements RestComponentHandl
                                     .label("Client Secret")
                                     .required(true))
                             .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
-                            .refreshUrl(connection -> null)
                             .scopes(connection -> List.of("read:jira-work", "write:jira-work"))
                             .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token"))));
 

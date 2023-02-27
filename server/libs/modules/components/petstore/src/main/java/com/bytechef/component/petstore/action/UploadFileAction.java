@@ -17,15 +17,15 @@
 
 package com.bytechef.component.petstore.action;
 
-import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
+import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.component.petstore.property.ApiResponseProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;

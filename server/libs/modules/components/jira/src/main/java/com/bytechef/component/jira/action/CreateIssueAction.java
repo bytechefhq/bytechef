@@ -17,13 +17,13 @@
 
 package com.bytechef.component.jira.action;
 
-import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
+import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.component.jira.property.CreatedIssueProperties;
 import com.bytechef.component.jira.property.IssueUpdateDetailsProperties;
