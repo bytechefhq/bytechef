@@ -1,9 +1,12 @@
 import {useQuery} from '@tanstack/react-query';
-
-import {ConnectionsApi, TagModel} from '../middleware/connection';
+import {
+    ConnectionModel,
+    ConnectionsApi,
+    TagModel,
+} from '../middleware/connection';
 
 export const ConnectionKeys = {
-    connection: (id: number) => ['connections', id],
+    connection: (id: number) => [...ConnectionKeys.connections, id],
     connectionList: (filters: {
         componentNames?: string[];
         tagIds?: number[];
@@ -11,6 +14,27 @@ export const ConnectionKeys = {
     connectionTags: ['connectionTags'] as const,
     connections: ['connections'] as const,
 };
+
+export const useGetConnectionQuery = (id: number) =>
+    useQuery<ConnectionModel, Error>(
+        ConnectionKeys.connection(id),
+        () => new ConnectionsApi().getConnection({id}),
+        {
+            staleTime: 1 * 60 * 1000,
+        }
+    );
+
+export const useGetConnectionsQuery = (filters: {
+    componentNames?: string[];
+    tagIds?: number[];
+}) =>
+    useQuery<ConnectionModel[], Error>(
+        ConnectionKeys.connectionList(filters),
+        () => new ConnectionsApi().getConnections(filters),
+        {
+            staleTime: 1 * 60 * 1000,
+        }
+    );
 
 export const useGetConnectionTagsQuery = () =>
     useQuery<TagModel[], Error>(
