@@ -167,12 +167,8 @@ const Integration: React.FC = () => {
                     }
                     leftSidebarHeader={
                         <>
-                            <h3 className="mt-4 text-center font-bold uppercase text-gray-600">
-                                Workflow nodes
-                            </h3>
-
                             <Input
-                                fieldsetClassName="px-4 py-2 border-b mb-0"
+                                fieldsetClassName="px-4 py-4 mb-0"
                                 name="workflowElementsFilter"
                                 onChange={(event) =>
                                     setFilter(event.target.value)
