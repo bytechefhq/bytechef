@@ -1,21 +1,17 @@
 [versions]
 ch-qos-logback = "1.4.5"
-checkstyle="10.6.0"
+checkstyle = "10.6.0"
 com-fasterxml-jackson-core = "2.14.2"
 com-fasterxml-jackson-dataformat = "2.14.2"
 info-picocli = "4.7.1"
 org-mapstruct = "1.5.3.Final"
 org-mapstruct-extensions-spring = "1.0.0"
-org-springframework = "6.0.4"
-org-springframework-amqp = "3.0.1"
 org-springframework-boot = "3.0.3"
 org-springframework-cloud = "4.0.1"
 org-springframework-cloud-dependencies = "2022.0.1"
-org-springframework-data = "3.0.1"
-org-springframework-security = "6.0.1"
 org-testcontainers = "1.17.6"
-pmd="6.54.0"
-spotbugs="4.7.3"
+pmd = "6.54.0"
+spotbugs = "4.7.3"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
@@ -35,11 +31,10 @@ com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 com-zaxxer-HikariCP = "com.zaxxer:HikariCP:5.0.1"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
-io-lettuce-lettuce-core = "io.lettuce:lettuce-core:6.2.2.RELEASE"
 io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.3"
 io-rsocket-rsocket-core = "io.rsocket:rsocket-core:1.1.3"
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.8"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.11"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.12"
 jakarta-annotation-jakarta-annotation-api = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 jakarta-jms-jakarta-jms-api = "jakarta.jms:jakarta.jms-api:3.1.0"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
@@ -49,7 +44,7 @@ org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.17.
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
 org-apache-tika-tika-core = "org.apache.tika:tika-core:2.7.0"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r"
-org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.14.1"
+org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.15.1"
 org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:22.3.1"
 org-json = "org.json:json:20220924"
 org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.2"
@@ -57,13 +52,10 @@ org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstru
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "org-mapstruct" }
-org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.5"
-org-postgresql = "org.postgresql:postgresql:42.5.3"
+org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-skyscreamer-jsonassert = "org.skyscreamer:jsonassert:1.5.1"
 org-slf4j-slf4j-api = "org.slf4j:slf4j-api:2.0.6"
 org-springdoc-springdoc-openapi-starter-webflux-ui = "org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2"
-org-springframework-amqp-spring-amqp = { module = "org.springframework.amqp:spring-amqp", version.ref = "org-springframework-amqp" }
-org-springframework-amqp-spring-rabbit = { module = "org.springframework.amqp:spring-rabbit", version.ref = "org-springframework-amqp" }
 org-springframework-boot-spring-boot = { module = "org.springframework.boot:spring-boot", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "org-springframework-boot" }
 org-springframework-boot-spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
@@ -80,35 +72,19 @@ org-springframework-boot-spring-boot-test = { module = "org.springframework.boot
 org-springframework-cloud-spring-cloud-commons = { module = "org.springframework.cloud:spring-cloud-commons", version.ref = "org-springframework-cloud" }
 org-springframework-cloud-spring-cloud-starter = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "org-springframework-cloud" }
 org-springframework-cloud-spring-cloud-starter-loadbalancer = { module = "org.springframework.cloud:spring-cloud-starter-loadbalancer", version.ref = "org-springframework-cloud" }
-org-springframework-data-spring-data-commons = { module = "org.springframework.data:spring-data-commons", version.ref = "org-springframework-data" }
-org-springframework-data-spring-data-jdbc = { module = "org.springframework.data:spring-data-jdbc", version.ref = "org-springframework-data" }
-org-springframework-data-spring-data-redis = { module = "org.springframework.data:spring-data-redis", version.ref = "org-springframework-data" }
-org-springframework-kafka-spring-kafka = "org.springframework.kafka:spring-kafka:3.0.2"
 org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry:2.0.0"
-org-springframework-security-spring-security-core = { module = "org.springframework.security:spring-security-core", version.ref = "org-springframework-security" }
-org-springframework-security-spring-security-test = { module = "org.springframework.security:spring-security-test", version.ref = "org-springframework-security" }
-org-springframework-spring-beans = { module = "org.springframework:spring-beans", version.ref = "org-springframework" }
-org-springframework-spring-context = { module = "org.springframework:spring-context", version.ref = "org-springframework" }
-org-springframework-spring-core = { module = "org.springframework:spring-core", version.ref = "org-springframework" }
-org-springframework-spring-expression = { module = "org.springframework:spring-expression", version.ref = "org-springframework" }
-org-springframework-spring-jdbc = { module = "org.springframework:spring-jdbc", version.ref = "org-springframework" }
-org-springframework-spring-jms = { module = "org.springframework:spring-jms", version.ref = "org-springframework" }
-org-springframework-spring-messaging = { module = "org.springframework:spring-messaging", version.ref = "org-springframework" }
-org-springframework-spring-tx = { module = "org.springframework:spring-tx", version.ref = "org-springframework" }
-org-springframework-spring-web = { module = "org.springframework:spring-web", version.ref = "org-springframework" }
-org-springframework-spring-webflux = { module = "org.springframework:spring-webflux", version.ref = "org-springframework" }
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.4"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.12"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.15.0"
-com-github-ben-manes-versions = "com.github.ben-manes.versions:0.45.0"
+com-github-ben-manes-versions = "com.github.ben-manes.versions:0.46.0"
 com-github-spotbugs = "com.github.spotbugs:5.0.13"
 com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.1"
 com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.7.0"
 org-openapi-generator = "org.openapi.generator:6.4.0"
-org-sonarqube = "org.sonarqube:3.5.0.2730"
+org-sonarqube = "org.sonarqube:4.0.0.2929"
 org-springframework-boot = "org.springframework.boot:3.0.3"
