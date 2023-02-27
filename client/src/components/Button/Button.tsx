@@ -2,16 +2,6 @@ import {forwardRef, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 import './button.css';
 
-type Size = 'small' | 'large';
-type DisplayType =
-    | 'danger'
-    | 'icon'
-    | 'primary'
-    | 'secondary'
-    | 'light'
-    | 'lightBorder'
-    | 'unstyled';
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     displayType?: DisplayType;
     icon?: ReactNode;
@@ -21,10 +11,16 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     size?: Size;
 }
 
-const sizes: Record<Size, string> = {
-    small: 'btn-small',
-    large: 'btn-large',
-};
+type DisplayType =
+    | 'danger'
+    | 'icon'
+    | 'primary'
+    | 'secondary'
+    | 'light'
+    | 'lightBorder'
+    | 'unstyled';
+
+type Size = 'small' | 'large';
 
 const displayTypes: Record<DisplayType, string> = {
     danger: 'btn-danger',
@@ -34,6 +30,11 @@ const displayTypes: Record<DisplayType, string> = {
     light: 'btn-light',
     lightBorder: 'btn-light-border',
     unstyled: 'btn-unstyled',
+};
+
+const sizes: Record<Size, string> = {
+    small: 'btn-small',
+    large: 'btn-large',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
