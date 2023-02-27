@@ -17,7 +17,7 @@
 
 package com.bytechef.component.petstore.action;
 
-import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
+import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
