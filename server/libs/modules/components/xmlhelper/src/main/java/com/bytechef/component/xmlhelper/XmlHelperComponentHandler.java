@@ -25,10 +25,12 @@ import com.bytechef.component.xmlhelper.action.XmlHelperParseAction;
 import com.bytechef.component.xmlhelper.action.XmlHelperStringifyAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class XmlHelperComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XML_HELPER)

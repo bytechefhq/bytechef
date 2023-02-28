@@ -17,5 +17,12 @@
 
 package com.bytechef.component.jira;
 
+import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.google.auto.service.AutoService;
+
+/**
+ * @generated
+ */
+@AutoService(OpenApiComponentHandler.class)
 public class JiraComponentHandler extends AbstractJiraComponentHandler {
 }
