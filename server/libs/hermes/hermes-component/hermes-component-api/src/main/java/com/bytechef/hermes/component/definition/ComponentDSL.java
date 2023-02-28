@@ -203,8 +203,7 @@ public final class ComponentDSL extends DefinitionDSL {
             Function<Connection, String> callbackUrlFunction = getCallbackUrlFunction();
             Function<Connection, String> tokenUrlFunction = getTokenUrlFunction();
 
-            @SuppressWarnings("unchecked")
-            Map<String, Object> result = (Map<String, Object>) HttpClientUtils.get(tokenUrlFunction.apply(connection))
+            HttpClientUtils.Response response = HttpClientUtils.get(tokenUrlFunction.apply(connection))
                 .payload(
                     HttpClientUtils.Payload.of(Map.of(
                         "grant_type", "authorization_code",
@@ -212,8 +211,11 @@ public final class ComponentDSL extends DefinitionDSL {
                         "redirect_uri", callbackUrlFunction.apply(connection))))
                 .execute();
 
+            @SuppressWarnings("unchecked")
+            Map<String, Object> body = (Map<String, Object>) response.body();
+
             return new AuthorizationCallbackResponse(
-                (String) result.get(ACCESS_TOKEN), (String) result.get(REFRESH_TOKEN), Map.of());
+                (String) body.get(ACCESS_TOKEN), (String) body.get(REFRESH_TOKEN), Map.of());
         };
 
         @JsonIgnore
