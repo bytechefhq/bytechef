@@ -34,6 +34,7 @@ dependencies {
     implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:db-migration")
+    implementation project(":server:libs:demo-configuration")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rsocket-client")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")
