@@ -19,7 +19,7 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AmazonS3Uri;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
@@ -45,8 +45,8 @@ public class AwsS3GetUrlAction {
         .output(string())
         .perform(AwsS3GetUrlAction::performGetUrl);
 
-    public static String performGetUrl(Context context, ExecutionParameters executionParameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(executionParameters.getRequiredString(URI));
+    public static String performGetUrl(Context context, Parameters parameters) {
+        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(parameters.getRequiredString(URI));
 
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();

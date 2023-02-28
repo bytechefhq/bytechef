@@ -21,7 +21,7 @@ package com.bytechef.component.delay;
 
 import com.bytechef.component.delay.action.DelayDelayAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -43,16 +43,16 @@ public class DelayComponentHandlerTest {
     public void test1() {
         long now = System.currentTimeMillis();
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.containsKey("millis"))
+        Mockito.when(parameters.containsKey("millis"))
             .thenReturn(false);
-        Mockito.when(executionParameters.containsKey("duration"))
+        Mockito.when(parameters.containsKey("duration"))
             .thenReturn(true);
-        Mockito.when(executionParameters.getDuration("duration"))
+        Mockito.when(parameters.getDuration("duration"))
             .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
 
-        DelayDelayAction.performDelay(Mockito.mock(Context.class), executionParameters);
+        DelayDelayAction.performDelay(Mockito.mock(Context.class), parameters);
 
         long delta = System.currentTimeMillis() - now;
 
@@ -64,14 +64,14 @@ public class DelayComponentHandlerTest {
     public void test2() {
         long now = System.currentTimeMillis();
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.containsKey("millis"))
+        Mockito.when(parameters.containsKey("millis"))
             .thenReturn(true);
-        Mockito.when(executionParameters.getLong("millis"))
+        Mockito.when(parameters.getLong("millis"))
             .thenReturn(500L);
 
-        DelayDelayAction.performDelay(Mockito.mock(Context.class), executionParameters);
+        DelayDelayAction.performDelay(Mockito.mock(Context.class), parameters);
 
         long delta = System.currentTimeMillis() - now;
 
@@ -83,7 +83,7 @@ public class DelayComponentHandlerTest {
     public void test3() {
         long now = System.currentTimeMillis();
 
-        DelayDelayAction.performDelay(Mockito.mock(Context.class), Mockito.mock(ExecutionParameters.class));
+        DelayDelayAction.performDelay(Mockito.mock(Context.class), Mockito.mock(Parameters.class));
 
         long delta = System.currentTimeMillis() - now;
 

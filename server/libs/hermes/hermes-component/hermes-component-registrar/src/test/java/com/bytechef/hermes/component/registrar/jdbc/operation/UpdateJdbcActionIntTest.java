@@ -25,7 +25,7 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_K
 
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.UpdateJdbcOperation;
@@ -81,20 +81,20 @@ public class UpdateJdbcActionIntTest {
 
     @Test
     public void testUpdate() {
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getList(COLUMNS, String.class, List.of()))
+        Mockito.when(parameters.getList(COLUMNS, String.class, List.of()))
             .thenReturn(List.of("name"));
-        Mockito.when(executionParameters.getList(ROWS, Map.class, List.of()))
+        Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
             .thenReturn(List.of(Map.of("id", "id2", "name", "name3")));
-        Mockito.when(executionParameters.getString(SCHEMA, "public"))
+        Mockito.when(parameters.getString(SCHEMA, "public"))
             .thenReturn("public");
-        Mockito.when(executionParameters.getRequiredString(TABLE))
+        Mockito.when(parameters.getRequiredString(TABLE))
             .thenReturn("test");
-        Mockito.when(executionParameters.getString(UPDATE_KEY, "id"))
+        Mockito.when(parameters.getString(UPDATE_KEY, "id"))
             .thenReturn("id");
 
-        Map<String, Integer> result = updateJdbcOperation.execute(Mockito.mock(Context.class), executionParameters);
+        Map<String, Integer> result = updateJdbcOperation.execute(Mockito.mock(Context.class), parameters);
 
         Assertions.assertEquals(1, result.get("rows"));
 

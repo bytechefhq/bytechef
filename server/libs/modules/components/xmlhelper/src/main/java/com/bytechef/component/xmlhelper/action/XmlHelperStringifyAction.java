@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.XmlUtils;
 
@@ -47,8 +47,8 @@ public class XmlHelperStringifyAction {
         .output(string())
         .perform(XmlHelperStringifyAction::performStringify);
 
-    public static String performStringify(Context context, ExecutionParameters executionParameters) {
-        Object source = executionParameters.getRequired(SOURCE);
+    public static String performStringify(Context context, Parameters parameters) {
+        Object source = parameters.getRequired(SOURCE);
 
         return XmlUtils.write(source);
     }

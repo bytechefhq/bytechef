@@ -32,7 +32,7 @@ import com.bytechef.component.xlsxfile.action.XlsxFileReadAction;
 import com.bytechef.component.xlsxfile.action.XlsxFileWriteAction;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.ByteArrayInputStream;
@@ -80,9 +80,9 @@ public class XlsxFileComponentHandlerTest {
     public void testPerformWriteXLSX() throws IOException, JSONException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        ExecutionParameters executionParameters = getWriteParameters(new JSONArray(jsonContent).toList());
+        Parameters parameters = getWriteParameters(new JSONArray(jsonContent).toList());
 
-        XlsxFileWriteAction.performWrite(context, executionParameters);
+        XlsxFileWriteAction.performWrite(context, parameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -251,7 +251,7 @@ public class XlsxFileComponentHandlerTest {
             .getFile());
     }
 
-    private ExecutionParameters getReadParameters(
+    private Parameters getReadParameters(
         String extension,
         boolean headerRow,
         boolean includeEmptyCells,
@@ -261,20 +261,20 @@ public class XlsxFileComponentHandlerTest {
         File file)
         throws FileNotFoundException {
 
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
         FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
-        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
             .thenReturn(fileEntry);
-        Mockito.when(executionParameters.getBoolean(HEADER_ROW, true))
+        Mockito.when(parameters.getBoolean(HEADER_ROW, true))
             .thenReturn(headerRow);
-        Mockito.when(executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
+        Mockito.when(parameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
             .thenReturn(includeEmptyCells);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+        Mockito.when(parameters.getInteger(PAGE_NUMBER))
             .thenReturn(pageNumber);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+        Mockito.when(parameters.getInteger(PAGE_SIZE))
             .thenReturn(pageSize);
-        Mockito.when(executionParameters.getBoolean(READ_AS_STRING, false))
+        Mockito.when(parameters.getBoolean(READ_AS_STRING, false))
             .thenReturn(readAsString);
 
         Mockito.when(fileEntry.getExtension())
@@ -285,21 +285,21 @@ public class XlsxFileComponentHandlerTest {
                 .thenReturn(new FileInputStream(file));
         }
 
-        return executionParameters;
+        return parameters;
     }
 
     @SuppressWarnings("raw")
-    private ExecutionParameters getWriteParameters(List items) {
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+    private Parameters getWriteParameters(List items) {
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getString(FILENAME, "file.xlsx"))
+        Mockito.when(parameters.getString(FILENAME, "file.xlsx"))
             .thenReturn("file.xlsx");
-        Mockito.when(executionParameters.getList(ROWS, Map.class, List.of()))
+        Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
             .thenReturn(items);
-        Mockito.when(executionParameters.getString(SHEET_NAME, "Sheet"))
+        Mockito.when(parameters.getString(SHEET_NAME, "Sheet"))
             .thenReturn("Sheet");
 
-        return executionParameters;
+        return parameters;
     }
 
     private void readFile(String extension) throws IOException, JSONException {

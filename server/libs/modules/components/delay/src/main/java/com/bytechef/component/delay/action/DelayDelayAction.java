@@ -19,7 +19,7 @@ package com.bytechef.component.delay.action;
 
 import com.bytechef.component.delay.constant.DelayConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 
@@ -44,18 +44,18 @@ public class DelayDelayAction {
             .defaultValue(1))
         .perform(DelayDelayAction::performDelay);
 
-    public static Object performDelay(Context context, ExecutionParameters executionParameters) {
+    public static Object performDelay(Context context, Parameters parameters) {
         try {
-            if (executionParameters.containsKey("millis")) {
-                Thread.sleep(executionParameters.getLong("millis"));
-            } else if (executionParameters.containsKey("duration")) {
-                Thread.sleep(executionParameters.getDuration("duration")
+            if (parameters.containsKey("millis")) {
+                Thread.sleep(parameters.getLong("millis"));
+            } else if (parameters.containsKey("duration")) {
+                Thread.sleep(parameters.getDuration("duration")
                     .toMillis());
             } else {
                 TimeUnit.SECONDS.sleep(1);
             }
         } catch (InterruptedException interruptedException) {
-            throw new ActionExecutionException("Unable to handle task " + executionParameters, interruptedException);
+            throw new ActionExecutionException("Unable to handle task " + parameters, interruptedException);
         }
 
         return null;

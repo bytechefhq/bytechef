@@ -20,7 +20,7 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.DELETE;
@@ -50,7 +50,7 @@ public class HttpClientDeleteAction {
         .output(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .perform(HttpClientDeleteAction::performDelete);
 
-    public static Object performDelete(Context context, ExecutionParameters executionParameters) {
-        return HttpClientActionUtils.execute(context, executionParameters, RequestMethod.DELETE);
+    public static Object performDelete(Context context, Parameters parameters) {
+        return HttpClientActionUtils.execute(context, parameters, RequestMethod.DELETE);
     }
 }

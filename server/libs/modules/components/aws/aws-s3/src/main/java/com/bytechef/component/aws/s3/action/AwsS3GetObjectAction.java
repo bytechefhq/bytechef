@@ -19,7 +19,7 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AmazonS3Uri;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
@@ -55,8 +55,8 @@ public class AwsS3GetObjectAction {
         .output(fileEntry())
         .perform(AwsS3GetObjectAction::performGetObject);
 
-    public static FileEntry performGetObject(Context context, ExecutionParameters executionParameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(executionParameters.getRequiredString(URI));
+    public static FileEntry performGetObject(Context context, Parameters parameters) {
+        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(parameters.getRequiredString(URI));
 
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
@@ -65,7 +65,7 @@ public class AwsS3GetObjectAction {
 
         try (S3Client s3Client = builder.build()) {
             return context.storeFileContent(
-                executionParameters.getRequiredString(FILENAME),
+                parameters.getRequiredString(FILENAME),
                 s3Client.getObject(
                     GetObjectRequest.builder()
                         .bucket(bucketName)

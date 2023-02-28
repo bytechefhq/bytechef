@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
 
@@ -52,7 +52,7 @@ public class ScriptPythonAction {
         .output(oneOf())
         .perform(ScriptPythonAction::performPython);
 
-    public static Object performPython(Context context, ExecutionParameters executionParameters) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("python", executionParameters);
+    public static Object performPython(Context context, Parameters parameters) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("python", parameters);
     }
 }
