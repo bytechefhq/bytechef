@@ -45,7 +45,7 @@ public class AwsS3PresignGetObjectAction {
             .label("URI")
             .description("The AWS S3 uri.")
             .required(true))
-        .output(string())
+        .outputSchema(string())
         .perform(AwsS3PresignGetObjectAction::performGetPresignedObject);
 
     public static String performGetPresignedObject(Context context, Parameters parameters) {

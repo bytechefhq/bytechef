@@ -72,7 +72,7 @@ public class CreateIssueAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .output(object(null).properties(CreatedIssueProperties.PROPERTIES)
+        .outputSchema(object(null).properties(CreatedIssueProperties.PROPERTIES)
             .description("Details about a created issue or subtask.")
             .metadata(
                 Map.of(

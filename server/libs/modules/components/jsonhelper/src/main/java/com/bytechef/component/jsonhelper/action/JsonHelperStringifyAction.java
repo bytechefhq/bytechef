@@ -41,7 +41,7 @@ public class JsonHelperStringifyAction {
             .label("Source")
             .description("The data to convert to JSON string.")
             .required(true))
-        .output(string())
+        .outputSchema(string())
         .perform(JsonHelperStringifyAction::performStringify);
 
     public static String performStringify(Context context, Parameters parameters) {

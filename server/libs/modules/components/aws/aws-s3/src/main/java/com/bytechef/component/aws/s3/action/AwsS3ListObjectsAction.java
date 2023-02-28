@@ -58,7 +58,7 @@ public class AwsS3ListObjectsAction {
                 .label("Prefix")
                 .description("The prefix of an AWS S3 objects.")
                 .required(true))
-        .output(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
+        .outputSchema(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
         .perform(AwsS3ListObjectsAction::performListObjects);
 
     public static List<S3ObjectDescription> performListObjects(

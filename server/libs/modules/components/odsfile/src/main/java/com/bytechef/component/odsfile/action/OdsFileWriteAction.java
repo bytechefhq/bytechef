@@ -72,7 +72,7 @@ public class OdsFileWriteAction {
                 .description("The name of the sheet to create in the spreadsheet.")
                 .defaultValue("Sheet")
                 .advancedOption(true))
-        .output(fileEntry())
+        .outputSchema(fileEntry())
         .perform(OdsFileWriteAction::performWrite);
 
     public static FileEntry performWrite(Context context, Parameters parameters) {

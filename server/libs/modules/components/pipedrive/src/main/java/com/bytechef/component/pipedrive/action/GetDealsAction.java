@@ -105,7 +105,7 @@ public class GetDealsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output(object(null).properties(bool("success").label("Success")
+        .outputSchema(object(null).properties(bool("success").label("Success")
             .description("If the response is successful or not")
             .required(false),
             array("data").items(object(null).properties(integer("email_messages_count").label("Email_messages_count")

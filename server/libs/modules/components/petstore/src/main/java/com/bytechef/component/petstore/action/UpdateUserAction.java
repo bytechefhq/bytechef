@@ -56,7 +56,7 @@ public class UpdateUserAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .output(object(null).properties(UserProperties.PROPERTIES)
+        .outputSchema(object(null).properties(UserProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

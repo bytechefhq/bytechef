@@ -58,7 +58,7 @@ public class FilesystemWriteFileAction {
                 .description("The path to which the file should be written.")
                 .placeholder("/data/your_file.pdf")
                 .required(true))
-        .output(object().properties(integer("bytes")))
+        .outputSchema(object().properties(integer("bytes")))
         .perform(FilesystemWriteFileAction::performWriteFile);
 
     public static Map<String, Long> performWriteFile(Context context, Parameters parameters) {

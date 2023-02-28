@@ -52,7 +52,7 @@ public class HttpClientPatchAction {
                 //
 
                 HttpClientActionUtils.options(true)))
-        .output(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
+        .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .perform(HttpClientPatchAction::performPatch);
 
     public static Object performPatch(Context context, Parameters parameters) {

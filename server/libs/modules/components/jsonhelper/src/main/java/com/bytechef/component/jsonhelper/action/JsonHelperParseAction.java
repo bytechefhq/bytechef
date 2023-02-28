@@ -41,7 +41,7 @@ public class JsonHelperParseAction {
             .label("Source")
             .description("The JSON string to convert to the data.")
             .required(true))
-        .output(oneOf())
+        .outputSchema(oneOf())
         .perform(JsonHelperParseAction::performParse);
 
     public static Object performParse(Context context, Parameters parameters) {

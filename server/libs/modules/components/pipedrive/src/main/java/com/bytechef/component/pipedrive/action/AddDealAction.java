@@ -109,7 +109,7 @@ public class AddDealAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .output(object(null).properties(bool("success").label("Success")
+        .outputSchema(object(null).properties(bool("success").label("Success")
             .description("If the response is successful or not")
             .required(false),
             integer("email_messages_count").label("Email_messages_count")

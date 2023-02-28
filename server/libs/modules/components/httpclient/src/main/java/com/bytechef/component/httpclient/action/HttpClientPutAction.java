@@ -52,7 +52,7 @@ public class HttpClientPutAction {
                 //
 
                 HttpClientActionUtils.options(true)))
-        .output(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
+        .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .perform(HttpClientPutAction::performPut);
 
     public static Object performPut(Context context, Parameters parameters) {

@@ -1,22 +1,16 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -37,9 +31,9 @@ public class ActionDefinitionModel {
   @JsonProperty("name")
   private String name;
 
-  @JsonProperty("output")
+  @JsonProperty("outputSchema")
   @Valid
-  private List<PropertyModel> output = null;
+  private List<PropertyModel> outputSchema = null;
 
   @JsonProperty("properties")
   @Valid
@@ -57,7 +51,7 @@ public class ActionDefinitionModel {
    * Get display
    * @return display
   */
-  @Valid 
+  @Valid
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public DisplayModel getDisplay() {
     return display;
@@ -76,7 +70,7 @@ public class ActionDefinitionModel {
    * The example of the action's output.
    * @return exampleOutput
   */
-  
+
   @Schema(name = "exampleOutput", description = "The example of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Object getExampleOutput() {
     return exampleOutput;
@@ -95,7 +89,7 @@ public class ActionDefinitionModel {
    * The action name.
    * @return name
   */
-  
+
   @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getName() {
     return name;
@@ -105,31 +99,31 @@ public class ActionDefinitionModel {
     this.name = name;
   }
 
-  public ActionDefinitionModel output(List<PropertyModel> output) {
-    this.output = output;
+  public ActionDefinitionModel outputSchema(List<PropertyModel> outputSchema) {
+    this.outputSchema = outputSchema;
     return this;
   }
 
-  public ActionDefinitionModel addOutputItem(PropertyModel outputItem) {
-    if (this.output == null) {
-      this.output = new ArrayList<>();
+  public ActionDefinitionModel addOutputSchemaItem(PropertyModel outputSchemaItem) {
+    if (this.outputSchema == null) {
+      this.outputSchema = new ArrayList<>();
     }
-    this.output.add(outputItem);
+    this.outputSchema.add(outputSchemaItem);
     return this;
   }
 
   /**
    * The output schema of an execution result.
-   * @return output
+   * @return outputSchema
   */
-  @Valid 
-  @Schema(name = "output", description = "The output schema of an execution result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getOutput() {
-    return output;
+  @Valid
+  @Schema(name = "outputSchema", description = "The output schema of an execution result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public List<PropertyModel> getOutputSchema() {
+    return outputSchema;
   }
 
-  public void setOutput(List<PropertyModel> output) {
-    this.output = output;
+  public void setOutputSchema(List<PropertyModel> outputSchema) {
+    this.outputSchema = outputSchema;
   }
 
   public ActionDefinitionModel properties(List<PropertyModel> properties) {
@@ -149,7 +143,7 @@ public class ActionDefinitionModel {
    * The list of action properties.
    * @return properties
   */
-  @Valid 
+  @Valid
   @Schema(name = "properties", description = "The list of action properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getProperties() {
     return properties;
@@ -168,7 +162,7 @@ public class ActionDefinitionModel {
    * Contains information required for a connection's authorization.
    * @return performFunction
   */
-  
+
   @Schema(name = "performFunction", description = "Contains information required for a connection's authorization.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Object getPerformFunction() {
     return performFunction;
@@ -190,14 +184,14 @@ public class ActionDefinitionModel {
     return Objects.equals(this.display, actionDefinition.display) &&
         Objects.equals(this.exampleOutput, actionDefinition.exampleOutput) &&
         Objects.equals(this.name, actionDefinition.name) &&
-        Objects.equals(this.output, actionDefinition.output) &&
+        Objects.equals(this.outputSchema, actionDefinition.outputSchema) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
         Objects.equals(this.performFunction, actionDefinition.performFunction);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, exampleOutput, name, output, properties, performFunction);
+    return Objects.hash(display, exampleOutput, name, outputSchema, properties, performFunction);
   }
 
   @Override
@@ -207,7 +201,7 @@ public class ActionDefinitionModel {
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    exampleOutput: ").append(toIndentedString(exampleOutput)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    output: ").append(toIndentedString(output)).append("\n");
+    sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    performFunction: ").append(toIndentedString(performFunction)).append("\n");
     sb.append("}");

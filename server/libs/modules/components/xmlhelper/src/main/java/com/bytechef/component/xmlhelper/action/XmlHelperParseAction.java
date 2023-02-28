@@ -43,7 +43,7 @@ public class XmlHelperParseAction {
             .label("Source")
             .description("The XML string to convert to the data.")
             .required(true))
-        .output(object())
+        .outputSchema(object())
         .perform(XmlHelperParseAction::performParse);
 
     public static Map<String, ?> performParse(Context context, Parameters parameters) {

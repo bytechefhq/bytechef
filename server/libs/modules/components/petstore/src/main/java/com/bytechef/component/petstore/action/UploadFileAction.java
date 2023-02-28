@@ -63,7 +63,7 @@ public class UploadFileAction {
             fileEntry("fileEntry").metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .output(object(null).properties(ApiResponseProperties.PROPERTIES)
+        .outputSchema(object(null).properties(ApiResponseProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

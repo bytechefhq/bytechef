@@ -13,7 +13,7 @@
         "requestMethod": "POST"
       },
       "name": "createIssue",
-      "output": [
+      "outputSchema": [
         {
           "description": "Details about a created issue or subtask.",
           "metadata": {
@@ -731,7 +731,7 @@
         "requestMethod": "GET"
       },
       "name": "getIssue",
-      "output": [
+      "outputSchema": [
         {
           "description": "Details about an issue.",
           "metadata": {
@@ -2119,7 +2119,7 @@
         "requestMethod": "GET"
       },
       "name": "searchForIssuesUsingJql",
-      "output": [
+      "outputSchema": [
         {
           "description": "The result of a JQL search.",
           "metadata": {

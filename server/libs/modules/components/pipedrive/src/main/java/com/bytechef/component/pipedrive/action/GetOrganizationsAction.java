@@ -85,7 +85,7 @@ public class GetOrganizationsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output(object(null)
+        .outputSchema(object(null)
             .properties(
                 object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
                     .description("Pagination start")

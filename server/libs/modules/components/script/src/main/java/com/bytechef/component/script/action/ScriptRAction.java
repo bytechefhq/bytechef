@@ -49,7 +49,7 @@ public class ScriptRAction {
                 .label("R code")
                 .description("Add your R custom logic here.")
                 .controlType(Property.ControlType.CODE))
-        .output(oneOf())
+        .outputSchema(oneOf())
         .perform(ScriptRAction::performR);
 
     public static Object performR(Context context, Parameters parameters) {

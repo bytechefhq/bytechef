@@ -48,7 +48,7 @@ public class ScriptRubyAction {
                 .label("Ruby code")
                 .description("Add your Ruby custom logic here.")
                 .controlType(Property.ControlType.CODE))
-        .output(oneOf())
+        .outputSchema(oneOf())
         .perform(ScriptRubyAction::performRuby);
 
     public static Object performRuby(Context context, Parameters parameters) {

@@ -50,7 +50,7 @@ public class DeleteLeadAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(object(null).properties(bool("success").label("Success")
+        .outputSchema(object(null).properties(bool("success").label("Success")
             .required(false),
             object("data").properties(string("id").label("Id")
                 .required(false))

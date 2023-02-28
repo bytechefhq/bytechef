@@ -46,7 +46,7 @@ public class HttpClientHeadAction {
             //
 
             HttpClientActionUtils.options(false)))
-        .output(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
+        .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .perform(HttpClientHeadAction::performHead);
 
     public static Object performHead(Context context, Parameters parameters) {

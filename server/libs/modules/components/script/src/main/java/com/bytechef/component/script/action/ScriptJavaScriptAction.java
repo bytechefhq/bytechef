@@ -49,7 +49,7 @@ public class ScriptJavaScriptAction {
                 .label("JavaScript code")
                 .description("Add your JavaScript custom logic here.")
                 .controlType(Property.ControlType.CODE))
-        .output(oneOf())
+        .outputSchema(oneOf())
         .perform(ScriptJavaScriptAction::performJavaScript);
 
     public static Object performJavaScript(Context context, Parameters parameters) {

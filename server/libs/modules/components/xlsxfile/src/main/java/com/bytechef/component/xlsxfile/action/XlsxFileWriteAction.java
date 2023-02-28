@@ -73,7 +73,7 @@ public class XlsxFileWriteAction {
                 .description("The name of the sheet to create in the spreadsheet.")
                 .defaultValue("Sheet")
                 .advancedOption(true))
-        .output(fileEntry())
+        .outputSchema(fileEntry())
         .perform(XlsxFileWriteAction::performWrite);
 
     public static FileEntry performWrite(Context context, Parameters parameters) {

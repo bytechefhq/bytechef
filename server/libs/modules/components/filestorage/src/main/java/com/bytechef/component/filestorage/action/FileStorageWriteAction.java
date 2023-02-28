@@ -47,7 +47,7 @@ public class FileStorageWriteAction {
                 .description(
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
-        .output(fileEntry())
+        .outputSchema(fileEntry())
         .perform(FileStorageWriteAction::performWrite);
 
     public static FileEntry performWrite(Context context, Parameters parameters) {

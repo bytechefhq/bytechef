@@ -69,7 +69,7 @@ public class CsvFileWriteAction {
                     "Filename to set for binary data. By default, \"file.csv\" will be used.")
                 .defaultValue("file.csv")
                 .advancedOption(true))
-        .output(fileEntry())
+        .outputSchema(fileEntry())
         .perform(CsvFileWriteAction::performWrite);
 
     public static FileEntry performWrite(Context context, Parameters parameters) {

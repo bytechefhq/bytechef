@@ -52,7 +52,7 @@ public class AwsS3GetObjectAction {
                 .description("Filename to set for binary data.")
                 .required(true)
                 .defaultValue("file.xml"))
-        .output(fileEntry())
+        .outputSchema(fileEntry())
         .perform(AwsS3GetObjectAction::performGetObject);
 
     public static FileEntry performGetObject(Context context, Parameters parameters) {
