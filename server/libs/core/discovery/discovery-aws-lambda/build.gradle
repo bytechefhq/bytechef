@@ -1,0 +1,5 @@
+dependencies {
+    implementation "io.projectreactor:reactor-core"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.cloud:spring-cloud-commons"
+}
