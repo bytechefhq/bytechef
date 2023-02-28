@@ -1,0 +1,7 @@
+.openapi-generator-ignore
+apis/CategoriesApi.ts
+apis/index.ts
+index.ts
+models/CategoryModel.ts
+models/index.ts
+runtime.ts
