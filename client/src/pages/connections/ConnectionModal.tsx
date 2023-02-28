@@ -10,7 +10,10 @@ import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
 } from '../../queries/componentDefinitions';
-import {ComponentDefinitionBasicModel} from '../../middleware/definition-registry';
+import {
+    AuthorizationModel,
+    ComponentDefinitionBasicModel,
+} from '../../middleware/definition-registry';
 import {ConnectionModel, TagModel} from '../../middleware/connection';
 import FilterableSelect, {
     SelectOption,
@@ -25,6 +28,20 @@ import {useGetConnectionDefinitionQuery} from '../../queries/connectionDefinitio
 import NativeSelect from '../../components/NativeSelect/NativeSelect';
 import Properties from '../../components/Properties/Properties';
 import {timeout} from 'd3-timer';
+import useOAuth2 from './oauth2/useOAuth2';
+import {UseFormHandleSubmit} from 'react-hook-form/dist/types/form';
+
+interface FormProps {
+    authorizationName: string;
+    componentName: SelectOption;
+    name: string;
+    parameters: {[key: string]: object};
+    tags: TagModel[];
+}
+
+interface OAuth2ButtonProps {
+    handleSubmit: UseFormHandleSubmit<FormProps>;
+}
 
 const ConnectionModal = () => {
     const [authorizationName, setAuthorizationName] = useState<string>();
@@ -75,19 +92,14 @@ const ConnectionModal = () => {
 
     const {
         control,
+        formState,
         formState: {errors, touchedFields},
         handleSubmit,
         getValues,
         register,
         setValue,
         reset,
-    } = useForm<{
-        authorizationName: string;
-        componentName: SelectOption;
-        name: string;
-        parameters: {[key: string]: object};
-        tags: TagModel[];
-    }>({
+    } = useForm<FormProps>({
         defaultValues: {
             authorizationName: '',
             componentName: undefined,
@@ -101,6 +113,37 @@ const ConnectionModal = () => {
         connectionDefinition &&
         connectionDefinition?.authorizations &&
         connectionDefinition.authorizations.length > 0;
+
+    const authorizationOptions: SelectOption[] =
+        connectionDefinition && connectionDefinition.authorizations
+            ? [
+                  ...(connectionDefinition.authorizationRequired === false
+                      ? [{label: 'None', value: ''}]
+                      : []),
+                  ...connectionDefinition.authorizations.map(
+                      (authorization) => ({
+                          label: authorization?.display?.label as string,
+                          value: authorization.name as string,
+                      })
+                  ),
+              ]
+            : [];
+
+    const propertiesExists =
+        !connectionDefinitionIsLoading &&
+        connectionDefinition &&
+        connectionDefinition?.properties &&
+        connectionDefinition.properties.length > 0;
+
+    const isOAuth2AuthorizationType =
+        connectionDefinition &&
+        connectionDefinition.authorizations &&
+        authorizationName &&
+        [
+            'OAUTH2_AUTHORIZATION_CODE',
+            'OAUTH2_AUTHORIZATION_CODE_PKCE',
+            'OAUTH2_IMPLICIT_CODE',
+        ].includes(getAuthorizationType());
 
     function closeForm() {
         setIsOpen(false);
@@ -129,18 +172,21 @@ const ConnectionModal = () => {
         mutation.mutate(connectionModel);
     }
 
-    let authorizationOptions: SelectOption[] = [];
+    function getAuthorizationType(): string {
+        let authorizationType = '';
 
-    if (connectionDefinition && connectionDefinition.authorizations) {
-        authorizationOptions = [
-            ...(!connectionDefinition.authorizationRequired
-                ? [{label: 'None', value: ''}]
-                : []),
-            ...connectionDefinition.authorizations.map((authorization) => ({
-                label: authorization?.display?.label as string,
-                value: authorization.name as string,
-            })),
-        ];
+        if (connectionDefinition && connectionDefinition.authorizations) {
+            const authorization: AuthorizationModel =
+                connectionDefinition.authorizations.filter(
+                    (authorization) => authorization.name === authorizationName
+                )[0];
+
+            if (authorization) {
+                authorizationType = authorization.type!;
+            }
+        }
+
+        return authorizationType;
     }
 
     return (
@@ -212,6 +258,14 @@ const ConnectionModal = () => {
                 {...register('name', {required: true})}
             />
 
+            {propertiesExists && (
+                <Properties
+                    formState={formState}
+                    properties={connectionDefinition?.properties}
+                    register={register}
+                />
+            )}
+
             {authorizationsExists && (
                 <NativeSelect
                     error={
@@ -221,48 +275,30 @@ const ConnectionModal = () => {
                     label="Authorization"
                     options={authorizationOptions}
                     placeholder="Select..."
-                    {...register('authorizationName')}
-                    onValueChange={setAuthorizationName}
+                    {...register('authorizationName', {
+                        required:
+                            connectionDefinition?.authorizationRequired ===
+                                true ||
+                            connectionDefinition?.authorizationRequired ===
+                                undefined,
+                        onChange: (event) =>
+                            setAuthorizationName(event.target.value),
+                    })}
                 />
             )}
 
             {authorizationsExists && authorizationName && (
-                <fieldset className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Authorization
-                    </label>
-
-                    <div className="mt-1 pl-3">
-                        <Properties
-                            properties={
-                                connectionDefinition?.authorizations?.filter(
-                                    (authorization) =>
-                                        authorization.name === authorizationName
-                                )[0]?.properties
-                            }
-                            register={register}
-                        />
-                    </div>
-                </fieldset>
+                <Properties
+                    formState={formState}
+                    properties={
+                        connectionDefinition?.authorizations?.filter(
+                            (authorization) =>
+                                authorization.name === authorizationName
+                        )[0]?.properties
+                    }
+                    register={register}
+                />
             )}
-
-            {!connectionDefinitionIsLoading &&
-                connectionDefinition &&
-                connectionDefinition?.properties &&
-                connectionDefinition.properties.length > 0 && (
-                    <fieldset className="mb-3">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Properties
-                        </label>
-
-                        <div className="mt-1 pl-3">
-                            <Properties
-                                properties={connectionDefinition.properties}
-                                register={register}
-                            />
-                        </div>
-                    </fieldset>
-                )}
 
             {!tagsIsLoading && (
                 <Controller
@@ -298,14 +334,91 @@ const ConnectionModal = () => {
                 />
             )}
 
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-end space-x-1">
                 <Button
-                    label="Create"
-                    onClick={handleSubmit(createConnection)}
-                    type="submit"
+                    displayType="lightBorder"
+                    label="Cancel"
+                    type="button"
+                    onClick={closeForm}
                 />
+
+                {isOAuth2AuthorizationType ? (
+                    <OAuth2Button handleSubmit={handleSubmit} />
+                ) : (
+                    <Button
+                        label="Create"
+                        onClick={handleSubmit(createConnection)}
+                        type="submit"
+                    />
+                )}
             </div>
         </Modal>
+    );
+};
+
+const LoadingIcon = (): JSX.Element => (
+    <svg
+        className="-ml-1 mr-1 h-4 w-4 animate-spin text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+    >
+        <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+        ></circle>
+        <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+    </svg>
+);
+
+const OAuth2Button = ({handleSubmit}: OAuth2ButtonProps) => {
+    const {data, loading, error, getAuth} = useOAuth2({
+        authorizeUrl: 'https://login.mailchimp.com/oauth2/authorize',
+        clientId: '344111396868',
+        redirectUri: `${document.location.origin}/callback`,
+        scope: '',
+        responseType: 'code',
+        exchangeCodeForTokenServerURL: 'http://localhost:5173/token',
+        exchangeCodeForTokenMethod: 'POST',
+        onSuccess: (payload) => console.log('Success', payload),
+        onError: (error_) => console.log('Error', error_),
+    });
+
+    const isLoggedIn = Boolean(data?.access_token); // or whatever...
+
+    if (error) {
+        return <div>Error</div>;
+    }
+
+    if (loading) {
+        return (
+            <Button
+                icon={<LoadingIcon />}
+                iconPosition="left"
+                label="Creating..."
+                type="button"
+            />
+        );
+    }
+
+    if (isLoggedIn) {
+        return <pre>{JSON.stringify(data)}</pre>;
+    }
+
+    return (
+        <Button
+            label="Create"
+            onClick={handleSubmit(() => getAuth())}
+            type="submit"
+        />
     );
 };
 
