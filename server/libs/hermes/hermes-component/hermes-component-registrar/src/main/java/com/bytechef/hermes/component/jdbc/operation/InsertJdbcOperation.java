@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.jdbc.operation;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import java.util.Arrays;
@@ -38,12 +38,12 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, ExecutionParameters executionParameters) {
-        List<String> columns = executionParameters.getList(JdbcConstants.COLUMNS, String.class, List.of());
+    public Map<String, Integer> execute(Context context, Parameters parameters) {
+        List<String> columns = parameters.getList(JdbcConstants.COLUMNS, String.class, List.of());
         @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) executionParameters.getList(JdbcConstants.ROWS, Map.class, List.of());
-        String schema = executionParameters.getString(JdbcConstants.SCHEMA, "public");
-        String table = executionParameters.getRequiredString(JdbcConstants.TABLE);
+        List<Map<String, ?>> rows = (List) parameters.getList(JdbcConstants.ROWS, Map.class, List.of());
+        String schema = parameters.getString(JdbcConstants.SCHEMA, "public");
+        String table = parameters.getRequiredString(JdbcConstants.TABLE);
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
             context.getConnection(),

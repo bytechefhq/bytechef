@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.XmlUtils;
@@ -83,13 +83,13 @@ public class XmlFileReadAction {
             object().displayOption(show(IS_ARRAY, false)))
         .perform(XmlFileReadAction::performRead);
 
-    public static Object performRead(Context context, ExecutionParameters executionParameters) {
-        FileEntry fileEntry = executionParameters.get(FILE_ENTRY, FileEntry.class);
-        boolean isArray = executionParameters.getBoolean(IS_ARRAY, true);
+    public static Object performRead(Context context, Parameters parameters) {
+        FileEntry fileEntry = parameters.get(FILE_ENTRY, FileEntry.class);
+        boolean isArray = parameters.getBoolean(IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = executionParameters.getString(PATH);
+            String path = parameters.getString(PATH);
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
@@ -101,8 +101,8 @@ public class XmlFileReadAction {
                 items = XmlUtils.read(inputStream, path, new TypeReference<>() {});
             }
 
-            Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
-            Integer pageNumber = executionParameters.getInteger(PAGE_NUMBER);
+            Integer pageSize = parameters.getInteger(PAGE_SIZE);
+            Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 

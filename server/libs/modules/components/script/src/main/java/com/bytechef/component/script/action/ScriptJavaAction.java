@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
 
@@ -52,7 +52,7 @@ public class ScriptJavaAction {
         .output(oneOf())
         .perform(ScriptJavaAction::performJava);
 
-    public static Object performJava(Context context, ExecutionParameters executionParameters) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("java", executionParameters);
+    public static Object performJava(Context context, Parameters parameters) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("java", parameters);
     }
 }

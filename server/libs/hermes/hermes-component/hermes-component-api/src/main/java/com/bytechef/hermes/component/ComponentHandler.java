@@ -33,11 +33,11 @@ public interface ComponentHandler extends ComponentDefinitionFactory {
      *
      * @param actionDefinition
      * @param context
-     * @param executionParameters
+     * @param parameters
      * @return the result of execution
      * @throws ActionExecutionException
      */
-    default Object handle(ActionDefinition actionDefinition, Context context, ExecutionParameters executionParameters)
+    default Object handle(ActionDefinition actionDefinition, Context context, Parameters parameters)
         throws ActionExecutionException {
 
         return null;

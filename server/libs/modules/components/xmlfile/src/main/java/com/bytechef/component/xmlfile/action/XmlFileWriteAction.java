@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
@@ -65,8 +65,8 @@ public class XmlFileWriteAction {
         .output(fileEntry())
         .perform(XmlFileWriteAction::performWrite);
 
-    public static FileEntry performWrite(Context context, ExecutionParameters executionParameters) {
-        Object source = executionParameters.getRequired(SOURCE);
+    public static FileEntry performWrite(Context context, Parameters parameters) {
+        Object source = parameters.getRequired(SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -76,12 +76,12 @@ public class XmlFileWriteAction {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                executionParameters.getString(FILENAME) == null
+                parameters.getString(FILENAME) == null
                     ? "file.xml"
-                    : executionParameters.getString(FILENAME),
+                    : parameters.getString(FILENAME),
                 inputStream);
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to handle task " + executionParameters, ioException);
+            throw new ActionExecutionException("Unable to handle task " + parameters, ioException);
         }
     }
 }

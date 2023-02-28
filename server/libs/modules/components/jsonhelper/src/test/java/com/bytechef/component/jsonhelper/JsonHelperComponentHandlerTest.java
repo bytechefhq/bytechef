@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.component.jsonhelper.action.JsonHelperParseAction;
 import com.bytechef.component.jsonhelper.action.JsonHelperStringifyAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
@@ -45,21 +45,21 @@ public class JsonHelperComponentHandlerTest {
 
     @Test
     public void testPerformParse() {
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn("""
                 {
                     "key": 3
                 }
                 """);
 
-        assertThat(JsonHelperParseAction.performParse(context, executionParameters))
+        assertThat(JsonHelperParseAction.performParse(context, parameters))
             .isEqualTo(Map.of("key", 3));
 
-        executionParameters = Mockito.mock(ExecutionParameters.class);
+        parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(
                 """
                     [
@@ -69,20 +69,20 @@ public class JsonHelperComponentHandlerTest {
                     ]
                     """);
 
-        assertThat(JsonHelperParseAction.performParse(context, executionParameters))
+        assertThat(JsonHelperParseAction.performParse(context, parameters))
             .isEqualTo(List.of(Map.of("key", 3)));
     }
 
     @Test
     public void testPerformStringify() {
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         Map<String, Integer> input = Map.of("key", 3);
 
-        Mockito.when(executionParameters.getRequired(SOURCE))
+        Mockito.when(parameters.getRequired(SOURCE))
             .thenReturn(Map.of("key", 3));
 
-        assertThat(JsonHelperStringifyAction.performStringify(context, executionParameters))
+        assertThat(JsonHelperStringifyAction.performStringify(context, parameters))
             .isEqualTo(JsonUtils.write(input));
     }
 }

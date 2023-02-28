@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -51,5 +51,5 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      *
      * @return an optional perform function implementation
      */
-    Optional<BiFunction<Context, ExecutionParameters, Object>> getPerformFunction();
+    Optional<BiFunction<Context, Parameters, Object>> getPerformFunction();
 }

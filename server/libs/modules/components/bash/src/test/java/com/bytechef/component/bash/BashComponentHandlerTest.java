@@ -22,7 +22,7 @@ package com.bytechef.component.bash;
 import com.bytechef.component.bash.action.BashExecuteAction;
 import com.bytechef.component.bash.constant.BashConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,16 +41,16 @@ public class BashComponentHandlerTest {
 
     @Test
     public void testPerformExecute() {
-        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(executionParameters.getRequiredString(BashConstants.SCRIPT))
+        Mockito.when(parameters.getRequiredString(BashConstants.SCRIPT))
             .thenReturn("ls -l "
                 + BashComponentHandlerTest.class
                     .getClassLoader()
                     .getResource("dependencies/test.txt")
                     .getFile());
 
-        String output = BashExecuteAction.performExecute(Mockito.mock(Context.class), executionParameters);
+        String output = BashExecuteAction.performExecute(Mockito.mock(Context.class), parameters);
 
         Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
     }

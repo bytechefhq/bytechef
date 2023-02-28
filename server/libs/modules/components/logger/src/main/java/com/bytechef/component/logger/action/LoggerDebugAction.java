@@ -18,7 +18,7 @@
 package com.bytechef.component.logger.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +41,8 @@ public class LoggerDebugAction {
         .properties(string(TEXT))
         .perform(LoggerDebugAction::performDebug);
 
-    public static Object performDebug(Context context, ExecutionParameters executionParameters) {
-        logger.debug(executionParameters.getString(TEXT));
+    public static Object performDebug(Context context, Parameters parameters) {
+        logger.debug(parameters.getString(TEXT));
 
         return null;
     }

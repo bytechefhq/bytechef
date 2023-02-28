@@ -19,7 +19,7 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AmazonS3Uri;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -62,14 +62,14 @@ public class AwsS3PutObjectAction {
         .output(string())
         .perform(AwsS3PutObjectAction::performPutObject);
 
-    public static Object performPutObject(Context context, ExecutionParameters executionParameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(executionParameters.getRequiredString(URI));
+    public static Object performPutObject(Context context, Parameters parameters) {
+        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(parameters.getRequiredString(URI));
 
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
         S3ClientBuilder builder = S3Client.builder();
-        FileEntry fileEntry = executionParameters.get(FILE_ENTRY, FileEntry.class);
+        FileEntry fileEntry = parameters.get(FILE_ENTRY, FileEntry.class);
 
         try (S3Client s3Client = builder.build()) {
             Path tempFilePath = Files.createTempFile("", ".tmp");
@@ -81,8 +81,8 @@ public class AwsS3PutObjectAction {
                     .bucket(bucketName)
                     .key(key)
                     .acl(
-                        executionParameters.getString(ACL) != null
-                            ? ObjectCannedACL.fromValue(executionParameters.getString(ACL))
+                        parameters.getString(ACL) != null
+                            ? ObjectCannedACL.fromValue(parameters.getString(ACL))
                             : null)
                     .build(),
                 tempFilePath);

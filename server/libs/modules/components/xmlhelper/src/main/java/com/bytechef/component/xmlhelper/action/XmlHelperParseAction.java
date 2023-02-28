@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.XmlUtils;
 
@@ -46,8 +46,8 @@ public class XmlHelperParseAction {
         .output(object())
         .perform(XmlHelperParseAction::performParse);
 
-    public static Map<String, ?> performParse(Context context, ExecutionParameters executionParameters) {
-        String source = executionParameters.getRequiredString(SOURCE);
+    public static Map<String, ?> performParse(Context context, Parameters parameters) {
+        String source = parameters.getRequiredString(SOURCE);
 
         return XmlUtils.read(source);
     }

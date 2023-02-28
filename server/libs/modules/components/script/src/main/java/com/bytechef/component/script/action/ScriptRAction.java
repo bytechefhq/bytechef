@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
 
@@ -52,7 +52,7 @@ public class ScriptRAction {
         .output(oneOf())
         .perform(ScriptRAction::performR);
 
-    public static Object performR(Context context, ExecutionParameters executionParameters) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("R", executionParameters);
+    public static Object performR(Context context, Parameters parameters) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("R", parameters);
     }
 }
