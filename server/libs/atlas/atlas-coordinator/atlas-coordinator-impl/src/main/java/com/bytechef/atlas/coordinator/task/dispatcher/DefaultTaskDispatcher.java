@@ -27,12 +27,17 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import java.util.List;
 import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
  */
 public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultTaskDispatcher.class);
 
     private final MessageBroker messageBroker;
     private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
@@ -55,10 +60,18 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
         }
 
-        messageBroker.send(calculateRoutingKey(taskExecution), taskExecution);
+        String queueName = calculateQueueName(taskExecution);
+
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Task id={}, type='{}' sent to queueName='{}'", taskExecution.getId(), taskExecution.getType(),
+                queueName);
+        }
+
+        messageBroker.send(queueName, taskExecution);
     }
 
-    private String calculateRoutingKey(Task task) {
+    private String calculateQueueName(Task task) {
         TaskExecution taskExecution = (TaskExecution) task;
 
         return taskExecution.getNode() != null ? taskExecution.getNode() : DEFAULT_QUEUE;

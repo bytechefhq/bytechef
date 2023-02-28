@@ -133,6 +133,14 @@ public class WorkflowTask implements Serializable {
         }
     }
 
+    public static WorkflowTask of(String type) {
+        WorkflowTask workflowTask = new WorkflowTask();
+
+        workflowTask.type = type;
+
+        return workflowTask;
+    }
+
     /**
      * Creates a {@link WorkflowTask} instance for the given Key-Value pair.
      *
@@ -146,6 +154,14 @@ public class WorkflowTask implements Serializable {
         } else {
             return new WorkflowTask(Map.of(WorkflowConstants.PARAMETERS, Collections.singletonMap(key, value)));
         }
+    }
+
+    public static WorkflowTask of(String type, String key, Object value) {
+        WorkflowTask workflowTask = of(key, value);
+
+        workflowTask.type = type;
+
+        return workflowTask;
     }
 
     @Override
