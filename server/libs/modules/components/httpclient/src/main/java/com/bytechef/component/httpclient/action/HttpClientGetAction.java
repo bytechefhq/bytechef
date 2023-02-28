@@ -52,7 +52,7 @@ public class HttpClientGetAction {
                 //
 
                 HttpClientConstants.COMMON_PROPERTIES))
-        .output(
+        .outputSchema(
             oneOf()
                 .types(array(), object())
                 .displayOption(

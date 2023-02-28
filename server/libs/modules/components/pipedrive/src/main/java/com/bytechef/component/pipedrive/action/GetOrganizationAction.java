@@ -52,7 +52,7 @@ public class GetOrganizationAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(
+        .outputSchema(
             object(null)
                 .properties(object("additional_data").properties(object("followers").properties(string("name")
                     .label("Name")

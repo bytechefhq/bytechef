@@ -67,7 +67,7 @@ public class AddOrganizationAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .output(object(null).properties(string("address_route").label("Address_route")
+        .outputSchema(object(null).properties(string("address_route").label("Address_route")
             .description("The route of the organization location")
             .required(false),
             integer("related_closed_deals_count").label("Related_closed_deals_count")

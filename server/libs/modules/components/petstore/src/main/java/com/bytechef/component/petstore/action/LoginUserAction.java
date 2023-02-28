@@ -54,7 +54,7 @@ public class LoginUserAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output(string(null).metadata(
+        .outputSchema(string(null).metadata(
             Map.of(
                 "responseFormat", ResponseFormat.TEXT)));
 }

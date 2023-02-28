@@ -122,7 +122,7 @@ public class OpenApiClient {
 
     private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
         ResponseFormat responseFormat = null;
-        List<Property<?>> outputProperties = actionDefinition.getOutput();
+        List<Property<?>> outputProperties = actionDefinition.getOutputSchema();
 
         if (outputProperties != null && !outputProperties.isEmpty()) {
             Property<?> property = outputProperties.get(0);

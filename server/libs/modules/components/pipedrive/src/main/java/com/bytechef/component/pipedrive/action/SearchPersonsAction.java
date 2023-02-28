@@ -100,7 +100,7 @@ public class SearchPersonsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output(
+        .outputSchema(
             object(
                 null)
                     .properties(

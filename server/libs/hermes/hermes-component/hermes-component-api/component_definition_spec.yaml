@@ -20,7 +20,7 @@ schemas:
       name:
         description: The action name.
         type: string
-      output:
+      outputSchema:
         description: The output schema of an execution result.
         type: array
         items:

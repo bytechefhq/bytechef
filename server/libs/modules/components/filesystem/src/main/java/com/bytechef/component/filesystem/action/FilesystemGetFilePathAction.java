@@ -45,7 +45,7 @@ public class FilesystemGetFilePathAction {
             .placeholder("/data/your_file.pdf")
             .required(true))
         .perform(FilesystemGetFilePathAction::performGetFilePath)
-        .output(string())
+        .outputSchema(string())
         .exampleOutput("/data");
 
     /**

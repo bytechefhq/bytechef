@@ -4,7 +4,7 @@
     "label": "Loop"
   },
   "name": "loop",
-  "output": [
+  "outputSchema": [
     {
       "name": "item",
       "type": "ONE_OF",

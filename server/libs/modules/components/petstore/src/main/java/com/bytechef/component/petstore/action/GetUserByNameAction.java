@@ -50,7 +50,7 @@ public class GetUserByNameAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(object(null).properties(UserProperties.PROPERTIES)
+        .outputSchema(object(null).properties(UserProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

@@ -6,7 +6,7 @@
         "label": "Java"
       },
       "name": "java",
-      "output": [
+      "outputSchema": [
         {
           "type": "ONE_OF",
           "types": [
@@ -90,7 +90,7 @@
         "label": "JavaScript"
       },
       "name": "javascript",
-      "output": [
+      "outputSchema": [
         {
           "type": "ONE_OF",
           "types": [
@@ -174,7 +174,7 @@
         "label": "Python"
       },
       "name": "python",
-      "output": [
+      "outputSchema": [
         {
           "type": "ONE_OF",
           "types": [
@@ -258,7 +258,7 @@
         "label": "R"
       },
       "name": "r",
-      "output": [
+      "outputSchema": [
         {
           "type": "ONE_OF",
           "types": [
@@ -342,7 +342,7 @@
         "label": "Ruby"
       },
       "name": "ruby",
-      "output": [
+      "outputSchema": [
         {
           "type": "ONE_OF",
           "types": [

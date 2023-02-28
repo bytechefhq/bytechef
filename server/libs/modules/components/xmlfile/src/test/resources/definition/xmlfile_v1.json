@@ -6,7 +6,7 @@
                 "label": "Read from file"
             },
             "name": "read",
-            "output": [
+            "outputSchema": [
                 {
                     "displayOption": {
                         "show": {
@@ -116,7 +116,7 @@
                 "label": "Write to file"
             },
             "name": "write",
-            "output": [
+            "outputSchema": [
                 {
                     "type": "OBJECT",
                     "objectType": "FILE_ENTRY",

@@ -12,7 +12,7 @@
         "bodyContentType": "JSON"
       },
       "name": "addPet",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -238,7 +238,7 @@
         "bodyContentType": "JSON"
       },
       "name": "updatePet",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -462,7 +462,7 @@
         "requestMethod": "GET"
       },
       "name": "findPetsByStatus",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -610,7 +610,7 @@
         "requestMethod": "GET"
       },
       "name": "findPetsByTags",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -783,7 +783,7 @@
         "requestMethod": "GET"
       },
       "name": "getPetById",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -956,7 +956,7 @@
         "bodyContentType": "BINARY"
       },
       "name": "uploadFile",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1047,7 +1047,7 @@
         "requestMethod": "GET"
       },
       "name": "getInventory",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1074,7 +1074,7 @@
         "bodyContentType": "JSON"
       },
       "name": "placeOrder",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1240,7 +1240,7 @@
         "requestMethod": "GET"
       },
       "name": "getOrderById",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1330,7 +1330,7 @@
         "bodyContentType": "JSON"
       },
       "name": "createUser",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1479,7 +1479,7 @@
         "bodyContentType": "JSON"
       },
       "name": "createUsersWithListInput",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1637,7 +1637,7 @@
         "requestMethod": "GET"
       },
       "name": "loginUser",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "TEXT"
@@ -1713,7 +1713,7 @@
         "requestMethod": "GET"
       },
       "name": "getUserByName",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1805,7 +1805,7 @@
         "bodyContentType": "JSON"
       },
       "name": "updateUser",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"

@@ -41,7 +41,7 @@ public class FileStorageReadAction {
             .description(
                 "The object property which contains a reference to the file to read from.")
             .required(true))
-        .output(string())
+        .outputSchema(string())
         .perform(FileStorageReadAction::performRead);
 
     public static String performRead(Context context, Parameters parameters) {

@@ -11,7 +11,7 @@
         "label": "Get Object"
       },
       "name": "getObject",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "objectType": "FILE_ENTRY",
@@ -63,7 +63,7 @@
         "label": "Get URL"
       },
       "name": "getUrl",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }
@@ -84,7 +84,7 @@
         "label": "List Objects"
       },
       "name": "listObjects",
-      "output": [
+      "outputSchema": [
         {
           "type": "ARRAY",
           "items": [
@@ -131,7 +131,7 @@
         "label": "Get Pre-signed Object"
       },
       "name": "presignGetObject",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }
@@ -152,7 +152,7 @@
         "label": "Put Object"
       },
       "name": "putObject",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }

@@ -94,7 +94,7 @@ public class JsonFileReadAction {
                 .description("The page number to get.")
                 .displayOption(show(IS_ARRAY, true))
                 .advancedOption(true))
-        .output(
+        .outputSchema(
             array().displayOption(show(IS_ARRAY, true)),
             object().displayOption(show(IS_ARRAY, false)))
         .perform(JsonFileReadAction::performRead);

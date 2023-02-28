@@ -59,7 +59,7 @@ public class AwsS3PutObjectAction {
                 .required(true),
             string(ACL).label("ACL")
                 .description("The canned ACL to apply to the object."))
-        .output(string())
+        .outputSchema(string())
         .perform(AwsS3PutObjectAction::performPutObject);
 
     public static Object performPutObject(Context context, Parameters parameters) {

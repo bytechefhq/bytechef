@@ -62,7 +62,7 @@ public class XmlFileWriteAction {
                 .required(true)
                 .defaultValue("file.xml")
                 .advancedOption(true))
-        .output(fileEntry())
+        .outputSchema(fileEntry())
         .perform(XmlFileWriteAction::performWrite);
 
     public static FileEntry performWrite(Context context, Parameters parameters) {

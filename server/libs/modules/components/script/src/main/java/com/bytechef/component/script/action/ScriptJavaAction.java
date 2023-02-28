@@ -49,7 +49,7 @@ public class ScriptJavaAction {
                 .label("Java code")
                 .description("Add your Java custom logic here.")
                 .controlType(Property.ControlType.CODE))
-        .output(oneOf())
+        .outputSchema(oneOf())
         .perform(ScriptJavaAction::performJava);
 
     public static Object performJava(Context context, Parameters parameters) {
