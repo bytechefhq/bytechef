@@ -73,7 +73,6 @@
             <Class name="com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.loop.LoopTaskDispatcher" />
             <Class name="com.bytechef.hermes.component.util.HttpClientUtils" />
-            <Class name="com.bytechef.hermes.component.util.HttpClientUtils$HttpResponseEntry" />
             <Class name="com.bytechef.component.jsonfile.JsonFileComponentHandler" />
             <Class name="com.bytechef.component.xmlfile.XmlFileComponentHandler" />
             <Class name="com.bytechef.component.object.helper.ObjectHelperComponentHandler" />
@@ -125,7 +124,6 @@
             <Class name="com.bytechef.hermes.component.definition.ActionDefinition" />
             <Class name="com.bytechef.hermes.description.ext.domain.ExtDescriptor" />
             <Class name="com.bytechef.hermes.component.util.HttpClientUtils" />
-            <Class name="com.bytechef.hermes.component.util.HttpClientUtils$HttpResponseEntry" />
             <Class name="com.bytechef.atlas.event.WorkflowEvent" />
             <Class name="com.bytechef.hermes.connection.domain.Connection" />
             <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties" />

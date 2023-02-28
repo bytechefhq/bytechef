@@ -122,14 +122,6 @@ public final class HttpClientUtils {
         return configuration;
     }
 
-    public static Configuration fullResponse(boolean fullResponse) {
-        Configuration configuration = new Configuration();
-
-        configuration.fullResponse = fullResponse;
-
-        return configuration;
-    }
-
     public static Configuration proxy(String proxy) {
         Configuration configuration = new Configuration();
 
@@ -288,17 +280,21 @@ public final class HttpClientUtils {
         return httpRequestBuilder.build();
     }
 
-    static Object handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration)
+    static Response handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration)
         throws Exception {
 
-        Object body = null;
+        Response response;
         HttpHeaders httpHeaders = httpResponse.headers();
 
         Map<String, List<String>> headersMap = httpHeaders.map();
 
-        if (configuration.getResponseFormat() != null) {
+        if (configuration.getResponseFormat() == null) {
+            response = new Response(null, headersMap, httpResponse.statusCode());
+        } else {
             Object httpResponseBody = httpResponse.body();
             ResponseFormat responseFormat = configuration.getResponseFormat();
+
+            Object body;
 
             if (!ObjectUtils.isEmpty(httpResponseBody) && responseFormat == ResponseFormat.BINARY) {
                 body = storeBinaryResponseBody(context, configuration, headersMap, (InputStream) httpResponseBody);
@@ -310,17 +306,13 @@ public final class HttpClientUtils {
                 body = ObjectUtils.isEmpty(httpResponseBody) ? null : XmlUtils.read(httpResponseBody.toString());
             }
 
-            if (configuration.isFullResponse()) {
-                body = new HttpResponseEntry(body, headersMap, httpResponse.statusCode());
-            }
-        } else if (configuration.isFullResponse()) {
-            body = new HttpResponseEntry(null, headersMap, httpResponse.statusCode());
+            response = new Response(body, headersMap, httpResponse.statusCode());
         }
 
-        return body;
+        return response;
     }
 
-    private static Object execute(
+    private static Response execute(
         Context context, String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
         Payload payload, Configuration configuration, RequestMethod requestMethod) throws Exception {
 
@@ -474,7 +466,7 @@ public final class HttpClientUtils {
     @SuppressFBWarnings({
         "EI", "EI2"
     })
-    public record HttpResponseEntry(Object body, Map<String, List<String>> headers, int statusCode) {
+    public record Response(Object body, Map<String, List<String>> headers, int statusCode) {
 
     }
 
@@ -484,7 +476,6 @@ public final class HttpClientUtils {
         private String filename;
         private boolean followAllRedirects;
         private boolean followRedirect;
-        private boolean fullResponse;
         private String proxy;
         private ResponseFormat responseFormat;
         private Duration timeout = Duration.ofMillis(1000);
@@ -516,12 +507,6 @@ public final class HttpClientUtils {
 
         public Configuration followRedirect(boolean followRedirect) {
             this.followRedirect = followRedirect;
-
-            return this;
-        }
-
-        public Configuration fullResponse(boolean fullResponse) {
-            this.fullResponse = fullResponse;
 
             return this;
         }
@@ -570,10 +555,6 @@ public final class HttpClientUtils {
 
         public Duration getTimeout() {
             return timeout;
-        }
-
-        public boolean isFullResponse() {
-            return fullResponse;
         }
     }
 
@@ -666,11 +647,10 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Object execute() {
+        public Response execute() {
             try {
                 return HttpClientUtils.execute(
-                    ContextThreadLocal.get(), url, headers, queryParameters, payload, configuration,
-                    requestMethod);
+                    ContextThreadLocal.get(), url, headers, queryParameters, payload, configuration, requestMethod);
             } catch (Exception e) {
                 throw new ActionExecutionException("Unable to execute HTTP request", e);
             }

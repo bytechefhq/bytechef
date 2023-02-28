@@ -368,7 +368,8 @@ public class HttpClientUtilsTest {
     @Test
     public void testHandleResponse() throws Exception {
         Assertions.assertNull(
-            HttpClientUtils.handleResponse(context, new TestHttpResponse(null), Configuration.configuration()));
+            HttpClientUtils.handleResponse(context, new TestHttpResponse(null), Configuration.configuration())
+                .body());
 
         //
 
@@ -381,7 +382,8 @@ public class HttpClientUtilsTest {
             fileEntry,
             HttpClientUtils.handleResponse(
                 context, new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY)));
+                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY))
+                .body());
 
         //
 
@@ -395,7 +397,8 @@ public class HttpClientUtilsTest {
                             "key1": "value1"
                         }
                         """),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.JSON)));
+                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                .body());
 
         //
 
@@ -403,7 +406,8 @@ public class HttpClientUtilsTest {
             "text",
             HttpClientUtils.handleResponse(
                 context, new TestHttpResponse("text"),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT)));
+                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT))
+                .body());
 
         //
 
@@ -420,12 +424,13 @@ public class HttpClientUtilsTest {
                         </root>
 
                         """),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.XML)));
+                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.XML))
+                .body());
 
         //
 
         Assertions.assertEquals(
-            new HttpClientUtils.HttpResponseEntry("text", Map.of(), 200),
+            new HttpClientUtils.Response("text", Map.of(), 200),
             HttpClientUtils.handleResponse(
                 context, new TestHttpResponse("text"),
                 HttpClientUtils.fullResponse(true)

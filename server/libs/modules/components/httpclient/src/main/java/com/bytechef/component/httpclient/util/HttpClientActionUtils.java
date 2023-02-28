@@ -20,6 +20,7 @@ package com.bytechef.component.httpclient.util;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
@@ -132,14 +133,13 @@ public class HttpClientActionUtils {
     public static Object execute(
         Context context, Parameters parameters, RequestMethod requestMethod) {
 
-        return exchange(
+        HttpClientUtils.Response response = exchange(
             parameters.getRequiredString(URI), requestMethod)
                 .configuration(
                     allowUnauthorizedCerts(parameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
                         .filename(parameters.getString(RESPONSE_FILENAME))
                         .followAllRedirects(parameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
                         .followRedirect(parameters.getBoolean(FOLLOW_REDIRECT, false))
-                        .fullResponse(parameters.getBoolean(FULL_RESPONSE, false))
                         .proxy(parameters.getString(PROXY))
                         .responseFormat(getResponseFormat(parameters))
                         .timeout(Duration.ofMillis(parameters.getInteger(TIMEOUT, 10000))))
@@ -147,6 +147,12 @@ public class HttpClientActionUtils {
                 .queryParameters(parameters.getMap(QUERY_PARAMETERS))
                 .payload(getPayload(parameters, getBodyContentType(parameters)))
                 .execute();
+
+        if (parameters.getBoolean(FULL_RESPONSE, false)) {
+            return response;
+        } else {
+            return response.body();
+        }
     }
 
     public static Property<?>[] toArray(List<Property<?>>... propertiesArray) {

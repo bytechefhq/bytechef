@@ -46,15 +46,15 @@ public class OpenApiClient {
 
     private static final String TYPE = "type";
 
-    public Object execute(ActionDefinition actionDefinition, Context context, TaskExecution taskExecution) {
+    public HttpClientUtils.Response execute(
+        ActionDefinition actionDefinition, Context context, TaskExecution taskExecution) {
         Map<String, Object> metadata = actionDefinition.getMetadata();
 
         return exchange(
             createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
             MapValueUtils.get(metadata, "requestMethod", RequestMethod.class))
                 .configuration(
-                    HttpClientUtils.responseFormat(getResponseFormat(actionDefinition))
-                        .fullResponse(true))
+                    HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
                 .headers(
                     getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
                 .payload(
