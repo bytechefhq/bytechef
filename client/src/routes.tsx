@@ -10,10 +10,15 @@ import Executions from './pages/executions/Executions';
 import {QueryClient} from '@tanstack/react-query';
 import {IntegrationsApi} from './middleware/integration';
 import {IntegrationKeys} from './queries/integrations';
+import OAuthPopup from './pages/connections/oauth2/OAuthPopup';
 
 const queryClient = new QueryClient();
 
 export const router = createBrowserRouter([
+    {
+        element: <OAuthPopup />,
+        path: '/callback',
+    },
     {
         path: '/',
         element: <App />,
