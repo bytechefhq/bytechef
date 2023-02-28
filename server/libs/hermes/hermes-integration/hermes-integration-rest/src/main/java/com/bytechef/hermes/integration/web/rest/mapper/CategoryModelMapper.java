@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.integration.web.rest.mapper;
 
-import com.bytechef.hermes.integration.domain.Category;
+import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import org.mapstruct.Mapper;

@@ -19,10 +19,10 @@ package com.bytechef.hermes.integration.facade.impl;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.hermes.integration.domain.Category;
+import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
-import com.bytechef.hermes.integration.service.CategoryService;
+import com.bytechef.category.servicee.CategoryService;
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;

@@ -18,9 +18,9 @@
 package com.bytechef.hermes.integration.service;
 
 import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
-import com.bytechef.hermes.integration.domain.Category;
+import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
-import com.bytechef.hermes.integration.repository.CategoryRepository;
+import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.hermes.integration.repository.IntegrationRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.integration.service;
+package com.bytechef.category.servicee;
 
-import com.bytechef.hermes.integration.domain.Category;
+import com.bytechef.category.domain.Category;
 
 import java.util.List;
 import java.util.Optional;
