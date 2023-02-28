@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.integration.domain;
 
+import com.bytechef.category.domain.Category;
 import com.bytechef.tag.domain.Tag;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

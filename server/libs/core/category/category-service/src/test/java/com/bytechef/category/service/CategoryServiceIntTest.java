@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.integration.service;
+package com.bytechef.category.service;
 
-import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
-import com.bytechef.hermes.integration.domain.Category;
-import com.bytechef.hermes.integration.repository.CategoryRepository;
+import com.bytechef.category.config.CategoryIntTestConfiguration;
+import com.bytechef.category.repository.CategoryRepository;
+import com.bytechef.category.servicee.CategoryService;
+import com.bytechef.category.domain.Category;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = IntegrationIntTestConfiguration.class)
+@SpringBootTest(classes = CategoryIntTestConfiguration.class)
 public class CategoryServiceIntTest {
 
     @Autowired
