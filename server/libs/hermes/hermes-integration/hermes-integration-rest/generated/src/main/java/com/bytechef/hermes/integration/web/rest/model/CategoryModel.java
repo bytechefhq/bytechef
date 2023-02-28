@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Category", description = "An integration category.")
 @JsonTypeName("Category")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-16T08:29:28.643031+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
 public class CategoryModel {
 
   @JsonProperty("createdBy")
