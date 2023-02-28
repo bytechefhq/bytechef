@@ -17,11 +17,15 @@
 
 package com.bytechef.component.pipedrive;
 
+import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.definition.DefinitionDSL;
+import com.google.auto.service.AutoService;
 
 /**
+ * @generated
  * @author Ivica Cardic
  */
+@AutoService(OpenApiComponentHandler.class)
 public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {
 
     @Override

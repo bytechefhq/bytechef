@@ -28,10 +28,12 @@ import com.bytechef.component.aws.s3.action.AwsS3PresignGetObjectAction;
 import com.bytechef.component.aws.s3.action.AwsS3PutObjectAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
+@AutoService(ComponentHandler.class)
 public class AwsS3ComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(AWS_S3)
