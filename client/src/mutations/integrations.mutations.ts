@@ -1,5 +1,6 @@
 import {useMutation} from '@tanstack/react-query';
 import {
+    DeleteIntegrationRequest,
     IntegrationModel,
     IntegrationsApi,
     PutIntegrationTagsRequest,
@@ -23,6 +24,20 @@ export const useIntegrationMutation = (
         onError: mutationProps?.onError,
     });
 
+export const useIntegrationPutMutation = (
+    mutationProps?: IntegrationMutationProps
+) =>
+    useMutation({
+        mutationFn: (integration: IntegrationModel) => {
+            return new IntegrationsApi().putIntegration({
+                integrationModel: integration,
+                id: integration.id!,
+            });
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
 type IntegrationTagsMutationProps = {
     onSuccess?: (result: void, variables: PutIntegrationTagsRequest) => void;
     onError?: (error: object, variables: PutIntegrationTagsRequest) => void;
@@ -34,6 +49,22 @@ export const useIntegrationTagsMutation = (
     useMutation({
         mutationFn: (request: PutIntegrationTagsRequest) => {
             return new IntegrationsApi().putIntegrationTags(request);
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type IntegrationDeleteMutationProps = {
+    onSuccess?: (result: void, variables: DeleteIntegrationRequest) => void;
+    onError?: (error: object, variables: DeleteIntegrationRequest) => void;
+};
+
+export const useIntegrationDeleteMutation = (
+    mutationProps?: IntegrationDeleteMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: DeleteIntegrationRequest) => {
+            return new IntegrationsApi().deleteIntegration(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
