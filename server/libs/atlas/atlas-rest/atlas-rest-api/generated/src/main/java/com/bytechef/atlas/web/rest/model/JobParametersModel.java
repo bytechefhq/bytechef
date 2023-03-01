@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-20T23:05:08.874398+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T09:06:53.695754+01:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @JsonProperty("inputs")
@@ -70,7 +70,7 @@ public class JobParametersModel {
    * @return inputs
   */
   
-  @Schema(name = "inputs", description = "The inputs expected by the workflow", required = false)
+  @Schema(name = "inputs", description = "The inputs expected by the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Map<String, Object> getInputs() {
     return inputs;
   }
@@ -89,7 +89,7 @@ public class JobParametersModel {
    * @return label
   */
   
-  @Schema(name = "label", description = "The job's human-readable name", required = false)
+  @Schema(name = "label", description = "The job's human-readable name", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLabel() {
     return label;
   }
@@ -116,7 +116,7 @@ public class JobParametersModel {
    * @return outputs
   */
   
-  @Schema(name = "outputs", description = "The outputs expected by the workflow.", required = false)
+  @Schema(name = "outputs", description = "The outputs expected by the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Map<String, Object> getOutputs() {
     return outputs;
   }
@@ -135,7 +135,7 @@ public class JobParametersModel {
    * @return parentTaskExecutionId
   */
   
-  @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Used for sub-flows.", required = false)
+  @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Used for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
@@ -154,7 +154,7 @@ public class JobParametersModel {
    * @return priority
   */
   
-  @Schema(name = "priority", description = "The priority value used during execution of individual tasks.", required = false)
+  @Schema(name = "priority", description = "The priority value used during execution of individual tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getPriority() {
     return priority;
   }
@@ -173,7 +173,7 @@ public class JobParametersModel {
    * @return workflowId
   */
   @NotNull 
-  @Schema(name = "workflowId", description = "Id of the workflow to execute.", required = true)
+  @Schema(name = "workflowId", description = "Id of the workflow to execute.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getWorkflowId() {
     return workflowId;
   }
@@ -200,7 +200,7 @@ public class JobParametersModel {
    * @return webhooks
   */
   @Valid 
-  @Schema(name = "webhooks", description = "The list of webhooks to register to receive notifications for certain events.", required = false)
+  @Schema(name = "webhooks", description = "The list of webhooks to register to receive notifications for certain events.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<Map<String, Object>> getWebhooks() {
     return webhooks;
   }

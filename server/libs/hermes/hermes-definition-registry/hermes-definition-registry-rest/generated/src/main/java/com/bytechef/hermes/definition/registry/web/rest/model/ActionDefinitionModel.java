@@ -1,16 +1,22 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -19,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T08:54:46.758794+01:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
   @JsonProperty("display")
@@ -51,7 +57,7 @@ public class ActionDefinitionModel {
    * Get display
    * @return display
   */
-  @Valid
+  @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public DisplayModel getDisplay() {
     return display;
@@ -70,7 +76,7 @@ public class ActionDefinitionModel {
    * The example of the action's output.
    * @return exampleOutput
   */
-
+  
   @Schema(name = "exampleOutput", description = "The example of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Object getExampleOutput() {
     return exampleOutput;
@@ -89,7 +95,7 @@ public class ActionDefinitionModel {
    * The action name.
    * @return name
   */
-
+  
   @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getName() {
     return name;
@@ -116,7 +122,7 @@ public class ActionDefinitionModel {
    * The output schema of an execution result.
    * @return outputSchema
   */
-  @Valid
+  @Valid 
   @Schema(name = "outputSchema", description = "The output schema of an execution result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getOutputSchema() {
     return outputSchema;
@@ -143,7 +149,7 @@ public class ActionDefinitionModel {
    * The list of action properties.
    * @return properties
   */
-  @Valid
+  @Valid 
   @Schema(name = "properties", description = "The list of action properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getProperties() {
     return properties;
@@ -162,7 +168,7 @@ public class ActionDefinitionModel {
    * Contains information required for a connection's authorization.
    * @return performFunction
   */
-
+  
   @Schema(name = "performFunction", description = "Contains information required for a connection's authorization.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Object getPerformFunction() {
     return performFunction;

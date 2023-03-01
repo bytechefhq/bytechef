@@ -1,18 +1,22 @@
 package com.bytechef.dione.integration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -21,11 +25,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:43:15.780734+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("category")
-  private CategoryModel category;
+  private com.bytechef.category.web.rest.model.CategoryModel category;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -52,7 +56,7 @@ public class IntegrationModel {
 
   @JsonProperty("tags")
   @Valid
-  private List<TagModel> tags = null;
+  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
   @JsonProperty("version")
   private Integer version;
@@ -61,7 +65,7 @@ public class IntegrationModel {
   @Valid
   private List<String> workflowIds = null;
 
-  public IntegrationModel category(CategoryModel category) {
+  public IntegrationModel category(com.bytechef.category.web.rest.model.CategoryModel category) {
     this.category = category;
     return this;
   }
@@ -70,13 +74,13 @@ public class IntegrationModel {
    * Get category
    * @return category
   */
-  @Valid
+  @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public CategoryModel getCategory() {
+  public com.bytechef.category.web.rest.model.CategoryModel getCategory() {
     return category;
   }
 
-  public void setCategory(CategoryModel category) {
+  public void setCategory(com.bytechef.category.web.rest.model.CategoryModel category) {
     this.category = category;
   }
 
@@ -89,7 +93,7 @@ public class IntegrationModel {
    * The created by.
    * @return createdBy
   */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
@@ -108,7 +112,7 @@ public class IntegrationModel {
    * The created date.
    * @return createdDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
@@ -127,7 +131,7 @@ public class IntegrationModel {
    * The id of an integration.
    * @return id
   */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
@@ -146,7 +150,7 @@ public class IntegrationModel {
    * The name of the integration.
    * @return name
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The name of the integration.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
@@ -165,7 +169,7 @@ public class IntegrationModel {
    * The description of the integration.
    * @return description
   */
-
+  
   @Schema(name = "description", description = "The description of the integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
@@ -184,7 +188,7 @@ public class IntegrationModel {
    * The last modified by.
    * @return lastModifiedBy
   */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
@@ -203,7 +207,7 @@ public class IntegrationModel {
    * The last modified date.
    * @return lastModifiedDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
@@ -213,12 +217,12 @@ public class IntegrationModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public IntegrationModel tags(List<TagModel> tags) {
+  public IntegrationModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public IntegrationModel addTagsItem(TagModel tagsItem) {
+  public IntegrationModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -230,13 +234,13 @@ public class IntegrationModel {
    * Get tags
    * @return tags
   */
-  @Valid
+  @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<TagModel> getTags() {
+  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<TagModel> tags) {
+  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
   }
 
@@ -249,7 +253,7 @@ public class IntegrationModel {
    * Get version
    * @return version
   */
-
+  
   @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
@@ -276,7 +280,7 @@ public class IntegrationModel {
    * The workflow ids belonging to this integration.
    * @return workflowIds
   */
-
+  
   @Schema(name = "workflowIds", description = "The workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<String> getWorkflowIds() {
     return workflowIds;

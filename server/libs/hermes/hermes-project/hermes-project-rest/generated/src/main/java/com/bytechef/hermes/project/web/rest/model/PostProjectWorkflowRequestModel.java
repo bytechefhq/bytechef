@@ -1,20 +1,26 @@
 package com.bytechef.hermes.project.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * PostIntegrationWorkflowRequestModel
+ * PostProjectWorkflowRequestModel
  */
 
-@JsonTypeName("postIntegrationWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
+@JsonTypeName("postProjectWorkflow_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:35:39.488347+01:00[Europe/Zagreb]")
 public class PostProjectWorkflowRequestModel {
 
   @JsonProperty("name")
@@ -35,7 +41,7 @@ public class PostProjectWorkflowRequestModel {
    * The workflow name.
    * @return name
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The workflow name.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
@@ -54,7 +60,7 @@ public class PostProjectWorkflowRequestModel {
    * The workflow description.
    * @return description
   */
-
+  
   @Schema(name = "description", description = "The workflow description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
@@ -73,7 +79,7 @@ public class PostProjectWorkflowRequestModel {
    * The workflow definition.
    * @return definition
   */
-
+  
   @Schema(name = "definition", description = "The workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDefinition() {
     return definition;
@@ -91,10 +97,10 @@ public class PostProjectWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PostProjectWorkflowRequestModel postIntegrationWorkflowRequest = (PostProjectWorkflowRequestModel) o;
-    return Objects.equals(this.name, postIntegrationWorkflowRequest.name) &&
-        Objects.equals(this.description, postIntegrationWorkflowRequest.description) &&
-        Objects.equals(this.definition, postIntegrationWorkflowRequest.definition);
+    PostProjectWorkflowRequestModel postProjectWorkflowRequest = (PostProjectWorkflowRequestModel) o;
+    return Objects.equals(this.name, postProjectWorkflowRequest.name) &&
+        Objects.equals(this.description, postProjectWorkflowRequest.description) &&
+        Objects.equals(this.definition, postProjectWorkflowRequest.definition);
   }
 
   @Override
@@ -105,7 +111,7 @@ public class PostProjectWorkflowRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PostIntegrationWorkflowRequestModel {\n");
+    sb.append("class PostProjectWorkflowRequestModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");

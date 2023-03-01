@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 @JsonTypeName("Authorization")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T08:54:46.758794+01:00[Europe/Zagreb]")
 public class AuthorizationModel {
 
   @JsonProperty("display")

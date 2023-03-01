@@ -1,12 +1,18 @@
 package com.bytechef.dione.integration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -14,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("postIntegrationWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:43:15.780734+01:00[Europe/Zagreb]")
 public class PostIntegrationWorkflowRequestModel {
 
   @JsonProperty("name")
@@ -35,7 +41,7 @@ public class PostIntegrationWorkflowRequestModel {
    * The workflow name.
    * @return name
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The workflow name.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
@@ -54,7 +60,7 @@ public class PostIntegrationWorkflowRequestModel {
    * The workflow description.
    * @return description
   */
-
+  
   @Schema(name = "description", description = "The workflow description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
@@ -73,7 +79,7 @@ public class PostIntegrationWorkflowRequestModel {
    * The workflow definition.
    * @return definition
   */
-
+  
   @Schema(name = "definition", description = "The workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDefinition() {
     return definition;
