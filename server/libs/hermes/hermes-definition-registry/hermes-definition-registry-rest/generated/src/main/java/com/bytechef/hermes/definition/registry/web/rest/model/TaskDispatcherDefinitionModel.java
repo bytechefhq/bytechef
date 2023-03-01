@@ -1,16 +1,23 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -19,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T08:54:46.758794+01:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
   @JsonProperty("display")
@@ -55,7 +62,7 @@ public class TaskDispatcherDefinitionModel {
    * Get display
    * @return display
   */
-  @Valid
+  @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public DisplayModel getDisplay() {
     return display;
@@ -74,7 +81,7 @@ public class TaskDispatcherDefinitionModel {
    * The task dispatcher name..
    * @return name
   */
-
+  
   @Schema(name = "name", description = "The task dispatcher name..", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getName() {
     return name;
@@ -89,19 +96,19 @@ public class TaskDispatcherDefinitionModel {
     return this;
   }
 
-  public TaskDispatcherDefinitionModel addOutputSchemaItem(PropertyModel outputISchemaItem) {
+  public TaskDispatcherDefinitionModel addOutputSchemaItem(PropertyModel outputSchemaItem) {
     if (this.outputSchema == null) {
       this.outputSchema = new ArrayList<>();
     }
-    this.outputSchema.add(outputISchemaItem);
+    this.outputSchema.add(outputSchemaItem);
     return this;
   }
 
   /**
    * The output schema of a task dispatching result.
-   * @return output
+   * @return outputSchema
   */
-  @Valid
+  @Valid 
   @Schema(name = "outputSchema", description = "The output schema of a task dispatching result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getOutputSchema() {
     return outputSchema;
@@ -128,7 +135,7 @@ public class TaskDispatcherDefinitionModel {
    * The list of task dispatcher properties.
    * @return properties
   */
-  @Valid
+  @Valid 
   @Schema(name = "properties", description = "The list of task dispatcher properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getProperties() {
     return properties;
@@ -147,7 +154,7 @@ public class TaskDispatcherDefinitionModel {
    * Get resources
    * @return resources
   */
-  @Valid
+  @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public ResourcesModel getResources() {
     return resources;
@@ -166,7 +173,7 @@ public class TaskDispatcherDefinitionModel {
    * Get version
    * @return version
   */
-
+  
   @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
@@ -193,7 +200,7 @@ public class TaskDispatcherDefinitionModel {
    * Properties used to define tasks to be dispatched.
    * @return taskProperties
   */
-  @Valid
+  @Valid 
   @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getTaskProperties() {
     return taskProperties;

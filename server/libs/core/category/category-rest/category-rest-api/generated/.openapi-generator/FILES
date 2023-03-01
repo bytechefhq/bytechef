@@ -1,0 +1,6 @@
+.openapi-generator-ignore
+README.md
+pom.xml
+src/main/java/com/bytechef/category/web/rest/ApiUtil.java
+src/main/java/com/bytechef/category/web/rest/CategoriesApi.java
+src/main/java/com/bytechef/category/web/rest/model/CategoryModel.java

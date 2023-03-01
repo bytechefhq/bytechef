@@ -1,25 +1,30 @@
-package com.bytechef.dione.integration.web.rest.model;
+package com.bytechef.tag.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * An integration category.
+ * A tag.
  */
 
-@Schema(name = "Category", description = "An integration category.")
-@JsonTypeName("Category")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
-public class CategoryModel {
+@Schema(name = "Tag", description = "A tag.")
+@JsonTypeName("Tag")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:08:21.049362+01:00[Europe/Zagreb]")
+public class TagModel {
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -31,9 +36,6 @@ public class CategoryModel {
   @JsonProperty("id")
   private Long id;
 
-  @JsonProperty("name")
-  private String name;
-
   @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
@@ -41,10 +43,13 @@ public class CategoryModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
+  @JsonProperty("name")
+  private String name;
+
   @JsonProperty("version")
   private Integer version;
 
-  public CategoryModel createdBy(String createdBy) {
+  public TagModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -53,7 +58,7 @@ public class CategoryModel {
    * The created by.
    * @return createdBy
   */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
@@ -63,7 +68,7 @@ public class CategoryModel {
     this.createdBy = createdBy;
   }
 
-  public CategoryModel createdDate(LocalDateTime createdDate) {
+  public TagModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -72,7 +77,7 @@ public class CategoryModel {
    * The created date.
    * @return createdDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
@@ -82,17 +87,17 @@ public class CategoryModel {
     this.createdDate = createdDate;
   }
 
-  public CategoryModel id(Long id) {
+  public TagModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of the category.
+   * The id of the tag.
    * @return id
   */
-
-  @Schema(name = "id", description = "The id of the category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  
+  @Schema(name = "id", description = "The id of the tag.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -101,26 +106,7 @@ public class CategoryModel {
     this.id = id;
   }
 
-  public CategoryModel name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * The name of the category.
-   * @return name
-  */
-  @NotNull
-  @Schema(name = "name", description = "The name of the category.", requiredMode = Schema.RequiredMode.REQUIRED)
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public CategoryModel lastModifiedBy(String lastModifiedBy) {
+  public TagModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -129,7 +115,7 @@ public class CategoryModel {
    * The last modified by.
    * @return lastModifiedBy
   */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
@@ -139,7 +125,7 @@ public class CategoryModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public CategoryModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public TagModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -148,7 +134,7 @@ public class CategoryModel {
    * The last modified date.
    * @return lastModifiedDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
@@ -158,7 +144,26 @@ public class CategoryModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public CategoryModel version(Integer version) {
+  public TagModel name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * The name of the tag.
+   * @return name
+  */
+  @NotNull 
+  @Schema(name = "name", description = "The name of the tag.", requiredMode = Schema.RequiredMode.REQUIRED)
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public TagModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -167,7 +172,7 @@ public class CategoryModel {
    * Get version
    * @return version
   */
-
+  
   @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
@@ -185,31 +190,31 @@ public class CategoryModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CategoryModel category = (CategoryModel) o;
-    return Objects.equals(this.createdBy, category.createdBy) &&
-        Objects.equals(this.createdDate, category.createdDate) &&
-        Objects.equals(this.id, category.id) &&
-        Objects.equals(this.name, category.name) &&
-        Objects.equals(this.lastModifiedBy, category.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, category.lastModifiedDate) &&
-        Objects.equals(this.version, category.version);
+    TagModel tag = (TagModel) o;
+    return Objects.equals(this.createdBy, tag.createdBy) &&
+        Objects.equals(this.createdDate, tag.createdDate) &&
+        Objects.equals(this.id, tag.id) &&
+        Objects.equals(this.lastModifiedBy, tag.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, tag.lastModifiedDate) &&
+        Objects.equals(this.name, tag.name) &&
+        Objects.equals(this.version, tag.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, id, name, lastModifiedBy, lastModifiedDate, version);
+    return Objects.hash(createdBy, createdDate, id, lastModifiedBy, lastModifiedDate, name, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CategoryModel {\n");
+    sb.append("class TagModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -1,37 +1,41 @@
 package com.bytechef.hermes.project.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
  * The request object that contains the array of tags.
  */
 
-@Schema(name = "putIntegrationTags_request", description = "The request object that contains the array of tags.")
-@JsonTypeName("putIntegrationTags_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
+@Schema(name = "putProjectTags_request", description = "The request object that contains the array of tags.")
+@JsonTypeName("putProjectTags_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:35:39.488347+01:00[Europe/Zagreb]")
 public class PutProjectTagsRequestModel {
 
   @JsonProperty("tags")
   @Valid
-  private List<TagModel> tags = null;
+  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
-  public PutProjectTagsRequestModel tags(List<TagModel> tags) {
+  public PutProjectTagsRequestModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public PutProjectTagsRequestModel addTagsItem(TagModel tagsItem) {
+  public PutProjectTagsRequestModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -43,13 +47,13 @@ public class PutProjectTagsRequestModel {
    * Get tags
    * @return tags
   */
-  @Valid
+  @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<TagModel> getTags() {
+  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<TagModel> tags) {
+  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
   }
 
@@ -61,8 +65,8 @@ public class PutProjectTagsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PutProjectTagsRequestModel putIntegrationTagsRequest = (PutProjectTagsRequestModel) o;
-    return Objects.equals(this.tags, putIntegrationTagsRequest.tags);
+    PutProjectTagsRequestModel putProjectTagsRequest = (PutProjectTagsRequestModel) o;
+    return Objects.equals(this.tags, putProjectTagsRequest.tags);
   }
 
   @Override
@@ -73,7 +77,7 @@ public class PutProjectTagsRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PutIntegrationTagsRequestModel {\n");
+    sb.append("class PutProjectTagsRequestModel {\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("}");
     return sb.toString();

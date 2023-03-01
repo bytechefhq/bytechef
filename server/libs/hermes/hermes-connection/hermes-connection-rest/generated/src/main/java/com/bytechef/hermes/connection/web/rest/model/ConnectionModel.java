@@ -2,7 +2,6 @@ package com.bytechef.hermes.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-26T23:43:53.466934+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:45:15.933556+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")
@@ -66,7 +65,7 @@ public class ConnectionModel {
 
   @JsonProperty("tags")
   @Valid
-  private List<TagModel> tags = null;
+  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
   @JsonProperty("version")
   private Integer version;
@@ -266,12 +265,12 @@ public class ConnectionModel {
     this.parameters = parameters;
   }
 
-  public ConnectionModel tags(List<TagModel> tags) {
+  public ConnectionModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public ConnectionModel addTagsItem(TagModel tagsItem) {
+  public ConnectionModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -285,11 +284,11 @@ public class ConnectionModel {
   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<TagModel> getTags() {
+  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<TagModel> tags) {
+  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
   }
 
