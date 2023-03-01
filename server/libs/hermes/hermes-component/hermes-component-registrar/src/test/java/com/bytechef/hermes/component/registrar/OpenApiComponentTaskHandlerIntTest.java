@@ -43,7 +43,7 @@ import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
-import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
@@ -863,14 +863,14 @@ public class OpenApiComponentTaskHandlerIntTest {
         }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.hermes.connection.repository")
-        public static class ConnectionJdbcRepositoriesIntTestConfiguration
-            extends JdbcRepositoriesIntTestConfiguration {
+        public static class ConnectionJdbcIntTestConfiguration
+            extends AbstractIntTestJdbcConfiguration {
 
             private final Encryption encryption;
             private final ObjectMapper objectMapper;
 
             @SuppressFBWarnings("EI2")
-            public ConnectionJdbcRepositoriesIntTestConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            public ConnectionJdbcIntTestConfiguration(Encryption encryption, ObjectMapper objectMapper) {
                 this.encryption = encryption;
                 this.objectMapper = objectMapper;
             }

@@ -25,7 +25,7 @@ import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.SpringBootConfiguration;
@@ -65,12 +65,12 @@ public class WorkflowRepositoryIntTestConfiguration {
     }
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
-    public static class WorkflowJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
+    public static class WorkflowIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        public WorkflowJdbcRepositoriesIntTestConfiguration(ObjectMapper objectMapper) {
+        public WorkflowIntJdbcTestConfiguration(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
         }
 
