@@ -37,8 +37,8 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
-    implementation project(":server:libs:hermes:hermes-integration:hermes-integration-rest")
-    implementation project(":server:libs:hermes:hermes-integration:hermes-integration-service")
+    implementation project(":server:libs:hermes:hermes-project:hermes-project-rest")
+    implementation project(":server:libs:hermes:hermes-project:hermes-project-service")
 
     testImplementation project(":server:libs:test:test-int-support")
 }
