@@ -75,7 +75,7 @@ paths:
                 description: The response object that contains the array of categories.
                 type: array
                 items:
-                  $ref: '#/components/schemas/Category'
+                  $ref: '../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
   /integrations/tags:
     get:
       description: Get integration tags.
@@ -92,7 +92,7 @@ paths:
                 description: The response object that contains the array of tags.
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tag'
+                  $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
   /integrations/{id}:
     delete:
       description: Delete an integration.
@@ -247,46 +247,13 @@ paths:
                 tags:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Tag'
+                    $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
         required: true
       responses:
         "200":
           description: Successful operation.
 components:
   schemas:
-    Category:
-      description: An integration category.
-      required:
-        - name
-      properties:
-        createdBy:
-          description: The created by.
-          type: string
-          readOnly: true
-        createdDate:
-          description: The created date.
-          type: string
-          format: date-time
-          readOnly: true
-        id:
-          description: The id of the category.
-          type: integer
-          format: int64
-        name:
-          description: The name of the category.
-          type: string
-        lastModifiedBy:
-          description: The last modified by.
-          type: string
-          readOnly: true
-        lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
-          readOnly: true
-        version:
-          type: integer
-          format: int32
     Integration:
       description: A group of workflows that make one logical integration.
       type: object
@@ -294,7 +261,7 @@ components:
         - name
       properties:
         category:
-          $ref: '#/components/schemas/Category'
+          $ref: '../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
         createdBy:
           description: The created by.
           type: string
@@ -327,7 +294,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/Tag'
+            $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
         version:
           type: integer
           format: int32
@@ -337,27 +304,3 @@ components:
           items:
             type: string
             readOnly: true
-    Tag:
-      description: An integration tag.
-      required:
-        - name
-      properties:
-        id:
-          description: The id of the tag.
-          type: integer
-          format: int64
-        lastModifiedBy:
-          description: The last modified by.
-          type: string
-          readOnly: true
-        lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
-          readOnly: true
-        name:
-          description: The name of the tag.
-          type: string
-        version:
-          type: integer
-          format: int32

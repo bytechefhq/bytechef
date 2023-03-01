@@ -18,7 +18,7 @@
 package com.bytechef.tag.web.rest.mapper;
 
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.web.rest.adapter.TagConversionServiceAdapter;
+import com.bytechef.tag.web.rest.mapper.config.TagMapperSpringConfiguration;
 import com.bytechef.tag.web.rest.model.TagModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = TagConversionServiceAdapter.class)
+@Mapper(config = TagMapperSpringConfiguration.class)
 public interface TagMapper extends Converter<Tag, TagModel> {
 
     TagModel convert(Tag tag);

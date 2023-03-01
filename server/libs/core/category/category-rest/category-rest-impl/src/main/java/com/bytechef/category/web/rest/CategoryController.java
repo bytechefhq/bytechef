@@ -19,8 +19,9 @@ package com.bytechef.category.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.category.domain.Category;
-import com.bytechef.category.servicee.CategoryService;
+import com.bytechef.category.service.CategoryService;
 import com.bytechef.category.web.rest.model.CategoryModel;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,7 @@ public class CategoryController implements CategoriesApi {
     private final CategoryService categoryService;
     private final ConversionService conversionService;
 
+    @SuppressFBWarnings("EI2")
     public CategoryController(CategoryService categoryService, ConversionService conversionService) {
         this.categoryService = categoryService;
         this.conversionService = conversionService;

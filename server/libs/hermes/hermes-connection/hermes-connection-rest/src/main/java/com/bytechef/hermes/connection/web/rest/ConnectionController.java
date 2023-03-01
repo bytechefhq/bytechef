@@ -22,8 +22,8 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.PutConnectionTagsRequestModel;
-import com.bytechef.hermes.connection.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.web.rest.model.TagModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,6 +66,7 @@ public class ConnectionController implements ConnectionsApi {
     @Override
     public Mono<ResponseEntity<Flux<ConnectionModel>>> getConnections(
         List<String> componentNames, List<Long> tagIds, ServerWebExchange exchange) {
+
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(connectionFacade.getConnections(componentNames, tagIds)
             .stream()
             .map(connection -> conversionService.convert(connection, ConnectionModel.class))
@@ -97,6 +98,7 @@ public class ConnectionController implements ConnectionsApi {
     @Override
     public Mono<ResponseEntity<ConnectionModel>> putConnection(
         Long id, Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
+
         return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
             conversionService.convert(
                 connectionFacade.update(
