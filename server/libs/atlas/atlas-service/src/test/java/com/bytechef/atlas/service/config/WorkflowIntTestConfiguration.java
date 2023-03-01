@@ -21,7 +21,7 @@ import com.bytechef.atlas.config.WorkflowConfiguration;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
-import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -64,6 +64,6 @@ public class WorkflowIntTestConfiguration {
     }
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
-    public static class WorkflowJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
+    public static class WorkflowIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }

@@ -17,7 +17,7 @@
 
 package com.bytechef.category.config;
 
-import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -32,6 +32,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class CategoryIntTestConfiguration {
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.category.repository")
-    public static class CategoryJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
+    public static class CategoryJdbcIntTestConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }
