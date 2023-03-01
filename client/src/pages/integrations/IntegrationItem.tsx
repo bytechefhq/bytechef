@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
 import {
     CategoryModel,
@@ -37,6 +37,7 @@ interface IntegrationItemProps {
     tags?: TagModel[];
     version?: number;
     workflowIds?: string[];
+    allIntegrationsNames: string[];
 }
 
 interface DateProps {
@@ -152,60 +153,120 @@ const IntegrationItem = ({
     version,
     workflowIds,
     remainingTags,
+    allIntegrationsNames,
 }: IntegrationItemProps) => {
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
-    // const [isEditButtonClicked, setIsEditButtonClicked] = useState<boolean>(false);
+    const [showDeleteAlertDialog, setShowDeleteAlertDialog] = useState(false);
+    const [showDuplicate, setShowDuplicate] = useState<boolean>(false);
 
     const menuItems: DropDownMenuItem[] = [
         {
             label: 'Edit',
-            handleOnClick: (id: number) => {
+            handleOnClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
                 setShowEditModal(true);
             },
         },
         {
             label: 'Duplicate',
-            handleOnClick: (id: number) => {
+            handleOnClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
                 duplicateIntegrationItem();
             },
         },
         {
             label: 'New Workflow',
-            handleOnClick: (id: number) => alert('workflow'),
+            handleOnClick: (id: number, event: React.MouseEvent) =>
+                alert('workflow'),
         },
         {
             separator: true,
-            handleOnClick: (id: number) => {
+            handleOnClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
                 return;
             },
         },
         {
             label: 'Delete',
-            handleOnClick: (id: number) => alert,
-            //     setShowDeleteAlertDialog(true);
-            //     // deleteIntegrationItem();
-            // },
+            handleOnClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
+                setShowDeleteAlertDialog(true);
+            },
         },
     ];
+
+    const DeleteAlertDialog: React.FC<{
+        isOpen: boolean;
+        handleOnConfirm: () => void;
+        setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    }> = ({isOpen, handleOnConfirm, setIsOpen}) => {
+        return (
+            <AlertDialog.Root open={isOpen} onOpenChange={setIsOpen}>
+                <AlertDialog.Portal>
+                    <AlertDialog.Overlay />
+                    <AlertDialog.Content>
+                        <AlertDialog.Title>Are you sure?</AlertDialog.Title>
+                        <AlertDialog.Description>
+                            This action cannot be undone. This will permanently
+                            delete your item and remove your data from our
+                            servers.
+                        </AlertDialog.Description>
+                        <div
+                            style={{
+                                display: 'flex',
+                                gap: 25,
+                                justifyContent: 'flex-end',
+                            }}
+                        >
+                            <AlertDialog.Cancel onClick={handleOnConfirm}>
+                                No
+                            </AlertDialog.Cancel>
+                            <AlertDialog.Action onClick={handleOnConfirm}>
+                                Yes
+                            </AlertDialog.Action>
+                        </div>
+                    </AlertDialog.Content>
+                </AlertDialog.Portal>
+            </AlertDialog.Root>
+        );
+    };
 
     const queryClient = useQueryClient();
 
     const {data: item} = useGetIntegrationQuery(id!);
+
     const duplication = useIntegrationMutation({
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries(
                 IntegrationKeys.integrationCategories
             );
             queryClient.invalidateQueries(IntegrationKeys.integrations);
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+            const integrationsData = queryClient.getQueryData<
+                IntegrationModel[]
+            >(IntegrationKeys.integrations);
+
+            if (integrationsData) {
+                queryClient.setQueryData<IntegrationModel[]>(
+                    IntegrationKeys.integrations,
+                    [...integrationsData, data]
+                );
+                setShowDuplicate(true);
+            }
         },
     });
 
     const duplicateIntegrationItem = () => {
+        let copyNumber = 1;
+        while (allIntegrationsNames.includes(`${item?.name} (${copyNumber})`)) {
+            copyNumber++;
+        }
+
         duplication.mutate({
             ...item,
             id: undefined,
-            name: `${item?.name} - duplicated`,
+            name: `${item?.name} (${copyNumber})`,
+            version: undefined,
         } as IntegrationModel);
     };
 
@@ -223,6 +284,10 @@ const IntegrationItem = ({
             deletion.mutate({
                 id: id,
             });
+    };
+    const handleOnConfirmDelete = () => {
+        deleteIntegrationItem();
+        setShowDeleteAlertDialog(false);
     };
 
     const tagsMutation = useIntegrationTagsMutation({
@@ -286,10 +351,24 @@ const IntegrationItem = ({
                 </div>
             </div>
 
-            {showEditModal && <IntegrationModal id={id} openModal={true} />}
-            {/* {showDeleteAlertDialog && (
-                <DeleteAlertDialog handleOnConfirm={deleteIntegrationItem} />
-            )} */}
+            {showEditModal && (
+                <IntegrationModal id={id} openModal={true} item={item} />
+            )}
+            {showDeleteAlertDialog && (
+                <DeleteAlertDialog
+                    isOpen={showDeleteAlertDialog}
+                    handleOnConfirm={handleOnConfirmDelete}
+                    setIsOpen={setShowDeleteAlertDialog}
+                />
+            )}
+            {showDuplicate && (
+                <IntegrationItem
+                    allIntegrationsNames={allIntegrationsNames}
+                    name={''}
+                    published={false}
+                    {...item}
+                />
+            )}
         </>
     );
 };
@@ -446,49 +525,5 @@ const Workflows = ({workflowIds}: WorkflowsProps) => {
         </div>
     );
 };
-
-// const DeleteAlertDialog: React.FC<{
-//     handleOnConfirm: () => void;
-// }> = (handleOnConfirm) => {
-//     return (
-//         <AlertDialog.Root>
-//             <AlertDialog.Trigger asChild>
-//                 <button className="Button violet">Delete account</button>
-//             </AlertDialog.Trigger>
-//             <AlertDialog.Portal>
-//                 <AlertDialog.Overlay className="AlertDialogOverlay" />
-//                 <AlertDialog.Content className="AlertDialogContent">
-//                     <AlertDialog.Title className="AlertDialogTitle">
-//                         Are you absolutely sure?
-//                     </AlertDialog.Title>
-//                     <AlertDialog.Description className="AlertDialogDescription">
-//                         This action cannot be undone. This will permanently
-//                         delete your account and remove your data from our
-//                         servers.
-//                     </AlertDialog.Description>
-//                     <div
-//                         style={{
-//                             display: 'flex',
-//                             gap: 25,
-//                             justifyContent: 'flex-end',
-//                         }}
-//                     >
-//                         <AlertDialog.Cancel asChild>
-//                             <button className="Button mauve">Cancel</button>
-//                         </AlertDialog.Cancel>
-//                         <AlertDialog.Action asChild>
-//                             <button
-//                                 className="Button red"
-//                                 onClick={handleOnConfirm}
-//                             >
-//                                 Yes, delete account
-//                             </button>
-//                         </AlertDialog.Action>
-//                     </div>
-//                 </AlertDialog.Content>
-//             </AlertDialog.Portal>
-//         </AlertDialog.Root>
-//     );
-// };
 
 export default IntegrationItem;

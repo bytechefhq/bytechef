@@ -17,18 +17,22 @@ import {
     IntegrationModel,
     TagModel,
 } from '../../middleware/integration';
-import {useIntegrationMutation} from '../../mutations/integrations.mutations';
+import {
+    useIntegrationMutation,
+    useIntegrationPutMutation,
+} from '../../mutations/integrations.mutations';
 
 interface IntegrationModalProps {
     id?: number;
+    item: IntegrationModel | undefined;
     openModal?: boolean;
     onClose?: () => void;
 }
 
 const IntegrationModal = ({
     id,
+    item,
     openModal = false,
-    onClose,
 }: IntegrationModalProps) => {
     const [isOpen, setIsOpen] = useState(openModal);
 
@@ -38,10 +42,12 @@ const IntegrationModal = ({
 
     const {control, getValues, setValue, handleSubmit, reset} = useForm({
         defaultValues: {
-            name: '',
-            description: '',
-            category: undefined,
-            tags: [],
+            name: item?.name || '',
+            description: item?.description || '',
+            category:
+                {...item?.category, label: item?.category?.name} || undefined,
+            tags: item?.tags?.map((x) => ({...x, label: x.name})) || [],
+            // workflowIds: item?.workflowIds,
         },
     });
 
@@ -57,7 +63,25 @@ const IntegrationModal = ({
         data: tags,
     } = useGetIntegrationTagsQuery();
 
+    const remainingTags = tags?.filter(
+        (x) => !item?.tags?.map((y) => y.name).includes(x.name)
+    );
+
     const mutation = useIntegrationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(
+                IntegrationKeys.integrationCategories
+            );
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+
+            setIsOpen(false);
+
+            reset();
+        },
+    });
+
+    const putMutation = useIntegrationPutMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
                 IntegrationKeys.integrationCategories
@@ -80,14 +104,14 @@ const IntegrationModal = ({
             return {id: tag.id, name: tag.name, version: tag.version};
         });
 
-        mutation.mutate({...formData, tags: tagValues} as IntegrationModel);
-    }
-
-    function handleClose() {
-        setIsOpen(false);
-
-        if (onClose) {
-            onClose();
+        if (id != undefined) {
+            putMutation.mutate({
+                ...item,
+                ...formData,
+                createdDate: item?.createdDate,
+            } as IntegrationModel);
+        } else {
+            mutation.mutate({...formData, tags: tagValues} as IntegrationModel);
         }
     }
 
@@ -104,7 +128,6 @@ const IntegrationModal = ({
             isOpen={isOpen}
             setIsOpen={setIsOpen}
             showTriggerLabel={id === undefined}
-            onClose={handleClose}
         >
             {categoriesError &&
                 !categoriesIsLoading &&
@@ -169,13 +192,16 @@ const IntegrationModal = ({
                                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                 } as any);
                             }}
-                            {...field}
+                            name={field.name}
+                            value={field.value}
+                            onBlur={field.onBlur}
+                            onChange={field.onChange}
                         />
                     )}
                 />
             )}
 
-            {!tagsIsLoading && (
+            {remainingTags && (
                 <Controller
                     control={control}
                     name="tags"
@@ -183,15 +209,17 @@ const IntegrationModal = ({
                         <CreatableSelect
                             isMulti={true}
                             label="Tags"
-                            options={tags!.map((tag: TagModel) => ({
-                                label: `${tag.name
-                                    .charAt(0)
-                                    .toUpperCase()}${tag.name.slice(1)}`,
-                                value: tag.name
-                                    .toLowerCase()
-                                    .replace(/\W/g, ''),
-                                ...tag,
-                            }))}
+                            options={remainingTags!.map((tag: TagModel) => {
+                                return {
+                                    label: `${tag.name
+                                        .charAt(0)
+                                        .toUpperCase()}${tag.name.slice(1)}`,
+                                    value: tag.name
+                                        .toLowerCase()
+                                        .replace(/\W/g, ''),
+                                    ...tag,
+                                };
+                            })}
                             onCreateOption={(inputValue: string) => {
                                 setValue('tags', [
                                     ...getValues().tags!,
@@ -202,7 +230,10 @@ const IntegrationModal = ({
                                     },
                                 ] as never[]);
                             }}
-                            {...field}
+                            name={field.name}
+                            value={field.value}
+                            onBlur={field.onBlur}
+                            onChange={field.onChange}
                         />
                     )}
                 />

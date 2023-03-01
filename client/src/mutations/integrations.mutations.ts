@@ -24,6 +24,24 @@ export const useIntegrationMutation = (
         onError: mutationProps?.onError,
     });
 
+export const useIntegrationPutMutation = (
+    mutationProps?: IntegrationMutationProps
+) =>
+    useMutation({
+        mutationFn: (integration: IntegrationModel) => {
+            console.log(
+                'inside integrations.mutations.useIntegrationPutMutation',
+                integration
+            );
+            return new IntegrationsApi().putIntegration({
+                integrationModel: integration,
+                id: integration.id!,
+            });
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
 type IntegrationTagsMutationProps = {
     onSuccess?: (result: void, variables: PutIntegrationTagsRequest) => void;
     onError?: (error: object, variables: PutIntegrationTagsRequest) => void;

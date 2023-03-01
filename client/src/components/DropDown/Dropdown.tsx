@@ -14,7 +14,7 @@ export interface DropDownMenuItem {
     shortcut?: string;
     icon?: ReactNode;
     separator?: boolean;
-    handleOnClick: (id: number) => void;
+    handleOnClick: (id: number, event: React.MouseEvent) => void;
     integrationId?: number;
 }
 
@@ -45,7 +45,9 @@ export const Dropdown: React.FC<{
                                     {!separator && (
                                         <Item
                                             className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900"
-                                            onClick={() => handleOnClick(id)}
+                                            onClick={(
+                                                event: React.MouseEvent
+                                            ) => handleOnClick(id, event)}
                                         >
                                             <span className="grow text-gray-700 dark:text-gray-300">
                                                 {label}

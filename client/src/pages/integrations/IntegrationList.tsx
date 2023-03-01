@@ -44,36 +44,39 @@ const IntegrationList = () => {
 
                             return (
                                 <div key={integration.id}>
-                                    <Link
+                                    {/* <Link
                                         to={`/automation/integrations/${integration.id}`}
-                                    >
-                                        <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
-                                            <IntegrationItem
-                                                key={integration.id}
-                                                category={integration.category}
-                                                description={
-                                                    integration.description
-                                                }
-                                                id={integration.id}
-                                                lastDatePublished={
-                                                    undefined // missing lastDatePublished
-                                                }
-                                                name={integration.name}
-                                                published={false} // missing api
-                                                remainingTags={tags?.filter(
-                                                    (tag) =>
-                                                        !integrationTagIds?.includes(
-                                                            tag.id
-                                                        )
-                                                )}
-                                                tags={integration.tags}
-                                                version={integration.version}
-                                                workflowIds={
-                                                    integration.workflowIds
-                                                }
-                                            />
-                                        </li>
-                                    </Link>
+                                    > */}
+                                    <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
+                                        <IntegrationItem
+                                            key={integration.id}
+                                            category={integration.category}
+                                            description={
+                                                integration.description
+                                            }
+                                            id={integration.id}
+                                            lastDatePublished={
+                                                undefined // missing lastDatePublished
+                                            }
+                                            name={integration.name}
+                                            published={false} // missing api
+                                            remainingTags={tags?.filter(
+                                                (tag) =>
+                                                    !integrationTagIds?.includes(
+                                                        tag.id
+                                                    )
+                                            )}
+                                            tags={integration.tags}
+                                            version={integration.version}
+                                            workflowIds={
+                                                integration.workflowIds
+                                            }
+                                            allIntegrationsNames={integrations.map(
+                                                (x) => x.name
+                                            )}
+                                        />
+                                    </li>
+                                    {/* </Link> */}
                                 </div>
                             );
                         })
