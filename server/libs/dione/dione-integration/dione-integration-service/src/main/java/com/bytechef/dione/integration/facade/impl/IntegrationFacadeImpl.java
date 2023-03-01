@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.facade.impl;
+package com.bytechef.dione.integration.facade.impl;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
-import com.bytechef.category.servicee.CategoryService;
+import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;

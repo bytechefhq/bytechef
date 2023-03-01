@@ -29,6 +29,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class TagIntTestConfiguration {
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.tag.repository")
-    public static class TagJdbcIntTestConfiguration extends AbstractIntTestJdbcConfiguration {
+    public static class TagIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }

@@ -15,18 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.tag.web.rest.mapper.config;
+package com.bytechef.dione.integration.web.rest.mapper.config;
 
-import com.bytechef.tag.web.rest.adapter.TagConversionServiceAdapter;
+import com.bytechef.category.web.rest.mapper.adapter.CategoryConversionServiceAdapter;
+import com.bytechef.dione.integration.web.rest.adapter.IntegrationConversionServiceAdapter;
+import com.bytechef.tag.web.rest.mapper.adapter.TagConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = TagConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = {
+    CategoryConversionServiceAdapter.class, IntegrationConversionServiceAdapter.class, TagConversionServiceAdapter.class
+})
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.tag.web.rest.adapter",
-    conversionServiceAdapterClassName = "TagConversionServiceAdapter")
-public interface TagMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.dione.integration.web.rest.adapter",
+    conversionServiceAdapterClassName = "IntegrationConversionServiceAdapter")
+public interface IntegrationMapperSpringConfiguration {
 }

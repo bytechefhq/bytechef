@@ -24,12 +24,11 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
-import com.bytechef.hermes.connection.web.rest.config.ConnectionRestTestConfiguration;
 import com.bytechef.hermes.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.PutConnectionTagsRequestModel;
-import com.bytechef.hermes.connection.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Iterator;
@@ -39,16 +38,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = ConnectionRestTestConfiguration.class)
 @WebFluxTest(value = ConnectionController.class)
 public class ConnectionControllerIntTest {
 
@@ -299,5 +298,12 @@ public class ConnectionControllerIntTest {
         connection.setVersion(1);
 
         return connection;
+    }
+
+    @ComponentScan(basePackages = {
+        "com.bytechef.hermes.connection.web.rest", "com.bytechef.tag.web.rest.mapper"
+    })
+    @SpringBootConfiguration
+    public static class ConnectionRestTestConfiguration {
     }
 }

@@ -19,15 +19,15 @@ package com.bytechef.dione.integration.web.rest;
 
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
-import com.bytechef.category.servicee.CategoryService;
-import com.bytechef.dione.integration.web.rest.model.CategoryModel;
+import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.PutIntegrationTagsRequestModel;
-import com.bytechef.dione.integration.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

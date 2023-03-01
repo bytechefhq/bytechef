@@ -19,7 +19,6 @@ package com.bytechef.category.service;
 
 import com.bytechef.category.config.CategoryIntTestConfiguration;
 import com.bytechef.category.repository.CategoryRepository;
-import com.bytechef.category.servicee.CategoryService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

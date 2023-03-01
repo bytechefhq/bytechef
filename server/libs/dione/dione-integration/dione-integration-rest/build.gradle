@@ -16,6 +16,8 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     modelPackage = "com.bytechef.dione.integration.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
+        Category: "com.bytechef.category.web.rest.model.CategoryModel",
+        Tag: "com.bytechef.tag.web.rest.model.TagModel",
         Workflow: "com.bytechef.atlas.web.rest.model.WorkflowModel",
         WorkflowFormat: "com.bytechef.atlas.web.rest.model.WorkflowFormatModel",
         WorkflowTask: "com.bytechef.atlas.web.rest.model.WorkflowTaskModel"
@@ -43,6 +45,8 @@ dependencies {
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
     api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
+    api project(":server:libs:core:category:category-rest:category-rest-api")
+    api project(":server:libs:core:tag:tag-rest:tag-rest-api")
     api project(":server:libs:dione:dione-integration:dione-integration-api")
 
     implementation libs.org.openapitools.jackson.databind.nullable
@@ -57,5 +61,4 @@ dependencies {
     implementation project(":server:libs:core:autoconfigure-annotations")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
-    testImplementation project(":server:libs:core:tag:tag-service")
 }

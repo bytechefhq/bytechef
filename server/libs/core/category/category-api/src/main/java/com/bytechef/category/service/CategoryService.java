@@ -15,18 +15,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.category.web.rest.mapper.config;
+package com.bytechef.category.service;
 
-import com.bytechef.category.web.rest.adapter.CategoryConversionServiceAdapter;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import com.bytechef.category.domain.Category;
 
-/**
- * @author Ivica Cardic
- */
-@MapperConfig(componentModel = "spring", uses = CategoryConversionServiceAdapter.class)
-@SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.category.web.rest.adapter",
-    conversionServiceAdapterClassName = "CategoryConversionServiceAdapter")
-public interface CategoryMapperSpringConfig {
+import java.util.List;
+import java.util.Optional;
+
+public interface CategoryService {
+
+    Category create(Category category);
+
+    void delete(long id);
+
+    List<Category> getCategories();
+
+    Category getCategory(long id);
+
+    List<Category> getCategories(List<Long> ids);
+
+    Optional<Category> fetchCategory(Long id);
+
+    Category save(Category category);
+
+    Category update(Category category);
 }

@@ -74,7 +74,7 @@ paths:
                 description: The response object that contains the array of tags.
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tag'
+                  $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
   /connections/{id}:
     delete:
       description: Delete a connection.
@@ -166,7 +166,7 @@ paths:
                 tags:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Tag'
+                    $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
         required: true
       responses:
         "200":
@@ -226,31 +226,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/Tag'
-        version:
-          type: integer
-          format: int32
-    Tag:
-      description: An integration tag.
-      required:
-        - name
-      properties:
-        id:
-          description: The id of the tag.
-          type: integer
-          format: int64
-        lastModifiedBy:
-          description: The last modified by.
-          type: string
-          readOnly: true
-        lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
-          readOnly: true
-        name:
-          description: The name of the tag.
-          type: string
+            $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
         version:
           type: integer
           format: int32

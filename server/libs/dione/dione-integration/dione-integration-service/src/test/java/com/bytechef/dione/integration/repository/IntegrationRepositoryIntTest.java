@@ -17,7 +17,6 @@
 
 package com.bytechef.dione.integration.repository;
 
-import com.bytechef.dione.repository.IntegrationRepository;
 import com.bytechef.dione.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.test.annotation.EmbeddedSql;

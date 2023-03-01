@@ -15,6 +15,9 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.hermes.connection.web.rest.model"
     outputDir = "$projectDir/generated".toString()
+    schemaMappings = [
+        Tag: "com.bytechef.tag.web.rest.model.TagModel"
+    ]
 }
 
 sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
@@ -37,6 +40,7 @@ dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
+    api project(":server:libs:core:tag:tag-rest:tag-rest-api")
     api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
 
     implementation libs.org.openapitools.jackson.databind.nullable

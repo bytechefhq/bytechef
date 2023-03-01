@@ -41,7 +41,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.project", "com.bytechef.tag"
+        "com.bytechef.atlas.repository.jdbc", "com.bytechef.category", "com.bytechef.hermes.project", "com.bytechef.tag"
     })
 @EnableAutoConfiguration
 @Import({
@@ -65,9 +65,9 @@ public class ProjectIntTestConfiguration {
 
     @EnableJdbcRepositories(
         basePackages = {
-            "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.project.repository",
-            "com.bytechef.tag.repository"
+            "com.bytechef.atlas.repository.jdbc", "com.bytechef.category.repository",
+            "com.bytechef.hermes.project.repository", "com.bytechef.tag.repository"
         })
-    public static class ProjectJdbcIntTestConfiguration extends AbstractIntTestJdbcConfiguration {
+    public static class ProjectIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }
