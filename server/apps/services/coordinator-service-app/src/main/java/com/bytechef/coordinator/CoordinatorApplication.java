@@ -83,7 +83,7 @@ public class CoordinatorApplication {
             """
                 \n----------------------------------------------------------
                 \tApplication '{}' is running! Access URLs:
-                \tLocal: \t\t{}://localhost:{}{}
+                \tLocal: \t\t{}://127.0.0.1:{}{}
                 \tExternal: \t{}://{}:{}{}
                 \tProfile(s): \t{}
                 \tGit Commit Id: \t{}
