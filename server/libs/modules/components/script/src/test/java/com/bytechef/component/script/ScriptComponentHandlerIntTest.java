@@ -25,12 +25,12 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -56,7 +56,8 @@ public class ScriptComponentHandlerIntTest {
     @Test
     public void testPerformJavaScript() {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -69,7 +70,8 @@ public class ScriptComponentHandlerIntTest {
     @Test
     public void testPerformPython() {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -82,7 +84,8 @@ public class ScriptComponentHandlerIntTest {
     @Test
     public void testPerformR() {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -95,7 +98,8 @@ public class ScriptComponentHandlerIntTest {
     @Test
     public void testPerformRuby() {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);

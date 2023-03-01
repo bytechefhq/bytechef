@@ -41,14 +41,7 @@ import org.springframework.util.Assert;
 public class WorkflowTask implements Serializable {
 
     static {
-        MapValueUtils.addConverter(new Converter<Map, WorkflowTask>() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public WorkflowTask convert(Map source) {
-                return new WorkflowTask(source);
-            }
-        });
+        MapValueUtils.addConverter(new WorkflowTaskConverter());
     }
 
     public static final WorkflowTask EMPTY_WORKFLOW_TASK = new WorkflowTask();
@@ -324,5 +317,14 @@ public class WorkflowTask implements Serializable {
             + timeout + '\'' + ", type='"
             + type + '\'' + ", parameters='"
             + parameters + '\'' + '}';
+    }
+
+    private static class WorkflowTaskConverter implements Converter<Map, WorkflowTask> {
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public WorkflowTask convert(Map source) {
+            return new WorkflowTask(source);
+        }
     }
 }
