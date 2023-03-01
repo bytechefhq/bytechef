@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.integration.web.rest.mapper;
+package com.bytechef.category.web.rest.mapper.config;
 
-import com.bytechef.category.domain.Category;
-import com.bytechef.dione.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
-import com.bytechef.dione.integration.web.rest.model.CategoryModel;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.category.web.rest.adapter.CategoryConversionServiceAdapter;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = IntegrationMapperSpringConfig.class)
-public interface CategoryModelMapper extends Converter<CategoryModel, Category> {
-
-    Category convert(CategoryModel categoryModel);
+@MapperConfig(componentModel = "spring", uses = CategoryConversionServiceAdapter.class)
+@SpringMapperConfig(
+    conversionServiceAdapterPackage = "com.bytechef.category.web.rest.adapter",
+    conversionServiceAdapterClassName = "CategoryConversionServiceAdapter")
+public interface CategoryMapperSpringConfig {
 }
