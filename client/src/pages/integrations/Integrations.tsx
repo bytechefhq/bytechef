@@ -22,9 +22,9 @@ const Integrations = () => {
 
     const defaultCurrentState = {
         id: searchParams.get('categoryId')
-            ? +searchParams.get('categoryId')!
+            ? parseInt(searchParams.get('categoryId')!)
             : searchParams.get('tagId')
-            ? +searchParams.get('tagId')!
+            ? parseInt(searchParams.get('tagId')!)
             : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
@@ -32,6 +32,7 @@ const Integrations = () => {
     const [current, setCurrent] = useState<{id?: number; type: Type}>(
         defaultCurrentState
     );
+
     const {isLoading: categoriesIsLoading, data: categories} =
         useGetIntegrationCategoriesQuery();
     const {isLoading: tagsIsLoading, data: tags} = useGetIntegrationTagsQuery();
@@ -56,7 +57,7 @@ const Integrations = () => {
             header={
                 <PageHeader
                     position="main"
-                    right={<IntegrationModal />}
+                    right={<IntegrationModal integrationItem={undefined} />}
                     title={title}
                 />
             }
