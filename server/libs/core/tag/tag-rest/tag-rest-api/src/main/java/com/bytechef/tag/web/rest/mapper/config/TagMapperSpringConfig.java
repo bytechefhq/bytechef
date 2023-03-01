@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.web.rest.mapper;
+package com.bytechef.tag.web.rest.mapper.config;
 
-import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
-import com.bytechef.hermes.connection.web.rest.model.TagModel;
-import com.bytechef.tag.domain.Tag;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.tag.web.rest.adapter.TagConversionServiceAdapter;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConnectionMapperSpringConfig.class)
-public interface ConnectionTagMapper extends Converter<Tag, TagModel> {
-
-    TagModel convert(Tag tag);
+@MapperConfig(componentModel = "spring", uses = TagConversionServiceAdapter.class)
+@SpringMapperConfig(
+    conversionServiceAdapterPackage = "com.bytechef.tag.web.rest.adapter",
+    conversionServiceAdapterClassName = "TagConversionServiceAdapter")
+public interface TagMapperSpringConfig {
 }
