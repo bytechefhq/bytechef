@@ -10,19 +10,18 @@ import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {ReactNode} from 'react';
 
 export interface DropDownMenuItem {
-    label?: string;
-    shortcut?: string;
     icon?: ReactNode;
+    integrationId?: number;
+    label?: string;
+    onClick?: (id: number, event: React.MouseEvent) => void;
     separator?: boolean;
-    onClick?: (id?: number) => void;
+    shortcut?: string;
 }
 
-interface DropdownProps {
-    id?: number;
+export const Dropdown: React.FC<{
     menuItems: DropDownMenuItem[];
-}
-
-export const Dropdown = ({id = 0, menuItems}: DropdownProps): JSX.Element => {
+    id?: number;
+}> = ({id = 0, menuItems}) => {
     return (
         <div>
             <Root>
@@ -40,30 +39,34 @@ export const Dropdown = ({id = 0, menuItems}: DropdownProps): JSX.Element => {
                         id={id.toString()}
                         sideOffset={5}
                     >
-                        {menuItems.map(({label, separator, onClick}, i) => (
-                            <div key={`menu-item-${i}`}>
-                                {!separator && (
-                                    <Item
-                                        className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900"
-                                        onClick={(event) => {
-                                            event.preventDefault();
+                        {menuItems.map((menuItem, i) => {
+                            const {label, onClick, separator} = menuItem;
 
-                                            if (onClick) {
-                                                onClick(id);
-                                            }
-                                        }}
-                                    >
-                                        <span className="grow text-gray-700 dark:text-gray-300">
-                                            {label}
-                                        </span>
-                                    </Item>
-                                )}
-
-                                {separator && (
-                                    <Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
-                                )}
-                            </div>
-                        ))}
+                            return (
+                                <div
+                                    key={`menu-item-${
+                                        label || 'separator'
+                                    }-${i}`}
+                                >
+                                    {separator ? (
+                                        <Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
+                                    ) : (
+                                        <Item
+                                            className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900"
+                                            onClick={(event) => {
+                                                if (onClick) {
+                                                    onClick(id, event);
+                                                }
+                                            }}
+                                        >
+                                            <span className="grow text-gray-700 dark:text-gray-300">
+                                                {label}
+                                            </span>
+                                        </Item>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </Content>
                 </Portal>
             </Root>

@@ -49,12 +49,17 @@ const IntegrationList = () => {
                                     >
                                         <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
                                             <IntegrationItem
-                                                key={integration.id}
                                                 category={integration.category}
+                                                componentVersion={undefined} // missing api
+                                                key={integration.id}
                                                 description={
                                                     integration.description
                                                 }
                                                 id={integration.id}
+                                                integrationNames={integrations.map(
+                                                    (integration) =>
+                                                        integration.name
+                                                )}
                                                 lastDatePublished={
                                                     undefined // missing lastDatePublished
                                                 }
@@ -67,7 +72,6 @@ const IntegrationList = () => {
                                                         )
                                                 )}
                                                 tags={integration.tags}
-                                                componentVersion={undefined} // missing api
                                                 workflowIds={
                                                     integration.workflowIds
                                                 }
