@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.integration.web.rest.mapper;
+package com.bytechef.tag.web.rest.mapper;
 
-import com.bytechef.dione.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
-import com.bytechef.dione.integration.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.web.rest.mapper.config.TagMapperSpringConfig;
+import com.bytechef.tag.web.rest.model.TagModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = IntegrationMapperSpringConfig.class)
-public interface IntegrationTagModelMapper extends Converter<TagModel, Tag> {
+@Mapper(config = TagMapperSpringConfig.class)
+public interface TagModelMapper extends Converter<TagModel, Tag> {
 
     Tag convert(TagModel tagModel);
 }
