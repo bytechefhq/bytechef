@@ -8,18 +8,20 @@ import {
 } from '@radix-ui/react-dropdown-menu';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {ReactNode} from 'react';
+import {twMerge} from 'tailwind-merge';
 
-export interface DropDownMenuItem {
+export interface DropdownMenuItemType {
     icon?: ReactNode;
     integrationId?: number;
     label?: string;
     onClick?: (id: number, event: React.MouseEvent) => void;
     separator?: boolean;
     shortcut?: string;
+    danger?: boolean;
 }
 
 export const Dropdown: React.FC<{
-    menuItems: DropDownMenuItem[];
+    menuItems: DropdownMenuItemType[];
     id?: number;
 }> = ({id = 0, menuItems}) => {
     return (
@@ -40,7 +42,8 @@ export const Dropdown: React.FC<{
                         sideOffset={5}
                     >
                         {menuItems.map((menuItem, i) => {
-                            const {label, onClick, separator} = menuItem;
+                            const {danger, label, onClick, separator} =
+                                menuItem;
 
                             return (
                                 <div
@@ -52,14 +55,18 @@ export const Dropdown: React.FC<{
                                         <Separator className="my-1 h-px bg-gray-200 dark:bg-gray-700" />
                                     ) : (
                                         <Item
-                                            className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900"
+                                            className={twMerge([
+                                                'flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-700 outline-none hover:cursor-pointer dark:text-gray-300',
+                                                danger &&
+                                                    'bg-red-600 text-white hover:bg-red-800 hover:text-white',
+                                            ])}
                                             onClick={(event) => {
                                                 if (onClick) {
                                                     onClick(id, event);
                                                 }
                                             }}
                                         >
-                                            <span className="grow text-gray-700 dark:text-gray-300">
+                                            <span className="grow">
                                                 {label}
                                             </span>
                                         </Item>
