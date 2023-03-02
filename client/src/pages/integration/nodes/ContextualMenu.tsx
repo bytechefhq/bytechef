@@ -15,14 +15,17 @@ interface ContextualMenuProps {
     components: ComponentDefinitionBasicModel[] | undefined;
     flowControls: TaskDispatcherDefinitionModel[] | undefined;
     id: string;
+    edge?: boolean;
 }
 
 const ContextualMenu = ({
     components,
     flowControls,
     id,
+    edge,
 }: ContextualMenuProps): JSX.Element => {
     const [filter, setFilter] = useState('');
+
     const [filteredComponents, setFilteredComponents] = useState<
         Array<ComponentDefinitionBasicModel>
     >([]);
@@ -30,13 +33,63 @@ const ContextualMenu = ({
         Array<TaskDispatcherDefinitionModel>
     >([]);
 
-    const {getNode, setEdges, setNodes} = useReactFlow();
+    const {getEdge, getNode, setEdges, setNodes} = useReactFlow();
 
     const handleItemClick = (
         clickedItem:
             | ComponentDefinitionBasicModel
             | TaskDispatcherDefinitionModel
     ) => {
+        if (edge) {
+            const clickedEdge = getEdge(id);
+
+            if (!clickedEdge) {
+                return;
+            }
+
+            const newWorkflowNode = {
+                data: {
+                    label: clickedItem.display?.label,
+                    name: clickedItem?.name,
+                    icon: <Component1Icon className="h-8 w-8 text-gray-700" />,
+                },
+                position: {
+                    x: 0,
+                    y: 0,
+                },
+                id: uuid(),
+                type: 'workflow',
+            };
+
+            const sourceEdge = {
+                id: `${clickedEdge.source}->${newWorkflowNode.id}`,
+                source: clickedEdge.source,
+                target: newWorkflowNode.id,
+                type: 'workflow',
+            };
+
+            const targetEdge = {
+                id: `${newWorkflowNode.id}->${clickedEdge.target}`,
+                source: newWorkflowNode.id,
+                target: clickedEdge.target,
+                type: 'workflow',
+            };
+
+            setEdges((edges) =>
+                edges
+                    .filter((edge) => edge.id !== id)
+                    .concat([sourceEdge, targetEdge])
+            );
+
+            setNodes((nodes) => {
+                if (!nodes.find((node) => node.type === 'contextualMenu')) {
+                    return nodes.concat(newWorkflowNode);
+                } else {
+                    return nodes;
+                }
+            });
+        }
+
         const placeholderNode = getNode(id);
 
         if (!placeholderNode) {
@@ -46,7 +99,6 @@ const ContextualMenu = ({
         const placeholderId = placeholderNode.id;
         const childPlaceholderId = uuid();
 
-        // create a placeholder node that will be added as a child of the clicked node
         const childPlaceholderNode = {
             id: childPlaceholderId,
             position: {
@@ -60,7 +112,6 @@ const ContextualMenu = ({
             },
         };
 
-        // we need a connection from the clicked node to the new placeholder
         const childPlaceholderEdge = {
             id: `${placeholderId}=>${childPlaceholderId}`,
             source: placeholderId,
@@ -71,7 +122,6 @@ const ContextualMenu = ({
         setNodes((nodes: Node[]) =>
             nodes
                 .map((node) => {
-                    // here we are changing the type of the clicked node from placeholder to workflow
                     if (node.id === placeholderId) {
                         return {
                             ...node,
@@ -88,14 +138,12 @@ const ContextualMenu = ({
 
                     return node;
                 })
-                // add the new placeholder node
                 .concat([childPlaceholderNode])
         );
 
         setEdges((edges: Edge[]) =>
             edges
                 .map((edge) => {
-                    // here we are changing the type of the connecting edge from placeholder to workflow
                     if (edge.target === id) {
                         return {
                             ...edge,
@@ -108,7 +156,6 @@ const ContextualMenu = ({
 
                     return edge;
                 })
-                // add the new placeholder edge
                 .concat([childPlaceholderEdge])
         );
     };
@@ -139,7 +186,7 @@ const ContextualMenu = ({
                 )
             );
         }
-    }, [components, filter, flowControls]);
+    }, [components, filter, flowControls, edge]);
 
     return (
         // eslint-disable-next-line tailwindcss/no-custom-classname
