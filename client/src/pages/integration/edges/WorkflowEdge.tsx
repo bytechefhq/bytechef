@@ -1,8 +1,5 @@
-import React from 'react';
 import {EdgeProps, getBezierPath} from 'reactflow';
-
-import useEdgeClick from '../hooks/useEdgeClick';
-import styles from './EdgeTypes.module.css';
+import PopoverMenu from '../components/PopoverMenu';
 
 export default function WorkflowEdge({
     id,
@@ -15,8 +12,6 @@ export default function WorkflowEdge({
     style,
     markerEnd,
 }: EdgeProps) {
-    const onClick = useEdgeClick(id);
-
     const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
         sourceX,
         sourceY,
@@ -36,24 +31,27 @@ export default function WorkflowEdge({
                 markerEnd={markerEnd}
             />
 
-            {/*<PopoverMenu>*/}
-            <g transform={`translate(${edgeCenterX}, ${edgeCenterY})`}>
-                <rect
-                    onClick={onClick}
-                    x={-10}
-                    y={-10}
-                    width={20}
-                    ry={4}
-                    rx={4}
-                    height={20}
-                    className={styles.edgeButton}
-                />
+            <PopoverMenu id={id} edge>
+                <g transform={`translate(${edgeCenterX}, ${edgeCenterY})`}>
+                    <rect
+                        className="pointer-events-auto cursor-pointer fill-white stroke-gray-400 hover:fill-gray-200"
+                        height={20}
+                        rx={4}
+                        ry={4}
+                        width={20}
+                        x={-10}
+                        y={-10}
+                    />
 
-                <text className={styles.edgeButtonText} y={5} x={-5}>
-                    +
-                </text>
-            </g>
-            {/*</PopoverMenu>*/}
+                    <text
+                        className="pointer-events-none select-none fill-gray-500"
+                        y={5}
+                        x={-5}
+                    >
+                        +
+                    </text>
+                </g>
+            </PopoverMenu>
         </>
     );
 }
