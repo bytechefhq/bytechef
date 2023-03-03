@@ -1,18 +1,19 @@
 import {useMutation} from '@tanstack/react-query';
 import {
+    CreateIntegrationWorkflowRequest,
     DeleteIntegrationRequest,
     IntegrationModel,
     IntegrationsApi,
     UpdateIntegrationTagsRequest,
 } from 'middleware/integration';
 
-type IntegrationMutationProps = {
+type CreateIntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
     onError?: (error: object, variables: IntegrationModel) => void;
 };
 
 export const useCreateIntegrationMutation = (
-    mutationProps?: IntegrationMutationProps
+    mutationProps?: CreateIntegrationMutationProps
 ) =>
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
@@ -24,8 +25,13 @@ export const useCreateIntegrationMutation = (
         onError: mutationProps?.onError,
     });
 
+type UpdateIntegrationMutationProps = {
+    onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
+    onError?: (error: object, variables: IntegrationModel) => void;
+};
+
 export const useUpdateIntegrationMutation = (
-    mutationProps?: IntegrationMutationProps
+    mutationProps?: UpdateIntegrationMutationProps
 ) =>
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
@@ -38,13 +44,13 @@ export const useUpdateIntegrationMutation = (
         onError: mutationProps?.onError,
     });
 
-type IntegrationTagsMutationProps = {
+type UpdateIntegrationTagsMutationProps = {
     onSuccess?: (result: void, variables: UpdateIntegrationTagsRequest) => void;
     onError?: (error: object, variables: UpdateIntegrationTagsRequest) => void;
 };
 
 export const useUpdateIntegrationTagsMutation = (
-    mutationProps?: IntegrationTagsMutationProps
+    mutationProps?: UpdateIntegrationTagsMutationProps
 ) =>
     useMutation({
         mutationFn: (request: UpdateIntegrationTagsRequest) => {
@@ -54,13 +60,13 @@ export const useUpdateIntegrationTagsMutation = (
         onError: mutationProps?.onError,
     });
 
-type IntegrationDeleteMutationProps = {
+type DeleteIntegrationMutationProps = {
     onSuccess?: (result: void, variables: DeleteIntegrationRequest) => void;
     onError?: (error: object, variables: DeleteIntegrationRequest) => void;
 };
 
 export const useDeleteIntegrationMutation = (
-    mutationProps?: IntegrationDeleteMutationProps
+    mutationProps?: DeleteIntegrationMutationProps
 ) =>
     useMutation({
         mutationFn: (request: DeleteIntegrationRequest) => {
@@ -70,17 +76,23 @@ export const useDeleteIntegrationMutation = (
         onError: mutationProps?.onError,
     });
 
-type WorkflowMutationProps = {
-    onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
-    onError?: (error: object, variables: IntegrationModel) => void;
+type CreateIntegrationWorkflowRequestMutationProps = {
+    onSuccess?: (
+        result: IntegrationModel,
+        variables: CreateIntegrationWorkflowRequest
+    ) => void;
+    onError?: (
+        error: object,
+        variables: CreateIntegrationWorkflowRequest
+    ) => void;
 };
 
-export const useWorkflowMutation = (mutationProps?: WorkflowMutationProps) =>
+export const useCreateIntegrationWorkflowRequestMutation = (
+    mutationProps?: CreateIntegrationWorkflowRequestMutationProps
+) =>
     useMutation({
-        mutationFn: (workflows: IntegrationModel) => {
-            return new IntegrationsApi().postIntegration({
-                integrationModel: workflows,
-            });
+        mutationFn: (request: CreateIntegrationWorkflowRequest) => {
+            return new IntegrationsApi().createIntegrationWorkflow(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
