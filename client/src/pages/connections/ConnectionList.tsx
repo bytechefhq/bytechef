@@ -6,7 +6,7 @@ import {
 } from '../../queries/connections';
 import EmptyList from '../../components/EmptyList/EmptyList';
 import {LinkIcon} from '@heroicons/react/24/outline';
-import ConnectionModal from './ConnectionModal';
+import ConnectionDialog from './ConnectionDialog';
 import {twMerge} from 'tailwind-merge';
 
 const ConnectionList = () => {
@@ -45,7 +45,7 @@ const ConnectionList = () => {
                     !error &&
                     (connections?.length === 0 ? (
                         <EmptyList
-                            button={<ConnectionModal />}
+                            button={<ConnectionDialog />}
                             icon={
                                 <LinkIcon className="h-12 w-12 text-gray-400" />
                             }
