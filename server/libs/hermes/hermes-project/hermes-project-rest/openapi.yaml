@@ -45,7 +45,7 @@ paths:
       summary: Create a new project.
       tags:
         - projects
-      operationId: postProject
+      operationId: createProject
       requestBody:
         content:
           application/json:
@@ -137,7 +137,7 @@ paths:
       summary: Update an existing project.
       tags:
         - projects
-      operationId: putProject
+      operationId: updateProject
       parameters:
         - name: id
           description: The id of an project.
@@ -155,6 +155,28 @@ paths:
       responses:
         "200":
           description: The updated project object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+  /projects/{id}/duplicate:
+    post:
+      description: Duplicates existing project.
+      summary: Duplicates existing project.
+      tags:
+        - projects
+      operationId: duplicateProject
+      parameters:
+        - name: id
+          description: The id of an project.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The duplicated project object.
           content:
             application/json:
               schema:
@@ -188,7 +210,7 @@ paths:
       summary: Create new workflow and adds it to an existing project.
       tags:
         - projects
-      operationId: postProjectWorkflow
+      operationId: createProjectWorkflow
       parameters:
         - name: id
           description: The id of an project.
@@ -228,7 +250,7 @@ paths:
       summary: Updates tags of an existing project.
       tags:
         - projects
-      operationId: putProjectTags
+      operationId: updateProjectTags
       parameters:
         - name: id
           description: The id of an project.
@@ -291,16 +313,30 @@ components:
           type: string
           format: date-time
           readOnly: true
+        lastPublishedDate:
+          description: The last published date.
+          type: string
+          format: date-time
+        projectVersion:
+          description: The version of a project.
+          type: integer
+        status:
+          $ref: '#/components/schemas/Status'
         tags:
           type: array
           items:
             $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
-        version:
-          type: integer
-          format: int32
         workflowIds:
           description: The workflow ids belonging to this project.
           type: array
           items:
             type: string
             readOnly: true
+        __version:
+          type: integer
+    Status:
+      description: A status of a project.
+      type: string
+      enum:
+        - PUBLISHED
+        - UNPUBLISHED

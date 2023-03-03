@@ -45,7 +45,7 @@ paths:
       summary: Create a new integration.
       tags:
         - integrations
-      operationId: postIntegration
+      operationId: createIntegration
       requestBody:
         content:
           application/json:
@@ -137,7 +137,7 @@ paths:
       summary: Update an existing integration.
       tags:
         - integrations
-      operationId: putIntegration
+      operationId: updateIntegration
       parameters:
         - name: id
           description: The id of an integration.
@@ -188,7 +188,7 @@ paths:
       summary: Create new workflow and adds it to an existing integration.
       tags:
         - integrations
-      operationId: postIntegrationWorkflow
+      operationId: createIntegrationWorkflow
       parameters:
         - name: id
           description: The id of an integration.
@@ -228,7 +228,7 @@ paths:
       summary: Updates tags of an existing integration.
       tags:
         - integrations
-      operationId: putIntegrationTags
+      operationId: updateIntegrationTags
       parameters:
         - name: id
           description: The id of an integration.
@@ -291,16 +291,30 @@ components:
           type: string
           format: date-time
           readOnly: true
+        lastPublishedDate:
+          description: The last published date.
+          type: string
+          format: date-time
+        integrationVersion:
+          description: The version of an integration.
+          type: integer
+        status:
+          $ref: '#/components/schemas/Status'
         tags:
           type: array
           items:
             $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
-        version:
-          type: integer
-          format: int32
         workflowIds:
           description: The workflow ids belonging to this integration.
           type: array
           items:
             type: string
             readOnly: true
+        __version:
+          type: integer
+    Status:
+      description: A status of an integration.
+      type: string
+      enum:
+        - PUBLISHED
+        - UNPUBLISHED

@@ -26,7 +26,6 @@ schemas:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
         type: integer
-        format: int32
         description:
       taskProperties:
         description: Properties used to define tasks to be dispatched.

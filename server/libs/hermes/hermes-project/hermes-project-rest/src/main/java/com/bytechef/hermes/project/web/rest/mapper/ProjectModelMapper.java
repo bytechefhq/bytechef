@@ -31,6 +31,7 @@ import org.springframework.core.convert.converter.Converter;
 public interface ProjectModelMapper extends Converter<ProjectModel, Project> {
 
     @Mapping(target = "categoryId", ignore = true)
+    @Mapping(target = "update", ignore = true)
     @Mapping(target = "tagIds", ignore = true)
     Project convert(ProjectModel projectModel);
 }

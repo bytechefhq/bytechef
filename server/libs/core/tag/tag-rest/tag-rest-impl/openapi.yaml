@@ -26,7 +26,7 @@ paths:
       summary: Create a new tag.
       tags:
         - tags
-      operationId: postTag
+      operationId: createTag
       requestBody:
         content:
           application/json:
@@ -84,7 +84,7 @@ paths:
       summary: Update an existing tag.
       tags:
         - tags
-      operationId: putTag
+      operationId: updateTag
       parameters:
         - name: id
           description: The id of a tag.
@@ -138,6 +138,5 @@ components:
         name:
           description: The name of the tag.
           type: string
-        version:
+        __version:
           type: integer
-          format: int32

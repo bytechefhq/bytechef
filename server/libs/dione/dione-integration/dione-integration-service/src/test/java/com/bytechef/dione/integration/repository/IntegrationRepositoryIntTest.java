@@ -120,7 +120,9 @@ public class IntegrationRepositoryIntTest {
         integration.setWorkflowIds(workflowIds);
 
         integration.setDescription("name");
+        integration.setIntegrationVersion(1);
         integration.setName("name");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
 
         return integration;
     }

@@ -35,10 +35,52 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:08:48.823625+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:05.892297+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "categories", description = "the categories API")
 public interface CategoriesApi {
+
+    /**
+     * POST /categories : Create a new category.
+     * Create a new category.
+     *
+     * @param categoryModel  (required)
+     * @return The category object. (status code 200)
+     */
+    @Operation(
+        operationId = "createCategory",
+        summary = "Create a new category.",
+        description = "Create a new category.",
+        tags = { "categories" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The category object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/categories",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<CategoryModel>> createCategory(
+        @Parameter(name = "CategoryModel", description = "", required = true) @Valid @RequestBody Mono<CategoryModel> categoryModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(categoryModel).then(Mono.empty());
+
+    }
+
 
     /**
      * DELETE /categories/{id} : Delete a category.
@@ -100,7 +142,7 @@ public interface CategoriesApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "[ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"version\" : 6 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"version\" : 6 } ]";
+                String exampleString = "[ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ]";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -141,54 +183,12 @@ public interface CategoriesApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"version\" : 6 }";
+                String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
         }
         return result.then(Mono.empty());
-
-    }
-
-
-    /**
-     * POST /categories : Create a new category.
-     * Create a new category.
-     *
-     * @param categoryModel  (required)
-     * @return The category object. (status code 200)
-     */
-    @Operation(
-        operationId = "postCategory",
-        summary = "Create a new category.",
-        description = "Create a new category.",
-        tags = { "categories" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The category object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/categories",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default Mono<ResponseEntity<CategoryModel>> postCategory(
-        @Parameter(name = "CategoryModel", description = "", required = true) @Valid @RequestBody Mono<CategoryModel> categoryModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
-    ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"version\" : 6 }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
-            }
-        }
-        return result.then(categoryModel).then(Mono.empty());
 
     }
 
@@ -202,7 +202,7 @@ public interface CategoriesApi {
      * @return The updated category object. (status code 200)
      */
     @Operation(
-        operationId = "putCategory",
+        operationId = "updateCategory",
         summary = "Update an existing category.",
         description = "Update an existing category.",
         tags = { "categories" },
@@ -218,7 +218,7 @@ public interface CategoriesApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<CategoryModel>> putCategory(
+    default Mono<ResponseEntity<CategoryModel>> updateCategory(
         @Parameter(name = "id", description = "The id of a category.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "CategoryModel", description = "", required = true) @Valid @RequestBody Mono<CategoryModel> categoryModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
@@ -227,7 +227,7 @@ public interface CategoriesApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"version\" : 6 }";
+                String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }

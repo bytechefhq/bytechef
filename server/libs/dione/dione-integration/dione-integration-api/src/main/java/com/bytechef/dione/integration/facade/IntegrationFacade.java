@@ -18,8 +18,10 @@
 package com.bytechef.dione.integration.facade;
 
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.category.domain.Category;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.tag.domain.Tag;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +37,9 @@ public interface IntegrationFacade {
     void delete(Long id);
 
     Integration getIntegration(Long id);
+
+    @Transactional(readOnly = true)
+    List<Category> getIntegrationCategories();
 
     List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds);
 
