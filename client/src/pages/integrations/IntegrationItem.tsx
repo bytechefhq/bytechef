@@ -203,6 +203,3 @@ const IntegrationItem = ({
 };
 
 export default IntegrationItem;
-function setShowTrigger(arg0: boolean) {
-    throw new Error('Function not implemented.');
-}

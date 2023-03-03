@@ -1,4 +1,4 @@
-import React, {ReactNode, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Input from 'components/Input/Input';
 import Modal from 'components/Modal/Modal';
 import {useForm} from 'react-hook-form';
@@ -47,6 +47,7 @@ const WorkflowModal = ({visible = false, id}: WorkflowModalProps) => {
 
     function createWorkflow() {
         const formData = getValues();
+
         mutate(formData);
     }
 
@@ -66,10 +67,11 @@ const WorkflowModal = ({visible = false, id}: WorkflowModalProps) => {
                 label="Name"
                 {...register('name', {required: true})}
             />
+
             <TextArea
+                style={{height: '120px'}}
                 label="Description"
                 {...register('description')}
-                style={{height: '120px'}}
             />
 
             <div className="mt-4 flex justify-end space-x-1">
@@ -79,6 +81,7 @@ const WorkflowModal = ({visible = false, id}: WorkflowModalProps) => {
                     type="button"
                     onClick={() => {
                         setIsOpen(false);
+
                         reset();
                     }}
                 />
