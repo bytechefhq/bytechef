@@ -16,12 +16,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * PostProjectWorkflowRequestModel
+ * CreateProjectWorkflowRequestModel
  */
 
-@JsonTypeName("postProjectWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:35:39.488347+01:00[Europe/Zagreb]")
-public class PostProjectWorkflowRequestModel {
+@JsonTypeName("createProjectWorkflow_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:05.522675+01:00[Europe/Zagreb]")
+public class CreateProjectWorkflowRequestModel {
 
   @JsonProperty("name")
   private String name;
@@ -32,7 +32,7 @@ public class PostProjectWorkflowRequestModel {
   @JsonProperty("definition")
   private String definition;
 
-  public PostProjectWorkflowRequestModel name(String name) {
+  public CreateProjectWorkflowRequestModel name(String name) {
     this.name = name;
     return this;
   }
@@ -51,7 +51,7 @@ public class PostProjectWorkflowRequestModel {
     this.name = name;
   }
 
-  public PostProjectWorkflowRequestModel description(String description) {
+  public CreateProjectWorkflowRequestModel description(String description) {
     this.description = description;
     return this;
   }
@@ -70,7 +70,7 @@ public class PostProjectWorkflowRequestModel {
     this.description = description;
   }
 
-  public PostProjectWorkflowRequestModel definition(String definition) {
+  public CreateProjectWorkflowRequestModel definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -97,10 +97,10 @@ public class PostProjectWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PostProjectWorkflowRequestModel postProjectWorkflowRequest = (PostProjectWorkflowRequestModel) o;
-    return Objects.equals(this.name, postProjectWorkflowRequest.name) &&
-        Objects.equals(this.description, postProjectWorkflowRequest.description) &&
-        Objects.equals(this.definition, postProjectWorkflowRequest.definition);
+    CreateProjectWorkflowRequestModel createProjectWorkflowRequest = (CreateProjectWorkflowRequestModel) o;
+    return Objects.equals(this.name, createProjectWorkflowRequest.name) &&
+        Objects.equals(this.description, createProjectWorkflowRequest.description) &&
+        Objects.equals(this.definition, createProjectWorkflowRequest.definition);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class PostProjectWorkflowRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PostProjectWorkflowRequestModel {\n");
+    sb.append("class CreateProjectWorkflowRequestModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");

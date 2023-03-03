@@ -16,12 +16,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * PostIntegrationWorkflowRequestModel
+ * CreateIntegrationWorkflowRequestModel
  */
 
-@JsonTypeName("postIntegrationWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:41:56.234549+01:00[Europe/Zagreb]")
-public class PostIntegrationWorkflowRequestModel {
+@JsonTypeName("createIntegrationWorkflow_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:04.815288+01:00[Europe/Zagreb]")
+public class CreateIntegrationWorkflowRequestModel {
 
   @JsonProperty("name")
   private String name;
@@ -32,7 +32,7 @@ public class PostIntegrationWorkflowRequestModel {
   @JsonProperty("definition")
   private String definition;
 
-  public PostIntegrationWorkflowRequestModel name(String name) {
+  public CreateIntegrationWorkflowRequestModel name(String name) {
     this.name = name;
     return this;
   }
@@ -51,7 +51,7 @@ public class PostIntegrationWorkflowRequestModel {
     this.name = name;
   }
 
-  public PostIntegrationWorkflowRequestModel description(String description) {
+  public CreateIntegrationWorkflowRequestModel description(String description) {
     this.description = description;
     return this;
   }
@@ -70,7 +70,7 @@ public class PostIntegrationWorkflowRequestModel {
     this.description = description;
   }
 
-  public PostIntegrationWorkflowRequestModel definition(String definition) {
+  public CreateIntegrationWorkflowRequestModel definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -97,10 +97,10 @@ public class PostIntegrationWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PostIntegrationWorkflowRequestModel postIntegrationWorkflowRequest = (PostIntegrationWorkflowRequestModel) o;
-    return Objects.equals(this.name, postIntegrationWorkflowRequest.name) &&
-        Objects.equals(this.description, postIntegrationWorkflowRequest.description) &&
-        Objects.equals(this.definition, postIntegrationWorkflowRequest.definition);
+    CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequest = (CreateIntegrationWorkflowRequestModel) o;
+    return Objects.equals(this.name, createIntegrationWorkflowRequest.name) &&
+        Objects.equals(this.description, createIntegrationWorkflowRequest.description) &&
+        Objects.equals(this.definition, createIntegrationWorkflowRequest.definition);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class PostIntegrationWorkflowRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PostIntegrationWorkflowRequestModel {\n");
+    sb.append("class CreateIntegrationWorkflowRequestModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
