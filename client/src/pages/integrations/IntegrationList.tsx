@@ -3,7 +3,11 @@ import {
     useGetIntegrationTagsQuery,
 } from '../../queries/integrations';
 import IntegrationItem from 'pages/integrations/IntegrationItem';
-import {Link, useSearchParams} from 'react-router-dom';
+import {useSearchParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
+import EmptyList from '../../components/EmptyList/EmptyList';
+import IntegrationModal from './IntegrationModal';
+import {FolderPlusIcon} from '@heroicons/react/24/outline';
 
 const IntegrationList = () => {
     const [searchParams] = useSearchParams();
@@ -24,7 +28,12 @@ const IntegrationList = () => {
     const {data: tags} = useGetIntegrationTagsQuery();
 
     return (
-        <div className="flex place-self-center px-2 sm:w-full 2xl:w-4/5">
+        <div
+            className={twMerge(
+                'flex place-self-center px-2 sm:w-full 2xl:w-4/5',
+                integrations?.length === 0 ? 'h-full items-center' : ''
+            )}
+        >
             <ul role="list" className="w-full divide-y divide-gray-100">
                 {isLoading && 'Loading...'}
 
@@ -35,7 +44,16 @@ const IntegrationList = () => {
                 {!isLoading &&
                     !error &&
                     (integrations?.length === 0 ? (
-                        <p>You do not have any Integration created yet.</p>
+                        <EmptyList
+                            button={
+                                <IntegrationModal integration={undefined} />
+                            }
+                            icon={
+                                <FolderPlusIcon className="h-12 w-12 text-gray-400" />
+                            }
+                            message="Get started by creating a new project."
+                            title="No projects"
+                        />
                     ) : (
                         integrations.map((integration) => {
                             const integrationTagIds = integration.tags?.map(
@@ -44,29 +62,22 @@ const IntegrationList = () => {
 
                             return (
                                 <div key={integration.id}>
-                                    <Link
-                                        to={`/automation/integrations/${integration.id}`}
-                                    >
-                                        <li className="group my-3 flex items-center justify-between rounded-md bg-white p-2 hover:bg-gray-50">
-                                            <IntegrationItem
-                                                componentVersion={undefined} // missing api
-                                                integration={integration}
-                                                integrationNames={integrations.map(
-                                                    (integration) =>
-                                                        integration.name
-                                                )}
-                                                key={integration.id}
-                                                lastDatePublished={undefined} // missing api
-                                                published={false} // missing api
-                                                remainingTags={tags?.filter(
-                                                    (tag) =>
-                                                        !integrationTagIds?.includes(
-                                                            tag.id
-                                                        )
-                                                )}
-                                            />
-                                        </li>
-                                    </Link>
+                                    <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
+                                        <IntegrationItem
+                                            integration={integration}
+                                            integrationNames={integrations.map(
+                                                (integration) =>
+                                                    integration.name
+                                            )}
+                                            key={integration.id}
+                                            remainingTags={tags?.filter(
+                                                (tag) =>
+                                                    !integrationTagIds?.includes(
+                                                        tag.id
+                                                    )
+                                            )}
+                                        />
+                                    </li>
                                 </div>
                             );
                         })
