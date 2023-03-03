@@ -2,9 +2,11 @@ package com.bytechef.dione.integration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.dione.integration.web.rest.model.StatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:43:15.780734+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:04.815288+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("category")
@@ -54,16 +56,26 @@ public class IntegrationModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
+  @JsonProperty("lastPublishedDate")
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime lastPublishedDate;
+
+  @JsonProperty("integrationVersion")
+  private Integer integrationVersion;
+
+  @JsonProperty("status")
+  private StatusModel status;
+
   @JsonProperty("tags")
   @Valid
   private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
-  @JsonProperty("version")
-  private Integer version;
-
   @JsonProperty("workflowIds")
   @Valid
   private List<String> workflowIds = null;
+
+  @JsonProperty("__version")
+  private Integer version;
 
   public IntegrationModel category(com.bytechef.category.web.rest.model.CategoryModel category) {
     this.category = category;
@@ -217,6 +229,63 @@ public class IntegrationModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public IntegrationModel lastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
+    return this;
+  }
+
+  /**
+   * The last published date.
+   * @return lastPublishedDate
+  */
+  @Valid 
+  @Schema(name = "lastPublishedDate", description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public LocalDateTime getLastPublishedDate() {
+    return lastPublishedDate;
+  }
+
+  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
+  }
+
+  public IntegrationModel integrationVersion(Integer integrationVersion) {
+    this.integrationVersion = integrationVersion;
+    return this;
+  }
+
+  /**
+   * The version of an integration.
+   * @return integrationVersion
+  */
+  
+  @Schema(name = "integrationVersion", description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Integer getIntegrationVersion() {
+    return integrationVersion;
+  }
+
+  public void setIntegrationVersion(Integer integrationVersion) {
+    this.integrationVersion = integrationVersion;
+  }
+
+  public IntegrationModel status(StatusModel status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Get status
+   * @return status
+  */
+  @Valid 
+  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public StatusModel getStatus() {
+    return status;
+  }
+
+  public void setStatus(StatusModel status) {
+    this.status = status;
+  }
+
   public IntegrationModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
@@ -242,25 +311,6 @@ public class IntegrationModel {
 
   public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
-  }
-
-  public IntegrationModel version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-  /**
-   * Get version
-   * @return version
-  */
-  
-  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
   }
 
   public IntegrationModel workflowIds(List<String> workflowIds) {
@@ -290,6 +340,25 @@ public class IntegrationModel {
     this.workflowIds = workflowIds;
   }
 
+  public IntegrationModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+  */
+  
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -307,14 +376,17 @@ public class IntegrationModel {
         Objects.equals(this.description, integration.description) &&
         Objects.equals(this.lastModifiedBy, integration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integration.lastModifiedDate) &&
+        Objects.equals(this.lastPublishedDate, integration.lastPublishedDate) &&
+        Objects.equals(this.integrationVersion, integration.integrationVersion) &&
+        Objects.equals(this.status, integration.status) &&
         Objects.equals(this.tags, integration.tags) &&
-        Objects.equals(this.version, integration.version) &&
-        Objects.equals(this.workflowIds, integration.workflowIds);
+        Objects.equals(this.workflowIds, integration.workflowIds) &&
+        Objects.equals(this.version, integration.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, tags, version, workflowIds);
+    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, lastPublishedDate, integrationVersion, status, tags, workflowIds, version);
   }
 
   @Override
@@ -329,9 +401,12 @@ public class IntegrationModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    workflowIds: ").append(toIndentedString(workflowIds)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

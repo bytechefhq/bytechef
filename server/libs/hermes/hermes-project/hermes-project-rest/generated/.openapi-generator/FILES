@@ -1,5 +1,6 @@
 src/main/java/com/bytechef/hermes/project/web/rest/ApiUtil.java
 src/main/java/com/bytechef/hermes/project/web/rest/ProjectsApi.java
-src/main/java/com/bytechef/hermes/project/web/rest/model/PostProjectWorkflowRequestModel.java
+src/main/java/com/bytechef/hermes/project/web/rest/model/CreateProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/hermes/project/web/rest/model/ProjectModel.java
-src/main/java/com/bytechef/hermes/project/web/rest/model/PutProjectTagsRequestModel.java
+src/main/java/com/bytechef/hermes/project/web/rest/model/StatusModel.java
+src/main/java/com/bytechef/hermes/project/web/rest/model/UpdateProjectTagsRequestModel.java
