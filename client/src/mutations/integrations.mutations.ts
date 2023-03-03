@@ -4,9 +4,7 @@ import {
     IntegrationModel,
     IntegrationsApi,
     PutIntegrationTagsRequest,
-    WorkflowModel,
 } from 'middleware/integration';
-import {WorkflowsApi} from 'middleware/workflow';
 
 type IntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
