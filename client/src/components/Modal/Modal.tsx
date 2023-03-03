@@ -18,12 +18,12 @@ import {Dispatch, Fragment, SetStateAction} from 'react';
 interface ModalProps {
     children: React.ReactNode;
     confirmButtonLabel: string;
-    description: string;
     form: boolean;
     isOpen: boolean;
     setIsOpen: Dispatch<SetStateAction<boolean>>;
     title: string;
     triggerLabel: string;
+    description?: string;
     onCloseClick?: () => void;
     onConfirmButtonClick: () => void;
 }

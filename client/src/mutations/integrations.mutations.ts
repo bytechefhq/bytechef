@@ -4,7 +4,9 @@ import {
     IntegrationModel,
     IntegrationsApi,
     PutIntegrationTagsRequest,
+    WorkflowModel,
 } from 'middleware/integration';
+import {WorkflowsApi} from 'middleware/workflow';
 
 type IntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
@@ -65,6 +67,22 @@ export const useIntegrationDeleteMutation = (
     useMutation({
         mutationFn: (request: DeleteIntegrationRequest) => {
             return new IntegrationsApi().deleteIntegration(request);
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type WorkflowMutationProps = {
+    onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
+    onError?: (error: object, variables: IntegrationModel) => void;
+};
+
+export const useWorkflowMutation = (mutationProps?: WorkflowMutationProps) =>
+    useMutation({
+        mutationFn: (workflows: IntegrationModel) => {
+            return new IntegrationsApi().postIntegration({
+                integrationModel: workflows,
+            });
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,

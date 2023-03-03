@@ -15,6 +15,7 @@ import IntegrationModal from './IntegrationModal';
 import duplicate from './utils/duplicate';
 import TagList from './components/TagList';
 import Name from './components/Name';
+import WorkflowModal from './WorkflowModal';
 
 interface IntegrationItemProps {
     componentVersion: undefined;
@@ -34,6 +35,7 @@ const IntegrationItem = ({
     remainingTags,
 }: IntegrationItemProps) => {
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showWorkflowModal, setShowWorkflowModal] = useState(false);
 
     const {category, description, id, name, tags, workflowIds} = integration;
 
@@ -62,6 +64,11 @@ const IntegrationItem = ({
         },
         {
             label: 'New Workflow',
+            onClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
+
+                setShowWorkflowModal(true);
+            },
         },
         {
             separator: true,
@@ -181,8 +188,15 @@ const IntegrationItem = ({
                     visible
                 />
             )}
+
+            {showWorkflowModal && (
+                <WorkflowModal id={id} visible version={undefined} />
+            )}
         </>
     );
 };
 
 export default IntegrationItem;
+function setShowTrigger(arg0: boolean) {
+    throw new Error('Function not implemented.');
+}
