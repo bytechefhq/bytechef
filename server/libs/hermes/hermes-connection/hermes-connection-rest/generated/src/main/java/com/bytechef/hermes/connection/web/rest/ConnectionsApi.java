@@ -6,7 +6,7 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import com.bytechef.hermes.connection.web.rest.model.PutConnectionTagsRequestModel;
+import com.bytechef.hermes.connection.web.rest.model.UpdateConnectionTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,10 +36,52 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:45:15.933556+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:05.159071+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connections", description = "the connections API")
 public interface ConnectionsApi {
+
+    /**
+     * POST /connections : Create a new connection.
+     * Create a new connection.
+     *
+     * @param connectionModel  (required)
+     * @return The connection object. (status code 200)
+     */
+    @Operation(
+        operationId = "createConnection",
+        summary = "Create a new connection.",
+        description = "Create a new connection.",
+        tags = { "connections" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The connection object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/connections",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<ConnectionModel>> createConnection(
+        @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody Mono<ConnectionModel> connectionModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"__version\" : 5, \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"connectionVersion\" : 0, \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ] }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(connectionModel).then(Mono.empty());
+
+    }
+
 
     /**
      * DELETE /connections/{id} : Delete a connection.
@@ -103,7 +145,7 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"version\" : 5, \"connectionVersion\" : 0, \"tags\" : [ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 } ] }";
+                String exampleString = "{ \"__version\" : 5, \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"connectionVersion\" : 0, \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -142,7 +184,7 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "[ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 } ]";
+                String exampleString = "[ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ]";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -185,54 +227,12 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "[ { \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"version\" : 5, \"connectionVersion\" : 0, \"tags\" : [ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 } ] }, { \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"version\" : 5, \"connectionVersion\" : 0, \"tags\" : [ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 } ] } ]";
+                String exampleString = "[ { \"__version\" : 5, \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"connectionVersion\" : 0, \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ] }, { \"__version\" : 5, \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"connectionVersion\" : 0, \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ] } ]";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
         }
         return result.then(Mono.empty());
-
-    }
-
-
-    /**
-     * POST /connections : Create a new connection.
-     * Create a new connection.
-     *
-     * @param connectionModel  (required)
-     * @return The connection object. (status code 200)
-     */
-    @Operation(
-        operationId = "postConnection",
-        summary = "Create a new connection.",
-        description = "Create a new connection.",
-        tags = { "connections" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The connection object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/connections",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default Mono<ResponseEntity<ConnectionModel>> postConnection(
-        @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody Mono<ConnectionModel> connectionModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
-    ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"version\" : 5, \"connectionVersion\" : 0, \"tags\" : [ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 } ] }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
-            }
-        }
-        return result.then(connectionModel).then(Mono.empty());
 
     }
 
@@ -246,7 +246,7 @@ public interface ConnectionsApi {
      * @return The updated connection object. (status code 200)
      */
     @Operation(
-        operationId = "putConnection",
+        operationId = "updateConnection",
         summary = "Update an existing connection.",
         description = "Update an existing connection.",
         tags = { "connections" },
@@ -262,7 +262,7 @@ public interface ConnectionsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<ConnectionModel>> putConnection(
+    default Mono<ResponseEntity<ConnectionModel>> updateConnection(
         @Parameter(name = "id", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody Mono<ConnectionModel> connectionModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
@@ -271,7 +271,7 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"version\" : 5, \"connectionVersion\" : 0, \"tags\" : [ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1, \"version\" : 5 } ] }";
+                String exampleString = "{ \"__version\" : 5, \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"{}\" }, \"connectionVersion\" : 0, \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -286,11 +286,11 @@ public interface ConnectionsApi {
      * Updates tags of an existing connection.
      *
      * @param id The id of the connection. (required)
-     * @param putConnectionTagsRequestModel  (required)
+     * @param updateConnectionTagsRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
-        operationId = "putConnectionTags",
+        operationId = "updateConnectionTags",
         summary = "Updates tags of an existing connection.",
         description = "Updates tags of an existing connection.",
         tags = { "connections" },
@@ -303,14 +303,14 @@ public interface ConnectionsApi {
         value = "/connections/{id}/tags",
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<Void>> putConnectionTags(
+    default Mono<ResponseEntity<Void>> updateConnectionTags(
         @Parameter(name = "id", description = "The id of the connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "PutConnectionTagsRequestModel", description = "", required = true) @Valid @RequestBody Mono<PutConnectionTagsRequestModel> putConnectionTagsRequestModel,
+        @Parameter(name = "UpdateConnectionTagsRequestModel", description = "", required = true) @Valid @RequestBody Mono<UpdateConnectionTagsRequestModel> updateConnectionTagsRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(putConnectionTagsRequestModel).then(Mono.empty());
+        return result.then(updateConnectionTagsRequestModel).then(Mono.empty());
 
     }
 
