@@ -91,6 +91,10 @@ public final class Connection implements Persistable<Long> {
     @Version
     private int version;
 
+    public Connection() {
+        this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
+    }
+
     public void addTag(Tag tag) {
         if (tag.getId() != null) {
             connectionTags.add(new ConnectionTag(tag));
@@ -274,6 +278,13 @@ public final class Connection implements Persistable<Long> {
             + createdDate + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
             + lastModifiedDate + '}';
+    }
+
+    public Connection update(Connection connection) {
+        this.setName(connection.getName());
+        this.setVersion(connection.getVersion());
+
+        return this;
     }
 
     private static class ConnectionImpl implements com.bytechef.hermes.component.Connection {

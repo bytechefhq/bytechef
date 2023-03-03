@@ -44,7 +44,7 @@ paths:
       summary: Create a new connection.
       tags:
         - connections
-      operationId: postConnection
+      operationId: createConnection
       requestBody:
         content:
           application/json:
@@ -119,7 +119,7 @@ paths:
       summary: Update an existing connection.
       tags:
         - connections
-      operationId: putConnection
+      operationId: updateConnection
       parameters:
         - name: id
           description: The id of a connection.
@@ -147,7 +147,7 @@ paths:
       summary: Updates tags of an existing connection.
       tags:
         - connections
-      operationId: putConnectionTags
+      operationId: updateConnectionTags
       parameters:
         - name: id
           description: The id of the connection.
@@ -227,6 +227,6 @@ components:
           type: array
           items:
             $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
-        version:
+        __version:
           type: integer
           format: int32

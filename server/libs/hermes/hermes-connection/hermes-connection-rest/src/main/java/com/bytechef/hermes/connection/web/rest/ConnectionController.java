@@ -21,9 +21,10 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import com.bytechef.hermes.connection.web.rest.model.PutConnectionTagsRequestModel;
+import com.bytechef.hermes.connection.web.rest.model.UpdateConnectionTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,18 +59,22 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ConnectionModel>> getConnection(Long id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-            conversionService.convert(connectionFacade.getConnection(id), ConnectionModel.class)));
+            conversionService.convert(connectionFacade.getConnection(id), ConnectionModel.class)
+                .parameters(null)));
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<Flux<ConnectionModel>>> getConnections(
         List<String> componentNames, List<Long> tagIds, ServerWebExchange exchange) {
 
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(connectionFacade.getConnections(componentNames, tagIds)
             .stream()
-            .map(connection -> conversionService.convert(connection, ConnectionModel.class))
+            .map(connection -> conversionService.convert(connection, ConnectionModel.class)
+                .parameters(null))
             .toList())));
     }
 
@@ -85,7 +90,7 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<ConnectionModel>> postConnection(
+    public Mono<ResponseEntity<ConnectionModel>> createConnection(
         Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
         return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
@@ -96,7 +101,7 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<ConnectionModel>> putConnection(
+    public Mono<ResponseEntity<ConnectionModel>> updateConnection(
         Long id, Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
         return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
@@ -107,10 +112,11 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> putConnectionTags(
-        Long id, Mono<PutConnectionTagsRequestModel> putConnectionTagsRequestModelMono, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Void>> updateConnectionTags(
+        Long id, Mono<UpdateConnectionTagsRequestModel> updateConnectionTagsRequestModelMono,
+        ServerWebExchange exchange) {
 
-        return putConnectionTagsRequestModelMono.map(putConnectionTagsRequestModel -> {
+        return updateConnectionTagsRequestModelMono.map(putConnectionTagsRequestModel -> {
             List<TagModel> tagModels = putConnectionTagsRequestModel.getTags();
 
             connectionFacade.update(
