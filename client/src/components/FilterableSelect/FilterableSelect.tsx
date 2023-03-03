@@ -53,7 +53,7 @@ const FilterableSelect = <
         <fieldset className={twMerge(label ? 'mb-3' : '', fieldsetClassName)}>
             {label && (
                 <label
-                    htmlFor={name}
+                    htmlFor={name || field?.name}
                     className="block text-sm font-medium text-gray-700 dark:text-gray-400"
                 >
                     {label}
