@@ -4,6 +4,10 @@ import {
     useGetConnectionsQuery,
     useGetConnectionTagsQuery,
 } from '../../queries/connections';
+import EmptyList from '../../components/EmptyList/EmptyList';
+import {LinkIcon} from '@heroicons/react/24/outline';
+import ConnectionModal from './ConnectionModal';
+import {twMerge} from 'tailwind-merge';
 
 const ConnectionList = () => {
     const [searchParams] = useSearchParams();
@@ -24,7 +28,12 @@ const ConnectionList = () => {
     const {data: tags} = useGetConnectionTagsQuery();
 
     return (
-        <div className="flex place-self-center px-2 sm:w-full 2xl:w-4/5">
+        <div
+            className={twMerge(
+                'flex place-self-center px-2 sm:w-full 2xl:w-4/5',
+                connections?.length === 0 ? 'h-full items-center' : ''
+            )}
+        >
             <ul role="list" className="w-full divide-y divide-gray-100">
                 {isLoading && 'Loading...'}
 
@@ -35,10 +44,17 @@ const ConnectionList = () => {
                 {!isLoading &&
                     !error &&
                     (connections?.length === 0 ? (
-                        <p>You do not have any Connection created yet.</p>
+                        <EmptyList
+                            button={<ConnectionModal />}
+                            icon={
+                                <LinkIcon className="h-12 w-12 text-gray-400" />
+                            }
+                            message="You do not have any Connection created yet."
+                            title="No Connections"
+                        />
                     ) : (
                         connections.map((connection) => {
-                            const integrationTagIds = connection.tags?.map(
+                            const connectionTagIds = connection.tags?.map(
                                 (tag) => tag.id
                             );
 
@@ -48,21 +64,13 @@ const ConnectionList = () => {
                                         <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
                                             <ConnectionItem
                                                 key={connection.id}
-                                                id={connection.id}
-                                                lastModifiedDate={
-                                                    connection.lastModifiedDate
-                                                }
-                                                name={connection.name}
+                                                connection={connection}
                                                 remainingTags={tags?.filter(
                                                     (tag) =>
-                                                        !integrationTagIds?.includes(
+                                                        !connectionTagIds?.includes(
                                                             tag.id
                                                         )
                                                 )}
-                                                tags={connection.tags}
-                                                version={
-                                                    connection.connectionVersion
-                                                }
                                             />
                                         </li>
                                     </Link>
