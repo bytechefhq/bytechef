@@ -16,11 +16,11 @@ import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
-import IntegrationModal from './IntegrationModal';
+import IntegrationDialog from './IntegrationDialog';
 import duplicate from './utils/duplicate';
 import Name from './components/Name';
 import AlertDialog from '../../components/AlertDialog/AlertDialog';
-import WorkflowModal from './WorkflowModal';
+import WorkflowDialog from './WorkflowDialog';
 import TagList from '../../components/TagList/TagList';
 
 interface IntegrationItemProps {
@@ -34,15 +34,15 @@ const IntegrationItem = ({
     remainingTags,
     integrationNames,
 }: IntegrationItemProps) => {
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showWorkflowModal, setShowWorkflowModal] = useState(false);
+    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const dropdownItems: IDropdownMenuItem[] = [
         {
             label: 'Edit',
             onClick: () => {
-                setShowEditModal(true);
+                setShowEditDialog(true);
             },
         },
         {
@@ -58,7 +58,7 @@ const IntegrationItem = ({
         {
             label: 'New Workflow',
             onClick: () => {
-                setShowWorkflowModal(true);
+                setShowWorkflowDialog(true);
             },
         },
         {
@@ -177,12 +177,12 @@ const IntegrationItem = ({
                 <DropdownMenu id={integration.id} menuItems={dropdownItems} />
             </div>
 
-            {showEditModal && (
-                <IntegrationModal
+            {showEditDialog && (
+                <IntegrationDialog
                     integration={integration}
                     showTrigger={false}
                     visible
-                    onClose={() => setShowEditModal(false)}
+                    onClose={() => setShowEditDialog(false)}
                 />
             )}
 
@@ -203,8 +203,8 @@ const IntegrationItem = ({
                 />
             )}
 
-            {showWorkflowModal && (
-                <WorkflowModal
+            {showWorkflowDialog && (
+                <WorkflowDialog
                     id={integration.id}
                     visible
                     version={undefined}
