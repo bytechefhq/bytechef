@@ -26,7 +26,7 @@ type CreatableSelectProps<
     field?: ControllerRenderProps<TFieldValues, TName>;
     isMulti?: boolean;
     label?: string;
-    name: string;
+    name?: string;
     options: SelectOption[];
 } & CreatableProps<Option, IsMulti, Group>;
 
@@ -54,7 +54,7 @@ const CreatableSelect = <
         <fieldset className={label ? 'mb-3' : ''}>
             {label && (
                 <label
-                    htmlFor={name}
+                    htmlFor={name || field?.name}
                     className="text-sm font-medium text-gray-700 dark:text-gray-400"
                 >
                     {label}
