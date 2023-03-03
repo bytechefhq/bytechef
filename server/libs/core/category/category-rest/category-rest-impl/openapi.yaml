@@ -26,7 +26,7 @@ paths:
       summary: Create a new category.
       tags:
         - categories
-      operationId: postCategory
+      operationId: createCategory
       requestBody:
         content:
           application/json:
@@ -84,7 +84,7 @@ paths:
       summary: Update an existing category.
       tags:
         - categories
-      operationId: putCategory
+      operationId: updateCategory
       parameters:
         - name: id
           description: The id of a category.
@@ -138,6 +138,5 @@ components:
           type: string
           format: date-time
           readOnly: true
-        version:
+        __version:
           type: integer
-          format: int32

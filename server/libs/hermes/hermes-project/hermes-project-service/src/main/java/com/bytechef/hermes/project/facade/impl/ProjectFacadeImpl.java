@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -105,6 +106,27 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public Project duplicate(long id) {
+        Project project = getProject(id);
+
+        List<String> workflowIds = new ArrayList<>();
+
+        for (String workflowId : project.getWorkflowIds()) {
+            Workflow workflow = workflowService.getWorkflow(workflowId);
+
+            workflow = workflowService.create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
+
+            workflowIds.add(workflow.getId());
+        }
+
+        project.setId(null);
+        project.setVersion(0);
+        project.setWorkflowIds(workflowIds);
+
+        return projectService.create(project);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Project getProject(Long id) {
         Project project = projectService.getProject(id);
@@ -117,6 +139,18 @@ public class ProjectFacadeImpl implements ProjectFacade {
         project.setTags(tagService.getTags(project.getTagIds()));
 
         return project;
+    }
+
+    @Override
+    public List<Category> getProjectCategories() {
+        List<Project> projects = projectService.getProjects(null, null);
+
+        List<Long> categoryIds = projects.stream()
+            .map(Project::getCategoryId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        return categoryService.getCategories(categoryIds);
     }
 
     @Override

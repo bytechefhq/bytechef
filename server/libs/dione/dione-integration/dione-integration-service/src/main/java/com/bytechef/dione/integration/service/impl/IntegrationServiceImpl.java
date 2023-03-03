@@ -25,6 +25,7 @@ import java.util.stream.StreamSupport;
 
 import com.bytechef.dione.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -44,6 +45,8 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration addWorkflow(long id, String workflowId) {
+        Assert.notNull(workflowId, "'workflowId' must not be null");
+
         Integration integration = getIntegration(id);
 
         integration.addWorkflow(workflowId);
@@ -54,6 +57,10 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Override
     public Integration create(Integration integration) {
         Assert.notNull(integration, "'integration' must not be null");
+        Assert.isNull(integration.getId(), "'id' must be null");
+
+        integration.setIntegrationVersion(1);
+        integration.setStatus(Integration.Status.UNPUBLISHED);
 
         return integrationRepository.save(integration);
     }
@@ -74,13 +81,13 @@ public class IntegrationServiceImpl implements IntegrationService {
         Iterable<Integration> integrationIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            integrationIterable = integrationRepository.findAll();
+            integrationIterable = integrationRepository.findAllOrderByName();
         } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            integrationIterable = integrationRepository.findByCategoryIdIn(categoryIds);
+            integrationIterable = integrationRepository.findByCategoryIdInOrderByName(categoryIds);
         } else if (CollectionUtils.isEmpty(categoryIds)) {
-            integrationIterable = integrationRepository.findByTagIdIn(tagIds);
+            integrationIterable = integrationRepository.findByTagIdInOrderByName(tagIds);
         } else {
-            integrationIterable = integrationRepository.findByCategoryIdsAndTagIds(categoryIds, tagIds);
+            integrationIterable = integrationRepository.findByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
         }
 
         return StreamSupport.stream(integrationIterable.spliterator(), false)
@@ -97,10 +104,14 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Integration update(@NonNull Integration integration) {
         Assert.notNull(integration, "'integration' must not be null");
+        Assert.notNull(integration.getId(), "'id' must not be null");
         Assert.notEmpty(integration.getWorkflowIds(), "'workflowIds' must not be empty");
 
-        return integrationRepository.save(integration);
+        Integration curIntegration = getIntegration(integration.getId());
+
+        return integrationRepository.save(curIntegration.update(integration));
     }
 }

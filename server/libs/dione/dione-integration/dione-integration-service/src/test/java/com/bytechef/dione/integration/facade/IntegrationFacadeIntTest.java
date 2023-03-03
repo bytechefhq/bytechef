@@ -74,7 +74,12 @@ public class IntegrationFacadeIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testAddWorkflow() {
-        Integration integration = integrationRepository.save(new Integration("name"));
+        Integration integration = new Integration();
+
+        integration.setName("name");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
+
+        integration = integrationRepository.save(integration);
 
         integration = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description", null);
 
@@ -94,6 +99,7 @@ public class IntegrationFacadeIntTest {
 
         integration.setName("name1");
         integration.setDescription("description");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
 
         Category category = categoryRepository.save(new Category("name"));
 
@@ -112,6 +118,7 @@ public class IntegrationFacadeIntTest {
         integration = new Integration();
 
         integration.setName("name2");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
         integration.setWorkflowIds(List.of("workflow2"));
 
         integration = integrationFacade.create(integration);
@@ -157,6 +164,7 @@ public class IntegrationFacadeIntTest {
 
         integration.setCategory(category);
         integration.setName("name");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -179,6 +187,7 @@ public class IntegrationFacadeIntTest {
 
         integration.setCategory(category);
         integration.setName("name");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -207,6 +216,7 @@ public class IntegrationFacadeIntTest {
         Tag tag1 = tagRepository.save(new Tag("tag1"));
 
         integration.setName("name");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
         integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
         integrationRepository.save(integration);
@@ -219,6 +229,7 @@ public class IntegrationFacadeIntTest {
         integration = new Integration();
 
         integration.setName("name2");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
 
         tag1 = tagRepository.findById(tag1.getId())
             .orElseThrow();
@@ -252,7 +263,7 @@ public class IntegrationFacadeIntTest {
         Integration integration = new Integration();
 
         integration.setName("name");
-
+        integration.setStatus(Integration.Status.UNPUBLISHED);
         integration.setWorkflowIds(List.of(workflow.getId()));
 
         integration = integrationRepository.save(integration);
@@ -267,6 +278,7 @@ public class IntegrationFacadeIntTest {
         Integration integration = new Integration();
 
         integration.setName("name");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
 
         Tag tag1 = new Tag("tag1");
 

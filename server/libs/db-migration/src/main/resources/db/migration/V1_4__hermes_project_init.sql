@@ -2,6 +2,9 @@ CREATE TABLE IF NOT EXISTS project (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     name                     VARCHAR(256) NOT NULL,
     description              TEXT         NULL,
+    project_version          INT          NOT NULL,
+    status                   VARCHAR(256) NOT NULL,
+    last_published_date      TIMESTAMP    NULL,
     category_id              BIGINT       NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               TEXT         NOT NULL,
@@ -14,13 +17,13 @@ ALTER TABLE project ADD CONSTRAINT uk_project_name UNIQUE (name);
 
 CREATE TABLE IF NOT EXISTS project_tag (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
-    project_id           BIGSERIAL    NOT NULL,
+    project_id               BIGSERIAL    NOT NULL,
     tag_id                   BIGSERIAL    NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS project_workflow (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
-    project_id           BIGSERIAL    NOT NULL,
+    project_id               BIGSERIAL    NOT NULL,
     workflow_id              VARCHAR(256) NOT NULL
 );
 

@@ -163,6 +163,18 @@ public class IntegrationServiceIntTest {
     public void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration());
 
+        Integration updateIntegration = new Integration();
+
+        updateIntegration.setCategory(integration.getCategory());
+        updateIntegration.setDescription(integration.getDescription());
+        updateIntegration.setIntegrationVersion(integration.getIntegrationVersion());
+        updateIntegration.setId(integration.getId());
+        updateIntegration.setName(integration.getName());
+        updateIntegration.setStatus(integration.getStatus());
+        updateIntegration.setVersion(integration.getVersion());
+        updateIntegration.setTags(integration.getTags());
+        updateIntegration.setWorkflowIds(integration.getWorkflowIds());
+
         integration = integrationService.update(integration);
 
         assertThat(integration)
@@ -196,10 +208,12 @@ public class IntegrationServiceIntTest {
     private Integration getIntegration() {
         Integration integration = new Integration();
 
-        integration.addWorkflow("workflow1");
         integration.setCategory(category);
         integration.setDescription("description");
+        integration.setIntegrationVersion(1);
         integration.setName("name");
+        integration.setStatus(Integration.Status.UNPUBLISHED);
+        integration.addWorkflow("workflow1");
 
         return integration;
     }

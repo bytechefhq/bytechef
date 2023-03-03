@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +90,12 @@ public class CategoryServiceImpl implements CategoryService {
     @SuppressFBWarnings("NP")
     public Category save(Category category) {
         if (category.isNew()) {
-            category = categoryRepository.save(category);
+            if (StringUtils.hasText(category.getName())) {
+                Category finalCategory = category;
+
+                category = categoryRepository.findByName(category.getName())
+                    .orElseGet(() -> categoryRepository.save(finalCategory));
+            }
         } else {
             Category curCategory = categoryRepository.findById(category.getId())
                 .orElseThrow();

@@ -48,6 +48,10 @@ import org.springframework.util.CollectionUtils;
 @Table
 public final class Integration implements Persistable<Long> {
 
+    public enum Status {
+        PUBLISHED, UNPUBLISHED
+    }
+
     @Transient
     private Category category;
 
@@ -77,6 +81,9 @@ public final class Integration implements Persistable<Long> {
     @Column
     private String name;
 
+    @Column
+    private int integrationVersion;
+
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -85,6 +92,12 @@ public final class Integration implements Persistable<Long> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+    @Column("last_published_date")
+    private LocalDateTime lastPublishedDate;
+
+    @Column
+    private Status status;
+
     @Transient
     private List<Tag> tags = new ArrayList<>();
 
@@ -92,10 +105,6 @@ public final class Integration implements Persistable<Long> {
     private int version;
 
     public Integration() {
-    }
-
-    public Integration(String name) {
-        this.name = name;
     }
 
     @PersistenceCreator
@@ -167,6 +176,10 @@ public final class Integration implements Persistable<Long> {
         return id;
     }
 
+    public int getIntegrationVersion() {
+        return integrationVersion;
+    }
+
     public String getName() {
         return name;
     }
@@ -177,6 +190,14 @@ public final class Integration implements Persistable<Long> {
 
     public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public LocalDateTime getLastPublishedDate() {
+        return lastPublishedDate;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public List<Long> getTagIds() {
@@ -235,8 +256,20 @@ public final class Integration implements Persistable<Long> {
         this.id = id;
     }
 
+    public void setIntegrationVersion(int integrationVersion) {
+        this.integrationVersion = integrationVersion;
+    }
+
+    public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+        this.lastPublishedDate = lastPublishedDate;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public void setTags(List<Tag> tags) {
@@ -267,6 +300,9 @@ public final class Integration implements Persistable<Long> {
         return "Integration{" +
             "id=" + id +
             ", name='" + name + '\'' +
+            ", integrationVersion='" + integrationVersion + '\'' +
+            ", status='" + status + '\'' +
+            ", lastPublishedDate='" + lastPublishedDate + '\'' +
             ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
             ", integrationTags=" + integrationTags +
@@ -277,5 +313,18 @@ public final class Integration implements Persistable<Long> {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
+    }
+
+    public Integration update(Integration integration) {
+        this.category = integration.category;
+        this.categoryId = integration.categoryId;
+        this.description = integration.description;
+        this.id = integration.id;
+        this.integrationTags = integration.integrationTags;
+        this.integrationWorkflows = integration.integrationWorkflows;
+        this.name = integration.name;
+        this.tags = integration.tags;
+
+        return this;
     }
 }

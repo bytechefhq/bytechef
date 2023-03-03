@@ -121,6 +121,19 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Category> getIntegrationCategories() {
+        List<Integration> integrations = integrationService.getIntegrations(null, null);
+
+        List<Long> categoryIds = integrations.stream()
+            .map(Integration::getCategoryId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        return categoryService.getCategories(categoryIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
         List<Integration> integrations = integrationService.getIntegrations(categoryIds, tagIds);
 
