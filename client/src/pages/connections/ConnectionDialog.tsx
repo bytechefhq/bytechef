@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
 import Input from 'components/Input/Input';
-import Modal from 'components/Modal/Modal';
+import Dialog from 'components/Dialog/Dialog';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {Controller, useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
@@ -38,7 +38,7 @@ interface FormProps {
     tags: TagModel[];
 }
 
-const ConnectionModal = () => {
+const ConnectionDialog = () => {
     const [authorizationName, setAuthorizationName] = useState<string>();
     const [componentDefinition, setComponentDefinition] =
         useState<ComponentDefinitionBasicModel>();
@@ -81,7 +81,7 @@ const ConnectionModal = () => {
             queryClient.invalidateQueries(ConnectionKeys.connections);
             queryClient.invalidateQueries(ConnectionKeys.connectionTags);
 
-            closeModal();
+            closeDialog();
         },
     });
 
@@ -140,7 +140,7 @@ const ConnectionModal = () => {
             'OAUTH2_IMPLICIT_CODE',
         ].includes(getAuthorizationType());
 
-    function closeModal() {
+    function closeDialog() {
         setIsOpen(false);
 
         timeout(() => {
@@ -185,14 +185,14 @@ const ConnectionModal = () => {
     }
 
     return (
-        <Modal
+        <Dialog
             description="Create your connection to connect to the chosen service"
             isOpen={isOpen}
             setIsOpen={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
                 } else {
-                    closeModal();
+                    closeDialog();
                 }
             }}
             title="Create Connection"
@@ -334,7 +334,7 @@ const ConnectionModal = () => {
                     displayType="lightBorder"
                     label="Cancel"
                     type="button"
-                    onClick={closeModal}
+                    onClick={closeDialog}
                 />
 
                 {isOAuth2AuthorizationType ? (
@@ -351,8 +351,8 @@ const ConnectionModal = () => {
                     />
                 )}
             </div>
-        </Modal>
+        </Dialog>
     );
 };
 
-export default ConnectionModal;
+export default ConnectionDialog;

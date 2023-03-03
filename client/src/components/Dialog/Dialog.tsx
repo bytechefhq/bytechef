@@ -15,7 +15,7 @@ import {Cross1Icon} from '@radix-ui/react-icons';
 import Button from '../Button/Button';
 import {Dispatch, Fragment, SetStateAction} from 'react';
 
-interface ModalProps {
+interface DialogProps {
     children: React.ReactNode;
     description?: string;
     isOpen: boolean;
@@ -24,14 +24,14 @@ interface ModalProps {
     setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const Modal = ({
+const Dialog = ({
     children,
     description,
     isOpen,
     setIsOpen,
     title,
     triggerLabel,
-}: ModalProps): JSX.Element => (
+}: DialogProps): JSX.Element => (
     <Root open={isOpen} onOpenChange={setIsOpen}>
         {triggerLabel && (
             <Trigger asChild>
@@ -89,4 +89,4 @@ const Modal = ({
     </Root>
 );
 
-export default Modal;
+export default Dialog;
