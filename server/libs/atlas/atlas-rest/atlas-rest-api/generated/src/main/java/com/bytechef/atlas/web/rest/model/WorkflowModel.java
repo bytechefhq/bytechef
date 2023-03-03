@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T09:06:53.695754+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:04.302675+01:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("createdBy")
@@ -115,7 +115,7 @@ public class WorkflowModel {
   @Valid
   private List<WorkflowTaskModel> tasks = null;
 
-  @JsonProperty("version")
+  @JsonProperty("__version")
   private Integer version;
 
   public WorkflowModel createdBy(String createdBy) {
@@ -399,7 +399,7 @@ public class WorkflowModel {
    * @return version
   */
   
-  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }
