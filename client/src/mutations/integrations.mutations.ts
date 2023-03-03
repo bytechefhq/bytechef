@@ -3,7 +3,7 @@ import {
     DeleteIntegrationRequest,
     IntegrationModel,
     IntegrationsApi,
-    PutIntegrationTagsRequest,
+    UpdateIntegrationTagsRequest,
 } from 'middleware/integration';
 
 type IntegrationMutationProps = {
@@ -11,12 +11,12 @@ type IntegrationMutationProps = {
     onError?: (error: object, variables: IntegrationModel) => void;
 };
 
-export const useIntegrationMutation = (
+export const useCreateIntegrationMutation = (
     mutationProps?: IntegrationMutationProps
 ) =>
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
-            return new IntegrationsApi().postIntegration({
+            return new IntegrationsApi().createIntegration({
                 integrationModel: integration,
             });
         },
@@ -24,12 +24,12 @@ export const useIntegrationMutation = (
         onError: mutationProps?.onError,
     });
 
-export const useIntegrationPutMutation = (
+export const useUpdateIntegrationMutation = (
     mutationProps?: IntegrationMutationProps
 ) =>
     useMutation({
         mutationFn: (integration: IntegrationModel) => {
-            return new IntegrationsApi().putIntegration({
+            return new IntegrationsApi().updateIntegration({
                 integrationModel: integration,
                 id: integration.id!,
             });
@@ -39,16 +39,16 @@ export const useIntegrationPutMutation = (
     });
 
 type IntegrationTagsMutationProps = {
-    onSuccess?: (result: void, variables: PutIntegrationTagsRequest) => void;
-    onError?: (error: object, variables: PutIntegrationTagsRequest) => void;
+    onSuccess?: (result: void, variables: UpdateIntegrationTagsRequest) => void;
+    onError?: (error: object, variables: UpdateIntegrationTagsRequest) => void;
 };
 
-export const useIntegrationTagsMutation = (
+export const useUpdateIntegrationTagsMutation = (
     mutationProps?: IntegrationTagsMutationProps
 ) =>
     useMutation({
-        mutationFn: (request: PutIntegrationTagsRequest) => {
-            return new IntegrationsApi().putIntegrationTags(request);
+        mutationFn: (request: UpdateIntegrationTagsRequest) => {
+            return new IntegrationsApi().updateIntegrationTags(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
@@ -59,7 +59,7 @@ type IntegrationDeleteMutationProps = {
     onError?: (error: object, variables: DeleteIntegrationRequest) => void;
 };
 
-export const useIntegrationDeleteMutation = (
+export const useDeleteIntegrationMutation = (
     mutationProps?: IntegrationDeleteMutationProps
 ) =>
     useMutation({
