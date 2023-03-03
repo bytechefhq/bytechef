@@ -5,18 +5,13 @@ import {
     UpdateConnectionTagsRequest,
 } from '../middleware/connection';
 
-type ConnectionMutationProps = {
+type CreateConnectionMutationProps = {
     onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
     onError?: (error: object, variables: ConnectionModel) => void;
 };
 
-type ConnectionMutationDeleteProps = {
-    onSuccess?: () => void;
-    onError?: (error: object, id: number) => void;
-};
-
 export const useCreateConnectionMutation = (
-    mutationProps?: ConnectionMutationProps
+    mutationProps?: CreateConnectionMutationProps
 ) =>
     useMutation({
         mutationFn: (connectionModel: ConnectionModel) => {
@@ -28,8 +23,13 @@ export const useCreateConnectionMutation = (
         onError: mutationProps?.onError,
     });
 
+type DeleteConnectionMutationProps = {
+    onSuccess?: () => void;
+    onError?: (error: object, id: number) => void;
+};
+
 export const useDeleteConnectionMutation = (
-    mutationProps?: ConnectionMutationDeleteProps
+    mutationProps?: DeleteConnectionMutationProps
 ) =>
     useMutation({
         mutationFn: (id: number) => {
@@ -41,13 +41,13 @@ export const useDeleteConnectionMutation = (
         onError: mutationProps?.onError,
     });
 
-type ConnectionTagsMutationProps = {
+type UpdateConnectionTagsMutationProps = {
     onSuccess?: (result: void, variables: UpdateConnectionTagsRequest) => void;
     onError?: (error: object, variables: UpdateConnectionTagsRequest) => void;
 };
 
 export const useUpdateConnectionTagsMutation = (
-    mutationProps?: ConnectionTagsMutationProps
+    mutationProps?: UpdateConnectionTagsMutationProps
 ) =>
     useMutation({
         mutationFn: (request: UpdateConnectionTagsRequest) => {
