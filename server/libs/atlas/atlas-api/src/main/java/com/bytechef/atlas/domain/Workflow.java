@@ -276,28 +276,12 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return isNew;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public void setDefinition(String definition) {
         this.definition = definition;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setNew(boolean isNew) {
@@ -331,5 +315,22 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
+    }
+
+    public Workflow update(Workflow workflow) {
+        this.definition = workflow.definition;
+        this.description = workflow.description;
+        this.error = workflow.error;
+        this.format = workflow.format;
+        this.id = workflow.id;
+        this.isNew = workflow.isNew;
+        this.inputs = workflow.inputs;
+        this.label = workflow.label;
+        this.outputs = workflow.outputs;
+        this.sourceType = workflow.sourceType;
+        this.retry = workflow.retry;
+        this.tasks = workflow.tasks;
+
+        return this;
     }
 }

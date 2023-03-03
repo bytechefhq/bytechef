@@ -67,12 +67,6 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
                 new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
                 workflow.getFormat()));
 
-        newWorkflow.setCreatedBy(workflow.getCreatedBy());
-        newWorkflow.setCreatedDate(workflow.getCreatedDate());
-        newWorkflow.setLastModifiedBy(workflow.getLastModifiedBy());
-        newWorkflow.setLastModifiedDate(workflow.getLastModifiedDate());
-        newWorkflow.setVersion(workflow.getVersion());
-
-        return newWorkflow;
+        return workflow.update(newWorkflow);
     }
 }
