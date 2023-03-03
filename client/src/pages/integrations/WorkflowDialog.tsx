@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Input from 'components/Input/Input';
-import Modal from 'components/Modal/Modal';
+import Dialog from 'components/Dialog/Dialog';
 import {useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
 import {useQueryClient} from '@tanstack/react-query';
@@ -9,14 +9,14 @@ import {WorkflowModel} from 'middleware/integration';
 import TextArea from 'components/TextArea/TextArea';
 import {IntegrationKeys} from '../../queries/integrations';
 
-interface WorkflowModalProps {
+interface WorkflowDialogProps {
     id?: number;
     workflowItem?: WorkflowModel | undefined;
     visible?: boolean;
     version: undefined;
 }
 
-const WorkflowModal = ({id, visible = false}: WorkflowModalProps) => {
+const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
     useEffect(() => {
@@ -42,11 +42,11 @@ const WorkflowModal = ({id, visible = false}: WorkflowModalProps) => {
         onSuccess: () => {
             queryClient.invalidateQueries(IntegrationKeys.integrations);
 
-            closeModal();
+            closeDialog();
         },
     });
 
-    function closeModal() {
+    function closeDialog() {
         reset();
         setIsOpen(false);
     }
@@ -61,13 +61,13 @@ const WorkflowModal = ({id, visible = false}: WorkflowModalProps) => {
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             setIsOpen={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
                 } else {
-                    closeModal();
+                    closeDialog();
                 }
             }}
             title="Create Workflow"
@@ -103,8 +103,8 @@ const WorkflowModal = ({id, visible = false}: WorkflowModalProps) => {
                     disabled={isLoading}
                 />
             </div>
-        </Modal>
+        </Dialog>
     );
 };
 
-export default WorkflowModal;
+export default WorkflowDialog;

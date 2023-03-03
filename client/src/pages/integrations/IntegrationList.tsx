@@ -6,7 +6,7 @@ import IntegrationItem from 'pages/integrations/IntegrationItem';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import EmptyList from '../../components/EmptyList/EmptyList';
-import IntegrationModal from './IntegrationModal';
+import IntegrationDialog from './IntegrationDialog';
 import {FolderPlusIcon} from '@heroicons/react/24/outline';
 
 const IntegrationList = () => {
@@ -46,7 +46,7 @@ const IntegrationList = () => {
                     (integrations?.length === 0 ? (
                         <EmptyList
                             button={
-                                <IntegrationModal integration={undefined} />
+                                <IntegrationDialog integration={undefined} />
                             }
                             icon={
                                 <FolderPlusIcon className="h-12 w-12 text-gray-400" />
