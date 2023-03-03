@@ -87,7 +87,7 @@ public class WorkflowController implements WorkflowsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<WorkflowModel>> postWorkflow(
+    public Mono<ResponseEntity<WorkflowModel>> createWorkflow(
         Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
         return workflowModelMono.map(workflowModel -> {
             WorkflowFormatModel workflowFormatModel = workflowModel.getFormat();
@@ -104,7 +104,7 @@ public class WorkflowController implements WorkflowsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<WorkflowModel>> putWorkflow(
+    public Mono<ResponseEntity<WorkflowModel>> updateWorkflow(
         String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
         return workflowModelMono.map(workflowModel -> ResponseEntity.ok(
             conversionService.convert(
