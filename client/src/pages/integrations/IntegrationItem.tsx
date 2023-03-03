@@ -56,7 +56,7 @@ const IntegrationItem = ({
         },
         {
             label: 'New Workflow',
-            onClick: (id: number, event: React.MouseEvent) => {
+            onClick: () => {
                 setShowWorkflowModal(true);
             },
         },
@@ -196,7 +196,11 @@ const IntegrationItem = ({
             )}
 
             {showWorkflowModal && (
-                <WorkflowModal id={id} visible version={undefined} />
+                <WorkflowModal
+                    id={integration.id}
+                    visible
+                    version={undefined}
+                />
             )}
         </>
     );
