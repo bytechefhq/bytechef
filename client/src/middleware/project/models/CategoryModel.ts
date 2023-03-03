@@ -89,7 +89,7 @@ export function CategoryModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'name': json['name'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'version': !exists(json, 'version') ? undefined : json['version'],
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -104,7 +104,7 @@ export function CategoryModelToJSON(value?: CategoryModel | null): any {
         
         'id': value.id,
         'name': value.name,
-        'version': value.version,
+        '__version': value.version,
     };
 }
 

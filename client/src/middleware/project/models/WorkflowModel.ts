@@ -163,7 +163,7 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
         'retry': !exists(json, 'retry') ? undefined : json['retry'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
-        'version': !exists(json, 'version') ? undefined : json['version'],
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -179,7 +179,7 @@ export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
         'definition': value.definition,
         'format': WorkflowFormatModelToJSON(value.format),
         'sourceType': value.sourceType,
-        'version': value.version,
+        '__version': value.version,
     };
 }
 

@@ -19,6 +19,12 @@ import {
     CategoryModelFromJSONTyped,
     CategoryModelToJSON,
 } from './CategoryModel';
+import type { StatusModel } from './StatusModel';
+import {
+    StatusModelFromJSON,
+    StatusModelFromJSONTyped,
+    StatusModelToJSON,
+} from './StatusModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -81,23 +87,41 @@ export interface IntegrationModel {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * The last published date.
+     * @type {Date}
+     * @memberof IntegrationModel
+     */
+    lastPublishedDate?: Date;
+    /**
+     * The version of an integration.
+     * @type {number}
+     * @memberof IntegrationModel
+     */
+    integrationVersion?: number;
+    /**
+     * 
+     * @type {StatusModel}
+     * @memberof IntegrationModel
+     */
+    status?: StatusModel;
+    /**
      * 
      * @type {Array<TagModel>}
      * @memberof IntegrationModel
      */
     tags?: Array<TagModel>;
     /**
-     * 
-     * @type {number}
-     * @memberof IntegrationModel
-     */
-    version?: number;
-    /**
      * The workflow ids belonging to this integration.
      * @type {Array<string>}
      * @memberof IntegrationModel
      */
     workflowIds?: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof IntegrationModel
+     */
+    version?: number;
 }
 
 /**
@@ -128,9 +152,12 @@ export function IntegrationModelFromJSONTyped(json: any, ignoreDiscriminator: bo
         'description': !exists(json, 'description') ? undefined : json['description'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastPublishedDate': !exists(json, 'lastPublishedDate') ? undefined : (new Date(json['lastPublishedDate'])),
+        'integrationVersion': !exists(json, 'integrationVersion') ? undefined : json['integrationVersion'],
+        'status': !exists(json, 'status') ? undefined : StatusModelFromJSON(json['status']),
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
-        'version': !exists(json, 'version') ? undefined : json['version'],
         'workflowIds': !exists(json, 'workflowIds') ? undefined : json['workflowIds'],
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -146,9 +173,12 @@ export function IntegrationModelToJSON(value?: IntegrationModel | null): any {
         'category': CategoryModelToJSON(value.category),
         'name': value.name,
         'description': value.description,
+        'lastPublishedDate': value.lastPublishedDate === undefined ? undefined : (value.lastPublishedDate.toISOString()),
+        'integrationVersion': value.integrationVersion,
+        'status': StatusModelToJSON(value.status),
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
-        'version': value.version,
         'workflowIds': value.workflowIds,
+        '__version': value.version,
     };
 }
 

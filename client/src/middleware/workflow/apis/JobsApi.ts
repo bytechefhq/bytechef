@@ -15,21 +15,25 @@
 
 import * as runtime from '../runtime';
 import type {
+  CreateJob200ResponseModel,
   JobModel,
   JobParametersModel,
   PageModel,
-  PostJob200ResponseModel,
 } from '../models';
 import {
+    CreateJob200ResponseModelFromJSON,
+    CreateJob200ResponseModelToJSON,
     JobModelFromJSON,
     JobModelToJSON,
     JobParametersModelFromJSON,
     JobParametersModelToJSON,
     PageModelFromJSON,
     PageModelToJSON,
-    PostJob200ResponseModelFromJSON,
-    PostJob200ResponseModelToJSON,
 } from '../models';
+
+export interface CreateJobRequest {
+    jobParametersModel: JobParametersModel;
+}
 
 export interface GetJobRequest {
     id: number;
@@ -37,10 +41,6 @@ export interface GetJobRequest {
 
 export interface GetJobsRequest {
     pageNumber?: number;
-}
-
-export interface PostJobRequest {
-    jobParametersModel: JobParametersModel;
 }
 
 export interface RestartJobRequest {
@@ -55,6 +55,41 @@ export interface StopJobRequest {
  * 
  */
 export class JobsApi extends runtime.BaseAPI {
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job.
+     */
+    async createJobRaw(requestParameters: CreateJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateJob200ResponseModel>> {
+        if (requestParameters.jobParametersModel === null || requestParameters.jobParametersModel === undefined) {
+            throw new runtime.RequiredError('jobParametersModel','Required parameter requestParameters.jobParametersModel was null or undefined when calling createJob.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/jobs`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: JobParametersModelToJSON(requestParameters.jobParametersModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateJob200ResponseModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job.
+     */
+    async createJob(requestParameters: CreateJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateJob200ResponseModel> {
+        const response = await this.createJobRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get a job by id.
@@ -145,41 +180,6 @@ export class JobsApi extends runtime.BaseAPI {
      */
     async getLatestJob(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobModel> {
         const response = await this.getLatestJobRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Create a request for running a new job.
-     * Create a request for running a new job.
-     */
-    async postJobRaw(requestParameters: PostJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostJob200ResponseModel>> {
-        if (requestParameters.jobParametersModel === null || requestParameters.jobParametersModel === undefined) {
-            throw new runtime.RequiredError('jobParametersModel','Required parameter requestParameters.jobParametersModel was null or undefined when calling postJob.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/jobs`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: JobParametersModelToJSON(requestParameters.jobParametersModel),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => PostJob200ResponseModelFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a request for running a new job.
-     * Create a request for running a new job.
-     */
-    async postJob(requestParameters: PostJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostJob200ResponseModel> {
-        const response = await this.postJobRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

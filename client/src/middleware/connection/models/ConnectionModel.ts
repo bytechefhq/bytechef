@@ -134,7 +134,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'parameters': json['parameters'],
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
-        'version': !exists(json, 'version') ? undefined : json['version'],
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -153,7 +153,7 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
         'name': value.name,
         'parameters': value.parameters,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
-        'version': value.version,
+        '__version': value.version,
     };
 }
 
