@@ -23,31 +23,31 @@ import {
 /**
  * The request object that contains the array of tags.
  * @export
- * @interface PutIntegrationTagsRequestModel
+ * @interface UpdateProjectTagsRequestModel
  */
-export interface PutIntegrationTagsRequestModel {
+export interface UpdateProjectTagsRequestModel {
     /**
      * 
      * @type {Array<TagModel>}
-     * @memberof PutIntegrationTagsRequestModel
+     * @memberof UpdateProjectTagsRequestModel
      */
     tags?: Array<TagModel>;
 }
 
 /**
- * Check if a given object implements the PutIntegrationTagsRequestModel interface.
+ * Check if a given object implements the UpdateProjectTagsRequestModel interface.
  */
-export function instanceOfPutIntegrationTagsRequestModel(value: object): boolean {
+export function instanceOfUpdateProjectTagsRequestModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function PutIntegrationTagsRequestModelFromJSON(json: any): PutIntegrationTagsRequestModel {
-    return PutIntegrationTagsRequestModelFromJSONTyped(json, false);
+export function UpdateProjectTagsRequestModelFromJSON(json: any): UpdateProjectTagsRequestModel {
+    return UpdateProjectTagsRequestModelFromJSONTyped(json, false);
 }
 
-export function PutIntegrationTagsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PutIntegrationTagsRequestModel {
+export function UpdateProjectTagsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateProjectTagsRequestModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -57,7 +57,7 @@ export function PutIntegrationTagsRequestModelFromJSONTyped(json: any, ignoreDis
     };
 }
 
-export function PutIntegrationTagsRequestModelToJSON(value?: PutIntegrationTagsRequestModel | null): any {
+export function UpdateProjectTagsRequestModelToJSON(value?: UpdateProjectTagsRequestModel | null): any {
     if (value === undefined) {
         return undefined;
     }

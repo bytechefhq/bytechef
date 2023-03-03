@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PostJob200ResponseModel
+ * @interface CreateJob200ResponseModel
  */
-export interface PostJob200ResponseModel {
+export interface CreateJob200ResponseModel {
     /**
      * 
      * @type {number}
-     * @memberof PostJob200ResponseModel
+     * @memberof CreateJob200ResponseModel
      */
     jobId?: number;
 }
 
 /**
- * Check if a given object implements the PostJob200ResponseModel interface.
+ * Check if a given object implements the CreateJob200ResponseModel interface.
  */
-export function instanceOfPostJob200ResponseModel(value: object): boolean {
+export function instanceOfCreateJob200ResponseModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function PostJob200ResponseModelFromJSON(json: any): PostJob200ResponseModel {
-    return PostJob200ResponseModelFromJSONTyped(json, false);
+export function CreateJob200ResponseModelFromJSON(json: any): CreateJob200ResponseModel {
+    return CreateJob200ResponseModelFromJSONTyped(json, false);
 }
 
-export function PostJob200ResponseModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostJob200ResponseModel {
+export function CreateJob200ResponseModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateJob200ResponseModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function PostJob200ResponseModelFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-export function PostJob200ResponseModelToJSON(value?: PostJob200ResponseModel | null): any {
+export function CreateJob200ResponseModelToJSON(value?: CreateJob200ResponseModel | null): any {
     if (value === undefined) {
         return undefined;
     }
