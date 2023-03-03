@@ -102,12 +102,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         return connectionRepository
             .findById(Objects.requireNonNull(connection.getId()))
-            .map(curConnection -> {
-                curConnection.setName(connection.getName());
-                curConnection.setVersion(connection.getVersion());
-
-                return connectionRepository.save(curConnection);
-            })
+            .map(curConnection -> connectionRepository.save(curConnection.update(connection)))
             .orElseThrow();
     }
 }

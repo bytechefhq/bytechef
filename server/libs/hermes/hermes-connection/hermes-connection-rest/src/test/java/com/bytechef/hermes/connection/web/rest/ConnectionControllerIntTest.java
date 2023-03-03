@@ -26,7 +26,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import com.bytechef.hermes.connection.web.rest.model.PutConnectionTagsRequestModel;
+import com.bytechef.hermes.connection.web.rest.model.UpdateConnectionTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -96,7 +96,8 @@ public class ConnectionControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(ConnectionModel.class)
-                .isEqualTo(connectionMapper.convert(connection));
+                .isEqualTo(connectionMapper.convert(connection)
+                    .parameters(null));
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -128,6 +129,7 @@ public class ConnectionControllerIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testGetConnections() {
         Connection connection = getConnection();
 
@@ -141,7 +143,8 @@ public class ConnectionControllerIntTest {
             .expectStatus()
             .isOk()
             .expectBodyList(ConnectionModel.class)
-            .contains(connectionMapper.convert(connection))
+            .contains(connectionMapper.convert(connection)
+                .parameters(null))
             .hasSize(1);
 
         when(connectionFacade.getConnections(List.of("component1"), null)).thenReturn(List.of(connection));
@@ -267,7 +270,7 @@ public class ConnectionControllerIntTest {
                 .uri("/connections/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new PutConnectionTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
+                .bodyValue(new UpdateConnectionTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
