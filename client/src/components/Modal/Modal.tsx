@@ -17,33 +17,27 @@ import {Dispatch, Fragment, SetStateAction} from 'react';
 
 interface ModalProps {
     children: React.ReactNode;
-    confirmButtonLabel: string;
     description: string;
-    form: boolean;
     isOpen: boolean;
-    setIsOpen: Dispatch<SetStateAction<boolean>>;
     title: string;
-    triggerLabel: string;
-    onCloseClick?: () => void;
-    onConfirmButtonClick: () => void;
+    triggerLabel?: string;
+    setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 const Modal = ({
     children,
-    confirmButtonLabel,
     description,
-    form,
     isOpen,
     setIsOpen,
     title,
     triggerLabel,
-    onCloseClick,
-    onConfirmButtonClick,
 }: ModalProps): JSX.Element => (
     <Root open={isOpen} onOpenChange={setIsOpen}>
-        <Trigger asChild>
-            <Button label={triggerLabel} />
-        </Trigger>
+        {triggerLabel && (
+            <Trigger asChild>
+                <Button label={triggerLabel} />
+            </Trigger>
+        )}
 
         <Portal forceMount>
             <Transition.Root show={isOpen}>
@@ -85,22 +79,8 @@ const Modal = ({
 
                         {children}
 
-                        {!form && (
-                            <div className="mt-4 flex justify-end">
-                                <Close asChild>
-                                    <Button
-                                        label={confirmButtonLabel}
-                                        onClick={onConfirmButtonClick}
-                                    />
-                                </Close>
-                            </div>
-                        )}
-
                         <Close className="absolute top-3.5 right-3.5 inline-flex items-center justify-center rounded-full p-1 focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75">
-                            <Cross1Icon
-                                className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-400"
-                                onClick={onCloseClick}
-                            />
+                            <Cross1Icon className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-400" />
                         </Close>
                     </Content>
                 </Transition.Child>
