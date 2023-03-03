@@ -32,8 +32,8 @@ const IntegrationItem = ({
     remainingTags,
     integrationNames,
 }: IntegrationItemProps) => {
-    const [showEditModal, setShowEditModal] = useState<boolean>(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const dropdownItems: DropdownMenuItem[] = [
         {
@@ -61,9 +61,7 @@ const IntegrationItem = ({
         {
             danger: true,
             label: 'Delete',
-            onClick: () => {
-                setShowDeleteDialog(true);
-            },
+            onClick: () => setShowDeleteDialog(true),
         },
     ];
 
@@ -72,11 +70,9 @@ const IntegrationItem = ({
     const createIntegrationMutation = useCreateIntegrationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(IntegrationKeys.integrations);
-
             queryClient.invalidateQueries(
                 IntegrationKeys.integrationCategories
             );
-
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
         },
     });
@@ -93,7 +89,7 @@ const IntegrationItem = ({
 
     return (
         <>
-            <div className="flex items-center ">
+            <div className="flex items-center">
                 <Link
                     className="flex-1"
                     to={`/automation/integrations/${integration.id}`}
@@ -162,12 +158,10 @@ const IntegrationItem = ({
                     </div>
                 </Link>
 
-                <div>
-                    <DropdownMenu
-                        id={integration.id}
-                        menuItems={dropdownItems}
-                    />
-                </div>
+                <DropdownMenu
+                    id={integration.id}
+                    menuItems={dropdownItems}
+                />
             </div>
 
             {showEditModal && (
