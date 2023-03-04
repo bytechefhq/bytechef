@@ -59,6 +59,9 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(project, "'project' must not be null");
         Assert.isNull(project.getId(), "'id' must be null");
 
+        project.setProjectVersion(1);
+        project.setStatus(Project.Status.UNPUBLISHED);
+
         return projectRepository.save(project);
     }
 
