@@ -26,6 +26,7 @@ import java.util.stream.StreamSupport;
 import com.bytechef.hermes.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -81,7 +82,7 @@ public class ProjectServiceImpl implements ProjectService {
         Iterable<Project> projectIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            projectIterable = projectRepository.findAllOrderByName();
+            projectIterable = projectRepository.findAll(Sort.by("name"));
         } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
             projectIterable = projectRepository.findByCategoryIdInOrderByName(categoryIds);
         } else if (CollectionUtils.isEmpty(categoryIds)) {

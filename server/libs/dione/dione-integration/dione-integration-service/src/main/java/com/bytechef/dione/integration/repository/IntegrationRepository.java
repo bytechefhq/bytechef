@@ -33,9 +33,6 @@ import java.util.List;
 public interface IntegrationRepository
     extends PagingAndSortingRepository<Integration, Long>, CrudRepository<Integration, Long> {
 
-    @Query("SELECT integration.* from integration ORDER BY name")
-    Iterable<Integration> findAllOrderByName();
-
     Iterable<Integration> findByCategoryIdInOrderByName(List<Long> categoryIds);
 
     @Query("""

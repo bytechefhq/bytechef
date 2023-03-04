@@ -21,12 +21,14 @@ import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.category.service.CategoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -64,8 +66,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getCategories() {
-        return StreamSupport.stream(categoryRepository.findAll()
+        return StreamSupport.stream(categoryRepository.findAll(Sort.by("name"))
             .spliterator(), false)
+            .sorted(Comparator.comparing(Category::getName))
             .toList();
     }
 
@@ -82,7 +85,11 @@ public class CategoryServiceImpl implements CategoryService {
         if (ids.isEmpty()) {
             return Collections.emptyList();
         } else {
-            return categoryRepository.findByIdIn(ids);
+            return StreamSupport.stream(categoryRepository.findAllById(ids)
+                .spliterator(),
+                false)
+                .sorted(Comparator.comparing(Category::getName))
+                .toList();
         }
     }
 
