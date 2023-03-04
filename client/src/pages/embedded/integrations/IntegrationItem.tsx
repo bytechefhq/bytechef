@@ -10,6 +10,7 @@ import {
 import {
     useDeleteIntegrationMutation,
     useUpdateIntegrationTagsMutation,
+    useCreateIntegrationWorkflowRequestMutation,
 } from '../../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -18,8 +19,8 @@ import {Link} from 'react-router-dom';
 import IntegrationDialog from './IntegrationDialog';
 import Name from './components/Name';
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
-import WorkflowDialog from './WorkflowDialog';
 import TagList from '../../../components/TagList/TagList';
+import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 
 interface IntegrationItemProps {
     integration: IntegrationModel;
@@ -58,6 +59,15 @@ const IntegrationItem = ({
     ];
 
     const queryClient = useQueryClient();
+
+    const createIntegrationWorkflowRequestMutation =
+        useCreateIntegrationWorkflowRequestMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries(IntegrationKeys.integrations);
+
+                setShowWorkflowDialog(false);
+            },
+        });
 
     const deleteIntegrationMutation = useDeleteIntegrationMutation({
         onSuccess: () => {
@@ -172,7 +182,7 @@ const IntegrationItem = ({
                 <AlertDialog
                     danger
                     isOpen
-                    message="This action cannot be undone. This will permanently delete the project and workflows it contains."
+                    message="This action cannot be undone. This will permanently delete the integration and workflows it contains."
                     title="Are you absolutely sure?"
                     setIsOpen={setShowDeleteDialog}
                     onConfirmClick={() => {
@@ -189,7 +199,9 @@ const IntegrationItem = ({
                 <WorkflowDialog
                     id={integration.id}
                     visible
-                    version={undefined}
+                    createWorkflowRequestMutation={
+                        createIntegrationWorkflowRequestMutation
+                    }
                 />
             )}
         </>

@@ -154,7 +154,7 @@ const IntegrationDialog = ({
                 integration?.id ? 'edit' : 'create'
             } your integration which will contain related workflows`}
             isOpen={isOpen}
-            setIsOpen={(isOpen) => {
+            onOpenChange={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
                 } else {
