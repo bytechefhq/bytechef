@@ -9,24 +9,24 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
-} from '../../queries/componentDefinitions';
+} from '../../../queries/componentDefinitions';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
-} from '../../middleware/definition-registry';
-import {ConnectionModel, TagModel} from '../../middleware/connection';
+} from '../../../middleware/definition-registry';
+import {ConnectionModel, TagModel} from '../../../middleware/connection';
 import FilterableSelect, {
     SelectOption,
-} from '../../components/FilterableSelect/FilterableSelect';
+} from '../../../components/FilterableSelect/FilterableSelect';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
-} from '../../queries/connections';
-import {useCreateConnectionMutation} from '../../mutations/connections.mutations';
+} from '../../../queries/connections';
+import {useCreateConnectionMutation} from '../../../mutations/connections.mutations';
 import {OnChangeValue} from 'react-select';
-import {useGetConnectionDefinitionQuery} from '../../queries/connectionDefinitions';
-import NativeSelect from '../../components/NativeSelect/NativeSelect';
-import Properties from '../../components/Properties/Properties';
+import {useGetConnectionDefinitionQuery} from '../../../queries/connectionDefinitions';
+import NativeSelect from '../../../components/NativeSelect/NativeSelect';
+import Properties from '../../../components/Properties/Properties';
 import {timeout} from 'd3-timer';
 import OAuth2Button from './components/OAuth2Button';
 

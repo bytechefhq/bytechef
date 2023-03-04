@@ -3,8 +3,8 @@ import ConnectionItem from './ConnectionItem';
 import {
     useGetConnectionsQuery,
     useGetConnectionTagsQuery,
-} from '../../queries/connections';
-import EmptyList from '../../components/EmptyList/EmptyList';
+} from '../../../queries/connections';
+import EmptyList from '../../../components/EmptyList/EmptyList';
 import {LinkIcon} from '@heroicons/react/24/outline';
 import ConnectionDialog from './ConnectionDialog';
 import {twMerge} from 'tailwind-merge';
