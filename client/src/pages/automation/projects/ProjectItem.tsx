@@ -1,39 +1,35 @@
 import {useState} from 'react';
 import DropdownMenu, {
     IDropdownMenuItem,
-} from '../../components/DropdownMenu/DropdownMenu';
+} from '../../../components/DropdownMenu/DropdownMenu';
+import {ProjectModel, StatusModel, TagModel} from '../../../middleware/project';
 import {
-    IntegrationModel,
-    StatusModel,
-    TagModel,
-} from '../../middleware/integration';
-import {
-    useDeleteIntegrationMutation,
-    useCreateIntegrationMutation,
-    useUpdateIntegrationTagsMutation,
-} from '../../mutations/integrations.mutations';
-import {IntegrationKeys} from '../../queries/integrations';
+    useDeleteProjectMutation,
+    useCreateProjectMutation,
+    useUpdateProjectTagsMutation,
+} from '../../../mutations/projects.mutations';
+import {ProjectKeys} from '../../../queries/projects';
 import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
-import IntegrationDialog from './IntegrationDialog';
+import ProjectDialog from './ProjectDialog';
 import duplicate from './utils/duplicate';
 import Name from './components/Name';
-import AlertDialog from '../../components/AlertDialog/AlertDialog';
+import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import WorkflowDialog from './WorkflowDialog';
-import TagList from '../../components/TagList/TagList';
+import TagList from '../../../components/TagList/TagList';
 
-interface IntegrationItemProps {
-    integration: IntegrationModel;
-    integrationNames: string[];
+interface ProjectItemProps {
+    project: ProjectModel;
+    projectNames: string[];
     remainingTags?: TagModel[];
 }
 
-const IntegrationItem = ({
-    integration,
+const ProjectItem = ({
+    project,
     remainingTags,
-    integrationNames,
-}: IntegrationItemProps) => {
+    projectNames,
+}: ProjectItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -48,11 +44,7 @@ const IntegrationItem = ({
         {
             label: 'Duplicate',
             onClick: () => {
-                duplicate(
-                    integration!,
-                    integrationNames,
-                    createIntegrationMutation
-                );
+                duplicate(project!, projectNames, createProjectMutation);
             },
         },
         {
@@ -73,30 +65,28 @@ const IntegrationItem = ({
 
     const queryClient = useQueryClient();
 
-    const createIntegrationMutation = useCreateIntegrationMutation({
+    const createProjectMutation = useCreateProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-            queryClient.invalidateQueries(
-                IntegrationKeys.integrationCategories
-            );
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+            queryClient.invalidateQueries(ProjectKeys.projects);
+
+            queryClient.invalidateQueries(ProjectKeys.projectCategories);
+
+            queryClient.invalidateQueries(ProjectKeys.projectTags);
         },
     });
 
-    const deleteIntegrationMutation = useDeleteIntegrationMutation({
+    const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-            queryClient.invalidateQueries(
-                IntegrationKeys.integrationCategories
-            );
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries(ProjectKeys.projectCategories);
+            queryClient.invalidateQueries(ProjectKeys.projectTags);
         },
     });
 
-    const updateIntegrationTagsMutation = useUpdateIntegrationTagsMutation({
+    const updateProjectTagsMutation = useUpdateProjectTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries(ProjectKeys.projectTags);
         },
     });
 
@@ -105,25 +95,25 @@ const IntegrationItem = ({
             <div className="flex items-center">
                 <Link
                     className="flex-1"
-                    to={`/automation/integrations/${integration.id}`}
+                    to={`/automation/projects/${project.id}`}
                 >
                     <div className="flex justify-between">
                         <div>
                             <header className="relative mb-2 flex items-center">
-                                {integration.description ? (
+                                {project.description ? (
                                     <Name
-                                        description={integration.description}
-                                        name={integration.name}
+                                        description={project.description}
+                                        name={project.name}
                                     />
                                 ) : (
                                     <span className="mr-2 text-base font-semibold text-gray-900">
-                                        {integration.name}
+                                        {project.name}
                                     </span>
                                 )}
 
-                                {integration.category && (
+                                {project.category && (
                                     <span className="text-xs uppercase text-gray-700">
-                                        {integration.category.name}
+                                        {project.category.name}
                                     </span>
                                 )}
                             </header>
@@ -133,18 +123,18 @@ const IntegrationItem = ({
                                 onClick={(event) => event.preventDefault()}
                             >
                                 <div className="mr-4 text-xs font-semibold text-gray-700">
-                                    {integration.workflowIds?.length === 1
-                                        ? `${integration.workflowIds?.length} workflow`
-                                        : `${integration.workflowIds?.length} workflows`}
+                                    {project.workflowIds?.length === 1
+                                        ? `${project.workflowIds?.length} workflow`
+                                        : `${project.workflowIds?.length} workflows`}
                                 </div>
 
-                                {integration.tags && (
+                                {project.tags && (
                                     <TagList
-                                        id={integration.id!}
+                                        id={project.id!}
                                         remainingTags={remainingTags}
-                                        tags={integration.tags}
+                                        tags={project.tags}
                                         updateTagsMutation={
-                                            updateIntegrationTagsMutation
+                                            updateProjectTagsMutation
                                         }
                                     />
                                 )}
@@ -155,31 +145,31 @@ const IntegrationItem = ({
                             <span
                                 className={twMerge(
                                     'mr-4 rounded px-2.5 py-0.5 text-sm font-medium',
-                                    integration.status === StatusModel.Published
+                                    project.status === StatusModel.Published
                                         ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900'
                                         : 'bg-gray-100 text-gray-800 dark:bg-gray-200 dark:text-gray-900'
                                 )}
                             >
-                                {integration.status === StatusModel.Published
-                                    ? `Published V${integration.integrationVersion}`
+                                {project.status === StatusModel.Published
+                                    ? `Published V${project.projectVersion}`
                                     : 'Not Published'}
                             </span>
 
                             <span className="mr-4 w-[76px] text-center text-sm text-gray-500">
-                                {integration.status === StatusModel.Published
-                                    ? integration.lastPublishedDate?.toLocaleDateString()
+                                {project.status === StatusModel.Published
+                                    ? project.lastPublishedDate?.toLocaleDateString()
                                     : '-'}
                             </span>
                         </aside>
                     </div>
                 </Link>
 
-                <DropdownMenu id={integration.id} menuItems={dropdownItems} />
+                <DropdownMenu id={project.id} menuItems={dropdownItems} />
             </div>
 
             {showEditDialog && (
-                <IntegrationDialog
-                    integration={integration}
+                <ProjectDialog
+                    project={project}
                     showTrigger={false}
                     visible
                     onClose={() => setShowEditDialog(false)}
@@ -194,9 +184,9 @@ const IntegrationItem = ({
                     title="Are you absolutely sure?"
                     setIsOpen={setShowDeleteDialog}
                     onConfirmClick={() => {
-                        if (integration.id) {
-                            deleteIntegrationMutation.mutate({
-                                id: integration.id,
+                        if (project.id) {
+                            deleteProjectMutation.mutate({
+                                id: project.id,
                             });
                         }
                     }}
@@ -204,14 +194,10 @@ const IntegrationItem = ({
             )}
 
             {showWorkflowDialog && (
-                <WorkflowDialog
-                    id={integration.id}
-                    visible
-                    version={undefined}
-                />
+                <WorkflowDialog id={project.id} visible version={undefined} />
             )}
         </>
     );
 };
 
-export default IntegrationItem;
+export default ProjectItem;

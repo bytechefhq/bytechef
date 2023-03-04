@@ -1,23 +1,23 @@
-import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
-import IntegrationList from './IntegrationList';
-import IntegrationDialog from './IntegrationDialog';
+import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
+import ProjectList from './ProjectList';
+import ProjectDialog from './ProjectDialog';
 import React, {useState} from 'react';
-import PageHeader from '../../components/PageHeader/PageHeader';
-import LeftSidebarMenu from '../../layouts/LeftSidebarMenu/LeftSidebarMenu';
-import LeftSidebarMenuItem from '../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
+import PageHeader from '../../../components/PageHeader/PageHeader';
+import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
+import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
 import {TagIcon} from '@heroicons/react/20/solid';
 import {useSearchParams} from 'react-router-dom';
 import {
-    useGetIntegrationCategoriesQuery,
-    useGetIntegrationTagsQuery,
-} from '../../queries/integrations';
+    useGetProjectCategoriesQuery,
+    useGetProjectTagsQuery,
+} from '../../../queries/projects';
 
 export enum Type {
     Category,
     Tag,
 }
 
-const Integrations = () => {
+const Projects = () => {
     const [searchParams] = useSearchParams();
 
     const defaultCurrentState = {
@@ -34,8 +34,8 @@ const Integrations = () => {
     );
 
     const {isLoading: categoriesIsLoading, data: categories} =
-        useGetIntegrationCategoriesQuery();
-    const {isLoading: tagsIsLoading, data: tags} = useGetIntegrationTagsQuery();
+        useGetProjectCategoriesQuery();
+    const {isLoading: tagsIsLoading, data: tags} = useGetProjectTagsQuery();
 
     const title =
         !categoriesIsLoading &&
@@ -57,11 +57,11 @@ const Integrations = () => {
             header={
                 <PageHeader
                     position="main"
-                    right={<IntegrationDialog integration={undefined} />}
+                    right={<ProjectDialog project={undefined} />}
                     title={title}
                 />
             }
-            leftSidebarHeader={<PageHeader leftSidebar title="Integrations" />}
+            leftSidebarHeader={<PageHeader leftSidebar title="Projects" />}
             leftSidebarBody={
                 <LeftSidebarMenu
                     topTitle="Categories"
@@ -144,9 +144,9 @@ const Integrations = () => {
                 />
             }
         >
-            <IntegrationList />
+            <ProjectList />
         </LayoutContainer>
     );
 };
 
-export default Integrations;
+export default Projects;

@@ -7,35 +7,32 @@ import TextArea from 'components/TextArea/TextArea';
 import {Controller, useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
 import {
-    IntegrationKeys,
-    useGetIntegrationCategoriesQuery,
-    useGetIntegrationTagsQuery,
-} from '../../queries/integrations';
+    ProjectKeys,
+    useGetProjectCategoriesQuery,
+    useGetProjectTagsQuery,
+} from '../../../queries/projects';
 import {useQueryClient} from '@tanstack/react-query';
+import {CategoryModel, TagModel} from '../../../middleware/project';
 import {
-    CategoryModel,
-    IntegrationModel,
-    TagModel,
-} from '../../middleware/integration';
-import {
-    useCreateIntegrationMutation,
-    useUpdateIntegrationMutation,
-} from '../../mutations/integrations.mutations';
+    useCreateProjectMutation,
+    useUpdateProjectMutation,
+} from '../../../mutations/projects.mutations';
 import {Close} from '@radix-ui/react-dialog';
+import {ProjectModel} from '../../../middleware/project';
 
-interface IntegrationDialogProps {
-    integration: IntegrationModel | undefined;
+interface ProjectDialogProps {
+    project: ProjectModel | undefined;
     showTrigger?: boolean;
     visible?: boolean;
     onClose?: () => void;
 }
 
-const IntegrationDialog = ({
-    integration,
+const ProjectDialog = ({
+    project,
     showTrigger = true,
     visible = false,
     onClose,
-}: IntegrationDialogProps) => {
+}: ProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
     const {
@@ -46,63 +43,59 @@ const IntegrationDialog = ({
         register,
         reset,
         setValue,
-    } = useForm<IntegrationModel>({
+    } = useForm<ProjectModel>({
         defaultValues: {
-            category: integration?.category
+            category: project?.category
                 ? {
-                      label: integration?.category?.name,
-                      ...integration?.category,
+                      label: project?.category?.name,
+                      ...project?.category,
                   }
                 : undefined,
-            description: integration?.description || '',
-            name: integration?.name || '',
+            description: project?.description || '',
+            name: project?.name || '',
             tags:
-                integration?.tags?.map((tag) => ({
+                project?.tags?.map((tag) => ({
                     ...tag,
                     label: tag.name,
                 })) || [],
-        } as IntegrationModel,
+        } as ProjectModel,
     });
 
     const {
         isLoading: categoriesIsLoading,
         error: categoriesError,
         data: categories,
-    } = useGetIntegrationCategoriesQuery();
+    } = useGetProjectCategoriesQuery();
 
     const {
         isLoading: tagsIsLoading,
         error: tagsError,
         data: tags,
-    } = useGetIntegrationTagsQuery();
+    } = useGetProjectTagsQuery();
 
     const queryClient = useQueryClient();
 
-    const tagNames = integration?.tags?.map((tag) => tag.name);
+    const tagNames = project?.tags?.map((tag) => tag.name);
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
-    const createMutation = useCreateIntegrationMutation({
+    const createMutation = useCreateProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(
-                IntegrationKeys.integrationCategories
-            );
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+            queryClient.invalidateQueries(ProjectKeys.projectCategories);
+            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries(ProjectKeys.projectTags);
 
             closeDialog();
         },
     });
 
-    const updateMutation = useUpdateIntegrationMutation({
+    const updateMutation = useUpdateProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(
-                IntegrationKeys.integrationCategories
-            );
+            queryClient.invalidateQueries(ProjectKeys.projectCategories);
 
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(ProjectKeys.projects);
 
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+            queryClient.invalidateQueries(ProjectKeys.projectTags);
 
             closeDialog();
         },
@@ -118,7 +111,7 @@ const IntegrationDialog = ({
         }
     }
 
-    function createIntegration() {
+    function createProject() {
         const formData = getValues();
 
         if (!formData) {
@@ -133,26 +126,26 @@ const IntegrationDialog = ({
             ? formData?.category
             : undefined;
 
-        if (integration?.id) {
+        if (project?.id) {
             updateMutation.mutate({
-                ...integration,
+                ...project,
                 ...formData,
                 category,
-            } as IntegrationModel);
+            } as ProjectModel);
         } else {
             createMutation.mutate({
                 ...formData,
                 category,
                 tags: tagValues,
-            } as IntegrationModel);
+            } as ProjectModel);
         }
     }
 
     return (
         <Dialog
             description={`Use this to ${
-                integration?.id ? 'edit' : 'create'
-            } your integration which will contain related workflows`}
+                project?.id ? 'edit' : 'create'
+            } your project which will contain related workflows`}
             isOpen={isOpen}
             setIsOpen={(isOpen) => {
                 if (isOpen) {
@@ -161,10 +154,10 @@ const IntegrationDialog = ({
                     closeDialog();
                 }
             }}
-            title={`${integration?.id ? 'Edit' : 'Create'} Integration`}
+            title={`${project?.id ? 'Edit' : 'Create'} Project`}
             triggerLabel={
                 showTrigger
-                    ? `${integration?.id ? 'Edit' : 'Create'} Integration`
+                    ? `${project?.id ? 'Edit' : 'Create'} Project`
                     : undefined
             }
         >
@@ -179,13 +172,13 @@ const IntegrationDialog = ({
             <Input
                 error={touchedFields.name && !!errors.name}
                 label="Name"
-                placeholder="My CRM Integration"
+                placeholder="My CRM Project"
                 {...register('name', {required: true})}
             />
 
             <TextArea
                 label="Description"
-                placeholder="Cute description of your integration"
+                placeholder="Cute description of your project"
                 {...register('description')}
             />
 
@@ -272,11 +265,11 @@ const IntegrationDialog = ({
                 <Button
                     label="Save"
                     type="submit"
-                    onClick={handleSubmit(createIntegration)}
+                    onClick={handleSubmit(createProject)}
                 />
             </div>
         </Dialog>
     );
 };
 
-export default IntegrationDialog;
+export default ProjectDialog;
