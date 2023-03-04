@@ -122,6 +122,12 @@ const IntegrationItem = ({
                                         updateTagsMutation={
                                             updateIntegrationTagsMutation
                                         }
+                                        getRequest={(id, tags) => ({
+                                            id: id!,
+                                            updateIntegrationTagsRequestModel: {
+                                                tags: tags || [],
+                                            },
+                                        })}
                                     />
                                 )}
                             </footer>
