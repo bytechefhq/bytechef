@@ -65,12 +65,19 @@ type DeleteProjectMutationProps = {
     onError?: (error: object, variables: DeleteProjectRequest) => void;
 };
 
-export const useDeleteProjectMutation = (
-    mutationProps?: DeleteProjectMutationProps
+type DuplicateProjectMutationProps = {
+    onSuccess?: (result: ProjectModel, variables: number) => void;
+    onError?: (error: object, variables: number) => void;
+};
+
+export const useDuplicateProjectMutation = (
+    mutationProps?: DuplicateProjectMutationProps
 ) =>
     useMutation({
-        mutationFn: (request: DeleteProjectRequest) => {
-            return new ProjectsApi().deleteProject(request);
+        mutationFn: (id: number) => {
+            return new ProjectsApi().duplicateProject({
+                id: id,
+            });
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
