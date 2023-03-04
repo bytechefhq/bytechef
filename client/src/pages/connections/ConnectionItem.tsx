@@ -1,6 +1,6 @@
 import React from 'react';
 import DropdownMenu, {
-    DropdownMenuItemProps,
+    IDropdownMenuItem,
 } from '../../components/DropdownMenu/DropdownMenu';
 import {ConnectionModel, TagModel} from '../../middleware/connection';
 import {useQueryClient} from '@tanstack/react-query';
@@ -30,7 +30,7 @@ const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
         },
     });
 
-    const menuItems: DropdownMenuItemProps[] = [
+    const menuItems: IDropdownMenuItem[] = [
         {
             label: 'Edit',
         },
@@ -52,7 +52,8 @@ const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
         <div className="flex items-center justify-between">
             <div>
                 <div className="relative mb-2 flex items-center">
-                    <Component1Icon className="mr-1 h-5 w-5 flex-none" />{' '}
+                    <Component1Icon className="mr-1 h-5 w-5 flex-none" />
+
                     <span className="mr-2 text-base font-semibold text-gray-900">
                         {connection.name}
                     </span>
@@ -73,9 +74,11 @@ const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
             </div>
 
             <div className="flex items-center">
-                <span className="mr-4 text-center text-sm text-gray-500">
-                    {`Last Modified ${connection.lastModifiedDate?.toLocaleDateString()} ${connection.lastModifiedDate?.toLocaleTimeString()}`}
-                </span>
+                {connection.lastModifiedDate && (
+                    <span className="mr-4 text-center text-sm text-gray-500">
+                        {`Last Modified ${connection.lastModifiedDate?.toLocaleDateString()} ${connection.lastModifiedDate?.toLocaleTimeString()}`}
+                    </span>
+                )}
 
                 <DropdownMenu id={connection.id} menuItems={menuItems} />
             </div>
