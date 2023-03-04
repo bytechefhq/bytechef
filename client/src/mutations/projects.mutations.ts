@@ -25,10 +25,63 @@ export const useCreateProjectMutation = (
         onError: mutationProps?.onError,
     });
 
+type CreateProjectWorkflowRequestMutationProps = {
+    onSuccess?: (
+        result: ProjectModel,
+        variables: CreateProjectWorkflowRequest
+    ) => void;
+    onError?: (error: object, variables: CreateProjectWorkflowRequest) => void;
+};
+
+export const useCreateProjectWorkflowRequestMutation = (
+    mutationProps?: CreateProjectWorkflowRequestMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: CreateProjectWorkflowRequest) => {
+            return new ProjectsApi().createProjectWorkflow(request);
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type DeleteProjectMutationProps = {
+    onSuccess?: (result: void, variables: DeleteProjectRequest) => void;
+    onError?: (error: object, variables: DeleteProjectRequest) => void;
+};
+
+export const useDeleteProjectMutation = (
+    mutationProps?: DeleteProjectMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: DeleteProjectRequest) => {
+            return new ProjectsApi().deleteProject(request);
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
 type UpdateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
     onError?: (error: object, variables: ProjectModel) => void;
 };
+
+type DuplicateProjectMutationProps = {
+    onSuccess?: (result: ProjectModel, variables: number) => void;
+    onError?: (error: object, variables: number) => void;
+};
+
+export const useDuplicateProjectMutation = (
+    mutationProps?: DuplicateProjectMutationProps
+) =>
+    useMutation({
+        mutationFn: (id: number) => {
+            return new ProjectsApi().duplicateProject({
+                id: id,
+            });
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
 
 export const useUpdateProjectMutation = (
     mutationProps?: UpdateProjectMutationProps
@@ -55,48 +108,6 @@ export const useUpdateProjectTagsMutation = (
     useMutation({
         mutationFn: (request: UpdateProjectTagsRequest) => {
             return new ProjectsApi().updateProjectTags(request);
-        },
-        onSuccess: mutationProps?.onSuccess,
-        onError: mutationProps?.onError,
-    });
-
-type DeleteProjectMutationProps = {
-    onSuccess?: (result: void, variables: DeleteProjectRequest) => void;
-    onError?: (error: object, variables: DeleteProjectRequest) => void;
-};
-
-type DuplicateProjectMutationProps = {
-    onSuccess?: (result: ProjectModel, variables: number) => void;
-    onError?: (error: object, variables: number) => void;
-};
-
-export const useDuplicateProjectMutation = (
-    mutationProps?: DuplicateProjectMutationProps
-) =>
-    useMutation({
-        mutationFn: (id: number) => {
-            return new ProjectsApi().duplicateProject({
-                id: id,
-            });
-        },
-        onSuccess: mutationProps?.onSuccess,
-        onError: mutationProps?.onError,
-    });
-
-type CreateProjectWorkflowRequestMutationProps = {
-    onSuccess?: (
-        result: ProjectModel,
-        variables: CreateProjectWorkflowRequest
-    ) => void;
-    onError?: (error: object, variables: CreateProjectWorkflowRequest) => void;
-};
-
-export const useCreateProjectWorkflowRequestMutation = (
-    mutationProps?: CreateProjectWorkflowRequestMutationProps
-) =>
-    useMutation({
-        mutationFn: (request: CreateProjectWorkflowRequest) => {
-            return new ProjectsApi().createProjectWorkflow(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
