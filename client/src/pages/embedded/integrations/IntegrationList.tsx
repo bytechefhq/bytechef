@@ -1,7 +1,7 @@
 import {
     useGetIntegrationsQuery,
     useGetIntegrationTagsQuery,
-} from '../../../queries/integrations';
+} from '../../../queries/integrations.queries';
 import IntegrationItem from 'pages/embedded/integrations/IntegrationItem';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';

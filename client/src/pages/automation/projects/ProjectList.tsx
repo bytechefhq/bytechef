@@ -1,7 +1,7 @@
 import {
     useGetProjectsQuery,
     useGetProjectTagsQuery,
-} from '../../../queries/projects';
+} from '../../../queries/projects.queries';
 import ProjectItem from 'pages/automation/projects/ProjectItem';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';

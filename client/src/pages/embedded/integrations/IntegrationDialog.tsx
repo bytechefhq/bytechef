@@ -10,7 +10,7 @@ import {
     IntegrationKeys,
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '../../../queries/integrations';
+} from '../../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CategoryModel,
