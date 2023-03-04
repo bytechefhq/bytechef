@@ -1,61 +1,64 @@
-import React, {useState} from 'react';
-import Button from '../../../components/Button/Button';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
+import {XMarkIcon} from '@heroicons/react/24/outline';
+import {ChevronDownIcon, PlusIcon} from '@radix-ui/react-icons';
+import Button from 'components/Button/Button';
+import {useState} from 'react';
+import {OnChangeValue} from 'react-select';
 import CreatableSelect, {
     SelectOption,
-} from '../../../components/CreatableSelect/CreatableSelect';
-import {TagModel} from '../../../middleware/connection';
-import {SingleValue} from 'react-select';
-import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
-import {useUpdateConnectionTagsMutation} from '../../../mutations/connections.mutations';
-import {ConnectionKeys} from '../../../queries/connections';
-import {useQueryClient} from '@tanstack/react-query';
+} from 'components/CreatableSelect/CreatableSelect';
+import {UseMutationResult} from '@tanstack/react-query';
+
+interface TagModel {
+    readonly createdBy?: string;
+    readonly createdDate?: Date;
+    id?: number;
+    readonly lastModifiedBy?: string;
+    readonly lastModifiedDate?: Date;
+    name: string;
+    version?: number;
+}
 
 interface TagProps {
     tag: TagModel;
     onDeleteTag: (deletedTag: TagModel) => void;
 }
 
-const Tag = ({tag, onDeleteTag}: TagProps) => {
-    return (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
-            {tag.name}
+const Tag = ({tag, onDeleteTag}: TagProps) => (
+    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200">
+        {tag.name}
 
-            <XMarkIcon
-                className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
-                onClick={() => onDeleteTag(tag)}
-            />
-        </span>
-    );
-};
+        <XMarkIcon
+            className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
+            onClick={() => onDeleteTag(tag)}
+        />
+    </span>
+);
 
 interface TagListProps {
-    connectionId: number;
+    id: number;
     remainingTags?: TagModel[];
     tags: TagModel[];
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    updateTagsMutation: UseMutationResult<void, object, any, unknown>;
 }
 
-const TagList = ({connectionId, tags, remainingTags}: TagListProps) => {
+const TagList = ({
+    id,
+    tags,
+    remainingTags,
+    updateTagsMutation,
+}: TagListProps) => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
-
-    const queryClient = useQueryClient();
-
-    const updateConnectionTagsMutation = useUpdateConnectionTagsMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries(ConnectionKeys.connections);
-            queryClient.invalidateQueries(ConnectionKeys.connectionTags);
-        },
-    });
 
     const handleOnAddTag = (newTag: TagModel) => {
         const newTags = (tags && [...tags]) || [];
 
         newTags.push(newTag);
 
-        updateConnectionTagsMutation.mutate({
-            id: connectionId,
-            updateConnectionTagsRequestModel: {
+        updateTagsMutation.mutate({
+            id: id!,
+            updateIntegrationTagsRequestModel: {
                 tags: newTags || [],
             },
         });
@@ -64,9 +67,9 @@ const TagList = ({connectionId, tags, remainingTags}: TagListProps) => {
     const handleOnDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
 
-        updateConnectionTagsMutation.mutate({
-            id: connectionId,
-            updateConnectionTagsRequestModel: {
+        updateTagsMutation.mutate({
+            id: id || 0,
+            updateIntegrationTagsRequestModel: {
                 tags: newTags || [],
             },
         });
@@ -109,7 +112,6 @@ const TagList = ({connectionId, tags, remainingTags}: TagListProps) => {
                 <CreatableSelect
                     className="w-40"
                     name="newTag"
-                    isMulti={false}
                     options={remainingTags!.map((tag: TagModel) => ({
                         label: `${tag.name
                             .charAt(0)
@@ -121,9 +123,12 @@ const TagList = ({connectionId, tags, remainingTags}: TagListProps) => {
                         handleOnAddTag({
                             name: inputValue,
                         });
+
                         setIsNewTagWindowVisible(false);
                     }}
-                    onChange={(selectedOption: SingleValue<SelectOption>) => {
+                    onChange={(
+                        selectedOption: OnChangeValue<SelectOption, false>
+                    ) => {
                         if (selectedOption) {
                             handleOnAddTag(selectedOption.tag);
                         }
@@ -136,6 +141,7 @@ const TagList = ({connectionId, tags, remainingTags}: TagListProps) => {
                     className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
                     onClick={(event) => {
                         event.preventDefault();
+
                         setIsNewTagWindowVisible(true);
                     }}
                 >
