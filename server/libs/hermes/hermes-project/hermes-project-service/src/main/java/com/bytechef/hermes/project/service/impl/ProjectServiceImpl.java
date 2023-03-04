@@ -78,6 +78,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public List<Project> getProjects() {
+        return getProjects(null, null);
+    }
+
+    @Override
     public List<Project> getProjects(List<Long> categoryIds, List<Long> tagIds) {
         Iterable<Project> projectIterable;
 
