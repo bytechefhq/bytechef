@@ -3,14 +3,14 @@ import App from './App';
 import ErrorPage from './ErrorPage';
 import Project from './pages/automation/project/Project';
 import Integrations from './pages/embedded/integrations/Integrations';
-import Connections from './pages/connections/Connections';
+import Connections from './pages/automation/connections/Connections';
 import Settings from './pages/settings/Settings';
-import Instances from './pages/instances/Instances';
-import Executions from './pages/executions/Executions';
+import Instances from './pages/automation/instances/Instances';
+import Executions from './pages/automation/executions/Executions';
 import {QueryClient} from '@tanstack/react-query';
 import {ProjectsApi} from './middleware/project';
 import {ProjectKeys} from './queries/projects';
-import OAuthPopup from './pages/connections/oauth2/OAuthPopup';
+import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
 import Projects from './pages/automation/projects/Projects';
 
 const queryClient = new QueryClient();
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
                                         id: +params.projectId!,
                                     })
                             ),
-                        path: 'integrations/:integrationId',
+                        path: 'projects/:projectId',
                         element: <Project />,
                     },
                     {
