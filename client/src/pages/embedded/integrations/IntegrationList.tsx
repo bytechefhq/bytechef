@@ -65,10 +65,6 @@ const IntegrationList = () => {
                                     <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
                                         <IntegrationItem
                                             integration={integration}
-                                            integrationNames={integrations.map(
-                                                (integration) =>
-                                                    integration.name
-                                            )}
                                             key={integration.id}
                                             remainingTags={tags?.filter(
                                                 (tag) =>
