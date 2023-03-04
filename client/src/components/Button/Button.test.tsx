@@ -6,17 +6,15 @@ import {MixIcon} from '@radix-ui/react-icons';
 
 describe('Button', async () => {
     it('should render the button', () => {
-        render(<Button label="New Integration" />);
+        render(<Button label="New Project" />);
 
-        expect(screen.getByText('New Integration')).toBeInTheDocument();
+        expect(screen.getByText('New Project')).toBeInTheDocument();
     });
 
     it('should be interactive', () => {
         const handleClick = vi.fn();
 
-        render(
-            <Button id="btn" label="New Integration" onClick={handleClick} />
-        );
+        render(<Button id="btn" label="New Project" onClick={handleClick} />);
 
         const button = document.getElementById('btn');
 
