@@ -2,7 +2,7 @@ import {createBrowserRouter} from 'react-router-dom';
 import App from './App';
 import ErrorPage from './ErrorPage';
 import Integration from './pages/integration/Integration';
-import Integrations from './pages/integrations/Integrations';
+import Integrations from './pages/embedded/integrations/Integrations';
 import Connections from './pages/connections/Connections';
 import Settings from './pages/settings/Settings';
 import Instances from './pages/instances/Instances';
@@ -64,6 +64,15 @@ export const router = createBrowserRouter([
                     {
                         path: 'settings',
                         element: <Settings />,
+                    },
+                ],
+            },
+            {
+                path: 'embedded',
+                children: [
+                    {
+                        path: 'integrations',
+                        element: <Integrations />,
                     },
                 ],
             },
