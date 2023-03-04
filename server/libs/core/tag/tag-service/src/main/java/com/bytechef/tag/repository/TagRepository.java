@@ -30,5 +30,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TagRepository extends PagingAndSortingRepository<Tag, Long>, CrudRepository<Tag, Long> {
+
     Optional<Tag> findByName(String name);
 }
