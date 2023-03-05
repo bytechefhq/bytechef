@@ -14,28 +14,38 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "BOOLEAN"
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
             },
             {
-              "type": "DATE"
+              "type": "DATE",
+              "controlType": "DATE"
             },
             {
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
-              "type": "INTEGER"
+              "type": "INTEGER",
+              "controlType": "INPUT_INTEGER"
             },
             {
-              "type": "NUMBER"
+              "type": "NUMBER",
+              "controlType": "INPUT_NUMBER"
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
           ]
         }

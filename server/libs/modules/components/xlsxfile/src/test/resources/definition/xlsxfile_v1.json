@@ -1,197 +1,233 @@
 {
-    "actions": [
+  "actions": [
+    {
+      "display": {
+        "description": "Reads data from a XLS/XLSX file.",
+        "label": "Read from file"
+      },
+      "name": "read",
+      "outputSchema": [
         {
-            "display": {
-                "description": "Reads data from a XLS/XLSX file.",
-                "label": "Read from file"
+          "type": "ARRAY",
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
+        }
+      ],
+      "properties": [
+        {
+          "description": "The object property which contains a reference to the XLS/XLSX file to read from.",
+          "label": "File",
+          "required": true,
+          "name": "fileEntry",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "required": true,
+              "name": "extension",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
-            "name": "read",
-            "outputSchema": [
-                {
-                    "type": "ARRAY"
-                }
-            ],
-            "properties": [
-                {
-                    "description": "The object property which contains a reference to the XLS/XLSX file to read from.",
-                    "label": "File",
-                    "required": true,
-                    "name": "fileEntry",
-                    "type": "OBJECT",
-                    "objectType": "FILE_ENTRY",
-                    "properties": [
-                        {
-                            "required": true,
-                            "name": "extension",
-                            "type": "STRING"
-                        },
-                        {
-                            "required": true,
-                            "name": "mimeType",
-                            "type": "STRING"
-                        },
-                        {
-                            "required": true,
-                            "name": "name",
-                            "type": "STRING"
-                        },
-                        {
-                            "required": true,
-                            "name": "url",
-                            "type": "STRING"
-                        }
-                    ]
-                },
-                {
-                    "advancedOption": true,
-                    "description": "The first row of the file contains the header names.",
-                    "label": "Header Row",
-                    "name": "headerRow",
-                    "type": "BOOLEAN",
-                    "defaultValue": true
-                },
-                {
-                    "advancedOption": true,
-                    "description": "When reading from file the empty cells will be filled with an empty string.",
-                    "label": "Include Empty Cells",
-                    "name": "includeEmptyCells",
-                    "type": "BOOLEAN",
-                    "defaultValue": false
-                },
-                {
-                    "advancedOption": true,
-                    "description": "The amount of child elements to return in a page.",
-                    "label": "Page Size",
-                    "name": "pageSize",
-                    "type": "INTEGER"
-                },
-                {
-                    "advancedOption": true,
-                    "description": "The page number to get.",
-                    "label": "Page Number",
-                    "name": "pageNumber",
-                    "type": "INTEGER"
-                },
-                {
-                    "advancedOption": true,
-                    "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
-                    "label": "Read As String",
-                    "name": "readAsString",
-                    "type": "BOOLEAN",
-                    "defaultValue": false
-                },
-                {
-                    "advancedOption": true,
-                    "description": "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.",
-                    "label": "Sheet Name",
-                    "name": "sheetName",
-                    "type": "STRING",
-                    "defaultValue": "Sheet"
-                }
-            ]
+            {
+              "required": true,
+              "name": "mimeType",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            },
+            {
+              "required": true,
+              "name": "name",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            },
+            {
+              "required": true,
+              "name": "url",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }
+          ],
+          "controlType": "INPUT_TEXT"
         },
         {
-            "display": {
-                "description": "Writes the data to a XLS/XLSX file.",
-                "label": "Write to file"
-            },
-            "name": "write",
-            "outputSchema": [
-                {
-                    "type": "OBJECT",
-                    "objectType": "FILE_ENTRY",
-                    "properties": [
-                        {
-                            "required": true,
-                            "name": "extension",
-                            "type": "STRING"
-                        },
-                        {
-                            "required": true,
-                            "name": "mimeType",
-                            "type": "STRING"
-                        },
-                        {
-                            "required": true,
-                            "name": "name",
-                            "type": "STRING"
-                        },
-                        {
-                            "required": true,
-                            "name": "url",
-                            "type": "STRING"
-                        }
-                    ]
-                }
-            ],
-            "properties": [
-                {
-                    "description": "The array of objects to write to the file.",
-                    "label": "Rows",
-                    "required": true,
-                    "name": "rows",
-                    "type": "ARRAY",
-                    "items": [
-                        {
-                            "type": "OBJECT",
-                            "additionalProperties": [
-                                {
-                                    "type": "ONE_OF",
-                                    "types": [
-                                        {
-                                            "type": "ARRAY"
-                                        },
-                                        {
-                                            "type": "BOOLEAN"
-                                        },
-                                        {
-                                            "type": "DATE"
-                                        },
-                                        {
-                                            "type": "DATE_TIME"
-                                        },
-                                        {
-                                            "type": "INTEGER"
-                                        },
-                                        {
-                                            "type": "NUMBER"
-                                        },
-                                        {
-                                            "type": "OBJECT"
-                                        },
-                                        {
-                                            "type": "STRING"
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "advancedOption": true,
-                    "description": "Filename to set for binary data. By default, \"file.xlsx\" will be used.",
-                    "label": "Filename",
-                    "required": true,
-                    "name": "filename",
-                    "type": "STRING",
-                    "defaultValue": "file.xlsx"
-                },
-                {
-                    "advancedOption": true,
-                    "description": "The name of the sheet to create in the spreadsheet.",
-                    "label": "Sheet Name",
-                    "name": "sheetName",
-                    "type": "STRING",
-                    "defaultValue": "Sheet"
-                }
-            ]
+          "advancedOption": true,
+          "description": "The first row of the file contains the header names.",
+          "label": "Header Row",
+          "name": "headerRow",
+          "type": "BOOLEAN",
+          "defaultValue": true,
+          "controlType": "CHECKBOX"
+        },
+        {
+          "advancedOption": true,
+          "description": "When reading from file the empty cells will be filled with an empty string.",
+          "label": "Include Empty Cells",
+          "name": "includeEmptyCells",
+          "type": "BOOLEAN",
+          "defaultValue": false,
+          "controlType": "CHECKBOX"
+        },
+        {
+          "advancedOption": true,
+          "description": "The amount of child elements to return in a page.",
+          "label": "Page Size",
+          "name": "pageSize",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        },
+        {
+          "advancedOption": true,
+          "description": "The page number to get.",
+          "label": "Page Number",
+          "name": "pageNumber",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        },
+        {
+          "advancedOption": true,
+          "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
+          "label": "Read As String",
+          "name": "readAsString",
+          "type": "BOOLEAN",
+          "defaultValue": false,
+          "controlType": "CHECKBOX"
+        },
+        {
+          "advancedOption": true,
+          "description": "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.",
+          "label": "Sheet Name",
+          "name": "sheetName",
+          "type": "STRING",
+          "defaultValue": "Sheet",
+          "controlType": "INPUT_TEXT"
         }
-    ],
-    "display": {
-        "description": "Reads and writes data from a XLS/XLSX file.",
-        "label": "XLSX File"
+      ]
     },
-    "name": "xlsxFile",
-    "version": 1
+    {
+      "display": {
+        "description": "Writes the data to a XLS/XLSX file.",
+        "label": "Write to file"
+      },
+      "name": "write",
+      "outputSchema": [
+        {
+          "type": "OBJECT",
+          "multipleValues": true,
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "required": true,
+              "name": "extension",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            },
+            {
+              "required": true,
+              "name": "mimeType",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            },
+            {
+              "required": true,
+              "name": "name",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            },
+            {
+              "required": true,
+              "name": "url",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }
+          ],
+          "controlType": "INPUT_TEXT"
+        }
+      ],
+      "properties": [
+        {
+          "description": "The array of objects to write to the file.",
+          "label": "Rows",
+          "required": true,
+          "name": "rows",
+          "type": "ARRAY",
+          "items": [
+            {
+              "type": "OBJECT",
+              "additionalProperties": [
+                {
+                  "type": "ONE_OF",
+                  "types": [
+                    {
+                      "type": "ARRAY",
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
+                    },
+                    {
+                      "type": "BOOLEAN",
+                      "controlType": "CHECKBOX"
+                    },
+                    {
+                      "type": "DATE",
+                      "controlType": "DATE"
+                    },
+                    {
+                      "type": "DATE_TIME",
+                      "controlType": "DATE_TIME"
+                    },
+                    {
+                      "type": "INTEGER",
+                      "controlType": "INPUT_INTEGER"
+                    },
+                    {
+                      "type": "NUMBER",
+                      "controlType": "INPUT_NUMBER"
+                    },
+                    {
+                      "type": "OBJECT",
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
+                    },
+                    {
+                      "type": "STRING",
+                      "controlType": "INPUT_TEXT"
+                    }
+                  ]
+                }
+              ],
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
+            }
+          ],
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
+        },
+        {
+          "advancedOption": true,
+          "description": "Filename to set for binary data. By default, \"file.xlsx\" will be used.",
+          "label": "Filename",
+          "required": true,
+          "name": "filename",
+          "type": "STRING",
+          "defaultValue": "file.xlsx",
+          "controlType": "INPUT_TEXT"
+        },
+        {
+          "advancedOption": true,
+          "description": "The name of the sheet to create in the spreadsheet.",
+          "label": "Sheet Name",
+          "name": "sheetName",
+          "type": "STRING",
+          "defaultValue": "Sheet",
+          "controlType": "INPUT_TEXT"
+        }
+      ]
+    }
+  ],
+  "display": {
+    "description": "Reads and writes data from a XLS/XLSX file.",
+    "label": "XLSX File"
+  },
+  "name": "xlsxFile",
+  "version": 1
 }

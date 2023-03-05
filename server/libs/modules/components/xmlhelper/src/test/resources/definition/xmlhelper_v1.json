@@ -8,7 +8,9 @@
       "name": "parse",
       "outputSchema": [
         {
-          "type": "OBJECT"
+          "type": "OBJECT",
+          "controlType": "JSON_BUILDER",
+          "multipleValues": true
         }
       ],
       "properties": [
@@ -17,7 +19,8 @@
           "label": "Source",
           "required": true,
           "name": "source",
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -29,7 +32,8 @@
       "name": "stringify",
       "outputSchema": [
         {
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ],
       "properties": [
@@ -41,10 +45,14 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             }
           ]
         }
