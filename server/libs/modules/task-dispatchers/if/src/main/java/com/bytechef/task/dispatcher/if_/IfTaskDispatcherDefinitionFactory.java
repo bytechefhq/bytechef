@@ -21,11 +21,9 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.a
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.hide;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.number;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.option;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.show;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
@@ -48,7 +46,6 @@ import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.CombineOperation;
 import com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.Operation;
-import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -69,7 +66,7 @@ public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefiniti
                 .label("Conditions")
                 .placeholder("Add Condition")
                 .description("The type of values to compare.")
-                .displayOption(show(RAW_EXPRESSION, false))
+                .displayCondition("%s === true".formatted(RAW_EXPRESSION))
                 .items(
                     object(BOOLEAN)
                         .label("Boolean")
@@ -143,7 +140,7 @@ public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefiniti
                                 .description(
                                     "The number value to compare with the first one.")
                                 .defaultValue(0)
-                                .displayOption(hide(OPERATION, Operation.EMPTY.name()))),
+                                .displayCondition("%s !== '%s'".formatted(OPERATION, Operation.EMPTY.name()))),
                     object(STRING)
                         .label("String")
                         .properties(
@@ -173,18 +170,17 @@ public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefiniti
                                 .description(
                                     "The string value to compare with the first one.")
                                 .defaultValue("")
-                                .displayOption(hide(
-                                    OPERATION,
-                                    List.of(
-                                        Operation.EMPTY.name(),
-                                        Operation.REGEX.name()))),
+                                .displayCondition("!['%s','%s'].includes('%s')".formatted(
+                                    Operation.EMPTY.name(),
+                                    Operation.REGEX.name(),
+                                    OPERATION)),
                             string(VALUE_2)
                                 .label("Regex")
                                 .description(
                                     "The regex value to compare with the first one.")
                                 .placeholder("/text/i")
                                 .defaultValue("")
-                                .displayOption(show(OPERATION, Operation.REGEX.name())))),
+                                .displayCondition("%s === '%s'".formatted(OPERATION, Operation.REGEX.name())))),
             string(COMBINE_OPERATION)
                 .label("Combine")
                 .description(
@@ -192,7 +188,7 @@ public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefiniti
                         If multiple conditions are set, this setting decides if it is true as soon as ANY condition
                          matches or only if ALL are met.
                         """)
-                .displayOption(show(RAW_EXPRESSION, false))
+                .displayCondition("%s === false".formatted(RAW_EXPRESSION))
                 .options(
                     option(
                         "All",

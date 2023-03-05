@@ -1,7 +1,7 @@
 {
   "display": {
-    "label": "Switch",
-    "description": "Executes one and only one branch of execution based on the `expression` value."
+    "description": "Executes one and only one branch of execution based on the `expression` value.",
+    "label": "Switch"
   },
   "name": "switch",
   "properties": [
@@ -9,7 +9,8 @@
       "description": "Defines expression upon which evaluation the proper branch continues execution.",
       "label": "Expression",
       "name": "expression",
-      "type": "STRING"
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
     }
   ],
   "version": 1,
@@ -21,10 +22,12 @@
       "items": [
         {
           "type": "OBJECT",
+          "multipleValues": true,
           "properties": [
             {
               "name": "key",
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
             {
               "description": "The list of tasks.",
@@ -34,13 +37,20 @@
                 {
                   "description": "The task or task dispatcher to use.",
                   "type": "OBJECT",
-                  "objectType": "TASK"
+                  "multipleValues": true,
+                  "objectType": "TASK",
+                  "controlType": "INPUT_TEXT"
                 }
-              ]
+              ],
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
-      ]
+      ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     },
     {
       "description": "The list of tasks to execute if the result of expression does not match any of 'key' values.",
@@ -50,9 +60,13 @@
         {
           "description": "The task or task dispatcher to use.",
           "type": "OBJECT",
-          "objectType": "TASK"
+          "multipleValues": true,
+          "objectType": "TASK",
+          "controlType": "INPUT_TEXT"
         }
-      ]
+      ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     }
   ]
 }

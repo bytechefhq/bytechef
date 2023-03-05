@@ -6,10 +6,11 @@
   "name": "subflow",
   "properties": [
     {
-      "type": "STRING",
       "description": "The id of sub-workflow to execute.",
       "label": "Workflow Id",
-      "name": "workflowId"
+      "name": "workflowId",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
     }
   ],
   "version": 1
