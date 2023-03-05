@@ -19,17 +19,13 @@ package com.bytechef.hermes.definition;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiablePropertyOption.class)
-public sealed interface PropertyOption permits DefinitionDSL.ModifiablePropertyOption {
+@JsonDeserialize(as = DefinitionDSL.ModifiablePropertiesDataSource.class)
+public interface PropertiesDataSource {
 
-    String getDescription();
-
-    DisplayOption getDisplayOption();
-
-    String getName();
-
-    Object getValue();
+    List<String> getLoadPropertiesDependsOn();
 }

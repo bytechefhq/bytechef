@@ -10,7 +10,7 @@ schemas:
       display:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       exampleOutput:
-        description: The example of the action's output.
+        description: The example value of the action's output.
         type: object
 #      metadata:
 #        description: The additional data that can be used during processing.
@@ -30,9 +30,9 @@ schemas:
         type: array
         items:
           $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
-      performFunction:
-        description: Contains information required for a connection's authorization.
-        type: object
+#      performFunction:
+#        description: Contains information required for a connection's authorization.
+#        type: object
   Authorization:
     description: Contains information required for a connection's authorization.
     type: object
