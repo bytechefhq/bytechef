@@ -67,7 +67,6 @@ public class SearchDealsAction {
             bool("exact_match").label("Exact_match")
                 .description(
                     "When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.")
-                .options(option("True", true), option("False", false))
                 .required(false)
                 .metadata(
                     Map.of(
