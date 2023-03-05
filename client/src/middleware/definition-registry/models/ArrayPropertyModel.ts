@@ -13,24 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
+import type { ControlTypeModel } from './ControlTypeModel';
 import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
+    ControlTypeModelFromJSON,
+    ControlTypeModelFromJSONTyped,
+    ControlTypeModelToJSON,
+} from './ControlTypeModel';
+import type { OptionModel } from './OptionModel';
+import {
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
     PropertyModelFromJSONTyped,
     PropertyModelToJSON,
 } from './PropertyModel';
-import type { PropertyOptionModel } from './PropertyOptionModel';
-import {
-    PropertyOptionModelFromJSON,
-    PropertyOptionModelFromJSONTyped,
-    PropertyOptionModelToJSON,
-} from './PropertyOptionModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -62,6 +62,18 @@ export interface ArrayPropertyModel extends ValuePropertyModel {
      * @memberof ArrayPropertyModel
      */
     multipleValues?: boolean;
+    /**
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
+     * @memberof ArrayPropertyModel
+     */
+    options?: Array<OptionModel>;
+    /**
+     * 
+     * @type {any}
+     * @memberof ArrayPropertyModel
+     */
+    optionsDataSource?: any | null;
 }
 
 /**
@@ -85,6 +97,8 @@ export function ArrayPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'items': !exists(json, 'items') ? undefined : ((json['items'] as Array<any>).map(PropertyModelFromJSON)),
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
     };
 }
 
@@ -99,6 +113,8 @@ export function ArrayPropertyModelToJSON(value?: ArrayPropertyModel | null): any
         ...ValuePropertyModelToJSON(value),
         'items': value.items === undefined ? undefined : ((value.items as Array<any>).map(PropertyModelToJSON)),
         'multipleValues': value.multipleValues,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': value.optionsDataSource,
     };
 }
 

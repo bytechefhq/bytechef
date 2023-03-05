@@ -13,76 +13,58 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ControlTypeModel } from './ControlTypeModel';
-import {
-    ControlTypeModelFromJSON,
-    ControlTypeModelFromJSONTyped,
-    ControlTypeModelToJSON,
-} from './ControlTypeModel';
 import type { OptionModel } from './OptionModel';
 import {
     OptionModelFromJSON,
     OptionModelFromJSONTyped,
     OptionModelToJSON,
 } from './OptionModel';
-import type { PropertyTypeModel } from './PropertyTypeModel';
-import {
-    PropertyTypeModelFromJSON,
-    PropertyTypeModelFromJSONTyped,
-    PropertyTypeModelToJSON,
-} from './PropertyTypeModel';
-import type { ValuePropertyModel } from './ValuePropertyModel';
-import {
-    ValuePropertyModelFromJSON,
-    ValuePropertyModelFromJSONTyped,
-    ValuePropertyModelToJSON,
-} from './ValuePropertyModel';
 
 /**
- * A string property.
+ * 
  * @export
- * @interface StringPropertyModel
+ * @interface DatePropertyAllOfModel
  */
-export interface StringPropertyModel extends ValuePropertyModel {
+export interface DatePropertyAllOfModel {
     /**
      * The list of valid property options.
      * @type {Array<OptionModel>}
-     * @memberof StringPropertyModel
+     * @memberof DatePropertyAllOfModel
      */
     options?: Array<OptionModel>;
     /**
      * 
      * @type {any}
-     * @memberof StringPropertyModel
+     * @memberof DatePropertyAllOfModel
      */
     optionsDataSource?: any | null;
 }
 
 /**
- * Check if a given object implements the StringPropertyModel interface.
+ * Check if a given object implements the DatePropertyAllOfModel interface.
  */
-export function instanceOfStringPropertyModel(value: object): boolean {
+export function instanceOfDatePropertyAllOfModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function StringPropertyModelFromJSON(json: any): StringPropertyModel {
-    return StringPropertyModelFromJSONTyped(json, false);
+export function DatePropertyAllOfModelFromJSON(json: any): DatePropertyAllOfModel {
+    return DatePropertyAllOfModelFromJSONTyped(json, false);
 }
 
-export function StringPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): StringPropertyModel {
+export function DatePropertyAllOfModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DatePropertyAllOfModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
-        ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
         'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
     };
 }
 
-export function StringPropertyModelToJSON(value?: StringPropertyModel | null): any {
+export function DatePropertyAllOfModelToJSON(value?: DatePropertyAllOfModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -90,7 +72,7 @@ export function StringPropertyModelToJSON(value?: StringPropertyModel | null): a
         return null;
     }
     return {
-        ...ValuePropertyModelToJSON(value),
+        
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
         'optionsDataSource': value.optionsDataSource,
     };

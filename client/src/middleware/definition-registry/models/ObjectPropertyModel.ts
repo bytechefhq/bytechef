@@ -13,24 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
+import type { ControlTypeModel } from './ControlTypeModel';
 import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
+    ControlTypeModelFromJSON,
+    ControlTypeModelFromJSONTyped,
+    ControlTypeModelToJSON,
+} from './ControlTypeModel';
+import type { OptionModel } from './OptionModel';
+import {
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
     PropertyModelFromJSONTyped,
     PropertyModelToJSON,
 } from './PropertyModel';
-import type { PropertyOptionModel } from './PropertyOptionModel';
-import {
-    PropertyOptionModelFromJSON,
-    PropertyOptionModelFromJSONTyped,
-    PropertyOptionModelToJSON,
-} from './PropertyOptionModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -69,6 +69,18 @@ export interface ObjectPropertyModel extends ValuePropertyModel {
      */
     objectType?: string;
     /**
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
+     * @memberof ObjectPropertyModel
+     */
+    options?: Array<OptionModel>;
+    /**
+     * 
+     * @type {any}
+     * @memberof ObjectPropertyModel
+     */
+    optionsDataSource?: any | null;
+    /**
      * The list of valid object property types.
      * @type {Array<PropertyModel>}
      * @memberof ObjectPropertyModel
@@ -98,6 +110,8 @@ export function ObjectPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         'additionalProperties': !exists(json, 'additionalProperties') ? undefined : ((json['additionalProperties'] as Array<any>).map(PropertyModelFromJSON)),
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
     };
 }
@@ -114,6 +128,8 @@ export function ObjectPropertyModelToJSON(value?: ObjectPropertyModel | null): a
         'additionalProperties': value.additionalProperties === undefined ? undefined : ((value.additionalProperties as Array<any>).map(PropertyModelToJSON)),
         'multipleValues': value.multipleValues,
         'objectType': value.objectType,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': value.optionsDataSource,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
     };
 }

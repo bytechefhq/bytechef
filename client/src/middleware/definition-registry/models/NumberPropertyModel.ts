@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
+import type { ControlTypeModel } from './ControlTypeModel';
 import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
-import type { PropertyOptionModel } from './PropertyOptionModel';
+    ControlTypeModelFromJSON,
+    ControlTypeModelFromJSONTyped,
+    ControlTypeModelToJSON,
+} from './ControlTypeModel';
+import type { OptionModel } from './OptionModel';
 import {
-    PropertyOptionModelFromJSON,
-    PropertyOptionModelFromJSONTyped,
-    PropertyOptionModelToJSON,
-} from './PropertyOptionModel';
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -62,6 +62,18 @@ export interface NumberPropertyModel extends ValuePropertyModel {
      * @memberof NumberPropertyModel
      */
     numberPrecision?: number;
+    /**
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
+     * @memberof NumberPropertyModel
+     */
+    options?: Array<OptionModel>;
+    /**
+     * 
+     * @type {any}
+     * @memberof NumberPropertyModel
+     */
+    optionsDataSource?: any | null;
 }
 
 /**
@@ -86,6 +98,8 @@ export function NumberPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
     };
 }
 
@@ -101,6 +115,8 @@ export function NumberPropertyModelToJSON(value?: NumberPropertyModel | null): a
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': value.optionsDataSource,
     };
 }
 

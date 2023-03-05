@@ -27,43 +27,43 @@ import {
 } from './PropertyTypeModel';
 
 /**
- * A one of property type.
+ * A dynamic properties property type.
  * @export
- * @interface OneOfPropertyModel
+ * @interface DynamicPropertiesPropertyModel
  */
-export interface OneOfPropertyModel extends PropertyModel {
+export interface DynamicPropertiesPropertyModel extends PropertyModel {
     /**
-     * Possible types of properties that can be used.
-     * @type {Array<PropertyModel>}
-     * @memberof OneOfPropertyModel
+     * 
+     * @type {any}
+     * @memberof DynamicPropertiesPropertyModel
      */
-    types?: Array<PropertyModel>;
+    propertiesDataSource?: any | null;
 }
 
 /**
- * Check if a given object implements the OneOfPropertyModel interface.
+ * Check if a given object implements the DynamicPropertiesPropertyModel interface.
  */
-export function instanceOfOneOfPropertyModel(value: object): boolean {
+export function instanceOfDynamicPropertiesPropertyModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function OneOfPropertyModelFromJSON(json: any): OneOfPropertyModel {
-    return OneOfPropertyModelFromJSONTyped(json, false);
+export function DynamicPropertiesPropertyModelFromJSON(json: any): DynamicPropertiesPropertyModel {
+    return DynamicPropertiesPropertyModelFromJSONTyped(json, false);
 }
 
-export function OneOfPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OneOfPropertyModel {
+export function DynamicPropertiesPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DynamicPropertiesPropertyModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'types': !exists(json, 'types') ? undefined : ((json['types'] as Array<any>).map(PropertyModelFromJSON)),
+        'propertiesDataSource': !exists(json, 'propertiesDataSource') ? undefined : json['propertiesDataSource'],
     };
 }
 
-export function OneOfPropertyModelToJSON(value?: OneOfPropertyModel | null): any {
+export function DynamicPropertiesPropertyModelToJSON(value?: DynamicPropertiesPropertyModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -72,7 +72,7 @@ export function OneOfPropertyModelToJSON(value?: OneOfPropertyModel | null): any
     }
     return {
         ...PropertyModelToJSON(value),
-        'types': value.types === undefined ? undefined : ((value.types as Array<any>).map(PropertyModelToJSON)),
+        'propertiesDataSource': value.propertiesDataSource,
     };
 }
 
