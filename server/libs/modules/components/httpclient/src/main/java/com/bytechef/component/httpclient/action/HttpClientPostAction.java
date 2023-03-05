@@ -23,8 +23,6 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
-import java.util.List;
-
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.POST;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.RESPONSE_FORMAT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
@@ -35,7 +33,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.display;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
-import static com.bytechef.hermes.definition.DefinitionDSL.show;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -64,13 +61,12 @@ public class HttpClientPostAction {
                 HttpClientActionUtils.options(true)))
         .outputSchema(
             oneOf().types(array(), object())
-                .displayOption(show(
-                    RESPONSE_FORMAT,
-                    List.of(
-                        ResponseFormat.JSON.name(),
-                        ResponseFormat.XML.name()))),
-            string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
-            fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
+                .displayCondition("['%s', '%s'].includes('%s')".formatted(
+                    ResponseFormat.JSON.name(),
+                    ResponseFormat.XML.name(),
+                    RESPONSE_FORMAT)),
+            string().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
+            fileEntry().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
         .perform(HttpClientPostAction::performPost);
 
     public static Object performPost(Context context, Parameters parameters) {

@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "Allows you to run arbitrary Bash scripts.",
-    "label": "Bash"
-  },
-  "name": "bash",
   "actions": [
     {
       "display": {
@@ -13,19 +8,26 @@
       "name": "execute",
       "outputSchema": [
         {
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ],
       "properties": [
         {
           "description": "Script written in bash.",
           "label": "Script",
-          "name": "script",
           "required": true,
-          "type": "STRING"
+          "name": "script",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     }
   ],
+  "display": {
+    "description": "Allows you to run arbitrary Bash scripts.",
+    "label": "Bash"
+  },
+  "name": "bash",
   "version": 1
 }

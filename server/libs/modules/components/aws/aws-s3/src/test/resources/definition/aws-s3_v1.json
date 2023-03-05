@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "label": "AWS S3"
-  },
-  "name": "aws-s3",
   "actions": [
     {
       "display": {
@@ -14,46 +9,54 @@
       "outputSchema": [
         {
           "type": "OBJECT",
+          "multipleValues": true,
           "objectType": "FILE_ENTRY",
           "properties": [
             {
+              "required": true,
               "name": "extension",
-              "required": true,
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
             {
+              "required": true,
               "name": "mimeType",
-              "required": true,
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
             {
+              "required": true,
               "name": "name",
-              "required": true,
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
             {
-              "name": "url",
               "required": true,
-              "type": "STRING"
+              "name": "url",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
-          ]
+          ],
+          "controlType": "INPUT_TEXT"
         }
       ],
       "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
-          "name": "uri",
           "required": true,
-          "type": "STRING"
+          "name": "uri",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         },
         {
           "description": "Filename to set for binary data.",
           "label": "Filename",
-          "name": "filename",
           "required": true,
+          "name": "filename",
           "type": "STRING",
-          "defaultValue": "file.xml"
+          "defaultValue": "file.xml",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -65,16 +68,18 @@
       "name": "getUrl",
       "outputSchema": [
         {
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ],
       "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
-          "name": "uri",
           "required": true,
-          "type": "STRING"
+          "name": "uri",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -90,38 +95,47 @@
           "items": [
             {
               "type": "OBJECT",
+              "multipleValues": true,
               "properties": [
                 {
                   "name": "key",
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 },
                 {
                   "name": "suffix",
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 },
                 {
                   "name": "uri",
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 }
-              ]
+              ],
+              "controlType": "JSON_BUILDER"
             }
-          ]
+          ],
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         }
       ],
       "properties": [
         {
           "description": "The bucket to list AWS S3 objects from.",
           "label": "Bucket",
-          "name": "bucket",
           "required": true,
-          "type": "STRING"
+          "name": "bucket",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         },
         {
           "description": "The prefix of an AWS S3 objects.",
           "label": "Prefix",
-          "name": "prefix",
           "required": true,
-          "type": "STRING"
+          "name": "prefix",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -133,16 +147,18 @@
       "name": "presignGetObject",
       "outputSchema": [
         {
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ],
       "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
-          "name": "uri",
           "required": true,
-          "type": "STRING"
+          "name": "uri",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -154,55 +170,69 @@
       "name": "putObject",
       "outputSchema": [
         {
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ],
       "properties": [
         {
           "description": "The AWS S3 uri.",
           "label": "URI",
-          "name": "uri",
           "required": true,
-          "type": "STRING"
+          "name": "uri",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         },
         {
           "description": "The object property which contains a reference to the file that needs to be written to AWS S3.",
           "label": "File",
-          "name": "fileEntry",
           "required": true,
+          "name": "fileEntry",
           "type": "OBJECT",
+          "multipleValues": true,
           "objectType": "FILE_ENTRY",
           "properties": [
             {
+              "required": true,
               "name": "extension",
-              "required": true,
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
             {
+              "required": true,
               "name": "mimeType",
-              "required": true,
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
             {
+              "required": true,
               "name": "name",
-              "required": true,
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             },
             {
-              "name": "url",
               "required": true,
-              "type": "STRING"
+              "name": "url",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
-          ]
+          ],
+          "controlType": "INPUT_TEXT"
         },
         {
           "description": "The canned ACL to apply to the object.",
           "label": "ACL",
           "name": "acl",
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     }
   ],
+  "display": {
+    "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "label": "AWS S3"
+  },
+  "name": "aws-s3",
   "version": 1
 }
