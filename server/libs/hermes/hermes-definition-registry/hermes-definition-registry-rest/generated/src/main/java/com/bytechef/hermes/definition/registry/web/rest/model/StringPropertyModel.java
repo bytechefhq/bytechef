@@ -7,12 +7,12 @@ import com.bytechef.hermes.definition.registry.web.rest.model.BooleanPropertyMod
 import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayOptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyOptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
@@ -24,9 +24,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -52,6 +55,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BOOLEAN"),
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DATE"),
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DATE_TIME"),
+  @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DYNAMIC_PROPERTIES"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
@@ -59,29 +63,65 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
 public class StringPropertyModel extends ValuePropertyModel {
 
-  @JsonProperty("controlType")
-  private ControlTypeModel controlType;
+  @JsonProperty("options")
+  @Valid
+  private List<OptionModel> options = null;
 
-  public StringPropertyModel controlType(ControlTypeModel controlType) {
-    this.controlType = controlType;
+  @JsonProperty("optionsDataSource")
+  private JsonNullable<Object> optionsDataSource = JsonNullable.undefined();
+
+  public StringPropertyModel options(List<OptionModel> options) {
+    this.options = options;
+    return this;
+  }
+
+  public StringPropertyModel addOptionsItem(OptionModel optionsItem) {
+    if (this.options == null) {
+      this.options = new ArrayList<>();
+    }
+    this.options.add(optionsItem);
     return this;
   }
 
   /**
-   * Get controlType
-   * @return controlType
+   * The list of valid property options.
+   * @return options
   */
   @Valid 
-  @Schema(name = "controlType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public ControlTypeModel getControlType() {
-    return controlType;
+  @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public List<OptionModel> getOptions() {
+    return options;
   }
 
-  public void setControlType(ControlTypeModel controlType) {
-    this.controlType = controlType;
+  public void setOptions(List<OptionModel> options) {
+    this.options = options;
+  }
+
+  public StringPropertyModel optionsDataSource(Object optionsDataSource) {
+    this.optionsDataSource = JsonNullable.of(optionsDataSource);
+    return this;
+  }
+
+  /**
+   * Get optionsDataSource
+   * @return optionsDataSource
+  */
+  
+  @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public JsonNullable<Object> getOptionsDataSource() {
+    return optionsDataSource;
+  }
+
+  public void setOptionsDataSource(JsonNullable<Object> optionsDataSource) {
+    this.optionsDataSource = optionsDataSource;
+  }
+
+  public StringPropertyModel controlType(ControlTypeModel controlType) {
+    super.setControlType(controlType);
+    return this;
   }
 
   public StringPropertyModel defaultValue(Object defaultValue) {
@@ -89,18 +129,8 @@ public class StringPropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public StringPropertyModel exampleValue(Object exampleValue) {
-    super.setExampleValue(exampleValue);
-    return this;
-  }
-
-  public StringPropertyModel options(List<PropertyOptionModel> options) {
-    super.setOptions(options);
-    return this;
-  }
-
-  public StringPropertyModel addOptionsItem(PropertyOptionModel optionsItem) {
-    super.addOptionsItem(optionsItem);
+  public StringPropertyModel sampleValue(Object sampleValue) {
+    super.setSampleValue(sampleValue);
     return this;
   }
 
@@ -114,8 +144,13 @@ public class StringPropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public StringPropertyModel displayOption(DisplayOptionModel displayOption) {
-    super.setDisplayOption(displayOption);
+  public StringPropertyModel displayCondition(String displayCondition) {
+    super.setDisplayCondition(displayCondition);
+    return this;
+  }
+
+  public StringPropertyModel expressionEnabled(Boolean expressionEnabled) {
+    super.setExpressionEnabled(expressionEnabled);
     return this;
   }
 
@@ -168,13 +203,25 @@ public class StringPropertyModel extends ValuePropertyModel {
       return false;
     }
     StringPropertyModel stringProperty = (StringPropertyModel) o;
-    return Objects.equals(this.controlType, stringProperty.controlType) &&
+    return Objects.equals(this.options, stringProperty.options) &&
+        equalsNullable(this.optionsDataSource, stringProperty.optionsDataSource) &&
         super.equals(o);
+  }
+
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(controlType, super.hashCode());
+    return Objects.hash(options, hashCodeNullable(optionsDataSource), super.hashCode());
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override
@@ -182,7 +229,8 @@ public class StringPropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class StringPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-    sb.append("    controlType: ").append(toIndentedString(controlType)).append("\n");
+    sb.append("    options: ").append(toIndentedString(options)).append("\n");
+    sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("}");
     return sb.toString();
   }

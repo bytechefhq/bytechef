@@ -6,7 +6,7 @@ import com.bytechef.hermes.definition.registry.web.rest.model.ArrayPropertyModel
 import com.bytechef.hermes.definition.registry.web.rest.model.BooleanPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayOptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
@@ -50,8 +50,10 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BooleanProperty"),
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DATE"),
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DATE_TIME"),
+  @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DYNAMIC_PROPERTIES"),
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DateProperty"),
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DateTimeProperty"),
+  @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DynamicPropertiesProperty"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "IntegerProperty"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
@@ -65,7 +67,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
 public class PropertyModel {
 
   @JsonProperty("advancedOption")
@@ -74,8 +76,11 @@ public class PropertyModel {
   @JsonProperty("description")
   private String description;
 
-  @JsonProperty("displayOption")
-  private DisplayOptionModel displayOption;
+  @JsonProperty("displayCondition")
+  private String displayCondition;
+
+  @JsonProperty("expressionEnabled")
+  private Boolean expressionEnabled;
 
   @JsonProperty("hidden")
   private Boolean hidden;
@@ -137,23 +142,42 @@ public class PropertyModel {
     this.description = description;
   }
 
-  public PropertyModel displayOption(DisplayOptionModel displayOption) {
-    this.displayOption = displayOption;
+  public PropertyModel displayCondition(String displayCondition) {
+    this.displayCondition = displayCondition;
     return this;
   }
 
   /**
-   * Get displayOption
-   * @return displayOption
+   * Defines rules when a property should be shown or hidden.
+   * @return displayCondition
   */
-  @Valid 
-  @Schema(name = "displayOption", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public DisplayOptionModel getDisplayOption() {
-    return displayOption;
+  
+  @Schema(name = "displayCondition", description = "Defines rules when a property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public String getDisplayCondition() {
+    return displayCondition;
   }
 
-  public void setDisplayOption(DisplayOptionModel displayOption) {
-    this.displayOption = displayOption;
+  public void setDisplayCondition(String displayCondition) {
+    this.displayCondition = displayCondition;
+  }
+
+  public PropertyModel expressionEnabled(Boolean expressionEnabled) {
+    this.expressionEnabled = expressionEnabled;
+    return this;
+  }
+
+  /**
+   * Defines if the property can contain expressions or only constant values.
+   * @return expressionEnabled
+  */
+  
+  @Schema(name = "expressionEnabled", description = "Defines if the property can contain expressions or only constant values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Boolean getExpressionEnabled() {
+    return expressionEnabled;
+  }
+
+  public void setExpressionEnabled(Boolean expressionEnabled) {
+    this.expressionEnabled = expressionEnabled;
   }
 
   public PropertyModel hidden(Boolean hidden) {
@@ -162,11 +186,11 @@ public class PropertyModel {
   }
 
   /**
-   * If the property should be visible or not.\"
+   * If the property should be visible or not.
    * @return hidden
   */
   
-  @Schema(name = "hidden", description = "If the property should be visible or not.\"", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "hidden", description = "If the property should be visible or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Boolean getHidden() {
     return hidden;
   }
@@ -308,7 +332,8 @@ public class PropertyModel {
     PropertyModel property = (PropertyModel) o;
     return Objects.equals(this.advancedOption, property.advancedOption) &&
         Objects.equals(this.description, property.description) &&
-        Objects.equals(this.displayOption, property.displayOption) &&
+        Objects.equals(this.displayCondition, property.displayCondition) &&
+        Objects.equals(this.expressionEnabled, property.expressionEnabled) &&
         Objects.equals(this.hidden, property.hidden) &&
         Objects.equals(this.label, property.label) &&
         Objects.equals(this.metadata, property.metadata) &&
@@ -320,7 +345,7 @@ public class PropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(advancedOption, description, displayOption, hidden, label, metadata, name, placeholder, required, type);
+    return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, label, metadata, name, placeholder, required, type);
   }
 
   @Override
@@ -329,7 +354,8 @@ public class PropertyModel {
     sb.append("class PropertyModel {\n");
     sb.append("    advancedOption: ").append(toIndentedString(advancedOption)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    displayOption: ").append(toIndentedString(displayOption)).append("\n");
+    sb.append("    displayCondition: ").append(toIndentedString(displayCondition)).append("\n");
+    sb.append("    expressionEnabled: ").append(toIndentedString(expressionEnabled)).append("\n");
     sb.append("    hidden: ").append(toIndentedString(hidden)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
