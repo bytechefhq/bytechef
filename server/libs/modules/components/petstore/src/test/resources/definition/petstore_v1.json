@@ -1,2025 +1,1925 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Add a new pet to the store",
-        "label": "Add a new pet to the store"
-      },
-      "metadata": {
-        "path": "/pet",
-        "mimeType": "application/json",
-        "requestMethod": "POST",
-        "bodyContentType": "JSON"
-      },
-      "name": "addPet",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Name",
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "exampleValue": "doggie"
-            },
-            {
-              "label": "Category",
-              "required": false,
-              "name": "category",
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 1
-                },
-                {
-                  "label": "Name",
-                  "required": false,
-                  "name": "name",
-                  "type": "STRING",
-                  "exampleValue": "Dogs"
-                }
-              ]
-            },
-            {
-              "label": "PhotoUrls",
-              "placeholder": "Add",
-              "required": true,
-              "name": "photoUrls",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "STRING"
-                }
-              ]
-            },
-            {
-              "label": "Tags",
-              "placeholder": "Add",
-              "required": false,
-              "name": "tags",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "OBJECT",
-                  "properties": [
-                    {
-                      "label": "Id",
-                      "required": false,
-                      "name": "id",
-                      "type": "INTEGER"
-                    },
-                    {
-                      "label": "Name",
-                      "required": false,
-                      "name": "name",
-                      "type": "STRING"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": "pet status in the store",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "options": [
-                {
-                  "name": "Available",
-                  "value": "available"
-                },
-                {
-                  "name": "Pending",
-                  "value": "pending"
-                },
-                {
-                  "name": "Sold",
-                  "value": "sold"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "label": "Pet",
-          "metadata": {
-            "type": "BODY"
-          },
-          "required": true,
-          "name": "pet",
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Name",
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "exampleValue": "doggie"
-            },
-            {
-              "label": "Category",
-              "required": false,
-              "name": "category",
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 1
-                },
-                {
-                  "label": "Name",
-                  "required": false,
-                  "name": "name",
-                  "type": "STRING",
-                  "exampleValue": "Dogs"
-                }
-              ]
-            },
-            {
-              "label": "PhotoUrls",
-              "placeholder": "Add",
-              "required": true,
-              "name": "photoUrls",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "STRING"
-                }
-              ]
-            },
-            {
-              "label": "Tags",
-              "placeholder": "Add",
-              "required": false,
-              "name": "tags",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "OBJECT",
-                  "properties": [
-                    {
-                      "label": "Id",
-                      "required": false,
-                      "name": "id",
-                      "type": "INTEGER"
-                    },
-                    {
-                      "label": "Name",
-                      "required": false,
-                      "name": "name",
-                      "type": "STRING"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": "pet status in the store",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "options": [
-                {
-                  "name": "Available",
-                  "value": "available"
-                },
-                {
-                  "name": "Pending",
-                  "value": "pending"
-                },
-                {
-                  "name": "Sold",
-                  "value": "sold"
-                }
-              ]
-            }
-          ]
-        }
-      ]
+  "actions" : [ {
+    "display" : {
+      "description" : "Add a new pet to the store",
+      "label" : "Add a new pet to the store"
     },
-    {
-      "display": {
-        "description": "Update an existing pet by Id",
-        "label": "Update an existing pet"
-      },
-      "metadata": {
-        "path": "/pet",
-        "mimeType": "application/json",
-        "requestMethod": "PUT",
-        "bodyContentType": "JSON"
-      },
-      "name": "updatePet",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Name",
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "exampleValue": "doggie"
-            },
-            {
-              "label": "Category",
-              "required": false,
-              "name": "category",
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 1
-                },
-                {
-                  "label": "Name",
-                  "required": false,
-                  "name": "name",
-                  "type": "STRING",
-                  "exampleValue": "Dogs"
-                }
-              ]
-            },
-            {
-              "label": "PhotoUrls",
-              "placeholder": "Add",
-              "required": true,
-              "name": "photoUrls",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "STRING"
-                }
-              ]
-            },
-            {
-              "label": "Tags",
-              "placeholder": "Add",
-              "required": false,
-              "name": "tags",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "OBJECT",
-                  "properties": [
-                    {
-                      "label": "Id",
-                      "required": false,
-                      "name": "id",
-                      "type": "INTEGER"
-                    },
-                    {
-                      "label": "Name",
-                      "required": false,
-                      "name": "name",
-                      "type": "STRING"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": "pet status in the store",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "options": [
-                {
-                  "name": "Available",
-                  "value": "available"
-                },
-                {
-                  "name": "Pending",
-                  "value": "pending"
-                },
-                {
-                  "name": "Sold",
-                  "value": "sold"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "label": "Pet",
-          "metadata": {
-            "type": "BODY"
-          },
-          "required": true,
-          "name": "pet",
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Name",
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "exampleValue": "doggie"
-            },
-            {
-              "label": "Category",
-              "required": false,
-              "name": "category",
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 1
-                },
-                {
-                  "label": "Name",
-                  "required": false,
-                  "name": "name",
-                  "type": "STRING",
-                  "exampleValue": "Dogs"
-                }
-              ]
-            },
-            {
-              "label": "PhotoUrls",
-              "placeholder": "Add",
-              "required": true,
-              "name": "photoUrls",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "STRING"
-                }
-              ]
-            },
-            {
-              "label": "Tags",
-              "placeholder": "Add",
-              "required": false,
-              "name": "tags",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "OBJECT",
-                  "properties": [
-                    {
-                      "label": "Id",
-                      "required": false,
-                      "name": "id",
-                      "type": "INTEGER"
-                    },
-                    {
-                      "label": "Name",
-                      "required": false,
-                      "name": "name",
-                      "type": "STRING"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": "pet status in the store",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "options": [
-                {
-                  "name": "Available",
-                  "value": "available"
-                },
-                {
-                  "name": "Pending",
-                  "value": "pending"
-                },
-                {
-                  "name": "Sold",
-                  "value": "sold"
-                }
-              ]
-            }
-          ]
-        }
-      ]
+    "metadata" : {
+      "path" : "/pet",
+      "mimeType" : "application/json",
+      "requestMethod" : "POST",
+      "bodyContentType" : "JSON"
     },
-    {
-      "display": {
-        "description": "Multiple status values can be provided with comma separated strings",
-        "label": "Finds Pets by status"
+    "name" : "addPet",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
       },
-      "metadata": {
-        "path": "/pet/findByStatus",
-        "requestMethod": "GET"
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Name",
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "doggie"
+      }, {
+        "label" : "Category",
+        "required" : false,
+        "name" : "category",
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 1
+        }, {
+          "label" : "Name",
+          "required" : false,
+          "name" : "name",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "Dogs"
+        } ]
+      }, {
+        "label" : "PhotoUrls",
+        "placeholder" : "Add",
+        "required" : true,
+        "name" : "photoUrls",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT"
+        } ],
+        "multipleValues" : true
+      }, {
+        "label" : "Tags",
+        "placeholder" : "Add",
+        "required" : false,
+        "name" : "tags",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "OBJECT",
+          "controlType" : "JSON_BUILDER",
+          "multipleValues" : true,
+          "properties" : [ {
+            "label" : "Id",
+            "required" : false,
+            "name" : "id",
+            "type" : "INTEGER",
+            "controlType" : "INPUT_INTEGER"
+          }, {
+            "label" : "Name",
+            "required" : false,
+            "name" : "name",
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues" : true
+      }, {
+        "description" : "pet status in the store",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "options" : [ {
+          "name" : "Available",
+          "value" : "available"
+        }, {
+          "name" : "Pending",
+          "value" : "pending"
+        }, {
+          "name" : "Sold",
+          "value" : "sold"
+        } ]
+      } ]
+    } ],
+    "properties" : [ {
+      "label" : "Pet",
+      "metadata" : {
+        "type" : "BODY"
       },
-      "name": "findPetsByStatus",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "name": "array",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 10
-                },
-                {
-                  "label": "Name",
-                  "required": true,
-                  "name": "name",
-                  "type": "STRING",
-                  "exampleValue": "doggie"
-                },
-                {
-                  "label": "Category",
-                  "required": false,
-                  "name": "category",
-                  "type": "OBJECT",
-                  "properties": [
-                    {
-                      "label": "Id",
-                      "required": false,
-                      "name": "id",
-                      "type": "INTEGER",
-                      "exampleValue": 1
-                    },
-                    {
-                      "label": "Name",
-                      "required": false,
-                      "name": "name",
-                      "type": "STRING",
-                      "exampleValue": "Dogs"
-                    }
-                  ]
-                },
-                {
-                  "label": "PhotoUrls",
-                  "placeholder": "Add",
-                  "required": true,
-                  "name": "photoUrls",
-                  "type": "ARRAY",
-                  "items": [
-                    {
-                      "type": "STRING"
-                    }
-                  ]
-                },
-                {
-                  "label": "Tags",
-                  "placeholder": "Add",
-                  "required": false,
-                  "name": "tags",
-                  "type": "ARRAY",
-                  "items": [
-                    {
-                      "type": "OBJECT",
-                      "properties": [
-                        {
-                          "label": "Id",
-                          "required": false,
-                          "name": "id",
-                          "type": "INTEGER"
-                        },
-                        {
-                          "label": "Name",
-                          "required": false,
-                          "name": "name",
-                          "type": "STRING"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "description": "pet status in the store",
-                  "label": "Status",
-                  "required": false,
-                  "name": "status",
-                  "type": "STRING",
-                  "options": [
-                    {
-                      "name": "Available",
-                      "value": "available"
-                    },
-                    {
-                      "name": "Pending",
-                      "value": "pending"
-                    },
-                    {
-                      "name": "Sold",
-                      "value": "sold"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "Status values that need to be considered for filter",
-          "label": "Status",
-          "metadata": {
-            "type": "QUERY"
-          },
-          "required": false,
-          "name": "status",
-          "type": "STRING",
-          "options": [
-            {
-              "name": "Available",
-              "value": "available"
-            },
-            {
-              "name": "Pending",
-              "value": "pending"
-            },
-            {
-              "name": "Sold",
-              "value": "sold"
-            }
-          ]
-        }
-      ]
+      "required" : true,
+      "name" : "pet",
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Name",
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "doggie"
+      }, {
+        "label" : "Category",
+        "required" : false,
+        "name" : "category",
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 1
+        }, {
+          "label" : "Name",
+          "required" : false,
+          "name" : "name",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "Dogs"
+        } ]
+      }, {
+        "label" : "PhotoUrls",
+        "placeholder" : "Add",
+        "required" : true,
+        "name" : "photoUrls",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT"
+        } ],
+        "multipleValues" : true
+      }, {
+        "label" : "Tags",
+        "placeholder" : "Add",
+        "required" : false,
+        "name" : "tags",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "OBJECT",
+          "controlType" : "JSON_BUILDER",
+          "multipleValues" : true,
+          "properties" : [ {
+            "label" : "Id",
+            "required" : false,
+            "name" : "id",
+            "type" : "INTEGER",
+            "controlType" : "INPUT_INTEGER"
+          }, {
+            "label" : "Name",
+            "required" : false,
+            "name" : "name",
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues" : true
+      }, {
+        "description" : "pet status in the store",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "options" : [ {
+          "name" : "Available",
+          "value" : "available"
+        }, {
+          "name" : "Pending",
+          "value" : "pending"
+        }, {
+          "name" : "Sold",
+          "value" : "sold"
+        } ]
+      } ]
+    } ]
+  }, {
+    "display" : {
+      "description" : "Update an existing pet by Id",
+      "label" : "Update an existing pet"
     },
-    {
-      "display": {
-        "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-        "label": "Finds Pets by tags"
-      },
-      "metadata": {
-        "path": "/pet/findByTags",
-        "requestMethod": "GET"
-      },
-      "name": "findPetsByTags",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "name": "array",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 10
-                },
-                {
-                  "label": "Name",
-                  "required": true,
-                  "name": "name",
-                  "type": "STRING",
-                  "exampleValue": "doggie"
-                },
-                {
-                  "label": "Category",
-                  "required": false,
-                  "name": "category",
-                  "type": "OBJECT",
-                  "properties": [
-                    {
-                      "label": "Id",
-                      "required": false,
-                      "name": "id",
-                      "type": "INTEGER",
-                      "exampleValue": 1
-                    },
-                    {
-                      "label": "Name",
-                      "required": false,
-                      "name": "name",
-                      "type": "STRING",
-                      "exampleValue": "Dogs"
-                    }
-                  ]
-                },
-                {
-                  "label": "PhotoUrls",
-                  "placeholder": "Add",
-                  "required": true,
-                  "name": "photoUrls",
-                  "type": "ARRAY",
-                  "items": [
-                    {
-                      "type": "STRING"
-                    }
-                  ]
-                },
-                {
-                  "label": "Tags",
-                  "placeholder": "Add",
-                  "required": false,
-                  "name": "tags",
-                  "type": "ARRAY",
-                  "items": [
-                    {
-                      "type": "OBJECT",
-                      "properties": [
-                        {
-                          "label": "Id",
-                          "required": false,
-                          "name": "id",
-                          "type": "INTEGER"
-                        },
-                        {
-                          "label": "Name",
-                          "required": false,
-                          "name": "name",
-                          "type": "STRING"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "description": "pet status in the store",
-                  "label": "Status",
-                  "required": false,
-                  "name": "status",
-                  "type": "STRING",
-                  "options": [
-                    {
-                      "name": "Available",
-                      "value": "available"
-                    },
-                    {
-                      "name": "Pending",
-                      "value": "pending"
-                    },
-                    {
-                      "name": "Sold",
-                      "value": "sold"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "Tags to filter by",
-          "label": "Tags",
-          "metadata": {
-            "type": "QUERY"
-          },
-          "placeholder": "Add",
-          "required": false,
-          "name": "tags",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "STRING"
-            }
-          ]
-        }
-      ]
+    "metadata" : {
+      "path" : "/pet",
+      "mimeType" : "application/json",
+      "requestMethod" : "PUT",
+      "bodyContentType" : "JSON"
     },
-    {
-      "display": {
-        "description": "delete a pet",
-        "label": "Deletes a pet"
+    "name" : "updatePet",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
       },
-      "metadata": {
-        "path": "/pet/{petId}",
-        "requestMethod": "DELETE"
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Name",
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "doggie"
+      }, {
+        "label" : "Category",
+        "required" : false,
+        "name" : "category",
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 1
+        }, {
+          "label" : "Name",
+          "required" : false,
+          "name" : "name",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "Dogs"
+        } ]
+      }, {
+        "label" : "PhotoUrls",
+        "placeholder" : "Add",
+        "required" : true,
+        "name" : "photoUrls",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT"
+        } ],
+        "multipleValues" : true
+      }, {
+        "label" : "Tags",
+        "placeholder" : "Add",
+        "required" : false,
+        "name" : "tags",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "OBJECT",
+          "controlType" : "JSON_BUILDER",
+          "multipleValues" : true,
+          "properties" : [ {
+            "label" : "Id",
+            "required" : false,
+            "name" : "id",
+            "type" : "INTEGER",
+            "controlType" : "INPUT_INTEGER"
+          }, {
+            "label" : "Name",
+            "required" : false,
+            "name" : "name",
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues" : true
+      }, {
+        "description" : "pet status in the store",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "options" : [ {
+          "name" : "Available",
+          "value" : "available"
+        }, {
+          "name" : "Pending",
+          "value" : "pending"
+        }, {
+          "name" : "Sold",
+          "value" : "sold"
+        } ]
+      } ]
+    } ],
+    "properties" : [ {
+      "label" : "Pet",
+      "metadata" : {
+        "type" : "BODY"
       },
-      "name": "deletePet",
-      "properties": [
-        {
-          "description": "",
-          "label": "Api_key",
-          "metadata": {
-            "type": "HEADER"
-          },
-          "required": false,
-          "name": "api_key",
-          "type": "STRING"
-        },
-        {
-          "description": "Pet id to delete",
-          "label": "PetId",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "petId",
-          "type": "INTEGER"
-        }
-      ]
+      "required" : true,
+      "name" : "pet",
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Name",
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "doggie"
+      }, {
+        "label" : "Category",
+        "required" : false,
+        "name" : "category",
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 1
+        }, {
+          "label" : "Name",
+          "required" : false,
+          "name" : "name",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "Dogs"
+        } ]
+      }, {
+        "label" : "PhotoUrls",
+        "placeholder" : "Add",
+        "required" : true,
+        "name" : "photoUrls",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT"
+        } ],
+        "multipleValues" : true
+      }, {
+        "label" : "Tags",
+        "placeholder" : "Add",
+        "required" : false,
+        "name" : "tags",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "OBJECT",
+          "controlType" : "JSON_BUILDER",
+          "multipleValues" : true,
+          "properties" : [ {
+            "label" : "Id",
+            "required" : false,
+            "name" : "id",
+            "type" : "INTEGER",
+            "controlType" : "INPUT_INTEGER"
+          }, {
+            "label" : "Name",
+            "required" : false,
+            "name" : "name",
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues" : true
+      }, {
+        "description" : "pet status in the store",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "options" : [ {
+          "name" : "Available",
+          "value" : "available"
+        }, {
+          "name" : "Pending",
+          "value" : "pending"
+        }, {
+          "name" : "Sold",
+          "value" : "sold"
+        } ]
+      } ]
+    } ]
+  }, {
+    "display" : {
+      "description" : "Multiple status values can be provided with comma separated strings",
+      "label" : "Finds Pets by status"
     },
-    {
-      "display": {
-        "description": "Returns a single pet",
-        "label": "Find pet by ID"
-      },
-      "metadata": {
-        "path": "/pet/{petId}",
-        "requestMethod": "GET"
-      },
-      "name": "getPetById",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Name",
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "exampleValue": "doggie"
-            },
-            {
-              "label": "Category",
-              "required": false,
-              "name": "category",
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 1
-                },
-                {
-                  "label": "Name",
-                  "required": false,
-                  "name": "name",
-                  "type": "STRING",
-                  "exampleValue": "Dogs"
-                }
-              ]
-            },
-            {
-              "label": "PhotoUrls",
-              "placeholder": "Add",
-              "required": true,
-              "name": "photoUrls",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "STRING"
-                }
-              ]
-            },
-            {
-              "label": "Tags",
-              "placeholder": "Add",
-              "required": false,
-              "name": "tags",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "type": "OBJECT",
-                  "properties": [
-                    {
-                      "label": "Id",
-                      "required": false,
-                      "name": "id",
-                      "type": "INTEGER"
-                    },
-                    {
-                      "label": "Name",
-                      "required": false,
-                      "name": "name",
-                      "type": "STRING"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": "pet status in the store",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "options": [
-                {
-                  "name": "Available",
-                  "value": "available"
-                },
-                {
-                  "name": "Pending",
-                  "value": "pending"
-                },
-                {
-                  "name": "Sold",
-                  "value": "sold"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "ID of pet to return",
-          "label": "PetId",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "petId",
-          "type": "INTEGER"
-        }
-      ]
+    "metadata" : {
+      "path" : "/pet/findByStatus",
+      "requestMethod" : "GET"
     },
-    {
-      "display": {
-        "description": "",
-        "label": "Updates a pet in the store with form data"
+    "name" : "findPetsByStatus",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
       },
-      "metadata": {
-        "path": "/pet/{petId}",
-        "requestMethod": "POST"
+      "name" : "array",
+      "type" : "ARRAY",
+      "controlType" : "JSON_BUILDER",
+      "items" : [ {
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 10
+        }, {
+          "label" : "Name",
+          "required" : true,
+          "name" : "name",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "doggie"
+        }, {
+          "label" : "Category",
+          "required" : false,
+          "name" : "category",
+          "type" : "OBJECT",
+          "controlType" : "JSON_BUILDER",
+          "multipleValues" : true,
+          "properties" : [ {
+            "label" : "Id",
+            "required" : false,
+            "name" : "id",
+            "type" : "INTEGER",
+            "controlType" : "INPUT_INTEGER",
+            "exampleValue" : 1
+          }, {
+            "label" : "Name",
+            "required" : false,
+            "name" : "name",
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT",
+            "exampleValue" : "Dogs"
+          } ]
+        }, {
+          "label" : "PhotoUrls",
+          "placeholder" : "Add",
+          "required" : true,
+          "name" : "photoUrls",
+          "type" : "ARRAY",
+          "controlType" : "JSON_BUILDER",
+          "items" : [ {
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT"
+          } ],
+          "multipleValues" : true
+        }, {
+          "label" : "Tags",
+          "placeholder" : "Add",
+          "required" : false,
+          "name" : "tags",
+          "type" : "ARRAY",
+          "controlType" : "JSON_BUILDER",
+          "items" : [ {
+            "type" : "OBJECT",
+            "controlType" : "JSON_BUILDER",
+            "multipleValues" : true,
+            "properties" : [ {
+              "label" : "Id",
+              "required" : false,
+              "name" : "id",
+              "type" : "INTEGER",
+              "controlType" : "INPUT_INTEGER"
+            }, {
+              "label" : "Name",
+              "required" : false,
+              "name" : "name",
+              "type" : "STRING",
+              "controlType" : "INPUT_TEXT"
+            } ]
+          } ],
+          "multipleValues" : true
+        }, {
+          "description" : "pet status in the store",
+          "label" : "Status",
+          "required" : false,
+          "name" : "status",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "options" : [ {
+            "name" : "Available",
+            "value" : "available"
+          }, {
+            "name" : "Pending",
+            "value" : "pending"
+          }, {
+            "name" : "Sold",
+            "value" : "sold"
+          } ]
+        } ]
+      } ],
+      "multipleValues" : true
+    } ],
+    "properties" : [ {
+      "description" : "Status values that need to be considered for filter",
+      "label" : "Status",
+      "metadata" : {
+        "type" : "QUERY"
       },
-      "name": "updatePetWithForm",
-      "properties": [
-        {
-          "description": "ID of pet that needs to be updated",
-          "label": "PetId",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "petId",
-          "type": "INTEGER"
-        },
-        {
-          "description": "Name of pet that needs to be updated",
-          "label": "Name",
-          "metadata": {
-            "type": "QUERY"
-          },
-          "required": false,
-          "name": "name",
-          "type": "STRING"
-        },
-        {
-          "description": "Status of pet that needs to be updated",
-          "label": "Status",
-          "metadata": {
-            "type": "QUERY"
-          },
-          "required": false,
-          "name": "status",
-          "type": "STRING"
-        }
-      ]
+      "required" : false,
+      "name" : "status",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT",
+      "options" : [ {
+        "name" : "Available",
+        "value" : "available"
+      }, {
+        "name" : "Pending",
+        "value" : "pending"
+      }, {
+        "name" : "Sold",
+        "value" : "sold"
+      } ]
+    } ]
+  }, {
+    "display" : {
+      "description" : "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+      "label" : "Finds Pets by tags"
     },
-    {
-      "display": {
-        "description": "",
-        "label": "uploads an image"
-      },
-      "metadata": {
-        "path": "/pet/{petId}/uploadImage",
-        "mimeType": "application/octet-stream",
-        "requestMethod": "POST",
-        "bodyContentType": "BINARY"
-      },
-      "name": "uploadFile",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Code",
-              "required": false,
-              "name": "code",
-              "type": "INTEGER"
-            },
-            {
-              "label": "Type",
-              "required": false,
-              "name": "type",
-              "type": "STRING"
-            },
-            {
-              "label": "Message",
-              "required": false,
-              "name": "message",
-              "type": "STRING"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "ID of pet to update",
-          "label": "PetId",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "petId",
-          "type": "INTEGER"
-        },
-        {
-          "description": "Additional Metadata",
-          "label": "AdditionalMetadata",
-          "metadata": {
-            "type": "QUERY"
-          },
-          "required": false,
-          "name": "additionalMetadata",
-          "type": "STRING"
-        },
-        {
-          "metadata": {
-            "type": "BODY"
-          },
-          "name": "fileEntry",
-          "type": "OBJECT",
-          "objectType": "FILE_ENTRY",
-          "properties": [
-            {
-              "required": true,
-              "name": "extension",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "mimeType",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "name",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "url",
-              "type": "STRING"
-            }
-          ]
-        }
-      ]
+    "metadata" : {
+      "path" : "/pet/findByTags",
+      "requestMethod" : "GET"
     },
-    {
-      "display": {
-        "description": "Returns a map of status codes to quantities",
-        "label": "Returns pet inventories by status"
+    "name" : "findPetsByTags",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
       },
-      "metadata": {
-        "path": "/store/inventory",
-        "requestMethod": "GET"
+      "name" : "array",
+      "type" : "ARRAY",
+      "controlType" : "JSON_BUILDER",
+      "items" : [ {
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 10
+        }, {
+          "label" : "Name",
+          "required" : true,
+          "name" : "name",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "doggie"
+        }, {
+          "label" : "Category",
+          "required" : false,
+          "name" : "category",
+          "type" : "OBJECT",
+          "controlType" : "JSON_BUILDER",
+          "multipleValues" : true,
+          "properties" : [ {
+            "label" : "Id",
+            "required" : false,
+            "name" : "id",
+            "type" : "INTEGER",
+            "controlType" : "INPUT_INTEGER",
+            "exampleValue" : 1
+          }, {
+            "label" : "Name",
+            "required" : false,
+            "name" : "name",
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT",
+            "exampleValue" : "Dogs"
+          } ]
+        }, {
+          "label" : "PhotoUrls",
+          "placeholder" : "Add",
+          "required" : true,
+          "name" : "photoUrls",
+          "type" : "ARRAY",
+          "controlType" : "JSON_BUILDER",
+          "items" : [ {
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT"
+          } ],
+          "multipleValues" : true
+        }, {
+          "label" : "Tags",
+          "placeholder" : "Add",
+          "required" : false,
+          "name" : "tags",
+          "type" : "ARRAY",
+          "controlType" : "JSON_BUILDER",
+          "items" : [ {
+            "type" : "OBJECT",
+            "controlType" : "JSON_BUILDER",
+            "multipleValues" : true,
+            "properties" : [ {
+              "label" : "Id",
+              "required" : false,
+              "name" : "id",
+              "type" : "INTEGER",
+              "controlType" : "INPUT_INTEGER"
+            }, {
+              "label" : "Name",
+              "required" : false,
+              "name" : "name",
+              "type" : "STRING",
+              "controlType" : "INPUT_TEXT"
+            } ]
+          } ],
+          "multipleValues" : true
+        }, {
+          "description" : "pet status in the store",
+          "label" : "Status",
+          "required" : false,
+          "name" : "status",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "options" : [ {
+            "name" : "Available",
+            "value" : "available"
+          }, {
+            "name" : "Pending",
+            "value" : "pending"
+          }, {
+            "name" : "Sold",
+            "value" : "sold"
+          } ]
+        } ]
+      } ],
+      "multipleValues" : true
+    } ],
+    "properties" : [ {
+      "description" : "Tags to filter by",
+      "label" : "Tags",
+      "metadata" : {
+        "type" : "QUERY"
       },
-      "name": "getInventory",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "additionalProperties": [
-            {
-              "type": "INTEGER"
-            }
-          ]
-        }
-      ],
-      "properties": []
+      "placeholder" : "Add",
+      "required" : false,
+      "name" : "tags",
+      "type" : "ARRAY",
+      "controlType" : "JSON_BUILDER",
+      "items" : [ {
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      } ],
+      "multipleValues" : true
+    } ]
+  }, {
+    "display" : {
+      "description" : "delete a pet",
+      "label" : "Deletes a pet"
     },
-    {
-      "display": {
-        "description": "Place a new order in the store",
-        "label": "Place an order for a pet"
-      },
-      "metadata": {
-        "path": "/store/order",
-        "mimeType": "application/json",
-        "requestMethod": "POST",
-        "bodyContentType": "JSON"
-      },
-      "name": "placeOrder",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "PetId",
-              "required": false,
-              "name": "petId",
-              "type": "INTEGER",
-              "exampleValue": 198772
-            },
-            {
-              "label": "Quantity",
-              "required": false,
-              "name": "quantity",
-              "type": "INTEGER",
-              "exampleValue": 7
-            },
-            {
-              "label": "ShipDate",
-              "required": false,
-              "name": "shipDate",
-              "type": "DATE_TIME"
-            },
-            {
-              "description": "Order Status",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "exampleValue": "approved",
-              "options": [
-                {
-                  "name": "Placed",
-                  "value": "placed"
-                },
-                {
-                  "name": "Approved",
-                  "value": "approved"
-                },
-                {
-                  "name": "Delivered",
-                  "value": "delivered"
-                }
-              ]
-            },
-            {
-              "label": "Complete",
-              "required": false,
-              "name": "complete",
-              "type": "BOOLEAN"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "label": "Order",
-          "metadata": {
-            "type": "BODY"
-          },
-          "name": "order",
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "PetId",
-              "required": false,
-              "name": "petId",
-              "type": "INTEGER",
-              "exampleValue": 198772
-            },
-            {
-              "label": "Quantity",
-              "required": false,
-              "name": "quantity",
-              "type": "INTEGER",
-              "exampleValue": 7
-            },
-            {
-              "label": "ShipDate",
-              "required": false,
-              "name": "shipDate",
-              "type": "DATE_TIME"
-            },
-            {
-              "description": "Order Status",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "exampleValue": "approved",
-              "options": [
-                {
-                  "name": "Placed",
-                  "value": "placed"
-                },
-                {
-                  "name": "Approved",
-                  "value": "approved"
-                },
-                {
-                  "name": "Delivered",
-                  "value": "delivered"
-                }
-              ]
-            },
-            {
-              "label": "Complete",
-              "required": false,
-              "name": "complete",
-              "type": "BOOLEAN"
-            }
-          ]
-        }
-      ]
+    "metadata" : {
+      "path" : "/pet/{petId}",
+      "requestMethod" : "DELETE"
     },
-    {
-      "display": {
-        "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-        "label": "Delete purchase order by ID"
+    "name" : "deletePet",
+    "properties" : [ {
+      "description" : "",
+      "label" : "Api_key",
+      "metadata" : {
+        "type" : "HEADER"
       },
-      "metadata": {
-        "path": "/store/order/{orderId}",
-        "requestMethod": "DELETE"
+      "required" : false,
+      "name" : "api_key",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    }, {
+      "description" : "Pet id to delete",
+      "label" : "PetId",
+      "metadata" : {
+        "type" : "PATH"
       },
-      "name": "deleteOrder",
-      "properties": [
-        {
-          "description": "ID of the order that needs to be deleted",
-          "label": "OrderId",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "orderId",
-          "type": "INTEGER"
-        }
-      ]
+      "required" : true,
+      "name" : "petId",
+      "type" : "INTEGER",
+      "controlType" : "INPUT_INTEGER"
+    } ]
+  }, {
+    "display" : {
+      "description" : "Returns a single pet",
+      "label" : "Find pet by ID"
     },
-    {
-      "display": {
-        "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-        "label": "Find purchase order by ID"
-      },
-      "metadata": {
-        "path": "/store/order/{orderId}",
-        "requestMethod": "GET"
-      },
-      "name": "getOrderById",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "PetId",
-              "required": false,
-              "name": "petId",
-              "type": "INTEGER",
-              "exampleValue": 198772
-            },
-            {
-              "label": "Quantity",
-              "required": false,
-              "name": "quantity",
-              "type": "INTEGER",
-              "exampleValue": 7
-            },
-            {
-              "label": "ShipDate",
-              "required": false,
-              "name": "shipDate",
-              "type": "DATE_TIME"
-            },
-            {
-              "description": "Order Status",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "exampleValue": "approved",
-              "options": [
-                {
-                  "name": "Placed",
-                  "value": "placed"
-                },
-                {
-                  "name": "Approved",
-                  "value": "approved"
-                },
-                {
-                  "name": "Delivered",
-                  "value": "delivered"
-                }
-              ]
-            },
-            {
-              "label": "Complete",
-              "required": false,
-              "name": "complete",
-              "type": "BOOLEAN"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "ID of order that needs to be fetched",
-          "label": "OrderId",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "orderId",
-          "type": "INTEGER"
-        }
-      ]
+    "metadata" : {
+      "path" : "/pet/{petId}",
+      "requestMethod" : "GET"
     },
-    {
-      "display": {
-        "description": "This can only be done by the logged in user.",
-        "label": "Create user"
+    "name" : "getPetById",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
       },
-      "metadata": {
-        "path": "/user",
-        "mimeType": "application/json",
-        "requestMethod": "POST",
-        "bodyContentType": "JSON"
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Name",
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "doggie"
+      }, {
+        "label" : "Category",
+        "required" : false,
+        "name" : "category",
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 1
+        }, {
+          "label" : "Name",
+          "required" : false,
+          "name" : "name",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "Dogs"
+        } ]
+      }, {
+        "label" : "PhotoUrls",
+        "placeholder" : "Add",
+        "required" : true,
+        "name" : "photoUrls",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT"
+        } ],
+        "multipleValues" : true
+      }, {
+        "label" : "Tags",
+        "placeholder" : "Add",
+        "required" : false,
+        "name" : "tags",
+        "type" : "ARRAY",
+        "controlType" : "JSON_BUILDER",
+        "items" : [ {
+          "type" : "OBJECT",
+          "controlType" : "JSON_BUILDER",
+          "multipleValues" : true,
+          "properties" : [ {
+            "label" : "Id",
+            "required" : false,
+            "name" : "id",
+            "type" : "INTEGER",
+            "controlType" : "INPUT_INTEGER"
+          }, {
+            "label" : "Name",
+            "required" : false,
+            "name" : "name",
+            "type" : "STRING",
+            "controlType" : "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues" : true
+      }, {
+        "description" : "pet status in the store",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "options" : [ {
+          "name" : "Available",
+          "value" : "available"
+        }, {
+          "name" : "Pending",
+          "value" : "pending"
+        }, {
+          "name" : "Sold",
+          "value" : "sold"
+        } ]
+      } ]
+    } ],
+    "properties" : [ {
+      "description" : "ID of pet to return",
+      "label" : "PetId",
+      "metadata" : {
+        "type" : "PATH"
       },
-      "name": "createUser",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Username",
-              "required": false,
-              "name": "username",
-              "type": "STRING",
-              "exampleValue": "theUser"
-            },
-            {
-              "label": "FirstName",
-              "required": false,
-              "name": "firstName",
-              "type": "STRING",
-              "exampleValue": "John"
-            },
-            {
-              "label": "LastName",
-              "required": false,
-              "name": "lastName",
-              "type": "STRING",
-              "exampleValue": "James"
-            },
-            {
-              "label": "Email",
-              "required": false,
-              "name": "email",
-              "type": "STRING",
-              "exampleValue": "john@email.com"
-            },
-            {
-              "label": "Password",
-              "required": false,
-              "name": "password",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "label": "Phone",
-              "required": false,
-              "name": "phone",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "description": "User Status",
-              "label": "UserStatus",
-              "required": false,
-              "name": "userStatus",
-              "type": "INTEGER",
-              "exampleValue": 1
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "label": "User",
-          "metadata": {
-            "type": "BODY"
-          },
-          "name": "user",
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Username",
-              "required": false,
-              "name": "username",
-              "type": "STRING",
-              "exampleValue": "theUser"
-            },
-            {
-              "label": "FirstName",
-              "required": false,
-              "name": "firstName",
-              "type": "STRING",
-              "exampleValue": "John"
-            },
-            {
-              "label": "LastName",
-              "required": false,
-              "name": "lastName",
-              "type": "STRING",
-              "exampleValue": "James"
-            },
-            {
-              "label": "Email",
-              "required": false,
-              "name": "email",
-              "type": "STRING",
-              "exampleValue": "john@email.com"
-            },
-            {
-              "label": "Password",
-              "required": false,
-              "name": "password",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "label": "Phone",
-              "required": false,
-              "name": "phone",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "description": "User Status",
-              "label": "UserStatus",
-              "required": false,
-              "name": "userStatus",
-              "type": "INTEGER",
-              "exampleValue": 1
-            }
-          ]
-        }
-      ]
+      "required" : true,
+      "name" : "petId",
+      "type" : "INTEGER",
+      "controlType" : "INPUT_INTEGER"
+    } ]
+  }, {
+    "display" : {
+      "description" : "",
+      "label" : "Updates a pet in the store with form data"
     },
-    {
-      "display": {
-        "description": "Creates list of users with given input array",
-        "label": "Creates list of users with given input array"
-      },
-      "metadata": {
-        "path": "/user/createWithList",
-        "mimeType": "application/json",
-        "requestMethod": "POST",
-        "bodyContentType": "JSON"
-      },
-      "name": "createUsersWithListInput",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "name": "array",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 10
-                },
-                {
-                  "label": "Username",
-                  "required": false,
-                  "name": "username",
-                  "type": "STRING",
-                  "exampleValue": "theUser"
-                },
-                {
-                  "label": "FirstName",
-                  "required": false,
-                  "name": "firstName",
-                  "type": "STRING",
-                  "exampleValue": "John"
-                },
-                {
-                  "label": "LastName",
-                  "required": false,
-                  "name": "lastName",
-                  "type": "STRING",
-                  "exampleValue": "James"
-                },
-                {
-                  "label": "Email",
-                  "required": false,
-                  "name": "email",
-                  "type": "STRING",
-                  "exampleValue": "john@email.com"
-                },
-                {
-                  "label": "Password",
-                  "required": false,
-                  "name": "password",
-                  "type": "STRING",
-                  "exampleValue": "12345"
-                },
-                {
-                  "label": "Phone",
-                  "required": false,
-                  "name": "phone",
-                  "type": "STRING",
-                  "exampleValue": "12345"
-                },
-                {
-                  "description": "User Status",
-                  "label": "UserStatus",
-                  "required": false,
-                  "name": "userStatus",
-                  "type": "INTEGER",
-                  "exampleValue": 1
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "metadata": {
-            "type": "BODY"
-          },
-          "placeholder": "Add",
-          "name": "array",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "properties": [
-                {
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "exampleValue": 10
-                },
-                {
-                  "label": "Username",
-                  "required": false,
-                  "name": "username",
-                  "type": "STRING",
-                  "exampleValue": "theUser"
-                },
-                {
-                  "label": "FirstName",
-                  "required": false,
-                  "name": "firstName",
-                  "type": "STRING",
-                  "exampleValue": "John"
-                },
-                {
-                  "label": "LastName",
-                  "required": false,
-                  "name": "lastName",
-                  "type": "STRING",
-                  "exampleValue": "James"
-                },
-                {
-                  "label": "Email",
-                  "required": false,
-                  "name": "email",
-                  "type": "STRING",
-                  "exampleValue": "john@email.com"
-                },
-                {
-                  "label": "Password",
-                  "required": false,
-                  "name": "password",
-                  "type": "STRING",
-                  "exampleValue": "12345"
-                },
-                {
-                  "label": "Phone",
-                  "required": false,
-                  "name": "phone",
-                  "type": "STRING",
-                  "exampleValue": "12345"
-                },
-                {
-                  "description": "User Status",
-                  "label": "UserStatus",
-                  "required": false,
-                  "name": "userStatus",
-                  "type": "INTEGER",
-                  "exampleValue": 1
-                }
-              ]
-            }
-          ]
-        }
-      ]
+    "metadata" : {
+      "path" : "/pet/{petId}",
+      "requestMethod" : "POST"
     },
-    {
-      "display": {
-        "description": "",
-        "label": "Logs user into the system"
+    "name" : "updatePetWithForm",
+    "properties" : [ {
+      "description" : "ID of pet that needs to be updated",
+      "label" : "PetId",
+      "metadata" : {
+        "type" : "PATH"
       },
-      "metadata": {
-        "path": "/user/login",
-        "requestMethod": "GET"
+      "required" : true,
+      "name" : "petId",
+      "type" : "INTEGER",
+      "controlType" : "INPUT_INTEGER"
+    }, {
+      "description" : "Name of pet that needs to be updated",
+      "label" : "Name",
+      "metadata" : {
+        "type" : "QUERY"
       },
-      "name": "loginUser",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "TEXT"
-          },
-          "type": "STRING"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The user name for login",
-          "label": "Username",
-          "metadata": {
-            "type": "QUERY"
-          },
-          "required": false,
-          "name": "username",
-          "type": "STRING"
-        },
-        {
-          "description": "The password for login in clear text",
-          "label": "Password",
-          "metadata": {
-            "type": "QUERY"
-          },
-          "required": false,
-          "name": "password",
-          "type": "STRING"
-        }
-      ]
+      "required" : false,
+      "name" : "name",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    }, {
+      "description" : "Status of pet that needs to be updated",
+      "label" : "Status",
+      "metadata" : {
+        "type" : "QUERY"
+      },
+      "required" : false,
+      "name" : "status",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    } ]
+  }, {
+    "display" : {
+      "description" : "",
+      "label" : "uploads an image"
     },
-    {
-      "display": {
-        "description": "",
-        "label": "Logs out current logged in user session"
-      },
-      "metadata": {
-        "path": "/user/logout",
-        "requestMethod": "GET"
-      },
-      "name": "logoutUser",
-      "properties": []
+    "metadata" : {
+      "path" : "/pet/{petId}/uploadImage",
+      "mimeType" : "application/octet-stream",
+      "requestMethod" : "POST",
+      "bodyContentType" : "BINARY"
     },
-    {
-      "display": {
-        "description": "This can only be done by the logged in user.",
-        "label": "Delete user"
+    "name" : "uploadFile",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
       },
-      "metadata": {
-        "path": "/user/{username}",
-        "requestMethod": "DELETE"
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Code",
+        "required" : false,
+        "name" : "code",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER"
+      }, {
+        "label" : "Type",
+        "required" : false,
+        "name" : "type",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      }, {
+        "label" : "Message",
+        "required" : false,
+        "name" : "message",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      } ]
+    } ],
+    "properties" : [ {
+      "description" : "ID of pet to update",
+      "label" : "PetId",
+      "metadata" : {
+        "type" : "PATH"
       },
-      "name": "deleteUser",
-      "properties": [
-        {
-          "description": "The name that needs to be deleted",
-          "label": "Username",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "username",
-          "type": "STRING"
-        }
-      ]
+      "required" : true,
+      "name" : "petId",
+      "type" : "INTEGER",
+      "controlType" : "INPUT_INTEGER"
+    }, {
+      "description" : "Additional Metadata",
+      "label" : "AdditionalMetadata",
+      "metadata" : {
+        "type" : "QUERY"
+      },
+      "required" : false,
+      "name" : "additionalMetadata",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    }, {
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "name" : "fileEntry",
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "objectType" : "FILE_ENTRY",
+      "properties" : [ {
+        "required" : true,
+        "name" : "extension",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      }, {
+        "required" : true,
+        "name" : "mimeType",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      }, {
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      }, {
+        "required" : true,
+        "name" : "url",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      } ]
+    } ]
+  }, {
+    "display" : {
+      "description" : "Returns a map of status codes to quantities",
+      "label" : "Returns pet inventories by status"
     },
-    {
-      "display": {
-        "description": "",
-        "label": "Get user by user name"
-      },
-      "metadata": {
-        "path": "/user/{username}",
-        "requestMethod": "GET"
-      },
-      "name": "getUserByName",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Username",
-              "required": false,
-              "name": "username",
-              "type": "STRING",
-              "exampleValue": "theUser"
-            },
-            {
-              "label": "FirstName",
-              "required": false,
-              "name": "firstName",
-              "type": "STRING",
-              "exampleValue": "John"
-            },
-            {
-              "label": "LastName",
-              "required": false,
-              "name": "lastName",
-              "type": "STRING",
-              "exampleValue": "James"
-            },
-            {
-              "label": "Email",
-              "required": false,
-              "name": "email",
-              "type": "STRING",
-              "exampleValue": "john@email.com"
-            },
-            {
-              "label": "Password",
-              "required": false,
-              "name": "password",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "label": "Phone",
-              "required": false,
-              "name": "phone",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "description": "User Status",
-              "label": "UserStatus",
-              "required": false,
-              "name": "userStatus",
-              "type": "INTEGER",
-              "exampleValue": 1
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "The name that needs to be fetched. Use user1 for testing. ",
-          "label": "Username",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "username",
-          "type": "STRING"
-        }
-      ]
+    "metadata" : {
+      "path" : "/store/inventory",
+      "requestMethod" : "GET"
     },
-    {
-      "display": {
-        "description": "This can only be done by the logged in user.",
-        "label": "Update user"
+    "name" : "getInventory",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
       },
-      "metadata": {
-        "path": "/user/{username}",
-        "mimeType": "application/json",
-        "requestMethod": "PUT",
-        "bodyContentType": "JSON"
-      },
-      "name": "updateUser",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Username",
-              "required": false,
-              "name": "username",
-              "type": "STRING",
-              "exampleValue": "theUser"
-            },
-            {
-              "label": "FirstName",
-              "required": false,
-              "name": "firstName",
-              "type": "STRING",
-              "exampleValue": "John"
-            },
-            {
-              "label": "LastName",
-              "required": false,
-              "name": "lastName",
-              "type": "STRING",
-              "exampleValue": "James"
-            },
-            {
-              "label": "Email",
-              "required": false,
-              "name": "email",
-              "type": "STRING",
-              "exampleValue": "john@email.com"
-            },
-            {
-              "label": "Password",
-              "required": false,
-              "name": "password",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "label": "Phone",
-              "required": false,
-              "name": "phone",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "description": "User Status",
-              "label": "UserStatus",
-              "required": false,
-              "name": "userStatus",
-              "type": "INTEGER",
-              "exampleValue": 1
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "name that need to be deleted",
-          "label": "Username",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "username",
-          "type": "STRING"
-        },
-        {
-          "label": "User",
-          "metadata": {
-            "type": "BODY"
-          },
-          "name": "user",
-          "type": "OBJECT",
-          "properties": [
-            {
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "INTEGER",
-              "exampleValue": 10
-            },
-            {
-              "label": "Username",
-              "required": false,
-              "name": "username",
-              "type": "STRING",
-              "exampleValue": "theUser"
-            },
-            {
-              "label": "FirstName",
-              "required": false,
-              "name": "firstName",
-              "type": "STRING",
-              "exampleValue": "John"
-            },
-            {
-              "label": "LastName",
-              "required": false,
-              "name": "lastName",
-              "type": "STRING",
-              "exampleValue": "James"
-            },
-            {
-              "label": "Email",
-              "required": false,
-              "name": "email",
-              "type": "STRING",
-              "exampleValue": "john@email.com"
-            },
-            {
-              "label": "Password",
-              "required": false,
-              "name": "password",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "label": "Phone",
-              "required": false,
-              "name": "phone",
-              "type": "STRING",
-              "exampleValue": "12345"
-            },
-            {
-              "description": "User Status",
-              "label": "UserStatus",
-              "required": false,
-              "name": "userStatus",
-              "type": "INTEGER",
-              "exampleValue": 1
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "connection": {
-    "authorizations": [
-      {
-        "display": {
-          "label": "OAuth2 Implicit"
-        },
-        "properties": [
-          {
-            "label": "Client Id",
-            "required": true,
-            "name": "clientId",
-            "type": "STRING"
-          },
-          {
-            "label": "Client Secret",
-            "required": true,
-            "name": "clientSecret",
-            "type": "STRING"
-          }
-        ],
-        "name": "oauth2_implicit_code",
-        "type": "OAUTH2_IMPLICIT_CODE"
-      },
-      {
-        "display": {
-          "label": "API Key"
-        },
-        "properties": [
-          {
-            "hidden": true,
-            "label": "Key",
-            "required": true,
-            "name": "key",
-            "type": "STRING",
-            "defaultValue": "api_key"
-          },
-          {
-            "label": "Value",
-            "required": true,
-            "name": "value",
-            "type": "STRING"
-          },
-          {
-            "hidden": true,
-            "label": "Add to",
-            "required": true,
-            "name": "addTo",
-            "type": "STRING",
-            "defaultValue": "HEADER"
-          }
-        ],
-        "name": "api_key",
-        "type": "API_KEY"
-      }
-    ],
-    "componentName": "petstore",
-    "display": {
-      "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-      "label": "Petstore"
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "additionalProperties" : [ {
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER"
+      } ],
+      "multipleValues" : true
+    } ],
+    "properties" : [ ]
+  }, {
+    "display" : {
+      "description" : "Place a new order in the store",
+      "label" : "Place an order for a pet"
     },
-    "version": 1,
-    "authorizationRequired": true
+    "metadata" : {
+      "path" : "/store/order",
+      "mimeType" : "application/json",
+      "requestMethod" : "POST",
+      "bodyContentType" : "JSON"
+    },
+    "name" : "placeOrder",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "PetId",
+        "required" : false,
+        "name" : "petId",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 198772
+      }, {
+        "label" : "Quantity",
+        "required" : false,
+        "name" : "quantity",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 7
+      }, {
+        "label" : "ShipDate",
+        "required" : false,
+        "name" : "shipDate",
+        "type" : "DATE_TIME",
+        "controlType" : "DATE_TIME"
+      }, {
+        "description" : "Order Status",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "approved",
+        "options" : [ {
+          "name" : "Placed",
+          "value" : "placed"
+        }, {
+          "name" : "Approved",
+          "value" : "approved"
+        }, {
+          "name" : "Delivered",
+          "value" : "delivered"
+        } ]
+      }, {
+        "label" : "Complete",
+        "required" : false,
+        "name" : "complete",
+        "type" : "BOOLEAN",
+        "controlType" : "CHECKBOX"
+      } ]
+    } ],
+    "properties" : [ {
+      "label" : "Order",
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "name" : "order",
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "PetId",
+        "required" : false,
+        "name" : "petId",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 198772
+      }, {
+        "label" : "Quantity",
+        "required" : false,
+        "name" : "quantity",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 7
+      }, {
+        "label" : "ShipDate",
+        "required" : false,
+        "name" : "shipDate",
+        "type" : "DATE_TIME",
+        "controlType" : "DATE_TIME"
+      }, {
+        "description" : "Order Status",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "approved",
+        "options" : [ {
+          "name" : "Placed",
+          "value" : "placed"
+        }, {
+          "name" : "Approved",
+          "value" : "approved"
+        }, {
+          "name" : "Delivered",
+          "value" : "delivered"
+        } ]
+      }, {
+        "label" : "Complete",
+        "required" : false,
+        "name" : "complete",
+        "type" : "BOOLEAN",
+        "controlType" : "CHECKBOX"
+      } ]
+    } ]
+  }, {
+    "display" : {
+      "description" : "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
+      "label" : "Delete purchase order by ID"
+    },
+    "metadata" : {
+      "path" : "/store/order/{orderId}",
+      "requestMethod" : "DELETE"
+    },
+    "name" : "deleteOrder",
+    "properties" : [ {
+      "description" : "ID of the order that needs to be deleted",
+      "label" : "OrderId",
+      "metadata" : {
+        "type" : "PATH"
+      },
+      "required" : true,
+      "name" : "orderId",
+      "type" : "INTEGER",
+      "controlType" : "INPUT_INTEGER"
+    } ]
+  }, {
+    "display" : {
+      "description" : "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
+      "label" : "Find purchase order by ID"
+    },
+    "metadata" : {
+      "path" : "/store/order/{orderId}",
+      "requestMethod" : "GET"
+    },
+    "name" : "getOrderById",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "PetId",
+        "required" : false,
+        "name" : "petId",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 198772
+      }, {
+        "label" : "Quantity",
+        "required" : false,
+        "name" : "quantity",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 7
+      }, {
+        "label" : "ShipDate",
+        "required" : false,
+        "name" : "shipDate",
+        "type" : "DATE_TIME",
+        "controlType" : "DATE_TIME"
+      }, {
+        "description" : "Order Status",
+        "label" : "Status",
+        "required" : false,
+        "name" : "status",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "approved",
+        "options" : [ {
+          "name" : "Placed",
+          "value" : "placed"
+        }, {
+          "name" : "Approved",
+          "value" : "approved"
+        }, {
+          "name" : "Delivered",
+          "value" : "delivered"
+        } ]
+      }, {
+        "label" : "Complete",
+        "required" : false,
+        "name" : "complete",
+        "type" : "BOOLEAN",
+        "controlType" : "CHECKBOX"
+      } ]
+    } ],
+    "properties" : [ {
+      "description" : "ID of order that needs to be fetched",
+      "label" : "OrderId",
+      "metadata" : {
+        "type" : "PATH"
+      },
+      "required" : true,
+      "name" : "orderId",
+      "type" : "INTEGER",
+      "controlType" : "INPUT_INTEGER"
+    } ]
+  }, {
+    "display" : {
+      "description" : "This can only be done by the logged in user.",
+      "label" : "Create user"
+    },
+    "metadata" : {
+      "path" : "/user",
+      "mimeType" : "application/json",
+      "requestMethod" : "POST",
+      "bodyContentType" : "JSON"
+    },
+    "name" : "createUser",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Username",
+        "required" : false,
+        "name" : "username",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "theUser"
+      }, {
+        "label" : "FirstName",
+        "required" : false,
+        "name" : "firstName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "John"
+      }, {
+        "label" : "LastName",
+        "required" : false,
+        "name" : "lastName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "James"
+      }, {
+        "label" : "Email",
+        "required" : false,
+        "name" : "email",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "john@email.com"
+      }, {
+        "label" : "Password",
+        "required" : false,
+        "name" : "password",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "label" : "Phone",
+        "required" : false,
+        "name" : "phone",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "description" : "User Status",
+        "label" : "UserStatus",
+        "required" : false,
+        "name" : "userStatus",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 1
+      } ]
+    } ],
+    "properties" : [ {
+      "label" : "User",
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "name" : "user",
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Username",
+        "required" : false,
+        "name" : "username",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "theUser"
+      }, {
+        "label" : "FirstName",
+        "required" : false,
+        "name" : "firstName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "John"
+      }, {
+        "label" : "LastName",
+        "required" : false,
+        "name" : "lastName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "James"
+      }, {
+        "label" : "Email",
+        "required" : false,
+        "name" : "email",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "john@email.com"
+      }, {
+        "label" : "Password",
+        "required" : false,
+        "name" : "password",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "label" : "Phone",
+        "required" : false,
+        "name" : "phone",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "description" : "User Status",
+        "label" : "UserStatus",
+        "required" : false,
+        "name" : "userStatus",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 1
+      } ]
+    } ]
+  }, {
+    "display" : {
+      "description" : "Creates list of users with given input array",
+      "label" : "Creates list of users with given input array"
+    },
+    "metadata" : {
+      "path" : "/user/createWithList",
+      "mimeType" : "application/json",
+      "requestMethod" : "POST",
+      "bodyContentType" : "JSON"
+    },
+    "name" : "createUsersWithListInput",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "name" : "array",
+      "type" : "ARRAY",
+      "controlType" : "JSON_BUILDER",
+      "items" : [ {
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 10
+        }, {
+          "label" : "Username",
+          "required" : false,
+          "name" : "username",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "theUser"
+        }, {
+          "label" : "FirstName",
+          "required" : false,
+          "name" : "firstName",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "John"
+        }, {
+          "label" : "LastName",
+          "required" : false,
+          "name" : "lastName",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "James"
+        }, {
+          "label" : "Email",
+          "required" : false,
+          "name" : "email",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "john@email.com"
+        }, {
+          "label" : "Password",
+          "required" : false,
+          "name" : "password",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "12345"
+        }, {
+          "label" : "Phone",
+          "required" : false,
+          "name" : "phone",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "12345"
+        }, {
+          "description" : "User Status",
+          "label" : "UserStatus",
+          "required" : false,
+          "name" : "userStatus",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 1
+        } ]
+      } ],
+      "multipleValues" : true
+    } ],
+    "properties" : [ {
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "placeholder" : "Add",
+      "name" : "array",
+      "type" : "ARRAY",
+      "controlType" : "JSON_BUILDER",
+      "items" : [ {
+        "type" : "OBJECT",
+        "controlType" : "JSON_BUILDER",
+        "multipleValues" : true,
+        "properties" : [ {
+          "label" : "Id",
+          "required" : false,
+          "name" : "id",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 10
+        }, {
+          "label" : "Username",
+          "required" : false,
+          "name" : "username",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "theUser"
+        }, {
+          "label" : "FirstName",
+          "required" : false,
+          "name" : "firstName",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "John"
+        }, {
+          "label" : "LastName",
+          "required" : false,
+          "name" : "lastName",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "James"
+        }, {
+          "label" : "Email",
+          "required" : false,
+          "name" : "email",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "john@email.com"
+        }, {
+          "label" : "Password",
+          "required" : false,
+          "name" : "password",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "12345"
+        }, {
+          "label" : "Phone",
+          "required" : false,
+          "name" : "phone",
+          "type" : "STRING",
+          "controlType" : "INPUT_TEXT",
+          "exampleValue" : "12345"
+        }, {
+          "description" : "User Status",
+          "label" : "UserStatus",
+          "required" : false,
+          "name" : "userStatus",
+          "type" : "INTEGER",
+          "controlType" : "INPUT_INTEGER",
+          "exampleValue" : 1
+        } ]
+      } ],
+      "multipleValues" : true
+    } ]
+  }, {
+    "display" : {
+      "description" : "",
+      "label" : "Logs user into the system"
+    },
+    "metadata" : {
+      "path" : "/user/login",
+      "requestMethod" : "GET"
+    },
+    "name" : "loginUser",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "TEXT"
+      },
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    } ],
+    "properties" : [ {
+      "description" : "The user name for login",
+      "label" : "Username",
+      "metadata" : {
+        "type" : "QUERY"
+      },
+      "required" : false,
+      "name" : "username",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    }, {
+      "description" : "The password for login in clear text",
+      "label" : "Password",
+      "metadata" : {
+        "type" : "QUERY"
+      },
+      "required" : false,
+      "name" : "password",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    } ]
+  }, {
+    "display" : {
+      "description" : "",
+      "label" : "Logs out current logged in user session"
+    },
+    "metadata" : {
+      "path" : "/user/logout",
+      "requestMethod" : "GET"
+    },
+    "name" : "logoutUser",
+    "properties" : [ ]
+  }, {
+    "display" : {
+      "description" : "This can only be done by the logged in user.",
+      "label" : "Delete user"
+    },
+    "metadata" : {
+      "path" : "/user/{username}",
+      "requestMethod" : "DELETE"
+    },
+    "name" : "deleteUser",
+    "properties" : [ {
+      "description" : "The name that needs to be deleted",
+      "label" : "Username",
+      "metadata" : {
+        "type" : "PATH"
+      },
+      "required" : true,
+      "name" : "username",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    } ]
+  }, {
+    "display" : {
+      "description" : "",
+      "label" : "Get user by user name"
+    },
+    "metadata" : {
+      "path" : "/user/{username}",
+      "requestMethod" : "GET"
+    },
+    "name" : "getUserByName",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Username",
+        "required" : false,
+        "name" : "username",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "theUser"
+      }, {
+        "label" : "FirstName",
+        "required" : false,
+        "name" : "firstName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "John"
+      }, {
+        "label" : "LastName",
+        "required" : false,
+        "name" : "lastName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "James"
+      }, {
+        "label" : "Email",
+        "required" : false,
+        "name" : "email",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "john@email.com"
+      }, {
+        "label" : "Password",
+        "required" : false,
+        "name" : "password",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "label" : "Phone",
+        "required" : false,
+        "name" : "phone",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "description" : "User Status",
+        "label" : "UserStatus",
+        "required" : false,
+        "name" : "userStatus",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 1
+      } ]
+    } ],
+    "properties" : [ {
+      "description" : "The name that needs to be fetched. Use user1 for testing. ",
+      "label" : "Username",
+      "metadata" : {
+        "type" : "PATH"
+      },
+      "required" : true,
+      "name" : "username",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    } ]
+  }, {
+    "display" : {
+      "description" : "This can only be done by the logged in user.",
+      "label" : "Update user"
+    },
+    "metadata" : {
+      "path" : "/user/{username}",
+      "mimeType" : "application/json",
+      "requestMethod" : "PUT",
+      "bodyContentType" : "JSON"
+    },
+    "name" : "updateUser",
+    "outputSchema" : [ {
+      "metadata" : {
+        "responseFormat" : "JSON"
+      },
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Username",
+        "required" : false,
+        "name" : "username",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "theUser"
+      }, {
+        "label" : "FirstName",
+        "required" : false,
+        "name" : "firstName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "John"
+      }, {
+        "label" : "LastName",
+        "required" : false,
+        "name" : "lastName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "James"
+      }, {
+        "label" : "Email",
+        "required" : false,
+        "name" : "email",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "john@email.com"
+      }, {
+        "label" : "Password",
+        "required" : false,
+        "name" : "password",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "label" : "Phone",
+        "required" : false,
+        "name" : "phone",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "description" : "User Status",
+        "label" : "UserStatus",
+        "required" : false,
+        "name" : "userStatus",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 1
+      } ]
+    } ],
+    "properties" : [ {
+      "description" : "name that need to be deleted",
+      "label" : "Username",
+      "metadata" : {
+        "type" : "PATH"
+      },
+      "required" : true,
+      "name" : "username",
+      "type" : "STRING",
+      "controlType" : "INPUT_TEXT"
+    }, {
+      "label" : "User",
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "name" : "user",
+      "type" : "OBJECT",
+      "controlType" : "JSON_BUILDER",
+      "multipleValues" : true,
+      "properties" : [ {
+        "label" : "Id",
+        "required" : false,
+        "name" : "id",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 10
+      }, {
+        "label" : "Username",
+        "required" : false,
+        "name" : "username",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "theUser"
+      }, {
+        "label" : "FirstName",
+        "required" : false,
+        "name" : "firstName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "John"
+      }, {
+        "label" : "LastName",
+        "required" : false,
+        "name" : "lastName",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "James"
+      }, {
+        "label" : "Email",
+        "required" : false,
+        "name" : "email",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "john@email.com"
+      }, {
+        "label" : "Password",
+        "required" : false,
+        "name" : "password",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "label" : "Phone",
+        "required" : false,
+        "name" : "phone",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "exampleValue" : "12345"
+      }, {
+        "description" : "User Status",
+        "label" : "UserStatus",
+        "required" : false,
+        "name" : "userStatus",
+        "type" : "INTEGER",
+        "controlType" : "INPUT_INTEGER",
+        "exampleValue" : 1
+      } ]
+    } ]
+  } ],
+  "connection" : {
+    "authorizations" : [ {
+      "display" : {
+        "label" : "OAuth2 Implicit"
+      },
+      "properties" : [ {
+        "label" : "Client Id",
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      }, {
+        "label" : "Client Secret",
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      } ],
+      "name" : "oauth2_implicit_code",
+      "type" : "OAUTH2_IMPLICIT_CODE"
+    }, {
+      "display" : {
+        "label" : "API Key"
+      },
+      "properties" : [ {
+        "hidden" : true,
+        "label" : "Key",
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "defaultValue" : "api_key"
+      }, {
+        "label" : "Value",
+        "required" : true,
+        "name" : "value",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT"
+      }, {
+        "hidden" : true,
+        "label" : "Add to",
+        "required" : true,
+        "name" : "addTo",
+        "type" : "STRING",
+        "controlType" : "INPUT_TEXT",
+        "defaultValue" : "HEADER"
+      } ],
+      "name" : "api_key",
+      "type" : "API_KEY"
+    } ],
+    "componentName" : "petstore",
+    "display" : {
+      "description" : "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
+      "label" : "Petstore"
+    },
+    "version" : 1,
+    "authorizationRequired" : true
   },
-  "display": {
-    "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-    "label": "Petstore"
+  "display" : {
+    "description" : "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
+    "label" : "Petstore"
   },
-  "name": "petstore",
-  "version": 1
+  "name" : "petstore",
+  "version" : 1
 }
