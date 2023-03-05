@@ -6,24 +6,28 @@
   "name": "map",
   "properties": [
     {
-      "type": "ARRAY",
       "description": "List of items to iterate over.",
       "label": "List of items",
-      "name": "list"
+      "name": "list",
+      "type": "ARRAY",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     },
     {
-      "type": "STRING",
       "description": "The name of the item variable.",
       "label": "Item Var",
       "name": "itemVar",
-      "defaultValue": "item"
+      "type": "STRING",
+      "defaultValue": "item",
+      "controlType": "INPUT_TEXT"
     },
     {
-      "type": "STRING",
       "description": "The name of the index variable.",
       "label": "Item Index",
       "name": "itemIndex",
-      "defaultValue": "itemIndex"
+      "type": "STRING",
+      "defaultValue": "itemIndex",
+      "controlType": "INPUT_TEXT"
     }
   ],
   "version": 1,
@@ -31,8 +35,10 @@
     {
       "description": "The task or task dispatcher to use.",
       "name": "iteratee",
+      "type": "OBJECT",
+      "multipleValues": true,
       "objectType": "TASK",
-      "type": "OBJECT"
+      "controlType": "INPUT_TEXT"
     }
   ]
 }
