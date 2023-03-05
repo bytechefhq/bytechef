@@ -39,6 +39,8 @@ public class JsonFileAssert {
 
     public static void assertEquals(String path, Object object) {
         try {
+            String value = OBJECT_MAPPER.writeValueAsString(object);
+
             JSONAssert.assertEquals(
                 Files.readString(
                     Paths.get(
@@ -46,7 +48,7 @@ public class JsonFileAssert {
                             .getClassLoader()
                             .getResource(path)
                             .toURI())),
-                OBJECT_MAPPER.writeValueAsString(object),
+                value,
                 true);
         } catch (IOException | JSONException | URISyntaxException e) {
             throw new RuntimeException(e);
