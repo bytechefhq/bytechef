@@ -25,6 +25,7 @@ import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
+import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -67,6 +68,20 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableConnectionDefinition();
     }
 
+    public static ModifiableExampleOutputDataSource exampleOutputDataSource(
+        BiFunction<Connection, Parameters, Object> exampleOutputFunction) {
+
+        return new ModifiableExampleOutputDataSource(exampleOutputFunction);
+    }
+
+    public static ModifiableComponentPropertiesDataSource propertiesDataSource(
+        BiFunction<Connection, Parameters, List<? extends Property<?>>> propertiesFunction,
+        String... propertiesDependOnPropertyNames) {
+
+        return new ModifiableComponentPropertiesDataSource(propertiesFunction,
+            List.of(propertiesDependOnPropertyNames));
+    }
+
     public static ModifiableProperty.ModifiableObjectProperty fileEntry() {
         return fileEntry(null);
     }
@@ -86,6 +101,18 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableJdbcComponentDefinition(name);
     }
 
+    public static ModifiableComponentOptionsDataSource optionsDataSource(
+        BiFunction<Connection, Parameters, List<Option>> optionsFunction, String... loadOptionsDependOnPropertyNames) {
+
+        return new ModifiableComponentOptionsDataSource(optionsFunction, List.of(loadOptionsDependOnPropertyNames));
+    }
+
+    public static ModifiableOutputSchemaDataSource outputSchemaDataSource(
+        BiFunction<Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction) {
+
+        return new ModifiableOutputSchemaDataSource(outputSchemaFunction);
+    }
+
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Display display;
@@ -97,6 +124,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @JsonIgnore
         private BiFunction<Context, Parameters, Object> performFunction;
+        private ExampleOutputDataSource exampleOutputDataSource;
+        private OutputSchemaDataSource outputSchemaDataSource;
 
         private ModifiableActionDefinition() {
         }
@@ -113,6 +142,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableActionDefinition exampleOutput(Object exampleOutput) {
             this.exampleOutput = exampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
+            this.exampleOutputDataSource = exampleOutputDataSource;
 
             return this;
         }
@@ -142,6 +177,12 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableActionDefinition outputSchemaDataSource(OutputSchemaDataSource outputSchemaDataSource) {
+            this.outputSchemaDataSource = outputSchemaDataSource;
+
+            return this;
+        }
+
         public ModifiableActionDefinition perform(BiFunction<Context, Parameters, Object> performFunction) {
             this.performFunction = performFunction;
 
@@ -164,6 +205,11 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public ExampleOutputDataSource getExampleOutputDataSource() {
+            return exampleOutputDataSource;
+        }
+
+        @Override
         public Map<String, Object> getMetadata() {
             return metadata == null ? null : new HashMap<>(metadata);
         }
@@ -176,6 +222,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public List<Property<? extends Property<?>>> getOutputSchema() {
             return outputSchema;
+        }
+
+        @Override
+        public OutputSchemaDataSource getOutputSchemaDataSource() {
+            return outputSchemaDataSource;
         }
 
         @Override
@@ -643,6 +694,59 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
+    public static final class ModifiableComponentOptionsDataSource extends DefinitionDSL.ModifiableOptionsDataSource
+        implements ComponentOptionsDataSource {
+
+        @JsonIgnore
+        private BiFunction<Connection, Parameters, List<Option>> optionsFunction;
+
+        private ModifiableComponentOptionsDataSource(
+            BiFunction<Connection, Parameters, List<Option>> optionsFunction,
+            List<String> loadOptionsDependOnPropertyNames) {
+
+            super(loadOptionsDependOnPropertyNames);
+
+            this.optionsFunction = optionsFunction;
+        }
+
+        @Override
+        public BiFunction<Connection, Parameters, List<Option>> getOptionsFunction() {
+            return optionsFunction;
+        }
+    }
+
+    public static final class ModifiableOutputSchemaDataSource implements OutputSchemaDataSource {
+
+        private final BiFunction<Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction;
+
+        public ModifiableOutputSchemaDataSource(
+            BiFunction<Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction) {
+
+            this.outputSchemaFunction = outputSchemaFunction;
+        }
+
+        @Override
+        public BiFunction<Connection, Parameters, List<? extends Property<?>>> getOutputSchemaFunction() {
+            return outputSchemaFunction;
+        }
+    }
+
+    public static final class ModifiableExampleOutputDataSource implements ExampleOutputDataSource {
+
+        private final BiFunction<Connection, Parameters, Object> exampleOutputFunction;
+
+        public ModifiableExampleOutputDataSource(
+            BiFunction<Connection, Parameters, Object> exampleOutputFunction) {
+
+            this.exampleOutputFunction = exampleOutputFunction;
+        }
+
+        @Override
+        public BiFunction<Connection, Parameters, Object> getExampleOutputFunction() {
+            return exampleOutputFunction;
+        }
+    }
+
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
         private List<? extends Authorization> authorizations;
@@ -789,6 +893,27 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<Consumer<Connection>> getTestConsumer() {
             return Optional.ofNullable(testConsumer);
+        }
+    }
+
+    public static final class ModifiableComponentPropertiesDataSource
+        extends DefinitionDSL.ModifiablePropertiesDataSource implements ComponentPropertiesDataSource {
+
+        @JsonIgnore
+        private BiFunction<Connection, Parameters, List<? extends Property<?>>> propertiesFunction;
+
+        private ModifiableComponentPropertiesDataSource(
+            BiFunction<Connection, Parameters, List<? extends Property<?>>> propertiesFunction,
+            List<String> loadPropertiesDependOnPropertyNames) {
+
+            super(loadPropertiesDependOnPropertyNames);
+
+            this.propertiesFunction = propertiesFunction;
+        }
+
+        @Override
+        public BiFunction<Connection, Parameters, List<? extends Property<?>>> getPropertiesFunction() {
+            return propertiesFunction;
         }
     }
 

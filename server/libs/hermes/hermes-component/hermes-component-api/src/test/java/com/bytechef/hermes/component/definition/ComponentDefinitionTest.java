@@ -20,8 +20,8 @@ package com.bytechef.hermes.component.definition;
 import static com.bytechef.hermes.component.constant.ComponentConstants.Versions.VERSION_1;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
+import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.PropertyOption;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,30 +59,6 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testAnyProperty() throws JSONException, JsonProcessingException {
-        Property<Property.OneOfProperty> property = ComponentDSL.oneOf("name")
-            .description("description")
-            .label("label")
-            .placeholder("placeholder")
-            .required(true)
-            .types(ComponentDSL.string());
-
-        jsonAssertEquals(
-            """
-                {
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "types":[{"type":"STRING"}],
-                    "type": "ONE_OF"
-                }
-                """,
-            property);
-    }
-
-    @Test
     public void testArrayProperty() throws JSONException, JsonProcessingException {
         Property<Property.ArrayProperty> property = ComponentDSL.array("name")
             .defaultValue(1, 2)
@@ -95,10 +71,12 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "JSON_BUILDER",
                     "defaultValue":[1,2],
                     "description":"description",
                     "label":"label",
-                    "items":[{"type":"STRING"}],
+                    "items":[{"controlType":"INPUT_TEXT","type":"STRING"}],
+                     "multipleValues": true,
                     "name":"name",
                     "placeholder":"placeholder",
                     "required":true,
@@ -120,6 +98,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "CHECKBOX",
                     "defaultValue":true,
                     "description":"description",
                     "label":"label",
@@ -144,6 +123,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "DATE",
                     "defaultValue":[-999999999,1,1],
                     "description":"description",
                     "label":"label",
@@ -168,6 +148,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "DATE_TIME",
                     "defaultValue":[-999999999,1,1,0,0],
                     "description":"description",
                     "label":"label",
@@ -192,6 +173,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "INPUT_INTEGER",
                     "defaultValue":2,
                     "description":"description",
                     "label":"label",
@@ -217,6 +199,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "INPUT_NUMBER",
                     "defaultValue":2,
                     "description":"description",
                     "label":"label",
@@ -251,13 +234,39 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "JSON_BUILDER",
                     "defaultValue":{"key":{"key1":"value1"}},
+                    "description":"description",
+                    "label":"label",
+                    "multipleValues": true,
+                    "name":"name",
+                    "placeholder":"placeholder",
+                    "required":true,
+                    "type":"OBJECT"
+                }
+                """,
+            property);
+    }
+
+    @Test
+    public void testOneOfProperty() throws JSONException, JsonProcessingException {
+        Property<Property.OneOfProperty> property = ComponentDSL.oneOf("name")
+            .description("description")
+            .label("label")
+            .placeholder("placeholder")
+            .required(true)
+            .types(ComponentDSL.string());
+
+        jsonAssertEquals(
+            """
+                {
                     "description":"description",
                     "label":"label",
                     "name":"name",
                     "placeholder":"placeholder",
                     "required":true,
-                    "type":"OBJECT"
+                    "types":[{"controlType":"INPUT_TEXT","type":"STRING"}],
+                    "type": "ONE_OF"
                 }
                 """,
             property);
@@ -275,6 +284,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
+                    "controlType": "INPUT_TEXT",
                     "defaultValue":"defaultValue",
                     "description":"description",
                     "label":"label",
@@ -306,7 +316,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testPropertyOption() throws JSONException, JsonProcessingException {
-        PropertyOption propertyOption = ComponentDSL.option("name", 1);
+        Option option = ComponentDSL.option("name", 1);
 
         jsonAssertEquals(
             """
@@ -315,9 +325,9 @@ public class ComponentDefinitionTest {
                     "value":1
                 }
                 """,
-            propertyOption);
+            option);
 
-        propertyOption = ComponentDSL.option("name", "value");
+        option = ComponentDSL.option("name", "value");
 
         jsonAssertEquals(
             """
@@ -326,9 +336,9 @@ public class ComponentDefinitionTest {
                     "value":"value"
                 }
                 """,
-            propertyOption);
+            option);
 
-        propertyOption = ComponentDSL.option("name", 1, "description");
+        option = ComponentDSL.option("name", 1, "description");
 
         jsonAssertEquals(
             """
@@ -338,9 +348,9 @@ public class ComponentDefinitionTest {
                     "description":"description"
                 }
                 """,
-            propertyOption);
+            option);
 
-        propertyOption = ComponentDSL.option("name", "value", "description");
+        option = ComponentDSL.option("name", "value", "description");
 
         jsonAssertEquals(
             """
@@ -350,7 +360,7 @@ public class ComponentDefinitionTest {
                     "description":"description"
                 }
                 """,
-            propertyOption);
+            option);
     }
 
     private void jsonAssertEquals(String expectedString, Object jsonObject)
