@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
   @JsonProperty("display")
@@ -44,9 +44,6 @@ public class ActionDefinitionModel {
   @JsonProperty("properties")
   @Valid
   private List<PropertyModel> properties = null;
-
-  @JsonProperty("performFunction")
-  private Object performFunction;
 
   public ActionDefinitionModel display(DisplayModel display) {
     this.display = display;
@@ -73,11 +70,11 @@ public class ActionDefinitionModel {
   }
 
   /**
-   * The example of the action's output.
+   * The example value of the action's output.
    * @return exampleOutput
   */
   
-  @Schema(name = "exampleOutput", description = "The example of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "exampleOutput", description = "The example value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Object getExampleOutput() {
     return exampleOutput;
   }
@@ -159,25 +156,6 @@ public class ActionDefinitionModel {
     this.properties = properties;
   }
 
-  public ActionDefinitionModel performFunction(Object performFunction) {
-    this.performFunction = performFunction;
-    return this;
-  }
-
-  /**
-   * Contains information required for a connection's authorization.
-   * @return performFunction
-  */
-  
-  @Schema(name = "performFunction", description = "Contains information required for a connection's authorization.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Object getPerformFunction() {
-    return performFunction;
-  }
-
-  public void setPerformFunction(Object performFunction) {
-    this.performFunction = performFunction;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -191,13 +169,12 @@ public class ActionDefinitionModel {
         Objects.equals(this.exampleOutput, actionDefinition.exampleOutput) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputSchema, actionDefinition.outputSchema) &&
-        Objects.equals(this.properties, actionDefinition.properties) &&
-        Objects.equals(this.performFunction, actionDefinition.performFunction);
+        Objects.equals(this.properties, actionDefinition.properties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, exampleOutput, name, outputSchema, properties, performFunction);
+    return Objects.hash(display, exampleOutput, name, outputSchema, properties);
   }
 
   @Override
@@ -209,7 +186,6 @@ public class ActionDefinitionModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
-    sb.append("    performFunction: ").append(toIndentedString(performFunction)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -4,14 +4,14 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.ArrayPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.BooleanPropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayOptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyOptionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
@@ -22,9 +22,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -51,6 +49,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BOOLEAN"),
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DATE"),
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DATE_TIME"),
+  @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DYNAMIC_PROPERTIES"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
@@ -58,26 +57,21 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
 public class BooleanPropertyModel extends ValuePropertyModel {
+
+  public BooleanPropertyModel controlType(ControlTypeModel controlType) {
+    super.setControlType(controlType);
+    return this;
+  }
 
   public BooleanPropertyModel defaultValue(Object defaultValue) {
     super.setDefaultValue(defaultValue);
     return this;
   }
 
-  public BooleanPropertyModel exampleValue(Object exampleValue) {
-    super.setExampleValue(exampleValue);
-    return this;
-  }
-
-  public BooleanPropertyModel options(List<PropertyOptionModel> options) {
-    super.setOptions(options);
-    return this;
-  }
-
-  public BooleanPropertyModel addOptionsItem(PropertyOptionModel optionsItem) {
-    super.addOptionsItem(optionsItem);
+  public BooleanPropertyModel sampleValue(Object sampleValue) {
+    super.setSampleValue(sampleValue);
     return this;
   }
 
@@ -91,8 +85,13 @@ public class BooleanPropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public BooleanPropertyModel displayOption(DisplayOptionModel displayOption) {
-    super.setDisplayOption(displayOption);
+  public BooleanPropertyModel displayCondition(String displayCondition) {
+    super.setDisplayCondition(displayCondition);
+    return this;
+  }
+
+  public BooleanPropertyModel expressionEnabled(Boolean expressionEnabled) {
+    super.setExpressionEnabled(expressionEnabled);
     return this;
   }
 
