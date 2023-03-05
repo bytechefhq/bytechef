@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { OptionModel } from './OptionModel';
+import {
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
+
 /**
  * 
  * @export
@@ -31,6 +38,18 @@ export interface IntegerPropertyAllOfModel {
      * @memberof IntegerPropertyAllOfModel
      */
     minValue?: number;
+    /**
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
+     * @memberof IntegerPropertyAllOfModel
+     */
+    options?: Array<OptionModel>;
+    /**
+     * 
+     * @type {any}
+     * @memberof IntegerPropertyAllOfModel
+     */
+    optionsDataSource?: any | null;
 }
 
 /**
@@ -54,6 +73,8 @@ export function IntegerPropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimi
         
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
     };
 }
 
@@ -68,6 +89,8 @@ export function IntegerPropertyAllOfModelToJSON(value?: IntegerPropertyAllOfMode
         
         'maxValue': value.maxValue,
         'minValue': value.minValue,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': value.optionsDataSource,
     };
 }
 

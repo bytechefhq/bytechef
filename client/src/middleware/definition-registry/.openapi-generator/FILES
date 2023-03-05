@@ -16,10 +16,12 @@ models/ComponentDefinitionWithBasicActionsModel.ts
 models/ConnectionDefinitionBasicModel.ts
 models/ConnectionDefinitionModel.ts
 models/ControlTypeModel.ts
+models/DatePropertyAllOfModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
 models/DisplayModel.ts
-models/DisplayOptionModel.ts
+models/DynamicPropertiesPropertyAllOfModel.ts
+models/DynamicPropertiesPropertyModel.ts
 models/IntegerPropertyAllOfModel.ts
 models/IntegerPropertyModel.ts
 models/NumberPropertyAllOfModel.ts
@@ -28,11 +30,10 @@ models/ObjectPropertyAllOfModel.ts
 models/ObjectPropertyModel.ts
 models/OneOfPropertyAllOfModel.ts
 models/OneOfPropertyModel.ts
+models/OptionModel.ts
 models/PropertyModel.ts
-models/PropertyOptionModel.ts
 models/PropertyTypeModel.ts
 models/ResourcesModel.ts
-models/StringPropertyAllOfModel.ts
 models/StringPropertyModel.ts
 models/TaskDispatcherDefinitionModel.ts
 models/ValuePropertyAllOfModel.ts

@@ -13,72 +13,65 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
-import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
-
 /**
  * Defines valid property value.
  * @export
- * @interface PropertyOptionModel
+ * @interface OptionModel
  */
-export interface PropertyOptionModel {
+export interface OptionModel {
     /**
      * Description of the option.
      * @type {string}
-     * @memberof PropertyOptionModel
+     * @memberof OptionModel
      */
     description?: string;
     /**
-     * 
-     * @type {DisplayOptionModel}
-     * @memberof PropertyOptionModel
+     * Defines rules when a property should be shown or hidden.
+     * @type {string}
+     * @memberof OptionModel
      */
-    displayOption?: DisplayOptionModel;
+    displayCondition?: string;
     /**
      * The name of an option.
      * @type {string}
-     * @memberof PropertyOptionModel
+     * @memberof OptionModel
      */
     name?: string;
     /**
      * The value of an option.
      * @type {object}
-     * @memberof PropertyOptionModel
+     * @memberof OptionModel
      */
     value?: object;
 }
 
 /**
- * Check if a given object implements the PropertyOptionModel interface.
+ * Check if a given object implements the OptionModel interface.
  */
-export function instanceOfPropertyOptionModel(value: object): boolean {
+export function instanceOfOptionModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function PropertyOptionModelFromJSON(json: any): PropertyOptionModel {
-    return PropertyOptionModelFromJSONTyped(json, false);
+export function OptionModelFromJSON(json: any): OptionModel {
+    return OptionModelFromJSONTyped(json, false);
 }
 
-export function PropertyOptionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PropertyOptionModel {
+export function OptionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OptionModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'displayOption': !exists(json, 'displayOption') ? undefined : DisplayOptionModelFromJSON(json['displayOption']),
+        'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
         'name': !exists(json, 'name') ? undefined : json['name'],
         'value': !exists(json, 'value') ? undefined : json['value'],
     };
 }
 
-export function PropertyOptionModelToJSON(value?: PropertyOptionModel | null): any {
+export function OptionModelToJSON(value?: OptionModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -88,7 +81,7 @@ export function PropertyOptionModelToJSON(value?: PropertyOptionModel | null): a
     return {
         
         'description': value.description,
-        'displayOption': DisplayOptionModelToJSON(value.displayOption),
+        'displayCondition': value.displayCondition,
         'name': value.name,
         'value': value.value,
     };

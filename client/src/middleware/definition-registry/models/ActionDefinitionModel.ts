@@ -39,7 +39,7 @@ export interface ActionDefinitionModel {
      */
     display?: DisplayModel;
     /**
-     * The example of the action's output.
+     * The example value of the action's output.
      * @type {object}
      * @memberof ActionDefinitionModel
      */
@@ -62,12 +62,6 @@ export interface ActionDefinitionModel {
      * @memberof ActionDefinitionModel
      */
     properties?: Array<PropertyModel>;
-    /**
-     * Contains information required for a connection's authorization.
-     * @type {object}
-     * @memberof ActionDefinitionModel
-     */
-    performFunction?: object;
 }
 
 /**
@@ -94,7 +88,6 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         'name': !exists(json, 'name') ? undefined : json['name'],
         'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'performFunction': !exists(json, 'performFunction') ? undefined : json['performFunction'],
     };
 }
 
@@ -112,7 +105,6 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         'name': value.name,
         'outputSchema': value.outputSchema === undefined ? undefined : ((value.outputSchema as Array<any>).map(PropertyModelToJSON)),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'performFunction': value.performFunction,
     };
 }
 

@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
-import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -31,6 +25,7 @@ import {
      BooleanPropertyModelFromJSONTyped,
      DatePropertyModelFromJSONTyped,
      DateTimePropertyModelFromJSONTyped,
+     DynamicPropertiesPropertyModelFromJSONTyped,
      IntegerPropertyModelFromJSONTyped,
      NumberPropertyModelFromJSONTyped,
      ObjectPropertyModelFromJSONTyped,
@@ -57,13 +52,19 @@ export interface PropertyModel {
      */
     description?: string;
     /**
-     * 
-     * @type {DisplayOptionModel}
+     * Defines rules when a property should be shown or hidden.
+     * @type {string}
      * @memberof PropertyModel
      */
-    displayOption?: DisplayOptionModel;
+    displayCondition?: string;
     /**
-     * If the property should be visible or not."
+     * Defines if the property can contain expressions or only constant values.
+     * @type {boolean}
+     * @memberof PropertyModel
+     */
+    expressionEnabled?: boolean;
+    /**
+     * If the property should be visible or not.
      * @type {boolean}
      * @memberof PropertyModel
      */
@@ -136,6 +137,9 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         if (json['modelType'] === 'DATE_TIME') {
             return DateTimePropertyModelFromJSONTyped(json, true);
         }
+        if (json['modelType'] === 'DYNAMIC_PROPERTIES') {
+            return DynamicPropertiesPropertyModelFromJSONTyped(json, true);
+        }
         if (json['modelType'] === 'INTEGER') {
             return IntegerPropertyModelFromJSONTyped(json, true);
         }
@@ -156,7 +160,8 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'advancedOption': !exists(json, 'advancedOption') ? undefined : json['advancedOption'],
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'displayOption': !exists(json, 'displayOption') ? undefined : DisplayOptionModelFromJSON(json['displayOption']),
+        'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
+        'expressionEnabled': !exists(json, 'expressionEnabled') ? undefined : json['expressionEnabled'],
         'hidden': !exists(json, 'hidden') ? undefined : json['hidden'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
@@ -178,7 +183,8 @@ export function PropertyModelToJSON(value?: PropertyModel | null): any {
         
         'advancedOption': value.advancedOption,
         'description': value.description,
-        'displayOption': DisplayOptionModelToJSON(value.displayOption),
+        'displayCondition': value.displayCondition,
+        'expressionEnabled': value.expressionEnabled,
         'hidden': value.hidden,
         'label': value.label,
         'metadata': value.metadata,
