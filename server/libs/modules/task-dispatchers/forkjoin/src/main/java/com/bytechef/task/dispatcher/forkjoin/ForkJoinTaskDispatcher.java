@@ -115,7 +115,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
+            .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))
             .toList();
 
         taskExecution.setStartTime(LocalDateTime.now());
@@ -141,13 +141,11 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(0);
 
-                branchWorkflowTask.put(BRANCH, i);
-
                 Assert.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
                 TaskExecution branchTaskExecution = TaskExecution.of(
                     taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
-                    branchWorkflowTask);
+                    branchWorkflowTask.putParameter(BRANCH, i));
 
                 Map<String, Object> context = contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION);

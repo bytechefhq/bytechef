@@ -45,9 +45,12 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver,
             TaskEvaluator.create());
 
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(
-            Map.of(WorkflowConstants.PARAMETERS, Map.of("list", List.of(1, 2, 3), "iteratee",
-                Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(
+            Map.of(
+                WorkflowConstants.TYPE, "type",
+                WorkflowConstants.PARAMETERS, Map.of(
+                    "list", List.of(1, 2, 3), "iteratee", Map.of(
+                        "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))));
 
         taskExecution.setJobId(4567L);
 
@@ -66,7 +69,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 taskHandlerResolver, TaskEvaluator.create());
 
             TaskExecution taskExecution = new TaskExecution(
-                new WorkflowTask(
+                WorkflowTask.of(
                     Map.of(
                         WorkflowConstants.PARAMETERS,
                         Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue")))));
@@ -123,7 +126,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver,
             TaskEvaluator.create());
 
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
             "finalize",
             List.of(Map.of(
                 "name",

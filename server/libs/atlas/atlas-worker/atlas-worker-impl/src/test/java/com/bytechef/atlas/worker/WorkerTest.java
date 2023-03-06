@@ -42,6 +42,7 @@ public class WorkerTest {
     @Test
     public void test1() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
+
         messageBroker.receive(
             Queues.COMPLETIONS,
             t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
@@ -54,20 +55,24 @@ public class WorkerTest {
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution task = new TaskExecution();
-        task.setId(1234L);
-        task.setJobId(4567L);
-        worker.handle(task);
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+
+        worker.handle(taskExecution);
     }
 
     @Test
     public void test2() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
+
         messageBroker.receive(
             Queues.ERRORS,
             t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
                 .getMessage()));
         messageBroker.receive(Queues.EVENTS, t -> {});
+
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(jt -> t -> {
                 throw new IllegalArgumentException("bad input");
@@ -76,10 +81,12 @@ public class WorkerTest {
             .withEventPublisher(e -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
-        TaskExecution task = new TaskExecution();
-        task.setId(1234L);
-        task.setJobId(4567L);
-        worker.handle(task);
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+
+        worker.handle(taskExecution);
     }
 
     @Test
@@ -109,7 +116,7 @@ public class WorkerTest {
             .withEventPublisher(e -> {})
             .build();
 
-        TaskExecution task = new TaskExecution(new WorkflowTask(Map.of(
+        TaskExecution task = new TaskExecution(WorkflowTask.of(Map.of(
             "pre",
             List.of(Map.of("name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
             "type", "var",
@@ -156,7 +163,7 @@ public class WorkerTest {
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
             "post", List.of(Map.of("type", "rm", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
             "pre", List.of(Map.of("type", "mkdir", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
             "type", "pass")));
@@ -179,7 +186,6 @@ public class WorkerTest {
             Assertions.assertFalse(new File(tempDir).exists());
         });
         messageBroker.receive(Queues.EVENTS, t -> {});
-
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(t1 -> {
                 String type = t1.getType();
@@ -204,7 +210,7 @@ public class WorkerTest {
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
             "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
             "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
             "type", "rogue")));
@@ -217,9 +223,8 @@ public class WorkerTest {
 
     @Test
     public void test6() throws InterruptedException {
-        ExecutorService executors = Executors.newSingleThreadExecutor();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(task -> taskExecution -> {
                 try {
@@ -235,28 +240,33 @@ public class WorkerTest {
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution task = new TaskExecution();
-        task.setId(1234L);
-        task.setJobId(4567L);
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+
         // execute the task
-        executors.submit(() -> worker.handle(task));
+        executorService.submit(() -> worker.handle(taskExecution));
+
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
+
         Assertions.assertEquals(1, worker.getTaskExecutions()
             .size());
+
         // cancel the execution of the task
-        worker.handle(new CancelControlTask(task.getJobId(), task.getId()));
+        worker.handle(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
+
         Assertions.assertEquals(0, worker.getTaskExecutions()
             .size());
     }
 
     @Test
     public void test7() throws InterruptedException {
-        ExecutorService executors = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(task -> taskExecution -> {
                 try {
@@ -272,21 +282,21 @@ public class WorkerTest {
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution task1 = new TaskExecution();
+        TaskExecution taskExecution1 = new TaskExecution(WorkflowTask.of("type"));
 
-        task1.setId(1111L);
-        task1.setJobId(2222L);
-
-        // execute the task
-        executors.submit(() -> worker.handle(task1));
-
-        TaskExecution task2 = new TaskExecution();
-
-        task2.setId(3333L);
-        task2.setJobId(4444L);
+        taskExecution1.setId(1111L);
+        taskExecution1.setJobId(2222L);
 
         // execute the task
-        executors.submit(() -> worker.handle(task2));
+        executorService.submit(() -> worker.handle(taskExecution1));
+
+        TaskExecution taskExecution2 = new TaskExecution(WorkflowTask.of("type"));
+
+        taskExecution2.setId(3333L);
+        taskExecution2.setJobId(4444L);
+
+        // execute the task
+        executorService.submit(() -> worker.handle(taskExecution2));
 
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
@@ -295,7 +305,7 @@ public class WorkerTest {
             .size());
 
         // cancel the execution of the task
-        worker.handle(new CancelControlTask(task1.getJobId(), task1.getId()));
+        worker.handle(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
 
@@ -305,7 +315,7 @@ public class WorkerTest {
 
     @Test
     public void test8() throws InterruptedException {
-        ExecutorService executors = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(task -> taskExecution -> {
@@ -322,28 +332,30 @@ public class WorkerTest {
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution task1 = new TaskExecution();
-        task1.setId(1111L);
-        task1.setJobId(2222L);
+        TaskExecution taskExecution1 = new TaskExecution(WorkflowTask.of("type"));
+        taskExecution1.setId(1111L);
+        taskExecution1.setJobId(2222L);
         // execute the task
-        executors.submit(() -> worker.handle(task1));
+        executorService.submit(() -> worker.handle(taskExecution1));
 
-        TaskExecution task2 = new TaskExecution();
-        task2.setId(3333L);
-        task2.setJobId(2222L);
-        task2.setParentId(task1.getId());
+        TaskExecution taskExecution2 = new TaskExecution(WorkflowTask.of("type"));
+        taskExecution2.setId(3333L);
+        taskExecution2.setJobId(2222L);
+        taskExecution2.setParentId(taskExecution1.getId());
         // execute the task
-        executors.submit(() -> worker.handle(task2));
+        executorService.submit(() -> worker.handle(taskExecution2));
 
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
 
         Assertions.assertEquals(2, worker.getTaskExecutions()
             .size());
+
         // cancel the execution of the task
-        worker.handle(new CancelControlTask(task1.getJobId(), task1.getId()));
+        worker.handle(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
+
         Assertions.assertEquals(0, worker.getTaskExecutions()
             .size());
     }

@@ -96,6 +96,8 @@ public class Worker {
      */
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
+        logger.debug("Received task: {}", taskExecution);
+
         CountDownLatch latch = new CountDownLatch(1);
 
         Future<?> future = executors.submit(() -> {
@@ -167,8 +169,6 @@ public class Worker {
 
         try {
             long startTime = System.currentTimeMillis();
-
-            logger.debug("Received task: {}", taskExecution);
 
             // pre tasks
             executeSubTasks(taskExecution, taskExecution.getPre(), context);

@@ -22,6 +22,7 @@ package com.bytechef.atlas.task.evaluator;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.util.MapValueUtils;
@@ -44,7 +45,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test1() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution();
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "hello", null));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -54,7 +55,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test2() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "world"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "hello", "world"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -64,7 +65,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test3() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "${name}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "hello", "${name}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.singletonMap("name", "arik"));
 
@@ -74,7 +75,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test4() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("hello", "${firstName} ${lastName}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "hello", "${firstName} ${lastName}"));
 
         Map<String, Object> context = new HashMap<>();
 
@@ -90,7 +91,7 @@ public class TaskEvaluatorTest {
     public void test5() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("hello", "${T(java.lang.Integer).valueOf(number)}"));
+            WorkflowTask.of("type", "hello", "${T(java.lang.Integer).valueOf(number)}"));
         Map<String, Object> context = new HashMap<>();
 
         context.put("number", "5");
@@ -105,7 +106,7 @@ public class TaskEvaluatorTest {
     public void test6() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("list", Arrays.asList("${firstName}", "${lastName}")));
+            WorkflowTask.of("type", "list", Arrays.asList("${firstName}", "${lastName}")));
 
         Map<String, Object> context = new HashMap<>();
         context.put("firstName", "Arik");
@@ -122,7 +123,7 @@ public class TaskEvaluatorTest {
     public void test7() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("map", Collections.singletonMap("hello", "${firstName}")));
+            WorkflowTask.of("type", "map", Collections.singletonMap("hello", "${firstName}")));
         Map<String, Object> context = new HashMap<>();
 
         context.put("firstName", "Arik");
@@ -136,7 +137,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test8() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("mult", "${n1*n2}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "mult", "${n1*n2}"));
         Map<String, Object> context = new HashMap<>();
 
         context.put("n1", 5);
@@ -151,7 +152,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test9() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "${name}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "message", "${name}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -161,7 +162,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test10() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "yo ${name}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "message", "yo ${name}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -171,7 +172,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test11() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "thing", "${number}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.singletonMap("number", 1));
 
@@ -181,7 +182,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test12() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number*3}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "thing", "${number*3}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.singletonMap("number", 1));
 
@@ -191,7 +192,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test13() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("thing", "${number*3}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "thing", "${number*3}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -201,7 +202,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test14() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("list", "${range(1,3)}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "list", "${range(1,3)}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -212,7 +213,7 @@ public class TaskEvaluatorTest {
     public void test15() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("sub", Collections.singletonMap("list", "${range(1,3)}")));
+            WorkflowTask.of("type", "sub", Collections.singletonMap("list", "${range(1,3)}")));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -225,7 +226,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test16() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("message", "${item1}-${item2}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "message", "${item1}-${item2}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Map.of("item1", "hello", "item2", "world"));
 
@@ -235,7 +236,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test17() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someBoolean", "${boolean('1')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someBoolean", "${boolean('1')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -245,7 +246,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test18() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someByte", "${byte('127')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someByte", "${byte('127')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -256,7 +257,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test19() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someChar", "${char('c')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someChar", "${char('c')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -267,7 +268,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test20() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someShort", "${short('32767')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someShort", "${short('32767')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -278,7 +279,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test21() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someInt", "${int('1')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someInt", "${int('1')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -288,7 +289,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test22() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someLong", "${long('1')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someLong", "${long('1')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -298,7 +299,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test23() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someFloat", "${float('1.337')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someFloat", "${float('1.337')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -309,7 +310,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test24() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("someDouble", "${double('1.337')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "someDouble", "${double('1.337')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -320,7 +321,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test25() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(',',range(1,3))}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "joined", "${join(',',range(1,3))}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -330,7 +331,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test26() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(',',range(1,1))}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "joined", "${join(',',range(1,1))}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -340,7 +341,8 @@ public class TaskEvaluatorTest {
     @Test
     public void test27() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("joined", "${join(' and ',{'a','b','c'})}"));
+        TaskExecution taskExecution = new TaskExecution(
+            WorkflowTask.of("type", "joined", "${join(' and ',{'a','b','c'})}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -351,7 +353,7 @@ public class TaskEvaluatorTest {
     public void test28() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}"));
+            WorkflowTask.of("type", "concatenated", "${concat({'a','b','c'}, {'d','e','f'})}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -364,7 +366,7 @@ public class TaskEvaluatorTest {
     public void test29() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("concatenated", "${concat({'a','b','c'}, range(1,3))}"));
+            WorkflowTask.of("type", "concatenated", "${concat({'a','b','c'}, range(1,3))}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -377,7 +379,7 @@ public class TaskEvaluatorTest {
     public void test30() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}"));
+            WorkflowTask.of("type", "flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -390,7 +392,7 @@ public class TaskEvaluatorTest {
     public void test31() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("flattened", "${flatten({{'a','b','c'},range(1,3)})}"));
+            WorkflowTask.of("type", "flattened", "${flatten({{'a','b','c'},range(1,3)})}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -404,7 +406,7 @@ public class TaskEvaluatorTest {
         TaskEvaluator taskEvaluator = TaskEvaluator.builder()
             .methodExecutor("tempDir", new TempDir())
             .build();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("tempDir", "${tempDir()}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "tempDir", "${tempDir()}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -420,7 +422,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test33() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("uuid", "${uuid()}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "uuid", "${uuid()}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -430,7 +432,8 @@ public class TaskEvaluatorTest {
     @Test
     public void test34() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("fullName", "${firstName} ${lastName}"));
+        TaskExecution taskExecution = new TaskExecution(
+            WorkflowTask.of(WorkflowConstants.TYPE, "fullName", "${firstName} ${lastName}"));
         Map<String, Object> context = new HashMap<>();
 
         context.put("firstName", "Arik");
@@ -444,7 +447,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test35() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("result", "${num/den}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "result", "${num/den}"));
         Map<String, Object> context = new HashMap<>();
 
         context.put("num", 5.0);
@@ -458,7 +461,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test36() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("number", "${stringf('%03d',5)}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "number", "${stringf('%03d',5)}"));
         Map<String, Object> context = new HashMap<>();
 
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
@@ -470,7 +473,7 @@ public class TaskEvaluatorTest {
     public void test37() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("number", "${stringf('%s %s','hello','world')}"));
+            WorkflowTask.of("type", "number", "${stringf('%s %s','hello','world')}"));
         Map<String, Object> context = new HashMap<>();
 
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
@@ -481,7 +484,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test38() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("sorted", "${sort({3,1,2})}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "sorted", "${sort({3,1,2})}"));
         Map<String, Object> context = new HashMap<>();
 
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
@@ -494,7 +497,7 @@ public class TaskEvaluatorTest {
     @Test
     public void test39() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("sorted", "${sort({'C','A','B'})}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "sorted", "${sort({'C','A','B'})}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -506,7 +509,8 @@ public class TaskEvaluatorTest {
     @Test
     public void test40() {
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("date", "${dateFormat(now(),'yyyyMMdd')}"));
+        TaskExecution taskExecution = new TaskExecution(
+            WorkflowTask.of("type", "date", "${dateFormat(now(),'yyyyMMdd')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -523,7 +527,7 @@ public class TaskEvaluatorTest {
         TaskEvaluator taskEvaluator = TaskEvaluator.builder()
             .environment(environment)
             .build();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("myValue", "${config('my.property')}"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type", "myValue", "${config('my.property')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
@@ -536,7 +540,8 @@ public class TaskEvaluatorTest {
         TaskEvaluator taskEvaluator = TaskEvaluator.builder()
             .environment(environment)
             .build();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("myValue", "${config('no.such.property')}"));
+        TaskExecution taskExecution = new TaskExecution(
+            WorkflowTask.of("type", "myValue", "${config('no.such.property')}"));
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
