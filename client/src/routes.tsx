@@ -2,7 +2,7 @@ import {createBrowserRouter} from 'react-router-dom';
 import App from './App';
 import ErrorPage from './ErrorPage';
 import Project from './pages/automation/project/Project';
-import Integrations from './pages/embedded/integrations/Integrations';
+import Integrations from './pages/ee/embedded/integrations/Integrations';
 import Connections from './pages/automation/connections/Connections';
 import Settings from './pages/settings/Settings';
 import Instances from './pages/automation/instances/Instances';
