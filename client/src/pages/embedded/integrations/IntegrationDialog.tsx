@@ -10,17 +10,17 @@ import {
     IntegrationKeys,
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '../../../../queries/integrations.queries';
+} from '../../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CategoryModel,
     IntegrationModel,
     TagModel,
-} from '../../../../middleware/integration';
+} from '../../../middleware/integration';
 import {
     useCreateIntegrationMutation,
     useUpdateIntegrationMutation,
-} from '../../../../mutations/integrations.mutations';
+} from '../../../mutations/integrations.mutations';
 import {Close} from '@radix-ui/react-dialog';
 
 interface IntegrationDialogProps {

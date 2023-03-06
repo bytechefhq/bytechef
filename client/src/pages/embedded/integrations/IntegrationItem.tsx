@@ -1,26 +1,26 @@
 import {useState} from 'react';
 import DropdownMenu, {
     IDropdownMenuItem,
-} from '../../../../components/DropdownMenu/DropdownMenu';
+} from '../../../components/DropdownMenu/DropdownMenu';
 import {
     IntegrationModel,
     StatusModel,
     TagModel,
-} from '../../../../middleware/integration';
+} from '../../../middleware/integration';
 import {
     useDeleteIntegrationMutation,
     useUpdateIntegrationTagsMutation,
     useCreateIntegrationWorkflowRequestMutation,
-} from '../../../../mutations/integrations.mutations';
-import {IntegrationKeys} from '../../../../queries/integrations.queries';
+} from '../../../mutations/integrations.mutations';
+import {IntegrationKeys} from '../../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
 import IntegrationDialog from './IntegrationDialog';
 import Name from './components/Name';
-import AlertDialog from '../../../../components/AlertDialog/AlertDialog';
-import TagList from '../../../../components/TagList/TagList';
-import WorkflowDialog from '../../../../components/WorkflowDialog/WorkflowDialog';
+import AlertDialog from '../../../components/AlertDialog/AlertDialog';
+import TagList from '../../../components/TagList/TagList';
+import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 
 interface IntegrationItemProps {
     integration: IntegrationModel;
