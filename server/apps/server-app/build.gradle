@@ -17,6 +17,8 @@ dependencies {
     implementation "org.springframework.kafka:spring-kafka"
     implementation libs.org.springdoc.springdoc.openapi.starter.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    implementation project(":server:ee:libs:dione:dione-integration:dione-integration-rest")
+    implementation project(":server:ee:libs:dione:dione-integration:dione-integration-service")
     implementation project(":server:libs:atlas:atlas-config")
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config")
     implementation project(":server:libs:atlas:atlas-event:atlas-event-impl")
@@ -38,8 +40,6 @@ dependencies {
     implementation project(":server:libs:core:tag:tag-service")
     implementation project(":server:libs:db-migration")
     implementation project(":server:libs:demo-configuration")
-    implementation project(":server:libs:dione:dione-integration:dione-integration-rest")
-    implementation project(":server:libs:dione:dione-integration:dione-integration-service")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
