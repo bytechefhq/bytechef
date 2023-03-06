@@ -37,7 +37,7 @@ public class DefaultTaskDispatcherTest {
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
             (k, m) -> Assertions.assertEquals(Queues.TASKS, k), List.of());
 
-        defaultTaskDispatcher.dispatch(new TaskExecution(WorkflowTask.of("test")));
+        defaultTaskDispatcher.dispatch(new TaskExecution(WorkflowTask.of("type", "test", "value")));
     }
 
     @Test

@@ -108,6 +108,6 @@ public class JdbcCounterRepositoryIntTest {
     }
 
     private static TaskExecution getTaskExecution(long jobId) {
-        return TaskExecution.of(jobId, new WorkflowTask());
+        return TaskExecution.of(jobId, WorkflowTask.of("type"));
     }
 }

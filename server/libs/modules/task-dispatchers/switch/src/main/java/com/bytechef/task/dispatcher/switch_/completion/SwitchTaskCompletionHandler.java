@@ -139,7 +139,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         List<WorkflowTask> caseWorkflowTasks = MapValueUtils
             .getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList())
             .stream()
-            .map(WorkflowTask::new)
+            .map(WorkflowTask::of)
             .toList();
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a switch statement");
@@ -149,7 +149,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
             List<WorkflowTask> subWorkflowTasks = MapValueUtils
                 .getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList())
                 .stream()
-                .map(WorkflowTask::new)
+                .map(WorkflowTask::of)
                 .toList();
 
             if (key.equals(expression)) {
@@ -159,7 +159,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
         return MapValueUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList())
             .stream()
-            .map(WorkflowTask::new)
+            .map(WorkflowTask::of)
             .toList();
     }
 }

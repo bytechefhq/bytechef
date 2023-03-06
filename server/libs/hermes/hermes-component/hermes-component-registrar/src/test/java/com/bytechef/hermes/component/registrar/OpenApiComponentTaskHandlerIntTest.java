@@ -817,9 +817,10 @@ public class OpenApiComponentTaskHandlerIntTest {
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {
         return new TaskExecution(
             connection.getId() == null
-                ? new WorkflowTask()
-                : new WorkflowTask(
+                ? WorkflowTask.of("type")
+                : WorkflowTask.of(
                     Map.of(
+                        WorkflowConstants.TYPE, "type",
                         WorkflowConstants.PARAMETERS,
                         Stream
                             .concat(

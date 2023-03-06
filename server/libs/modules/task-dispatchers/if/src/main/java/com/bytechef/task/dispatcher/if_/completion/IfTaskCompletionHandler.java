@@ -136,7 +136,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution ifTaskExecution, String caseTrue) {
         return MapValueUtils.getList(ifTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList())
             .stream()
-            .map(WorkflowTask::new)
+            .map(WorkflowTask::of)
             .toList();
     }
 }
