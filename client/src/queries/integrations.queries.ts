@@ -1,8 +1,10 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
+    IntegrationCategoriesApi,
     IntegrationModel,
     IntegrationsApi,
+    IntegrationTagsApi,
     TagModel,
 } from 'middleware/integration';
 import {WorkflowModel} from '../middleware/workflow';
@@ -19,10 +21,19 @@ export const IntegrationKeys = {
     integrations: ['integrations'] as const,
 };
 
+export const useGetIntegrationCategoriesQuery = () =>
+    useQuery<CategoryModel[], Error>(
+        IntegrationKeys.integrationCategories,
+        () => new IntegrationCategoriesApi().getIntegrationCategories(),
+        {
+            staleTime: 1 * 60 * 1000,
+        }
+    );
+
 export const useGetIntegrationTagsQuery = () =>
     useQuery<TagModel[], Error>(
         IntegrationKeys.integrationTags,
-        () => new IntegrationsApi().getIntegrationTags(),
+        () => new IntegrationTagsApi().getIntegrationTags(),
         {
             staleTime: 1 * 60 * 1000,
         }
@@ -48,15 +59,6 @@ export const useGetIntegrationsQuery = (filters: {
     useQuery<IntegrationModel[], Error>(
         IntegrationKeys.integrationList(filters),
         () => new IntegrationsApi().getIntegrations(filters),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
-    );
-
-export const useGetIntegrationCategoriesQuery = () =>
-    useQuery<CategoryModel[], Error>(
-        IntegrationKeys.integrationCategories,
-        () => new IntegrationsApi().getIntegrationCategories(),
         {
             staleTime: 1 * 60 * 1000,
         }
