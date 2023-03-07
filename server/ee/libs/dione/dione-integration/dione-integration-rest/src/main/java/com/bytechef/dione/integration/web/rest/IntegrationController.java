@@ -77,7 +77,7 @@ public class IntegrationController implements IntegrationsApi {
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    integrationFacade.getIntegrations(categoryIds, tagIds)
+                    integrationFacade.searchIntegrations(categoryIds, tagIds)
                         .stream()
                         .map(integration -> conversionService.convert(integration, IntegrationModel.class))
                         .toList())));

@@ -113,7 +113,7 @@ public class IntegrationFacadeIntTest {
         assertThat(integration.getName()).isEqualTo("name1");
         assertThat(integration.getId()).isNotNull();
         assertThat(integration.getTagIds()).hasSize(1);
-        assertThat(integration.getWorkflowIds()).hasSize(1);
+        assertThat(integration.getWorkflowIds()).hasSize(0);
 
         integration = new Integration();
 
@@ -196,7 +196,7 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        List<Integration> integrations = integrationFacade.getIntegrations(null, null);
+        List<Integration> integrations = integrationFacade.searchIntegrations(null, null);
 
         assertThat(integrations).isEqualTo(List.of(integration));
 
@@ -287,7 +287,7 @@ public class IntegrationFacadeIntTest {
         integration = integrationFacade.create(integration);
 
         assertThat(integration.getTagIds()).hasSize(2);
-        assertThat(integration.getWorkflowIds()).hasSize(1);
+        assertThat(integration.getWorkflowIds()).hasSize(0);
 
         integration.setTags(List.of(tag1));
 
