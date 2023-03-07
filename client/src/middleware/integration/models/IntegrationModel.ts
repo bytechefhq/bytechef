@@ -19,12 +19,6 @@ import {
     CategoryModelFromJSONTyped,
     CategoryModelToJSON,
 } from './CategoryModel';
-import type { StatusModel } from './StatusModel';
-import {
-    StatusModelFromJSON,
-    StatusModelFromJSONTyped,
-    StatusModelToJSON,
-} from './StatusModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -99,11 +93,11 @@ export interface IntegrationModel {
      */
     integrationVersion?: number;
     /**
-     * 
-     * @type {StatusModel}
+     * A status of an integration.
+     * @type {string}
      * @memberof IntegrationModel
      */
-    status?: StatusModel;
+    status?: IntegrationModelStatusEnum;
     /**
      * 
      * @type {Array<TagModel>}
@@ -123,6 +117,17 @@ export interface IntegrationModel {
      */
     version?: number;
 }
+
+
+/**
+ * @export
+ */
+export const IntegrationModelStatusEnum = {
+    Published: 'PUBLISHED',
+    Unpublished: 'UNPUBLISHED'
+} as const;
+export type IntegrationModelStatusEnum = typeof IntegrationModelStatusEnum[keyof typeof IntegrationModelStatusEnum];
+
 
 /**
  * Check if a given object implements the IntegrationModel interface.
@@ -154,7 +159,7 @@ export function IntegrationModelFromJSONTyped(json: any, ignoreDiscriminator: bo
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'lastPublishedDate': !exists(json, 'lastPublishedDate') ? undefined : (new Date(json['lastPublishedDate'])),
         'integrationVersion': !exists(json, 'integrationVersion') ? undefined : json['integrationVersion'],
-        'status': !exists(json, 'status') ? undefined : StatusModelFromJSON(json['status']),
+        'status': !exists(json, 'status') ? undefined : json['status'],
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'workflowIds': !exists(json, 'workflowIds') ? undefined : json['workflowIds'],
         'version': !exists(json, '__version') ? undefined : json['__version'],
@@ -175,7 +180,7 @@ export function IntegrationModelToJSON(value?: IntegrationModel | null): any {
         'description': value.description,
         'lastPublishedDate': value.lastPublishedDate === undefined ? undefined : (value.lastPublishedDate.toISOString()),
         'integrationVersion': value.integrationVersion,
-        'status': StatusModelToJSON(value.status),
+        'status': value.status,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         'workflowIds': value.workflowIds,
         '__version': value.version,

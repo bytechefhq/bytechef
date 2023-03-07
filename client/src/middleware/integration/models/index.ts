@@ -3,7 +3,6 @@
 export * from './CategoryModel';
 export * from './CreateIntegrationWorkflowRequestModel';
 export * from './IntegrationModel';
-export * from './StatusModel';
 export * from './TagModel';
 export * from './UpdateIntegrationTagsRequestModel';
 export * from './WorkflowFormatModel';
