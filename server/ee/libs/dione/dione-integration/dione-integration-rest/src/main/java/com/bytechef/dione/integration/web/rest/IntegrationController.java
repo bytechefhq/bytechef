@@ -19,7 +19,6 @@ package com.bytechef.dione.integration.web.rest;
 
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
@@ -73,17 +72,6 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<CategoryModel>>> getIntegrationCategories(ServerWebExchange exchange) {
-        return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    integrationFacade.getIntegrationCategories()
-                        .stream()
-                        .map(category -> conversionService.convert(category, CategoryModel.class))
-                        .toList())));
-    }
-
-    @Override
     public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(
         List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
         return Mono.just(
@@ -92,17 +80,6 @@ public class IntegrationController implements IntegrationsApi {
                     integrationFacade.getIntegrations(categoryIds, tagIds)
                         .stream()
                         .map(integration -> conversionService.convert(integration, IntegrationModel.class))
-                        .toList())));
-    }
-
-    @Override
-    public Mono<ResponseEntity<Flux<TagModel>>> getIntegrationTags(ServerWebExchange exchange) {
-        return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    integrationFacade.getIntegrationTags()
-                        .stream()
-                        .map(tag -> conversionService.convert(tag, TagModel.class))
                         .toList())));
     }
 
