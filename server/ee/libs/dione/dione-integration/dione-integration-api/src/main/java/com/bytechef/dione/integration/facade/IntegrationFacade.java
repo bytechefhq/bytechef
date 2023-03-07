@@ -41,11 +41,11 @@ public interface IntegrationFacade {
     @Transactional(readOnly = true)
     List<Category> getIntegrationCategories();
 
-    List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds);
-
     List<Tag> getIntegrationTags();
 
     List<Workflow> getIntegrationWorkflows(Long id);
+
+    List<Integration> searchIntegrations(List<Long> categoryIds, List<Long> tagIds);
 
     Integration update(Long id, List<Tag> tags);
 

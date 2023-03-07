@@ -78,7 +78,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
+    public List<Integration> searchIntegrations(List<Long> categoryIds, List<Long> tagIds) {
         Iterable<Integration> integrationIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
@@ -109,7 +109,6 @@ public class IntegrationServiceImpl implements IntegrationService {
     public Integration update(@NonNull Integration integration) {
         Assert.notNull(integration, "'integration' must not be null");
         Assert.notNull(integration.getId(), "'id' must not be null");
-        Assert.notEmpty(integration.getWorkflowIds(), "'workflowIds' must not be empty");
 
         Integration curIntegration = getIntegration(integration.getId());
 
