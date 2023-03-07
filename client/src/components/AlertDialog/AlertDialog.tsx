@@ -69,7 +69,7 @@ const AlertDialog = ({
                             </Description>
 
                             <div className="mt-4 flex justify-end space-x-2">
-                                <AlertDialogPrimitive.Cancel asChild={true}>
+                                <AlertDialogPrimitive.Cancel asChild>
                                     <Button
                                         displayType="lightBorder"
                                         label="Cancel"
@@ -77,7 +77,7 @@ const AlertDialog = ({
                                     />
                                 </AlertDialogPrimitive.Cancel>
 
-                                <AlertDialogPrimitive.Action asChild={true}>
+                                <AlertDialogPrimitive.Action asChild>
                                     <Button
                                         displayType={
                                             danger ? 'danger' : 'primary'

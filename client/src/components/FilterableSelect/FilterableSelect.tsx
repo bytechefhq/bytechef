@@ -6,7 +6,7 @@ import {FieldValues} from 'react-hook-form';
 import {FieldPath} from 'react-hook-form/dist/types';
 import {twMerge} from 'tailwind-merge';
 
-export interface SelectOption {
+export interface ISelectOption {
     value: string;
     label: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -26,7 +26,7 @@ type FilterableSelectProps<
     fieldsetClassName?: string;
     name?: string;
     label?: string;
-    options: SelectOption[];
+    options: ISelectOption[];
 } & Props<Option, IsMulti, Group>;
 
 const FilterableSelect = <
