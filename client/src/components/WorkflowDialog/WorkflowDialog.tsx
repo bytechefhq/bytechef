@@ -1,32 +1,30 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import Input from 'components/Input/Input';
 import Dialog from 'components/Dialog/Dialog';
 import {useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
 import {UseMutationResult} from '@tanstack/react-query';
-import {WorkflowModel} from 'middleware/project';
 import TextArea from 'components/TextArea/TextArea';
 import {Close} from '@radix-ui/react-dialog';
 
 interface WorkflowDialogProps {
-    id?: number;
-    workflowItem?: WorkflowModel | undefined;
-    visible?: boolean;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowRequestMutation: UseMutationResult<any, object, any, unknown>;
+    id: string | number;
+    visible?: boolean;
 }
 
 const WorkflowDialog = ({
+    createWorkflowRequestMutation,
     id,
     visible = false,
-    createWorkflowRequestMutation,
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
     const {
         formState: {errors, touchedFields},
-        handleSubmit,
         getValues,
+        handleSubmit,
         register,
     } = useForm({
         defaultValues: {
@@ -41,9 +39,11 @@ const WorkflowDialog = ({
         const formData = getValues();
 
         mutate({
-            id: id!,
             createProjectWorkflowRequestModel: formData,
+            id,
         });
+
+        setIsOpen(false);
     }
 
     return (
@@ -65,7 +65,7 @@ const WorkflowDialog = ({
             />
 
             <div className="mt-4 flex justify-end space-x-1">
-                <Close asChild={true}>
+                <Close asChild>
                     <Button
                         displayType="lightBorder"
                         label="Cancel"

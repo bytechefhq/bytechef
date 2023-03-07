@@ -1,5 +1,3 @@
-/* eslint-disable tailwindcss/no-custom-classname */
-
 import {Transition} from '@headlessui/react';
 import {
     Close,

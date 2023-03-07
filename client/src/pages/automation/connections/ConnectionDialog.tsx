@@ -16,7 +16,7 @@ import {
 } from '../../../middleware/definition-registry';
 import {ConnectionModel, TagModel} from '../../../middleware/connection';
 import FilterableSelect, {
-    SelectOption,
+    ISelectOption,
 } from '../../../components/FilterableSelect/FilterableSelect';
 import {
     ConnectionKeys,
@@ -32,7 +32,7 @@ import OAuth2Button from './components/OAuth2Button';
 
 interface FormProps {
     authorizationName: string;
-    componentName: SelectOption;
+    componentName: ISelectOption;
     name: string;
     parameters: {[key: string]: object};
     tags: TagModel[];
@@ -109,7 +109,7 @@ const ConnectionDialog = () => {
         connectionDefinition?.authorizations &&
         connectionDefinition.authorizations.length > 0;
 
-    const authorizationOptions: SelectOption[] =
+    const authorizationOptions: ISelectOption[] =
         connectionDefinition && connectionDefinition.authorizations
             ? [
                   ...(connectionDefinition.authorizationRequired === false
@@ -232,7 +232,7 @@ const ConnectionDialog = () => {
                                 })
                             )}
                             onChange={(
-                                value: OnChangeValue<SelectOption, false>
+                                value: OnChangeValue<ISelectOption, false>
                             ) => {
                                 if (value) {
                                     setValue('componentName', value);
