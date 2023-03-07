@@ -15,22 +15,16 @@
 
 import * as runtime from '../runtime';
 import type {
-  CategoryModel,
   CreateProjectWorkflowRequestModel,
   ProjectModel,
-  TagModel,
   UpdateProjectTagsRequestModel,
   WorkflowModel,
 } from '../models';
 import {
-    CategoryModelFromJSON,
-    CategoryModelToJSON,
     CreateProjectWorkflowRequestModelFromJSON,
     CreateProjectWorkflowRequestModelToJSON,
     ProjectModelFromJSON,
     ProjectModelToJSON,
-    TagModelFromJSON,
-    TagModelToJSON,
     UpdateProjectTagsRequestModelFromJSON,
     UpdateProjectTagsRequestModelToJSON,
     WorkflowModelFromJSON,
@@ -248,62 +242,6 @@ export class ProjectsApi extends runtime.BaseAPI {
      */
     async getProject(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
         const response = await this.getProjectRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get categories.
-     * Get categories.
-     */
-    async getProjectCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/projects/categories`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryModelFromJSON));
-    }
-
-    /**
-     * Get categories.
-     * Get categories.
-     */
-    async getProjectCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
-        const response = await this.getProjectCategoriesRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get project tags.
-     * Get project tags.
-     */
-    async getProjectTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/projects/tags`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
-    }
-
-    /**
-     * Get project tags.
-     * Get project tags.
-     */
-    async getProjectTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
-        const response = await this.getProjectTagsRaw(initOverrides);
         return await response.value();
     }
 
