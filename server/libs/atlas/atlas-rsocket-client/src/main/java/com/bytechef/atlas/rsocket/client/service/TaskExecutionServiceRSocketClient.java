@@ -66,6 +66,15 @@ public class TaskExecutionServiceRSocketClient implements TaskExecutionService {
     }
 
     @Override
+    public List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds) {
+        return rSocketRequester
+            .route("getJobsTaskExecutions")
+            .data(jobIds)
+            .retrieveMono(new ParameterizedTypeReference<List<TaskExecution>>() {})
+            .block();
+    }
+
+    @Override
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return rSocketRequester
             .route("getParentTaskExecutions")

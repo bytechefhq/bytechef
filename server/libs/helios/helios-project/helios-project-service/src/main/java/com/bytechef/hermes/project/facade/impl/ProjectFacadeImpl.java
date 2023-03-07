@@ -17,20 +17,27 @@
 
 package com.bytechef.hermes.project.facade.impl;
 
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.project.domain.Project;
+import com.bytechef.hermes.project.dto.ProjectExecution;
 import com.bytechef.hermes.project.facade.ProjectFacade;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.hermes.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,18 +52,22 @@ import java.util.Objects;
 public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
+    private final JobService jobService;
     private final ProjectService projectService;
     private final TagService tagService;
+    private final TaskExecutionService taskExecutionService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, ProjectService projectService, TagService tagService,
-        WorkflowService workflowService) {
+        CategoryService categoryService, JobService jobService, ProjectService projectService, TagService tagService,
+        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
+        this.jobService = jobService;
         this.projectService = projectService;
         this.tagService = tagService;
+        this.taskExecutionService = taskExecutionService;
         this.workflowService = workflowService;
     }
 
@@ -156,7 +167,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public List<Category> getProjectCategories() {
-        List<Project> projects = projectService.getProjects(null, null);
+        List<Project> projects = projectService.searchProjects(null, null);
 
         List<Long> categoryIds = projects.stream()
             .map(Project::getCategoryId)
@@ -168,8 +179,56 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Project> getProjects(List<Long> categoryIds, List<Long> tagIds) {
-        List<Project> projects = projectService.getProjects(categoryIds, tagIds);
+    public List<Tag> getProjectTags() {
+        List<Project> projects = projectService.searchProjects(null, null);
+
+        List<Long> tagIds = projects.stream()
+            .map(Project::getTagIds)
+            .flatMap(Collection::stream)
+            .toList();
+
+        return tagService.getTags(tagIds);
+    }
+
+    @Override
+    public List<Workflow> getProjectWorkflows(Long id) {
+        Project project = projectService.getProject(id);
+
+        return workflowService.getWorkflows(project.getWorkflowIds());
+    }
+
+    @Override
+    public Page<ProjectExecution> searchProjectExecutions(
+        String jobStatus, LocalDateTime jobStartTime, LocalDateTime jobEndTime, Long projectId, Long projectInstanceId,
+        Long workflowId, Integer pageNumber) {
+
+        Project project;
+
+        if (projectId != null) {
+            project = projectService.getProject(projectId);
+        } else {
+            project = null;
+        }
+
+        Page<Job> jobs = jobService.searchJobs(jobStatus, jobStartTime, jobEndTime, workflowId, pageNumber);
+
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobsTaskExecutions(
+            jobs.stream()
+                .map(Job::getId)
+                .toList());
+
+        return jobs.map(job -> new ProjectExecution(
+            job, project,
+            taskExecutions.stream()
+                .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId()))
+                .toList(),
+            workflowService.getWorkflow(job.getWorkflowId())));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds) {
+        List<Project> projects = projectService.searchProjects(categoryIds, tagIds);
 
         List<Category> categories = categoryService.getCategories(projects.stream()
             .map(Project::getCategoryId)
@@ -200,26 +259,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         return projects;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Tag> getProjectTags() {
-        List<Project> projects = projectService.getProjects(null, null);
-
-        List<Long> tagIds = projects.stream()
-            .map(Project::getTagIds)
-            .flatMap(Collection::stream)
-            .toList();
-
-        return tagService.getTags(tagIds);
-    }
-
-    @Override
-    public List<Workflow> getProjectWorkflows(Long id) {
-        Project project = projectService.getProject(id);
-
-        return workflowService.getWorkflows(project.getWorkflowIds());
     }
 
     @Override

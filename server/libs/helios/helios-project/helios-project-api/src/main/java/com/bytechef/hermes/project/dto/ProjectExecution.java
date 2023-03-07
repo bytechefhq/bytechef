@@ -15,26 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service;
+package com.bytechef.hermes.project.dto;
 
+import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.hermes.project.domain.Project;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskExecutionService {
-
-    TaskExecution create(TaskExecution taskExecution);
-
-    TaskExecution getTaskExecution(long id);
-
-    List<TaskExecution> getJobTaskExecutions(long jobId);
-
-    List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds);
-
-    List<TaskExecution> getParentTaskExecutions(long parentId);
-
-    TaskExecution update(TaskExecution taskExecution);
+@SuppressFBWarnings("EI")
+public record ProjectExecution(
+    /* ProjectInstance instance, */ Job job, Project project, List<TaskExecution> taskExecutions, Workflow workflow) {
 }
