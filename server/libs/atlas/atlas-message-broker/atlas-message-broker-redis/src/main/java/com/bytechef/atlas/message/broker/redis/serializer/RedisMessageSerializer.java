@@ -23,8 +23,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.util.Assert;
 
-import java.util.Objects;
-
 /**
  * @author Ivica Cardic
  */
@@ -50,21 +48,16 @@ public class RedisMessageSerializer {
         }
     }
 
-    @SuppressFBWarnings("NP")
     public Object deserialize(String string) throws SerializationException {
-        Object object = null;
+        Assert.notNull(string, "'string' must not be null");
 
-        if (string != null) {
-            try {
-                RedisMessage redisMessage = Objects.requireNonNull(objectMapper.readValue(string, RedisMessage.class));
+        try {
+            RedisMessage redisMessage = objectMapper.readValue(string, RedisMessage.class);
 
-                object = objectMapper.readValue(redisMessage.payload(), Class.forName(redisMessage.type()));
-            } catch (Exception e) {
-                throw new SerializationException(e.getMessage());
-            }
+            return objectMapper.readValue(redisMessage.payload(), Class.forName(redisMessage.type()));
+        } catch (Exception e) {
+            throw new SerializationException(e.getMessage());
         }
-
-        return object;
     }
 
     record RedisMessage(String payload, String type) {
