@@ -2,7 +2,6 @@ package com.bytechef.hermes.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.project.web.rest.model.StatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-04T17:08:24.734312+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-08T07:37:11.195591+01:00[Europe/Zagreb]")
 public class ProjectModel {
 
   @JsonProperty("category")
@@ -63,8 +62,43 @@ public class ProjectModel {
   @JsonProperty("projectVersion")
   private Integer projectVersion;
 
+  /**
+   * A status of a project.
+   */
+  public enum StatusEnum {
+    PUBLISHED("PUBLISHED"),
+    
+    UNPUBLISHED("UNPUBLISHED");
+
+    private String value;
+
+    StatusEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static StatusEnum fromValue(String value) {
+      for (StatusEnum b : StatusEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
   @JsonProperty("status")
-  private StatusModel status;
+  private StatusEnum status;
 
   @JsonProperty("tags")
   @Valid
@@ -140,11 +174,11 @@ public class ProjectModel {
   }
 
   /**
-   * The id of an project.
+   * The id of a project.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -159,11 +193,11 @@ public class ProjectModel {
   }
 
   /**
-   * The name of the project.
+   * The name of a project.
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of the project.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The name of a project.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -178,11 +212,11 @@ public class ProjectModel {
   }
 
   /**
-   * The description of the project.
+   * The description of a project.
    * @return description
   */
   
-  @Schema(name = "description", description = "The description of the project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
   }
@@ -267,22 +301,22 @@ public class ProjectModel {
     this.projectVersion = projectVersion;
   }
 
-  public ProjectModel status(StatusModel status) {
+  public ProjectModel status(StatusEnum status) {
     this.status = status;
     return this;
   }
 
   /**
-   * Get status
+   * A status of a project.
    * @return status
   */
-  @Valid 
-  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public StatusModel getStatus() {
+  
+  @Schema(name = "status", description = "A status of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public StatusEnum getStatus() {
     return status;
   }
 
-  public void setStatus(StatusModel status) {
+  public void setStatus(StatusEnum status) {
     this.status = status;
   }
 
