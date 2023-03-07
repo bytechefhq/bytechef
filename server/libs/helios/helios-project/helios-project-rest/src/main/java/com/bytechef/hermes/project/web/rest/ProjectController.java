@@ -19,7 +19,6 @@ package com.bytechef.hermes.project.web.rest;
 
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.facade.ProjectFacade;
 import com.bytechef.hermes.project.web.rest.model.CreateProjectWorkflowRequestModel;
@@ -103,17 +102,6 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<CategoryModel>>> getProjectCategories(ServerWebExchange exchange) {
-        return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    projectFacade.getProjectCategories()
-                        .stream()
-                        .map(category -> conversionService.convert(category, CategoryModel.class))
-                        .toList())));
-    }
-
-    @Override
     public Mono<ResponseEntity<Flux<ProjectModel>>> getProjects(
         List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
 
@@ -123,17 +111,6 @@ public class ProjectController implements ProjectsApi {
                     projectFacade.getProjects(categoryIds, tagIds)
                         .stream()
                         .map(project -> conversionService.convert(project, ProjectModel.class))
-                        .toList())));
-    }
-
-    @Override
-    public Mono<ResponseEntity<Flux<TagModel>>> getProjectTags(ServerWebExchange exchange) {
-        return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    projectFacade.getProjectTags()
-                        .stream()
-                        .map(tag -> conversionService.convert(tag, TagModel.class))
                         .toList())));
     }
 
