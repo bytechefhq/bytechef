@@ -63,6 +63,7 @@ public class WorkflowConfiguration {
     public JobFacade jobFacade(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker) {
+
         return new JobFacadeImpl(contextService, eventPublisher, jobService, messageBroker);
     }
 
@@ -80,6 +81,7 @@ public class WorkflowConfiguration {
     public WorkflowService workflowService(
         CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
+
         return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 }

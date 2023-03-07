@@ -15,26 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service;
+package com.bytechef.atlas.repository.jdbc;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.domain.Job;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskExecutionService {
+public interface CustomJobRepository {
 
-    TaskExecution create(TaskExecution taskExecution);
-
-    TaskExecution getTaskExecution(long id);
-
-    List<TaskExecution> getJobTaskExecutions(long jobId);
-
-    List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds);
-
-    List<TaskExecution> getParentTaskExecutions(long parentId);
-
-    TaskExecution update(TaskExecution taskExecution);
+    Page<Job> findAll(
+        String status, LocalDateTime startTime, LocalDateTime endTime, Long workflowId, Pageable pageable);
 }

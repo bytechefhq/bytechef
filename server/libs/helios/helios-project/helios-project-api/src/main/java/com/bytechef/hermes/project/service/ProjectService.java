@@ -37,7 +37,7 @@ public interface ProjectService {
 
     List<Project> getProjects();
 
-    List<Project> getProjects(List<Long> categoryIds, List<Long> tagIds);
+    List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds);
 
     Project update(long id, List<Tag> tags);
 

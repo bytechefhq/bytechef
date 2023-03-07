@@ -79,11 +79,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> getProjects() {
-        return getProjects(null, null);
+        return searchProjects(null, null);
     }
 
     @Override
-    public List<Project> getProjects(List<Long> categoryIds, List<Long> tagIds) {
+    public List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds) {
         Iterable<Project> projectIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {

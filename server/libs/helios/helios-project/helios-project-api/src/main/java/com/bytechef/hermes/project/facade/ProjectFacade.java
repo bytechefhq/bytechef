@@ -20,8 +20,11 @@ package com.bytechef.hermes.project.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.project.domain.Project;
+import com.bytechef.hermes.project.dto.ProjectExecution;
 import com.bytechef.tag.domain.Tag;
+import org.springframework.data.domain.Page;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,13 +44,18 @@ public interface ProjectFacade {
 
     List<Category> getProjectCategories();
 
-    List<Project> getProjects(List<Long> categoryIds, List<Long> tagIds);
-
     List<Tag> getProjectTags();
 
     List<Workflow> getProjectWorkflows(Long id);
 
+    Page<ProjectExecution> searchProjectExecutions(
+        String jobStatus, LocalDateTime jobStartTime, LocalDateTime jobEndTime, Long projectId, Long projectInstanceId,
+        Long workflowId, Integer pageNumber);
+
+    List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds);
+
     Project update(Long id, List<Tag> tags);
 
     Project update(Project project);
+
 }
