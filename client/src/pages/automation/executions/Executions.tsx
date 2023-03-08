@@ -41,74 +41,64 @@ export const Executions = () => {
     const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} =
         tableInstance;
 
-    const Status = (): JSX.Element => (
+    const StatusInput = (): JSX.Element => (
         <div className="p-4">
-            <h2 className="text-sm font-medium text-gray-500">Status</h2>
-
             <Input
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                type="text"
                 name="Status"
+                label="Status"
             />
         </div>
     );
 
     const StartTimeInput = (): JSX.Element => (
         <div className="p-4">
-            <h2 className="text-sm font-medium text-gray-500">Start time</h2>
-
             <Input
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                 type="date"
                 name="Start time"
+                label="Start time"
             />
         </div>
     );
 
     const EndTimeInput = (): JSX.Element => (
         <div className="p-4">
-            <h2 className="text-sm font-medium text-gray-500">End time</h2>
-
             <Input
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                 type="date"
                 name="End time"
+                label="End time"
             />
         </div>
     );
 
-    const Projects = (): JSX.Element => (
+    const ProjectsInput = (): JSX.Element => (
         <div className="p-4">
-            <h2 className="text-sm font-medium text-gray-500">Projects</h2>
-
             <Input
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                type="text"
                 name="Projects"
+                label="Projects"
             />
         </div>
     );
 
-    const Workflows = (): JSX.Element => (
+    const WorkflowsInput = (): JSX.Element => (
         <div className="p-4">
-            <h2 className="text-sm font-medium text-gray-500">Workflows</h2>
-
             <Input
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                type="text"
                 name="Workflows"
+                label="Workflows"
             />
         </div>
     );
 
-    const Instances = (): JSX.Element => (
+    const InstancesInput = (): JSX.Element => (
         <div className="p-4">
-            <h2 className="text-sm font-medium text-gray-500">Instances</h2>
-
             <Input
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                type="text"
                 name="Instances"
+                label="Instances"
             />
         </div>
     );
@@ -119,12 +109,18 @@ export const Executions = () => {
             leftSidebarHeader={
                 <>
                     <PageHeader leftSidebar title="Executions" />
-                    <Status />
+
+                    <StatusInput />
+
                     <StartTimeInput />
+
                     <EndTimeInput />
-                    <Projects />
-                    <Workflows />
-                    <Instances />
+
+                    <ProjectsInput />
+
+                    <WorkflowsInput />
+
+                    <InstancesInput />
                 </>
             }
         >
