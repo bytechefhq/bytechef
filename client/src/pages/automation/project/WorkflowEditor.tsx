@@ -17,6 +17,8 @@ import WorkflowNode from './nodes/WorkflowNode';
 import './WorkflowEditor.css';
 import useLayout from './hooks/useLayout';
 import {PlayIcon} from '@heroicons/react/24/outline';
+import RightSlideOver from './components/RightSlideOver';
+import useRightSlideOverStore from './stores/useRightSlideOverStore';
 
 const Workflow = (): JSX.Element => {
     const [viewportWidth, setViewportWidth] = useState(0);
@@ -115,10 +117,22 @@ const Workflow = (): JSX.Element => {
 };
 
 function WorkflowEditor() {
+    const {rightSlideOverOpen, setRightSlideOverOpen} =
+        useRightSlideOverStore();
+
     return (
-        <ReactFlowProvider>
-            <Workflow />
-        </ReactFlowProvider>
+        <>
+            <ReactFlowProvider>
+                <Workflow />
+            </ReactFlowProvider>
+
+            {rightSlideOverOpen && (
+                <RightSlideOver
+                    open={rightSlideOverOpen}
+                    closeSidebar={() => setRightSlideOverOpen(false)}
+                />
+            )}
+        </>
     );
 }
 
