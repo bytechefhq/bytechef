@@ -198,7 +198,7 @@ const IntegrationItem = ({
                 />
             )}
 
-            {showWorkflowDialog && (
+            {showWorkflowDialog && !!integration.id && (
                 <WorkflowDialog
                     id={integration.id}
                     visible
