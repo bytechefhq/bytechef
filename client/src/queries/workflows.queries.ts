@@ -7,10 +7,6 @@ export const WorkflowKeys = {
 };
 
 export const useGetWorkflowsQuery = () =>
-    useQuery<WorkflowModel[], Error>(
-        WorkflowKeys.workflows,
-        () => new WorkflowsApi().getWorkflows(),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<WorkflowModel[], Error>(WorkflowKeys.workflows, () =>
+        new WorkflowsApi().getWorkflows()
     );

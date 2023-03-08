@@ -16,12 +16,8 @@ export const ConnectionKeys = {
 };
 
 export const useGetConnectionQuery = (id: number) =>
-    useQuery<ConnectionModel, Error>(
-        ConnectionKeys.connection(id),
-        () => new ConnectionsApi().getConnection({id}),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<ConnectionModel, Error>(ConnectionKeys.connection(id), () =>
+        new ConnectionsApi().getConnection({id})
     );
 
 export const useGetConnectionsQuery = (filters: {
@@ -30,17 +26,10 @@ export const useGetConnectionsQuery = (filters: {
 }) =>
     useQuery<ConnectionModel[], Error>(
         ConnectionKeys.connectionList(filters),
-        () => new ConnectionsApi().getConnections(filters),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+        () => new ConnectionsApi().getConnections(filters)
     );
 
 export const useGetConnectionTagsQuery = () =>
-    useQuery<TagModel[], Error>(
-        ConnectionKeys.connectionTags,
-        () => new ConnectionsApi().getConnectionTags(),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<TagModel[], Error>(ConnectionKeys.connectionTags, () =>
+        new ConnectionsApi().getConnectionTags()
     );
