@@ -1,38 +1,34 @@
 /* eslint-disable react/jsx-key */
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import PageHeader from 'components/PageHeader/PageHeader';
-import {useMemo} from 'react';
 import {useTable} from 'react-table';
 import Input from 'components/Input/Input';
 import {DATA} from './ExecutionsData';
 
-export const Executions = () => {
-    const columns = useMemo(
-        () => [
-            {
-                Header: 'Status',
-                accessor: 'status',
-            },
-            {
-                Header: 'Project',
-                accessor: 'project',
-            },
-            {
-                Header: 'Workflow',
-                accessor: 'workflow',
-            },
-            {
-                Header: 'Instance',
-                accessor: 'instance',
-            },
-            {
-                Header: 'Completed time',
-                accessor: 'date',
-            },
-        ],
-        []
-    );
+const columns = [
+    {
+        Header: 'Status',
+        accessor: 'status',
+    },
+    {
+        Header: 'Project',
+        accessor: 'project',
+    },
+    {
+        Header: 'Workflow',
+        accessor: 'workflow',
+    },
+    {
+        Header: 'Instance',
+        accessor: 'instance',
+    },
+    {
+        Header: 'Completed time',
+        accessor: 'date',
+    },
+];
 
+export const Executions = () => {
     const tableInstance = useTable({
         columns,
         data: DATA,
@@ -41,68 +37,6 @@ export const Executions = () => {
     const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} =
         tableInstance;
 
-    const StatusInput = (): JSX.Element => (
-        <div className="p-4">
-            <Input
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                name="Status"
-                label="Status"
-            />
-        </div>
-    );
-
-    const StartTimeInput = (): JSX.Element => (
-        <div className="p-4">
-            <Input
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                type="date"
-                name="Start time"
-                label="Start time"
-            />
-        </div>
-    );
-
-    const EndTimeInput = (): JSX.Element => (
-        <div className="p-4">
-            <Input
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                type="date"
-                name="End time"
-                label="End time"
-            />
-        </div>
-    );
-
-    const ProjectsInput = (): JSX.Element => (
-        <div className="p-4">
-            <Input
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                name="Projects"
-                label="Projects"
-            />
-        </div>
-    );
-
-    const WorkflowsInput = (): JSX.Element => (
-        <div className="p-4">
-            <Input
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                name="Workflows"
-                label="Workflows"
-            />
-        </div>
-    );
-
-    const InstancesInput = (): JSX.Element => (
-        <div className="p-4">
-            <Input
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                name="Instances"
-                label="Instances"
-            />
-        </div>
-    );
-
     return (
         <LayoutContainer
             header={<PageHeader title="Workflow History" />}
@@ -110,17 +44,45 @@ export const Executions = () => {
                 <>
                     <PageHeader leftSidebar title="Executions" />
 
-                    <StatusInput />
+                    <div className="p-4">
+                        <Input
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            name="Status"
+                            label="Status"
+                        />
 
-                    <StartTimeInput />
+                        <Input
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            type="date"
+                            name="Start time"
+                            label="Start time"
+                        />
 
-                    <EndTimeInput />
+                        <Input
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            type="date"
+                            name="End time"
+                            label="End time"
+                        />
 
-                    <ProjectsInput />
+                        <Input
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            name="Projects"
+                            label="Projects"
+                        />
 
-                    <WorkflowsInput />
+                        <Input
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            name="Workflows"
+                            label="Workflows"
+                        />
 
-                    <InstancesInput />
+                        <Input
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            name="Instances"
+                            label="Instances"
+                        />
+                    </div>
                 </>
             }
         >
