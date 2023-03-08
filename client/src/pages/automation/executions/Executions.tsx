@@ -3,42 +3,8 @@ import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import PageHeader from 'components/PageHeader/PageHeader';
 import {useMemo} from 'react';
 import {useTable} from 'react-table';
-
-type Data = {
-    id: number;
-    date: string;
-    status: string;
-    project: string;
-    workflow: string;
-    instance: string;
-};
-
-const DATA: Data[] = [
-    {
-        id: 1,
-        project: 'Project one',
-        workflow: 'Workflow 1',
-        instance: 'Instance 1',
-        date: '01/01/2023',
-        status: 'Completed',
-    },
-    {
-        id: 2,
-        project: 'Project two',
-        workflow: 'Workflow 2',
-        instance: 'Instance 2',
-        date: '02/01/2023',
-        status: 'Failed',
-    },
-    {
-        id: 3,
-        project: 'Project three',
-        workflow: 'Workflow 3',
-        instance: 'Instance 3',
-        date: '03/01/2023',
-        status: 'Running',
-    },
-];
+import Input from 'components/Input/Input';
+import {DATA} from './ExecutionsData';
 
 export const Executions = () => {
     const columns = useMemo(
@@ -75,79 +41,77 @@ export const Executions = () => {
     const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} =
         tableInstance;
 
-    const Status = () => {
-        return (
-            <div className="p-4">
-                <h2 className="text-sm font-medium text-gray-500">Status</h2>
-                <input
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                    type="text"
-                />
-            </div>
-        );
-    };
+    const Status = (): JSX.Element => (
+        <div className="p-4">
+            <h2 className="text-sm font-medium text-gray-500">Status</h2>
 
-    const StartTime = () => {
-        return (
-            <div className="p-4">
-                <h2 className="text-sm font-medium text-gray-500">
-                    Start time
-                </h2>
-                <input
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                    type="date"
-                />
-            </div>
-        );
-    };
+            <Input
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                type="text"
+                name="Status"
+            />
+        </div>
+    );
 
-    const EndTime = () => {
-        return (
-            <div className="p-4">
-                <h2 className="text-sm font-medium text-gray-500">End time</h2>
-                <input
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                    type="date"
-                />
-            </div>
-        );
-    };
+    const StartTimeInput = (): JSX.Element => (
+        <div className="p-4">
+            <h2 className="text-sm font-medium text-gray-500">Start time</h2>
 
-    const Projects = () => {
-        return (
-            <div className="p-4">
-                <h2 className="text-sm font-medium text-gray-500">Projects</h2>
-                <input
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                    type="text"
-                />
-            </div>
-        );
-    };
+            <Input
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                type="date"
+                name="Start time"
+            />
+        </div>
+    );
 
-    const Workflows = () => {
-        return (
-            <div className="p-4">
-                <h2 className="text-sm font-medium text-gray-500">Workflows</h2>
-                <input
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                    type="text"
-                />
-            </div>
-        );
-    };
+    const EndTimeInput = (): JSX.Element => (
+        <div className="p-4">
+            <h2 className="text-sm font-medium text-gray-500">End time</h2>
 
-    const Instances = () => {
-        return (
-            <div className="p-4">
-                <h2 className="text-sm font-medium text-gray-500">Instances</h2>
-                <input
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                    type="text"
-                />
-            </div>
-        );
-    };
+            <Input
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                type="date"
+                name="End time"
+            />
+        </div>
+    );
+
+    const Projects = (): JSX.Element => (
+        <div className="p-4">
+            <h2 className="text-sm font-medium text-gray-500">Projects</h2>
+
+            <Input
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                type="text"
+                name="Projects"
+            />
+        </div>
+    );
+
+    const Workflows = (): JSX.Element => (
+        <div className="p-4">
+            <h2 className="text-sm font-medium text-gray-500">Workflows</h2>
+
+            <Input
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                type="text"
+                name="Workflows"
+            />
+        </div>
+    );
+
+    const Instances = (): JSX.Element => (
+        <div className="p-4">
+            <h2 className="text-sm font-medium text-gray-500">Instances</h2>
+
+            <Input
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                type="text"
+                name="Instances"
+            />
+        </div>
+    );
 
     return (
         <LayoutContainer
@@ -156,8 +120,8 @@ export const Executions = () => {
                 <>
                     <PageHeader leftSidebar title="Executions" />
                     <Status />
-                    <StartTime />
-                    <EndTime />
+                    <StartTimeInput />
+                    <EndTimeInput />
                     <Projects />
                     <Workflows />
                     <Instances />
@@ -186,6 +150,7 @@ export const Executions = () => {
                 <tbody {...getTableBodyProps()}>
                     {rows.map((row) => {
                         prepareRow(row);
+
                         return (
                             <tr
                                 {...row.getRowProps()}
