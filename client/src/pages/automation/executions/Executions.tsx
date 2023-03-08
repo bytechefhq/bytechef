@@ -45,43 +45,21 @@ export const Executions = () => {
                     <PageHeader leftSidebar title="Executions" />
 
                     <div className="p-4">
-                        <Input
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                            name="Status"
-                            label="Status"
-                        />
+                        <Input name="Status" label="Status" />
 
                         <Input
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                             type="date"
                             name="Start time"
                             label="Start time"
                         />
 
-                        <Input
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                            type="date"
-                            name="End time"
-                            label="End time"
-                        />
+                        <Input type="date" name="End time" label="End time" />
 
-                        <Input
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                            name="Projects"
-                            label="Projects"
-                        />
+                        <Input name="Projects" label="Projects" />
 
-                        <Input
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                            name="Workflows"
-                            label="Workflows"
-                        />
+                        <Input name="Workflows" label="Workflows" />
 
-                        <Input
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                            name="Instances"
-                            label="Instances"
-                        />
+                        <Input name="Instances" label="Instances" />
                     </div>
                 </>
             }
