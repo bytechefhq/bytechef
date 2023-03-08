@@ -23,6 +23,5 @@ export const useGetConnectionDefinitionQuery = (request?: Request) =>
         () => new ConnectionDefinitionsApi().getConnectionDefinition(request!),
         {
             enabled: !!request,
-            staleTime: 1 * 60 * 1000,
         }
     );

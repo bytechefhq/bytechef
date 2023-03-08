@@ -19,8 +19,5 @@ export const ComponentDefinitionKeys = {
 export const useGetComponentDefinitionsQuery = (request?: Request) =>
     useQuery<ComponentDefinitionBasicModel[], Error>(
         ComponentDefinitionKeys.componentDefinitions(request),
-        () => new ComponentDefinitionsApi().getComponentDefinitions(request),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+        () => new ComponentDefinitionsApi().getComponentDefinitions(request)
     );
