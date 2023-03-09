@@ -64,7 +64,6 @@
 		"react-hook-form": "^7.43.4",
 		"react-router-dom": "^6.8.2",
 		"react-select": "^5.7.0",
-		"react-table": "^7.8.0",
 		"reactflow": "^11.5.6",
 		"tailwind-merge": "^1.10.0",
 		"tailwindcss-radix": "^2.8.0",
