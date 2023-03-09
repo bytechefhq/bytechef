@@ -115,7 +115,7 @@ const Project: React.FC = () => {
     ) {
         return (
             <LayoutContainer
-                className="border-l border-gray-200 bg-gray-100"
+                bodyClassName="border-l border-gray-200 bg-gray-100"
                 header={
                     <header className="flex items-center">
                         <Button
