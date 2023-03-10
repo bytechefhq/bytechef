@@ -2,8 +2,8 @@ import React from 'react';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 
 export interface IToggleItem {
-    value: string;
     label: string;
+    value: string;
 }
 
 type ToggleGroupProps = {
@@ -12,24 +12,24 @@ type ToggleGroupProps = {
     onValueChange?(value: string): void;
 };
 
-const ToggleGroup: React.FC<ToggleGroupProps> = ({
+const ToggleGroup = ({
     defaultValue,
     toggleItems,
     onValueChange,
-}: ToggleGroupProps) => (
+}: ToggleGroupProps): JSX.Element => (
     <ToggleGroupPrimitive.Root
-        type="single"
         aria-label="Items"
+        className="flex px-2 py-4"
         defaultValue={defaultValue}
+        type="single"
         onValueChange={onValueChange}
-        className="flex px-2 py-4 hover:cursor-pointer"
     >
-        {toggleItems.map(({value, label}) => (
+        {toggleItems.map(({label, value}) => (
             <ToggleGroupPrimitive.Item
+                aria-label={label}
+                className="border-y border-gray-100 bg-white px-2.5 py-2 first:rounded-l-md first:border-x last:rounded-r-md last:border-x-2 focus:relative focus:outline-none focus-visible:z-20 focus-visible:ring focus-visible:ring-purple-500/75 radix-state-on:pointer-events-none radix-state-on:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:radix-state-on:bg-gray-900 [&:not(:last-child)]:border-r-transparent"
                 key={`group-item-${value}-${label}`}
                 value={value}
-                aria-label={label}
-                className="group w-full border border-solid border-gray-200 bg-gray-200 px-2.5 py-2 text-center text-sm font-medium text-gray-600 first:rounded-l-md last:rounded-r-md hover:border-gray-50 hover:bg-gray-50 focus:relative focus:outline-none focus-visible:z-20 focus-visible:ring focus-visible:ring-blue-500/75 radix-state-on:border-white radix-state-on:bg-white radix-state-on:text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:radix-state-on:border-transparent dark:radix-state-on:bg-gray-900"
             >
                 {label}
             </ToggleGroupPrimitive.Item>
