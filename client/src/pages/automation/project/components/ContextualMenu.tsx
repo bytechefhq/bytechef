@@ -33,13 +33,25 @@ const ContextualMenu = ({
         Array<TaskDispatcherDefinitionModel>
     >([]);
 
-    const {getEdge, getNode, setEdges, setNodes} = useReactFlow();
+    const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
     const handleItemClick = (
         clickedItem:
             | ComponentDefinitionBasicModel
             | TaskDispatcherDefinitionModel
     ) => {
+        const nodes = getNodes();
+
+        const nodeNames = nodes.map((node) => node.data.name);
+
+        const existingNodes = nodeNames.filter((name) =>
+            name?.includes(clickedItem.name)
+        );
+
+        const formattedName = existingNodes.length
+            ? `${clickedItem.name}-${existingNodes.length}`
+            : clickedItem.name;
+
         if (edge) {
             const clickedEdge = getEdge(id);
 
@@ -50,7 +62,7 @@ const ContextualMenu = ({
             const newWorkflowNode = {
                 data: {
                     label: clickedItem.display?.label,
-                    name: clickedItem?.name,
+                    name: formattedName,
                     icon: <Component1Icon className="h-8 w-8 text-gray-700" />,
                 },
                 position: {
@@ -128,7 +140,7 @@ const ContextualMenu = ({
                             type: 'workflow',
                             data: {
                                 label: clickedItem.display?.label,
-                                name: clickedItem?.name,
+                                name: formattedName,
                                 icon: (
                                     <Component1Icon className="h-8 w-8 text-gray-700" />
                                 ),
