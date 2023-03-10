@@ -67,7 +67,6 @@
 		"reactflow": "^11.5.6",
 		"tailwind-merge": "^1.10.0",
 		"tailwindcss-radix": "^2.8.0",
-		"use-local-storage-state": "18.1.2",
 		"yup": "^1.0.2",
 		"zustand": "^4.3.5"
 	},
