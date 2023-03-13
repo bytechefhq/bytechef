@@ -21,7 +21,7 @@ import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.connection.service.impl.ConnectionServiceImpl;
+import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
@@ -80,6 +80,7 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
+        connection.setKey("key");
         connection.setName("name1");
         connection.setTags(List.of(new Tag("tag1")));
 
@@ -95,6 +96,7 @@ public class ConnectionFacadeIntTest {
         Connection connection1 = new Connection();
 
         connection1.setComponentName("componentName");
+        connection1.setKey("key");
         connection1.setName("name1");
         connection1.setTags(List.of(new Tag("tag1")));
 
@@ -103,6 +105,7 @@ public class ConnectionFacadeIntTest {
         Connection connection2 = new Connection();
 
         connection2.setComponentName("componentName");
+        connection2.setKey("key");
         connection2.setName("name2");
         connection2.setTags(List.of(new Tag("tag1")));
 
@@ -126,6 +129,7 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
+        connection.setKey("key");
         connection.setName("name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -145,6 +149,7 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
+        connection.setKey("key");
         connection.setName("name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -173,6 +178,7 @@ public class ConnectionFacadeIntTest {
         Tag tag1 = tagRepository.save(new Tag("tag1"));
 
         connection.setComponentName("componentName");
+        connection.setKey("key");
         connection.setName("name");
         connection.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
@@ -186,6 +192,7 @@ public class ConnectionFacadeIntTest {
         connection = new Connection();
 
         connection.setComponentName("componentName");
+        connection.setKey("key");
         connection.setName("name2");
 
         tag1 = tagRepository.findById(tag1.getId())
@@ -213,6 +220,7 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
+        connection.setKey("key");
         connection.setName("name");
 
         Tag tag1 = new Tag("tag1");

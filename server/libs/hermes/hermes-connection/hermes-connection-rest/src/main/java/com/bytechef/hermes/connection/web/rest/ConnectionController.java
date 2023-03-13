@@ -52,6 +52,17 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
+    public Mono<ResponseEntity<ConnectionModel>> createConnection(
+        Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
+
+        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
+            conversionService.convert(
+                connectionFacade.create(
+                    conversionService.convert(connectionModel, Connection.class)),
+                ConnectionModel.class)));
+    }
+
+    @Override
     public Mono<ResponseEntity<Void>> deleteConnection(Long id, ServerWebExchange exchange) {
         connectionFacade.delete(id);
 
@@ -87,17 +98,6 @@ public class ConnectionController implements ConnectionsApi {
                         .stream()
                         .map(tag -> conversionService.convert(tag, TagModel.class))
                         .toList())));
-    }
-
-    @Override
-    public Mono<ResponseEntity<ConnectionModel>> createConnection(
-        Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
-
-        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.create(
-                    conversionService.convert(connectionModel, Connection.class)),
-                ConnectionModel.class)));
     }
 
     @Override
