@@ -41,14 +41,14 @@ public class HttpClientComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(HTTP_CLIENT)
         .display(display("HTTP Client").description("Makes an HTTP request and returns the response data."))
-        .connection(HttpClientConnection.CONNECTION_DEFINITION)
         .actions(
             HttpClientGetAction.ACTION_DEFINITION,
             HttpClientPostAction.ACTION_DEFINITION,
             HttpClientPutAction.ACTION_DEFINITION,
             HttpClientPatchAction.ACTION_DEFINITION,
             HttpClientDeleteAction.ACTION_DEFINITION,
-            HttpClientHeadAction.ACTION_DEFINITION);
+            HttpClientHeadAction.ACTION_DEFINITION)
+        .connection(HttpClientConnection.CONNECTION_DEFINITION)
         .filterCompatibleConnectionDefinitionsFunction(connectionDefinitions -> connectionDefinitions.stream()
             .filter(ConnectionDefinition::containsAuthorizations)
             .toList());
