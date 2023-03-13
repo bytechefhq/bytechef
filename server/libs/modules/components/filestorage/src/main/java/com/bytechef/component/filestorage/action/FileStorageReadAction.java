@@ -19,7 +19,6 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_ENTRY;
@@ -45,6 +44,6 @@ public class FileStorageReadAction {
         .perform(FileStorageReadAction::performRead);
 
     public static String performRead(Context context, Parameters parameters) {
-        return context.readFileToString(parameters.get(FILE_ENTRY, FileEntry.class));
+        return context.readFileToString(parameters.get(FILE_ENTRY, Context.FileEntry.class));
     }
 }

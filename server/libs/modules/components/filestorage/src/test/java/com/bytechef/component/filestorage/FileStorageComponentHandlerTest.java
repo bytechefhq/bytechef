@@ -26,7 +26,6 @@ import com.bytechef.component.filestorage.action.FileStorageReadAction;
 import com.bytechef.component.filestorage.action.FileStorageWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -53,14 +52,14 @@ public class FileStorageComponentHandlerTest {
     public void testPerformRead() {
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        FileEntry fileEntry = Mockito.mock(FileEntry.class);
+        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
             .thenReturn(fileEntry);
 
         FileStorageReadAction.performRead(context, parameters);
 
-        ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(FileEntry.class);
+        ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(Context.FileEntry.class);
 
         Mockito.verify(context)
             .readFileToString(fileEntryArgumentCaptor.capture());

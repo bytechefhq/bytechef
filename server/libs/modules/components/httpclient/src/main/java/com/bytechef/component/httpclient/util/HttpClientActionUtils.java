@@ -19,7 +19,6 @@ package com.bytechef.component.httpclient.util;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
@@ -178,11 +177,11 @@ public class HttpClientActionUtils {
         if (parameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {
                 payload = Payload.of(
-                    parameters.get(BODY_CONTENT, FileEntry.class),
+                    parameters.get(BODY_CONTENT, Context.FileEntry.class),
                     parameters.getString(BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == BodyContentType.FORM_DATA) {
                 payload = Payload.of(
-                    parameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()), bodyContentType);
+                    parameters.getMap(BODY_CONTENT, List.of(Context.FileEntry.class), Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
                 payload = Payload.of(parameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.JSON) {
