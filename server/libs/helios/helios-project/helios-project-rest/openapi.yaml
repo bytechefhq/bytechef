@@ -1,530 +1,533 @@
-openapi: 3.0.1
+---
+openapi: "3.0.1"
 info:
-  title: OpenAPI definition
-  version: v1
+  title: "OpenAPI definition"
+  version: "v1"
 servers:
-  - url: http://localhost:5173/api
+- url: "http://localhost:5173/api"
 paths:
   /project-categories:
     get:
-      description: Get categories.
-      summary: Get categories.
+      description: "Get categories."
+      summary: "Get categories."
       tags:
-        - project-categories
-      operationId: getProjectCategories
+      - "project-categories"
+      operationId: "getProjectCategories"
       responses:
         "200":
-          description: The list of categories.
+          description: "The list of categories."
           content:
             application/json:
               schema:
-                description: The response object that contains the array of categories.
-                type: array
+                description: "The response object that contains the array of categories."
+                type: "array"
                 items:
-                  $ref: '../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
+                  $ref: "../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category"
   /project-executions:
     get:
-      description: Get project executions.
-      summary: Get project executions.
+      description: "Get project executions."
+      summary: "Get project executions."
       tags:
-        - project-executions
-      operationId: getProjectExecutions
+      - "project-executions"
+      operationId: "getProjectExecutions"
       parameters:
-        - name: jobStatus
-          description: The status of an executed job
-          in: query
-          required: false
-          schema:
-            type: string
-            enum:
-              - CREATED
-              - STARTED
-              - STOPPED
-              - FAILED
-              - COMPLETED
-        - name: jobStartTime
-          description: The start time of a job.
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date-time
-        - name: jobEndTime
-          description: The end time of a job.
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date-time
-        - name: projectId
-          description: The id of aproject.
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int64
-        - name: projectInstanceId
-          description: The id of a project instance.
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int64
-        - name: workflowId
-          description: The id of a workflow.
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int64
-        - name: pageNumber
-          description: The number of the page to return.
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 0
+      - name: "jobStatus"
+        description: "The status of an executed job"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+          enum:
+          - "CREATED"
+          - "STARTED"
+          - "STOPPED"
+          - "FAILED"
+          - "COMPLETED"
+      - name: "jobStartTime"
+        description: "The start time of a job."
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+          format: "date-time"
+      - name: "jobEndTime"
+        description: "The end time of a job."
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+          format: "date-time"
+      - name: "projectId"
+        description: "The id of aproject."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "projectInstanceId"
+        description: "The id of a project instance."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "workflowId"
+        description: "The id of a workflow."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "pageNumber"
+        description: "The number of the page to return."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int32"
+          default: 0
       responses:
         "200":
-          description: The page of project executions.
+          description: "The page of project executions."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: "#/components/schemas/Page"
   /project-instances:
     get:
-      description: Get project instances.
-      summary: Get project instances.
+      description: "Get project instances."
+      summary: "Get project instances."
       tags:
-        - project-instances
-      operationId: getProjectInstances
+      - "project-instances"
+      operationId: "getProjectInstances"
       parameters:
-        - name: projectIds
-          description: The list of the project ids used for filtering project instances.
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int64
-        - name: tagIds
-          description: The list of tag ids of used for filtering project instances.
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int64
+      - name: "projectIds"
+        description: "The list of the project ids used for filtering project instances."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      - name: "tagIds"
+        description: "The list of tag ids of used for filtering project instances."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
-          description: The list of project instances.
+          description: "The list of project instances."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/ProjectInstance'
+                  $ref: "#/components/schemas/ProjectInstance"
   /project-tags:
     get:
-      description: Get project tags.
-      summary: Get project tags.
+      description: "Get project tags."
+      summary: "Get project tags."
       tags:
-        - project-tags
-      operationId: getProjectTags
+      - "project-tags"
+      operationId: "getProjectTags"
       responses:
         "200":
-          description: The list of project tags.
+          description: "The list of project tags."
           content:
             application/json:
               schema:
-                description: The response object that contains the array of tags.
-                type: array
+                description: "The response object that contains the array of tags."
+                type: "array"
                 items:
-                  $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+                  $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
   /projects:
     get:
-      description: Get projects.
-      summary: Get projects.
+      description: "Get projects."
+      summary: "Get projects."
       tags:
-        - projects
-      operationId: getProjects
+      - "projects"
+      operationId: "getProjects"
       parameters:
-        - name: categoryIds
-          description: The list of the category ids used for filtering projects.
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int64
-        - name: tagIds
-          description: The list of tag ids of used for filtering projects.
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int64
+      - name: "categoryIds"
+        description: "The list of the category ids used for filtering projects."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      - name: "tagIds"
+        description: "The list of tag ids of used for filtering projects."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
-          description: The list of projects.
+          description: "The list of projects."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/Project'
+                  $ref: "#/components/schemas/Project"
     post:
-      description: Create a new project.
-      summary: Create a new project.
+      description: "Create a new project."
+      summary: "Create a new project."
       tags:
-        - projects
-      operationId: createProject
+      - "projects"
+      operationId: "createProject"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Project'
+              $ref: "#/components/schemas/Project"
         required: true
       responses:
         "200":
-          description: The project object.
+          description: "The project object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
+                $ref: "#/components/schemas/Project"
   /projects/{id}:
     delete:
-      description: Delete an project.
-      summary: Delete an project.
+      description: "Delete an project."
+      summary: "Delete an project."
       tags:
-        - projects
-      operationId: deleteProject
+      - "projects"
+      operationId: "deleteProject"
       parameters:
-        - name: id
-          description: The id of an project.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
     get:
-      description: Get an project by id.
-      summary: Get an project by id.
+      description: "Get an project by id."
+      summary: "Get an project by id."
       tags:
-        - projects
-      operationId: getProject
+      - "projects"
+      operationId: "getProject"
       parameters:
-        - name: id
-          description: The id of an project.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The project object.
+          description: "The project object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
+                $ref: "#/components/schemas/Project"
     put:
-      description: Update an existing project.
-      summary: Update an existing project.
+      description: "Update an existing project."
+      summary: "Update an existing project."
       tags:
-        - projects
-      operationId: updateProject
+      - "projects"
+      operationId: "updateProject"
       parameters:
-        - name: id
-          description: The id of an project.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Project'
+              $ref: "#/components/schemas/Project"
         required: true
       responses:
         "200":
-          description: The updated project object.
+          description: "The updated project object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
+                $ref: "#/components/schemas/Project"
   /projects/{id}/duplicate:
     post:
-      description: Duplicates existing project.
-      summary: Duplicates existing project.
+      description: "Duplicates existing project."
+      summary: "Duplicates existing project."
       tags:
-        - projects
-      operationId: duplicateProject
+      - "projects"
+      operationId: "duplicateProject"
       parameters:
-        - name: id
-          description: The id of an project.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The duplicated project object.
+          description: "The duplicated project object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
+                $ref: "#/components/schemas/Project"
   /projects/{id}/workflows:
     get:
-      description: Get workflows for particular project.
-      summary: Get workflows for particular project.
+      description: "Get workflows for particular project."
+      summary: "Get workflows for particular project."
       tags:
-        - projects
-      operationId: getProjectWorkflows
+      - "projects"
+      operationId: "getProjectWorkflows"
       parameters:
-        - name: id
-          description: The id of an project.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The updated project object.
+          description: "The updated project object."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
+                  $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
     post:
-      description: Create new workflow and adds it to an existing project.
-      summary: Create new workflow and adds it to an existing project.
+      description: "Create new workflow and adds it to an existing project."
+      summary: "Create new workflow and adds it to an existing project."
       tags:
-        - projects
-      operationId: createProjectWorkflow
+      - "projects"
+      operationId: "createProjectWorkflow"
       parameters:
-        - name: id
-          description: The id of an project.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              type: object
+              type: "object"
               required:
-                - name
+              - "name"
               properties:
                 name:
-                  description: The workflow name.
-                  type: string
+                  description: "The workflow name."
+                  type: "string"
                 description:
-                  description: The workflow description.
-                  type: string
+                  description: "The workflow description."
+                  type: "string"
                 definition:
-                  description: The workflow definition.
-                  type: string
+                  description: "The workflow definition."
+                  type: "string"
         required: true
       responses:
         "200":
-          description: The updated project object.
+          description: "The updated project object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
+                $ref: "#/components/schemas/Project"
   /projects/{id}/tags:
     put:
-      description: Updates tags of an existing project.
-      summary: Updates tags of an existing project.
+      description: "Updates tags of an existing project."
+      summary: "Updates tags of an existing project."
       tags:
-        - projects
-      operationId: updateProjectTags
+      - "projects"
+      operationId: "updateProjectTags"
       parameters:
-        - name: id
-          description: The id of an project.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an project."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              description: The request object that contains the array of tags.
-              type: object
+              description: "The request object that contains the array of tags."
+              type: "object"
               properties:
                 tags:
-                  type: array
+                  type: "array"
                   items:
-                    $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+                    $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         required: true
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
 components:
   schemas:
     Page:
-      description: A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.
-      type: object
+      description: "A sublist of a list of objects. It allows gain information about\
+        \ the position of it in the containing entire list."
+      type: "object"
       properties:
         number:
-          description: The current page.
-          type: integer
+          description: "The current page."
+          type: "integer"
         size:
-          description: The size of the page.
-          type: integer
+          description: "The size of the page."
+          type: "integer"
         numberOfElements:
-          description: The number of elements.
-          type: integer
+          description: "The number of elements."
+          type: "integer"
         totalPages:
-          description: The total number of pages.
-          type: integer
+          description: "The total number of pages."
+          type: "integer"
         totalElements:
-          description: The total number of elements.
-          type: integer
+          description: "The total number of elements."
+          type: "integer"
         content:
-          description: List of elements.
-          type: array
+          description: "List of elements."
+          type: "array"
           items:
-            type: object
+            type: "object"
     Project:
-      description: A group of workflows that make one logical project.
-      type: object
+      description: "A group of workflows that make one logical project."
+      type: "object"
       required:
-        - name
+      - "name"
       properties:
         category:
-          $ref: '../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
+          $ref: "../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category"
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         id:
-          description: The id of a project.
-          type: integer
-          format: int64
+          description: "The id of a project."
+          type: "integer"
+          format: "int64"
           readOnly: true
         name:
-          description: The name of a project.
-          type: string
+          description: "The name of a project."
+          type: "string"
         description:
-          description: The description of a project.
-          type: string
+          description: "The description of a project."
+          type: "string"
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         lastPublishedDate:
-          description: The last published date.
-          type: string
-          format: date-time
+          description: "The last published date."
+          type: "string"
+          format: "date-time"
         projectVersion:
-          description: The version of a project.
-          type: integer
+          description: "The version of a project."
+          type: "integer"
         status:
-          description: A status of a project.
-          type: string
+          description: "A status of a project."
+          type: "string"
           enum:
-            - PUBLISHED
-            - UNPUBLISHED
+          - "PUBLISHED"
+          - "UNPUBLISHED"
         tags:
-          type: array
+          type: "array"
           items:
-            $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+            $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         workflowIds:
-          description: The workflow ids belonging to this project.
-          type: array
+          description: "The workflow ids belonging to this project."
+          type: "array"
           items:
-            type: string
+            type: "string"
             readOnly: true
         __version:
-          type: integer
+          type: "integer"
     ProjectExecution:
-      description: Contains information about execution of one of project workflows.
-      type: object
+      description: "Contains information about execution of one of project workflows."
+      type: "object"
       properties:
         instance:
-          $ref: '#/components/schemas/ProjectInstance'
+          $ref: "#/components/schemas/ProjectInstance"
         job:
-          $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Job'
+          $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Job"
         project:
-          $ref: '#/components/schemas/Project'
+          $ref: "#/components/schemas/Project"
         taskExecutions:
-          type: array
+          type: "array"
           items:
-            $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/TaskExecution'
+            $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
         workflow:
-            $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
+          $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
     ProjectInstance:
-      description: Contains specific configuration required for the execution of project workflows.
-      type: object
+      description: "Contains specific configuration required for the execution of\
+        \ project workflows."
+      type: "object"
       required:
-        - name
+      - "name"
       properties:
         configuration:
-          description: The configuration of an project instance.
-          type: object
+          description: "The configuration of an project instance."
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         id:
-          description: The id of a project instance.
-          type: integer
-          format: int64
+          description: "The id of a project instance."
+          type: "integer"
+          format: "int64"
           readOnly: true
         name:
-          description: The name of a project instance.
-          type: string
+          description: "The name of a project instance."
+          type: "string"
         project:
-          $ref: '#/components/schemas/Project'
+          $ref: "#/components/schemas/Project"
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         tags:
-          type: array
+          type: "array"
           items:
-            $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+            $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         __version:
-          type: integer
+          type: "integer"

@@ -1,673 +1,696 @@
-
-openapi: 3.0.1
+---
+openapi: "3.0.1"
 info:
-  title: OpenAPI definition
-  version: v1
+  title: "OpenAPI definition"
+  version: "v1"
 servers:
-  - url: http://localhost:5173/api
+- url: "http://localhost:5173/api"
 paths:
   /jobs:
     get:
-      description: Get a page of jobs.
-      summary: Get a page of jobs.
+      description: "Get a page of jobs."
+      summary: "Get a page of jobs."
       tags:
-        - jobs
-      operationId: getJobs
+      - "jobs"
+      operationId: "getJobs"
       parameters:
-        - name: pageNumber
-          description: The number of the page to return.
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 0
+      - name: "pageNumber"
+        description: "The number of the page to return."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int32"
+          default: 0
       responses:
         "200":
-          description: The page of jobs.
+          description: "The page of jobs."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: "#/components/schemas/Page"
     post:
-      description: Create a request for running a new job.
-      summary: Create a request for running a new job.
+      description: "Create a request for running a new job."
+      summary: "Create a request for running a new job."
       tags:
-        - jobs
-      operationId: createJob
+      - "jobs"
+      operationId: "createJob"
       requestBody:
-        description: Parameters required to run a job, for example '{"workflowId":"samples/hello","inputs":{"yourName":"Joe Jones"}}'
+        description: "Parameters required to run a job, for example '{\"workflowId\"\
+          :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/JobParameters'
+              $ref: "#/components/schemas/JobParameters"
         required: true
       responses:
         "200":
-          description: The id of the created job.
+          description: "The id of the created job."
           content:
             application/json:
               schema:
-                type: object
+                type: "object"
                 properties:
                   jobId:
-                    type: integer
-                    format: int64
+                    type: "integer"
+                    format: "int64"
   /jobs/latest:
     get:
-      description: Get the latest job.
-      summary: Get the latest job.
+      description: "Get the latest job."
+      summary: "Get the latest job."
       tags:
-        - jobs
-      operationId: getLatestJob
+      - "jobs"
+      operationId: "getLatestJob"
       responses:
         "200":
-          description: The latest job.
+          description: "The latest job."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Job'
+                $ref: "#/components/schemas/Job"
   /jobs/{id}:
     get:
-      description: Get a job by id.
-      summary: Get a job by id.
+      description: "Get a job by id."
+      summary: "Get a job by id."
       tags:
-        - jobs
-      operationId: getJob
+      - "jobs"
+      operationId: "getJob"
       parameters:
-        - name: id
-          description: The id of the job to return.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of the job to return."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The job.
+          description: "The job."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Job'
+                $ref: "#/components/schemas/Job"
   /jobs/{id}/restart:
     put:
-      description: Restart a job.
-      summary: Restart a job.
+      description: "Restart a job."
+      summary: "Restart a job."
       tags:
-        - jobs
-      operationId: restartJob
+      - "jobs"
+      operationId: "restartJob"
       parameters:
-        - name: id
-          description: The id of the job to restart.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of the job to restart."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
   /jobs/{id}/stop:
     put:
-      description: Stop a job.
-      summary: Stop a job.
+      description: "Stop a job."
+      summary: "Stop a job."
       tags:
-        - jobs
-      operationId: stopJob
+      - "jobs"
+      operationId: "stopJob"
       parameters:
-        - name: id
-          description: The id of the job to stop.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of the job to stop."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
   /jobs/{id}/task-executions:
     get:
-      description: Get task executions of a job.
-      summary: Get task executions of a job.
+      description: "Get task executions of a job."
+      summary: "Get task executions of a job."
       tags:
-        - task-executions
-      operationId: getJobTaskExecutions
+      - "task-executions"
+      operationId: "getJobTaskExecutions"
       parameters:
-        - name: id
-          description: The id of the job to return task executions for.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of the job to return task executions for."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: List of task executions.
+          description: "List of task executions."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/TaskExecution'
+                  $ref: "#/components/schemas/TaskExecution"
   /task-executions/{id}:
     get:
-      description: Get a task execution by id.
-      summary: Get a task execution by id.
+      description: "Get a task execution by id."
+      summary: "Get a task execution by id."
       tags:
-        - task-executions
-      operationId: getTaskExecution
+      - "task-executions"
+      operationId: "getTaskExecution"
       parameters:
-        - name: id
-          description: The id of the task execution to get.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of the task execution to get."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The task execution.
+          description: "The task execution."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TaskExecution'
+                $ref: "#/components/schemas/TaskExecution"
   /workflows:
     get:
-      description: Get workflow definitions.
-      summary: Get workflow definitions.
+      description: "Get workflow definitions."
+      summary: "Get workflow definitions."
       tags:
-        - workflows
-      operationId: getWorkflows
+      - "workflows"
+      operationId: "getWorkflows"
       responses:
         "200":
-          description: The list of workflows.
+          description: "The list of workflows."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/Workflow'
+                  $ref: "#/components/schemas/Workflow"
     post:
-      description: Create a new workflow.
-      summary: Create a new workflow.
+      description: "Create a new workflow."
+      summary: "Create a new workflow."
       tags:
-        - workflows
-      operationId: createWorkflow
+      - "workflows"
+      operationId: "createWorkflow"
       requestBody:
-        description: The workflow object that needs to be created.
+        description: "The workflow object that needs to be created."
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Workflow'
+              $ref: "#/components/schemas/Workflow"
         required: true
       responses:
         "200":
-          description: The workflow object.
+          description: "The workflow object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workflow'
+                $ref: "#/components/schemas/Workflow"
   /workflows/{id}:
     delete:
-      description: Delete a workflow.
-      summary: Delete a workflow.
+      description: "Delete a workflow."
+      summary: "Delete a workflow."
       tags:
-        - workflows
-      operationId: deleteWorkflow
+      - "workflows"
+      operationId: "deleteWorkflow"
       parameters:
-        - name: id
-          description: The id of the workflow to delete.
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: "id"
+        description: "The id of the workflow to delete."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
     get:
-      description: Get a workflow by id.
-      summary: Get a workflow by id.
+      description: "Get a workflow by id."
+      summary: "Get a workflow by id."
       tags:
-        - workflows
-      operationId: getWorkflow
+      - "workflows"
+      operationId: "getWorkflow"
       parameters:
-        - name: id
-          description: The id of the workflow to get.
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: "id"
+        description: "The id of the workflow to get."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
       responses:
         "200":
-          description: The workflow object.
+          description: "The workflow object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workflow'
+                $ref: "#/components/schemas/Workflow"
     put:
-      description: Update an existing workflow.
-      summary: Update an existing workflow.
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow."
       tags:
-        - workflows
-      operationId: updateWorkflow
+      - "workflows"
+      operationId: "updateWorkflow"
       parameters:
-        - name: id
-          description: The id of the workflow to update.
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: "id"
+        description: "The id of the workflow to update."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
       requestBody:
-        description: The workflow object that needs to updated.
+        description: "The workflow object that needs to updated."
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Workflow'
+              $ref: "#/components/schemas/Workflow"
         required: true
       responses:
         "200":
-          description: The updated workflow object.
+          description: "The updated workflow object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workflow'
+                $ref: "#/components/schemas/Workflow"
 components:
   schemas:
     ExecutionError:
-      description: Contains information about an error that happened during execution.
-      type: object
+      description: "Contains information about an error that happened during execution."
+      type: "object"
       properties:
         message:
-          description: The error message.
-          type: string
+          description: "The error message."
+          type: "string"
         stackTrace:
-          description: The error stacktrace.
-          type: array
+          description: "The error stacktrace."
+          type: "array"
           items:
-            type: string
+            type: "string"
     Job:
-      description: Represents an execution of a workflow.
-      type: object
+      description: "Represents an execution of a workflow."
+      type: "object"
       required:
-        - priority
-        - startTime
-        - status
+      - "priority"
+      - "startTime"
+      - "status"
       properties:
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         currentTask:
-          description: The index of the step on the job's workflow on which the job is working on right now.
-          type: integer
-          format: int32
+          description: "The index of the step on the job's workflow on which the job\
+            \ is working on right now."
+          type: "integer"
+          format: "int32"
           readOnly: true
         endTime:
-          description: The time execution entered end status COMPLETED, STOPPED, FAILED
-          type: string
-          format: date-time
+          description: "The time execution entered end status COMPLETED, STOPPED,\
+            \ FAILED"
+          type: "string"
+          format: "date-time"
         error:
-          $ref: '#/components/schemas/ExecutionError'
+          $ref: "#/components/schemas/ExecutionError"
         id:
-          description: Id of the job.
-          type: string
+          description: "Id of the job."
+          type: "string"
           readOnly: true
         inputs:
-          description: The key-value map of the inputs passed to the job when it was created.
-          type: object
+          description: "The key-value map of the inputs passed to the job when it\
+            \ was created."
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
           readOnly: true
         label:
-          description: The job's human-readable name.
-          type: string
+          description: "The job's human-readable name."
+          type: "string"
           readOnly: true
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         outputs:
-          description: The key-value map of the outputs returned.
-          type: object
+          description: "The key-value map of the outputs returned."
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
           readOnly: true
         parentTaskExecutionId:
-          description: The id of the parent task that created this job. Required for sub-flows.
-          type: integer
-          format: int64
+          description: "The id of the parent task that created this job. Required\
+            \ for sub-flows."
+          type: "integer"
+          format: "int64"
           readOnly: true
         priority:
-          description: The priority value.
-          type: integer
-          format: int32
+          description: "The priority value."
+          type: "integer"
+          format: "int32"
           readOnly: true
         startTime:
-          description: The time of when the job began.
-          type: string
-          format: date-time
+          description: "The time of when the job began."
+          type: "string"
+          format: "date-time"
           readOnly: true
         status:
-          description: The job's status.
-          type: string
+          description: "The job's status."
+          type: "string"
           enum:
-            - CREATED
-            - STARTED
-            - STOPPED
-            - FAILED
-            - COMPLETED
+          - "CREATED"
+          - "STARTED"
+          - "STOPPED"
+          - "FAILED"
+          - "COMPLETED"
           readOnly: true
         webhooks:
-          description: The list of the webhooks configured.
-          type: array
+          description: "The list of the webhooks configured."
+          type: "array"
           items:
-            type: object
+            type: "object"
             additionalProperties:
-              type: object
+              type: "object"
           readOnly: true
         workflowId:
-          type: string
+          type: "string"
           readOnly: true
     JobParameters:
-      description: Defines parameters used to execute a job.
-      type: object
+      description: "Defines parameters used to execute a job."
+      type: "object"
       required:
-        - workflowId
+      - "workflowId"
       properties:
         inputs:
-          description: The inputs expected by the workflow
-          type: object
+          description: "The inputs expected by the workflow"
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
         label:
-          description: The job's human-readable name
-          type: string
+          description: "The job's human-readable name"
+          type: "string"
         outputs:
-          description: The outputs expected by the workflow.
-          type: object
+          description: "The outputs expected by the workflow."
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
         parentTaskExecutionId:
-          description: The id of the parent task that created this job. Used for sub-flows.
-          type: string
+          description: "The id of the parent task that created this job. Used for\
+            \ sub-flows."
+          type: "string"
         priority:
-          description: The priority value used during execution of individual tasks.
-          type: integer
+          description: "The priority value used during execution of individual tasks."
+          type: "integer"
         workflowId:
-          description: Id of the workflow to execute.
-          type: string
+          description: "Id of the workflow to execute."
+          type: "string"
         webhooks:
-          description: The list of webhooks to register to receive notifications for certain events.
-          type: array
+          description: "The list of webhooks to register to receive notifications\
+            \ for certain events."
+          type: "array"
           items:
-            type: object
+            type: "object"
             additionalProperties:
-              type: object
+              type: "object"
     Page:
-      description: A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.
-      type: object
+      description: "A sublist of a list of objects. It allows gain information about\
+        \ the position of it in the containing entire list."
+      type: "object"
       properties:
         number:
-          description: The current page.
-          type: integer
+          description: "The current page."
+          type: "integer"
         size:
-          description: The size of the page.
-          type: integer
+          description: "The size of the page."
+          type: "integer"
         numberOfElements:
-          description: The number of elements.
-          type: integer
+          description: "The number of elements."
+          type: "integer"
         totalPages:
-          description: The total number of pages.
-          type: integer
+          description: "The total number of pages."
+          type: "integer"
         totalElements:
-          description: The total number of elements.
-          type: integer
+          description: "The total number of elements."
+          type: "integer"
         content:
-          description: List of elements.
-          type: array
+          description: "List of elements."
+          type: "array"
           items:
-            type: object
+            type: "object"
     TaskExecution:
-      description: Adds execution semantics to the task.
-      type: object
+      description: "Adds execution semantics to the task."
+      type: "object"
       required:
-          - jobId
-          - priority
-          - startTime
-          - status
+      - "jobId"
+      - "priority"
+      - "startTime"
+      - "status"
       properties:
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         endTime:
-          description: The time when this task instance ended (CANCELLED, FAILED, COMPLETED).
-          type: string
-          format: date-time
+          description: "The time when this task instance ended (CANCELLED, FAILED,\
+            \ COMPLETED)."
+          type: "string"
+          format: "date-time"
           readOnly: true
         error:
-          $ref: '#/components/schemas/ExecutionError'
+          $ref: "#/components/schemas/ExecutionError"
         executionTime:
-          description: The total time in ms for this task to execute (excluding wait time of the task in transit). i.e. actual execution time on a worker node.
-          type: integer
-          format: int64
+          description: "The total time in ms for this task to execute (excluding wait\
+            \ time of the task in transit). i.e. actual execution time on a worker\
+            \ node."
+          type: "integer"
+          format: "int64"
           readOnly: true
         id:
-          description: Id of the task execution.
-          type: string
+          description: "Id of the task execution."
+          type: "string"
           readOnly: true
         jobId:
-          description: The id of the job for which this task belongs to.
-          type: string
+          description: "The id of the job for which this task belongs to."
+          type: "string"
           readOnly: true
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         output:
-          description: The result output generated by the task handler which executed this task.
-          type: object
+          description: "The result output generated by the task handler which executed\
+            \ this task."
+          type: "object"
           readOnly: true
         parentId:
-          description: The id of the parent task, if this is a sub-task.
-          type: string
+          description: "The id of the parent task, if this is a sub-task."
+          type: "string"
           readOnly: true
         priority:
-          description: The priority value.
-          type: integer
-          format: int32
+          description: "The priority value."
+          type: "integer"
+          format: "int32"
           readOnly: true
         progress:
-          description: The current progress value, a number between 0 and 100.
-          type: integer
-          format: int32
+          description: "The current progress value, a number between 0 and 100."
+          type: "integer"
+          format: "int32"
           readOnly: true
         retry:
-          description: The maximum number of times that this task may retry.
-          type: integer
-          format: int32
+          description: "The maximum number of times that this task may retry."
+          type: "integer"
+          format: "int32"
           readOnly: true
         retryAttempts:
-          description: The number of times that this task has been retried.
-          type: integer
-          format: int32
+          description: "The number of times that this task has been retried."
+          type: "integer"
+          format: "int32"
           readOnly: true
         retryDelay:
-          description: The delay to introduce between each retry. Values are to be specified using the ISO-8601 format (excluding the PT prefix). e.g. 10s (ten seconds), 1m (one minute) etc.
-          type: string
+          description: "The delay to introduce between each retry. Values are to be\
+            \ specified using the ISO-8601 format (excluding the PT prefix). e.g.\
+            \ 10s (ten seconds), 1m (one minute) etc."
+          type: "string"
           readOnly: true
         retryDelayFactor:
-          description: The factor to use in order to calculate the actual delay time between each successive retry -- multiplying by the value of the retryDelay.
-          type: integer
-          format: int32
+          description: "The factor to use in order to calculate the actual delay time\
+            \ between each successive retry -- multiplying by the value of the retryDelay."
+          type: "integer"
+          format: "int32"
           readOnly: true
         startTime:
-          description: The time when this task instance was started.
-          type: string
-          format: date-time
+          description: "The time when this task instance was started."
+          type: "string"
+          format: "date-time"
           readOnly: true
         status:
-          description: The current status of this task.
-          type: string
+          description: "The current status of this task."
+          type: "string"
           enum:
-            - CREATED
-            - STARTED
-            - FAILED
-            - CANCELLED
-            - COMPLETED
+          - "CREATED"
+          - "STARTED"
+          - "FAILED"
+          - "CANCELLED"
+          - "COMPLETED"
           readOnly: true
         taskNumber:
-          description: The numeric order of the task in the workflow.
-          type: integer
-          format: int32
+          description: "The numeric order of the task in the workflow."
+          type: "integer"
+          format: "int32"
           readOnly: true
         retryDelayMillis:
-          description: The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.
-          type: integer
-          format: int64
+          description: "The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor."
+          type: "integer"
+          format: "int64"
           readOnly: true
         workflowTask:
-          $ref: '#/components/schemas/WorkflowTask'
+          $ref: "#/components/schemas/WorkflowTask"
         type:
-          description: The type of the task.
-          type: string
+          description: "The type of the task."
+          type: "string"
           readOnly: true
     Workflow:
-      description: The blueprint that describe the execution of a job.
-      type: object
+      description: "The blueprint that describe the execution of a job."
+      type: "object"
       properties:
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         definition:
-          type: string
+          type: "string"
           writeOnly: true
         format:
-          $ref: '#/components/schemas/WorkflowFormat'
+          $ref: "#/components/schemas/WorkflowFormat"
         id:
-          description: The id of the workflow.
-          type: string
+          description: "The id of the workflow."
+          type: "string"
           readOnly: true
         inputs:
-          description: The workflow's expected list of inputs.
-          type: array
+          description: "The workflow's expected list of inputs."
+          type: "array"
           items:
-            type: object
+            type: "object"
             additionalProperties:
-              type: object
+              type: "object"
           readOnly: true
         label:
-          description: The descriptive name for the workflow
-          type: string
+          description: "The descriptive name for the workflow"
+          type: "string"
           readOnly: true
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         outputs:
-          description: The workflow's list of expected outputs.
-          type: array
+          description: "The workflow's list of expected outputs."
+          type: "array"
           items:
-            type: object
+            type: "object"
             additionalProperties:
-              type: object
+              type: "object"
           readOnly: true
         sourceType:
-          description: The type of the source which stores the workflow definition.
-          type: string
+          description: "The type of the source which stores the workflow definition."
+          type: "string"
           enum:
-            - CLASSPATH
-            - FILESYSTEM
-            - GIT
-            - JDBC
+          - "CLASSPATH"
+          - "FILESYSTEM"
+          - "GIT"
+          - "JDBC"
         retry:
-          description: The maximum number of times a task may retry.
-          type: integer
-          format: int32
+          description: "The maximum number of times a task may retry."
+          type: "integer"
+          format: "int32"
           readOnly: true
         tasks:
-          description: The steps that make up the workflow.
-          type: array
+          description: "The steps that make up the workflow."
+          type: "array"
           items:
-            $ref: '#/components/schemas/WorkflowTask'
+            $ref: "#/components/schemas/WorkflowTask"
           readOnly: true
         __version:
-          type: integer
+          type: "integer"
     WorkflowFormat:
-      type: string
+      type: "string"
       enum:
-        - JSON
-        - YAML
+      - "JSON"
+      - "YAML"
     WorkflowTask:
-      description: Represents a definition of the task.
-      type: object
+      description: "Represents a definition of the task."
+      type: "object"
       required:
-          - name
-          - type
+      - "name"
+      - "type"
       properties:
         finalize:
-          description: The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.
-          type: array
+          description: "The (optional) list of tasks that are to be executed after\
+            \ execution of this task -- regardless of whether it had failed or not."
+          type: "array"
           items:
-            $ref: '#/components/schemas/WorkflowTask'
+            $ref: "#/components/schemas/WorkflowTask"
         label:
-          description: The human-readable description of the task.
-          type: string
+          description: "The human-readable description of the task."
+          type: "string"
         name:
-          description: The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
-          type: string
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
         node:
-          description: Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is "encoder", then the task will be routed to the "encoder" queue which is presumably subscribed to by worker nodes of "encoder" type.
-          type: string
+          description: "Defines the name of the type of the node that the task execution\
+            \ will be routed to. For instance, if the node value is \"encoder\", then\
+            \ the task will be routed to the \"encoder\" queue which is presumably\
+            \ subscribed to by worker nodes of \"encoder\" type."
+          type: "string"
         parameters:
-          description: Key-value map of task parameters.
-          type: object
+          description: "Key-value map of task parameters."
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
         post:
-          description: The (optional) list of tasks that are to be executed after the succesful execution of this task.
-          type: array
+          description: "The (optional) list of tasks that are to be executed after\
+            \ the succesful execution of this task."
+          type: "array"
           items:
-            $ref: '#/components/schemas/WorkflowTask'
+            $ref: "#/components/schemas/WorkflowTask"
         pre:
-          description: The (optional) list of tasks that are to be executed prior to this task.
-          type: array
+          description: "The (optional) list of tasks that are to be executed prior\
+            \ to this task."
+          type: "array"
           items:
-            $ref: '#/components/schemas/WorkflowTask'
+            $ref: "#/components/schemas/WorkflowTask"
         timeout:
-          description: The timeout expression which describes when this task should be deemed as timed-out.
-          type: string
+          description: "The timeout expression which describes when this task should\
+            \ be deemed as timed-out."
+          type: "string"
         type:
-          description: Type of the task.
-          type: string
+          description: "Type of the task."
+          type: "string"

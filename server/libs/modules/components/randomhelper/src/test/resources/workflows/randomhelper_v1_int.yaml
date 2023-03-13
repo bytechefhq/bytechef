@@ -1,13 +1,12 @@
-label: Random Int
-
+---
+label: "Random Int"
 outputs:
-  - name: randomNumber
-    value: ${randomNumber}
-
+- name: "randomNumber"
+  value: "${randomNumber}"
 tasks:
-  - name: randomNumber
-    label: Generate a random integer
-    type: random/v1/randomInt
-    parameters:
-      startInclusive: 0
-      endInclusive: 1000
+- name: "randomNumber"
+  label: "Generate a random integer"
+  type: "random/v1/randomInt"
+  parameters:
+    startInclusive: 0
+    endInclusive: 1000

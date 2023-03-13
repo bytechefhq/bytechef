@@ -1,12 +1,11 @@
-label: Rogue Demo
-
+---
+label: "Rogue Demo"
 tasks:
-  - label: Print a greeting
-    type: print
-    text: Hello rogue
-
-  - label: Rogue task
-    type: random/v1/randomFloat
-    parameters:
-      retry: 1
-      probability: 0.75
+- label: "Print a greeting"
+  type: "print"
+  text: "Hello rogue"
+- label: "Rogue task"
+  type: "random/v1/randomFloat"
+  parameters:
+    retry: 1
+    probability: 0.75

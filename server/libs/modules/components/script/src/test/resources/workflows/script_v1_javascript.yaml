@@ -1,29 +1,23 @@
+---
 inputs:
-  - name: factor
-    label: Factor
-    type: int
-    required: true
-
+- name: "factor"
+  label: "Factor"
+  type: "int"
+  required: true
 outputs:
-  - name: result
-    value: ${script1}
-
+- name: "result"
+  value: "${script1}"
 tasks:
-  - name: var1
-    label: Set value
-    type: var/v1/set
-    parameters:
-      value: 1000
-  - name: script1
-    type: script/v1/javascript
-    parameters:
-      input:
-        factor: ${factor}
-        var : ${var1}
-      script: >
-        function perform(input) {
-          print('Factor: ' + input.factor);
-          print('Var: ' + input.var);
-
-          return 2 * input.var * input.factor;
-        }
+- name: "var1"
+  label: "Set value"
+  type: "var/v1/set"
+  parameters:
+    value: 1000
+- name: "script1"
+  type: "script/v1/javascript"
+  parameters:
+    input:
+      factor: "${factor}"
+      var: "${var1}"
+    script: "function perform(input) {\n  print('Factor: ' + input.factor);\n  print('Var:\
+      \ ' + input.var);\n\n  return 2 * input.var * input.factor;\n}\n"
