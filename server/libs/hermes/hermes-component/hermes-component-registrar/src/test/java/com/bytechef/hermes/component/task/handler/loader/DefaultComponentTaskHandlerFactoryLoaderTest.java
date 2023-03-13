@@ -15,16 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.jdbc;
+package com.bytechef.hermes.component.task.handler.loader;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class DataSourceFactoryTest {
+/**
+ * @author Ivica Cardic
+ */
+public class DefaultComponentTaskHandlerFactoryLoaderTest {
 
     @Disabled
     @Test
-    public void testGetDataSource() {
+    public void testLoadComponentTaskHandlerFactories() {
         // TODO
     }
 }

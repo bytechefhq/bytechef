@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.jdbc;
+package com.bytechef.hermes.component.jdbc;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

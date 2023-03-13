@@ -17,7 +17,7 @@
 
 package com.bytechef.component.mysql;
 
-import com.bytechef.hermes.component.task.handler.JdbcComponentTaskHandler;
+import com.bytechef.hermes.component.task.handler.loader.JdbcComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ public class MySQLComponentDefinitionTest {
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/mysql_v1.json",
-            new JdbcComponentTaskHandler(
+            new JdbcComponentHandler(
                 null, new MySQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
                     .getDefinition());
     }

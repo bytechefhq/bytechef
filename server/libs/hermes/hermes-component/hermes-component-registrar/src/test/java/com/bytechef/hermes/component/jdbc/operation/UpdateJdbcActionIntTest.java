@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.jdbc.operation;
+package com.bytechef.hermes.component.jdbc.operation;
 
-import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.DELETE_KEY;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.COLUMNS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
-import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
-import com.bytechef.hermes.component.jdbc.operation.DeleteJdbcOperation;
-import com.bytechef.hermes.component.registrar.config.JdbcComponentRegistrarIntTestConfiguration;
+import com.bytechef.hermes.component.jdbc.config.JdbcComponentRegistrarIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,13 +48,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 @EmbeddedSql
 @SpringBootTest(classes = JdbcComponentRegistrarIntTestConfiguration.class)
-public class DeleteJdbcActionIntTest {
+public class UpdateJdbcActionIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private DeleteJdbcOperation deleteJdbcOperation;
+    private UpdateJdbcOperation updateJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -79,37 +79,48 @@ public class DeleteJdbcActionIntTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testUpdate() {
+        Context context = Mockito.mock(Context.class);
+
+        Mockito.when(context.fetchConnection())
+            .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
+
         Parameters parameters = Mockito.mock(Parameters.class);
 
+        Mockito.when(parameters.getList(COLUMNS, String.class, List.of()))
+            .thenReturn(List.of("name"));
         Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
-            .thenReturn(List.of(Map.of("id", "id1"), Map.of("id", "id2")));
-        Mockito.when(parameters.getString(DELETE_KEY, "id"))
-            .thenReturn("id");
+            .thenReturn(List.of(Map.of("id", "id2", "name", "name3")));
         Mockito.when(parameters.getString(SCHEMA, "public"))
             .thenReturn("public");
         Mockito.when(parameters.getRequiredString(TABLE))
             .thenReturn("test");
+        Mockito.when(parameters.getString(UPDATE_KEY, "id"))
+            .thenReturn("id");
 
-        Map<String, Integer> result = deleteJdbcOperation.execute(Mockito.mock(Context.class), parameters);
+        Map<String, Integer> result = updateJdbcOperation.execute(context, parameters);
 
-        Assertions.assertEquals(2, result.get("rows"));
+        Assertions.assertEquals(1, result.get("rows"));
+
+        Assertions.assertEquals(
+            "name3", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class));
     }
 
     @TestConfiguration
-    public static class DeleteJdbcActionIntTestConfiguration {
+    public static class UpdateJdbcActionIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        DeleteJdbcOperation deleteJdbcOperation() {
-            return new DeleteJdbcOperation(new JdbcExecutor(
+        UpdateJdbcOperation updateJdbcOperation() {
+            return new UpdateJdbcOperation(new JdbcExecutor(
                 null,
                 new DataSourceFactory() {
+
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        Context.Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
                         return dataSource;
                     }
                 },
