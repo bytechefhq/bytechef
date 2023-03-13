@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.facade.impl;
+package com.bytechef.hermes.definition.registry.facade;
 
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
@@ -33,15 +32,15 @@ import java.util.Objects;
  */
 public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade {
 
-    private final ConnectionService connectionService;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionFacadeImpl(
-        ConnectionService connectionService, ComponentDefinitionService componentDefinitionService) {
+        ComponentDefinitionService componentDefinitionService, ConnectionService connectionService) {
 
-        this.connectionService = connectionService;
         this.componentDefinitionService = componentDefinitionService;
+        this.connectionService = connectionService;
     }
 
     @Override

@@ -40,17 +40,17 @@ public class ComponentDefinitionServiceRSocketController {
         this.componentDefinitionService = componentDefinitionService;
     }
 
-    @MessageMapping("Service.getComponentDefinitions")
+    @MessageMapping("ComponentDefinitionService.getComponentDefinitions")
     public Mono<List<ComponentDefinition>> getComponentDefinitions() {
         return componentDefinitionService.getComponentDefinitionsMono();
     }
 
-    @MessageMapping("Service.getComponentDefinitionsForName")
+    @MessageMapping("ComponentDefinitionService.getComponentDefinitionsForName")
     public Mono<List<ComponentDefinition>> getComponentDefinitions(String name) {
         return componentDefinitionService.getComponentDefinitionsMono(name);
     }
 
-    @MessageMapping("Service.getComponentDefinition")
+    @MessageMapping("ComponentDefinitionService.getComponentDefinition")
     public Mono<ComponentDefinition> getComponentDefinition(Map<String, Object> map) {
         return componentDefinitionService.getComponentDefinitionMono((String) map.get("name"),
             (Integer) map.get("version"));

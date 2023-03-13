@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -27,9 +27,10 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ConnectionDefinitionMapper
-    extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
+public interface ModifiableTaskDispatcherDefinitionMapper
+    extends Converter<TaskDispatcherDSL.ModifiableTaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
 
     @Override
-    ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
+    TaskDispatcherDefinitionModel convert(
+        TaskDispatcherDSL.ModifiableTaskDispatcherDefinition taskDispatcherDefinition);
 }

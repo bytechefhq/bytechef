@@ -30,6 +30,7 @@ import com.bytechef.component.httpclient.action.HttpClientPutAction;
 import com.bytechef.component.httpclient.connection.HttpClientConnection;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -48,6 +49,9 @@ public class HttpClientComponentHandler implements ComponentHandler {
             HttpClientPatchAction.ACTION_DEFINITION,
             HttpClientDeleteAction.ACTION_DEFINITION,
             HttpClientHeadAction.ACTION_DEFINITION);
+        .filterCompatibleConnectionDefinitionsFunction(connectionDefinitions -> connectionDefinitions.stream()
+            .filter(ConnectionDefinition::containsAuthorizations)
+            .toList());
 
     @Override
     public ComponentDefinition getDefinition() {

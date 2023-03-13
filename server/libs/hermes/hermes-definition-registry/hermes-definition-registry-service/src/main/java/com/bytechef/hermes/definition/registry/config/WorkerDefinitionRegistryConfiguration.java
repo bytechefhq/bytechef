@@ -17,16 +17,18 @@
 
 package com.bytechef.hermes.definition.registry.config;
 
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.impl.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.definition.registry.service.impl.ActionDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.service.impl.ComponentDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.service.impl.ConnectionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,28 +43,31 @@ import java.util.List;
 public class WorkerDefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionService actionDefinitionService(List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        return new ActionDefinitionServiceImpl(componentDefinitionFactories);
+    ActionDefinitionService actionDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new ActionDefinitionServiceImpl(componentDefinitions);
     }
 
     @Bean
     ComponentDefinitionFacade componentDefinitionFacade(
-        ConnectionService connectionService, ComponentDefinitionService componentDefinitionService) {
+        ComponentDefinitionService componentDefinitionService, ConnectionService connectionService) {
 
-        return new ComponentDefinitionFacadeImpl(connectionService, componentDefinitionService);
+        return new ComponentDefinitionFacadeImpl(componentDefinitionService, connectionService);
     }
 
     @Bean
-    ComponentDefinitionService componentDefinitionService(
-        List<ComponentDefinitionFactory> componentDefinitionFactories) {
-
-        return new ComponentDefinitionServiceImpl(componentDefinitionFactories);
+    ComponentDefinitionService componentDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new ComponentDefinitionServiceImpl(componentDefinitions);
     }
 
     @Bean
-    ConnectionDefinitionService connectionDefinitionService(
-        List<ComponentDefinitionFactory> componentDefinitionFactories) {
+    ConnectionDefinitionFacade connectionDefinitionFacade(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService) {
 
-        return new ConnectionDefinitionServiceImpl(componentDefinitionFactories);
+        return new ConnectionDefinitionFacadeImpl(connectionDefinitionService, connectionService);
+    }
+
+    @Bean
+    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new ConnectionDefinitionServiceImpl(componentDefinitions);
     }
 }
