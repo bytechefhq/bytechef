@@ -3,15 +3,13 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -27,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ObjectProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
 public class ObjectPropertyAllOfModel {
 
   @JsonProperty("additionalProperties")
@@ -45,7 +43,7 @@ public class ObjectPropertyAllOfModel {
   private List<OptionModel> options = null;
 
   @JsonProperty("optionsDataSource")
-  private JsonNullable<Object> optionsDataSource = JsonNullable.undefined();
+  private OptionsDataSourceModel optionsDataSource;
 
   @JsonProperty("properties")
   @Valid
@@ -143,8 +141,8 @@ public class ObjectPropertyAllOfModel {
     this.options = options;
   }
 
-  public ObjectPropertyAllOfModel optionsDataSource(Object optionsDataSource) {
-    this.optionsDataSource = JsonNullable.of(optionsDataSource);
+  public ObjectPropertyAllOfModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+    this.optionsDataSource = optionsDataSource;
     return this;
   }
 
@@ -152,13 +150,13 @@ public class ObjectPropertyAllOfModel {
    * Get optionsDataSource
    * @return optionsDataSource
   */
-  
+  @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public JsonNullable<Object> getOptionsDataSource() {
+  public OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(JsonNullable<Object> optionsDataSource) {
+  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 
@@ -202,24 +200,13 @@ public class ObjectPropertyAllOfModel {
         Objects.equals(this.multipleValues, objectPropertyAllOf.multipleValues) &&
         Objects.equals(this.objectType, objectPropertyAllOf.objectType) &&
         Objects.equals(this.options, objectPropertyAllOf.options) &&
-        equalsNullable(this.optionsDataSource, objectPropertyAllOf.optionsDataSource) &&
+        Objects.equals(this.optionsDataSource, objectPropertyAllOf.optionsDataSource) &&
         Objects.equals(this.properties, objectPropertyAllOf.properties);
-  }
-
-  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
-    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(additionalProperties, multipleValues, objectType, options, hashCodeNullable(optionsDataSource), properties);
-  }
-
-  private static <T> int hashCodeNullable(JsonNullable<T> a) {
-    if (a == null) {
-      return 1;
-    }
-    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
+    return Objects.hash(additionalProperties, multipleValues, objectType, options, optionsDataSource, properties);
   }
 
   @Override

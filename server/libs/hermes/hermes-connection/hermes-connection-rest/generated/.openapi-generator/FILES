@@ -2,5 +2,6 @@ README.md
 pom.xml
 src/main/java/com/bytechef/hermes/connection/web/rest/ApiUtil.java
 src/main/java/com/bytechef/hermes/connection/web/rest/ConnectionsApi.java
+src/main/java/com/bytechef/hermes/connection/web/rest/Oauth2AppsApi.java
 src/main/java/com/bytechef/hermes/connection/web/rest/model/ConnectionModel.java
 src/main/java/com/bytechef/hermes/connection/web/rest/model/UpdateConnectionTagsRequestModel.java
