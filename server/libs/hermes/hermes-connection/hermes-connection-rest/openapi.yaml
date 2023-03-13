@@ -172,6 +172,22 @@ paths:
       responses:
         "200":
           description: "Successful operation."
+  /oauth2-apps:
+    get:
+      description: "Get registered OAuth2 apps."
+      summary: "Get registered OAuth2 apps."
+      tags:
+      - "oauth2"
+      operationId: "getOAuth2Apps"
+      responses:
+        "200":
+          description: "The list of OAuth2App object."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
 components:
   schemas:
     Connection:

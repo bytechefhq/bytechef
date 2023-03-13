@@ -57,6 +57,9 @@ public class ConnectionControllerIntTest {
     @Autowired
     private ConnectionMapper connectionMapper;
 
+    @MockBean
+    private com.bytechef.hermes.connection.config.OAuth2Properties oAuth2Properties;
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -187,7 +190,6 @@ public class ConnectionControllerIntTest {
     public void testPostConnection() {
         Connection connection = getConnection();
         ConnectionModel connectionModel = new ConnectionModel().componentName("componentName")
-            .connectionVersion(1)
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
@@ -225,7 +227,6 @@ public class ConnectionControllerIntTest {
 
         org.assertj.core.api.Assertions.assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
-            .hasFieldOrPropertyWithValue("connectionVersion", 1)
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("parameters", Map.of("key1", "value1"));
     }
