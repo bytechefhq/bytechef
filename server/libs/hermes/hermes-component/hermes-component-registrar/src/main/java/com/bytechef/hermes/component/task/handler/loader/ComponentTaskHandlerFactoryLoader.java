@@ -38,9 +38,9 @@ public interface ComponentTaskHandlerFactoryLoader {
 
     @SuppressFBWarnings("EI")
     record ComponentTaskHandlerFactory(
-        ComponentDefinition componentDefinition, List<TaskHandlerFactoryItem> taskHandlerFactoryItems) {
+        ComponentDefinition componentDefinition, List<TaskHandlerFactoryEntry> taskHandlerFactoryEntries) {
     }
 
-    record TaskHandlerFactoryItem(String actionDefinitionName, TaskHandlerFactory taskHandlerFactory) {
+    record TaskHandlerFactoryEntry(String actionDefinitionName, TaskHandlerFactory taskHandlerFactory) {
     }
 }
