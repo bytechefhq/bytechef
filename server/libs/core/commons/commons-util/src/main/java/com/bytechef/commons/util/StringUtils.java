@@ -17,17 +17,24 @@
 
 package com.bytechef.commons.util;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
-public final class OptionalUtils {
+public class StringUtils {
 
-    private OptionalUtils() {
+    public static String replaceAll(String string, String regex, String replacement) {
+        if (string == null) {
+            return null;
+        }
+
+        return string.replaceAll(regex, replacement);
     }
 
-    public static <T> T get(Optional<T> optional) {
-        return optional.orElseThrow(IllegalArgumentException::new);
+    public static String toLowerCase(String string) {
+        if (string == null) {
+            return null;
+        }
+
+        return string.toLowerCase();
     }
 }
