@@ -56,7 +56,7 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
                 .stream()
                 .map(serviceInstance -> rSocketRequesterBuilder
                     .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("Facade.getComponentDefinitions")
+                    .route("ComponentDefinitionFacade.getComponentDefinitions")
                     .data(new HashMap<>() {
                         {
                             put("connectionDefinitions", connectionDefinitions);

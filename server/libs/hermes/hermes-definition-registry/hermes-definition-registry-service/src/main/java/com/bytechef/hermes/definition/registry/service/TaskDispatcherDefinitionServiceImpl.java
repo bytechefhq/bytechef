@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.service.impl;
+package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

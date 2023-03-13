@@ -55,7 +55,7 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
             .websocket(ServiceInstanceUtils.toWebSocketUri(
                 ServiceInstanceUtils.filterServiceInstance(
                     discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
-            .route("Service.getComponentDefinitionAction")
+            .route("ActionDefinitionService.getComponentDefinitionAction")
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", actionName))
             .retrieveMono(ActionDefinition.class);
