@@ -119,6 +119,10 @@ subprojects {
             indentWithSpaces(4)
             endWithNewline()
         }
+        yaml {
+            target "**/*.yaml"
+            jackson()
+        }
     }
 
     check.dependsOn 'spotlessCheck'
