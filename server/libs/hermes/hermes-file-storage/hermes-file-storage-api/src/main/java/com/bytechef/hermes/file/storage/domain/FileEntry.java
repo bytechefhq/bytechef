@@ -23,14 +23,21 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.hermes.component.Context;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.tika.Tika;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
 public class FileEntry {
+
+    static {
+        MapValueUtils.addConverter(new FileEntryConverter());
+    }
 
     private final String extension;
     private final String mimeType;
@@ -75,14 +82,6 @@ public class FileEntry {
         this.url = url;
     }
 
-    public static com.bytechef.hermes.component.FileEntry toComponentFileEntry(Map<?, ?> source) {
-        return new FileEntryImpl(
-            (String) source.get("extension"),
-            (String) source.get("mimeType"),
-            (String) source.get("name"),
-            (String) source.get("url"));
-    }
-
     public String getExtension() {
         return extension;
     }
@@ -119,7 +118,7 @@ public class FileEntry {
         return Objects.hash(extension, mimeType, name, url);
     }
 
-    public com.bytechef.hermes.component.FileEntry toComponentFileEntry() {
+    public Context.FileEntry toContextFileEntry() {
         return new FileEntryImpl(this);
     }
 
@@ -140,7 +139,7 @@ public class FileEntry {
             + url + '\'' + '}';
     }
 
-    private static class FileEntryImpl implements com.bytechef.hermes.component.FileEntry {
+    private static class FileEntryImpl implements Context.FileEntry {
 
         private final String extension;
         private final String mimeType;
@@ -186,6 +185,18 @@ public class FileEntry {
                 ", name='" + name + '\'' +
                 ", url='" + url + '\'' +
                 '}';
+        }
+    }
+
+    private static class FileEntryConverter implements Converter<Map<?, ?>, Context.FileEntry> {
+
+        @Override
+        public Context.FileEntry convert(Map<?, ?> source) {
+            return new FileEntryImpl(
+                (String) source.get("extension"),
+                (String) source.get("mimeType"),
+                (String) source.get("name"),
+                (String) source.get("url"));
         }
     }
 }
