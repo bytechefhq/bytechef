@@ -20,7 +20,6 @@ package com.bytechef.component.xlsxfile.action;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -76,7 +75,7 @@ public class XlsxFileWriteAction {
         .outputSchema(fileEntry())
         .perform(XlsxFileWriteAction::performWrite);
 
-    public static FileEntry performWrite(Context context, Parameters parameters) {
+    public static Context.FileEntry performWrite(Context context, Parameters parameters) {
         String fileName = parameters.getString(FILENAME, getaDefaultFileName());
         @SuppressWarnings("unchecked")
         List<Map<String, ?>> rows = (List) parameters.getList(ROWS, Map.class, List.of());

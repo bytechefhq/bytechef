@@ -19,7 +19,6 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.CONTENT;
@@ -50,7 +49,7 @@ public class FileStorageWriteAction {
         .outputSchema(fileEntry())
         .perform(FileStorageWriteAction::performWrite);
 
-    public static FileEntry performWrite(Context context, Parameters parameters) {
+    public static Context.FileEntry performWrite(Context context, Parameters parameters) {
         Object content = parameters.getRequired(CONTENT);
         String fileName = parameters.getString(FILENAME, "file.txt");
 

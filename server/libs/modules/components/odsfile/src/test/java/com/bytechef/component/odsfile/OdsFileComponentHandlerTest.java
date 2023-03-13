@@ -32,7 +32,6 @@ import com.bytechef.component.odsfile.action.OdsFileReadAction;
 import com.bytechef.component.odsfile.action.OdsFileWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -325,8 +324,8 @@ public class OdsFileComponentHandlerTest {
         throws FileNotFoundException {
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getBoolean(HEADER_ROW, true))
             .thenReturn(headerRow);
         Mockito.when(parameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
@@ -339,7 +338,7 @@ public class OdsFileComponentHandlerTest {
             .thenReturn(readAsString);
 
         if (file != null) {
-            Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+            Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
         }
 

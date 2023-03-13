@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.jdbc;
 
-import com.bytechef.hermes.component.Connection;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +33,8 @@ import org.springframework.util.Assert;
 public class DataSourceFactory {
     private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
-    public DataSource getDataSource(Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+    public DataSource getDataSource(
+        Context.Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
         Assert.notNull(connection, "'connectionParameters' must not be null");
         Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
         Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");

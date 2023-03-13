@@ -22,6 +22,7 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
@@ -56,7 +57,7 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
             result = Map.of("rows", 0);
         } else {
             int[] rowsAffected = jdbcExecutor.batchUpdate(
-                context.getConnection(),
+                OptionalUtils.get(context.fetchConnection()),
                 "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
                 SqlParameterSourceUtils.createBatch(rows.toArray()));
 

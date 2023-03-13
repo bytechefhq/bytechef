@@ -20,7 +20,6 @@ package com.bytechef.component.aws.s3.action;
 import com.bytechef.component.aws.s3.util.AmazonS3Uri;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
@@ -69,7 +68,7 @@ public class AwsS3PutObjectAction {
         String key = amazonS3Uri.getKey();
 
         S3ClientBuilder builder = S3Client.builder();
-        FileEntry fileEntry = parameters.get(FILE_ENTRY, FileEntry.class);
+        Context.FileEntry fileEntry = parameters.get(FILE_ENTRY, Context.FileEntry.class);
 
         try (S3Client s3Client = builder.build()) {
             Path tempFilePath = Files.createTempFile("", ".tmp");

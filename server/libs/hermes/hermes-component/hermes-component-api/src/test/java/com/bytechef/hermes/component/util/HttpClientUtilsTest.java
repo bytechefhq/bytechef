@@ -79,7 +79,7 @@ public class HttpClientUtilsTest {
 
     @Test
     public void testCreateBodyPublisher() {
-        FileEntry fileEntry = Mockito.mock(FileEntry.class);
+        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
         Mockito.when(fileEntry.getName())
             .thenReturn("fileName");
@@ -149,7 +149,7 @@ public class HttpClientUtilsTest {
 
         //
 
-        fileEntry = Mockito.mock(FileEntry.class);
+        fileEntry = Mockito.mock(Context.FileEntry.class);
 
         Mockito.when(fileEntry.getMimeType())
             .thenReturn("text/plain");

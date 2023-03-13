@@ -29,11 +29,9 @@ public interface Context {
 
     Optional<Connection> fetchConnection();
 
-    Optional<Authorization> fetchConnectionAuthorization();
+    void applyConnectionAuthorization(Authorization.AuthorizationContext authorizationContext);
 
     Optional<String> fetchConnectionBaseUri();
-
-    Connection getConnection();
 
     InputStream getFileStream(FileEntry fileEntry);
 
@@ -44,4 +42,24 @@ public interface Context {
     FileEntry storeFileContent(String fileName, String data);
 
     FileEntry storeFileContent(String fileName, InputStream inputStream);
+
+    interface Connection {
+
+        boolean containsParameter(String name);
+
+        <T> T getParameter(String name);
+
+        <T> T getParameter(String name, T defaultValue);
+    }
+
+    interface FileEntry {
+
+        String getExtension();
+
+        String getMimeType();
+
+        String getName();
+
+        String getUrl();
+    }
 }

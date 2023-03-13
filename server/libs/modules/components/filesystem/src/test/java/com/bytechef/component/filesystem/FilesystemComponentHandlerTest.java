@@ -28,7 +28,6 @@ import com.bytechef.component.filesystem.action.FilesystemRmAction;
 import com.bytechef.component.filesystem.action.FilesystemWriteFileAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.File;
@@ -117,12 +116,12 @@ public class FilesystemComponentHandlerTest {
         Parameters parameters = Mockito.mock(Parameters.class);
         File file = getSampleFile();
 
-        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getRequiredString(FILENAME))
             .thenReturn(file.getAbsolutePath());
 
-        Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
         assertThat(FilesystemWriteFileAction.performWriteFile(context, parameters))
