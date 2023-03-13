@@ -17,26 +17,18 @@
 
 package com.bytechef.component.jira;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.constant.ComponentConstants.PASSWORD;
-import static com.bytechef.hermes.component.constant.ComponentConstants.USERNAME;
-import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.jira.action.CreateIssueAction;
 import com.bytechef.component.jira.action.GetIssueAction;
 import com.bytechef.component.jira.action.SearchForIssuesUsingJqlAction;
+import com.bytechef.component.jira.connection.JiraConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import java.util.List;
 
 /**
- * Provides the base implementation for the REST based component.
+ * Provides the base implementation for the REST-based component.
  *
  * @generated
  */
@@ -48,38 +40,7 @@ public abstract class AbstractJiraComponentHandler implements OpenApiComponentHa
                     .description("Jira Cloud platform REST API documentation")))
         .actions(modifyActions(CreateIssueAction.ACTION_DEFINITION, GetIssueAction.ACTION_DEFINITION,
             SearchForIssuesUsingJqlAction.ACTION_DEFINITION))
-        .connection(modifyConnection(
-            connection()
-                .baseUri(connection -> "https://your-domain.atlassian.net")
-                .authorizations(authorization(
-                    AuthorizationType.BASIC_AUTH.name()
-                        .toLowerCase(),
-                    AuthorizationType.BASIC_AUTH)
-                        .display(
-                            display("Basic Auth"))
-                        .properties(
-                            string(USERNAME)
-                                .label("Username")
-                                .required(true),
-                            string(PASSWORD)
-                                .label("Password")
-                                .required(true)),
-                    authorization(
-                        AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name()
-                            .toLowerCase(),
-                        AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                            .display(
-                                display("OAuth2 Authorization Code"))
-                            .properties(
-                                string(CLIENT_ID)
-                                    .label("Client Id")
-                                    .required(true),
-                                string(CLIENT_SECRET)
-                                    .label("Client Secret")
-                                    .required(true))
-                            .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
-                            .scopes(connection -> List.of("read:jira-work", "write:jira-work"))
-                            .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token"))));
+        .connection(modifyConnection(JiraConnection.CONNECTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -45,7 +45,7 @@ public class PetProperties {
             .placeholder("Add")
             .label("PhotoUrls")
             .required(true),
-        array("tags").items(object(null).properties(TagProperties.PROPERTIES))
+        array("tags").items(object().properties(TagProperties.PROPERTIES))
             .placeholder("Add")
             .label("Tags")
             .required(false),

@@ -105,105 +105,106 @@ public class SearchLeadsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null)
-            .properties(
-                object("data")
-                    .properties(array("items")
-                        .items(object(null).properties(number("result_score").label("Result_score")
-                            .description("Search result relevancy")
-                            .required(false),
-                            object("item").properties(string("id").label("Id")
-                                .description("The ID of the lead")
+        .outputSchema(
+            object()
+                .properties(
+                    object("data")
+                        .properties(array("items")
+                            .items(object().properties(number("result_score").label("Result_score")
+                                .description("Search result relevancy")
                                 .required(false),
-                                string("type").label("Type")
-                                    .description("The type of the item")
+                                object("item").properties(string("id").label("Id")
+                                    .description("The ID of the lead")
                                     .required(false),
-                                string("title").label("Title")
-                                    .description("The title of the lead")
-                                    .required(false),
-                                object("owner").properties(integer("id").label("Id")
-                                    .description("The ID of the owner of the lead")
-                                    .required(false))
-                                    .label("Owner")
-                                    .required(false),
-                                object("person").properties(integer("id").label("Id")
-                                    .description("The ID of the person the lead is associated with")
-                                    .required(false),
-                                    string("name").label("Name")
-                                        .description("The name of the person the lead is associated with")
+                                    string("type").label("Type")
+                                        .description("The type of the item")
+                                        .required(false),
+                                    string("title").label("Title")
+                                        .description("The title of the lead")
+                                        .required(false),
+                                    object("owner").properties(integer("id").label("Id")
+                                        .description("The ID of the owner of the lead")
                                         .required(false))
-                                    .label("Person")
-                                    .required(false),
-                                object("organization").properties(integer("id").label("Id")
-                                    .description("The ID of the organization the lead is associated with")
-                                    .required(false),
-                                    string("name").label("Name")
-                                        .description("The name of the organization the lead is associated with")
+                                        .label("Owner")
+                                        .required(false),
+                                    object("person").properties(integer("id").label("Id")
+                                        .description("The ID of the person the lead is associated with")
+                                        .required(false),
+                                        string("name").label("Name")
+                                            .description("The name of the person the lead is associated with")
+                                            .required(false))
+                                        .label("Person")
+                                        .required(false),
+                                    object("organization").properties(integer("id").label("Id")
+                                        .description("The ID of the organization the lead is associated with")
+                                        .required(false),
+                                        string("name").label("Name")
+                                            .description("The name of the organization the lead is associated with")
+                                            .required(false))
+                                        .label("Organization")
+                                        .required(false),
+                                    array("phones").items(string(null))
+                                        .placeholder("Add")
+                                        .label("Phones")
+                                        .required(false),
+                                    array("emails").items(string(null))
+                                        .placeholder("Add")
+                                        .label("Emails")
+                                        .required(false),
+                                    array("custom_fields").items(string(null).description("Custom fields"))
+                                        .placeholder("Add")
+                                        .label("Custom_fields")
+                                        .description("Custom fields")
+                                        .required(false),
+                                    array("notes").items(string(null).description("An array of notes"))
+                                        .placeholder("Add")
+                                        .label("Notes")
+                                        .description("An array of notes")
+                                        .required(false),
+                                    integer("value").label("Value")
+                                        .description("The value of the lead")
+                                        .required(false),
+                                    string("currency").label("Currency")
+                                        .description("The currency of the lead")
+                                        .required(false),
+                                    integer("visible_to").label("Visible_to")
+                                        .description("The visibility of the lead")
+                                        .required(false),
+                                    bool("is_archived").label("Is_archived")
+                                        .description("A flag indicating whether the lead is archived or not")
                                         .required(false))
-                                    .label("Organization")
-                                    .required(false),
-                                array("phones").items(string(null))
-                                    .placeholder("Add")
-                                    .label("Phones")
-                                    .required(false),
-                                array("emails").items(string(null))
-                                    .placeholder("Add")
-                                    .label("Emails")
-                                    .required(false),
-                                array("custom_fields").items(string(null).description("Custom fields"))
-                                    .placeholder("Add")
-                                    .label("Custom_fields")
-                                    .description("Custom fields")
-                                    .required(false),
-                                array("notes").items(string(null).description("An array of notes"))
-                                    .placeholder("Add")
-                                    .label("Notes")
-                                    .description("An array of notes")
-                                    .required(false),
-                                integer("value").label("Value")
-                                    .description("The value of the lead")
-                                    .required(false),
-                                string("currency").label("Currency")
-                                    .description("The currency of the lead")
-                                    .required(false),
-                                integer("visible_to").label("Visible_to")
-                                    .description("The visibility of the lead")
-                                    .required(false),
-                                bool("is_archived").label("Is_archived")
-                                    .description("A flag indicating whether the lead is archived or not")
+                                    .label("Item")
                                     .required(false))
-                                .label("Item")
-                                .required(false))
-                            .description("The array of leads"))
-                        .placeholder("Add")
-                        .label("Items")
-                        .description("The array of leads")
-                        .required(false))
-                    .label("Data")
-                    .required(false),
-                bool("success").label("Success")
-                    .description("If the response is successful or not")
-                    .required(false),
-                object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
-                    .description("Pagination start")
-                    .required(false),
-                    integer("limit").label("Limit")
-                        .description("Items shown per page")
+                                .description("The array of leads"))
+                            .placeholder("Add")
+                            .label("Items")
+                            .description("The array of leads")
+                            .required(false))
+                        .label("Data")
                         .required(false),
-                    bool("more_items_in_collection").label("More_items_in_collection")
-                        .description("Whether there are more list items in the collection than displayed")
+                    bool("success").label("Success")
+                        .description("If the response is successful or not")
                         .required(false),
-                    integer("next_start").label("Next_start")
-                        .description("Next pagination start")
+                    object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
+                        .description("Pagination start")
+                        .required(false),
+                        integer("limit").label("Limit")
+                            .description("Items shown per page")
+                            .required(false),
+                        bool("more_items_in_collection").label("More_items_in_collection")
+                            .description("Whether there are more list items in the collection than displayed")
+                            .required(false),
+                        integer("next_start").label("Next_start")
+                            .description("Next pagination start")
+                            .required(false))
+                        .label("Pagination")
+                        .description("Pagination details of the list")
                         .required(false))
-                    .label("Pagination")
-                    .description("Pagination details of the list")
-                    .required(false))
-                    .label("Additional_data")
-                    .required(false))
-            .metadata(
-                Map.of(
-                    "responseFormat", ResponseFormat.JSON)))
+                        .label("Additional_data")
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.29,\"item\":{\"id\":\"39c433f0-8a4c-11ec-8728-09968f0a1ca0\",\"type\":\"lead\",\"title\":\"John Doe lead\",\"owner\":{\"id\":1},\"person\":{\"id\":1,\"name\":\"John Doe\"},\"organization\":{\"id\":1,\"name\":\"John company\"},\"phones\":[],\"emails\":[\"john@doe.com\"],\"custom_fields\":[],\"notes\":[],\"value\":100,\"currency\":\"USD\",\"visible_to\":3,\"is_archived\":false}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}");
 }

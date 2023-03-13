@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class OperationsProperties {
     public static final List<Property> PROPERTIES = List.of(array("linkGroups")
-        .items(object(null).properties(LinkGroupProperties.PROPERTIES)
+        .items(object().properties(LinkGroupProperties.PROPERTIES)
             .description("Details a link group, which defines issue operations."))
         .placeholder("Add")
         .label("LinkGroups")

@@ -51,7 +51,7 @@ public class AddDealAction {
                 "path", "/deals", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object(null).properties(date("expected_close_date").label("Expected_close_date")
+        .properties(object().properties(date("expected_close_date").label("Expected_close_date")
             .description("The expected close date of the deal. In ISO 8601 format: YYYY-MM-DD.")
             .required(false),
             integer("stage_id").label("Stage_id")
@@ -109,7 +109,7 @@ public class AddDealAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object(null).properties(bool("success").label("Success")
+        .outputSchema(object().properties(bool("success").label("Success")
             .description("If the response is successful or not")
             .required(false),
             integer("email_messages_count").label("Email_messages_count")
@@ -139,7 +139,7 @@ public class AddDealAction {
             bool("active_flag").label("Active_flag")
                 .description("Whether the associated person is active or not")
                 .required(false),
-            array("phone").items(object(null).properties(string("label").label("Label")
+            array("phone").items(object().properties(string("label").label("Label")
                 .description("The type of the phone number")
                 .required(false),
                 string("value").label("Value")
@@ -156,7 +156,7 @@ public class AddDealAction {
             integer("value").label("Value")
                 .description("The ID of the person associated with the deal")
                 .required(false),
-            array("email").items(object(null).properties(string("label").label("Label")
+            array("email").items(object().properties(string("label").label("Label")
                 .description("The type of the email")
                 .required(false),
                 string("value").label("Value")
@@ -427,7 +427,7 @@ public class AddDealAction {
                     string("name").label("Name")
                         .description("The name of the person associated with the deal")
                         .required(false),
-                    array("email").items(object(null).properties(string("label").label("Label")
+                    array("email").items(object().properties(string("label").label("Label")
                         .description("The type of the email")
                         .required(false),
                         string("value").label("Value")
@@ -441,7 +441,7 @@ public class AddDealAction {
                         .label("Email")
                         .description("The emails of the person associated with the deal")
                         .required(false),
-                    array("phone").items(object(null).properties(string("label").label("Label")
+                    array("phone").items(object().properties(string("label").label("Label")
                         .description("The type of the phone number")
                         .required(false),
                         string("value").label("Value")

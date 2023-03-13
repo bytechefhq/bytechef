@@ -17,18 +17,8 @@
 
 package com.bytechef.component.pipedrive;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.ADD_TO;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.constant.ComponentConstants.KEY;
-import static com.bytechef.hermes.component.constant.ComponentConstants.VALUE;
-import static com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
-import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.pipedrive.action.AddDealAction;
 import com.bytechef.component.pipedrive.action.AddLeadAction;
@@ -50,9 +40,9 @@ import com.bytechef.component.pipedrive.action.SearchDealsAction;
 import com.bytechef.component.pipedrive.action.SearchLeadsAction;
 import com.bytechef.component.pipedrive.action.SearchOrganizationAction;
 import com.bytechef.component.pipedrive.action.SearchPersonsAction;
+import com.bytechef.component.pipedrive.connection.PipedriveConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import java.util.List;
 
 /**
  * Provides the base implementation for the REST based component.
@@ -74,47 +64,7 @@ public abstract class AbstractPipedriveComponentHandler implements OpenApiCompon
             GetOrganizationAction.ACTION_DEFINITION, GetPersonsAction.ACTION_DEFINITION,
             AddPersonAction.ACTION_DEFINITION, SearchPersonsAction.ACTION_DEFINITION,
             DeletePersonAction.ACTION_DEFINITION, GetPersonAction.ACTION_DEFINITION))
-        .connection(modifyConnection(
-            connection()
-                .baseUri(connection -> "https://api.pipedrive.com/v1")
-                .authorizations(authorization(
-                    AuthorizationType.API_KEY.name()
-                        .toLowerCase(),
-                    AuthorizationType.API_KEY)
-                        .display(
-                            display("API Key"))
-                        .properties(
-                            string(KEY)
-                                .label("Key")
-                                .required(true)
-                                .defaultValue("api_token")
-                                .hidden(true),
-                            string(VALUE)
-                                .label("Value")
-                                .required(true),
-                            string(ADD_TO)
-                                .label("Add to")
-                                .required(true)
-                                .defaultValue(ApiTokenLocation.QUERY_PARAMETERS.name())
-                                .hidden(true)),
-                    authorization(
-                        AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name()
-                            .toLowerCase(),
-                        AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                            .display(
-                                display("OAuth2 Authorization Code"))
-                            .properties(
-                                string(CLIENT_ID)
-                                    .label("Client Id")
-                                    .required(true),
-                                string(CLIENT_SECRET)
-                                    .label("Client Secret")
-                                    .required(true))
-                            .authorizationUrl(connection -> "https://oauth.pipedrive.com/oauth/authorize")
-                            .scopes(connection -> List.of("deals:full", "contacts:full", "search:read", "leads:read",
-                                "leads:full", "contacts:read", "deals:read"))
-                            .tokenUrl(connection -> "https://oauth.pipedrive.com/oauth/token")
-                            .refreshUrl(connection -> "https://oauth.pipedrive.com/oauth/token"))));
+        .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
