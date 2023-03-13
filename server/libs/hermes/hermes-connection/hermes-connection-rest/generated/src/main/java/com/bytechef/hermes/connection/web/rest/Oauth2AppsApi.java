@@ -3,7 +3,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.hermes.project.web.rest;
+package com.bytechef.hermes.connection.web.rest;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,41 +34,41 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:40.041735+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T10:00:29.397533+01:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-tags", description = "the project-tags API")
-public interface ProjectTagsApi {
+@Tag(name = "oauth2", description = "the oauth2 API")
+public interface Oauth2AppsApi {
 
     /**
-     * GET /project-tags : Get project tags.
-     * Get project tags.
+     * GET /oauth2-apps : Get registered OAuth2 apps.
+     * Get registered OAuth2 apps.
      *
-     * @return The list of project tags. (status code 200)
+     * @return The list of OAuth2App object. (status code 200)
      */
     @Operation(
-        operationId = "getProjectTags",
-        summary = "Get project tags.",
-        description = "Get project tags.",
-        tags = { "project-tags" },
+        operationId = "getOAuth2Apps",
+        summary = "Get registered OAuth2 apps.",
+        description = "Get registered OAuth2 apps.",
+        tags = { "oauth2" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of project tags.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.tag.web.rest.model.TagModel.class)))
+            @ApiResponse(responseCode = "200", description = "The list of OAuth2App object.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-tags",
+        value = "/oauth2-apps",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<Flux<com.bytechef.tag.web.rest.model.TagModel>>> getProjectTags(
+    default Mono<ResponseEntity<Flux<String>>> getOAuth2Apps(
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "[ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 5 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 5 } ]";
+                String exampleString = "[ \"\", \"\" ]";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
