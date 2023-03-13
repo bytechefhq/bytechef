@@ -69,7 +69,7 @@ export interface TaskDispatcherDefinitionModel {
      */
     resources?: ResourcesModel;
     /**
-     * 
+     * The version of a task dispatcher.
      * @type {number}
      * @memberof TaskDispatcherDefinitionModel
      */

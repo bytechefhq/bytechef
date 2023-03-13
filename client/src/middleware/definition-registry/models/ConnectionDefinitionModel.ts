@@ -67,7 +67,7 @@ export interface ConnectionDefinitionModel {
      * @type {DisplayModel}
      * @memberof ConnectionDefinitionModel
      */
-    display?: DisplayModel;
+    componentDisplay?: DisplayModel;
     /**
      * The properties of the connection.
      * @type {Array<PropertyModel>}
@@ -80,12 +80,6 @@ export interface ConnectionDefinitionModel {
      * @memberof ConnectionDefinitionModel
      */
     resources?: ResourcesModel;
-    /**
-     * The version of a connection.
-     * @type {number}
-     * @memberof ConnectionDefinitionModel
-     */
-    version?: number;
 }
 
 /**
@@ -110,10 +104,9 @@ export function ConnectionDefinitionModelFromJSONTyped(json: any, ignoreDiscrimi
         'authorizationRequired': !exists(json, 'authorizationRequired') ? undefined : json['authorizationRequired'],
         'authorizations': !exists(json, 'authorizations') ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationModelFromJSON)),
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
-        'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
+        'componentDisplay': !exists(json, 'componentDisplay') ? undefined : DisplayModelFromJSON(json['componentDisplay']),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'version': !exists(json, 'version') ? undefined : json['version'],
     };
 }
 
@@ -129,10 +122,9 @@ export function ConnectionDefinitionModelToJSON(value?: ConnectionDefinitionMode
         'authorizationRequired': value.authorizationRequired,
         'authorizations': value.authorizations === undefined ? undefined : ((value.authorizations as Array<any>).map(AuthorizationModelToJSON)),
         'componentName': value.componentName,
-        'display': DisplayModelToJSON(value.display),
+        'componentDisplay': DisplayModelToJSON(value.componentDisplay),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
-        'version': value.version,
     };
 }
 
