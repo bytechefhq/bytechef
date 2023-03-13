@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.project.facade.impl;
+package com.bytechef.hermes.project.facade;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -26,7 +26,6 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.dto.ProjectExecution;
-import com.bytechef.hermes.project.facade.ProjectFacade;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.hermes.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;

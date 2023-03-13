@@ -32,7 +32,7 @@ import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.facade.JobFacade;
-import com.bytechef.atlas.facade.impl.JobFacadeImpl;
+import com.bytechef.atlas.facade.JobFacadeImpl;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;

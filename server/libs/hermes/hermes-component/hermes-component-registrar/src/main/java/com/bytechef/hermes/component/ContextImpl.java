@@ -15,52 +15,41 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.impl;
+package com.bytechef.hermes.component;
 
 import static com.bytechef.hermes.connection.constant.ConnectionConstants.CONNECTION_ID;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.component.Connection;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 public class ContextImpl implements Context {
 
-    static {
-        MapValueUtils.addConverter(new FileEntryConverter());
-    }
-
-    private final ConnectionDefinition connectionDefinition;
+    private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final TaskExecution taskExecution;
 
     public ContextImpl(
-        ConnectionDefinition connectionDefinition,
+        ConnectionDefinitionFacade connectionDefinitionFacade,
         ConnectionService connectionService,
         EventPublisher eventPublisher,
         FileStorageService fileStorageService,
         TaskExecution taskExecution) {
 
-        this.connectionDefinition = connectionDefinition;
+        this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
@@ -69,54 +58,21 @@ public class ContextImpl implements Context {
 
     @Override
     public Optional<Connection> fetchConnection() {
-        Optional<Connection> connectionParametersOptional = Optional.empty();
-
-        if (CollectionUtils.containsKey(taskExecution.getParameters(), CONNECTION_ID)) {
-            connectionParametersOptional = Optional.of(getConnection());
-        }
-
-        return connectionParametersOptional;
+        return fetchConnectionId()
+            .map(connectionService::getConnection)
+            .map(com.bytechef.hermes.connection.domain.Connection::toContextConnection);
     }
 
     @Override
-    public Optional<Authorization> fetchConnectionAuthorization() {
-        if (connectionDefinition == null) {
-            return Optional.empty();
-        }
-
-        Optional<Connection> connectionOptional = fetchConnection();
-
-        if (connectionDefinition.isAuthorizationRequired() && connectionOptional.isEmpty()) {
-            throw new IllegalStateException(
-                "Connection for the instance of %s component is not defined".formatted(
-                    connectionDefinition.getComponentName()));
-        }
-
-        return connectionOptional
-            .flatMap(connection -> connectionDefinition.getAuthorizations()
-                .stream()
-                .filter(curAuthorization -> Objects.equals(
-                    curAuthorization.getName(), connection.getAuthorizationName()))
-                .findFirst());
+    public void applyConnectionAuthorization(Authorization.AuthorizationContext authorizationContext) {
+        fetchConnectionId()
+            .ifPresent(connection -> connectionDefinitionFacade.applyAuthorization(connection, authorizationContext));
     }
 
     @Override
     public Optional<String> fetchConnectionBaseUri() {
-        if (connectionDefinition == null) {
-            return Optional.empty();
-        }
-
-        return fetchConnection()
-            .map(connection -> connectionDefinition.getBaseUriFunction()
-                .apply(connection));
-    }
-
-    @Override
-    public Connection getConnection() {
-        com.bytechef.hermes.connection.domain.Connection connection = connectionService.getConnection(
-            MapValueUtils.getRequired(taskExecution.getParameters(), CONNECTION_ID));
-
-        return connection.toComponentConnection();
+        return fetchConnectionId()
+            .flatMap(connectionDefinitionFacade::fetchBaseUri);
     }
 
     @Override
@@ -150,15 +106,12 @@ public class ContextImpl implements Context {
         }
     }
 
+    private Optional<Long> fetchConnectionId() {
+        return Optional.ofNullable(MapValueUtils.getLong(taskExecution.getParameters(), CONNECTION_ID));
+    }
+
     private static FileEntry getFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
-        return fileEntry.toComponentFileEntry();
+        return fileEntry.toContextFileEntry();
     }
 
-    private static class FileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
-
-        @Override
-        public FileEntry convert(Map<?, ?> source) {
-            return com.bytechef.hermes.file.storage.domain.FileEntry.toComponentFileEntry(source);
-        }
-    }
 }
