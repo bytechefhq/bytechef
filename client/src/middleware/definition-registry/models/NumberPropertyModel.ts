@@ -25,6 +25,12 @@ import {
     OptionModelFromJSONTyped,
     OptionModelToJSON,
 } from './OptionModel';
+import type { OptionsDataSourceModel } from './OptionsDataSourceModel';
+import {
+    OptionsDataSourceModelFromJSON,
+    OptionsDataSourceModelFromJSONTyped,
+    OptionsDataSourceModelToJSON,
+} from './OptionsDataSourceModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -70,10 +76,10 @@ export interface NumberPropertyModel extends ValuePropertyModel {
     options?: Array<OptionModel>;
     /**
      * 
-     * @type {any}
+     * @type {OptionsDataSourceModel}
      * @memberof NumberPropertyModel
      */
-    optionsDataSource?: any | null;
+    optionsDataSource?: OptionsDataSourceModel;
 }
 
 /**
@@ -99,7 +105,7 @@ export function NumberPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
 }
 
@@ -116,7 +122,7 @@ export function NumberPropertyModelToJSON(value?: NumberPropertyModel | null): a
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': value.optionsDataSource,
+        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
     };
 }
 

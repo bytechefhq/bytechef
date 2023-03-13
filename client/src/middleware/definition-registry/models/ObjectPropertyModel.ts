@@ -25,6 +25,12 @@ import {
     OptionModelFromJSONTyped,
     OptionModelToJSON,
 } from './OptionModel';
+import type { OptionsDataSourceModel } from './OptionsDataSourceModel';
+import {
+    OptionsDataSourceModelFromJSON,
+    OptionsDataSourceModelFromJSONTyped,
+    OptionsDataSourceModelToJSON,
+} from './OptionsDataSourceModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
@@ -76,10 +82,10 @@ export interface ObjectPropertyModel extends ValuePropertyModel {
     options?: Array<OptionModel>;
     /**
      * 
-     * @type {any}
+     * @type {OptionsDataSourceModel}
      * @memberof ObjectPropertyModel
      */
-    optionsDataSource?: any | null;
+    optionsDataSource?: OptionsDataSourceModel;
     /**
      * The list of valid object property types.
      * @type {Array<PropertyModel>}
@@ -111,7 +117,7 @@ export function ObjectPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
-        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
     };
 }
@@ -129,7 +135,7 @@ export function ObjectPropertyModelToJSON(value?: ObjectPropertyModel | null): a
         'multipleValues': value.multipleValues,
         'objectType': value.objectType,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
-        'optionsDataSource': value.optionsDataSource,
+        'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
     };
 }
