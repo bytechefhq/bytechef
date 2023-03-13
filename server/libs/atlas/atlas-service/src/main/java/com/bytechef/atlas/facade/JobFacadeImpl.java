@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.facade.impl;
+package com.bytechef.atlas.facade;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.ContextService;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.tag.service.impl;
+package com.bytechef.tag.service;
 
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -64,7 +63,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public Tag getTag(long id) {
         return tagRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -105,7 +104,7 @@ public class TagServiceImpl implements TagService {
                     .ifPresentOrElse(resultTags::add, () -> resultTags.add(tagRepository.save(tag)));
             } else {
                 Tag curTag = tagRepository.findById(tag.getId())
-                    .orElseThrow();
+                    .orElseThrow(IllegalArgumentException::new);
 
                 curTag.setName(tag.getName());
                 curTag.setVersion(tag.getVersion());

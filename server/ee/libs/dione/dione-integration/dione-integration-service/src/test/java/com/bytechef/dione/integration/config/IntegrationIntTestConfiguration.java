@@ -21,7 +21,7 @@ import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
+import com.bytechef.atlas.service.WorkflowServiceImpl;
 
 import java.util.List;
 

@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service.impl;
+package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.repository.ContextRepository;
-import com.bytechef.atlas.service.ContextService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;

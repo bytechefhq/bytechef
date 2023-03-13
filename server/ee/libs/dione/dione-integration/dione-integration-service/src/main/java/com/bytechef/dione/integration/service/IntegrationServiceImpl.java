@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.integration.service.impl;
+package com.bytechef.dione.integration.service;
 
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.dione.integration.repository.IntegrationRepository;
@@ -23,7 +23,6 @@ import com.bytechef.dione.integration.repository.IntegrationRepository;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import com.bytechef.dione.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
@@ -74,7 +73,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Override
     public Integration getIntegration(long id) {
         return integrationRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override

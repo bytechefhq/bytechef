@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.project.service.impl;
+package com.bytechef.hermes.project.service;
 
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.repository.ProjectRepository;
@@ -23,7 +23,6 @@ import com.bytechef.hermes.project.repository.ProjectRepository;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import com.bytechef.hermes.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
@@ -74,7 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project getProject(long id) {
         return projectRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service.impl;
+package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
@@ -24,7 +24,6 @@ import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.service.JobService;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -72,7 +71,7 @@ public class JobServiceImpl implements JobService {
                 .spliterator(), false))
             .filter(curWorkflow -> Objects.equals(workflowId, curWorkflow.getId()))
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
 
@@ -119,7 +118,7 @@ public class JobServiceImpl implements JobService {
     @Transactional(readOnly = true)
     public Job getJob(@NonNull long id) {
         return jobRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -137,7 +136,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Job resume(long id) {
         Job job = jobRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
 
         Assert.notNull(job, String.format("Unknown job %s", id));
         Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
@@ -163,7 +162,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Job start(long id) {
         Job job = jobRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
 
         job.setCurrentTask(0);
         job.setStartTime(new Date());
@@ -177,7 +176,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Job stop(long id) {
         Job job = jobRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
 
         Assert.isTrue(
             job.getStatus() == Job.Status.STARTED,

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.service.impl;
+package com.bytechef.hermes.connection.service;
 
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
-import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -50,6 +50,8 @@ public class ConnectionServiceImpl implements ConnectionService {
         Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
         Assert.hasText(connection.getName(), "'name' must not be empty");
 
+        connection.setKey(StringUtils.toLowerCase(StringUtils.replaceAll(connection.getName(), "[^a-zA-Z0-9]", "")));
+
         return connectionRepository.save(connection);
     }
 
@@ -62,7 +64,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Transactional(readOnly = true)
     public Connection getConnection(long id) {
         return connectionRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -103,6 +105,6 @@ public class ConnectionServiceImpl implements ConnectionService {
         return connectionRepository
             .findById(Objects.requireNonNull(connection.getId()))
             .map(curConnection -> connectionRepository.save(curConnection.update(connection)))
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 }

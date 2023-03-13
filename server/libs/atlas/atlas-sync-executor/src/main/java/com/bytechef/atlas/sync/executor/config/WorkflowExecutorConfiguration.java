@@ -30,11 +30,11 @@ import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.service.impl.ContextServiceImpl;
-import com.bytechef.atlas.service.impl.CounterServiceImpl;
-import com.bytechef.atlas.service.impl.JobServiceImpl;
-import com.bytechef.atlas.service.impl.TaskExecutionServiceImpl;
-import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
+import com.bytechef.atlas.service.ContextServiceImpl;
+import com.bytechef.atlas.service.CounterServiceImpl;
+import com.bytechef.atlas.service.JobServiceImpl;
+import com.bytechef.atlas.service.TaskExecutionServiceImpl;
+import com.bytechef.atlas.service.WorkflowServiceImpl;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistrar;
@@ -58,10 +58,10 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
     private ConfigurableListableBeanFactory beanFactory;
 
     @Autowired(required = false)
-    private List<TaskHandlerRegistrar> taskHandlerRegistrars = List.of();
+    private TaskHandlerRegistrar taskHandlerRegistrar;
 
     public void afterPropertiesSet() {
-        for (TaskHandlerRegistrar taskHandlerRegistrar : taskHandlerRegistrars) {
+        if (taskHandlerRegistrar != null) {
             taskHandlerRegistrar.registerTaskHandlers(beanFactory);
         }
     }
