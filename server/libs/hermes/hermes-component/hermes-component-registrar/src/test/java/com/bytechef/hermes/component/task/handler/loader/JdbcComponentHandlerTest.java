@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar;
+package com.bytechef.hermes.component.task.handler.loader;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,11 +23,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class OpenApiComponentTaskHandlerRegistrarTest {
+public class JdbcComponentHandlerTest {
 
     @Disabled
     @Test
-    public void testCreateTaskHandler() {
+    public void testGetDefinition() {
         // TODO
     }
 }
