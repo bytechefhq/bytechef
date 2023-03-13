@@ -1,280 +1,752 @@
-openapi: 3.0.1
+---
+openapi: "3.0.1"
 info:
-  title: OpenAPI definition
-  version: v1
+  title: "OpenAPI definition"
+  version: "v1"
 servers:
-  - url: http://localhost:5173/api
+- url: "http://localhost:5173/api"
 paths:
   /component-definitions:
     get:
-      description: Get all component definitions.
-      summary: Get all component definitions.
+      description: "Get all component definitions."
+      summary: "Get all component definitions."
       tags:
-        - component-definitions
-      operationId: getComponentDefinitions
+      - "component-definitions"
+      operationId: "getComponentDefinitions"
       parameters:
-        - name: connectionDefinitions
-          description: Use for filtering components which define connection definitions.
-          in: query
-          required: false
-          schema:
-            type: boolean
-        - name: connectionInstances
-          description: Use for filtering components which have connection instances created.
-          in: query
-          required: false
-          schema:
-            type: boolean
+      - name: "connectionDefinitions"
+        description: "Use for filtering components which define connection definitions."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      - name: "connectionInstances"
+        description: "Use for filtering components which have connection instances\
+          \ created."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/ComponentDefinitionBasic'
+                  $ref: "#/components/schemas/ComponentDefinitionBasic"
+  /component-definitions/{name}/{version}/actions/{actionName}:
+    get:
+      description: "Get an action of a component definition."
+      summary: "Get an action of a component definition."
+      tags:
+      - "action-definitions"
+      operationId: "getActionDefinition"
+      parameters:
+      - name: "name"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "version"
+        description: "The version of the component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "actionName"
+        description: "The name of the action to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionDefinition"
+  /component-definitions/{name}/connection-definition:
+    get:
+      description: "Get connection definition for a component."
+      summary: "Get connection definition for a component."
+      tags:
+      - "connection-definitions"
+      operationId: "getComponentConnectionDefinition"
+      parameters:
+      - name: "name"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionDefinition"
+  /component-definitions/{name}/connection-definitions:
+    get:
+      description: "Get all compatible connection definitions for a component."
+      summary: "Get all compatible connection definitions for a component."
+      tags:
+      - "connection-definitions"
+      operationId: "getComponentConnectionDefinitions"
+      parameters:
+      - name: "name"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ConnectionDefinitionBasic"
   /component-definitions/{name}:
     get:
-      description: Get all component definition versions of a component definition.
-      summary: Get all component definition versions of a component definition.
+      description: "Get all component definition versions of a component definition."
+      summary: "Get all component definition versions of a component definition."
       tags:
-        - component-definitions
-      operationId: getComponentDefinitionVersions
+      - "component-definitions"
+      operationId: "getComponentDefinitionVersions"
       parameters:
-        - name: name
-          description: The name of the component to get.
-          required: true
-          in: path
-          schema:
-            type: string
+      - name: "name"
+        description: "The name of the component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/ComponentDefinitionBasic'
+                  $ref: "#/components/schemas/ComponentDefinitionBasic"
   /component-definitions/{name}/{version}:
     get:
-      description: Get a component definition.
-      summary: Get a component definition.
+      description: "Get a component definition."
+      summary: "Get a component definition."
       tags:
-        - component-definitions
-      operationId: getComponentDefinition
+      - "component-definitions"
+      operationId: "getComponentDefinition"
       parameters:
-        - name: name
-          description: The name of the component to get.
-          required: true
-          in: path
-          schema:
-            type: string
-        - name: version
-          description: The version of the component to get.
-          required: true
-          in: path
-          schema:
-            type: integer
+      - name: "name"
+        description: "The name of the component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "version"
+        description: "The version of the component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ComponentDefinitionWithBasicActions'
-  /component-definitions/{componentName}/{componentVersion}/actions/{actionName}:
-    get:
-      description: Get an action of a component definition.
-      summary: Get an action of a component definition.
-      tags:
-        - action-definitions
-      operationId: getActionDefinition
-      parameters:
-        - name: componentName
-          description: The name of the component.
-          required: true
-          in: path
-          schema:
-            type: string
-        - name: componentVersion
-          description: The version of the component to get.
-          required: true
-          in: path
-          schema:
-            type: integer
-        - name: actionName
-          description: The name of the action to get.
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Successful operation.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ActionDefinition'
+                $ref: "#/components/schemas/ComponentDefinitionWithBasicActions"
   /connection-definitions:
     get:
-      description: Get all connection definitions.
-      summary: Get all connection definitions.
+      description: "Get all connection definitions."
+      summary: "Get all connection definitions."
       tags:
-        - connection-definitions
-      operationId: getConnectionDefinitions
+      - "connection-definitions"
+      operationId: "getConnectionDefinitions"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/ConnectionDefinitionBasic'
-  /connection-definitions/{componentName}:
-    get:
-      description: Get all connection definitions for a component.
-      summary: Get all connection definitions for a component.
-      tags:
-        - connection-definitions
-      operationId: getComponentConnectionDefinitions
-      parameters:
-        - name: componentName
-          description: The name of the component.
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Successful operation.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ConnectionDefinitionBasic'
-  /connection-definitions/{componentName}/{componentVersion}:
-    get:
-      description: Get a connection definition of a component definition.
-      summary: Get a connection definition of a component definition.
-      tags:
-        - connection-definitions
-      operationId: getConnectionDefinition
-      parameters:
-        - name: componentName
-          description: The name of the component.
-          required: true
-          in: path
-          schema:
-            type: string
-        - name: componentVersion
-          description: The version of the component to get.
-          required: true
-          in: path
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Successful operation.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConnectionDefinition'
+                  $ref: "#/components/schemas/ConnectionDefinitionBasic"
   /task-dispatcher-definitions:
     get:
-      description: Get all task dispatcher definitions.
-      summary: Get all task dispatcher definitions.
+      description: "Get all task dispatcher definitions."
+      summary: "Get all task dispatcher definitions."
       tags:
-        - task-dispatcher-definitions
-      operationId: getTaskDispatcherDefinitions
+      - "task-dispatcher-definitions"
+      operationId: "getTaskDispatcherDefinitions"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/TaskDispatcherDefinition'
+                  $ref: "#/components/schemas/TaskDispatcherDefinition"
 components:
   schemas:
     ActionDefinition:
-      $ref: '../../hermes-component/hermes-component-api/component_definition_spec.yaml#/schemas/ActionDefinition'
+      description: "An action is a portion of reusable code that accomplish a specific\
+        \ task. When building a workflow, each action is represented as a task inside\
+        \ the workflow. The task 'type' property is defined as [component name]/v[component\
+        \ version]/[action name]. Action properties are used to set properties of\
+        \ the task inside the workflow."
+      type: "object"
+      properties:
+        display:
+          $ref: "#/components/schemas/Display"
+        exampleOutput:
+          description: "The example value of the action's output."
+          type: "object"
+        name:
+          description: "The action name."
+          type: "string"
+        outputSchema:
+          description: "The output schema of an execution result."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        properties:
+          description: "The list of action properties."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
     ActionDefinitionBasic:
-      description: An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
-      type: object
+      description: "An action is a portion of reusable code that accomplish a specific\
+        \ task. When building a workflow, each action is represented as a task inside\
+        \ the workflow. The task 'type' property is defined as [component name]/v[component\
+        \ version]/[action name]. Action properties are used to set properties of\
+        \ the task inside the workflow."
+      type: "object"
       required:
-        - name
-        - display
+      - "name"
+      - "display"
       properties:
         name:
-          description: The action name.
-          type: string
+          description: "The action name."
+          type: "string"
         display:
-          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
-    ComponentDefinitionBasic:
-      description: A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
-      type: object
-      required:
-        - display
-        - name
-        - version
+          $ref: "#/components/schemas/Display"
+    ArrayProperty:
+      description: "An array property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          items:
+            description: "Types of the array items."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Property"
+          multipleValues:
+            description: "If the array can contain multiple items."
+            type: "boolean"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    Authorization:
+      description: "Contains information required for a connection's authorization."
+      type: "object"
       properties:
         display:
-          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
+          $ref: "#/components/schemas/Display"
         name:
-          description: The name of a component.
-          type: string
-        version:
-          description: The version of a component.
-          type: integer
-    ComponentDefinitionWithBasicActions:
-      description: A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.
-      type: object
-      required:
-        - actions
-        - display
-        - name
-        - resources
-        - version
+          description: "The authorization name."
+          type: "string"
+        redirectUri:
+          description: "The redirect URI used for OAuth2 callback URL."
+          type: "string"
+          readOnly: true
+        properties:
+          description: "Properties of the connection."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        type:
+          $ref: "#/components/schemas/AuthorizationType"
+    AuthorizationType:
+      description: "Authorization type."
+      type: "string"
+      enum:
+      - "API_KEY"
+      - "BASIC_AUTH"
+      - "BEARER_TOKEN"
+      - "CUSTOM"
+      - "DIGEST_AUTH"
+      - "OAUTH2_AUTHORIZATION_CODE"
+      - "OAUTH2_AUTHORIZATION_CODE_PKCE"
+      - "OAUTH2_CLIENT_CREDENTIALS"
+      - "OAUTH2_IMPLICIT_CODE"
+      - "OAUTH2_RESOURCE_OWNER_PASSWORD"
+    BooleanProperty:
+      description: "A boolean property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+    ComponentDefinition:
+      description: "A component contains a set of reusable code(actions) that accomplish\
+        \ specific tasks, triggers and connections if there is a need for a connection\
+        \ to an outside service."
+      type: "object"
       properties:
         actions:
-          description: The list of all available actions the component can perform.
-          type: array
+          description: "The list of all available actions the component can perform."
+          type: "array"
           items:
-            $ref: '#/components/schemas/ActionDefinitionBasic'
+            $ref: "#/components/schemas/ActionDefinition"
         connection:
-          $ref: '../../hermes-component/hermes-component-api/component_definition_spec.yaml#/schemas/ConnectionDefinition'
+          $ref: "#/components/schemas/ConnectionDefinition"
         display:
-          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
+          $ref: "#/components/schemas/Display"
         name:
-          description: The component name.
-          type: string
+          description: "The name."
+          type: "string"
         resources:
-          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
+          $ref: "#/components/schemas/Resources"
         version:
-          description: The version of a component.
-          type: integer
-    ConnectionDefinition:
-      $ref: '../../hermes-component/hermes-component-api/component_definition_spec.yaml#/schemas/ConnectionDefinition'
-    ConnectionDefinitionBasic:
-      description: Definition of a connection to an outside service.
-      type: object
+          description: "The version of a component."
+          type: "integer"
+    ComponentDefinitionBasic:
+      description: "A component contains a set of reusable code(actions) that accomplish\
+        \ specific tasks, triggers and connections if there is a need for a connection\
+        \ to an outside service."
+      type: "object"
       required:
-        - componentName
-        - display
-        - version
+      - "display"
+      - "name"
+      - "version"
+      properties:
+        display:
+          $ref: "#/components/schemas/Display"
+        name:
+          description: "The name of a component."
+          type: "string"
+        version:
+          description: "The version of a component."
+          type: "integer"
+    ComponentDefinitionWithBasicActions:
+      description: "A component contains a set of reusable code(actions) that accomplish\
+        \ specific tasks, triggers(TODO) and connections if there is a need for a\
+        \ connection to an outside service."
+      type: "object"
+      required:
+      - "actions"
+      - "display"
+      - "name"
+      - "resources"
+      - "version"
+      properties:
+        actions:
+          description: "The list of all available actions the component can perform."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ActionDefinitionBasic"
+        connection:
+          $ref: "#/components/schemas/ConnectionDefinition"
+        display:
+          $ref: "#/components/schemas/Display"
+        name:
+          description: "The component name."
+          type: "string"
+        resources:
+          $ref: "#/components/schemas/Resources"
+        version:
+          description: "The version of a component."
+          type: "integer"
+    ConnectionDefinition:
+      description: "Definition of a connection to an outside service."
+      type: "object"
+      properties:
+        authorizationRequired:
+          description: "If connection requires an authorization to be configured or\
+            \ not."
+          type: "boolean"
+        authorizations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Authorization"
+        componentName:
+          description: "The name of a component this connection can be used for."
+          type: "string"
+        componentDisplay:
+          $ref: "#/components/schemas/Display"
+        properties:
+          description: "The properties of the connection."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        resources:
+          $ref: "#/components/schemas/Resources"
+    ConnectionDefinitionBasic:
+      description: "Definition of a connection to an outside service."
+      type: "object"
+      required:
+      - "componentName"
+      - "display"
       properties:
         componentName:
-          description: The name of a component this connection can be used for.
-          type: string
-        display:
-          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
-        version:
-          description: The version of a connection.
-          type: integer
+          description: "The name of a component this connection can be used for."
+          type: "string"
+        componentDisplay:
+          $ref: "#/components/schemas/Display"
+    ControlType:
+      description: "A type of the control to show in UI."
+      type: "string"
+      enum:
+      - "CHECKBOX"
+      - "CODE_EDITOR"
+      - "DATE"
+      - "DATE_TIME"
+      - "INPUT_EMAIL"
+      - "INPUT_INTEGER"
+      - "INPUT_NUMBER"
+      - "INPUT_PASSWORD"
+      - "INPUT_PHONE"
+      - "INPUT_TEXT"
+      - "INPUT_URL"
+      - "JSON_BUILDER"
+      - "MULTI_SELECT"
+      - "SELECT"
+      - "TEXT_AREA"
+    DateProperty:
+      description: "A date property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    DateTimeProperty:
+      description: "A date-time property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    DynamicPropertiesProperty:
+      description: "A dynamic properties property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/Property"
+      - type: "object"
+        properties:
+          propertiesDataSource:
+            $ref: "#/components/schemas/PropertiesDataSource"
+    Display:
+      description: "A display information."
+      type: "object"
+      properties:
+        category:
+          description: "The category."
+          type: "string"
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
+        label:
+          description: "The label."
+          type: "string"
+        subtitle:
+          description: "The additional explanation."
+          type: "string"
+        tags:
+          description: "Tags for categorization."
+          type: "array"
+          items:
+            type: "string"
+    IntegerProperty:
+      description: "An integer property type."
+      type: "object"
+      required:
+      - "type"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          maxValue:
+            description: "The maximum property value."
+            type: "integer"
+            format: "int32"
+          minValue:
+            description: "The minimum property value."
+            type: "integer"
+            format: "int32"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    NumberProperty:
+      description: "A number property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          maxValue:
+            description: "The maximum property value."
+            type: "integer"
+            format: "int32"
+          minValue:
+            description: "The minimum property value."
+            type: "integer"
+            format: "int32"
+          numberPrecision:
+            description: "The number value precision."
+            type: "integer"
+            format: "int32"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    ObjectProperty:
+      description: "An object property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          additionalProperties:
+            description: "Types of dynamically defined properties."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Property"
+          multipleValues:
+            description: "If the object can contain multiple additional properties."
+            type: "boolean"
+          objectType:
+            description: "The object type."
+            type: "string"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+          properties:
+            description: "The list of valid object property types."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Property"
+    OneOfProperty:
+      description: "A one of property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/Property"
+      - type: "object"
+        properties:
+          types:
+            description: "Possible types of properties that can be used."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Property"
+    Option:
+      description: "Defines valid property value."
+      type: "object"
+      properties:
+        description:
+          description: "Description of the option."
+          type: "string"
+        displayCondition:
+          description: "Defines rules when a property should be shown or hidden."
+          type: "string"
+        name:
+          description: "The name of an option."
+          type: "string"
+        value:
+          description: "The value of an option."
+          type: "object"
+    OptionsDataSource:
+      description: "Defines function that should dynamically load options for the\
+        \ property."
+      type: "object"
+      properties:
+        loadOptionsDependsOn:
+          description: "The list of property names on which value change the property\
+            \ options should load/reload."
+          type: "array"
+          items:
+            type: "string"
+    PropertiesDataSource:
+      description: "Defines function that should load properties."
+      type: "object"
+      properties:
+        loadPropertiesDependsOn:
+          description: "The list of property names on which value change the properties\
+            \ should load/reload."
+          type: "array"
+          items:
+            type: "string"
+    Property:
+      description: "A base property."
+      type: "object"
+      required:
+      - "propertyType"
+      properties:
+        advancedOption:
+          description: "If the property should be grouped under advanced options."
+          type: "boolean"
+        description:
+          description: "The property description."
+          type: "string"
+        displayCondition:
+          description: "Defines rules when a property should be shown or hidden."
+          type: "string"
+        expressionEnabled:
+          description: "Defines if the property can contain expressions or only constant\
+            \ values."
+          type: "boolean"
+        hidden:
+          description: "If the property should be visible or not."
+          type: "boolean"
+        label:
+          description: "The property label."
+          type: "string"
+        metadata:
+          description: "The additional data that can be used during processing."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        name:
+          description: "The property name."
+          type: "string"
+        placeholder:
+          description: "The property placeholder."
+          type: "string"
+        required:
+          description: "If the property is required or not."
+          type: "boolean"
+        type:
+          $ref: "#/components/schemas/PropertyType"
+      discriminator:
+        propertyName: "__model_type"
+        mapping:
+          ARRAY: "#/components/schemas/ArrayProperty"
+          BOOLEAN: "#/components/schemas/BooleanProperty"
+          DATE: "#/components/schemas/DateProperty"
+          DATE_TIME: "#/components/schemas/DateTimeProperty"
+          DYNAMIC_PROPERTIES: "#/components/schemas/DynamicPropertiesProperty"
+          INTEGER: "#/components/schemas/IntegerProperty"
+          NUMBER: "#/components/schemas/NumberProperty"
+          STRING: "#/components/schemas/StringProperty"
+          OBJECT: "#/components/schemas/ObjectProperty"
+          ONE_OF: "#/components/schemas/OneOfProperty"
+    PropertyType:
+      description: "A type of property."
+      type: "string"
+      enum:
+      - "ARRAY"
+      - "BOOLEAN"
+      - "DATE"
+      - "DATE_TIME"
+      - "DYNAMIC_PROPERTIES"
+      - "INTEGER"
+      - "NULL"
+      - "NUMBER"
+      - "STRING"
+      - "OBJECT"
+      - "ONE_OF"
+    Resources:
+      description: "A set of available resources."
+      type: "object"
+      properties:
+        documentationUrl:
+          description: "The url of available documentation."
+          type: "string"
+    StringProperty:
+      description: "A string property."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
     TaskDispatcherDefinition:
-      $ref: '../../hermes-task-dispatcher/hermes-task-dispatcher-api/task_dispatcher_definition_spec.yaml#/schemas/TaskDispatcherDefinition'
+      description: "A task dispatcher defines a strategy for dispatching tasks to\
+        \ be executed."
+      type: "object"
+      properties:
+        display:
+          $ref: "#/components/schemas/Display"
+        name:
+          description: "The task dispatcher name.."
+          type: "string"
+        outputSchema:
+          description: "The output schema of a task dispatching result."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        properties:
+          description: "The list of task dispatcher properties."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        resources:
+          $ref: "#/components/schemas/Resources"
+        version:
+          type: "integer"
+          description: "The version of a task dispatcher."
+        taskProperties:
+          description: "Properties used to define tasks to be dispatched."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+    ValueProperty:
+      description: "A base property for all value based properties."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/Property"
+      - type: "object"
+        properties:
+          controlType:
+            $ref: "#/components/schemas/ControlType"
+          defaultValue:
+            description: "The property default value."
+            type: "object"
+          sampleValue:
+            description: "The property sample value."
+            type: "object"
