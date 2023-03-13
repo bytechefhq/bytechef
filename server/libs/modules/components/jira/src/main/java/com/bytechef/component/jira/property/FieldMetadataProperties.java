@@ -56,7 +56,7 @@ public class FieldMetadataProperties {
             .label("Operations")
             .description("The list of operations that can be performed on the field.")
             .required(true),
-        array("allowedValues").items(object(null).description("The list of values allowed in the field."))
+        array("allowedValues").items(object().description("The list of values allowed in the field."))
             .placeholder("Add")
             .label("AllowedValues")
             .description("The list of values allowed in the field.")

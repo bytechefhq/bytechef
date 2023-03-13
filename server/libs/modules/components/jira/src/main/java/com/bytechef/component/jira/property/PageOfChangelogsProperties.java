@@ -39,7 +39,7 @@ public class PageOfChangelogsProperties {
         integer("total").label("Total")
             .description("The number of results on the page.")
             .required(false),
-        array("histories").items(object(null).properties(ChangelogProperties.PROPERTIES)
+        array("histories").items(object().properties(ChangelogProperties.PROPERTIES)
             .description("A changelog."))
             .placeholder("Add")
             .label("Histories")

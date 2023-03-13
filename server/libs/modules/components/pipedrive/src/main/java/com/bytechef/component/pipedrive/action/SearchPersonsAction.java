@@ -100,95 +100,90 @@ public class SearchPersonsAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .outputSchema(
-            object(
-                null)
-                    .properties(
-                        object("data")
-                            .properties(
-                                array("items")
-                                    .items(object(null).properties(number("result_score").label("Result_score")
-                                        .description("Search result relevancy")
-                                        .required(false),
-                                        object("item").properties(integer("id").label("Id")
-                                            .description("The ID of the person")
-                                            .required(false),
-                                            string("type").label("Type")
-                                                .description("The type of the item")
-                                                .required(false),
-                                            string("name").label("Name")
-                                                .description("The name of the person")
-                                                .required(false),
-                                            array("phones").items(string(null).description("An array of phone numbers"))
-                                                .placeholder("Add")
-                                                .label("Phones")
-                                                .description("An array of phone numbers")
-                                                .required(false),
-                                            array("emails")
-                                                .items(string(null).description("An array of email addresses"))
-                                                .placeholder("Add")
-                                                .label("Emails")
-                                                .description("An array of email addresses")
-                                                .required(false),
-                                            integer("visible_to").label("Visible_to")
-                                                .description("The visibility of the person")
-                                                .required(false),
-                                            object("owner").properties(integer("id").label("Id")
-                                                .description("The ID of the owner of the person")
-                                                .required(false))
-                                                .label("Owner")
-                                                .required(false),
-                                            object("organization").properties(integer("id").label("Id")
-                                                .description("The ID of the organization the person is associated with")
-                                                .required(false),
-                                                string("name").label("Name")
-                                                    .description(
-                                                        "The name of the organization the person is associated with")
-                                                    .required(false))
-                                                .label("Organization")
-                                                .required(false),
-                                            array("custom_fields").items(string(null).description("Custom fields"))
-                                                .placeholder("Add")
-                                                .label("Custom_fields")
-                                                .description("Custom fields")
-                                                .required(false),
-                                            array("notes").items(string(null).description("An array of notes"))
-                                                .placeholder("Add")
-                                                .label("Notes")
-                                                .description("An array of notes")
-                                                .required(false))
-                                            .label("Item")
-                                            .required(false))
-                                        .description("The array of found items"))
-                                    .placeholder("Add")
-                                    .label("Items")
-                                    .description("The array of found items")
-                                    .required(false))
-                            .label("Data")
-                            .required(false),
-                        bool("success").label("Success")
-                            .description("If the response is successful or not")
-                            .required(false),
-                        object("additional_data")
-                            .properties(object("pagination").properties(integer("start").label("Start")
-                                .description("Pagination start")
+            object()
+                .properties(
+                    object("data")
+                        .properties(array("items")
+                            .items(object().properties(number("result_score").label("Result_score")
+                                .description("Search result relevancy")
                                 .required(false),
-                                integer("limit").label("Limit")
-                                    .description("Items shown per page")
+                                object("item").properties(integer("id").label("Id")
+                                    .description("The ID of the person")
                                     .required(false),
-                                bool("more_items_in_collection").label("More_items_in_collection")
-                                    .description("Whether there are more list items in the collection than displayed")
-                                    .required(false),
-                                integer("next_start").label("Next_start")
-                                    .description("Next pagination start")
+                                    string("type").label("Type")
+                                        .description("The type of the item")
+                                        .required(false),
+                                    string("name").label("Name")
+                                        .description("The name of the person")
+                                        .required(false),
+                                    array("phones").items(string(null).description("An array of phone numbers"))
+                                        .placeholder("Add")
+                                        .label("Phones")
+                                        .description("An array of phone numbers")
+                                        .required(false),
+                                    array("emails").items(string(null).description("An array of email addresses"))
+                                        .placeholder("Add")
+                                        .label("Emails")
+                                        .description("An array of email addresses")
+                                        .required(false),
+                                    integer("visible_to").label("Visible_to")
+                                        .description("The visibility of the person")
+                                        .required(false),
+                                    object("owner").properties(integer("id").label("Id")
+                                        .description("The ID of the owner of the person")
+                                        .required(false))
+                                        .label("Owner")
+                                        .required(false),
+                                    object("organization").properties(integer("id").label("Id")
+                                        .description("The ID of the organization the person is associated with")
+                                        .required(false),
+                                        string("name").label("Name")
+                                            .description("The name of the organization the person is associated with")
+                                            .required(false))
+                                        .label("Organization")
+                                        .required(false),
+                                    array("custom_fields").items(string(null).description("Custom fields"))
+                                        .placeholder("Add")
+                                        .label("Custom_fields")
+                                        .description("Custom fields")
+                                        .required(false),
+                                    array("notes").items(string(null).description("An array of notes"))
+                                        .placeholder("Add")
+                                        .label("Notes")
+                                        .description("An array of notes")
+                                        .required(false))
+                                    .label("Item")
                                     .required(false))
-                                .label("Pagination")
-                                .description("Pagination details of the list")
-                                .required(false))
-                            .label("Additional_data")
+                                .description("The array of found items"))
+                            .placeholder("Add")
+                            .label("Items")
+                            .description("The array of found items")
                             .required(false))
-                    .metadata(
-                        Map.of(
-                            "responseFormat", ResponseFormat.JSON)))
+                        .label("Data")
+                        .required(false),
+                    bool("success").label("Success")
+                        .description("If the response is successful or not")
+                        .required(false),
+                    object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
+                        .description("Pagination start")
+                        .required(false),
+                        integer("limit").label("Limit")
+                            .description("Items shown per page")
+                            .required(false),
+                        bool("more_items_in_collection").label("More_items_in_collection")
+                            .description("Whether there are more list items in the collection than displayed")
+                            .required(false),
+                        integer("next_start").label("Next_start")
+                            .description("Next pagination start")
+                            .required(false))
+                        .label("Pagination")
+                        .description("Pagination details of the list")
+                        .required(false))
+                        .label("Additional_data")
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.5092,\"item\":{\"id\":1,\"type\":\"person\",\"name\":\"Jane Doe\",\"phones\":[\"+372 555555555\"],\"emails\":[\"jane@pipedrive.com\"],\"visible_to\":3,\"owner\":{\"id\":1},\"organization\":{\"id\":1,\"name\":\"Organization name\",\"address\":null},\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}");
 }

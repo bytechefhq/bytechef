@@ -49,13 +49,13 @@ public class AddPersonAction {
                 "path", "/persons", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object(null).properties(string("marketing_status").label("Marketing_status")
+        .properties(object().properties(string("marketing_status").label("Marketing_status")
             .description(
                 "If the person does not have a valid email address, then the marketing status is **not set** and `no_consent` is returned for the `marketing_status` value when the new person is created. If the change is forbidden, the status will remain unchanged for every call that tries to modify the marketing status. Please be aware that it is only allowed **once** to change the marketing status from an old status to a new one.<table><tr><th>Value</th><th>Description</th></tr><tr><td>`no_consent`</td><td>The customer has not given consent to receive any marketing communications</td></tr><tr><td>`unsubscribed`</td><td>The customers have unsubscribed from ALL marketing communications</td></tr><tr><td>`subscribed`</td><td>The customers are subscribed and are counted towards marketing caps</td></tr><tr><td>`archived`</td><td>The customers with `subscribed` status can be moved to `archived` to save consent, but they are not paid for</td></tr></table>")
             .options(option("No_consent", "no_consent"), option("Unsubscribed", "unsubscribed"),
                 option("Subscribed", "subscribed"), option("Archived", "archived"))
             .required(false),
-            array("phone").items(object(null).properties(string("value").label("Value")
+            array("phone").items(object().properties(string("value").label("Value")
                 .description("The phone number")
                 .required(false),
                 bool("primary").label("Primary")
@@ -91,7 +91,7 @@ public class AddPersonAction {
                 .description(
                     "The optional creation date & time of the person in UTC. Requires admin user API token. Format: YYYY-MM-DD HH:MM:SS")
                 .required(false),
-            array("email").items(object(null).properties(string("value").label("Value")
+            array("email").items(object().properties(string("value").label("Value")
                 .description("The email")
                 .required(false),
                 bool("primary").label("Primary")
@@ -111,7 +111,7 @@ public class AddPersonAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object(null).properties(integer("related_closed_deals_count").label("Related_closed_deals_count")
+        .outputSchema(object().properties(integer("related_closed_deals_count").label("Related_closed_deals_count")
             .description("The count of related closed deals related with the item")
             .required(false),
             integer("email_messages_count").label("Email_messages_count")
@@ -200,7 +200,7 @@ public class AddPersonAction {
             string("first_name").label("First_name")
                 .description("The first name of the person")
                 .required(false),
-            array("email").items(object(null).properties(string("value").label("Value")
+            array("email").items(object().properties(string("value").label("Value")
                 .description("Email")
                 .required(false),
                 bool("primary").label("Primary")
@@ -262,7 +262,7 @@ public class AddPersonAction {
             integer("next_activity_id").label("Next_activity_id")
                 .description("The ID of the next activity associated with the deal")
                 .required(false),
-            array("phone").items(object(null).properties(string("value").label("Value")
+            array("phone").items(object().properties(string("value").label("Value")
                 .description("The phone number")
                 .required(false),
                 bool("primary").label("Primary")

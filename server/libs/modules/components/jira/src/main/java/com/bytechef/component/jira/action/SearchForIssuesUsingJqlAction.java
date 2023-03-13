@@ -152,7 +152,7 @@ public class SearchForIssuesUsingJqlAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null).properties(SearchResultsProperties.PROPERTIES)
+        .outputSchema(object().properties(SearchResultsProperties.PROPERTIES)
             .description("The result of a JQL search.")
             .metadata(
                 Map.of(

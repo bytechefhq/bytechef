@@ -50,7 +50,7 @@ public class DeletePersonAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object(null).properties(object("data").properties(integer("id").label("Id")
+        .outputSchema(object().properties(object("data").properties(integer("id").label("Id")
             .description("The ID of the deleted person")
             .required(false))
             .label("Data")

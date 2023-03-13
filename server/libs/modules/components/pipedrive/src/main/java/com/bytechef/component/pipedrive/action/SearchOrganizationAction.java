@@ -85,75 +85,76 @@ public class SearchOrganizationAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null)
-            .properties(
-                object("data")
-                    .properties(array("items")
-                        .items(object(null).properties(number("result_score").label("Result_score")
-                            .description("Search result relevancy")
-                            .required(false),
-                            object("item").properties(integer("id").label("Id")
-                                .description("The ID of the organization")
+        .outputSchema(
+            object()
+                .properties(
+                    object("data")
+                        .properties(array("items")
+                            .items(object().properties(number("result_score").label("Result_score")
+                                .description("Search result relevancy")
                                 .required(false),
-                                string("type").label("Type")
-                                    .description("The type of the item")
+                                object("item").properties(integer("id").label("Id")
+                                    .description("The ID of the organization")
                                     .required(false),
-                                string("name").label("Name")
-                                    .description("The name of the organization")
-                                    .required(false),
-                                string("address").label("Address")
-                                    .description("The address of the organization")
-                                    .required(false),
-                                integer("visible_to").label("Visible_to")
-                                    .description("The visibility of the organization")
-                                    .required(false),
-                                object("owner").properties(integer("id").label("Id")
-                                    .description("The ID of the owner of the deal")
+                                    string("type").label("Type")
+                                        .description("The type of the item")
+                                        .required(false),
+                                    string("name").label("Name")
+                                        .description("The name of the organization")
+                                        .required(false),
+                                    string("address").label("Address")
+                                        .description("The address of the organization")
+                                        .required(false),
+                                    integer("visible_to").label("Visible_to")
+                                        .description("The visibility of the organization")
+                                        .required(false),
+                                    object("owner").properties(integer("id").label("Id")
+                                        .description("The ID of the owner of the deal")
+                                        .required(false))
+                                        .label("Owner")
+                                        .required(false),
+                                    array("custom_fields").items(string(null).description("Custom fields"))
+                                        .placeholder("Add")
+                                        .label("Custom_fields")
+                                        .description("Custom fields")
+                                        .required(false),
+                                    array("notes").items(string(null).description("An array of notes"))
+                                        .placeholder("Add")
+                                        .label("Notes")
+                                        .description("An array of notes")
+                                        .required(false))
+                                    .label("Item")
                                     .required(false))
-                                    .label("Owner")
-                                    .required(false),
-                                array("custom_fields").items(string(null).description("Custom fields"))
-                                    .placeholder("Add")
-                                    .label("Custom_fields")
-                                    .description("Custom fields")
-                                    .required(false),
-                                array("notes").items(string(null).description("An array of notes"))
-                                    .placeholder("Add")
-                                    .label("Notes")
-                                    .description("An array of notes")
-                                    .required(false))
-                                .label("Item")
-                                .required(false))
-                            .description("The array of found items"))
-                        .placeholder("Add")
-                        .label("Items")
-                        .description("The array of found items")
-                        .required(false))
-                    .label("Data")
-                    .required(false),
-                bool("success").label("Success")
-                    .description("If the response is successful or not")
-                    .required(false),
-                object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
-                    .description("Pagination start")
-                    .required(false),
-                    integer("limit").label("Limit")
-                        .description("Items shown per page")
+                                .description("The array of found items"))
+                            .placeholder("Add")
+                            .label("Items")
+                            .description("The array of found items")
+                            .required(false))
+                        .label("Data")
                         .required(false),
-                    bool("more_items_in_collection").label("More_items_in_collection")
-                        .description("Whether there are more list items in the collection than displayed")
+                    bool("success").label("Success")
+                        .description("If the response is successful or not")
                         .required(false),
-                    integer("next_start").label("Next_start")
-                        .description("Next pagination start")
+                    object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
+                        .description("Pagination start")
+                        .required(false),
+                        integer("limit").label("Limit")
+                            .description("Items shown per page")
+                            .required(false),
+                        bool("more_items_in_collection").label("More_items_in_collection")
+                            .description("Whether there are more list items in the collection than displayed")
+                            .required(false),
+                        integer("next_start").label("Next_start")
+                            .description("Next pagination start")
+                            .required(false))
+                        .label("Pagination")
+                        .description("Pagination details of the list")
                         .required(false))
-                    .label("Pagination")
-                    .description("Pagination details of the list")
-                    .required(false))
-                    .label("Additional_data")
-                    .required(false))
-            .metadata(
-                Map.of(
-                    "responseFormat", ResponseFormat.JSON)))
+                        .label("Additional_data")
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.316,\"item\":{\"id\":1,\"type\":\"organization\",\"name\":\"Organization name\",\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"visible_to\":3,\"owner\":{\"id\":1},\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}");
 }

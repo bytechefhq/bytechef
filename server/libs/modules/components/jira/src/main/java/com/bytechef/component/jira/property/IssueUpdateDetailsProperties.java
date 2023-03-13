@@ -50,7 +50,7 @@ public class IssueUpdateDetailsProperties {
             .label("HistoryMetadata")
             .description("Details of issue history metadata.")
             .required(false),
-        array("properties").items(object(null).properties(EntityPropertyProperties.PROPERTIES)
+        array("properties").items(object().properties(EntityPropertyProperties.PROPERTIES)
             .description(
                 "An entity property, for more information see [Entity properties](https://developer.atlassian.com/cloud/jira/platform/jira-entity-properties/)."))
             .placeholder("Add")

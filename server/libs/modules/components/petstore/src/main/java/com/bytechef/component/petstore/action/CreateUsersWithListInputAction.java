@@ -45,12 +45,12 @@ public class CreateUsersWithListInputAction {
                 "path", "/user/createWithList", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(array("array").items(object(null).properties(UserProperties.PROPERTIES))
+        .properties(array("array").items(object().properties(UserProperties.PROPERTIES))
             .placeholder("Add")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(array("array").items(object(null).properties(UserProperties.PROPERTIES))
+        .outputSchema(array("array").items(object().properties(UserProperties.PROPERTIES))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));
