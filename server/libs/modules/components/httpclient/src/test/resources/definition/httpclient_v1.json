@@ -2415,6 +2415,7 @@
     }
   ],
   "connection": {
+    "authorizationRequired": false,
     "authorizations": [
       {
         "display": {
@@ -2525,13 +2526,6 @@
         },
         "properties": [
           {
-            "label": "Callback URL",
-            "required": true,
-            "name": "callbackUrl",
-            "type": "STRING",
-            "controlType": "INPUT_TEXT"
-          },
-          {
             "label": "Authorization URL",
             "required": true,
             "name": "authorizationUrl",
@@ -2581,13 +2575,6 @@
           "label": "OAuth2 Implicit Code"
         },
         "properties": [
-          {
-            "label": "Callback URL",
-            "required": true,
-            "name": "callbackUrl",
-            "type": "STRING",
-            "controlType": "INPUT_TEXT"
-          },
           {
             "label": "Authorization URL",
             "required": true,
@@ -2670,11 +2657,11 @@
         "type": "OAUTH2_CLIENT_CREDENTIALS"
       }
     ],
-    "componentName": "httpClient",
-    "display": {
+    "componentDisplay": {
       "description": "Makes an HTTP request and returns the response data.",
       "label": "HTTP Client"
     },
+    "componentName": "httpClient",
     "properties": [
       {
         "label": "Base URI",
@@ -2682,9 +2669,7 @@
         "type": "STRING",
         "controlType": "INPUT_TEXT"
       }
-    ],
-    "version": 1,
-    "authorizationRequired": false
+    ]
   },
   "display": {
     "description": "Makes an HTTP request and returns the response data.",

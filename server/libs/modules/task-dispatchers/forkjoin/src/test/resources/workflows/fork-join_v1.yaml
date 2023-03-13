@@ -1,25 +1,22 @@
-label: Hello fork/join
-
+---
+label: "Hello fork/join"
 tasks:
-  - type: fork-join/v1
-    parameters:
-      branches:
-         - - name: var1
-             type: var
-             parameters:
-              value: 50
-
-           - name: sumVar1
-             type: var
-             parameters:
-              value: ${35 + var1}
-
-         - - name: var2
-             type: var
-             parameters:
-              value: 100
-
-           - name: sumVar2
-             type: var
-             parameters:
-              value: ${12 + var2}
+- type: "fork-join/v1"
+  parameters:
+    branches:
+    - - name: "var1"
+        type: "var"
+        parameters:
+          value: 50
+      - name: "sumVar1"
+        type: "var"
+        parameters:
+          value: "${35 + var1}"
+    - - name: "var2"
+        type: "var"
+        parameters:
+          value: 100
+      - name: "sumVar2"
+        type: "var"
+        parameters:
+          value: "${12 + var2}"
