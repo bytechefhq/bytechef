@@ -26,7 +26,6 @@ public class ComponentConstants {
     public static final String AUTHORIZATION_CODE = "authorizationCode";
     public static final String AUTHORIZATION_URL = "authorizationUrl";
     public static final String BASE_URI = "baseUri";
-    public static final String CALLBACK_URL = "callbackUrl";
     public static final String CLIENT_ID = "clientId";
     public static final String CLIENT_SECRET = "clientSecret";
     public static final String HEADER_PREFIX = "headerPrefix";
