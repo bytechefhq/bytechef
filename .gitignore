@@ -1,7 +1,7 @@
 ######################
 # Project Specific
 ######################
-
+application-local.yml
 
 ######################
 # Node
@@ -35,7 +35,6 @@ local.properties
 .settings/
 .loadpath
 .factorypath
-/src/main/resources/rebel.xml
 
 # External tool builders
 .externalToolBuilders/**
@@ -150,3 +149,8 @@ Desktop.ini
 # Docusaurus
 ######################
 .docusaurus
+
+######################
+# Rebel
+######################
+rebel.xml
