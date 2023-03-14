@@ -69,7 +69,7 @@ public class LoopTaskDispatcherIntTest {
         workflowExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_1".getBytes(StandardCharsets.UTF_8)),
-            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(2, 11)
@@ -83,7 +83,7 @@ public class LoopTaskDispatcherIntTest {
         workflowExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_2".getBytes(StandardCharsets.UTF_8)),
-            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(1, 10)
@@ -99,7 +99,7 @@ public class LoopTaskDispatcherIntTest {
         workflowExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_3".getBytes(StandardCharsets.UTF_8)),
-            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 13)
@@ -113,7 +113,7 @@ public class LoopTaskDispatcherIntTest {
         workflowExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_4".getBytes(StandardCharsets.UTF_8)),
-            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -127,7 +127,7 @@ public class LoopTaskDispatcherIntTest {
         workflowExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_5".getBytes(StandardCharsets.UTF_8)),
-            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -141,7 +141,7 @@ public class LoopTaskDispatcherIntTest {
         workflowExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_6".getBytes(StandardCharsets.UTF_8)),
-            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(3, 8)
@@ -150,7 +150,7 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar2"));
     }
 
-    private WorkflowExecutor.GetTaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
+    private WorkflowExecutor.TaskCompletionHandlersFunction getTaskCompletionHandlers() {
         return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
             new IfTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
@@ -160,7 +160,7 @@ public class LoopTaskDispatcherIntTest {
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private static WorkflowExecutor.GetTaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
+    private static WorkflowExecutor.TaskDispatcherResolversFunction getTaskDispatcherResolvers() {
         return (
             contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
             taskExecutionService) -> List.of(
@@ -173,7 +173,7 @@ public class LoopTaskDispatcherIntTest {
                     contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private WorkflowExecutor.GetTaskHandlerMapSupplier getTaskHandlerMap() {
+    private WorkflowExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
         return () -> Map.of("var", testVarTaskHandler);
     }
 }

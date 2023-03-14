@@ -113,20 +113,20 @@ public class WorkflowExecutor {
 
     public Job execute(
         String workflowId,
-        GetTaskCompletionHandlersFunction getTaskCompletionHandlersFunction,
-        GetTaskDispatcherResolversFunction getTaskDispatcherResolversFunction,
-        GetTaskHandlerMapSupplier getTaskHandlerMapSupplier) {
+        TaskCompletionHandlersFunction taskCompletionHandlersFunction,
+        TaskDispatcherResolversFunction taskDispatcherResolversFunction,
+        TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
         return execute(
-            workflowId, Map.of(), getTaskCompletionHandlersFunction, getTaskDispatcherResolversFunction,
-            getTaskHandlerMapSupplier);
+            workflowId, Map.of(), taskCompletionHandlersFunction, taskDispatcherResolversFunction,
+            taskHandlerMapSupplier);
     }
 
     public Job execute(
         String workflowId, Map<String, Object> inputs,
-        GetTaskCompletionHandlersFunction getTaskCompletionHandlersFunction,
-        GetTaskDispatcherResolversFunction getTaskDispatcherResolversFunction,
-        GetTaskHandlerMapSupplier getTaskHandlerMapSupplier) {
+        TaskCompletionHandlersFunction taskCompletionHandlersFunction,
+        TaskDispatcherResolversFunction taskDispatcherResolversFunction,
+        TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
@@ -143,7 +143,7 @@ public class WorkflowExecutor {
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
                 new DefaultTaskHandlerResolver(
-                    CollectionUtils.concat(getTaskHandlerMapSupplier.get(), taskHandlerMap))));
+                    CollectionUtils.concat(taskHandlerMapSupplier.get(), taskHandlerMap))));
 
         TaskEvaluator taskEvaluator = TaskEvaluator.create();
 
@@ -162,7 +162,7 @@ public class WorkflowExecutor {
 
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
-                getTaskDispatcherResolversFunction
+                taskDispatcherResolversFunction
                     .apply(
                         contextService, counterService, coordinatorMessageBroker, taskDispatcherChain, taskEvaluator,
                         taskExecutionService),
@@ -178,7 +178,7 @@ public class WorkflowExecutor {
 
         taskCompletionHandlerChain.setTaskCompletionHandlers(
             CollectionUtils.concat(
-                getTaskCompletionHandlersFunction
+                taskCompletionHandlersFunction
                     .apply(
                         counterService, taskCompletionHandlerChain, taskDispatcherChain, taskEvaluator,
                         taskExecutionService),
@@ -206,21 +206,24 @@ public class WorkflowExecutor {
             eventPublisher, jobService, taskDispatcher, taskExecutionService);
     }
 
-    public interface GetTaskCompletionHandlersFunction {
+    @FunctionalInterface
+    public interface TaskCompletionHandlersFunction {
         List<TaskCompletionHandler> apply(
             CounterService counterService, TaskCompletionHandler taskCompletionHandler,
             TaskDispatcher<? super Task> taskDispatcher, TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService);
     }
 
-    public interface GetTaskDispatcherResolversFunction {
+    @FunctionalInterface
+    public interface TaskDispatcherResolversFunction {
         List<TaskDispatcherResolver> apply(
             ContextService contextService, CounterService counterService, MessageBroker messageBroker,
             TaskDispatcher<? super Task> taskDispatcher, TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService);
     }
 
-    public interface GetTaskHandlerMapSupplier {
+    @FunctionalInterface
+    public interface TaskHandlerMapSupplier {
         Map<String, TaskHandler<?>> get();
     }
 }

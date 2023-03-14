@@ -33,6 +33,7 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -67,13 +68,13 @@ public class WorkerConfiguration {
 
     @Bean
     @Primary
-    TaskHandlerResolver taskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
+    TaskHandlerResolver taskHandlerResolver(Map<String, TaskHandler<?>> taskHandlerMap) {
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
                 taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-                defaultTaskHandlerResolver(taskHandlers)));
+                defaultTaskHandlerResolver(taskHandlerMap)));
 
         return taskHandlerResolverChain;
     }
