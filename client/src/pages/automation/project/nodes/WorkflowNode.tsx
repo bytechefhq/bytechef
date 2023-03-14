@@ -1,5 +1,11 @@
 import {memo, useState} from 'react';
-import {Handle, Position, NodeProps} from 'reactflow';
+import {
+    Handle,
+    Position,
+    NodeProps,
+    useReactFlow,
+    getConnectedEdges,
+} from 'reactflow';
 import styles from './NodeTypes.module.css';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import Button from 'components/Button/Button';
@@ -8,10 +14,52 @@ import EditNodeDialog from '../components/EditNodeDialog';
 
 const WorkflowNode = ({id, data}: NodeProps) => {
     const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);
+
     const handleNodeClick = useNodeClickHandler(data, id);
 
+    const {getEdges, getNode, getNodes, setNodes, setEdges} = useReactFlow();
+
     const handleDeleteNodeClick = () => {
-        console.log('delete a node');
+        const nodes = getNodes();
+        const node = getNode(id);
+
+        if (!node) {
+            return;
+        }
+
+        const edges = getEdges();
+
+        setNodes((nodes) => nodes.filter((node) => node.id !== id));
+
+        const connectedEdges = getConnectedEdges([node], edges);
+
+        const previousNode = nodes.find(
+            (node) => node.id === connectedEdges[0].source
+        );
+
+        const nextNode = nodes.find(
+            (node) => node.id === connectedEdges[1].target
+        );
+
+        if (previousNode && nextNode) {
+            const connectedEdgeIds = connectedEdges.map((edge) => edge.id);
+
+            setEdges((edges) => {
+                const leftoverEdges = edges.filter(
+                    (edge) => !connectedEdgeIds.includes(edge.id)
+                );
+
+                return [
+                    ...leftoverEdges,
+                    {
+                        id: `${previousNode.id}=>${nextNode.id}`,
+                        source: previousNode.id,
+                        target: nextNode.id,
+                        type: 'workflow',
+                    },
+                ];
+            });
+        }
     };
 
     const handleEditNodeClick = () => {
