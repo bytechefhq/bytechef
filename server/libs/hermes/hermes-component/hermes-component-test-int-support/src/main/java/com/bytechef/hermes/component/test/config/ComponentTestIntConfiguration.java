@@ -54,17 +54,17 @@ import org.springframework.context.annotation.Import;
 @SpringBootConfiguration
 public class ComponentTestIntConfiguration {
 
-    @MockBean
+    @MockBean(name = "connectionService")
     private ConnectionService connectionService;
 
-    @MockBean
+    @MockBean(name = "connectionDefinitionFacade")
     private ConnectionDefinitionFacade connectionDefinitionFacade;
 
     @MockBean
     private ConnectionDefinitionService connectionDefinitionService;
 
     @Bean
-    FileStorageService base64FileStorageService() {
+    FileStorageService fileStorageService() {
         return new Base64FileStorageService();
     }
 

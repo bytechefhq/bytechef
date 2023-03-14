@@ -15,23 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.mysql;
+package com.bytechef.hermes.component.registrar.jdbc.task.handler;
 
-import com.bytechef.hermes.component.registrar.jdbc.task.handler.JdbcComponentHandler;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class MySQLComponentDefinitionTest {
+public class JdbcComponentTaskHandlerBeanDefinitionLoaderTest {
 
+    @Disabled
     @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/mysql_v1.json",
-            new JdbcComponentHandler(
-                new MySQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
-                    .getDefinition());
+    public void testLoadComponentTaskHandlerFactories() {
+        // TODO
     }
 }

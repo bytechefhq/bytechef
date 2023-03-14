@@ -84,7 +84,7 @@
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ConnectionDefinition" />
             <Class name="com.bytechef.hermes.component.ContextImpl" />
             <Class name="com.bytechef.hermes.component.ComponentAdapterTaskHandler" />
-            <Class name="com.bytechef.hermes.component.jdbc.DataSourceFactory" />
+            <Class name="com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory" />
             <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
             <Class name="com.bytechef.atlas.domain.Counter" />
             <Class name="com.bytechef.atlas.domain.Context"/>

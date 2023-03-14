@@ -20,6 +20,7 @@
 package com.bytechef.atlas.event.config;
 
 import com.bytechef.atlas.event.DistributedEventPublisher;
+import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
 class EventPublisherConfiguration {
 
     @Bean
-    DistributedEventPublisher defaultEventPublisher(MessageBroker messageBroker) {
+    EventPublisher eventPublisher(MessageBroker messageBroker) {
         return new DistributedEventPublisher(messageBroker);
     }
 }
