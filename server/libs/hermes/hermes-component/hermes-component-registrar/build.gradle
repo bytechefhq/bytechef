@@ -1,6 +1,5 @@
 dependencies {
     api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
-    api project(":server:libs:hermes:hermes-component:hermes-component-api")
 
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-jdbc"

@@ -17,7 +17,7 @@
 
 package com.bytechef.component.postgresql;
 
-import com.bytechef.hermes.component.task.handler.loader.JdbcComponentHandler;
+import com.bytechef.hermes.component.registrar.jdbc.task.handler.JdbcComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ public class PostgreSQLComponentDefinitionTest {
     @Test
     public void testGetComponentDefinition() {
         JdbcComponentHandler jdbcComponentHandler = new JdbcComponentHandler(
-            null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition());
+            new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition());
 
         JsonFileAssert.assertEquals("definition/postgresql_v1.json", jdbcComponentHandler.getDefinition());
     }
