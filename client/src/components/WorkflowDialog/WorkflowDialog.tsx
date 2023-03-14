@@ -92,7 +92,7 @@ const WorkflowDialog = ({
                 {...register('description')}
             />
 
-            <div className="mt-4 flex justify-end space-x-1">
+            <div className="mt-8 flex justify-end space-x-1">
                 <Close asChild>
                     <Button
                         displayType="lightBorder"
