@@ -3,7 +3,7 @@ import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import PageHeader from 'components/PageHeader/PageHeader';
 import Input from 'components/Input/Input';
 import {DATA} from './ExecutionsData';
-import {useReactTable} from "@tanstack/react-table";
+import {useReactTable} from '@tanstack/react-table';
 
 const columns = [
     {
