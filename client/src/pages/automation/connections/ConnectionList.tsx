@@ -1,5 +1,5 @@
 import {Link, useSearchParams} from 'react-router-dom';
-import ConnectionItem from './ConnectionItem';
+import ConnectionListItem from './ConnectionListItem';
 import {
     useGetConnectionsQuery,
     useGetConnectionTagsQuery,
@@ -62,7 +62,7 @@ const ConnectionList = () => {
                                 <div key={connection.id}>
                                     <Link to={``}>
                                         <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
-                                            <ConnectionItem
+                                            <ConnectionListItem
                                                 key={connection.id}
                                                 connection={connection}
                                                 remainingTags={tags?.filter(
