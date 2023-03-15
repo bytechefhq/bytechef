@@ -9,11 +9,13 @@ import {
 import styles from './NodeTypes.module.css';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import Button from 'components/Button/Button';
-import DropdownMenu from 'components/DropdownMenu/DropdownMenu';
 import EditNodeDialog from '../components/EditNodeDialog';
+import {PencilIcon, TrashIcon} from '@heroicons/react/24/outline';
+import {twMerge} from 'tailwind-merge';
 
 const WorkflowNode = ({id, data}: NodeProps) => {
     const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -66,38 +68,50 @@ const WorkflowNode = ({id, data}: NodeProps) => {
         setShowEditNodeDialog(true);
     };
 
+    const nodes = getNodes();
+
+    let isFirstNode;
+
+    if (nodes[0].id === id) {
+        isFirstNode = true;
+    }
+
     return (
         <div
-            className="relative flex cursor-pointer items-center justify-center rounded-md border-2 border-gray-300 bg-white shadow hover:bg-gray-200"
-            title="Click to add a child node"
+            className="relative flex min-w-[240px] cursor-pointer items-center justify-center"
+            onMouseOver={() => setIsHovered(true)}
+            onMouseOut={() => setIsHovered(false)}
         >
-            <div className="absolute left-[-32px]">
-                <DropdownMenu
-                    menuItems={[
-                        {
-                            label: 'Edit',
-                            onClick: handleEditNodeClick,
-                        },
-                        {
-                            separator: true,
-                        },
-                        {
-                            danger: true,
-                            label: 'Delete',
-                            onClick: handleDeleteNodeClick,
-                        },
-                    ]}
-                />
-            </div>
+            {!isFirstNode && !!isHovered && (
+                <div className="absolute left-[-46px] pr-4">
+                    {data.type === 'trigger' ? (
+                        <Button
+                            className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
+                            displayType="icon"
+                            icon={<PencilIcon className="h-5 w-5" />}
+                            onClick={handleEditNodeClick}
+                            title="Edit a node"
+                        />
+                    ) : (
+                        <Button
+                            className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
+                            displayType="icon"
+                            icon={<TrashIcon className="h-5 w-5" />}
+                            onClick={handleDeleteNodeClick}
+                            title="Delete a node"
+                        />
+                    )}
+                </div>
+            )}
 
             <Button
-                className="p-4"
+                className="rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:bg-gray-200"
                 displayType="icon"
                 icon={data.icon}
                 onClick={handleNodeClick}
             />
 
-            <div className="absolute left-[80px] flex w-full min-w-max flex-col items-start">
+            <div className="ml-2 flex w-full min-w-max flex-col items-start">
                 <span className="text-sm text-gray-900">{data.label}</span>
 
                 <span className="text-xs text-gray-500">{data.name}</span>
@@ -105,23 +119,23 @@ const WorkflowNode = ({id, data}: NodeProps) => {
 
             {showEditNodeDialog && (
                 <EditNodeDialog
-                    visible={showEditNodeDialog}
                     onClose={() => setShowEditNodeDialog(false)}
+                    visible={showEditNodeDialog}
                 />
             )}
 
             <Handle
-                className={styles.handle}
-                type="target"
-                position={Position.Top}
+                className={twMerge('left-[36px]', styles.handle)}
                 isConnectable={false}
+                position={Position.Top}
+                type="target"
             />
 
             <Handle
-                className={styles.handle}
-                type="source"
-                position={Position.Bottom}
+                className={twMerge('left-[36px]', styles.handle)}
                 isConnectable={false}
+                position={Position.Bottom}
+                type="source"
             />
         </div>
     );
