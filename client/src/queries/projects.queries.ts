@@ -1,7 +1,10 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
+    GetProjectExecutionsRequest,
+    PageModel,
     ProjectCategoriesApi,
+    ProjectExecutionsApi,
     ProjectModel,
     ProjectsApi,
     ProjectTagsApi,
@@ -23,6 +26,8 @@ export const ProjectKeys = {
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
+    projectExecutions: ['projectExecutions'] as const,
+    projectInstances: ['projectInstances'] as const,
 };
 
 export const useGetProjectCategoriesQuery = () =>
@@ -55,4 +60,11 @@ export const useGetProjectsQuery = (filters: {
 export const useGetProjectWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
         new ProjectsApi().getProjectWorkflows({id})
+    );
+
+export const useGetProjectExecutionsQuery = (
+    request: GetProjectExecutionsRequest
+) =>
+    useQuery<PageModel, Error>(ProjectKeys.projectExecutions, () =>
+        new ProjectExecutionsApi().getProjectExecutions(request)
     );
