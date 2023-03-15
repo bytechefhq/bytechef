@@ -48,30 +48,30 @@ const RightSlideOver = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-0 right-0 z-10 w-screen max-w-md overflow-hidden bg-white"
+                    className="fixed inset-y-0 right-0 z-10 w-screen max-w-md overflow-hidden border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                 >
-                    <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
-                        {currentNode.label}
-
-                        <Tooltip />
-
-                        <Button
-                            aria-label="Close panel"
-                            className="ml-auto"
-                            displayType="icon"
-                            icon={
-                                <Cross1Icon
-                                    className="h-3 w-3 cursor-pointer text-gray-900"
-                                    aria-hidden="true"
-                                />
-                            }
-                            onClick={() => setRightSlideOverOpen(false)}
-                        />
-                    </Dialog.Title>
-
                     <div className="flex h-full flex-col divide-y divide-gray-100 bg-white shadow-xl">
-                        <div className="flex h-full flex-col space-y-4 p-4">
+                        <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
+                            {currentNode.label}
+
+                            <Tooltip />
+
+                            <Button
+                                aria-label="Close panel"
+                                className="ml-auto"
+                                displayType="icon"
+                                icon={
+                                    <Cross1Icon
+                                        className="h-3 w-3 cursor-pointer text-gray-900"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                onClick={() => setRightSlideOverOpen(false)}
+                            />
+                        </Dialog.Title>
+
+                        <div className="space-y-4 p-4">
                             <div>
                                 <label
                                     htmlFor="location"
@@ -141,7 +141,7 @@ const RightSlideOver = () => {
                             </div>
                         </div>
 
-                        <div className="flex shrink-0 justify-start p-4">
+                        <div className="mt-auto flex p-4">
                             <Select
                                 defaultValue={'2'}
                                 options={[
