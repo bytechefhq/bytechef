@@ -35,9 +35,10 @@ const Workflow = (): JSX.Element => {
         {
             id: '1',
             data: {
+                icon: <PlayIcon className="h-8 w-8 text-gray-700" />,
                 label: 'Manual Trigger',
                 name: 'trigger',
-                icon: <PlayIcon className="h-8 w-8 text-gray-700" />,
+                type: 'trigger',
             },
             position: {x: 0, y: 0},
             type: 'workflow',
