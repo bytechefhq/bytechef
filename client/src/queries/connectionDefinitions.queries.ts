@@ -20,8 +20,11 @@ export const ConnectDefinitionKeys = {
 export const useGetConnectionDefinitionQuery = (request?: Request) =>
     useQuery<ConnectionDefinitionModel, Error>(
         ConnectDefinitionKeys.connectionDefinitionDetails(request),
-        () => new ConnectionDefinitionsApi().getConnectionDefinition(request!),
+        () =>
+            new ConnectionDefinitionsApi().getComponentConnectionDefinition({
+                name: request!.componentName,
+            }),
         {
-            enabled: !!request,
+            enabled: !!request?.componentName,
         }
     );
