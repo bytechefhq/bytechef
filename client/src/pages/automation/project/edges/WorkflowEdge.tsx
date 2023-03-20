@@ -1,4 +1,6 @@
+import {useState} from 'react';
 import {EdgeProps, getBezierPath} from 'reactflow';
+import {twMerge} from 'tailwind-merge';
 import PopoverMenu from '../components/PopoverMenu';
 
 export default function WorkflowEdge({
@@ -12,6 +14,8 @@ export default function WorkflowEdge({
     style,
     markerEnd,
 }: EdgeProps) {
+    const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
+
     const [edgePath, edgeCenterX, edgeCenterY] = getBezierPath({
         sourceX,
         sourceY,
@@ -32,9 +36,19 @@ export default function WorkflowEdge({
             />
 
             <PopoverMenu id={id} edge>
-                <g transform={`translate(${edgeCenterX}, ${edgeCenterY})`}>
+                <g
+                    transform={`translate(${edgeCenterX}, ${edgeCenterY})`}
+                    onDrop={() => setDropzoneActive(false)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDragEnter={() => setDropzoneActive(true)}
+                    onDragLeave={() => setDropzoneActive(false)}
+                >
                     <rect
-                        className="pointer-events-auto cursor-pointer fill-white stroke-gray-400 hover:fill-gray-200"
+                        className={twMerge(
+                            'react-flow__edge pointer-events-auto cursor-pointer fill-white stroke-gray-400 hover:fill-gray-200',
+                            isDropzoneActive && 'fill-gray-500 stroke-white'
+                        )}
+                        id={id}
                         height={20}
                         rx={4}
                         ry={4}
@@ -44,7 +58,10 @@ export default function WorkflowEdge({
                     />
 
                     <text
-                        className="pointer-events-none select-none fill-gray-500"
+                        className={twMerge(
+                            'pointer-events-none select-none fill-gray-500',
+                            isDropzoneActive && 'fill-white'
+                        )}
                         y={5}
                         x={-5}
                     >
