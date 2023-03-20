@@ -22,6 +22,7 @@ import {
     ComponentDefinitionModel,
     TaskDispatcherDefinitionModel,
 } from 'middleware/definition-registry';
+import getFormattedName from './utils/getFormattedName';
 
 const uuid = (): string =>
     new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
@@ -121,7 +122,7 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
                     <PlayIcon className="h-8 w-8 text-gray-700" />
                 ),
                 label: droppedNode.display?.label,
-                name: droppedNode.name,
+                name: getFormattedName(droppedNode.name!, nodes),
             },
             type: 'workflow',
         };

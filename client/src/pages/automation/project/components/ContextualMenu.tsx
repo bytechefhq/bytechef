@@ -7,9 +7,8 @@ import {
     TaskDispatcherDefinitionModel,
 } from '../../../../middleware/definition-registry';
 import WorkflowNodesList from '../components/WorkflowNodesList';
-
-const uuid = (): string =>
-    new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
+import getFormattedName from '../utils/getFormattedName';
+import getRandomId from '../utils/getRandomId';
 
 interface ContextualMenuProps {
     components: ComponentDefinitionBasicModel[] | undefined;
@@ -40,18 +39,6 @@ const ContextualMenu = ({
             | ComponentDefinitionBasicModel
             | TaskDispatcherDefinitionModel
     ) => {
-        const nodes = getNodes();
-
-        const nodeNames = nodes.map((node) => node.data.name);
-
-        const existingNodes = nodeNames.filter((name) =>
-            name?.includes(clickedItem.name)
-        );
-
-        const formattedName = existingNodes.length
-            ? `${clickedItem.name}-${existingNodes.length}`
-            : clickedItem.name;
-
         if (edge) {
             const clickedEdge = getEdge(id);
 
@@ -59,17 +46,19 @@ const ContextualMenu = ({
                 return;
             }
 
+            const nodes = getNodes();
+
             const newWorkflowNode = {
                 data: {
                     label: clickedItem.display?.label,
-                    name: formattedName,
+                    name: getFormattedName(clickedItem.name!, nodes),
                     icon: <Component1Icon className="h-8 w-8 text-gray-700" />,
                 },
                 position: {
                     x: 0,
                     y: 0,
                 },
-                id: uuid(),
+                id: getRandomId(),
                 type: 'workflow',
             };
 
@@ -109,7 +98,7 @@ const ContextualMenu = ({
         }
 
         const placeholderId = placeholderNode.id;
-        const childPlaceholderId = uuid();
+        const childPlaceholderId = getRandomId();
 
         const childPlaceholderNode = {
             id: childPlaceholderId,
@@ -140,7 +129,10 @@ const ContextualMenu = ({
                             type: 'workflow',
                             data: {
                                 label: clickedItem.display?.label,
-                                name: formattedName,
+                                name: getFormattedName(
+                                    clickedItem.name!,
+                                    nodes
+                                ),
                                 icon: (
                                     <Component1Icon className="h-8 w-8 text-gray-700" />
                                 ),
@@ -219,7 +211,7 @@ const ContextualMenu = ({
                 />
             </header>
 
-            <main className="max-h-64 overflow-auto bg-gray-100">
+            <main className="max-h-80 overflow-auto rounded-b-lg bg-gray-100">
                 <WorkflowNodesList
                     components={filteredComponents}
                     flowControls={filteredFlowControls}
