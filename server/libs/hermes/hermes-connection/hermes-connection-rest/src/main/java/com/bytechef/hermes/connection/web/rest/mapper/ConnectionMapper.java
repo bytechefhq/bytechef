@@ -29,5 +29,6 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = ConnectionMapperSpringConfig.class)
 public interface ConnectionMapper extends Converter<Connection, ConnectionModel> {
 
+    @Override
     ConnectionModel convert(Connection connection);
 }

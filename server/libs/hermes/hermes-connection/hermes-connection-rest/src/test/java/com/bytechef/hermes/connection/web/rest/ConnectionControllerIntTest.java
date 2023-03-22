@@ -27,6 +27,7 @@ import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.UpdateConnectionTagsRequestModel;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -50,6 +51,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
  */
 @WebFluxTest(value = ConnectionController.class)
 public class ConnectionControllerIntTest {
+
+    @MockBean
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private ConnectionFacade connectionFacade;

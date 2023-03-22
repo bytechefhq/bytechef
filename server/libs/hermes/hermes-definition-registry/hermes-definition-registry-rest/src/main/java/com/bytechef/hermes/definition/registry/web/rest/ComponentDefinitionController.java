@@ -85,21 +85,21 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     @Override
     public Mono<ResponseEntity<ConnectionDefinitionModel>> getComponentConnectionDefinition(
-        String componentName, ServerWebExchange exchange) {
+        String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
-        return connectionDefinitionService.getConnectionDefinitionMono(componentName)
-            .mapNotNull(componentDefinition -> conversionService.convert(
-                componentDefinition, ConnectionDefinitionModel.class))
+        return connectionDefinitionService.getComponentConnectionDefinitionMono(componentName, componentVersion)
+            .mapNotNull(connectionDefinition -> conversionService.convert(
+                connectionDefinition, ConnectionDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<Flux<ConnectionDefinitionBasicModel>>> getComponentConnectionDefinitions(
-        String componentName, ServerWebExchange exchange) {
+        String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return Mono.just(
             ResponseEntity.ok(
-                connectionDefinitionService.getConnectionDefinitionsMono(componentName)
+                connectionDefinitionService.getComponentConnectionDefinitionsMono(componentName, componentVersion)
                     .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
                         .map(connectionDefinition -> conversionService.convert(
                             connectionDefinition, ConnectionDefinitionBasicModel.class))

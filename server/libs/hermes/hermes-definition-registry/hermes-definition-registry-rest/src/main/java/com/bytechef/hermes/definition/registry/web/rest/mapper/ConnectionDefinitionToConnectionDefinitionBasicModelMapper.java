@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
@@ -31,5 +32,15 @@ public interface ConnectionDefinitionToConnectionDefinitionBasicModelMapper
     extends Converter<ConnectionDefinition, ConnectionDefinitionBasicModel> {
 
     @Override
-    ConnectionDefinitionBasicModel convert(ConnectionDefinition connectionDefinition);
+    default ConnectionDefinitionBasicModel convert(ConnectionDefinition connectionDefinition) {
+        if (connectionDefinition instanceof ComponentDSL.ModifiableConnectionDefinition) {
+            return map((ComponentDSL.ModifiableConnectionDefinition) connectionDefinition);
+        } else {
+            return map(connectionDefinition);
+        }
+    }
+
+    ConnectionDefinitionBasicModel map(ConnectionDefinition connectionDefinition);
+
+    ConnectionDefinitionBasicModel map(ComponentDSL.ModifiableConnectionDefinition modifiableConnectionDefinition);
 }

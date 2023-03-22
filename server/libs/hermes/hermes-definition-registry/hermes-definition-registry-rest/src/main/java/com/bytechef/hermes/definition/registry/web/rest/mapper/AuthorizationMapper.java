@@ -18,20 +18,28 @@
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
-public interface AuthorizationMapper
-    extends Converter<Authorization, AuthorizationModel> {
+public interface AuthorizationMapper extends Converter<Authorization, AuthorizationModel> {
 
     @Override
-    @Mapping(target = "redirectUri", ignore = true)
-    AuthorizationModel convert(Authorization authorization);
+    default AuthorizationModel convert(Authorization authorization) {
+        if (authorization instanceof ComponentDSL.ModifiableAuthorization) {
+            return map((ComponentDSL.ModifiableAuthorization) authorization);
+        } else {
+            return map(authorization);
+        }
+    }
+
+    AuthorizationModel map(Authorization actionDefinition);
+
+    AuthorizationModel map(ComponentDSL.ModifiableAuthorization modifiableAuthorization);
 }
