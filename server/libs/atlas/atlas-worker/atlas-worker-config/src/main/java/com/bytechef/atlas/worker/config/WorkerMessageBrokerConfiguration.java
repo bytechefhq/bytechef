@@ -49,6 +49,7 @@ public class WorkerMessageBrokerConfiguration implements ApplicationContextAware
     @Bean
     MessageBrokerConfigurer workerMessageBrokerConfigurer() {
         return new MessageBrokerConfigurer() {
+
             @Override
             public <T> void configure(
                 T listenerEndpointRegistrar, MessageBrokerListenerRegistrar<T> messageBrokerListenerRegistrar) {
