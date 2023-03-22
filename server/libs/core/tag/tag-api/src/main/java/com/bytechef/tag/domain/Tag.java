@@ -35,7 +35,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public class Tag implements Persistable<Long>, Serializable {
+public final class Tag implements Persistable<Long>, Serializable {
 
     @CreatedBy
     @Column("created_by")

@@ -114,6 +114,8 @@ public class IntegrationFacadeIntTest {
         assertThat(integration.getId()).isNotNull();
         assertThat(integration.getTagIds()).hasSize(1);
         assertThat(integration.getWorkflowIds()).hasSize(0);
+        assertThat(categoryRepository.count()).isEqualTo(1);
+        assertThat(tagRepository.count()).isEqualTo(1);
 
         integration = new Integration();
 
