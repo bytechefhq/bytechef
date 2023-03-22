@@ -55,6 +55,9 @@ public final class Connection implements Persistable<Long> {
     @Column("component_name")
     private String componentName;
 
+    @Column("connection_version")
+    private int connectionVersion = 1;
+
     @MappedCollection(idColumn = "connection_id")
     private Set<ConnectionTag> connectionTags = new HashSet<>();
 
@@ -142,6 +145,13 @@ public final class Connection implements Persistable<Long> {
         return componentName;
     }
 
+    /**
+     * Return the version of a component this connection can be used for.
+     */
+    public int getConnectionVersion() {
+        return connectionVersion;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -186,8 +196,9 @@ public final class Connection implements Persistable<Long> {
         return name;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getParameter(String name) {
-        return MapValueUtils.get(parameters.getMap(), name, new ParameterizedTypeReference<>() {});
+        return (T) MapValueUtils.get(parameters.getMap(), name);
     }
 
     /**
@@ -227,6 +238,10 @@ public final class Connection implements Persistable<Long> {
 
     public void setComponentName(String componentName) {
         this.componentName = componentName;
+    }
+
+    public void setConnectionVersion(int connectionVersion) {
+        this.connectionVersion = connectionVersion;
     }
 
     public void setId(Long id) {
@@ -271,7 +286,8 @@ public final class Connection implements Persistable<Long> {
             + name + '\'' + ", key='"
             + key + '\'' + "authorizationName='"
             + authorizationName + '\'' + ", componentName='"
-            + componentName + '\'' + ", connectionTags="
+            + componentName + ", connectionVersion='"
+            + connectionVersion + ", connectionTags="
             + connectionTags + ", parameters="
             + parameters + ", version="
             + version + ", createdBy='"
@@ -283,6 +299,7 @@ public final class Connection implements Persistable<Long> {
 
     public Connection update(Connection connection) {
         this.setName(connection.getName());
+        this.setTags(connection.getTags());
         this.setVersion(connection.getVersion());
 
         return this;
@@ -303,7 +320,7 @@ public final class Connection implements Persistable<Long> {
         @Override
         @SuppressWarnings("unchecked")
         public <T> T getParameter(String name) {
-            return (T) parameters.get(name);
+            return (T) MapValueUtils.get(parameters, name);
         }
 
         @Override

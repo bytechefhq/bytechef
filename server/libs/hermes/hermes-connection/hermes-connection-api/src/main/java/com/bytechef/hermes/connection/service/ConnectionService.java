@@ -33,6 +33,8 @@ public interface ConnectionService {
 
     Connection getConnection(long id);
 
+    List<Connection> getConnections();
+
     List<Connection> getConnections(List<String> componentNames, List<Long> tagIds);
 
     Connection update(Connection connection);

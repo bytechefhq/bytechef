@@ -36,9 +36,9 @@ public class ConnectionConfiguration {
     @Bean
     ConnectionFacade connectionFacade(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        TagService tagService) {
+        OAuth2Properties oAuth2Properties, TagService tagService) {
 
-        return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, tagService);
+        return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, oAuth2Properties, tagService);
     }
 
     @Bean
