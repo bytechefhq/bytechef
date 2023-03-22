@@ -114,7 +114,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 default:
-                    throw new IllegalStateException("Unknown status: " + status);
+                    throw new IllegalStateException("Unknown status: %s".formatted(status));
             }
         }
     }
