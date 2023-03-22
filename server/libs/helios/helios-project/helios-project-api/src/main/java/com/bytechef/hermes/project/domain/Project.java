@@ -83,8 +83,8 @@ public final class Project implements Persistable<Long> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @Column("last_published_date")
-    private LocalDateTime lastPublishedDate;
+    @Column("published_date")
+    private LocalDateTime publishedDate;
 
     @MappedCollection(idColumn = "project_id")
     private Set<ProjectTag> projectTags = new HashSet<>();
@@ -176,8 +176,8 @@ public final class Project implements Persistable<Long> {
         return id;
     }
 
-    public LocalDateTime getLastPublishedDate() {
-        return lastPublishedDate;
+    public LocalDateTime getPublishedDate() {
+        return publishedDate;
     }
 
     public String getName() {
@@ -256,8 +256,8 @@ public final class Project implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
-        this.lastPublishedDate = lastPublishedDate;
+    public void setPublishedDate(LocalDateTime publishedDate) {
+        this.publishedDate = publishedDate;
     }
 
     public void setName(String name) {
@@ -302,7 +302,7 @@ public final class Project implements Persistable<Long> {
             ", name='" + name + '\'' +
             ", projectVersion='" + projectVersion + '\'' +
             ", status='" + status + '\'' +
-            ", lastPublishedDate='" + lastPublishedDate + '\'' +
+            ", lastPublishedDate='" + publishedDate + '\'' +
             ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
             ", projectTags=" + projectTags +
@@ -326,5 +326,87 @@ public final class Project implements Persistable<Long> {
         this.tags = project.tags;
 
         return this;
+    }
+
+    @SuppressFBWarnings("EI")
+    public static final class Builder {
+        private Category category;
+        private String description;
+        private Long id;
+        private String name;
+        private LocalDateTime publishedDate;
+        private int projectVersion;
+        private Status status;
+        private List<Tag> tags;
+        private List<String> workflowIds;
+
+        private Builder() {
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public Builder category(Category category) {
+            this.category = category;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder publishedDate(LocalDateTime publishedDate) {
+            this.publishedDate = publishedDate;
+            return this;
+        }
+
+        public Builder projectVersion(int projectVersion) {
+            this.projectVersion = projectVersion;
+            return this;
+        }
+
+        public Builder status(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder tags(List<Tag> tags) {
+            this.tags = tags;
+            return this;
+        }
+
+        public Builder workflowIds(List<String> workflowIds) {
+            this.workflowIds = workflowIds;
+
+            return this;
+        }
+
+        public Project build() {
+            Project project = new Project();
+
+            project.setCategory(category);
+            project.setDescription(description);
+            project.setId(id);
+            project.setName(name);
+            project.setPublishedDate(publishedDate);
+            project.setProjectVersion(projectVersion);
+            project.setStatus(status);
+            project.setTags(tags);
+            project.setWorkflowIds(workflowIds);
+
+            return project;
+        }
     }
 }

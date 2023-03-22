@@ -92,8 +92,8 @@ public final class Integration implements Persistable<Long> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @Column("last_published_date")
-    private LocalDateTime lastPublishedDate;
+    @Column("published_date")
+    private LocalDateTime publishedDate;
 
     @Column
     private Status status;
@@ -192,8 +192,8 @@ public final class Integration implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public LocalDateTime getLastPublishedDate() {
-        return lastPublishedDate;
+    public LocalDateTime getPublishedDate() {
+        return publishedDate;
     }
 
     public Status getStatus() {
@@ -260,8 +260,8 @@ public final class Integration implements Persistable<Long> {
         this.integrationVersion = integrationVersion;
     }
 
-    public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
-        this.lastPublishedDate = lastPublishedDate;
+    public void setPublishedDate(LocalDateTime publishedDate) {
+        this.publishedDate = publishedDate;
     }
 
     public void setName(String name) {
@@ -302,7 +302,7 @@ public final class Integration implements Persistable<Long> {
             ", name='" + name + '\'' +
             ", integrationVersion='" + integrationVersion + '\'' +
             ", status='" + status + '\'' +
-            ", lastPublishedDate='" + lastPublishedDate + '\'' +
+            ", lastPublishedDate='" + publishedDate + '\'' +
             ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
             ", integrationTags=" + integrationTags +
