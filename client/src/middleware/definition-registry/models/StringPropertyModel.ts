@@ -51,7 +51,7 @@ import {
  */
 export interface StringPropertyModel extends ValuePropertyModel {
     /**
-     * The list of valid property options.
+     * A list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof StringPropertyModel
      */
