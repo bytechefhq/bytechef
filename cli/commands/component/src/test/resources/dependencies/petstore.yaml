@@ -24,7 +24,7 @@ paths:
           format: "int32"
       responses:
         "200":
-          description: "A paged array of pets"
+          description: "The paged list of pets"
           headers:
             x-next:
               description: "A link to the next page of responses"
