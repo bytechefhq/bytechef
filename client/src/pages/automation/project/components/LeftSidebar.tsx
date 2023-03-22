@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {Provider} from '@radix-ui/react-tooltip';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
@@ -51,13 +50,11 @@ const LeftSidebar: React.FC<SidebarProps> = ({data, filter}): JSX.Element => {
     }, [components, filter, flowControls]);
 
     return (
-        <Provider>
-            <WorkflowNodesList
-                components={filteredComponents}
-                flowControls={filteredFlowControls}
-                itemsDraggable
-            />
-        </Provider>
+        <WorkflowNodesList
+            components={filteredComponents}
+            flowControls={filteredFlowControls}
+            itemsDraggable
+        />
     );
 };
 
