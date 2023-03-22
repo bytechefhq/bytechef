@@ -26,11 +26,13 @@ import {
 } from '../models';
 
 export interface GetComponentConnectionDefinitionRequest {
-    name: string;
+    componentName: string;
+    componentVersion: number;
 }
 
 export interface GetComponentConnectionDefinitionsRequest {
-    name: string;
+    componentName: string;
+    componentVersion: number;
 }
 
 /**
@@ -43,8 +45,12 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
      * Get connection definition for a component.
      */
     async getComponentConnectionDefinitionRaw(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionDefinitionModel>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling getComponentConnectionDefinition.');
+        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
+            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentConnectionDefinition.');
+        }
+
+        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
+            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getComponentConnectionDefinition.');
         }
 
         const queryParameters: any = {};
@@ -52,7 +58,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{name}/connection-definition`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/component-definitions/{componentName}/{componentVersion}/connection-definition`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -75,8 +81,12 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
      * Get all compatible connection definitions for a component.
      */
     async getComponentConnectionDefinitionsRaw(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionDefinitionBasicModel>>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling getComponentConnectionDefinitions.');
+        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
+            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentConnectionDefinitions.');
+        }
+
+        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
+            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getComponentConnectionDefinitions.');
         }
 
         const queryParameters: any = {};
@@ -84,7 +94,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{name}/connection-definitions`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/component-definitions/{componentName}/{componentVersion}/connection-definitions`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

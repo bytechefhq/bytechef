@@ -55,7 +55,7 @@ export interface ValuePropertyModel extends PropertyModel {
      * @type {object}
      * @memberof ValuePropertyModel
      */
-    sampleValue?: object;
+    exampleValue?: object;
 }
 
 /**
@@ -79,7 +79,7 @@ export function ValuePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
-        'sampleValue': !exists(json, 'sampleValue') ? undefined : json['sampleValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
     };
 }
 
@@ -94,7 +94,7 @@ export function ValuePropertyModelToJSON(value?: ValuePropertyModel | null): any
         ...PropertyModelToJSON(value),
         'controlType': ControlTypeModelToJSON(value.controlType),
         'defaultValue': value.defaultValue,
-        'sampleValue': value.sampleValue,
+        'exampleValue': value.exampleValue,
     };
 }
 
