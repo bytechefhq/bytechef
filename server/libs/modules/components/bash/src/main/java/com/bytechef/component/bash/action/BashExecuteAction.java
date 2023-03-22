@@ -20,7 +20,7 @@ package com.bytechef.component.bash.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 import java.io.BufferedWriter;
@@ -68,7 +68,7 @@ public class BashExecuteAction {
                 int chmodRetCode = chmodProcess.waitFor();
 
                 if (chmodRetCode != 0) {
-                    throw new ActionExecutionException("Failed to chmod %s".formatted(chmodRetCode));
+                    throw new ComponentExecutionException("Failed to chmod %s".formatted(chmodRetCode));
                 }
 
                 return new ProcessExecutor().command(scriptFile.getAbsolutePath())
@@ -79,7 +79,7 @@ public class BashExecuteAction {
                 deleteRecursively(scriptFile.toPath());
             }
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to handle task " + parameters, exception);
+            throw new ComponentExecutionException("Unable to handle action " + parameters, exception);
         }
     }
 
@@ -111,7 +111,7 @@ public class BashExecuteAction {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(str);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ComponentExecutionException(e.getMessage(), e);
         }
     }
 }

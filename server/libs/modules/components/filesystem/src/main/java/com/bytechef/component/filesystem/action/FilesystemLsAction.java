@@ -20,7 +20,7 @@ package com.bytechef.component.filesystem.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class FilesystemLsAction {
                 .map(p -> new FileInfo(root, p))
                 .collect(Collectors.toList());
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to list directory entries", ioException);
+            throw new ComponentExecutionException("Unable to list directory entries", ioException);
         }
     }
 
@@ -78,7 +78,7 @@ public class FilesystemLsAction {
             File file = path.toFile();
 
             if (!file.exists() || !file.isFile()) {
-                throw new IllegalArgumentException("Path does not pint to valid file");
+                throw new ComponentExecutionException("Path does not pint to valid file");
             }
 
             size = file.length();

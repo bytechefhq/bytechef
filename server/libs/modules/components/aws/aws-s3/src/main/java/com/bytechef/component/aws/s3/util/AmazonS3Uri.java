@@ -34,7 +34,7 @@ package com.bytechef.component.aws.s3.util;
  * permissions and limitations under the License.
  */
 
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -68,7 +68,7 @@ public class AmazonS3Uri {
      *
      * @param str the URI to parse.
      */
-    public AmazonS3Uri(final String str) throws ActionExecutionException {
+    public AmazonS3Uri(final String str) throws ComponentExecutionException {
         this(str, true);
     }
 
@@ -80,7 +80,7 @@ public class AmazonS3Uri {
      * @param str       the URI to parse.
      * @param urlEncode true if string should be URL encoded
      */
-    public AmazonS3Uri(final String str, final boolean urlEncode) throws ActionExecutionException {
+    public AmazonS3Uri(final String str, final boolean urlEncode) throws ComponentExecutionException {
         this(URI.create(preprocessUrlStr(str, urlEncode)), urlEncode);
     }
 
@@ -95,7 +95,7 @@ public class AmazonS3Uri {
 
     private AmazonS3Uri(final URI uri, final boolean urlEncode) {
         if (uri == null) {
-            throw new IllegalArgumentException("uri must not be null");
+            throw new ComponentExecutionException("uri must not be null");
         }
 
         this.uri = uri;
@@ -108,7 +108,7 @@ public class AmazonS3Uri {
             this.bucket = uri.getAuthority();
 
             if (bucket == null) {
-                throw new IllegalArgumentException("Invalid S3 URI: no bucket: " + uri);
+                throw new ComponentExecutionException("Invalid S3 URI: no bucket: " + uri);
             }
 
             String path = uri.getPath();
@@ -126,12 +126,12 @@ public class AmazonS3Uri {
 
         String host = uri.getHost();
         if (host == null) {
-            throw new IllegalArgumentException("Invalid S3 URI: no hostname: " + uri);
+            throw new ComponentExecutionException("Invalid S3 URI: no hostname: " + uri);
         }
 
         Matcher matcher = ENDPOINT_PATTERN.matcher(host);
         if (!matcher.find()) {
-            throw new IllegalArgumentException(
+            throw new ComponentExecutionException(
                 "Invalid S3 URI: hostname does not appear to be a valid S3 " + "endpoint: " + uri);
         }
 
@@ -266,7 +266,7 @@ public class AmazonS3Uri {
      * @param str the string to encode
      * @return the encoded string
      */
-    private static String preprocessUrlStr(final String str, final boolean encode) throws ActionExecutionException {
+    private static String preprocessUrlStr(final String str, final boolean encode) throws ComponentExecutionException {
         if (encode) {
             return URLEncoder.encode(str, StandardCharsets.UTF_8)
                 .replace("%3A", ":")
@@ -333,7 +333,7 @@ public class AmazonS3Uri {
      */
     private static void appendDecoded(final StringBuilder builder, final String str, final int index) {
         if (index > str.length() - 3) {
-            throw new IllegalStateException("Invalid percent-encoded string:" + "\"" + str + "\"");
+            throw new ComponentExecutionException("Invalid percent-encoded string: %s".formatted("\"" + str + "\""));
         }
 
         char first = str.charAt(index + 1);
@@ -351,7 +351,7 @@ public class AmazonS3Uri {
      */
     private static int fromHex(final char c) {
         if (c < '0') {
-            throw new IllegalStateException(
+            throw new ComponentExecutionException(
                 "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
         }
 
@@ -360,7 +360,7 @@ public class AmazonS3Uri {
         }
 
         if (c < 'A') {
-            throw new IllegalStateException(
+            throw new ComponentExecutionException(
                 "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
         }
 
@@ -369,7 +369,7 @@ public class AmazonS3Uri {
         }
 
         if (c < 'a') {
-            throw new IllegalStateException(
+            throw new ComponentExecutionException(
                 "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
         }
 
@@ -377,7 +377,7 @@ public class AmazonS3Uri {
             return (c - 'a') + 10;
         }
 
-        throw new IllegalStateException(
+        throw new ComponentExecutionException(
             "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence");
     }
 

@@ -21,6 +21,7 @@ import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.END_INCLUSIVE;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_INT;
@@ -59,11 +60,11 @@ public class RandomHelperRandomIntAction {
 
     private static int nextInt(final int startInclusive, final int endExclusive) {
         if (endExclusive < startInclusive) {
-            throw new IllegalArgumentException("Start value must be smaller or equal to end value");
+            throw new ComponentExecutionException("Start value must be smaller or equal to end value");
         }
 
         if (startInclusive < 0) {
-            throw new IllegalArgumentException("Both range values must be non-negative");
+            throw new ComponentExecutionException("Both range values must be non-negative");
         }
 
         if (startInclusive == endExclusive) {

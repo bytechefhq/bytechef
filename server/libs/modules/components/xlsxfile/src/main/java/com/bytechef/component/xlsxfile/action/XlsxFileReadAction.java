@@ -21,7 +21,7 @@ import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.ObjectUtils;
 import com.bytechef.hermes.component.util.ValueUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -138,7 +138,7 @@ public class XlsxFileReadAction {
                     readAsString,
                     sheetName));
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to handle task " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to handle action " + parameters, ioException);
         }
     }
 
@@ -170,7 +170,7 @@ public class XlsxFileReadAction {
                     yield numericValue;
                 }
                 case STRING -> cell.getStringCellValue();
-                default -> throw new IllegalStateException("Unexpected value: " + cell.getCellType());
+                default -> throw new ComponentExecutionException("Unexpected value: %s".formatted(cell.getCellType()));
             };
         }
 
