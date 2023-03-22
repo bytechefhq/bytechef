@@ -274,7 +274,7 @@ public class DefinitionDSL {
     // CHECKSTYLE:OFF
     public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property<P>>
         implements
-        Property<P>permits ModifiableProperty.ModifiableDynamicPropertiesProperty,ModifiableProperty.ModifiableOneOfProperty,ModifiableProperty.ModifiableValueProperty {
+        Property<P> permits ModifiableProperty.ModifiableDynamicPropertiesProperty, ModifiableProperty.ModifiableOneOfProperty, ModifiableProperty.ModifiableValueProperty {
 
         private Boolean advancedOption;
         private String description;
@@ -582,6 +582,11 @@ public class DefinitionDSL {
             public OptionsDataSource getOptionsDataSource() {
                 return optionsDataSource;
             }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
+            }
         }
 
         @JsonTypeName("BOOLEAN")
@@ -612,6 +617,11 @@ public class DefinitionDSL {
             @Override
             public ControlType getControlType() {
                 return ControlType.CHECKBOX;
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
             }
         }
 
@@ -672,6 +682,11 @@ public class DefinitionDSL {
             public OptionsDataSource getOptionsDataSource() {
                 return optionsDataSource;
             }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
+            }
         }
 
         @JsonTypeName("DATE_TIME")
@@ -731,6 +746,11 @@ public class DefinitionDSL {
             @Override
             public OptionsDataSource getOptionsDataSource() {
                 return optionsDataSource;
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
             }
         }
 
@@ -815,6 +835,11 @@ public class DefinitionDSL {
             @Override
             public OptionsDataSource getOptionsDataSource() {
                 return optionsDataSource;
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
             }
         }
 
@@ -947,6 +972,11 @@ public class DefinitionDSL {
             @Override
             public OptionsDataSource getOptionsDataSource() {
                 return optionsDataSource;
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
             }
         }
 
@@ -1084,6 +1114,11 @@ public class DefinitionDSL {
             public List<? extends Property<?>> getProperties() {
                 return properties == null ? null : new ArrayList<>(properties);
             }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
+            }
         }
 
         @JsonTypeName("DYNAMIC_PROPERTIES")
@@ -1104,6 +1139,11 @@ public class DefinitionDSL {
             @Override
             public PropertiesDataSource getPropertiesDataSource() {
                 return propertiesDataSource;
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
             }
         }
 
@@ -1137,6 +1177,11 @@ public class DefinitionDSL {
 
             public List<? extends Property<?>> getTypes() {
                 return types;
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
             }
         }
 
@@ -1209,12 +1254,17 @@ public class DefinitionDSL {
             public OptionsDataSource getOptionsDataSource() {
                 return optionsDataSource;
             }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
+            }
         }
 
         public abstract static sealed class ModifiableValueProperty<V, M extends ModifiableValueProperty<V, M, P>, P extends ValueProperty<V, P>>
             extends ModifiableProperty<M, P>
             implements
-            Property.ValueProperty<V, P>permits ModifiableArrayProperty,ModifiableBooleanProperty,ModifiableDateProperty,ModifiableDateTimeProperty,ModifiableIntegerProperty,ModifiableNumberProperty,ModifiableObjectProperty,ModifiableStringProperty {
+            Property.ValueProperty<V, P> permits ModifiableArrayProperty, ModifiableBooleanProperty, ModifiableDateProperty, ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNumberProperty, ModifiableObjectProperty, ModifiableStringProperty {
 
             protected V defaultValue;
             protected V exampleValue;
@@ -1289,7 +1339,7 @@ public class DefinitionDSL {
         }
 
         @Override
-        public T getValue() {
+        public Object getValue() {
             return value;
         }
     }
