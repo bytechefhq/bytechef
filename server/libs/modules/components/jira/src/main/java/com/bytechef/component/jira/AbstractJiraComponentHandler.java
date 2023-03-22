@@ -28,7 +28,7 @@ import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
- * Provides the base implementation for the REST-based component.
+ * Provides the base implementation for the REST based component.
  *
  * @generated
  */
