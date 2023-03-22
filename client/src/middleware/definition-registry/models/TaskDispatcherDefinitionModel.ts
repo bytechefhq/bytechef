@@ -57,7 +57,7 @@ export interface TaskDispatcherDefinitionModel {
      */
     outputSchema?: Array<PropertyModel>;
     /**
-     * The list of task dispatcher properties.
+     * A list of task dispatcher properties.
      * @type {Array<PropertyModel>}
      * @memberof TaskDispatcherDefinitionModel
      */

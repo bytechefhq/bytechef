@@ -45,7 +45,7 @@ import {
  */
 export interface ComponentDefinitionModel {
     /**
-     * The list of all available actions the component can perform.
+     * A list of all available actions the component can perform.
      * @type {Array<ActionDefinitionModel>}
      * @memberof ComponentDefinitionModel
      */
