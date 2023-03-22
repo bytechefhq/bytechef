@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.jdbc.event;
+package com.bytechef.atlas.repository.jdbc.callback;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
