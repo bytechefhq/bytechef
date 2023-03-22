@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ValueProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
 public class ValuePropertyAllOfModel {
 
   @JsonProperty("controlType")
@@ -31,8 +31,8 @@ public class ValuePropertyAllOfModel {
   @JsonProperty("defaultValue")
   private Object defaultValue;
 
-  @JsonProperty("sampleValue")
-  private Object sampleValue;
+  @JsonProperty("exampleValue")
+  private Object exampleValue;
 
   public ValuePropertyAllOfModel controlType(ControlTypeModel controlType) {
     this.controlType = controlType;
@@ -72,23 +72,23 @@ public class ValuePropertyAllOfModel {
     this.defaultValue = defaultValue;
   }
 
-  public ValuePropertyAllOfModel sampleValue(Object sampleValue) {
-    this.sampleValue = sampleValue;
+  public ValuePropertyAllOfModel exampleValue(Object exampleValue) {
+    this.exampleValue = exampleValue;
     return this;
   }
 
   /**
    * The property sample value.
-   * @return sampleValue
+   * @return exampleValue
   */
   
-  @Schema(name = "sampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Object getSampleValue() {
-    return sampleValue;
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Object getExampleValue() {
+    return exampleValue;
   }
 
-  public void setSampleValue(Object sampleValue) {
-    this.sampleValue = sampleValue;
+  public void setExampleValue(Object exampleValue) {
+    this.exampleValue = exampleValue;
   }
 
   @Override
@@ -102,12 +102,12 @@ public class ValuePropertyAllOfModel {
     ValuePropertyAllOfModel valuePropertyAllOf = (ValuePropertyAllOfModel) o;
     return Objects.equals(this.controlType, valuePropertyAllOf.controlType) &&
         Objects.equals(this.defaultValue, valuePropertyAllOf.defaultValue) &&
-        Objects.equals(this.sampleValue, valuePropertyAllOf.sampleValue);
+        Objects.equals(this.exampleValue, valuePropertyAllOf.exampleValue);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(controlType, defaultValue, sampleValue);
+    return Objects.hash(controlType, defaultValue, exampleValue);
   }
 
   @Override
@@ -116,7 +116,7 @@ public class ValuePropertyAllOfModel {
     sb.append("class ValuePropertyAllOfModel {\n");
     sb.append("    controlType: ").append(toIndentedString(controlType)).append("\n");
     sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
-    sb.append("    sampleValue: ").append(toIndentedString(sampleValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("}");
     return sb.toString();
   }

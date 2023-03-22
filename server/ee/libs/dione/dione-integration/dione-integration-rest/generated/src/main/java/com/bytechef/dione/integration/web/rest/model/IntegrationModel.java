@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:40.978063+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:19.439912+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("category")
@@ -55,9 +55,9 @@ public class IntegrationModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("lastPublishedDate")
+  @JsonProperty("publishedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastPublishedDate;
+  private LocalDateTime publishedDate;
 
   @JsonProperty("integrationVersion")
   private Integer integrationVersion;
@@ -263,23 +263,23 @@ public class IntegrationModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public IntegrationModel lastPublishedDate(LocalDateTime lastPublishedDate) {
-    this.lastPublishedDate = lastPublishedDate;
+  public IntegrationModel publishedDate(LocalDateTime publishedDate) {
+    this.publishedDate = publishedDate;
     return this;
   }
 
   /**
-   * The last published date.
-   * @return lastPublishedDate
+   * The published date.
+   * @return publishedDate
   */
   @Valid 
-  @Schema(name = "lastPublishedDate", description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public LocalDateTime getLastPublishedDate() {
-    return lastPublishedDate;
+  @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public LocalDateTime getPublishedDate() {
+    return publishedDate;
   }
 
-  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
-    this.lastPublishedDate = lastPublishedDate;
+  public void setPublishedDate(LocalDateTime publishedDate) {
+    this.publishedDate = publishedDate;
   }
 
   public IntegrationModel integrationVersion(Integer integrationVersion) {
@@ -410,7 +410,7 @@ public class IntegrationModel {
         Objects.equals(this.description, integration.description) &&
         Objects.equals(this.lastModifiedBy, integration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integration.lastModifiedDate) &&
-        Objects.equals(this.lastPublishedDate, integration.lastPublishedDate) &&
+        Objects.equals(this.publishedDate, integration.publishedDate) &&
         Objects.equals(this.integrationVersion, integration.integrationVersion) &&
         Objects.equals(this.status, integration.status) &&
         Objects.equals(this.tags, integration.tags) &&
@@ -420,7 +420,7 @@ public class IntegrationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, lastPublishedDate, integrationVersion, status, tags, workflowIds, version);
+    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, publishedDate, integrationVersion, status, tags, workflowIds, version);
   }
 
   @Override
@@ -435,7 +435,7 @@ public class IntegrationModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
