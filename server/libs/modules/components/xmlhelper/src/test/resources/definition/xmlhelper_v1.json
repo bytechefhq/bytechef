@@ -1,64 +1,50 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Converts the XML string to object/array.",
-        "label": "Convert from XML string"
-      },
-      "name": "parse",
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
-          "multipleValues": true
-        }
-      ],
-      "properties": [
-        {
-          "description": "The XML string to convert to the data.",
-          "label": "Source",
-          "required": true,
-          "name": "source",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
+  "actions": [ {
+    "display": {
+      "description": "Converts the XML string to object/array.",
+      "label": "Convert from XML string"
     },
-    {
-      "display": {
-        "description": "Writes the object/array to a XML string.",
-        "label": "Convert to XML string"
-      },
-      "name": "stringify",
-      "outputSchema": [
-        {
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The data to convert to XML string.",
-          "label": "Source",
-          "required": true,
-          "name": "source",
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            }
-          ]
-        }
-      ]
-    }
-  ],
+    "name": "parse",
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "controlType": "JSON_BUILDER",
+      "multipleValues": true
+    } ],
+    "properties": [ {
+      "description": "The XML string to convert to the data.",
+      "label": "Source",
+      "required": true,
+      "name": "source",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "display": {
+      "description": "Writes the object/array to a XML string.",
+      "label": "Convert to XML string"
+    },
+    "name": "stringify",
+    "outputSchema": [ {
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "properties": [ {
+      "description": "The data to convert to XML string.",
+      "label": "Source",
+      "required": true,
+      "name": "source",
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      } ]
+    } ]
+  } ],
   "display": {
     "description": "Converts between XML string and object/array.",
     "label": "XML Helper"

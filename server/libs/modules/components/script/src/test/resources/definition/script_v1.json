@@ -1,536 +1,405 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Executes custom Java code.",
-        "label": "Java"
-      },
-      "name": "java",
-      "outputSchema": [
-        {
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE",
-              "controlType": "DATE"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "Initialize parameter values used in the custom code.",
-          "label": "Input",
-          "name": "input",
-          "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
-          "additionalProperties": [
-            {
-              "type": "ONE_OF",
-              "types": [
-                {
-                  "type": "ARRAY",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "BOOLEAN",
-                  "controlType": "CHECKBOX"
-                },
-                {
-                  "type": "DATE",
-                  "controlType": "DATE"
-                },
-                {
-                  "type": "DATE_TIME",
-                  "controlType": "DATE_TIME"
-                },
-                {
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "type": "OBJECT",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ]
-            }
-          ],
-          "multipleValues": true
-        },
-        {
-          "description": "Add your Java custom logic here.",
-          "label": "Java code",
-          "name": "script",
-          "type": "STRING",
-          "controlType": "CODE_EDITOR"
-        }
-      ]
+  "actions": [ {
+    "display": {
+      "description": "Executes custom Java code.",
+      "label": "Java"
     },
-    {
-      "display": {
-        "description": "Executes custom JavaScript code.",
-        "label": "JavaScript"
-      },
-      "name": "javascript",
-      "outputSchema": [
-        {
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE",
-              "controlType": "DATE"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "Initialize parameter values used in the custom code.",
-          "label": "Input",
-          "name": "input",
+    "name": "java",
+    "outputSchema": [ {
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ],
+    "properties": [ {
+      "description": "Initialize parameter values used in the custom code.",
+      "label": "Input",
+      "name": "input",
+      "type": "OBJECT",
+      "controlType": "JSON_BUILDER",
+      "additionalProperties": [ {
+        "type": "ONE_OF",
+        "types": [ {
+          "type": "ARRAY",
+          "controlType": "JSON_BUILDER",
+          "multipleValues": true
+        }, {
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "type": "DATE",
+          "controlType": "DATE"
+        }, {
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
           "type": "OBJECT",
           "controlType": "JSON_BUILDER",
-          "additionalProperties": [
-            {
-              "type": "ONE_OF",
-              "types": [
-                {
-                  "type": "ARRAY",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "BOOLEAN",
-                  "controlType": "CHECKBOX"
-                },
-                {
-                  "type": "DATE",
-                  "controlType": "DATE"
-                },
-                {
-                  "type": "DATE_TIME",
-                  "controlType": "DATE_TIME"
-                },
-                {
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "type": "OBJECT",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ]
-            }
-          ],
           "multipleValues": true
-        },
-        {
-          "description": "Add your JavaScript custom logic here.",
-          "label": "JavaScript code",
-          "name": "script",
+        }, {
           "type": "STRING",
-          "controlType": "CODE_EDITOR"
-        }
-      ]
+          "controlType": "INPUT_TEXT"
+        } ]
+      } ],
+      "multipleValues": true
+    }, {
+      "description": "Add your Java custom logic here.",
+      "label": "Java code",
+      "name": "script",
+      "type": "STRING",
+      "controlType": "CODE_EDITOR"
+    } ]
+  }, {
+    "display": {
+      "description": "Executes custom JavaScript code.",
+      "label": "JavaScript"
     },
-    {
-      "display": {
-        "description": "Executes custom Python code.",
-        "label": "Python"
-      },
-      "name": "python",
-      "outputSchema": [
-        {
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE",
-              "controlType": "DATE"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "Initialize parameter values used in the custom code.",
-          "label": "Input",
-          "name": "input",
+    "name": "javascript",
+    "outputSchema": [ {
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ],
+    "properties": [ {
+      "description": "Initialize parameter values used in the custom code.",
+      "label": "Input",
+      "name": "input",
+      "type": "OBJECT",
+      "controlType": "JSON_BUILDER",
+      "additionalProperties": [ {
+        "type": "ONE_OF",
+        "types": [ {
+          "type": "ARRAY",
+          "controlType": "JSON_BUILDER",
+          "multipleValues": true
+        }, {
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "type": "DATE",
+          "controlType": "DATE"
+        }, {
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
           "type": "OBJECT",
           "controlType": "JSON_BUILDER",
-          "additionalProperties": [
-            {
-              "type": "ONE_OF",
-              "types": [
-                {
-                  "type": "ARRAY",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "BOOLEAN",
-                  "controlType": "CHECKBOX"
-                },
-                {
-                  "type": "DATE",
-                  "controlType": "DATE"
-                },
-                {
-                  "type": "DATE_TIME",
-                  "controlType": "DATE_TIME"
-                },
-                {
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "type": "OBJECT",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ]
-            }
-          ],
           "multipleValues": true
-        },
-        {
-          "description": "Add your Python custom logic here.",
-          "label": "Python code",
-          "name": "script",
+        }, {
           "type": "STRING",
-          "controlType": "CODE_EDITOR"
-        }
-      ]
+          "controlType": "INPUT_TEXT"
+        } ]
+      } ],
+      "multipleValues": true
+    }, {
+      "description": "Add your JavaScript custom logic here.",
+      "label": "JavaScript code",
+      "name": "script",
+      "type": "STRING",
+      "controlType": "CODE_EDITOR"
+    } ]
+  }, {
+    "display": {
+      "description": "Executes custom Python code.",
+      "label": "Python"
     },
-    {
-      "display": {
-        "description": "Executes custom R code.",
-        "label": "R"
-      },
-      "name": "r",
-      "outputSchema": [
-        {
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE",
-              "controlType": "DATE"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "Initialize parameter values used in the custom code.",
-          "label": "Input",
-          "name": "input",
+    "name": "python",
+    "outputSchema": [ {
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ],
+    "properties": [ {
+      "description": "Initialize parameter values used in the custom code.",
+      "label": "Input",
+      "name": "input",
+      "type": "OBJECT",
+      "controlType": "JSON_BUILDER",
+      "additionalProperties": [ {
+        "type": "ONE_OF",
+        "types": [ {
+          "type": "ARRAY",
+          "controlType": "JSON_BUILDER",
+          "multipleValues": true
+        }, {
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "type": "DATE",
+          "controlType": "DATE"
+        }, {
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
           "type": "OBJECT",
           "controlType": "JSON_BUILDER",
-          "additionalProperties": [
-            {
-              "type": "ONE_OF",
-              "types": [
-                {
-                  "type": "ARRAY",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "BOOLEAN",
-                  "controlType": "CHECKBOX"
-                },
-                {
-                  "type": "DATE",
-                  "controlType": "DATE"
-                },
-                {
-                  "type": "DATE_TIME",
-                  "controlType": "DATE_TIME"
-                },
-                {
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "type": "OBJECT",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ]
-            }
-          ],
           "multipleValues": true
-        },
-        {
-          "description": "Add your R custom logic here.",
-          "label": "R code",
-          "name": "script",
+        }, {
           "type": "STRING",
-          "controlType": "CODE_EDITOR"
-        }
-      ]
+          "controlType": "INPUT_TEXT"
+        } ]
+      } ],
+      "multipleValues": true
+    }, {
+      "description": "Add your Python custom logic here.",
+      "label": "Python code",
+      "name": "script",
+      "type": "STRING",
+      "controlType": "CODE_EDITOR"
+    } ]
+  }, {
+    "display": {
+      "description": "Executes custom R code.",
+      "label": "R"
     },
-    {
-      "display": {
-        "description": "Executes custom Ruby code.",
-        "label": "Ruby"
-      },
-      "name": "ruby",
-      "outputSchema": [
-        {
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE",
-              "controlType": "DATE"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "Initialize parameter values used in the custom code.",
-          "label": "Input",
-          "name": "input",
+    "name": "r",
+    "outputSchema": [ {
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ],
+    "properties": [ {
+      "description": "Initialize parameter values used in the custom code.",
+      "label": "Input",
+      "name": "input",
+      "type": "OBJECT",
+      "controlType": "JSON_BUILDER",
+      "additionalProperties": [ {
+        "type": "ONE_OF",
+        "types": [ {
+          "type": "ARRAY",
+          "controlType": "JSON_BUILDER",
+          "multipleValues": true
+        }, {
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "type": "DATE",
+          "controlType": "DATE"
+        }, {
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
           "type": "OBJECT",
           "controlType": "JSON_BUILDER",
-          "additionalProperties": [
-            {
-              "type": "ONE_OF",
-              "types": [
-                {
-                  "type": "ARRAY",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "BOOLEAN",
-                  "controlType": "CHECKBOX"
-                },
-                {
-                  "type": "DATE",
-                  "controlType": "DATE"
-                },
-                {
-                  "type": "DATE_TIME",
-                  "controlType": "DATE_TIME"
-                },
-                {
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "type": "OBJECT",
-                  "controlType": "JSON_BUILDER",
-                  "multipleValues": true
-                },
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ]
-            }
-          ],
           "multipleValues": true
-        },
-        {
-          "description": "Add your Ruby custom logic here.",
-          "label": "Ruby code",
-          "name": "script",
+        }, {
           "type": "STRING",
-          "controlType": "CODE_EDITOR"
-        }
-      ]
-    }
-  ],
+          "controlType": "INPUT_TEXT"
+        } ]
+      } ],
+      "multipleValues": true
+    }, {
+      "description": "Add your R custom logic here.",
+      "label": "R code",
+      "name": "script",
+      "type": "STRING",
+      "controlType": "CODE_EDITOR"
+    } ]
+  }, {
+    "display": {
+      "description": "Executes custom Ruby code.",
+      "label": "Ruby"
+    },
+    "name": "ruby",
+    "outputSchema": [ {
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ],
+    "properties": [ {
+      "description": "Initialize parameter values used in the custom code.",
+      "label": "Input",
+      "name": "input",
+      "type": "OBJECT",
+      "controlType": "JSON_BUILDER",
+      "additionalProperties": [ {
+        "type": "ONE_OF",
+        "types": [ {
+          "type": "ARRAY",
+          "controlType": "JSON_BUILDER",
+          "multipleValues": true
+        }, {
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "type": "DATE",
+          "controlType": "DATE"
+        }, {
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
+          "type": "OBJECT",
+          "controlType": "JSON_BUILDER",
+          "multipleValues": true
+        }, {
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ]
+      } ],
+      "multipleValues": true
+    }, {
+      "description": "Add your Ruby custom logic here.",
+      "label": "Ruby code",
+      "name": "script",
+      "type": "STRING",
+      "controlType": "CODE_EDITOR"
+    } ]
+  } ],
   "display": {
     "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
     "label": "Script"

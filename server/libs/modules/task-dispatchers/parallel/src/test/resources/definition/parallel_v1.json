@@ -5,22 +5,18 @@
   },
   "name": "parallel",
   "version": 1,
-  "taskProperties": [
-    {
-      "description": "The task to use in each iteration.",
-      "name": "tasks",
-      "type": "ARRAY",
-      "items": [
-        {
-          "description": "The task or task dispatcher to use.",
-          "type": "OBJECT",
-          "multipleValues": true,
-          "objectType": "TASK",
-          "controlType": "INPUT_TEXT"
-        }
-      ],
+  "taskProperties": [ {
+    "description": "The task to use in each iteration.",
+    "name": "tasks",
+    "type": "ARRAY",
+    "items": [ {
+      "description": "The task or task dispatcher to use.",
+      "type": "OBJECT",
       "multipleValues": true,
-      "controlType": "JSON_BUILDER"
-    }
-  ]
+      "objectType": "TASK",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "multipleValues": true,
+    "controlType": "JSON_BUILDER"
+  } ]
 }
