@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.workflow", name = "workflow-repository.git.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef", name = "workflow-repository.git.enabled", havingValue = "true")
 public class GitWorkflowRepositoryConfiguration {
 
     @Bean

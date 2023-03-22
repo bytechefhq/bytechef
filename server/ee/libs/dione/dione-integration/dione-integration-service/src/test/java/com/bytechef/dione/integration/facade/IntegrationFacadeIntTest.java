@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EmbeddedSql
 @SpringBootTest(
     classes = IntegrationIntTestConfiguration.class,
-    properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
+    properties = "bytechef.workflow-repository.jdbc.enabled=true")
 public class IntegrationFacadeIntTest {
 
     @Autowired
