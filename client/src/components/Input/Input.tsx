@@ -11,13 +11,12 @@ type InputProps = {
     label?: string;
     labelClassName?: string;
     name: string;
+    trailing?: ReactNode;
     type?: string;
 } & React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
-> & {
-        trailing?: ReactNode;
-    };
+>
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     (
