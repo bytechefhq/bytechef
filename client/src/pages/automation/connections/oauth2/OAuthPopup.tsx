@@ -36,7 +36,8 @@ const OAuthPopup = (props: Props) => {
         if (error) {
             window.opener.postMessage({
                 type: OAUTH_RESPONSE,
-                error: decodeURI(error) || 'OAuth error: An error has occured.',
+                error:
+                    decodeURI(error) || 'OAuth error: An error has occurred.',
             });
         } else if (state && checkState(state)) {
             window.opener.postMessage({
