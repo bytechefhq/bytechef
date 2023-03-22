@@ -19,7 +19,9 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Option;
@@ -29,6 +31,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,14 +43,9 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.Versions;
-import static com.bytechef.hermes.component.constant.ComponentConstants.AUTHORIZATION_URL;
-import static com.bytechef.hermes.component.constant.ComponentConstants.BASE_URI;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.constant.ComponentConstants.REFRESH_URL;
-import static com.bytechef.hermes.component.constant.ComponentConstants.SCOPES;
-import static com.bytechef.hermes.component.constant.ComponentConstants.TOKEN_URL;
+import com.bytechef.hermes.component.constant.Version;
+
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 
 /**
  * @author Ivica Cardic
@@ -253,19 +252,39 @@ public final class ComponentDSL extends DefinitionDSL {
         private BiConsumer<AuthorizationContext, Context.Connection> applyConsumer;
 
         @JsonIgnore
-        private FourFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> authorizationCallbackFunction = (
-            connection, authorizationCode, redirectUri, verifier /* used only for pkce */) -> {
+        private QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> authorizationCallbackFunction = (
+            connection, code, redirectUri, codeVerifier) -> {
+            Function<Context.Connection, String> clientIdFunction = getClientIdFunction();
+            Function<Context.Connection, String> clientSecretFunction = getClientSecretFunction();
             Function<Context.Connection, String> tokenUrlFunction = getTokenUrlFunction();
 
-            HttpClientUtils.Response response = HttpClientUtils.get(tokenUrlFunction.apply(connection))
+            Map<String, Object> payload = new HashMap<>() {
+                {
+                    put("client_id", clientIdFunction.apply(connection));
+                    put("client_secret", clientSecretFunction.apply(connection));
+                    put("code", code);
+                    put("grant_type", "authorization_code");
+                    put("redirect_uri", redirectUri);
+                }
+            };
+
+            if (codeVerifier != null) {
+                payload.put("code_verifier", codeVerifier);
+            }
+
+            HttpClientUtils.Response response = HttpClientUtils.post(tokenUrlFunction.apply(connection))
                 .payload(
-                    HttpClientUtils.Payload.of(Map.of(
-                        "client_id", connection.getParameter(CLIENT_ID),
-                        "client_secret", connection.getParameter(CLIENT_SECRET),
-                        "code", authorizationCode,
-                        "grant_type", "authorization_code",
-                        "redirect_uri", redirectUri)))
+                    HttpClientUtils.Payload.of(payload, HttpClientUtils.BodyContentType.FORM_URL_ENCODED))
+                .configuration(responseFormat(ResponseFormat.JSON))
                 .execute();
+
+            if (response.statusCode() != 200) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
+
+            if (response.body() == null) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
 
             @SuppressWarnings("unchecked")
             Map<String, Object> body = (Map<String, Object>) response.body();
@@ -313,11 +332,25 @@ public final class ComponentDSL extends DefinitionDSL {
         };
 
         @JsonIgnore
-        private Function<Context.Connection, List<String>> scopesFunction = connectionParameters -> connectionParameters
-            .getParameter(SCOPES);
+        @SuppressWarnings("unchecked")
+        private Function<Context.Connection, List<String>> scopesFunction = connection -> {
+            Object scopes = connection.getParameter(SCOPES);
+
+            if (scopes instanceof List<?>) {
+                return (List<String>) scopes;
+            } else if (scopes == null) {
+                return Collections.emptyList();
+            } else {
+                return Arrays.stream(((String) scopes).split(","))
+                    .filter(Objects::nonNull)
+                    .filter(scope -> !scope.isBlank())
+                    .map(String::trim)
+                    .toList();
+            }
+        };
 
         @JsonIgnore
-        private Function<Context.Connection, String> tokenUrlFunction = connectionParameters -> connectionParameters
+        private Function<Context.Connection, String> tokenUrlFunction = connection -> connection
             .getParameter(TOKEN_URL);
 
         private String name;
@@ -353,7 +386,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization authorizationCallback(
-            FourFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> authorizationCallbackFunction) {
+            QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> authorizationCallbackFunction) {
             this.authorizationCallbackFunction = authorizationCallbackFunction;
 
             return this;
@@ -462,7 +495,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public FourFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction() {
+        public QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction() {
             return authorizationCallbackFunction;
         }
 
@@ -544,12 +577,12 @@ public final class ComponentDSL extends DefinitionDSL {
         private Display display;
 
         @JsonIgnore
-        private Function<List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction;
+        private BiFunction<ComponentDefinition, List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction;
 
         private Map<String, Object> metadata;
         private String name;
         private Resources resources;
-        private int version = Versions.VERSION_1;
+        private int version = Version.VERSION_1;
 
         private ModifiableComponentDefinition() {
         }
@@ -596,7 +629,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableComponentDefinition filterCompatibleConnectionDefinitionsFunction(
-            Function<List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction) {
+            BiFunction<ComponentDefinition, List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction) {
 
             this.filterCompatibleConnectionDefinitionsFunction = filterCompatibleConnectionDefinitionsFunction;
 
@@ -633,6 +666,20 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitionsFunction(
+            ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
+
+            List<ConnectionDefinition> filteredConnectionDefinitions = Collections.emptyList();
+
+            if (filterCompatibleConnectionDefinitionsFunction != null) {
+                filteredConnectionDefinitions = filterCompatibleConnectionDefinitionsFunction.apply(
+                    componentDefinition, connectionDefinitions);
+            }
+
+            return filteredConnectionDefinitions;
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -653,7 +700,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Function<List<ConnectionDefinition>, List<ConnectionDefinition>> getFilterCompatibleConnectionDefinitionsFunction() {
+        public BiFunction<ComponentDefinition, List<ConnectionDefinition>, List<ConnectionDefinition>> getFilterCompatibleConnectionDefinitionsFunction() {
             return filterCompatibleConnectionDefinitionsFunction;
         }
 
@@ -759,6 +806,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         private Display componentDisplay;
         private String componentName;
+        private int connectionVersion = 1;
         private List<? extends Property<?>> properties;
         private Resources resources;
 
@@ -786,6 +834,12 @@ public final class ComponentDSL extends DefinitionDSL {
             if (baseUriFunction != null) {
                 this.baseUriFunction = baseUriFunction;
             }
+
+            return this;
+        }
+
+        public ModifiableConnectionDefinition connectionVersion(int connectionVersion) {
+            this.connectionVersion = connectionVersion;
 
             return this;
         }
@@ -827,7 +881,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
             ModifiableConnectionDefinition that = (ModifiableConnectionDefinition) o;
 
-            return componentName.equals(that.componentName);
+            return componentName.equals(that.componentName) && connectionVersion == that.connectionVersion;
         }
 
         @Override
@@ -837,7 +891,20 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public int hashCode() {
-            return Objects.hash(componentName);
+            return Objects.hash(componentName, connectionVersion);
+        }
+
+        @Override
+        public Authorization getAuthorization(String authorizationName) {
+            if (authorizations == null) {
+                throw new ComponentExecutionException("Authorization %s does not exist".formatted(authorizationName));
+            }
+
+            return authorizations.stream()
+                .filter(
+                    authorization -> Objects.equals(authorization.getName(), authorizationName))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
         }
 
         @Override
@@ -858,6 +925,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public String getComponentName() {
             return componentName;
+        }
+
+        @Override
+        public int getConnectionVersion() {
+            return connectionVersion;
         }
 
         @Override
@@ -915,7 +987,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String jdbcDriverClassName;
         private Display display;
         private Resources resources;
-        private double version = Versions.VERSION_1;
+        private double version = Version.VERSION_1;
         private final String name;
 
         private ModifiableJdbcComponentDefinition(String name) {

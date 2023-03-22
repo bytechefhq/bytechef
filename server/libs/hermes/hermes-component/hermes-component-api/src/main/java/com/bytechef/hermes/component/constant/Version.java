@@ -15,18 +15,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.exception;
+package com.bytechef.hermes.component.constant;
 
-/**
- * @author Igor Beslic
- */
-public class ActionExecutionException extends RuntimeException {
-
-    public ActionExecutionException(String message) {
-        super(message);
-    }
-
-    public ActionExecutionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public class Version {
+    public static final int VERSION_1 = 1;
 }
