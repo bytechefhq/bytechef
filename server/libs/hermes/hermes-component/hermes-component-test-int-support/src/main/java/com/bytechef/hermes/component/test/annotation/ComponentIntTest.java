@@ -28,6 +28,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
     classes = ComponentTestIntConfiguration.class,
-    properties = "bytechef.workflow.workflow-repository.classpath.enabled=true")
+    properties = "bytechef.workflow-repository.classpath.enabled=true")
 public @interface ComponentIntTest {
 }
