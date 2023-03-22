@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.task.handler.DefaultComponentTaskHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,12 +36,12 @@ public class JdbcComponentTaskHandler extends DefaultComponentTaskHandler implem
 
     @SuppressFBWarnings("EI2")
     public JdbcComponentTaskHandler(
-        ActionDefinition actionDefinition, ConnectionDefinitionFacade connectionDefinitionFacade,
+        ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, DataSourceFactory dataSourceFactory, EventPublisher eventPublisher,
         FileStorageService fileStorageService, JdbcComponentHandler jdbcComponentHandler) {
 
         super(
-            actionDefinition, connectionDefinitionFacade, jdbcComponentHandler, connectionService, eventPublisher,
+            actionDefinition, connectionDefinitionService, jdbcComponentHandler, connectionService, eventPublisher,
             fileStorageService);
 
         this.dataSourceFactory = dataSourceFactory;

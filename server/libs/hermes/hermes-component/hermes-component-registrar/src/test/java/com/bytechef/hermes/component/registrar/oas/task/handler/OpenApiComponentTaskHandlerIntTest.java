@@ -36,8 +36,6 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
@@ -122,7 +120,7 @@ public class OpenApiComponentTaskHandlerIntTest {
     private Connection connection;
 
     @Autowired
-    private ConnectionDefinitionFacade connectionDefinitionFacade;
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @BeforeEach
     public void beforeEach() {
@@ -396,10 +394,10 @@ public class OpenApiComponentTaskHandlerIntTest {
         stubFor(
             get(
                 urlPathEqualTo("/user/login"))
-                    .willReturn(
-                        ok()
-                            .withBody("Logged in user session: 7284289668658063360")
-                            .withHeader("Content-Type", "text/plain")));
+                .willReturn(
+                    ok()
+                        .withBody("Logged in user session: 7284289668658063360")
+                        .withHeader("Content-Type", "text/plain")));
 
         openApiComponentTaskHandler = createOpenApiComponentHandler("loginUser");
 
@@ -795,7 +793,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
     private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentTaskHandler(
-            getActionDefinition(actionName), connectionDefinitionFacade, connectionService,
+            getActionDefinition(actionName), connectionDefinitionService, connectionService,
             PETSTORE_COMPONENT_HANDLER, null, FILE_STORAGE_SERVICE);
     }
 
@@ -838,11 +836,6 @@ public class OpenApiComponentTaskHandlerIntTest {
         @Bean
         ObjectMapper objectMapper() {
             return new ObjectMapper();
-        }
-
-        @Bean
-        ConnectionDefinitionFacade connectionDefinitionFacade(ConnectionService connectionService) {
-            return new ConnectionDefinitionFacadeImpl(connectionDefinitionService(), connectionService);
         }
 
         @Bean
