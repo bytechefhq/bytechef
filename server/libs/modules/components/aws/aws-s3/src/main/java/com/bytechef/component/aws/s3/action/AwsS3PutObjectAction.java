@@ -21,6 +21,7 @@ import com.bytechef.component.aws.s3.util.AmazonS3Uri;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
@@ -88,7 +89,7 @@ public class AwsS3PutObjectAction {
 
             return null;
         } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+            throw new ComponentExecutionException(ioe.getMessage(), ioe);
         }
     }
 }

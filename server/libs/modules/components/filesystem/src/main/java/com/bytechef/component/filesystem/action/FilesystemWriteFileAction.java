@@ -20,7 +20,7 @@ package com.bytechef.component.filesystem.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +66,7 @@ public class FilesystemWriteFileAction {
         try (InputStream inputStream = context.getFileStream(parameters.get(FILE_ENTRY, Context.FileEntry.class))) {
             return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to create file " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to create file " + parameters, ioException);
         }
     }
 }

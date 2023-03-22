@@ -20,7 +20,7 @@ package com.bytechef.component.xmlfile.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.XmlUtils;
 
 import java.io.ByteArrayInputStream;
@@ -80,7 +80,7 @@ public class XmlFileWriteAction {
                     : parameters.getString(FILENAME),
                 inputStream);
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to handle task " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to handle action " + parameters, ioException);
         }
     }
 }

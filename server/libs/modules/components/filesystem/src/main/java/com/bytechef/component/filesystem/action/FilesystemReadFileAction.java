@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class FilesystemReadFileAction {
         try (InputStream inputStream = new FileInputStream(filename)) {
             return context.storeFileContent(filename, inputStream);
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to open file " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to open file " + parameters, ioException);
         }
     }
 }

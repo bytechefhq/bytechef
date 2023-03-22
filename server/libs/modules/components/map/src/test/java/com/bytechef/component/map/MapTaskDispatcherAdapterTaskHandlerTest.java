@@ -31,6 +31,8 @@ import com.bytechef.commons.util.MapValueUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -63,7 +65,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test2() {
         Assertions.assertThrows(RuntimeException.class, () -> {
             TaskHandlerResolver taskHandlerResolver = task -> taskExecution -> {
-                throw new IllegalArgumentException("i'm rogue");
+                throw new ComponentExecutionException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
                 taskHandlerResolver, TaskEvaluator.create());
@@ -112,7 +114,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             if ("map".equals(type)) {
                 return mapAdapterTaskHandlerRefs[0];
             } else {
-                throw new IllegalArgumentException("unknown type: " + type);
+                throw new ComponentExecutionException("unknown type: " + type);
             }
         };
 

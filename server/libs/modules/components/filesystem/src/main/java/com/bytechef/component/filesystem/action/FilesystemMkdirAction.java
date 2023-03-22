@@ -20,7 +20,7 @@ package com.bytechef.component.filesystem.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -49,7 +49,7 @@ public class FilesystemMkdirAction {
         try {
             return Files.createDirectories(Paths.get(parameters.getRequiredString("path")));
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to create directories " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to create directories " + parameters, ioException);
         }
     }
 }

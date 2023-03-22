@@ -32,6 +32,6 @@ public class MySQLComponentDefinitionTest {
             "definition/mysql_v1.json",
             new JdbcComponentHandler(
                 new MySQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
-                    .getDefinition());
+                .getDefinition());
     }
 }

@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.databind.SequenceWriter;
 
 import java.io.ByteArrayInputStream;
@@ -78,7 +78,7 @@ public class CsvFileWriteAction {
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
             return context.storeFileContent("file.csv", inputStream);
         } catch (IOException e) {
-            throw new ActionExecutionException(e.getMessage(), e);
+            throw new ComponentExecutionException(e.getMessage(), e);
         }
     }
 
