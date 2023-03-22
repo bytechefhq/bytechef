@@ -1,5 +1,42 @@
 import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
 import {useCallback} from 'react';
+import {twMerge} from 'tailwind-merge';
+
+const visiblePageButtonCount = 6;
+
+interface ButtonProps {
+    pageIndexToMap: number;
+    pageNumber: number;
+    onClick: (pageNumber: number) => void;
+}
+
+const Button = ({
+    pageIndexToMap,
+    pageNumber,
+    onClick,
+}: ButtonProps): JSX.Element => (
+    <button
+        aria-current="page"
+        className={twMerge([
+            'relative inline-flex items-center px-4 py-2 text-sm font-semibold',
+            pageIndexToMap === pageNumber
+                ? 'z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0',
+        ])}
+        key={pageIndexToMap}
+        onClick={() => onClick(pageIndexToMap)}
+    >
+        {pageIndexToMap + 1}
+    </button>
+);
+
+interface PaginationProps {
+    pageNumber: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+    onClick: (pageNumber: number) => void;
+}
 
 const Pagination = ({
     pageNumber,
@@ -7,19 +44,11 @@ const Pagination = ({
     totalElements,
     totalPages,
     onClick,
-}: {
-    pageNumber: number;
-    pageSize: number;
-    totalElements: number;
-    totalPages: number;
-    onClick: (pageNumber: number) => void;
-}): JSX.Element => {
+}: PaginationProps): JSX.Element => {
     const renderPageLinks = useCallback(() => {
         if (totalPages === 0) {
             return null;
         }
-
-        const visiblePageButtonCount = 6;
 
         let numberOfButtons =
             totalPages < visiblePageButtonCount
@@ -28,9 +57,10 @@ const Pagination = ({
         const pageIndices = [pageNumber];
         numberOfButtons--;
 
-        [...Array(numberOfButtons)].forEach((_item, itemIndex) => {
+        for (let itemIndex = 0; itemIndex < numberOfButtons; itemIndex++) {
             const pageNumberBefore = pageIndices[0] - 1;
             const pageNumberAfter = pageIndices[pageIndices.length - 1] + 1;
+
             if (
                 pageNumberBefore >= 0 &&
                 (itemIndex < numberOfButtons / 2 ||
@@ -40,21 +70,15 @@ const Pagination = ({
             } else {
                 pageIndices.push(pageNumberAfter);
             }
-        });
+        }
 
         return pageIndices.map((pageIndexToMap) => (
-            <button
-                aria-current="page"
-                className={
-                    pageIndexToMap === pageNumber
-                        ? 'relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                        : 'relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                }
-                key={pageIndexToMap}
-                onClick={() => onClick(pageIndexToMap)}
-            >
-                {pageIndexToMap + 1}
-            </button>
+            <Button
+                key={`paginator_button_${pageIndexToMap}`}
+                pageIndexToMap={pageIndexToMap}
+                pageNumber={pageNumber}
+                onClick={onClick}
+            />
         ));
     }, [pageNumber, totalPages, onClick]);
 

@@ -1,40 +1,9 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import {
-    Arrow,
-    Content,
-    Provider,
-    Root,
-    Trigger,
-    Portal,
-} from '@radix-ui/react-tooltip';
 import Button from 'components/Button/Button';
 import Select from '../../../../components/Select/Select';
 import useRightSlideOverStore from '../stores/useRightSlideOverStore';
-
-const Tooltip = () => (
-    <Provider>
-        <Root>
-            <Trigger asChild>
-                <InfoCircledIcon className="ml-2 h-4 w-4" />
-            </Trigger>
-
-            <Portal>
-                <Content
-                    sideOffset={4}
-                    // eslint-disable-next-line tailwindcss/no-custom-classname
-                    className="z-50 inline-flex items-center rounded-md bg-gray-800 px-4 py-2.5 radix-side-bottom:animate-slide-up-fade radix-side-left:animate-slide-right-fade radix-side-right:animate-slide-left-fade radix-side-top:animate-slide-down-fade dark:bg-gray-800"
-                >
-                    <Arrow className="fill-current text-gray-800 dark:text-gray-800" />
-
-                    <span className="block text-xs leading-none text-gray-100 dark:text-gray-100">
-                        Information
-                    </span>
-                </Content>
-            </Portal>
-        </Root>
-    </Provider>
-);
+import {Tooltip} from '../../../../components/Tooltip/Tooltip';
 
 const RightSlideOver = () => {
     const {currentNode, rightSlideOverOpen, setRightSlideOverOpen} =
@@ -55,7 +24,9 @@ const RightSlideOver = () => {
                         <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
                             {currentNode.label}
 
-                            <Tooltip />
+                            <Tooltip text="Information">
+                                <InfoCircledIcon className="ml-2 h-4 w-4" />
+                            </Tooltip>
 
                             <Button
                                 aria-label="Close panel"
