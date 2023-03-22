@@ -18,6 +18,7 @@
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
@@ -33,7 +34,18 @@ public interface ComponentDefinitionToComponentDefinitionWithBasicActionsModelMa
     extends Converter<ComponentDefinition, ComponentDefinitionWithBasicActionsModel> {
 
     @Override
-    ComponentDefinitionWithBasicActionsModel convert(ComponentDefinition componentDefinition);
+    default ComponentDefinitionWithBasicActionsModel convert(ComponentDefinition componentDefinition) {
+        if (componentDefinition instanceof ComponentDSL.ModifiableComponentDefinition) {
+            return map((ComponentDSL.ModifiableComponentDefinition) componentDefinition);
+        } else {
+            return map(componentDefinition);
+        }
+    }
+
+    ComponentDefinitionWithBasicActionsModel map(ComponentDefinition componentDefinition);
+
+    ComponentDefinitionWithBasicActionsModel map(
+        ComponentDSL.ModifiableComponentDefinition modifiableComponentDefinition);
 
     ActionDefinitionBasicModel map(ActionDefinition actionDefinition);
 }

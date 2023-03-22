@@ -18,8 +18,15 @@
 package com.bytechef.hermes.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.project.web.rest.model.ProjectInstanceModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -28,4 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnApi
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class ProjectInstanceController implements ProjectInstancesApi {
+
+    @Override
+    public Mono<ResponseEntity<Flux<ProjectInstanceModel>>> getProjectInstances(
+        List<Long> projectIds, List<Long> tagIds, ServerWebExchange exchange) {
+
+        return Mono.just(
+            ResponseEntity.ok(Flux.empty()));
+    }
 }
