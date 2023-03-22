@@ -41,7 +41,7 @@ public class OpenApiComponentTaskHandlerBeanDefinitionLoader
 
         return BeanDefinitionBuilder.genericBeanDefinition(OpenApiComponentTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
-            .addConstructorArgReference("connectionDefinitionFacade")
+            .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgReference("connectionService")
             .addConstructorArgValue(openApiComponentHandler)
             .addConstructorArgReference("eventPublisher")

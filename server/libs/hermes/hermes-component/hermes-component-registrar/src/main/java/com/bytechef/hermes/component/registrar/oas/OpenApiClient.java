@@ -52,18 +52,18 @@ public class OpenApiClient {
         return exchange(
             createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
             MapValueUtils.get(metadata, "requestMethod", RequestMethod.class))
-                .configuration(
-                    HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
-                .headers(
-                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
-                .payload(
-                    getPayload(
-                        MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
-                        MapValueUtils.getString(metadata, "mimeType"),
-                        taskExecution.getParameters(), actionDefinition.getProperties()))
-                .queryParameters(
-                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
-                .execute();
+            .configuration(
+                HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
+            .headers(
+                getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
+            .payload(
+                getPayload(
+                    MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
+                    MapValueUtils.getString(metadata, "mimeType"),
+                    taskExecution.getParameters(), actionDefinition.getProperties()))
+            .queryParameters(
+                getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
+            .execute();
     }
 
     private String createUri(

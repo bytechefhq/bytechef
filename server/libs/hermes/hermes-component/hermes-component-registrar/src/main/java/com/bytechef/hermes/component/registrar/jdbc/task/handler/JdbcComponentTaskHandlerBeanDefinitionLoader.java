@@ -70,7 +70,7 @@ public class JdbcComponentTaskHandlerBeanDefinitionLoader implements ComponentTa
 
         return BeanDefinitionBuilder.genericBeanDefinition(JdbcComponentTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
-            .addConstructorArgReference("connectionDefinitionFacade")
+            .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgReference("connectionService")
             .addConstructorArgReference("dataSourceFactory")
             .addConstructorArgReference("eventPublisher")
