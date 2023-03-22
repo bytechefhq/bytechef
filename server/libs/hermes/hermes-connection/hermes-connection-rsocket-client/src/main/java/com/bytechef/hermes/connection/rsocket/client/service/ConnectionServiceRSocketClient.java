@@ -19,6 +19,8 @@ package com.bytechef.hermes.connection.rsocket.client.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,10 +68,20 @@ public class ConnectionServiceRSocketClient implements ConnectionService {
     }
 
     @Override
+    public List<Connection> getConnections() {
+        return getConnections(null, null);
+    }
+
+    @Override
     public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
         return rSocketRequester
             .route("getConnections")
-            .data(Map.of("componentNames", componentNames, "tagIds", tagIds))
+            .data(new HashMap<>() {
+                {
+                    put("componentNames", componentNames);
+                    put("tagIds", tagIds);
+                }
+            })
             .retrieveMono(new ParameterizedTypeReference<List<Connection>>() {})
             .block();
     }

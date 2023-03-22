@@ -17,15 +17,15 @@
 
 package com.bytechef.hermes.connection.service;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.StreamSupport;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -63,8 +63,13 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public Connection getConnection(long id) {
-        return connectionRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        return OptionalUtils.get(connectionRepository.findById(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getConnections() {
+        return getConnections(null, null);
     }
 
     @Override
@@ -73,17 +78,16 @@ public class ConnectionServiceImpl implements ConnectionService {
         Iterable<Connection> connectionIterable;
 
         if (CollectionUtils.isEmpty(componentNames) && CollectionUtils.isEmpty(tagIds)) {
-            connectionIterable = connectionRepository.findAll();
+            connectionIterable = connectionRepository.findAll(Sort.by("name"));
         } else if (!CollectionUtils.isEmpty(componentNames) && CollectionUtils.isEmpty(tagIds)) {
-            connectionIterable = connectionRepository.findByComponentNameIn(componentNames);
+            connectionIterable = connectionRepository.findAllByComponentNameInOrderByName(componentNames);
         } else if (CollectionUtils.isEmpty(componentNames)) {
-            connectionIterable = connectionRepository.findByTagIdIn(tagIds);
+            connectionIterable = connectionRepository.findAllByTagIdIn(tagIds);
         } else {
-            connectionIterable = connectionRepository.findByComponentNamesAndTagIds(componentNames, tagIds);
+            connectionIterable = connectionRepository.findAllByComponentNamesAndTagIds(componentNames, tagIds);
         }
 
-        return StreamSupport.stream(connectionIterable.spliterator(), false)
-            .toList();
+        return com.bytechef.commons.util.CollectionUtils.toList(connectionIterable);
     }
 
     @Override
@@ -99,11 +103,11 @@ public class ConnectionServiceImpl implements ConnectionService {
     @SuppressFBWarnings("NP")
     public Connection update(@NonNull Connection connection) {
         Assert.notNull(connection, "'connection' must not be null");
-        Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
+        Assert.notNull(connection.getId(), "'id' must not be null");
         Assert.hasText(connection.getName(), "'name' must not be empty");
 
         return connectionRepository
-            .findById(Objects.requireNonNull(connection.getId()))
+            .findById(connection.getId())
             .map(curConnection -> connectionRepository.save(curConnection.update(connection)))
             .orElseThrow(IllegalArgumentException::new);
     }
