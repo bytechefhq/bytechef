@@ -60,7 +60,7 @@ const FilterableSelect = <
                 </label>
             )}
 
-            <div>
+            <div className={twMerge([label && 'mt-1'])}>
                 <Select {...field} classNamePrefix="react-select" {...props} />
             </div>
 

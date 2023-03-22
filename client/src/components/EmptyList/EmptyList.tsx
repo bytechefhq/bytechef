@@ -1,9 +1,9 @@
 import {ReactNode} from 'react';
 
 interface EmptyListProps {
-    button: ReactNode;
+    button?: ReactNode;
     icon: ReactNode;
-    message: string;
+    message?: string;
     title: string;
 }
 
@@ -21,9 +21,9 @@ const EmptyList = ({
                 {title}
             </h3>
 
-            <p className="mt-1 text-sm text-gray-500">{message}</p>
+            {message && <p className="mt-1 text-sm text-gray-500">{message}</p>}
 
-            <div className="mt-6">{button}</div>
+            {button && <div className="mt-6">{button}</div>}
         </div>
     );
 };

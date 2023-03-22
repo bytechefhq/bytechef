@@ -17,9 +17,7 @@ const PageHeader = ({
     <header
         className={twMerge(
             'p-4',
-            position === 'main'
-                ? 'flex place-self-center sm:w-full 2xl:w-4/5'
-                : ''
+            position === 'main' ? '2xl:mx-auto 2xl:w-4/5' : ''
         )}
     >
         <div className="flex w-full items-center justify-between">
