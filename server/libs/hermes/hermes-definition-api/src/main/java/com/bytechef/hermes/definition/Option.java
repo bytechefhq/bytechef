@@ -31,5 +31,5 @@ public sealed interface Option<T> permits DefinitionDSL.ModifiableOption {
 
     String getName();
 
-    T getValue();
+    Object getValue();
 }
