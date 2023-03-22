@@ -36,9 +36,13 @@ import java.util.function.Function;
 @JsonDeserialize(as = ComponentDSL.ModifiableConnectionDefinition.class)
 public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
+    String BASE_URI = "baseUri";
+
     boolean isAuthorizationRequired();
 
     boolean containsAuthorizations();
+
+    Authorization getAuthorization(String authorizationName);
 
     List<? extends Authorization> getAuthorizations();
 
@@ -47,6 +51,8 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
     Display getComponentDisplay();
 
     String getComponentName();
+
+    int getConnectionVersion();
 
     List<? extends Property<?>> getProperties();
 

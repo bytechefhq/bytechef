@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -390,7 +390,7 @@ public final class HttpClientUtils {
         MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
 
         for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-            if (parameter.getValue()instanceof Context.FileEntry fileEntry) {
+            if (parameter.getValue() instanceof Context.FileEntry fileEntry) {
                 addFileEntry(context, builder, (String) parameter.getKey(), fileEntry);
             } else {
                 builder.textPart((String) parameter.getKey(), parameter.getValue());
@@ -645,7 +645,7 @@ public final class HttpClientUtils {
                 return HttpClientUtils.execute(
                     ContextThreadLocal.get(), url, headers, queryParameters, payload, configuration, requestMethod);
             } catch (Exception e) {
-                throw new ActionExecutionException("Unable to execute HTTP request", e);
+                throw new ComponentExecutionException("Unable to execute HTTP request", e);
             }
         }
     }

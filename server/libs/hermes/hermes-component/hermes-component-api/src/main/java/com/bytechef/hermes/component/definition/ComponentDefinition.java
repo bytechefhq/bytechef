@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * Used for specifying a component.
@@ -33,7 +33,7 @@ import java.util.function.Function;
 @JsonDeserialize(as = ComponentDSL.ModifiableComponentDefinition.class)
 public sealed interface ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
-    Function<List<ConnectionDefinition>, List<ConnectionDefinition>> getFilterCompatibleConnectionDefinitionsFunction();
+    BiFunction<ComponentDefinition, List<ConnectionDefinition>, List<ConnectionDefinition>> getFilterCompatibleConnectionDefinitionsFunction();
 
     List<? extends ActionDefinition> getActions();
 
@@ -48,4 +48,7 @@ public sealed interface ComponentDefinition permits ComponentDSL.ModifiableCompo
     Resources getResources();
 
     int getVersion();
+
+    List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitionsFunction(
+        ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions);
 }

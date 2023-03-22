@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
@@ -187,7 +186,7 @@ public class HttpClientUtilsTest {
             ComponentDSL.authorization(
                 Authorization.AuthorizationType.API_KEY.name(), Authorization.AuthorizationType.API_KEY),
             new MockConnection().parameters(
-                Map.of(ComponentConstants.KEY, Authorization.API_TOKEN, ComponentConstants.VALUE, "token_value")));
+                Map.of(Authorization.KEY, Authorization.API_TOKEN, Authorization.VALUE, "token_value")));
 
         Map<String, List<String>> headers = new HashMap<>();
 
@@ -199,9 +198,9 @@ public class HttpClientUtilsTest {
             ComponentDSL.authorization(
                 Authorization.AuthorizationType.API_KEY.name(), Authorization.AuthorizationType.API_KEY),
             new MockConnection().parameters(Map.of(
-                ComponentConstants.KEY, Authorization.API_TOKEN,
-                ComponentConstants.VALUE, "token_value",
-                ComponentConstants.ADD_TO, Authorization.ApiTokenLocation.QUERY_PARAMETERS.name())));
+                Authorization.KEY, Authorization.API_TOKEN,
+                Authorization.VALUE, "token_value",
+                Authorization.ADD_TO, Authorization.ApiTokenLocation.QUERY_PARAMETERS.name())));
 
         Map<String, List<String>> queryParameters = new HashMap<>();
 
@@ -214,7 +213,7 @@ public class HttpClientUtilsTest {
             ComponentDSL.authorization(
                 Authorization.AuthorizationType.BASIC_AUTH.name(), Authorization.AuthorizationType.BASIC_AUTH),
             new MockConnection().parameters(
-                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password")));
+                Map.of(Authorization.USERNAME, "username", Authorization.PASSWORD, "password")));
 
         headers = new HashMap<>();
 
@@ -230,7 +229,7 @@ public class HttpClientUtilsTest {
         doAnswer(
             ComponentDSL.authorization(
                 Authorization.AuthorizationType.BEARER_TOKEN.name(), Authorization.AuthorizationType.BEARER_TOKEN),
-            new MockConnection().parameters(Map.of(ComponentConstants.TOKEN, "token")));
+            new MockConnection().parameters(Map.of(Authorization.TOKEN, "token")));
 
         headers = new HashMap<>();
 
@@ -242,7 +241,7 @@ public class HttpClientUtilsTest {
             ComponentDSL.authorization(
                 Authorization.AuthorizationType.DIGEST_AUTH.name(), Authorization.AuthorizationType.DIGEST_AUTH),
             new MockConnection().parameters(
-                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password")));
+                Map.of(Authorization.USERNAME, "username", Authorization.PASSWORD, "password")));
 
         headers = new HashMap<>();
 
