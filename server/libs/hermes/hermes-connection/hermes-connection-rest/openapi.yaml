@@ -15,7 +15,7 @@ paths:
       operationId: "getConnections"
       parameters:
       - name: "componentNames"
-        description: "The list of component names used for filtering connections."
+        description: "A list of component names used for filtering connections."
         in: "query"
         required: false
         schema:
@@ -23,7 +23,7 @@ paths:
           items:
             type: "string"
       - name: "tagIds"
-        description: "The list of tag ids of used for filtering connections."
+        description: "A list of tag ids of used for filtering connections."
         in: "query"
         required: false
         schema:
@@ -33,7 +33,7 @@ paths:
             format: "int64"
       responses:
         "200":
-          description: "The list of connections."
+          description: "A list of connections."
           content:
             application/json:
               schema:
@@ -59,6 +59,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
+  /connections/oauth2:
+    post:
+      description: "Populates a new connection with oauth parameters."
+      summary: "Populates a new connection with oauth parameters."
+      tags:
+      - "connections"
+      operationId: "getConnectionOAuth2AuthorizationParameters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection object with oauth parameters."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2AuthorizationParameters"
   /connections/tags:
     get:
       description: "Get connection tags."
@@ -68,7 +88,7 @@ paths:
       operationId: "getConnectionTags"
       responses:
         "200":
-          description: "The list of connection tags."
+          description: "A list of connection tags."
           content:
             application/json:
               schema:
@@ -172,22 +192,20 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /oauth2-apps:
+  /oauth2-properties:
     get:
-      description: "Get registered OAuth2 apps."
-      summary: "Get registered OAuth2 apps."
+      description: "Get OAuth2 properties."
+      summary: "Get OAuth2 properties."
       tags:
       - "oauth2"
-      operationId: "getOAuth2Apps"
+      operationId: "getOAuth2Properties"
       responses:
         "200":
-          description: "The list of OAuth2App object."
+          description: "The OAuth2Properties object."
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  type: "string"
+                $ref: "#/components/schemas/OAuth2Properties"
 components:
   schemas:
     Connection:
@@ -197,8 +215,12 @@ components:
       required:
       - "name"
       - "componentName"
+      - "componentVersion"
       - "parameters"
       properties:
+        active:
+          description: "If a connection is used in any of active workflows."
+          type: "boolean"
         authorizationName:
           description: "The name of an authorization used by this connection. Used\
             \ for HTTP based services."
@@ -206,6 +228,9 @@ components:
         componentName:
           description: "The name of a component that uses this connection."
           type: "string"
+        connectionVersion:
+          description: "The version of a component that uses this connection."
+          type: "integer"
         createdBy:
           description: "The created by."
           type: "string"
@@ -245,3 +270,25 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    OAuth2AuthorizationParameters:
+      properties:
+        authorizationUrl:
+          type: "string"
+        clientId:
+          type: "string"
+        scopes:
+          type: "array"
+          items:
+            type: "string"
+    OAuth2Properties:
+      properties:
+        redirectUri:
+          description: "The redirect URI used for OAuth2 callback URL."
+          type: "string"
+          readOnly: true
+        predefinedApps:
+          description: "A list of predefined OAuth2 apps."
+          type: "array"
+          readOnly: true
+          items:
+            type: "string"

@@ -126,7 +126,7 @@ paths:
           - "sold"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -164,7 +164,7 @@ paths:
             type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -199,7 +199,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -303,7 +303,7 @@ paths:
               format: "binary"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -321,7 +321,7 @@ paths:
       operationId: "getInventory"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -351,7 +351,7 @@ paths:
               $ref: "#/components/schemas/Order"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -376,7 +376,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -489,7 +489,7 @@ paths:
           type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           headers:
             X-Rate-Limit:
               description: "calls per hour allowed by the user"
@@ -534,7 +534,7 @@ paths:
           type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -573,7 +573,7 @@ paths:
               $ref: "#/components/schemas/User"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -779,7 +779,7 @@ components:
           schema:
             $ref: "#/components/schemas/Pet"
     UserArray:
-      description: "List of user object"
+      description: "A list of user objects"
       content:
         application/json:
           schema:

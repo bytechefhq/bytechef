@@ -36,7 +36,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
-  /component-definitions/{name}/{version}/actions/{actionName}:
+  /component-definitions/{componentName}/{componentVersion}/actions/{actionName}:
     get:
       description: "Get an action of a component definition."
       summary: "Get an action of a component definition."
@@ -44,13 +44,13 @@ paths:
       - "action-definitions"
       operationId: "getActionDefinition"
       parameters:
-      - name: "name"
+      - name: "componentName"
         description: "The name of the component."
         required: true
         in: "path"
         schema:
           type: "string"
-      - name: "version"
+      - name: "componentVersion"
         description: "The version of the component to get."
         required: true
         in: "path"
@@ -69,7 +69,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDefinition"
-  /component-definitions/{name}/connection-definition:
+  /component-definitions/{componentName}/{componentVersion}/connection-definition:
     get:
       description: "Get connection definition for a component."
       summary: "Get connection definition for a component."
@@ -77,12 +77,18 @@ paths:
       - "connection-definitions"
       operationId: "getComponentConnectionDefinition"
       parameters:
-      - name: "name"
-        description: "The name of the component."
+      - name: "componentName"
+        description: "The name of a component."
         required: true
         in: "path"
         schema:
           type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
       responses:
         "200":
           description: "Successful operation."
@@ -90,7 +96,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConnectionDefinition"
-  /component-definitions/{name}/connection-definitions:
+  /component-definitions/{componentName}/{componentVersion}/connection-definitions:
     get:
       description: "Get all compatible connection definitions for a component."
       summary: "Get all compatible connection definitions for a component."
@@ -98,12 +104,18 @@ paths:
       - "connection-definitions"
       operationId: "getComponentConnectionDefinitions"
       parameters:
-      - name: "name"
-        description: "The name of the component."
+      - name: "componentName"
+        description: "The name of a component."
         required: true
         in: "path"
         schema:
           type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
       responses:
         "200":
           description: "Successful operation."
@@ -113,7 +125,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ConnectionDefinitionBasic"
-  /component-definitions/{name}:
+  /component-definitions/{componentName}:
     get:
       description: "Get all component definition versions of a component definition."
       summary: "Get all component definition versions of a component definition."
@@ -121,7 +133,7 @@ paths:
       - "component-definitions"
       operationId: "getComponentDefinitionVersions"
       parameters:
-      - name: "name"
+      - name: "componentName"
         description: "The name of the component to get."
         required: true
         in: "path"
@@ -136,7 +148,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
-  /component-definitions/{name}/{version}:
+  /component-definitions/{componentName}/{componentVersion}:
     get:
       description: "Get a component definition."
       summary: "Get a component definition."
@@ -144,13 +156,13 @@ paths:
       - "component-definitions"
       operationId: "getComponentDefinition"
       parameters:
-      - name: "name"
+      - name: "componentName"
         description: "The name of the component to get."
         required: true
         in: "path"
         schema:
           type: "string"
-      - name: "version"
+      - name: "componentVersion"
         description: "The version of the component to get."
         required: true
         in: "path"
@@ -219,7 +231,7 @@ components:
           items:
             $ref: "#/components/schemas/Property"
         properties:
-          description: "The list of action properties."
+          description: "A list of action properties."
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
@@ -255,7 +267,7 @@ components:
             description: "If the array can contain multiple items."
             type: "boolean"
           options:
-            description: "The list of valid property options."
+            description: "A list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -270,10 +282,6 @@ components:
         name:
           description: "The authorization name."
           type: "string"
-        redirectUri:
-          description: "The redirect URI used for OAuth2 callback URL."
-          type: "string"
-          readOnly: true
         properties:
           description: "Properties of the connection."
           type: "array"
@@ -307,7 +315,7 @@ components:
       type: "object"
       properties:
         actions:
-          description: "The list of all available actions the component can perform."
+          description: "A list of all available actions the component can perform."
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinition"
@@ -354,7 +362,7 @@ components:
       - "version"
       properties:
         actions:
-          description: "The list of all available actions the component can perform."
+          description: "A list of all available actions the component can perform."
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinitionBasic"
@@ -382,6 +390,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Authorization"
+        baseUri:
+          description: "Defines the base URI for all future HTTP requests."
+          type: "string"
         componentName:
           description: "The name of a component this connection can be used for."
           type: "string"
@@ -433,7 +444,7 @@ components:
       - type: "object"
         properties:
           options:
-            description: "The list of valid property options."
+            description: "A list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -447,7 +458,7 @@ components:
       - type: "object"
         properties:
           options:
-            description: "The list of valid property options."
+            description: "A list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -504,7 +515,7 @@ components:
             type: "integer"
             format: "int32"
           options:
-            description: "The list of valid property options."
+            description: "A list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -530,7 +541,7 @@ components:
             type: "integer"
             format: "int32"
           options:
-            description: "The list of valid property options."
+            description: "A list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -562,7 +573,7 @@ components:
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
           properties:
-            description: "The list of valid object property types."
+            description: "A list of valid object property types."
             type: "array"
             items:
               $ref: "#/components/schemas/Property"
@@ -600,7 +611,7 @@ components:
       type: "object"
       properties:
         loadOptionsDependsOn:
-          description: "The list of property names on which value change the property\
+          description: "A list of property names on which value change the property\
             \ options should load/reload."
           type: "array"
           items:
@@ -610,7 +621,7 @@ components:
       type: "object"
       properties:
         loadPropertiesDependsOn:
-          description: "The list of property names on which value change the properties\
+          description: "A list of property names on which value change the properties\
             \ should load/reload."
           type: "array"
           items:
@@ -657,7 +668,7 @@ components:
         type:
           $ref: "#/components/schemas/PropertyType"
       discriminator:
-        propertyName: "__model_type"
+        propertyName: "type"
         mapping:
           ARRAY: "#/components/schemas/ArrayProperty"
           BOOLEAN: "#/components/schemas/BooleanProperty"
@@ -699,7 +710,7 @@ components:
       - type: "object"
         properties:
           options:
-            description: "The list of valid property options."
+            description: "A list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -721,7 +732,7 @@ components:
           items:
             $ref: "#/components/schemas/Property"
         properties:
-          description: "The list of task dispatcher properties."
+          description: "A list of task dispatcher properties."
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
@@ -747,6 +758,6 @@ components:
           defaultValue:
             description: "The property default value."
             type: "object"
-          sampleValue:
+          exampleValue:
             description: "The property sample value."
             type: "object"
