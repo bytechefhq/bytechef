@@ -2,7 +2,7 @@ import {
     useGetIntegrationsQuery,
     useGetIntegrationTagsQuery,
 } from '../../../queries/integrations.queries';
-import IntegrationItem from './IntegrationItem';
+import IntegrationListItem from './IntegrationListItem';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import EmptyList from '../../../components/EmptyList/EmptyList';
@@ -30,12 +30,12 @@ const IntegrationList = () => {
     return (
         <div
             className={twMerge(
-                'flex place-self-center px-2 sm:w-full 2xl:w-4/5',
-                integrations?.length === 0 ? 'h-full items-center' : ''
+                'w-full px-2 2xl:mx-auto 2xl:w-4/5',
+                integrations?.length === 0 ? 'place-self-center' : ''
             )}
         >
-            <ul role="list" className="w-full divide-y divide-gray-100">
-                {isLoading && 'Loading...'}
+            <ul role="list">
+                {isLoading && <span className="px-2">Loading...</span>}
 
                 {error &&
                     !isLoading &&
@@ -61,9 +61,9 @@ const IntegrationList = () => {
                             );
 
                             return (
-                                <div key={integration.id}>
-                                    <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
-                                        <IntegrationItem
+                                <li key={integration.id}>
+                                    <div className="group rounded-md border-b border-b-gray-100 bg-white p-2 py-3 hover:bg-gray-50">
+                                        <IntegrationListItem
                                             integration={integration}
                                             key={integration.id}
                                             remainingTags={tags?.filter(
@@ -73,8 +73,8 @@ const IntegrationList = () => {
                                                     )
                                             )}
                                         />
-                                    </li>
-                                </div>
+                                    </div>
+                                </li>
                             );
                         })
                     ))}
