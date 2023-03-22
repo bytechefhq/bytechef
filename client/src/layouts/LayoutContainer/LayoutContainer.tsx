@@ -6,6 +6,7 @@ import {twMerge} from 'tailwind-merge';
 type SidebarContentLayoutProps = {
     bodyClassName?: string;
     className?: string;
+    footer?: ReactNode;
     header: ReactNode;
     leftSidebarBody?: ReactNode;
     leftSidebarHeader?: ReactNode;
@@ -14,11 +15,10 @@ type SidebarContentLayoutProps = {
     rightToolbarOpen?: boolean;
 };
 
-const LayoutContainer: React.FC<
-    PropsWithChildren<SidebarContentLayoutProps>
-> = ({
+const LayoutContainer = ({
     bodyClassName,
     className,
+    footer,
     header,
     leftSidebarBody,
     leftSidebarHeader,
@@ -26,7 +26,7 @@ const LayoutContainer: React.FC<
     rightToolbarBody,
     rightToolbarOpen = false,
     children,
-}) => {
+}: PropsWithChildren<SidebarContentLayoutProps>) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -122,24 +122,27 @@ const LayoutContainer: React.FC<
                     <div className="flex h-full w-full flex-col">
                         {header}
 
-                        <div className={twMerge('flex h-full', bodyClassName)}>
-                            <main className="flex flex-1 overflow-y-auto">
-                                <section className="flex h-full min-w-0 flex-1 flex-col lg:order-last">
-                                    {children}
-                                </section>
-                            </main>
-
-                            {rightToolbarOpen && rightToolbarBody && (
-                                <aside className="flex">
-                                    <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
-                                        <div className="overflow-y-auto">
-                                            {rightToolbarBody}
-                                        </div>
-                                    </nav>
-                                </aside>
+                        <main
+                            className={twMerge(
+                                'flex flex-1 overflow-y-auto',
+                                bodyClassName
                             )}
-                        </div>
+                        >
+                            {children}
+                        </main>
+
+                        {footer}
                     </div>
+
+                    {rightToolbarOpen && rightToolbarBody && (
+                        <aside className="flex">
+                            <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                                <div className="overflow-y-auto">
+                                    {rightToolbarBody}
+                                </div>
+                            </nav>
+                        </aside>
+                    )}
                 </div>
             </div>
         </>
