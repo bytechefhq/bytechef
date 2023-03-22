@@ -41,7 +41,7 @@ import org.springframework.data.domain.PageRequest;
 @EmbeddedSql
 @SpringBootTest(
     classes = WorkflowRepositoryIntTestConfiguration.class,
-    properties = "bytechef.workflow.persistence.provider=jdbc")
+    properties = "bytechef.persistence.provider=jdbc")
 public class JdbcJobRepositoryIntTest {
 
     @Autowired

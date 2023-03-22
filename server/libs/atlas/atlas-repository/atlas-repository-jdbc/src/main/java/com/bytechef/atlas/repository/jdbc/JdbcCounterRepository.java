@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-@ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
+@ConditionalOnProperty(prefix = "bytechef", name = "persistence.provider", havingValue = "jdbc")
 public interface JdbcCounterRepository extends PagingAndSortingRepository<Counter, Long>, CounterRepository {
 
     @Override

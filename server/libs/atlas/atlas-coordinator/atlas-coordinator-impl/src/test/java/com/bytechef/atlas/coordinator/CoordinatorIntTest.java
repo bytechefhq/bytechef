@@ -86,9 +86,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EmbeddedSql
 @SpringBootTest(
     properties = {
-        "bytechef.workflow.context-repository.provider=jdbc",
-        "bytechef.workflow.persistence.provider=jdbc",
-        "bytechef.workflow.workflow-repository.classpath.enabled=true"
+        "bytechef.context-repository.provider=jdbc",
+        "bytechef.persistence.provider=jdbc",
+        "bytechef.workflow-repository.classpath.enabled=true"
     })
 public class CoordinatorIntTest {
 
