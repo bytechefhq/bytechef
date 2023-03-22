@@ -49,6 +49,12 @@ public final class MapValueUtils {
     private MapValueUtils() {
     }
 
+    public static boolean containsKey(Map<String, Object> map, String key) {
+        Assert.notNull(map, "'map' must not be null");
+
+        return map.containsKey(key);
+    }
+
     public static Object get(Map<String, ?> map, String key) {
         Assert.notNull(map, "'map' must not be null");
 
