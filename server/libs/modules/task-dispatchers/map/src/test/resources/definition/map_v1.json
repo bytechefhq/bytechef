@@ -4,41 +4,35 @@
     "label": "Map"
   },
   "name": "map",
-  "properties": [
-    {
-      "description": "List of items to iterate over.",
-      "label": "List of items",
-      "name": "list",
-      "type": "ARRAY",
-      "multipleValues": true,
-      "controlType": "JSON_BUILDER"
-    },
-    {
-      "description": "The name of the item variable.",
-      "label": "Item Var",
-      "name": "itemVar",
-      "type": "STRING",
-      "defaultValue": "item",
-      "controlType": "INPUT_TEXT"
-    },
-    {
-      "description": "The name of the index variable.",
-      "label": "Item Index",
-      "name": "itemIndex",
-      "type": "STRING",
-      "defaultValue": "itemIndex",
-      "controlType": "INPUT_TEXT"
-    }
-  ],
+  "properties": [ {
+    "description": "List of items to iterate over.",
+    "label": "List of items",
+    "name": "list",
+    "type": "ARRAY",
+    "multipleValues": true,
+    "controlType": "JSON_BUILDER"
+  }, {
+    "description": "The name of the item variable.",
+    "label": "Item Var",
+    "name": "itemVar",
+    "type": "STRING",
+    "defaultValue": "item",
+    "controlType": "INPUT_TEXT"
+  }, {
+    "description": "The name of the index variable.",
+    "label": "Item Index",
+    "name": "itemIndex",
+    "type": "STRING",
+    "defaultValue": "itemIndex",
+    "controlType": "INPUT_TEXT"
+  } ],
   "version": 1,
-  "taskProperties": [
-    {
-      "description": "The task or task dispatcher to use.",
-      "name": "iteratee",
-      "type": "OBJECT",
-      "multipleValues": true,
-      "objectType": "TASK",
-      "controlType": "INPUT_TEXT"
-    }
-  ]
+  "taskProperties": [ {
+    "description": "The task or task dispatcher to use.",
+    "name": "iteratee",
+    "type": "OBJECT",
+    "multipleValues": true,
+    "objectType": "TASK",
+    "controlType": "INPUT_TEXT"
+  } ]
 }

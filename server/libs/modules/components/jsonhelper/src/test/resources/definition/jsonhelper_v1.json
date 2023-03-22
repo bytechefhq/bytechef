@@ -1,122 +1,93 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Converts the JSON string to object/array.",
-        "label": "Convert from JSON string"
-      },
-      "name": "parse",
-      "outputSchema": [
-        {
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE",
-              "controlType": "DATE"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "The JSON string to convert to the data.",
-          "label": "Source",
-          "required": true,
-          "name": "source",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
+  "actions": [ {
+    "display": {
+      "description": "Converts the JSON string to object/array.",
+      "label": "Convert from JSON string"
     },
-    {
-      "display": {
-        "description": "Writes the object/array to a JSON string.",
-        "label": "Convert to JSON string"
-      },
-      "name": "stringify",
-      "outputSchema": [
-        {
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The data to convert to JSON string.",
-          "label": "Source",
-          "required": true,
-          "name": "source",
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE",
-              "controlType": "DATE"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
-              "multipleValues": true
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ]
-        }
-      ]
-    }
-  ],
+    "name": "parse",
+    "outputSchema": [ {
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ],
+    "properties": [ {
+      "description": "The JSON string to convert to the data.",
+      "label": "Source",
+      "required": true,
+      "name": "source",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "display": {
+      "description": "Writes the object/array to a JSON string.",
+      "label": "Convert to JSON string"
+    },
+    "name": "stringify",
+    "outputSchema": [ {
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "properties": [ {
+      "description": "The data to convert to JSON string.",
+      "label": "Source",
+      "required": true,
+      "name": "source",
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "controlType": "JSON_BUILDER",
+        "multipleValues": true
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ]
+  } ],
   "display": {
     "description": "JSON Helper allows you to do various operations on objects.",
     "label": "JSON Helper"

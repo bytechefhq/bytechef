@@ -1,28 +1,22 @@
 {
   "label": "XML File - READ operation",
-  "inputs": [
-    {
-      "name": "fileEntry",
-      "label": "File property",
-      "type": "FILE_ENTRY",
-      "required": true
+  "inputs": [ {
+    "name": "fileEntry",
+    "label": "File property",
+    "type": "FILE_ENTRY",
+    "required": true
+  } ],
+  "outputs": [ {
+    "name": "readXMLFile",
+    "value": "${readXMLFile}"
+  } ],
+  "tasks": [ {
+    "name": "readXMLFile",
+    "label": "Read from the XML file",
+    "type": "xmlFile/v1/read",
+    "parameters": {
+      "fileEntry": "${fileEntry}",
+      "includeEmptyCells": true
     }
-  ],
-  "outputs": [
-    {
-      "name": "readXMLFile",
-      "value": "${readXMLFile}"
-    }
-  ],
-  "tasks": [
-    {
-      "name": "readXMLFile",
-      "label": "Read from the XML file",
-      "type": "xmlFile/v1/read",
-      "parameters": {
-        "fileEntry": "${fileEntry}",
-        "includeEmptyCells": true
-      }
-    }
-  ]
+  } ]
 }

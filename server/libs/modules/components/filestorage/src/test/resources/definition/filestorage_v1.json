@@ -1,175 +1,142 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Reads data from the file.",
-        "label": "Read from file"
-      },
-      "name": "read",
-      "outputSchema": [
-        {
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The object property which contains a reference to the file to read from.",
-          "label": "File",
-          "required": true,
-          "name": "fileEntry",
-          "type": "OBJECT",
-          "multipleValues": true,
-          "objectType": "FILE_ENTRY",
-          "properties": [
-            {
-              "required": true,
-              "name": "extension",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "mimeType",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "url",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "controlType": "INPUT_TEXT"
-        }
-      ]
+  "actions": [ {
+    "display": {
+      "description": "Reads data from the file.",
+      "label": "Read from file"
     },
-    {
-      "display": {
-        "description": "Writes the data to the file.",
-        "label": "Write to file"
-      },
-      "name": "write",
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "multipleValues": true,
-          "objectType": "FILE_ENTRY",
-          "properties": [
-            {
-              "required": true,
-              "name": "extension",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "mimeType",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "url",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "controlType": "INPUT_TEXT"
-        }
-      ],
-      "properties": [
-        {
-          "description": "String to write to the file.",
-          "label": "Content",
-          "required": true,
-          "name": "content",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "Filename to set for data. By default, \"file.txt\" will be used.",
-          "label": "Filename",
-          "name": "filename",
-          "type": "STRING",
-          "defaultValue": "file.txt",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
+    "name": "read",
+    "outputSchema": [ {
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "properties": [ {
+      "description": "The object property which contains a reference to the file to read from.",
+      "label": "File",
+      "required": true,
+      "name": "fileEntry",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "objectType": "FILE_ENTRY",
+      "properties": [ {
+        "required": true,
+        "name": "extension",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "mimeType",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "url",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "display": {
+      "description": "Writes the data to the file.",
+      "label": "Write to file"
     },
-    {
-      "display": {
-        "description": "Download thr file from the URL.",
-        "label": "Download file"
-      },
-      "name": "download",
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "multipleValues": true,
-          "objectType": "FILE_ENTRY",
-          "properties": [
-            {
-              "required": true,
-              "name": "extension",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "mimeType",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "name",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "required": true,
-              "name": "url",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "controlType": "INPUT_TEXT"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The URL to download the file from.",
-          "label": "URL",
-          "required": true,
-          "name": "url",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "Filename to set for data. By default, \"file.txt\" will be used.",
-          "label": "Filename",
-          "name": "filename",
-          "type": "STRING",
-          "defaultValue": "file.txt",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
-    }
-  ],
+    "name": "write",
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "objectType": "FILE_ENTRY",
+      "properties": [ {
+        "required": true,
+        "name": "extension",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "mimeType",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "url",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "INPUT_TEXT"
+    } ],
+    "properties": [ {
+      "description": "String to write to the file.",
+      "label": "Content",
+      "required": true,
+      "name": "content",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "Filename to set for data. By default, \"file.txt\" will be used.",
+      "label": "Filename",
+      "name": "filename",
+      "type": "STRING",
+      "defaultValue": "file.txt",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "display": {
+      "description": "Download thr file from the URL.",
+      "label": "Download file"
+    },
+    "name": "download",
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "objectType": "FILE_ENTRY",
+      "properties": [ {
+        "required": true,
+        "name": "extension",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "mimeType",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "required": true,
+        "name": "url",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "INPUT_TEXT"
+    } ],
+    "properties": [ {
+      "description": "The URL to download the file from.",
+      "label": "URL",
+      "required": true,
+      "name": "url",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "Filename to set for data. By default, \"file.txt\" will be used.",
+      "label": "Filename",
+      "name": "filename",
+      "type": "STRING",
+      "defaultValue": "file.txt",
+      "controlType": "INPUT_TEXT"
+    } ]
+  } ],
   "display": {
     "description": "Reads and writes data from a file",
     "label": "File Storage"
