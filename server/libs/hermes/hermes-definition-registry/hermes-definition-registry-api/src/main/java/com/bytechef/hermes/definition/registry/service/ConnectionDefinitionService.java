@@ -20,6 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -30,16 +31,25 @@ import java.util.Optional;
  */
 public interface ConnectionDefinitionService {
 
-    void applyAuthorization(Connection connection, Authorization.AuthorizationContext authorizationContext);
+    void executeAuthorizationApply(Connection connection, Authorization.AuthorizationContext authorizationContext);
+
+    Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(Connection connection, String redirectUri);
 
     Optional<String> fetchBaseUri(Connection connection);
 
-    Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName);
+    Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion);
+
+    ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion);
+
+    Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(String componentName, int componentVersion);
+
+    Mono<List<ConnectionDefinition>> getComponentConnectionDefinitionsMono(String componentName, int version);
 
     Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono();
 
-    List<ConnectionDefinition> getConnectionDefinitions(String componentName);
+    OAuth2AuthorizationParameters getOAuth2Parameters(Connection connection);
 
-    Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono(String componentName);
-
+    @SuppressFBWarnings("EI")
+    record OAuth2AuthorizationParameters(String authorizationUrl, String clientId, List<String> scopes) {
+    }
 }
