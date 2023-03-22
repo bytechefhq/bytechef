@@ -23,7 +23,6 @@ import com.bytechef.atlas.sync.executor.config.WorkflowExecutorConfiguration;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -57,10 +56,7 @@ public class ComponentTestIntConfiguration {
     @MockBean(name = "connectionService")
     private ConnectionService connectionService;
 
-    @MockBean(name = "connectionDefinitionFacade")
-    private ConnectionDefinitionFacade connectionDefinitionFacade;
-
-    @MockBean
+    @MockBean(name = "connectionDefinitionService")
     private ConnectionDefinitionService connectionDefinitionService;
 
     @Bean
