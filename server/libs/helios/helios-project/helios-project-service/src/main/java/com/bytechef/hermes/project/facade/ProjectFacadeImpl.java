@@ -24,8 +24,8 @@ import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.domain.Category;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.project.domain.Project;
-import com.bytechef.hermes.project.dto.ProjectExecution;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.hermes.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
@@ -34,7 +34,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -91,13 +90,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
             project.setCategory(categoryService.save(category));
         }
 
-        if (CollectionUtils.isEmpty(project.getWorkflowIds())) {
+        if (org.springframework.util.CollectionUtils.isEmpty(project.getWorkflowIds())) {
             Workflow workflow = workflowService.create(null, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
             project.setWorkflowIds(List.of(workflow.getId()));
         }
 
-        if (!CollectionUtils.isEmpty(project.getTags())) {
+        if (!org.springframework.util.CollectionUtils.isEmpty(project.getTags())) {
             project.setTags(tagService.save(project.getTags()));
         }
 
@@ -106,7 +105,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public void delete(Long id) {
-//        Project project = projectService.getProject(id);
+        Project project = projectService.getProject(id);
+
+        for (String workflowId : project.getWorkflowIds()) {
+            workflowService.delete(workflowId);
+        }
 
         projectService.delete(id);
 
@@ -199,29 +202,46 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     public Page<ProjectExecution> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartTime, LocalDateTime jobEndTime, Long projectId, Long projectInstanceId,
-        Long workflowId, Integer pageNumber) {
+        String workflowId, Integer pageNumber) {
 
-        Project project;
+        List<Project> projects;
 
-        if (projectId != null) {
-            project = projectService.getProject(projectId);
+        if (projectId == null) {
+            projects = projectService.getProjects();
         } else {
-            project = null;
+            projects = List.of(projectService.getProject(projectId));
         }
 
-        Page<Job> jobs = jobService.searchJobs(jobStatus, jobStartTime, jobEndTime, workflowId, pageNumber);
+        List<String> projectWorkflowIds = Collections.emptyList();
+
+        if (projectId != null) {
+            Project project = projects.get(0);
+
+            projectWorkflowIds = project.getWorkflowIds();
+        }
+
+        Page<Job> jobsPage = jobService.searchJobs(
+            jobStatus, jobStartTime, jobEndTime, workflowId, projectWorkflowIds, pageNumber);
 
         List<TaskExecution> taskExecutions = taskExecutionService.getJobsTaskExecutions(
-            jobs.stream()
-                .map(Job::getId)
-                .toList());
+            CollectionUtils.map(jobsPage.toList(), Job::getId));
 
-        return jobs.map(job -> new ProjectExecution(
-            job, project,
+        List<Workflow> workflows = workflowService.getWorkflows(
+            CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
+
+        return jobsPage.map(job -> new ProjectExecution(
+            job,
+            projects.stream()
+                .filter(project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId()))
+                .findFirst()
+                .orElseThrow(IllegalStateException::new),
             taskExecutions.stream()
                 .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId()))
                 .toList(),
-            workflowService.getWorkflow(job.getWorkflowId())));
+            workflows.stream()
+                .filter(workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()))
+                .findFirst()
+                .orElseThrow(IllegalStateException::new)));
     }
 
     @Override
@@ -240,11 +260,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 .forEach(project -> project.setCategory(category));
         }
 
-        List<Tag> tags = tagService.getTags(projects.stream()
-            .flatMap(project -> project.getTagIds()
-                .stream())
-            .filter(Objects::nonNull)
-            .toList());
+        List<Tag> tags = tagService.getTags(
+            projects.stream()
+                .flatMap(project -> CollectionUtils.stream(project.getTagIds()))
+                .filter(Objects::nonNull)
+                .toList());
 
         for (Project project : projects) {
             project.setTags(
@@ -262,7 +282,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public Project update(Long id, List<Tag> tags) {
-        tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
+        tags = org.springframework.util.CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         return projectService.update(id, tags);
     }
@@ -273,7 +293,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             .setCategory(project.getCategory() == null ? null : categoryService.save(project.getCategory()));
         project
             .setTags(
-                CollectionUtils.isEmpty(project.getTags())
+                org.springframework.util.CollectionUtils.isEmpty(project.getTags())
                     ? Collections.emptyList()
                     : tagService.save(project.getTags()));
 
