@@ -79,7 +79,7 @@ const ProjectDialog = ({
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
-    const createMutation = useCreateProjectMutation({
+    const createProjectMutation = useCreateProjectMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectKeys.projectCategories);
             queryClient.invalidateQueries(ProjectKeys.projects);
@@ -89,7 +89,7 @@ const ProjectDialog = ({
         },
     });
 
-    const updateMutation = useUpdateProjectMutation({
+    const updateProjectMutation = useUpdateProjectMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectKeys.projectCategories);
             queryClient.invalidateQueries(ProjectKeys.projects);
@@ -109,7 +109,7 @@ const ProjectDialog = ({
         }
     }
 
-    function createProject() {
+    function saveProject() {
         const formData = getValues();
 
         if (!formData) {
@@ -125,13 +125,13 @@ const ProjectDialog = ({
             : undefined;
 
         if (project?.id) {
-            updateMutation.mutate({
+            updateProjectMutation.mutate({
                 ...project,
                 ...formData,
                 category,
             } as ProjectModel);
         } else {
-            createMutation.mutate({
+            createProjectMutation.mutate({
                 ...formData,
                 category,
                 tags: tagValues,
@@ -263,7 +263,7 @@ const ProjectDialog = ({
                 <Button
                     label="Save"
                     type="submit"
-                    onClick={handleSubmit(createProject)}
+                    onClick={handleSubmit(saveProject)}
                 />
             </div>
         </Dialog>
