@@ -15,7 +15,7 @@ paths:
       operationId: "getIntegrationCategories"
       responses:
         "200":
-          description: "The list of categories."
+          description: "A list of categories."
           content:
             application/json:
               schema:
@@ -32,7 +32,7 @@ paths:
       operationId: "getIntegrationTags"
       responses:
         "200":
-          description: "The list of integration tags."
+          description: "A list of integration tags."
           content:
             application/json:
               schema:
@@ -49,7 +49,7 @@ paths:
       operationId: "getIntegrations"
       parameters:
       - name: "categoryIds"
-        description: "The list of the category ids used for filtering integrations."
+        description: "A list of the category ids used for filtering integrations."
         in: "query"
         required: false
         schema:
@@ -58,7 +58,7 @@ paths:
             type: "integer"
             format: "int64"
       - name: "tagIds"
-        description: "The list of tag ids of used for filtering integrations."
+        description: "A list of tag ids of used for filtering integrations."
         in: "query"
         required: false
         schema:
@@ -68,7 +68,7 @@ paths:
             format: "int64"
       responses:
         "200":
-          description: "The list of integrations."
+          description: "A list of integrations."
           content:
             application/json:
               schema:
@@ -292,8 +292,8 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        lastPublishedDate:
-          description: "The last published date."
+        publishedDate:
+          description: "The published date."
           type: "string"
           format: "date-time"
         integrationVersion:
