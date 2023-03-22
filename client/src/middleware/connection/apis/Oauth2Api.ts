@@ -14,6 +14,13 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  OAuth2PropertiesModel,
+} from '../models';
+import {
+    OAuth2PropertiesModelFromJSON,
+    OAuth2PropertiesModelToJSON,
+} from '../models';
 
 /**
  * 
@@ -21,30 +28,30 @@ import * as runtime from '../runtime';
 export class Oauth2Api extends runtime.BaseAPI {
 
     /**
-     * Get registered OAuth2 apps.
-     * Get registered OAuth2 apps.
+     * Get OAuth2 properties.
+     * Get OAuth2 properties.
      */
-    async getOAuth2AppsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+    async getOAuth2PropertiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2PropertiesModel>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/oauth2-apps`,
+            path: `/oauth2-properties`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2PropertiesModelFromJSON(jsonValue));
     }
 
     /**
-     * Get registered OAuth2 apps.
-     * Get registered OAuth2 apps.
+     * Get OAuth2 properties.
+     * Get OAuth2 properties.
      */
-    async getOAuth2Apps(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
-        const response = await this.getOAuth2AppsRaw(initOverrides);
+    async getOAuth2Properties(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2PropertiesModel> {
+        const response = await this.getOAuth2PropertiesRaw(initOverrides);
         return await response.value();
     }
 

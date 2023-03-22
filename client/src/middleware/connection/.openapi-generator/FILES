@@ -3,6 +3,8 @@ apis/Oauth2Api.ts
 apis/index.ts
 index.ts
 models/ConnectionModel.ts
+models/OAuth2AuthorizationParametersModel.ts
+models/OAuth2PropertiesModel.ts
 models/TagModel.ts
 models/UpdateConnectionTagsRequestModel.ts
 models/index.ts

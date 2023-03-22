@@ -125,34 +125,34 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     if (!ignoreDiscriminator) {
-        if (json['modelType'] === 'ARRAY') {
+        if (json['type'] === 'ARRAY') {
             return ArrayPropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'BOOLEAN') {
+        if (json['type'] === 'BOOLEAN') {
             return BooleanPropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'DATE') {
+        if (json['type'] === 'DATE') {
             return DatePropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'DATE_TIME') {
+        if (json['type'] === 'DATE_TIME') {
             return DateTimePropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'DYNAMIC_PROPERTIES') {
+        if (json['type'] === 'DYNAMIC_PROPERTIES') {
             return DynamicPropertiesPropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'INTEGER') {
+        if (json['type'] === 'INTEGER') {
             return IntegerPropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'NUMBER') {
+        if (json['type'] === 'NUMBER') {
             return NumberPropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'OBJECT') {
+        if (json['type'] === 'OBJECT') {
             return ObjectPropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'ONE_OF') {
+        if (json['type'] === 'ONE_OF') {
             return OneOfPropertyModelFromJSONTyped(json, true);
         }
-        if (json['modelType'] === 'STRING') {
+        if (json['type'] === 'STRING') {
             return StringPropertyModelFromJSONTyped(json, true);
         }
     }

@@ -57,6 +57,12 @@ export interface ConnectionDefinitionModel {
      */
     authorizations?: Array<AuthorizationModel>;
     /**
+     * Defines the base URI for all future HTTP requests.
+     * @type {string}
+     * @memberof ConnectionDefinitionModel
+     */
+    baseUri?: string;
+    /**
      * The name of a component this connection can be used for.
      * @type {string}
      * @memberof ConnectionDefinitionModel
@@ -103,6 +109,7 @@ export function ConnectionDefinitionModelFromJSONTyped(json: any, ignoreDiscrimi
         
         'authorizationRequired': !exists(json, 'authorizationRequired') ? undefined : json['authorizationRequired'],
         'authorizations': !exists(json, 'authorizations') ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationModelFromJSON)),
+        'baseUri': !exists(json, 'baseUri') ? undefined : json['baseUri'],
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'componentDisplay': !exists(json, 'componentDisplay') ? undefined : DisplayModelFromJSON(json['componentDisplay']),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
@@ -121,6 +128,7 @@ export function ConnectionDefinitionModelToJSON(value?: ConnectionDefinitionMode
         
         'authorizationRequired': value.authorizationRequired,
         'authorizations': value.authorizations === undefined ? undefined : ((value.authorizations as Array<any>).map(AuthorizationModelToJSON)),
+        'baseUri': value.baseUri,
         'componentName': value.componentName,
         'componentDisplay': DisplayModelToJSON(value.componentDisplay),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
