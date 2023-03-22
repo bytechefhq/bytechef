@@ -1,7 +1,6 @@
 import {QueryClient, useMutation} from '@tanstack/react-query';
 import {
     CreateProjectWorkflowRequest,
-    DeleteProjectRequest,
     ProjectModel,
     ProjectsApi,
     UpdateProjectTagsRequest,
@@ -67,25 +66,20 @@ export const useCreateProjectWorkflowRequestMutation = (
 };
 
 type DeleteProjectMutationProps = {
-    onSuccess?: (result: void, variables: DeleteProjectRequest) => void;
-    onError?: (error: object, variables: DeleteProjectRequest) => void;
+    onSuccess?: (result: void, variables: number) => void;
+    onError?: (error: object, variables: number) => void;
 };
 
 export const useDeleteProjectMutation = (
     mutationProps?: DeleteProjectMutationProps
 ) =>
     useMutation({
-        mutationFn: (request: DeleteProjectRequest) => {
-            return new ProjectsApi().deleteProject(request);
+        mutationFn: (id: number) => {
+            return new ProjectsApi().deleteProject({id: id});
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
     });
-
-type UpdateProjectMutationProps = {
-    onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
-    onError?: (error: object, variables: ProjectModel) => void;
-};
 
 type DuplicateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: number) => void;
@@ -104,6 +98,11 @@ export const useDuplicateProjectMutation = (
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
     });
+
+type UpdateProjectMutationProps = {
+    onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
+    onError?: (error: object, variables: ProjectModel) => void;
+};
 
 export const useUpdateProjectMutation = (
     mutationProps?: UpdateProjectMutationProps
