@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:40.978063+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:19.439912+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integration-tags", description = "the integration-tags API")
 public interface IntegrationTagsApi {
@@ -43,7 +43,7 @@ public interface IntegrationTagsApi {
      * GET /integration-tags : Get integration tags.
      * Get integration tags.
      *
-     * @return The list of integration tags. (status code 200)
+     * @return A list of integration tags. (status code 200)
      */
     @Operation(
         operationId = "getIntegrationTags",
@@ -51,7 +51,7 @@ public interface IntegrationTagsApi {
         description = "Get integration tags.",
         tags = { "integration-tags" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of integration tags.", content = {
+            @ApiResponse(responseCode = "200", description = "A list of integration tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.tag.web.rest.model.TagModel.class)))
             })
         }

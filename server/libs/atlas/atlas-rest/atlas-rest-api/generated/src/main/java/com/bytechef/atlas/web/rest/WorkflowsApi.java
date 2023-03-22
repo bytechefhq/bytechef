@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:39.516542+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:14.422631+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflows", description = "the workflows API")
 public interface WorkflowsApi {
@@ -158,7 +158,7 @@ public interface WorkflowsApi {
      * GET /workflows : Get workflow definitions.
      * Get workflow definitions.
      *
-     * @return The list of workflows. (status code 200)
+     * @return A list of workflows. (status code 200)
      */
     @Operation(
         operationId = "getWorkflows",
@@ -166,7 +166,7 @@ public interface WorkflowsApi {
         description = "Get workflow definitions.",
         tags = { "workflows" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of workflows.", content = {
+            @ApiResponse(responseCode = "200", description = "A list of workflows.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
             })
         }

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:39.516542+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:14.422631+01:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -446,11 +446,11 @@ public class JobModel {
   }
 
   /**
-   * The list of the webhooks configured.
+   * A list of the webhooks configured.
    * @return webhooks
   */
   @Valid 
-  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "A list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<Map<String, Object>> getWebhooks() {
     return webhooks;
   }

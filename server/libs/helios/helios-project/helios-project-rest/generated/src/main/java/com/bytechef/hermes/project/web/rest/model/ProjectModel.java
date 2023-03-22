@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:40.041735+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:15.647046+01:00[Europe/Zagreb]")
 public class ProjectModel {
 
   @JsonProperty("category")
@@ -55,9 +55,9 @@ public class ProjectModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("lastPublishedDate")
+  @JsonProperty("publishedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastPublishedDate;
+  private LocalDateTime publishedDate;
 
   @JsonProperty("projectVersion")
   private Integer projectVersion;
@@ -263,23 +263,23 @@ public class ProjectModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ProjectModel lastPublishedDate(LocalDateTime lastPublishedDate) {
-    this.lastPublishedDate = lastPublishedDate;
+  public ProjectModel publishedDate(LocalDateTime publishedDate) {
+    this.publishedDate = publishedDate;
     return this;
   }
 
   /**
-   * The last published date.
-   * @return lastPublishedDate
+   * The published date.
+   * @return publishedDate
   */
   @Valid 
-  @Schema(name = "lastPublishedDate", description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public LocalDateTime getLastPublishedDate() {
-    return lastPublishedDate;
+  @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public LocalDateTime getPublishedDate() {
+    return publishedDate;
   }
 
-  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
-    this.lastPublishedDate = lastPublishedDate;
+  public void setPublishedDate(LocalDateTime publishedDate) {
+    this.publishedDate = publishedDate;
   }
 
   public ProjectModel projectVersion(Integer projectVersion) {
@@ -410,7 +410,7 @@ public class ProjectModel {
         Objects.equals(this.description, project.description) &&
         Objects.equals(this.lastModifiedBy, project.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, project.lastModifiedDate) &&
-        Objects.equals(this.lastPublishedDate, project.lastPublishedDate) &&
+        Objects.equals(this.publishedDate, project.publishedDate) &&
         Objects.equals(this.projectVersion, project.projectVersion) &&
         Objects.equals(this.status, project.status) &&
         Objects.equals(this.tags, project.tags) &&
@@ -420,7 +420,7 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, lastPublishedDate, projectVersion, status, tags, workflowIds, version);
+    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, publishedDate, projectVersion, status, tags, workflowIds, version);
   }
 
   @Override
@@ -435,7 +435,7 @@ public class ProjectModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");

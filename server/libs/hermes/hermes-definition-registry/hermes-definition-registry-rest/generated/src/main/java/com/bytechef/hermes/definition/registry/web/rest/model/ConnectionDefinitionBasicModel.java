@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
 public class ConnectionDefinitionBasicModel {
 
   @JsonProperty("componentName")

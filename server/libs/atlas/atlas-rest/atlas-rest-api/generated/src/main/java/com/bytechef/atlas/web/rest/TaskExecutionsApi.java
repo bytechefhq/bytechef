@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:39.516542+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:14.422631+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-executions", description = "the task-executions API")
 public interface TaskExecutionsApi {
@@ -45,7 +45,7 @@ public interface TaskExecutionsApi {
      * Get a task execution by id.
      *
      * @param id The id of the task execution to get. (required)
-     * @return The task execution. (status code 200)
+     * @return The task execution object. (status code 200)
      */
     @Operation(
         operationId = "getTaskExecution",
@@ -53,7 +53,7 @@ public interface TaskExecutionsApi {
         description = "Get a task execution by id.",
         tags = { "task-executions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The task execution.", content = {
+            @ApiResponse(responseCode = "200", description = "The task execution object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = TaskExecutionModel.class))
             })
         }

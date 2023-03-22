@@ -27,14 +27,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T10:00:29.397533+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.549230+01:00[Europe/Zagreb]")
 public class ConnectionModel {
+
+  @JsonProperty("active")
+  private Boolean active;
 
   @JsonProperty("authorizationName")
   private String authorizationName;
 
   @JsonProperty("componentName")
   private String componentName;
+
+  @JsonProperty("connectionVersion")
+  private Integer connectionVersion;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -66,6 +72,25 @@ public class ConnectionModel {
 
   @JsonProperty("__version")
   private Integer version;
+
+  public ConnectionModel active(Boolean active) {
+    this.active = active;
+    return this;
+  }
+
+  /**
+   * If a connection is used in any of active workflows.
+   * @return active
+  */
+  
+  @Schema(name = "active", description = "If a connection is used in any of active workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Boolean getActive() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
 
   public ConnectionModel authorizationName(String authorizationName) {
     this.authorizationName = authorizationName;
@@ -103,6 +128,25 @@ public class ConnectionModel {
 
   public void setComponentName(String componentName) {
     this.componentName = componentName;
+  }
+
+  public ConnectionModel connectionVersion(Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
+    return this;
+  }
+
+  /**
+   * The version of a component that uses this connection.
+   * @return connectionVersion
+  */
+  
+  @Schema(name = "connectionVersion", description = "The version of a component that uses this connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Integer getConnectionVersion() {
+    return connectionVersion;
+  }
+
+  public void setConnectionVersion(Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
   }
 
   public ConnectionModel createdBy(String createdBy) {
@@ -298,8 +342,10 @@ public class ConnectionModel {
       return false;
     }
     ConnectionModel connection = (ConnectionModel) o;
-    return Objects.equals(this.authorizationName, connection.authorizationName) &&
+    return Objects.equals(this.active, connection.active) &&
+        Objects.equals(this.authorizationName, connection.authorizationName) &&
         Objects.equals(this.componentName, connection.componentName) &&
+        Objects.equals(this.connectionVersion, connection.connectionVersion) &&
         Objects.equals(this.createdBy, connection.createdBy) &&
         Objects.equals(this.createdDate, connection.createdDate) &&
         Objects.equals(this.name, connection.name) &&
@@ -313,15 +359,17 @@ public class ConnectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationName, componentName, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
+    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionModel {\n");
+    sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    authorizationName: ").append(toIndentedString(authorizationName)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
