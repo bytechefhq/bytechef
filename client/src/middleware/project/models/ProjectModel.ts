@@ -81,11 +81,11 @@ export interface ProjectModel {
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The last published date.
+     * The published date.
      * @type {Date}
      * @memberof ProjectModel
      */
-    lastPublishedDate?: Date;
+    publishedDate?: Date;
     /**
      * The version of a project.
      * @type {number}
@@ -157,7 +157,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'description': !exists(json, 'description') ? undefined : json['description'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'lastPublishedDate': !exists(json, 'lastPublishedDate') ? undefined : (new Date(json['lastPublishedDate'])),
+        'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
         'status': !exists(json, 'status') ? undefined : json['status'],
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
@@ -178,7 +178,7 @@ export function ProjectModelToJSON(value?: ProjectModel | null): any {
         'category': CategoryModelToJSON(value.category),
         'name': value.name,
         'description': value.description,
-        'lastPublishedDate': value.lastPublishedDate === undefined ? undefined : (value.lastPublishedDate.toISOString()),
+        'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
         'projectVersion': value.projectVersion,
         'status': value.status,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
