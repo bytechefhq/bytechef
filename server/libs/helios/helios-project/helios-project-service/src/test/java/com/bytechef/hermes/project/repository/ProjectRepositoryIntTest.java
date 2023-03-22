@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EmbeddedSql
 @SpringBootTest(classes = ProjectIntTestConfiguration.class, properties = {
-    "bytechef.workflow.context-repository.provider=jdbc", "bytechef.workflow.persistence.provider=jdbc"
+    "bytechef.context-repository.provider=jdbc", "bytechef.persistence.provider=jdbc"
 })
 public class ProjectRepositoryIntTest {
 
