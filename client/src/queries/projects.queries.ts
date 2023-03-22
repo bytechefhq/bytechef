@@ -26,7 +26,10 @@ export const ProjectKeys = {
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
-    projectExecutions: ['projectExecutions'] as const,
+    projectExecutions: (filter: GetProjectExecutionsRequest) => [
+        'projectExecutions',
+        filter,
+    ],
     projectInstances: ['projectInstances'] as const,
 };
 
@@ -65,6 +68,6 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
 export const useGetProjectExecutionsQuery = (
     request: GetProjectExecutionsRequest
 ) =>
-    useQuery<PageModel, Error>(ProjectKeys.projectExecutions, () =>
+    useQuery<PageModel, Error>(ProjectKeys.projectExecutions(request), () =>
         new ProjectExecutionsApi().getProjectExecutions(request)
     );
