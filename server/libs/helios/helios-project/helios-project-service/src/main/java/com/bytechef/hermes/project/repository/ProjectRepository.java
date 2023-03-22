@@ -25,6 +25,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -33,14 +34,7 @@ import java.util.List;
 public interface ProjectRepository
     extends PagingAndSortingRepository<Project, Long>, CrudRepository<Project, Long> {
 
-    Iterable<Project> findByCategoryIdInOrderByName(List<Long> categoryIds);
-
-    @Query("""
-            SELECT project.* FROM project
-            JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project_tag.tag_id in (:tagIds)
-        """)
-    Iterable<Project> findByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
+    List<Project> findAllByCategoryIdInOrderByName(List<Long> categoryIds);
 
     @Query("""
             SELECT project.* FROM project
@@ -48,6 +42,15 @@ public interface ProjectRepository
             WHERE project.category_id IN (:categoryIds)
             AND project_tag.tag_id IN (:tagId)
         """)
-    Iterable<Project> findByCategoryIdsAndTagIdsOrderByName(
+    List<Project> findAllByCategoryIdsAndTagIdsOrderByName(
         @Param("categoryIds") List<Long> categoryIds, @Param("tagIds") List<Long> tagIds);
+
+    @Query("""
+            SELECT project.* FROM project
+            JOIN project_tag ON project.id = project_tag.project_id
+            WHERE project_tag.tag_id in (:tagIds)
+        """)
+    List<Project> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
+
+    Optional<Project> findByName(String name);
 }
