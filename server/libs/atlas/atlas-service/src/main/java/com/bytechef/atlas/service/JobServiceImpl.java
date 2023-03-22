@@ -151,12 +151,13 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Page<Job> searchJobs(
-        String status, LocalDateTime startTime, LocalDateTime endTime, Long workflowId, Integer pageNumber) {
+        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        Integer pageNumber) {
 
-// TODO
-//        return jobRepository.findAll(
-//            status, startTime, endTime, workflowId, PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
-        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
+        return jobRepository.findAll(
+            status, startTime, endTime, workflowId, workflowIds,
+            PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
+//        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
     }
 
     @Override
