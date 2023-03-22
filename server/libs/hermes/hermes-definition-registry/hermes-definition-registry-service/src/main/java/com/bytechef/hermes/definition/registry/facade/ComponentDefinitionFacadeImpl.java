@@ -47,7 +47,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     public Mono<List<ComponentDefinition>> getComponentDefinitions(
         Boolean connectionDefinitions, Boolean connectionInstances) {
 
-        List<Connection> connections = connectionService.getConnections(null, null);
+        List<Connection> connections = connectionService.getConnections();
 
         return componentDefinitionService.getComponentDefinitionsMono()
             .map(componentDefinitions -> componentDefinitions.stream()

@@ -17,12 +17,10 @@
 
 package com.bytechef.hermes.definition.registry.config;
 
-import com.bytechef.hermes.definition.registry.ComponentDefinitionAccessor;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -33,6 +31,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
@@ -41,8 +41,8 @@ import org.springframework.context.annotation.Configuration;
 public class WorkerDefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionService actionDefinitionService(ComponentDefinitionAccessor componentDefinitionAccessor) {
-        return new ActionDefinitionServiceImpl(componentDefinitionAccessor.getComponentDefinitions());
+    ActionDefinitionService actionDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new ActionDefinitionServiceImpl(componentDefinitions);
     }
 
     @Bean
@@ -53,19 +53,12 @@ public class WorkerDefinitionRegistryConfiguration {
     }
 
     @Bean
-    ComponentDefinitionService componentDefinitionService(ComponentDefinitionAccessor componentDefinitionAccessor) {
-        return new ComponentDefinitionServiceImpl(componentDefinitionAccessor.getComponentDefinitions());
+    ComponentDefinitionService componentDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new ComponentDefinitionServiceImpl(componentDefinitions);
     }
 
     @Bean
-    ConnectionDefinitionFacade connectionDefinitionFacade(
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService) {
-
-        return new ConnectionDefinitionFacadeImpl(connectionDefinitionService, connectionService);
-    }
-
-    @Bean
-    ConnectionDefinitionService connectionDefinitionService(ComponentDefinitionAccessor componentDefinitionAccessor) {
-        return new ConnectionDefinitionServiceImpl(componentDefinitionAccessor.getComponentDefinitions());
+    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new ConnectionDefinitionServiceImpl(componentDefinitions);
     }
 }
