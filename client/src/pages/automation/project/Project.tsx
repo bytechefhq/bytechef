@@ -113,7 +113,7 @@ const Project: React.FC = () => {
             <LayoutContainer
                 bodyClassName="border-l border-gray-200 bg-gray-100"
                 header={
-                    <header className="flex items-center">
+                    <header className="flex items-center bg-gray-100">
                         <Button
                             className="p-4"
                             icon={
