@@ -113,22 +113,21 @@ const Pagination = ({
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                 <div>
                     <p className="text-sm text-gray-700">
-                        Showing{' '}
-
-                        <span className="font-medium">
+                        Showing
+                        <span className="px-2 font-medium">
                             {pageNumber * pageSize + 1}
-                        </span>{' '}
-
-                        to{' '}
-
-                        <span className="font-medium">
+                        </span>
+                        to
+                        <span className="pr-2 font-medium">
                             {Math.min(
                                 totalElements,
                                 (pageNumber + 1) * pageSize
                             )}
-                        </span>{' '}
-
-                        of <span className="font-medium">{totalElements}</span>{' '}
+                        </span>
+                        of
+                        <span className="px-2 font-medium">
+                            {totalElements}
+                        </span>
                         results
                     </p>
                 </div>
