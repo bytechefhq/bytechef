@@ -1,4 +1,4 @@
-import {Link, useSearchParams} from 'react-router-dom';
+import {useSearchParams} from 'react-router-dom';
 import ConnectionListItem from './ConnectionListItem';
 import {
     useGetConnectionsQuery,
@@ -30,12 +30,12 @@ const ConnectionList = () => {
     return (
         <div
             className={twMerge(
-                'flex place-self-center px-2 sm:w-full 2xl:w-4/5',
-                connections?.length === 0 ? 'h-full items-center' : ''
+                'w-full px-2 2xl:mx-auto 2xl:w-4/5',
+                connections?.length === 0 ? 'place-self-center' : ''
             )}
         >
-            <ul role="list" className="w-full divide-y divide-gray-100">
-                {isLoading && 'Loading...'}
+            <ul role="list">
+                {isLoading && <span className="px-2">Loading...</span>}
 
                 {error &&
                     !isLoading &&
@@ -59,22 +59,20 @@ const ConnectionList = () => {
                             );
 
                             return (
-                                <div key={connection.id}>
-                                    <Link to={``}>
-                                        <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
-                                            <ConnectionListItem
-                                                key={connection.id}
-                                                connection={connection}
-                                                remainingTags={tags?.filter(
-                                                    (tag) =>
-                                                        !connectionTagIds?.includes(
-                                                            tag.id
-                                                        )
-                                                )}
-                                            />
-                                        </li>
-                                    </Link>
-                                </div>
+                                <li key={connection.id}>
+                                    <div className="group rounded-md border-b border-b-gray-100 bg-white p-2 py-3 hover:bg-gray-50">
+                                        <ConnectionListItem
+                                            key={connection.id}
+                                            connection={connection}
+                                            remainingTags={tags?.filter(
+                                                (tag) =>
+                                                    !connectionTagIds?.includes(
+                                                        tag.id
+                                                    )
+                                            )}
+                                        />
+                                    </div>
+                                </li>
                             );
                         })
                     ))}
