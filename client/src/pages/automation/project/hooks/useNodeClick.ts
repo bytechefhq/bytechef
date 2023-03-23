@@ -1,5 +1,6 @@
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
+
 import useRightSlideOverStore from '../stores/useRightSlideOverStore';
 
 // this hook implements the logic for clicking a workflow node

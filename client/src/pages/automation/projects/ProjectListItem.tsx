@@ -1,7 +1,16 @@
+import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
+import getCreatedWorkflow from 'utils/getCreatedWorkflow';
+
+import AlertDialog from '../../../components/AlertDialog/AlertDialog';
+import Badge from '../../../components/Badge/Badge';
 import DropdownMenu, {
     IDropdownMenuItem,
 } from '../../../components/DropdownMenu/DropdownMenu';
+import HoverCard from '../../../components/HoverCard/HoverCard';
+import TagList from '../../../components/TagList/TagList';
+import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import {
     ProjectModel,
     ProjectModelStatusEnum,
@@ -17,15 +26,7 @@ import {
     ProjectKeys,
     useGetProjectWorkflowsQuery,
 } from '../../../queries/projects.queries';
-import {useQueryClient} from '@tanstack/react-query';
-import {Link, useNavigate} from 'react-router-dom';
 import ProjectDialog from './ProjectDialog';
-import AlertDialog from '../../../components/AlertDialog/AlertDialog';
-import TagList from '../../../components/TagList/TagList';
-import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
-import getCreatedWorkflow from 'utils/getCreatedWorkflow';
-import Badge from '../../../components/Badge/Badge';
-import HoverCard from '../../../components/HoverCard/HoverCard';
 
 interface ProjectItemProps {
     project: ProjectModel;
@@ -155,6 +156,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 />
                             </div>
                         </div>
+
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div
                                 className="flex h-[38px] items-center"

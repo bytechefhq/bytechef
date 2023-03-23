@@ -1,5 +1,5 @@
-import React from 'react';
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
+import React from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export interface ISelectOption {

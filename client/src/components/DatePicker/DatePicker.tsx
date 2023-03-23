@@ -1,9 +1,11 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
-import {twMerge} from 'tailwind-merge';
 import ReactDatePicker, {
     ReactDatePickerCustomHeaderProps,
 } from 'react-datepicker';
+import {twMerge} from 'tailwind-merge';
+
 import './DatePicker.css';
+
 import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/react/24/solid';
 import {format} from 'date-fns';
 import {useState} from 'react';

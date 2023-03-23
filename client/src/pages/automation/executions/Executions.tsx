@@ -1,22 +1,4 @@
-import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
-import PageHeader from 'components/PageHeader/PageHeader';
-import {useState} from 'react';
-import FilterableSelect, {
-    ISelectOption,
-} from 'components/FilterableSelect/FilterableSelect';
-import {
-    useGetProjectExecutionsQuery,
-    useGetProjectsQuery,
-} from 'queries/projects.queries';
-import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
-import {OnChangeValue} from 'react-select';
-import {useGetWorkflowsQuery} from 'queries/workflows.queries';
-import {useGetInstancesQuery} from 'queries/instances.queries';
-import {
-    JobModel,
-    ProjectExecutionModel,
-    ProjectExecutionModelFromJSON,
-} from 'middleware/project';
+import {QueueListIcon} from '@heroicons/react/24/outline';
 import {
     CellContext,
     createColumnHelper,
@@ -24,13 +6,32 @@ import {
     getCoreRowModel,
     useReactTable,
 } from '@tanstack/react-table';
+import FilterableSelect, {
+    ISelectOption,
+} from 'components/FilterableSelect/FilterableSelect';
+import PageHeader from 'components/PageHeader/PageHeader';
+import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
+import {
+    JobModel,
+    ProjectExecutionModel,
+    ProjectExecutionModelFromJSON,
+} from 'middleware/project';
+import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
+import {useGetInstancesQuery} from 'queries/instances.queries';
+import {
+    useGetProjectExecutionsQuery,
+    useGetProjectsQuery,
+} from 'queries/projects.queries';
+import {useGetWorkflowsQuery} from 'queries/workflows.queries';
+import {useState} from 'react';
+import {OnChangeValue} from 'react-select';
+import {twMerge} from 'tailwind-merge';
+
+import Badge from '../../../components/Badge/Badge';
+import DatePicker from '../../../components/DatePicker/DatePicker';
+import EmptyList from '../../../components/EmptyList/EmptyList';
 import PageFooter from '../../../components/PageFooter/PageFooter';
 import Pagination from '../../../components/Pagination/Pagination';
-import DatePicker from '../../../components/DatePicker/DatePicker';
-import Badge from '../../../components/Badge/Badge';
-import EmptyList from '../../../components/EmptyList/EmptyList';
-import {QueueListIcon} from '@heroicons/react/24/outline';
-import {twMerge} from 'tailwind-merge';
 
 const columnHelper = createColumnHelper<ProjectExecutionModel>();
 

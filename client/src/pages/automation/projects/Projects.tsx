@@ -1,16 +1,17 @@
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import ProjectList from './ProjectList';
-import ProjectDialog from './ProjectDialog';
+import {TagIcon} from '@heroicons/react/20/solid';
 import React, {useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
+
 import PageHeader from '../../../components/PageHeader/PageHeader';
+import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
 import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
-import {TagIcon} from '@heroicons/react/20/solid';
-import {useSearchParams} from 'react-router-dom';
 import {
     useGetProjectCategoriesQuery,
     useGetProjectTagsQuery,
 } from '../../../queries/projects.queries';
+import ProjectDialog from './ProjectDialog';
+import ProjectList from './ProjectList';
 
 export enum Type {
     Category,

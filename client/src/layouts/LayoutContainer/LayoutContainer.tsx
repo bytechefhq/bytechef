@@ -1,6 +1,6 @@
-import React, {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
+import React, {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type SidebarContentLayoutProps = {
@@ -81,6 +81,7 @@ const LayoutContainer = ({
                                                 className="h-6 w-6 text-white"
                                                 aria-hidden="true"
                                             />
+
                                             <span className="sr-only">
                                                 Close sidebar
                                             </span>
