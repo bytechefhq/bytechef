@@ -55,6 +55,7 @@ const Integrations = () => {
 
     return (
         <LayoutContainer
+            bodyClassName="bg-white"
             header={
                 <PageHeader
                     position="main"
