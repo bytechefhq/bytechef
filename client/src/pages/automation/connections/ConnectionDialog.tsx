@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import Input from 'components/Input/Input';
 import Dialog from 'components/Dialog/Dialog';
@@ -20,16 +20,28 @@ import FilterableSelect, {
 } from '../../../components/FilterableSelect/FilterableSelect';
 import {
     ConnectionKeys,
+    useGetConnectionOAuth2AuthorizationParametersQuery,
     useGetConnectionTagsQuery,
 } from '../../../queries/connections.queries';
-import {useCreateConnectionMutation} from '../../../mutations/connections.mutations';
+import {
+    useCreateConnectionMutation,
+    useUpdateConnectionMutation,
+} from '../../../mutations/connections.mutations';
 import {OnChangeValue} from 'react-select';
 import {useGetConnectionDefinitionQuery} from '../../../queries/connectionDefinitions.queries';
 import NativeSelect from '../../../components/NativeSelect/NativeSelect';
 import Properties from '../../../components/Properties/Properties';
-import {timeout} from 'd3-timer';
 import OAuth2Button from './components/OAuth2Button';
-import {AuthTokenPayload, AuthorizationCodePayload} from './oauth2/useOAuth2';
+import {AuthTokenPayload} from './oauth2/useOAuth2';
+import {useGetOAuth2PropertiesQuery} from '../../../queries/oauth2Properties.queries';
+import useCopyToClipboard from '../../../hooks/useCopyToClipboard';
+import {ClipboardIcon} from '@heroicons/react/24/outline';
+import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import Alert from '../../../components/Alert/Alert';
+import Checkbox from '../../../components/Checkbox/Checkbox';
+import Label from '../../../components/Label/Label';
+import {Tooltip} from '../../../components/Tooltip/Tooltip';
+import {timeout} from 'd3-timer';
 
 interface FormProps {
     authorizationName: string;
@@ -41,12 +53,44 @@ interface FormProps {
     [key: string]: any;
 }
 
-const ConnectionDialog = () => {
+interface ConnectionDialogProps {
+    connection?: ConnectionModel | undefined;
+    showTrigger?: boolean;
+    visible?: boolean;
+    onClose?: () => void;
+}
+
+const ConnectionDialog = ({
+    connection,
+    showTrigger = true,
+    visible = false,
+    onClose,
+}: ConnectionDialogProps) => {
     const [authorizationName, setAuthorizationName] = useState<string>();
     const [componentDefinition, setComponentDefinition] =
         useState<ComponentDefinitionBasicModel>();
+    const [isOpen, setIsOpen] = useState(visible);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
-    const [isOpen, setIsOpen] = useState(false);
+    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] =
+        useState<boolean>(true);
+    const [wizardStep, setWizardStep] = useState<'step1' | 'step2'>('step1');
+
+    const {
+        control,
+        formState,
+        handleSubmit,
+        getValues,
+        register,
+        setValue,
+        reset: formReset,
+    } = useForm<FormProps>({
+        defaultValues: {
+            authorizationName: '',
+            componentName: undefined,
+            name: connection?.name || '',
+            tags: [],
+        },
+    });
 
     const {
         isLoading: componentDefinitionsIsLoading,
@@ -55,22 +99,38 @@ const ConnectionDialog = () => {
     } = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
     const {
-        isLoading: tagsIsLoading,
-        error: tagsError,
-        data: tags,
-    } = useGetConnectionTagsQuery();
-
-    const {
         isLoading: connectionDefinitionIsLoading,
         error: connectionDefinitionError,
         data: connectionDefinition,
     } = useGetConnectionDefinitionQuery(
         componentDefinition
             ? {
-                  name: componentDefinition.name,
+                  componentName: componentDefinition.name,
+                  componentVersion: 1,
               }
             : undefined
     );
+
+    const {
+        isLoading: oAuth2AuthorizationParametersIsLoading,
+        error: oAuth2AuthorizationParametersError,
+        data: oAuth2AuthorizationParameters,
+    } = useGetConnectionOAuth2AuthorizationParametersQuery(
+        getNewConnection(),
+        wizardStep === 'step2'
+    );
+
+    const {
+        isLoading: tagsIsLoading,
+        error: tagsError,
+        data: tags,
+    } = useGetConnectionTagsQuery();
+
+    const {
+        isLoading: oAuth2PropertiesIsLoading,
+        error: oAuth2PropertiesError,
+        data: oAuth2Properties,
+    } = useGetOAuth2PropertiesQuery();
 
     const queryClient = useQueryClient();
 
@@ -88,96 +148,134 @@ const ConnectionDialog = () => {
         },
     });
 
-    const {
-        control,
-        formState,
-        formState: {errors, touchedFields},
-        handleSubmit,
-        getValues,
-        register,
-        setValue,
-        reset,
-    } = useForm<FormProps>({
-        defaultValues: {
-            authorizationName: '',
-            componentName: undefined,
-            name: '',
-            tags: [],
+    const updateConnectionMutation = useUpdateConnectionMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(
+                ComponentDefinitionKeys.componentDefinitions({
+                    connectionInstances: true,
+                })
+            );
+            queryClient.invalidateQueries(ConnectionKeys.connections);
+            queryClient.invalidateQueries(ConnectionKeys.connectionTags);
+
+            closeDialog();
         },
     });
 
     const authorizationsExists =
-        !connectionDefinitionIsLoading &&
         connectionDefinition &&
         connectionDefinition?.authorizations &&
         connectionDefinition.authorizations.length > 0;
 
-    const authorizationOptions: ISelectOption[] =
-        connectionDefinition && connectionDefinition.authorizations
-            ? [
-                  ...(connectionDefinition.authorizationRequired === false
-                      ? [{label: 'None', value: ''}]
-                      : []),
-                  ...connectionDefinition.authorizations.map(
-                      (authorization) => ({
-                          label: authorization?.display?.label as string,
-                          value: authorization.name as string,
-                      })
-                  ),
-              ]
-            : [];
+    const authorizationOptions: ISelectOption[] = useMemo(
+        () =>
+            connectionDefinition && connectionDefinition.authorizations
+                ? [
+                      ...(connectionDefinition.authorizationRequired === false
+                          ? [{label: 'None', value: ''}]
+                          : []),
+                      ...connectionDefinition.authorizations.map(
+                          (authorization) => ({
+                              label: authorization?.display?.label as string,
+                              value: authorization.name as string,
+                          })
+                      ),
+                  ]
+                : [],
+        [connectionDefinition]
+    );
 
-    const propertiesExists =
+    const authorizations = connectionDefinition?.authorizations?.filter(
+        (authorization) =>
+            authorization.name ===
+            (authorizationName || authorizationOptions[0].value)
+    );
+
+    const errors = getErrors();
+
+    const isOAuth2AuthorizationType = [
+        'OAUTH2_AUTHORIZATION_CODE',
+        'OAUTH2_AUTHORIZATION_CODE_PKCE',
+    ].includes(getAuthorizationType());
+
+    const isOAuth2ImplicitCodeType =
+        'OAUTH2_IMPLICIT_CODE' === getAuthorizationType();
+
+    const scopes =
+        oAuth2AuthorizationParameters &&
+        oAuth2AuthorizationParameters.scopes &&
+        oAuth2AuthorizationParameters.scopes.length > 0 &&
+        oAuth2AuthorizationParameters.scopes;
+
+    const showAuthorizations =
+        authorizationsExists && authorizationOptions.length > 1;
+
+    const showOAuth2AppPredefined =
+        (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
+        !oAuth2PropertiesIsLoading &&
+        oAuth2Properties?.predefinedApps?.includes(
+            connectionDefinition?.componentName || ''
+        );
+
+    const showAuthorizationProperties =
+        !showOAuth2AppPredefined ||
+        !(isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) ||
+        !usePredefinedOAuthApp;
+
+    const showConnectionProperties =
         !connectionDefinitionIsLoading &&
         connectionDefinition &&
         connectionDefinition?.properties &&
         connectionDefinition.properties.length > 0;
 
-    const isOAuth2AuthorizationType =
-        connectionDefinition &&
-        connectionDefinition.authorizations &&
-        authorizationName &&
-        [
-            'OAUTH2_AUTHORIZATION_CODE',
-            'OAUTH2_AUTHORIZATION_CODE_PKCE',
-            'OAUTH2_IMPLICIT_CODE',
-        ].includes(getAuthorizationType());
+    const showOAuth2Step =
+        (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
+        !connection?.id;
+
+    const showRedirectUriInput =
+        (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
+        !usePredefinedOAuthApp &&
+        oAuth2Properties?.redirectUri;
+
+    useEffect(() => {
+        setAuthorizationName(
+            authorizationOptions && authorizationOptions.length > 0
+                ? authorizationOptions[0].value
+                : undefined
+        );
+    }, [authorizationsExists, authorizationOptions, componentDefinition]);
 
     function closeDialog() {
         setIsOpen(false);
 
         timeout(() => {
-            reset();
+            formReset();
 
             setAuthorizationName(undefined);
             setComponentDefinition(undefined);
-        }, 1000);
+            setOAuth2Error(undefined);
+
+            createConnectionMutation.reset();
+            updateConnectionMutation.reset();
+
+            if (onClose) {
+                onClose();
+            }
+
+            setWizardStep('step1');
+        }, 300);
     }
 
-    function createConnection(additionalParameters?: {[key: string]: object}) {
-        const {authorizationName, componentName, name, parameters, tags} =
-            getValues();
-
-        const connectionModel = {
-            authorizationName: authorizationName,
-            componentName: componentName?.value,
-            name: name,
-            parameters: {
-                ...parameters,
-                ...additionalParameters,
-            },
-            tags: tags,
-        } as ConnectionModel;
-
-        createConnectionMutation.mutate(connectionModel);
-    }
-
-    function handleOnAuth2Success(
-        payload: AuthTokenPayload & AuthorizationCodePayload
-    ) {
-        if (payload.access_token || payload.code) {
+    function handleOnTokenSuccess(payload: AuthTokenPayload) {
+        if (payload.access_token) {
             /* eslint-disable @typescript-eslint/no-explicit-any */
-            createConnection(payload as any);
+            return saveConnection(payload as any);
+        }
+    }
+
+    async function handleOnCodeSuccess(code: string) {
+        if (code) {
+            await saveConnection({code: code} as any);
         }
     }
 
@@ -202,6 +300,82 @@ const ConnectionDialog = () => {
         return authorizationType;
     }
 
+    function getNewConnection(
+        additionalParameters?: Record<string, object>
+    ): ConnectionModel {
+        const {componentName, name, parameters, tags} = getValues();
+
+        return {
+            authorizationName: authorizationName,
+            componentName: componentName?.value,
+            name: name,
+            parameters: {
+                ...parameters,
+                ...additionalParameters,
+            },
+            tags: tags,
+        } as ConnectionModel;
+    }
+
+    function getErrors(): string[] {
+        const errors: string[] = [];
+
+        if (componentDefinitionsError && !componentDefinitionsIsLoading) {
+            errors.push(componentDefinitionsError.message);
+        }
+
+        if (connectionDefinitionError && !connectionDefinitionIsLoading) {
+            errors.push(connectionDefinitionError.message);
+        }
+
+        if (
+            createConnectionMutation.error &&
+            !createConnectionMutation.isLoading
+        ) {
+            errors.push(createConnectionMutation.error?.message);
+        }
+
+        if (tagsError && !tagsIsLoading) {
+            errors.push(tagsError.message);
+        }
+
+        if (
+            oAuth2AuthorizationParametersError &&
+            !oAuth2AuthorizationParametersIsLoading
+        ) {
+            errors.push(oAuth2AuthorizationParametersError.message);
+        }
+
+        if (oAuth2Error) {
+            errors.push(oAuth2Error);
+        }
+
+        if (oAuth2PropertiesError && !oAuth2PropertiesIsLoading) {
+            errors.push(oAuth2PropertiesError.message);
+        }
+
+        return errors;
+    }
+
+    function saveConnection(
+        additionalParameters?: Record<string, object>
+    ): Promise<ConnectionModel> | undefined {
+        if (connection?.id) {
+            const {name, tags} = getValues();
+
+            updateConnectionMutation.mutate({
+                id: connection?.id,
+                name: name,
+                tags: tags,
+                version: connection?.version,
+            } as ConnectionModel);
+        } else {
+            return createConnectionMutation.mutateAsync(
+                getNewConnection(additionalParameters)
+            );
+        }
+    }
+
     return (
         <Dialog
             description="Create your connection to connect to the chosen service"
@@ -214,182 +388,377 @@ const ConnectionDialog = () => {
                 }
             }}
             title="Create Connection"
-            triggerLabel="Create Connection"
+            triggerLabel={
+                showTrigger
+                    ? `${connection?.id ? 'Edit' : 'Create'} Connection`
+                    : undefined
+            }
         >
-            {componentDefinitionsError && !componentDefinitionsIsLoading && (
-                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
-                    `An error has occurred: ${componentDefinitionsError.message}
-                    `
-                </div>
-            )}
-            {connectionDefinitionError && !connectionDefinitionIsLoading && (
-                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
-                    `An error has occurred: ${connectionDefinitionError.message}
-                    `
-                </div>
-            )}
-            {tagsError && !tagsIsLoading && (
-                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
-                    `An error has occurred: ${tagsError.message}`
-                </div>
-            )}
-            {oAuth2Error && (
-                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
-                    `An OAuth2 error has occurred: ${oAuth2Error}`
-                </div>
-            )}
-
             {!componentDefinitionsIsLoading && (
-                <Controller
-                    control={control}
-                    name="componentName"
-                    rules={{required: true}}
-                    render={({field, fieldState: {error}}) => (
-                        <FilterableSelect
-                            error={!!error}
-                            field={field}
-                            label="Component"
-                            options={componentDefinitions!.map(
-                                (
-                                    componentDefinition: ComponentDefinitionBasicModel
-                                ) => ({
-                                    label: `${componentDefinition.name
-                                        .charAt(0)
-                                        .toUpperCase()}${componentDefinition.name.slice(
-                                        1
-                                    )}`,
-                                    value: componentDefinition.name,
-                                    componentDefinition,
-                                })
+                <>
+                    <Errors errors={errors} />
+
+                    {(wizardStep === 'step1' ||
+                        oAuth2AuthorizationParametersIsLoading) && (
+                        <>
+                            {!connection?.id && (
+                                <Controller
+                                    control={control}
+                                    name="componentName"
+                                    rules={{required: true}}
+                                    render={({field, fieldState: {error}}) => (
+                                        <FilterableSelect
+                                            error={!!error}
+                                            field={field}
+                                            label="Component"
+                                            options={componentDefinitions!.map(
+                                                (
+                                                    componentDefinition: ComponentDefinitionBasicModel
+                                                ) => ({
+                                                    label: `${componentDefinition.name
+                                                        .charAt(0)
+                                                        .toUpperCase()}${componentDefinition.name.slice(
+                                                        1
+                                                    )}`,
+                                                    value: componentDefinition.name,
+                                                    componentDefinition,
+                                                })
+                                            )}
+                                            onChange={(
+                                                value: OnChangeValue<
+                                                    ISelectOption,
+                                                    false
+                                                >
+                                            ) => {
+                                                if (value) {
+                                                    setValue(
+                                                        'componentName',
+                                                        value
+                                                    );
+
+                                                    setAuthorizationName(
+                                                        undefined
+                                                    );
+                                                    setComponentDefinition(
+                                                        value.componentDefinition
+                                                    );
+                                                    setUsePredefinedOAuthApp(
+                                                        true
+                                                    );
+                                                    setWizardStep('step1');
+                                                }
+                                            }}
+                                        />
+                                    )}
+                                />
                             )}
-                            onChange={(
-                                value: OnChangeValue<ISelectOption, false>
-                            ) => {
-                                if (value) {
-                                    setValue('componentName', value);
 
-                                    setAuthorizationName(undefined);
-                                    setComponentDefinition(
-                                        value.componentDefinition
-                                    );
+                            <Input
+                                error={
+                                    formState.touchedFields.name &&
+                                    !!formState.errors.name
                                 }
-                            }}
-                        />
+                                label="Name"
+                                placeholder="My Connection"
+                                {...register('name', {required: true})}
+                            />
+
+                            {showConnectionProperties && (
+                                <Properties
+                                    formState={formState}
+                                    properties={
+                                        connectionDefinition?.properties
+                                    }
+                                    register={register}
+                                />
+                            )}
+
+                            {showAuthorizations && (
+                                <NativeSelect
+                                    error={
+                                        formState.touchedFields
+                                            .authorizationName &&
+                                        !!formState.errors.authorizationName
+                                    }
+                                    label="Authorization"
+                                    options={authorizationOptions}
+                                    placeholder="Select..."
+                                    {...register('authorizationName', {
+                                        required:
+                                            connectionDefinition?.authorizationRequired ===
+                                                true ||
+                                            connectionDefinition?.authorizationRequired ===
+                                                undefined,
+                                        onChange: (event) =>
+                                            setAuthorizationName(
+                                                event.target.value
+                                            ),
+                                    })}
+                                    value={authorizationName}
+                                />
+                            )}
+
+                            {showRedirectUriInput &&
+                                oAuth2Properties?.redirectUri && (
+                                    <RedirectUriInput
+                                        redirectUri={
+                                            oAuth2Properties.redirectUri
+                                        }
+                                    />
+                                )}
+
+                            {showAuthorizationProperties && (
+                                <Properties
+                                    formState={formState}
+                                    properties={
+                                        authorizations &&
+                                        authorizations[0]?.properties
+                                    }
+                                    register={register}
+                                />
+                            )}
+
+                            {showOAuth2AppPredefined && (
+                                <div className="mb-3">
+                                    <a
+                                        href="#"
+                                        className="text-sm text-blue-600"
+                                        onClick={() =>
+                                            setUsePredefinedOAuthApp(
+                                                !usePredefinedOAuthApp
+                                            )
+                                        }
+                                    >
+                                        {usePredefinedOAuthApp && (
+                                            <span>
+                                                I want to use my own app
+                                                credentials
+                                            </span>
+                                        )}
+                                        {!usePredefinedOAuthApp && (
+                                            <span>
+                                                I want to use predefined app
+                                                credentials
+                                            </span>
+                                        )}
+                                    </a>
+                                </div>
+                            )}
+
+                            {!tagsIsLoading && (
+                                <Controller
+                                    control={control}
+                                    name="tags"
+                                    render={({field}) => (
+                                        <CreatableSelect
+                                            field={field}
+                                            isMulti={true}
+                                            label="Tags"
+                                            options={tags!.map(
+                                                (tag: TagModel) => ({
+                                                    label: `${tag.name
+                                                        .charAt(0)
+                                                        .toUpperCase()}${tag.name.slice(
+                                                        1
+                                                    )}`,
+                                                    value: tag.name
+                                                        .toLowerCase()
+                                                        .replace(/\W/g, ''),
+                                                    ...tag,
+                                                })
+                                            )}
+                                            onCreateOption={(
+                                                inputValue: string
+                                            ) => {
+                                                setValue('tags', [
+                                                    ...getValues().tags!,
+                                                    {
+                                                        label: inputValue,
+                                                        value: inputValue,
+                                                        name: inputValue,
+                                                    },
+                                                ] as never[]);
+                                            }}
+                                        />
+                                    )}
+                                />
+                            )}
+                        </>
                     )}
-                />
+
+                    {!oAuth2AuthorizationParametersIsLoading &&
+                        wizardStep === 'step2' && (
+                            <>
+                                <Alert
+                                    text={
+                                        <>
+                                            {`Excellent! You can connect and create the `}
+                                            <span className="font-semibold">
+                                                {
+                                                    connectionDefinition
+                                                        ?.componentDisplay
+                                                        ?.label
+                                                }
+                                            </span>
+                                            {` connection under name `}
+                                            <span className="font-semibold">
+                                                {`'${getValues()?.name}'`}
+                                            </span>
+                                            .
+                                        </>
+                                    }
+                                />
+
+                                {scopes && <Scopes scopes={scopes} />}
+                            </>
+                        )}
+
+                    <div className="mt-8 flex justify-end space-x-1">
+                        {wizardStep === 'step2' && (
+                            <Button
+                                displayType="lightBorder"
+                                label="Previous"
+                                type="button"
+                                onClick={() => {
+                                    createConnectionMutation.reset();
+                                    setOAuth2Error(undefined);
+                                    setWizardStep('step1');
+                                }}
+                            />
+                        )}
+
+                        {wizardStep === 'step1' && (
+                            <Button
+                                displayType="lightBorder"
+                                label="Cancel"
+                                type="button"
+                                onClick={closeDialog}
+                            />
+                        )}
+
+                        {showOAuth2Step && (
+                            <>
+                                {wizardStep === 'step1' && (
+                                    <Button
+                                        label="Next"
+                                        type="submit"
+                                        onClick={handleSubmit(() => {
+                                            setWizardStep('step2');
+                                        })}
+                                    />
+                                )}
+
+                                {wizardStep === 'step2' &&
+                                    oAuth2AuthorizationParameters?.authorizationUrl &&
+                                    oAuth2AuthorizationParameters?.clientId && (
+                                        <OAuth2Button
+                                            authorizationUrl={
+                                                oAuth2AuthorizationParameters.authorizationUrl
+                                            }
+                                            clientId={
+                                                oAuth2AuthorizationParameters.clientId
+                                            }
+                                            redirectUri={
+                                                oAuth2Properties?.redirectUri ??
+                                                ''
+                                            }
+                                            responseType={
+                                                isOAuth2AuthorizationType
+                                                    ? 'code'
+                                                    : 'token'
+                                            }
+                                            scope={oAuth2AuthorizationParameters?.scopes?.join(
+                                                '_'
+                                            )}
+                                            onClick={(getAuth: () => void) => {
+                                                getAuth();
+                                            }}
+                                            onCodeSuccess={handleOnCodeSuccess}
+                                            onTokenSuccess={
+                                                handleOnTokenSuccess
+                                            }
+                                            onError={handleOnOAuth2Error}
+                                        />
+                                    )}
+                            </>
+                        )}
+
+                        {!showOAuth2Step && (
+                            <Button
+                                label="Save"
+                                type="submit"
+                                onClick={handleSubmit(saveConnection)}
+                            />
+                        )}
+                    </div>
+                </>
             )}
-
-            <Input
-                error={touchedFields.name && !!errors.name}
-                label="Name"
-                placeholder="My Connection"
-                {...register('name', {required: true})}
-            />
-
-            {propertiesExists && (
-                <Properties
-                    formState={formState}
-                    properties={connectionDefinition?.properties}
-                    register={register}
-                />
-            )}
-
-            {authorizationsExists && (
-                <NativeSelect
-                    error={
-                        touchedFields.authorizationName &&
-                        !!errors.authorizationName
-                    }
-                    label="Authorization"
-                    options={authorizationOptions}
-                    placeholder="Select..."
-                    {...register('authorizationName', {
-                        required:
-                            connectionDefinition?.authorizationRequired ===
-                                true ||
-                            connectionDefinition?.authorizationRequired ===
-                                undefined,
-                        onChange: (event) =>
-                            setAuthorizationName(event.target.value),
-                    })}
-                    value={authorizationName || authorizationOptions[0].value}
-                />
-            )}
-
-            {authorizationsExists &&
-                (authorizationName || authorizationOptions[0].value) && (
-                    <Properties
-                        formState={formState}
-                        properties={
-                            connectionDefinition?.authorizations?.filter(
-                                (authorization) =>
-                                    authorization.name ===
-                                    (authorizationName ||
-                                        authorizationOptions[0].value)
-                            )[0]?.properties
-                        }
-                        register={register}
-                    />
-                )}
-
-            {!tagsIsLoading && (
-                <Controller
-                    control={control}
-                    name="tags"
-                    render={({field}) => (
-                        <CreatableSelect
-                            field={field}
-                            isMulti={true}
-                            label="Tags"
-                            options={tags!.map((tag: TagModel) => ({
-                                label: `${tag.name
-                                    .charAt(0)
-                                    .toUpperCase()}${tag.name.slice(1)}`,
-                                value: tag.name
-                                    .toLowerCase()
-                                    .replace(/\W/g, ''),
-                                ...tag,
-                            }))}
-                            onCreateOption={(inputValue: string) => {
-                                setValue('tags', [
-                                    ...getValues().tags!,
-                                    {
-                                        label: inputValue,
-                                        value: inputValue,
-                                        name: inputValue,
-                                    },
-                                ] as never[]);
-                            }}
-                        />
-                    )}
-                />
-            )}
-
-            <div className="mt-8 flex justify-end space-x-1">
-                <Button
-                    displayType="lightBorder"
-                    label="Cancel"
-                    type="button"
-                    onClick={closeDialog}
-                />
-
-                {isOAuth2AuthorizationType ? (
-                    <OAuth2Button
-                        onClick={(getAuth: () => void) =>
-                            handleSubmit(() => getAuth())()
-                        }
-                        onSuccess={handleOnAuth2Success}
-                        onError={handleOnOAuth2Error}
-                    />
-                ) : (
-                    <Button
-                        label="Save"
-                        type="submit"
-                        onClick={handleSubmit(createConnection)}
-                    />
-                )}
-            </div>
         </Dialog>
+    );
+};
+
+const Errors = ({errors}: {errors: string[]}) => (
+    <>
+        {errors.map((error, index) => (
+            <div
+                key={`error_${index}`}
+                className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700"
+            >
+                An error has occurred: {error}
+            </div>
+        ))}
+    </>
+);
+
+const RedirectUriInput = ({redirectUri}: {redirectUri: string}) => {
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const [_, copyToClipboard] = useCopyToClipboard();
+
+    return (
+        <Input
+            label="Redirect URI"
+            name="redirectUri"
+            readOnly={true}
+            value={redirectUri}
+            trailing={
+                <button
+                    type="button"
+                    className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    onClick={() => copyToClipboard(redirectUri ?? '')}
+                >
+                    <ClipboardIcon
+                        className="-ml-0.5 h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                    />
+                </button>
+            }
+        />
+    );
+};
+
+const Scopes = ({scopes}: {scopes: string[]}) => {
+    return (
+        <div className="py-2">
+            <div className="flex">
+                <span className="mb-2 mr-1 text-sm font-semibold">Scopes</span>
+
+                <Tooltip
+                    text={'OAuth permission scopes used for this connection.'}
+                >
+                    <QuestionMarkCircledIcon />
+                </Tooltip>
+            </div>
+
+            <div className="space-y-1">
+                {scopes.map((scope) => (
+                    <div className="flex items-center" key={scope}>
+                        <Checkbox id={scope} disabled />
+
+                        <Label htmlFor={scope} value={scope} />
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
 
