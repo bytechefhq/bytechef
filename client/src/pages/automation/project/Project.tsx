@@ -9,6 +9,7 @@ import React, {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import getCreatedWorkflow from 'utils/getCreatedWorkflow';
 
+import PageLoader from '../../../components/PageLoader/PageLoader';
 import Select from '../../../components/Select/Select';
 import ToggleGroup, {
     IToggleItem,
@@ -42,6 +43,7 @@ const headerToggleItems: IToggleItem[] = [
 
 const Project: React.FC = () => {
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
 
@@ -102,19 +104,19 @@ const Project: React.FC = () => {
         }
     }, [currentWorkflow, navigate, projectId]);
 
-    if (
-        !componentsLoading &&
-        !flowControlsLoading &&
-        !projectWorkflowsLoading &&
-        !componentsError &&
-        !flowControlsError &&
-        !projectWorkflowsError
-    ) {
-        return (
+    return (
+        <PageLoader
+            errors={[componentsError, flowControlsError, projectWorkflowsError]}
+            loading={
+                componentsLoading ||
+                flowControlsLoading ||
+                projectWorkflowsLoading
+            }
+        >
             <LayoutContainer
-                bodyClassName="border-l border-gray-200 bg-gray-100"
+                className="border-l border-gray-200"
                 header={
-                    <header className="flex items-center bg-gray-100">
+                    <header className="flex items-center">
                         <Button
                             className="p-4"
                             icon={
@@ -131,7 +133,7 @@ const Project: React.FC = () => {
                         <h1 className="mr-6 py-4 pr-4">{project?.name}</h1>
 
                         <div className="my-4 mx-2 flex rounded-md border border-gray-100 bg-white">
-                            {currentWorkflow && (
+                            {currentWorkflow && projectWorkflows && (
                                 <Select
                                     defaultValue={workflowId}
                                     onValueChange={(value) => {
@@ -187,22 +189,28 @@ const Project: React.FC = () => {
                     />
                 }
                 leftSidebarBody={
-                    <LeftSidebar
-                        data={{components, flowControls}}
-                        filter={filter}
-                    />
+                    <>
+                        {components && flowControls && (
+                            <LeftSidebar
+                                data={{components, flowControls}}
+                                filter={filter}
+                            />
+                        )}
+                    </>
                 }
                 leftSidebarOpen={leftSidebarOpen}
             >
-                <WorkflowEditor
-                    components={components}
-                    flowControls={flowControls}
-                />
+                <>
+                    {components && flowControls && (
+                        <WorkflowEditor
+                            components={components}
+                            flowControls={flowControls}
+                        />
+                    )}
+                </>
             </LayoutContainer>
-        );
-    } else {
-        return <h1>Loading current view: {view}</h1>;
-    }
+        </PageLoader>
+    );
 };
 
 export default Project;

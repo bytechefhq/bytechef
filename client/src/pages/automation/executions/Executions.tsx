@@ -31,6 +31,7 @@ import Badge from '../../../components/Badge/Badge';
 import DatePicker from '../../../components/DatePicker/DatePicker';
 import EmptyList from '../../../components/EmptyList/EmptyList';
 import PageFooter from '../../../components/PageFooter/PageFooter';
+import PageLoader from '../../../components/PageLoader/PageLoader';
 import Pagination from '../../../components/Pagination/Pagination';
 
 const columnHelper = createColumnHelper<ProjectExecutionModel>();
@@ -166,176 +167,200 @@ export const Executions = () => {
     });
 
     return (
-        <LayoutContainer
-            footer={
-                projectExecutionsResponse?.content &&
-                projectExecutionsResponse.content.length > 0 && (
-                    <PageFooter position="main">
-                        <Pagination
-                            pageNumber={projectExecutionsResponse.number!}
-                            pageSize={projectExecutionsResponse.size!}
-                            totalElements={
-                                projectExecutionsResponse.totalElements!
-                            }
-                            totalPages={projectExecutionsResponse.totalPages!}
-                            onClick={setFilterPageNumber}
-                        />
-                    </PageFooter>
-                )
-            }
-            header={<PageHeader position="main" title="Executions" />}
-            leftSidebarHeader={
-                <>
-                    <PageHeader leftSidebar title="Execution History" />
-
-                    <div className="px-4">
-                        <FilterableSelect
-                            isClearable
-                            label="Status"
-                            name="jobStatus"
-                            options={jobStatusOptions}
-                            onChange={(
-                                value: OnChangeValue<ISelectOption, false>
-                            ) => {
-                                if (value) {
-                                    setFilterStatus(
-                                        value.value as GetProjectExecutionsJobStatusEnum
-                                    );
-                                } else {
-                                    setFilterStatus(undefined);
+        <PageLoader
+            errors={[projectExecutionsError]}
+            loading={projectExecutionsIsLoading}
+        >
+            <LayoutContainer
+                bodyClassName="bg-white"
+                footer={
+                    projectExecutionsPage?.content &&
+                    projectExecutionsPage.content.length > 0 && (
+                        <PageFooter position="main">
+                            <Pagination
+                                pageNumber={projectExecutionsPage.number!}
+                                pageSize={projectExecutionsPage.size!}
+                                totalElements={
+                                    projectExecutionsPage.totalElements!
                                 }
-                            }}
-                        />
-
-                        <DatePicker
-                            label="Start time"
-                            name="jobStartTime"
-                            placeholder="Select..."
-                            onChange={setFilterStartDate}
-                        />
-
-                        <DatePicker
-                            label="End time"
-                            name="jobEndTime"
-                            placeholder="Select..."
-                            onChange={setFilterEndDate}
-                        />
-
-                        {!isLoadingProjects && !errorInProjects && (
-                            <FilterableSelect
-                                isClearable
-                                label="Projects"
-                                name="project"
-                                options={
-                                    projects?.map((project) => ({
-                                        label: project.name,
-                                        value: (project.id || 0).toString(),
-                                    })) || []
-                                }
-                                onChange={(
-                                    value: OnChangeValue<ISelectOption, false>
-                                ) => {
-                                    if (value) {
-                                        setFilterProjectId(Number(value.value));
-                                    } else {
-                                        setFilterProjectId(undefined);
-                                    }
-                                }}
+                                totalPages={projectExecutionsPage.totalPages!}
+                                onClick={setFilterPageNumber}
                             />
-                        )}
+                        </PageFooter>
+                    )
+                }
+                header={<PageHeader position="main" title="Executions" />}
+                leftSidebarHeader={
+                    <>
+                        <PageHeader leftSidebar title="Execution History" />
 
-                        {!isLoadingWorkflows && !errorInWorkflows && (
+                        <div className="px-4">
                             <FilterableSelect
                                 isClearable
-                                label="Workflows"
-                                name="workflows"
-                                options={
-                                    workflows?.map((workflow) => ({
-                                        label:
-                                            workflow.label || 'undefined label',
-                                        value: (workflow.id || 0).toString(),
-                                    })) || []
-                                }
+                                label="Status"
+                                name="jobStatus"
+                                options={jobStatusOptions}
                                 onChange={(
                                     value: OnChangeValue<ISelectOption, false>
                                 ) => {
                                     if (value) {
-                                        setFilterWorkflowId(value.value);
-                                    } else {
-                                        setFilterWorkflowId(undefined);
-                                    }
-                                }}
-                            />
-                        )}
-
-                        {!isLoadingInstances && !errorInInstances && (
-                            <FilterableSelect
-                                isClearable
-                                label="Instances"
-                                name="instances"
-                                options={
-                                    instances?.map((instance) => ({
-                                        label: instance.name,
-                                        value: (instance.id || 0).toString(),
-                                    })) || []
-                                }
-                                onChange={(
-                                    value: OnChangeValue<ISelectOption, false>
-                                ) => {
-                                    if (value) {
-                                        setFilterInstanceId(
-                                            Number(value.value)
+                                        setFilterStatus(
+                                            value.value as GetProjectExecutionsJobStatusEnum
                                         );
                                     } else {
-                                        setFilterInstanceId(undefined);
+                                        setFilterStatus(undefined);
                                     }
                                 }}
                             />
-                        )}
-                    </div>
-                </>
-            }
-        >
-            {!isLoadingProjectExecutions &&
-                !errorInProjectExecutions &&
-                projectExecutionsResponse?.content && (
-                    <div
-                        className={twMerge(
-                            'w-full px-4 2xl:mx-auto 2xl:w-4/5',
-                            projectExecutionsResponse.content.length === 0
-                                ? 'place-self-center'
-                                : ''
-                        )}
-                    >
-                        {projectExecutionsResponse.content.length === 0 ? (
-                            <EmptyList
-                                icon={
-                                    <QueueListIcon className="h-12 w-12 text-gray-400" />
-                                }
-                                message={
-                                    !filterStatus &&
-                                    !filterProjectId &&
-                                    !filterWorkflowId &&
-                                    !filterStartDate &&
-                                    !filterEndDate &&
-                                    !filterInstanceId &&
-                                    !filterPageNumber
-                                        ? "You don't have any executed workflows yet."
-                                        : 'There is no executed workflows for the current criteria.'
-                                }
-                                title="No executed workflows"
+
+                            <DatePicker
+                                label="Start time"
+                                name="jobStartTime"
+                                placeholder="Select..."
+                                onChange={setFilterStartDate}
                             />
-                        ) : (
-                            <Table
-                                data={projectExecutionsResponse.content.map(
-                                    (execution) =>
-                                        ProjectExecutionModelFromJSON(execution)
-                                )}
+
+                            <DatePicker
+                                label="End time"
+                                name="jobEndTime"
+                                placeholder="Select..."
+                                onChange={setFilterEndDate}
                             />
-                        )}
-                    </div>
-                )}
-        </LayoutContainer>
+
+                            {!pojectsIsLoading && !projectsError && (
+                                <FilterableSelect
+                                    isClearable
+                                    label="Projects"
+                                    name="project"
+                                    options={
+                                        projects?.map((project) => ({
+                                            label: project.name,
+                                            value: (project.id || 0).toString(),
+                                        })) || []
+                                    }
+                                    onChange={(
+                                        value: OnChangeValue<
+                                            ISelectOption,
+                                            false
+                                        >
+                                    ) => {
+                                        if (value) {
+                                            setFilterProjectId(
+                                                Number(value.value)
+                                            );
+                                        } else {
+                                            setFilterProjectId(undefined);
+                                        }
+                                    }}
+                                />
+                            )}
+
+                            {!workflowsIsLoading && !workflowsError && (
+                                <FilterableSelect
+                                    isClearable
+                                    label="Workflows"
+                                    name="workflows"
+                                    options={
+                                        workflows?.map((workflow) => ({
+                                            label:
+                                                workflow.label ||
+                                                'undefined label',
+                                            value: (
+                                                workflow.id || 0
+                                            ).toString(),
+                                        })) || []
+                                    }
+                                    onChange={(
+                                        value: OnChangeValue<
+                                            ISelectOption,
+                                            false
+                                        >
+                                    ) => {
+                                        if (value) {
+                                            setFilterWorkflowId(value.value);
+                                        } else {
+                                            setFilterWorkflowId(undefined);
+                                        }
+                                    }}
+                                />
+                            )}
+
+                            {!instancesIsLoading && !instancesError && (
+                                <FilterableSelect
+                                    isClearable
+                                    label="Instances"
+                                    name="instances"
+                                    options={
+                                        instances?.map((instance) => ({
+                                            label: instance.name,
+                                            value: (
+                                                instance.id || 0
+                                            ).toString(),
+                                        })) || []
+                                    }
+                                    onChange={(
+                                        value: OnChangeValue<
+                                            ISelectOption,
+                                            false
+                                        >
+                                    ) => {
+                                        if (value) {
+                                            setFilterInstanceId(
+                                                Number(value.value)
+                                            );
+                                        } else {
+                                            setFilterInstanceId(undefined);
+                                        }
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </>
+                }
+            >
+                {!projectExecutionsIsLoading &&
+                    !projectExecutionsError &&
+                    projectExecutionsPage?.content && (
+                        <div
+                            className={twMerge(
+                                'w-full px-4 2xl:mx-auto 2xl:w-4/5',
+                                projectExecutionsPage.content.length === 0
+                                    ? 'place-self-center'
+                                    : ''
+                            )}
+                        >
+                            {projectExecutionsPage.content.length === 0 ? (
+                                <EmptyList
+                                    icon={
+                                        <QueueListIcon className="h-12 w-12 text-gray-400" />
+                                    }
+                                    message={
+                                        !filterStatus &&
+                                        !filterProjectId &&
+                                        !filterWorkflowId &&
+                                        !filterStartDate &&
+                                        !filterEndDate &&
+                                        !filterInstanceId &&
+                                        !filterPageNumber
+                                            ? "You don't have any executed workflows yet."
+                                            : 'There is no executed workflows for the current criteria.'
+                                    }
+                                    title="No executed workflows"
+                                />
+                            ) : (
+                                <Table
+                                    data={projectExecutionsPage.content.map(
+                                        (execution) =>
+                                            ProjectExecutionModelFromJSON(
+                                                execution
+                                            )
+                                    )}
+                                />
+                            )}
+                        </div>
+                    )}
+            </LayoutContainer>
+        </PageLoader>
     );
 };
 
