@@ -1,7 +1,6 @@
 import {useCallback, useRef, useState} from 'react';
-import useLocalStorageState from 'use-local-storage-state';
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
-import {objectToQuery, queryToObject} from './tools';
+import {objectToQuery} from './tools';
 
 export type AuthTokenPayload = {
     token_type: string;
@@ -11,36 +10,23 @@ export type AuthTokenPayload = {
     refresh_token: string;
 };
 
-export type ResponseTypeBasedProps<TData> =
-    | {
-          responseType: 'code';
-          exchangeCodeForTokenServerURL: string;
-          exchangeCodeForTokenMethod?: 'POST' | 'GET';
-          onSuccess?: (payload: TData) => void; // TODO as this payload will be custom
-          // TODO Adjust payload type
-      }
-    | {
-          responseType: 'token';
-          onSuccess?: (payload: TData) => void; // TODO Adjust payload type
-      };
-
 export type Oauth2Props<TData = AuthTokenPayload> = {
-    authorizeUrl: string;
+    authorizationUrl: string;
     clientId: string;
     redirectUri: string;
+    responseType: 'code' | 'token';
     scope?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extraQueryParameters?: Record<string, any>;
+    onCodeSuccess?: (code: string) => void;
     onError?: (error: string) => void;
-} & ResponseTypeBasedProps<TData>;
-
-export type State<TData = AuthTokenPayload> = TData | null;
+    onTokenSuccess?: (payload: TData) => void;
+};
 
 const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;
-const DEFAULT_EXCHANGE_CODE_FOR_TOKEN_METHOD = 'POST';
 
-const enhanceAuthorizeUrl = (
+const enhanceAuthorizationUrl = (
     authorizeUrl: string,
     clientId: string,
     redirectUri: string,
@@ -118,59 +104,28 @@ const cleanup = (
     window.removeEventListener('message', handleMessageListener);
 };
 
-const formatExchangeCodeForTokenServerURL = (
-    exchangeCodeForTokenServerURL: string,
-    clientId: string,
-    code: string,
-    redirectUri: string,
-    state: string
-) => {
-    const url = exchangeCodeForTokenServerURL.split('?')[0];
-    const anySearchParameters = queryToObject(
-        exchangeCodeForTokenServerURL.split('?')[1]
-    );
-
-    return `${url}?${objectToQuery({
-        ...anySearchParameters,
-        client_id: clientId,
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: redirectUri,
-        state,
-    })}`;
-};
-
 const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
     const {
-        authorizeUrl,
+        authorizationUrl,
         clientId,
         redirectUri,
         scope = '',
         responseType,
         extraQueryParameters = {},
-        onSuccess,
+        onCodeSuccess,
+        onTokenSuccess,
         onError,
     } = props;
 
     const extraQueryParametersRef = useRef(extraQueryParameters);
     const popupRef = useRef<Window | null>();
+    const curStateRef = useRef(undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const intervalRef = useRef<any>();
     const [{loading, error}, setUI] = useState<{
         loading: boolean;
         error: string | null;
     }>({loading: false, error: null});
-    const [data, setData] = useLocalStorageState<State>(
-        `${responseType}-${authorizeUrl}-${clientId}-${scope}`,
-        {
-            defaultValue: null,
-        }
-    );
-
-    const exchangeCodeForTokenServerURL =
-        responseType === 'code' && props.exchangeCodeForTokenServerURL;
-    const exchangeCodeForTokenMethod =
-        responseType === 'code' && props.exchangeCodeForTokenMethod;
 
     const getAuth = useCallback(() => {
         // 1. Init
@@ -185,8 +140,8 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
 
         // 3. Open popup
         popupRef.current = openPopup(
-            enhanceAuthorizeUrl(
-                authorizeUrl,
+            enhanceAuthorizationUrl(
+                authorizationUrl,
                 clientId,
                 redirectUri,
                 scope,
@@ -200,56 +155,50 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async function handleMessageListener(message: MessageEvent<any>) {
             const type = message?.data?.type;
-            if (type !== OAUTH_RESPONSE) {
+
+            if (
+                type !== OAUTH_RESPONSE ||
+                curStateRef.current === message?.data?.payload.state
+            ) {
                 return;
             }
 
-            try {
-                const errorMaybe = message?.data?.error;
+            // Clear stuff ...
+            cleanup(intervalRef, popupRef, handleMessageListener);
 
-                if (errorMaybe) {
+            curStateRef.current = message?.data?.payload.state;
+
+            try {
+                const error = message?.data?.error;
+
+                if (error) {
                     setUI({
                         loading: false,
-                        error: errorMaybe || 'Unknown Error',
+                        error: error || 'Unknown Error',
                     });
 
                     if (onError) {
-                        await onError(errorMaybe);
+                        await onError(error);
                     }
                 } else {
-                    let payload = message?.data?.payload;
+                    const payload = message?.data?.payload;
 
-                    if (
-                        responseType === 'code' &&
-                        exchangeCodeForTokenServerURL
-                    ) {
-                        const response = await fetch(
-                            formatExchangeCodeForTokenServerURL(
-                                exchangeCodeForTokenServerURL,
-                                clientId,
-                                payload?.code,
-                                redirectUri,
-                                state
-                            ),
-                            {
-                                method:
-                                    exchangeCodeForTokenMethod ||
-                                    DEFAULT_EXCHANGE_CODE_FOR_TOKEN_METHOD,
-                            }
-                        );
+                    if (responseType === 'code' && onCodeSuccess) {
+                        await onCodeSuccess(payload?.code);
+                    } else {
+                        if (payload) {
+                            delete payload['state'];
+                        }
 
-                        payload = await response.json();
+                        if (onTokenSuccess) {
+                            await onTokenSuccess(payload);
+                        }
                     }
 
                     setUI({
                         loading: false,
                         error: null,
                     });
-                    setData(payload);
-
-                    if (onSuccess) {
-                        await onSuccess(payload);
-                    }
                 }
             } catch (genericError) {
                 console.error(genericError);
@@ -258,9 +207,6 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
                     loading: false,
                     error: (genericError as Error).toString(),
                 });
-            } finally {
-                // Clear stuff ...
-                cleanup(intervalRef, popupRef, handleMessageListener);
             }
         }
         window.addEventListener('message', handleMessageListener);
@@ -295,20 +241,18 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
             }
         };
     }, [
-        authorizeUrl,
+        authorizationUrl,
         clientId,
         redirectUri,
         scope,
         responseType,
-        exchangeCodeForTokenServerURL,
-        exchangeCodeForTokenMethod,
-        onSuccess,
+        onCodeSuccess,
+        onTokenSuccess,
         onError,
         setUI,
-        setData,
     ]);
 
-    return {data, loading, error, getAuth};
+    return {loading, error, getAuth};
 };
 
 export default useOAuth2;
