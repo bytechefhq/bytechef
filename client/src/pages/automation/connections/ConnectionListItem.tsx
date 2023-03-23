@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import DropdownMenu, {
     IDropdownMenuItem,
 } from '../../../components/DropdownMenu/DropdownMenu';
@@ -12,6 +12,10 @@ import {
 } from '../../../mutations/connections.mutations';
 import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions.queries';
 import TagList from '../../../components/TagList/TagList';
+import Badge from '../../../components/Badge/Badge';
+import {CalendarIcon} from '@heroicons/react/24/outline';
+import AlertDialog from '../../../components/AlertDialog/AlertDialog';
+import ConnectionDialog from './ConnectionDialog';
 
 interface ConnectionListItemProps {
     connection: ConnectionModel;
@@ -22,6 +26,9 @@ const ConnectionListItem = ({
     connection,
     remainingTags,
 }: ConnectionListItemProps) => {
+    const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
     const queryClient = useQueryClient();
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
@@ -46,6 +53,7 @@ const ConnectionListItem = ({
     const menuItems: IDropdownMenuItem[] = [
         {
             label: 'Edit',
+            onClick: () => setShowEditDialog(true),
         },
         {
             separator: true,
@@ -53,56 +61,101 @@ const ConnectionListItem = ({
         {
             danger: true,
             label: 'Delete',
-            onClick: (id?: number) => {
-                if (id) {
-                    deleteConnectionMutation.mutate(id);
-                }
-            },
+            onClick: () => setShowDeleteDialog(true),
         },
     ];
 
     return (
-        <div className="flex items-center justify-between">
-            <div>
-                <div className="relative mb-2 flex items-center">
-                    <Component1Icon className="mr-1 h-5 w-5 flex-none" />
-
-                    <span className="mr-2 text-base font-semibold text-gray-900">
-                        {connection.name}
-                    </span>
-                </div>
-
-                <div
-                    className="flex h-[38px] items-center"
-                    onClick={(event) => event.preventDefault()}
-                >
-                    {connection.tags && (
-                        <TagList
-                            id={connection.id!}
-                            remainingTags={remainingTags}
-                            tags={connection.tags}
-                            updateTagsMutation={updateConnectionTagsMutation}
-                            getRequest={(id, tags) => ({
-                                id: id!,
-                                updateConnectionTagsRequestModel: {
-                                    tags: tags || [],
-                                },
-                            })}
-                        />
-                    )}
-                </div>
-            </div>
-
+        <>
             <div className="flex items-center">
-                {connection.lastModifiedDate && (
-                    <span className="mr-4 text-center text-sm text-gray-500">
-                        {`Last Modified ${connection.lastModifiedDate?.toLocaleDateString()} ${connection.lastModifiedDate?.toLocaleTimeString()}`}
-                    </span>
-                )}
+                <div className="flex-1 pr-8">
+                    <div className="flex items-center justify-between">
+                        <div className="relative flex items-center">
+                            <Component1Icon className="mr-1 h-5 w-5 flex-none" />
+
+                            <span className="mr-2 text-base font-semibold text-gray-900">
+                                {connection.name}
+                            </span>
+                        </div>
+
+                        <div className="ml-2 flex shrink-0">
+                            <Badge
+                                color={connection.active ? 'green' : 'default'}
+                                text={
+                                    connection.active ? 'Active' : 'Not Active'
+                                }
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div
+                            className="flex h-[38px] items-center"
+                            onClick={(event) => event.preventDefault()}
+                        >
+                            {connection.tags && (
+                                <TagList
+                                    id={connection.id!}
+                                    remainingTags={remainingTags}
+                                    tags={connection.tags}
+                                    updateTagsMutation={
+                                        updateConnectionTagsMutation
+                                    }
+                                    getRequest={(id, tags) => ({
+                                        id: id!,
+                                        updateConnectionTagsRequestModel: {
+                                            tags: tags || [],
+                                        },
+                                    })}
+                                />
+                            )}
+                        </div>
+
+                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            {connection.lastModifiedDate && (
+                                <>
+                                    <CalendarIcon
+                                        className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                        aria-hidden="true"
+                                    />
+
+                                    <span>
+                                        {`Created ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
+                                    </span>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center"></div>
 
                 <DropdownMenu id={connection.id} menuItems={menuItems} />
             </div>
-        </div>
+
+            {showDeleteDialog && (
+                <AlertDialog
+                    danger
+                    isOpen
+                    message="This action cannot be undone. This will permanently delete the connection."
+                    title="Are you absolutely sure?"
+                    setIsOpen={setShowDeleteDialog}
+                    onConfirmClick={() => {
+                        if (connection.id) {
+                            deleteConnectionMutation.mutate(connection.id);
+                        }
+                    }}
+                />
+            )}
+
+            {showEditDialog && (
+                <ConnectionDialog
+                    connection={connection}
+                    showTrigger={false}
+                    visible
+                    onClose={() => setShowEditDialog(false)}
+                />
+            )}
+        </>
     );
 };
 
