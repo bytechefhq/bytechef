@@ -135,27 +135,21 @@ export const Executions = () => {
     const [filterPageNumber, setFilterPageNumber] = useState<number>();
 
     const {
-        isLoading: isLoadingProjects,
-        error: errorInProjects,
-        data: projects,
-    } = useGetProjectsQuery({});
-
-    const {
-        isLoading: isLoadingWorkflows,
-        error: errorInWorkflows,
-        data: workflows,
-    } = useGetWorkflowsQuery();
-
-    const {
-        isLoading: isLoadingInstances,
-        error: errorInInstances,
         data: instances,
+        error: instancesError,
+        isLoading: instancesLoading,
     } = useGetInstancesQuery();
 
     const {
-        isLoading: isLoadingProjectExecutions,
-        error: errorInProjectExecutions,
-        data: projectExecutionsResponse,
+        data: projects,
+        error: projectsError,
+        isLoading: projectsLoading,
+    } = useGetProjectsQuery({});
+
+    const {
+        data: projectExecutionsPage,
+        error: projectExecutionsError,
+        isLoading: projectExecutionsLoading,
     } = useGetProjectExecutionsQuery({
         jobStatus: filterStatus,
         projectId: filterProjectId,
@@ -166,10 +160,16 @@ export const Executions = () => {
         pageNumber: filterPageNumber,
     });
 
+    const {
+        data: workflows,
+        error: workflowsError,
+        isLoading: workflowsLoading,
+    } = useGetWorkflowsQuery();
+
     return (
         <PageLoader
-            errors={[projectExecutionsError]}
-            loading={projectExecutionsIsLoading}
+            errors={[projectsError, workflowsError]}
+            loading={projectsLoading}
         >
             <LayoutContainer
                 bodyClassName="bg-white"
@@ -227,7 +227,7 @@ export const Executions = () => {
                                 onChange={setFilterEndDate}
                             />
 
-                            {!pojectsIsLoading && !projectsError && (
+                            {!projectsLoading && !projectsError && (
                                 <FilterableSelect
                                     isClearable
                                     label="Projects"
@@ -255,7 +255,7 @@ export const Executions = () => {
                                 />
                             )}
 
-                            {!workflowsIsLoading && !workflowsError && (
+                            {!workflowsLoading && !workflowsError && (
                                 <FilterableSelect
                                     isClearable
                                     label="Workflows"
@@ -285,7 +285,7 @@ export const Executions = () => {
                                 />
                             )}
 
-                            {!instancesIsLoading && !instancesError && (
+                            {!instancesLoading && !instancesError && (
                                 <FilterableSelect
                                     isClearable
                                     label="Instances"
@@ -318,7 +318,7 @@ export const Executions = () => {
                     </>
                 }
             >
-                {!projectExecutionsIsLoading &&
+                {!projectExecutionsLoading &&
                     !projectExecutionsError &&
                     projectExecutionsPage?.content && (
                         <div
