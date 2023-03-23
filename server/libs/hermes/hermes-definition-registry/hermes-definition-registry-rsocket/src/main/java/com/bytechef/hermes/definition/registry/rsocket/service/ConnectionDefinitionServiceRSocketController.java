@@ -17,10 +17,12 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.service;
 
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.tag.domain.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -75,7 +77,7 @@ public class ConnectionDefinitionServiceRSocketController {
     public Mono<Authorization.AuthorizationCallbackResponse> executeAuthorizationCallback(Map<String, Object> map) {
         return Mono.just(
             connectionDefinitionService.executeAuthorizationCallback(
-                (Connection) map.get("connection"), (String) map.get("redirectUri")));
+                toConnection(MapValueUtils.getMap(map, "connection")), (String) map.get("redirectUri")));
     }
 
     @MessageMapping("ConnectionDefinitionService.getAuthorization")
@@ -106,5 +108,22 @@ public class ConnectionDefinitionServiceRSocketController {
     @MessageMapping("ConnectionDefinitionService.getOAuth2Parameters")
     public Mono<ConnectionDefinitionService.OAuth2AuthorizationParameters> getOAuth2Parameters(Connection connection) {
         return Mono.just(connectionDefinitionService.getOAuth2Parameters(connection));
+    }
+
+    // TODO check how to get automatic conversion in rosocket when sending complex objests inside map
+    private Connection toConnection(Map<String, Object> map) {
+        Connection connection = new Connection();
+
+        connection.setAuthorizationName(MapValueUtils.getString(map, "authorizationName"));
+        connection.setComponentName(MapValueUtils.getString(map, "componentName"));
+        connection.setConnectionVersion(MapValueUtils.getInteger(map, "connectionVersion"));
+        connection.setId(MapValueUtils.getLong(map, "id"));
+        connection.setKey(MapValueUtils.getString(map, "key"));
+        connection.setName(MapValueUtils.getString(map, "name"));
+        connection.setParameters(MapValueUtils.getMap(map, "parameters"));
+        connection.setTags(MapValueUtils.getList(map, "tags", Tag.class));
+        connection.setVersion(MapValueUtils.getInteger(map, "version"));
+
+        return connection;
     }
 }
