@@ -108,7 +108,7 @@ const LayoutContainer = ({
 
             {leftSidebarOpen && (
                 <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                    <nav className="flex h-full flex-col border-l border-gray-200 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                    <nav className="flex h-full flex-col dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                         {leftSidebarHeader}
 
                         <div className="overflow-y-auto">{leftSidebarBody}</div>
@@ -120,15 +120,15 @@ const LayoutContainer = ({
                 className={twMerge('h-full', leftSidebarOpen ? 'md:pl-72' : '')}
             >
                 <div className={twMerge('flex h-full', className)}>
-                    <div className="flex h-full w-full flex-col">
+                    <div
+                        className={twMerge(
+                            'flex h-full w-full flex-col',
+                            bodyClassName
+                        )}
+                    >
                         {header}
 
-                        <main
-                            className={twMerge(
-                                'flex flex-1 overflow-y-auto',
-                                bodyClassName
-                            )}
-                        >
+                        <main className="flex flex-1 overflow-y-auto">
                             {children}
                         </main>
 
