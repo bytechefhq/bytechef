@@ -24,15 +24,15 @@ export const Page: React.VFC = () => {
                 <h2>Pages in Storybook</h2>
 
                 <p>
-                    We recommend building UIs with a{' '}
-
+                    We recommend building UIs with a
                     <a
+                        className="px-2"
                         href="https://componentdriven.org"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
                         <strong>component-driven</strong>
-                    </a>{' '}
+                    </a>
                     process starting with atomic components and ending with
                     pages.
                 </p>
@@ -58,19 +58,18 @@ export const Page: React.VFC = () => {
                 </ul>
 
                 <p>
-                    Get a guided tutorial on component-driven development at{' '}
-
+                    Get a guided tutorial on component-driven development at
                     <a
+                        className="pl-2"
                         href="https://storybook.js.org/tutorials/"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
                         Storybook tutorials
                     </a>
-
-                    . Read more in the{' '}
-
+                    . Read more in the
                     <a
+                        className="pl-2"
                         href="https://storybook.js.org/docs"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -82,9 +81,7 @@ export const Page: React.VFC = () => {
 
                 <div className="tip-wrapper">
                     <span className="tip">Tip</span>
-
-                    Adjust the width of the canvas with the{' '}
-
+                    Adjust the width of the canvas with the
                     <svg
                         width="10"
                         height="10"
