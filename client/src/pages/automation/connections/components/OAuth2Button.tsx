@@ -1,4 +1,4 @@
-import useOAuth2 from '../oauth2/useOAuth2';
+import useOAuth2, {AuthTokenPayload} from '../oauth2/useOAuth2';
 import Button from '../../../../components/Button/Button';
 import React from 'react';
 
@@ -25,49 +25,57 @@ const LoadingIcon = (): JSX.Element => (
     </svg>
 );
 
-interface OAuth2ButtonProps {
+type OAuth2ButtonProps = {
+    authorizationUrl: string;
+    clientId: string;
+    redirectUri: string;
+    responseType: 'code' | 'token';
+    scope?: string;
     onClick: (getAuth: () => void) => void;
-}
+    onCodeSuccess?: (code: string) => void;
+    onError?: (error: string) => void;
+    onTokenSuccess?: (payload: AuthTokenPayload) => void;
+};
 
-const OAuth2Button = ({onClick}: OAuth2ButtonProps) => {
-    const {data, loading, error, getAuth} = useOAuth2({
-        authorizeUrl: 'https://login.mailchimp.com/oauth2/authorize',
-        clientId: '344111396868',
-        redirectUri: `${document.location.origin}/callback`,
-        scope: '',
-        responseType: 'code',
-        exchangeCodeForTokenServerURL: 'http://localhost:5173/token',
-        exchangeCodeForTokenMethod: 'POST',
-        onSuccess: (payload) => console.log('Success', payload),
-        onError: (error_) => console.log('Error', error_),
+const OAuth2Button = ({
+    authorizationUrl,
+    clientId,
+    redirectUri,
+    responseType,
+    scope,
+    onError,
+    onClick,
+    onCodeSuccess,
+    onTokenSuccess,
+}: OAuth2ButtonProps) => {
+    const {loading, getAuth} = useOAuth2({
+        authorizationUrl: authorizationUrl,
+        clientId: clientId,
+        redirectUri: redirectUri,
+        scope: scope,
+        responseType: responseType,
+        onCodeSuccess: onCodeSuccess,
+        onTokenSuccess: onTokenSuccess,
+        onError: onError,
     });
-
-    const isLoggedIn = Boolean(data?.access_token);
-
-    if (error) {
-        return <div>Error</div>;
-    }
 
     if (loading) {
         return (
             <Button
+                disabled={true}
                 icon={<LoadingIcon />}
                 iconPosition="left"
-                label="Creating..."
+                label="Connecting..."
                 type="button"
             />
         );
     }
 
-    if (isLoggedIn) {
-        return <pre>{JSON.stringify(data)}</pre>;
-    }
-
     return (
         <Button
             label="Connect"
-            onClick={() => onClick(getAuth)}
             type="submit"
+            onClick={() => onClick(getAuth)}
         />
     );
 };
