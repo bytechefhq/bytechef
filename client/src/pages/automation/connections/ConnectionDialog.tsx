@@ -265,8 +265,6 @@ const ConnectionDialog = ({
             if (onClose) {
                 onClose();
             }
-
-            setWizardStep('configuration_step');
         }, 300);
     }
 
