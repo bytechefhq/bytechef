@@ -22,11 +22,11 @@
     }
 
     .btn-danger {
-        @apply bg-rose-500 hover:bg-rose-800 text-white hover:text-white;
+        @apply border-transparent bg-rose-500 hover:bg-rose-800 text-white hover:text-white;
     }
 
     .btn-unstyled {
-        @apply bg-transparent shadow-none text-gray-800;
+        @apply border-transparent bg-transparent shadow-none text-gray-800;
     }
 
     .btn-small {
@@ -38,6 +38,6 @@
     }
 
     .btn-icon {
-        @apply shadow-none items-center justify-center text-black hover:text-blue-500;
+        @apply border-transparent shadow-none items-center justify-center text-black hover:text-blue-500;
     }
 }
