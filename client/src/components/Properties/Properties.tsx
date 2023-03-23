@@ -1,10 +1,11 @@
+import {FieldValues, Path} from 'react-hook-form/dist/types';
+import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
+
 import {
     PropertyModel,
     ValuePropertyModel,
 } from '../../middleware/definition-registry';
-import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import Input from '../Input/Input';
-import {Path, FieldValues} from 'react-hook-form/dist/types';
 
 interface PropertiesProps<
     TProperty extends PropertyModel,

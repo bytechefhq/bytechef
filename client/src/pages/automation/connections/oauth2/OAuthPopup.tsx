@@ -1,4 +1,5 @@
 import {useEffect} from 'react';
+
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {queryToObject} from './tools';
 

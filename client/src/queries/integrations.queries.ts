@@ -3,10 +3,11 @@ import {
     CategoryModel,
     IntegrationCategoriesApi,
     IntegrationModel,
-    IntegrationsApi,
     IntegrationTagsApi,
+    IntegrationsApi,
     TagModel,
 } from 'middleware/integration';
+
 import {WorkflowModel} from '../middleware/workflow';
 
 export const IntegrationKeys = {

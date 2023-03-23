@@ -1,26 +1,27 @@
+import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
+import {Link} from 'react-router-dom';
+
+import AlertDialog from '../../../components/AlertDialog/AlertDialog';
+import Badge from '../../../components/Badge/Badge';
 import DropdownMenu, {
     IDropdownMenuItem,
 } from '../../../components/DropdownMenu/DropdownMenu';
+import HoverCard from '../../../components/HoverCard/HoverCard';
+import TagList from '../../../components/TagList/TagList';
+import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import {
     IntegrationModel,
     IntegrationModelStatusEnum,
     TagModel,
 } from '../../../middleware/integration';
 import {
+    useCreateIntegrationWorkflowRequestMutation,
     useDeleteIntegrationMutation,
     useUpdateIntegrationTagsMutation,
-    useCreateIntegrationWorkflowRequestMutation,
 } from '../../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../../queries/integrations.queries';
-import {useQueryClient} from '@tanstack/react-query';
-import {Link} from 'react-router-dom';
 import IntegrationDialog from './IntegrationDialog';
-import AlertDialog from '../../../components/AlertDialog/AlertDialog';
-import TagList from '../../../components/TagList/TagList';
-import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
-import Badge from '../../../components/Badge/Badge';
-import HoverCard from '../../../components/HoverCard/HoverCard';
 
 interface IntegrationListItemProps {
     integration: IntegrationModel;
@@ -131,6 +132,7 @@ const IntegrationListItem = ({
                             />
                         </div>
                     </div>
+
                     <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                         <div
                             className="flex h-[38px] items-center"

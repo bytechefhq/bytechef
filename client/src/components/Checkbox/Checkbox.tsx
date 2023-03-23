@@ -1,6 +1,6 @@
+import {Indicator, Root} from '@radix-ui/react-checkbox';
 import {CheckIcon} from '@radix-ui/react-icons';
 import React from 'react';
-import {Indicator, Root} from '@radix-ui/react-checkbox';
 
 export interface CheckboxProps {
     defaultChecked?: boolean;

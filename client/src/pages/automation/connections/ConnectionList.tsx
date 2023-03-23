@@ -1,13 +1,14 @@
-import {useSearchParams} from 'react-router-dom';
-import ConnectionListItem from './ConnectionListItem';
-import {
-    useGetConnectionsQuery,
-    useGetConnectionTagsQuery,
-} from '../../../queries/connections.queries';
-import EmptyList from '../../../components/EmptyList/EmptyList';
 import {LinkIcon} from '@heroicons/react/24/outline';
-import ConnectionDialog from './ConnectionDialog';
+import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+
+import EmptyList from '../../../components/EmptyList/EmptyList';
+import {
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '../../../queries/connections.queries';
+import ConnectionDialog from './ConnectionDialog';
+import ConnectionListItem from './ConnectionListItem';
 
 const ConnectionList = () => {
     const [searchParams] = useSearchParams();

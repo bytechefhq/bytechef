@@ -30,18 +30,21 @@ const Alert = ({type = 'info', text}: AlertProps) => (
                         aria-hidden="true"
                     />
                 )}
+
                 {type === 'info' && (
                     <InformationCircleIcon
                         className="h-5 w-5 text-blue-400"
                         aria-hidden="true"
                     />
                 )}
+
                 {type === 'success' && (
                     <CheckCircleIcon
                         className="h-5 w-5 text-blue-400"
                         aria-hidden="true"
                     />
                 )}
+
                 {type === 'warning' && (
                     <ExclamationTriangleIcon
                         className="h-5 w-5 text-blue-400"

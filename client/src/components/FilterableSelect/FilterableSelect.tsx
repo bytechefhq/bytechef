@@ -1,9 +1,10 @@
 import './FilterableSelect.css';
+
 import React from 'react';
-import Select, {GroupBase, Props} from 'react-select';
-import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 import {FieldValues} from 'react-hook-form';
 import {FieldPath} from 'react-hook-form/dist/types';
+import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import Select, {GroupBase, Props} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
 export interface ISelectOption {

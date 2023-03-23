@@ -1,13 +1,14 @@
-import {
-    useGetIntegrationsQuery,
-    useGetIntegrationTagsQuery,
-} from '../../../queries/integrations.queries';
-import IntegrationListItem from './IntegrationListItem';
+import {Square3Stack3DIcon} from '@heroicons/react/24/outline';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+
 import EmptyList from '../../../components/EmptyList/EmptyList';
+import {
+    useGetIntegrationTagsQuery,
+    useGetIntegrationsQuery,
+} from '../../../queries/integrations.queries';
 import IntegrationDialog from './IntegrationDialog';
-import {Square3Stack3DIcon} from '@heroicons/react/24/outline';
+import IntegrationListItem from './IntegrationListItem';
 
 const IntegrationList = () => {
     const [searchParams] = useSearchParams();

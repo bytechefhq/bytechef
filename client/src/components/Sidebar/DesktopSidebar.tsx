@@ -1,5 +1,6 @@
-import reactLogo from '../../assets/logo.svg';
 import {Link} from 'react-router-dom';
+
+import reactLogo from '../../assets/logo.svg';
 import Avatar from '../Avatar/Avatar';
 
 export function DesktopSidebar({

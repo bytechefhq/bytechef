@@ -1,6 +1,7 @@
-import reactLogo from '../../assets/logo.svg';
 import {Bars3Icon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
+
+import reactLogo from '../../assets/logo.svg';
 
 export function MobileTopNavigation({
     setMobileMenuOpen,

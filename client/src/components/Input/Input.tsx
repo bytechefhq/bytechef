@@ -1,8 +1,9 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
-import {twMerge} from 'tailwind-merge';
-import React, {forwardRef, ReactNode} from 'react';
-import {Tooltip} from '../Tooltip/Tooltip';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import React, {ReactNode, forwardRef} from 'react';
+import {twMerge} from 'tailwind-merge';
+
+import {Tooltip} from '../Tooltip/Tooltip';
 
 type InputProps = {
     description?: string;

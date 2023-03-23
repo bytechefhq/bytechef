@@ -1,6 +1,6 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
-import {twMerge} from 'tailwind-merge';
 import {forwardRef} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 type TextAreaProps = {
     label: string;

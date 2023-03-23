@@ -1,12 +1,12 @@
 import {XMarkIcon} from '@heroicons/react/24/outline';
 import {ChevronDownIcon, PlusIcon} from '@radix-ui/react-icons';
+import {UseMutationResult} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
-import {useState} from 'react';
-import {OnChangeValue} from 'react-select';
 import CreatableSelect, {
     ISelectOption,
 } from 'components/CreatableSelect/CreatableSelect';
-import {UseMutationResult} from '@tanstack/react-query';
+import {useState} from 'react';
+import {OnChangeValue} from 'react-select';
 
 interface TagModel {
     readonly createdBy?: string;

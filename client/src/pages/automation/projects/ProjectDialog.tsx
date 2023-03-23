@@ -1,24 +1,27 @@
-import {useState} from 'react';
-
-import Input from 'components/Input/Input';
-import Dialog from 'components/Dialog/Dialog';
-import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import TextArea from 'components/TextArea/TextArea';
-import {Controller, useForm} from 'react-hook-form';
+import {Close} from '@radix-ui/react-dialog';
+import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
+import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
+import Dialog from 'components/Dialog/Dialog';
+import Input from 'components/Input/Input';
+import TextArea from 'components/TextArea/TextArea';
+import {useState} from 'react';
+import {Controller, useForm} from 'react-hook-form';
+
+import {
+    CategoryModel,
+    ProjectModel,
+    TagModel,
+} from '../../../middleware/project';
+import {
+    useCreateProjectMutation,
+    useUpdateProjectMutation,
+} from '../../../mutations/projects.mutations';
 import {
     ProjectKeys,
     useGetProjectCategoriesQuery,
     useGetProjectTagsQuery,
 } from '../../../queries/projects.queries';
-import {useQueryClient} from '@tanstack/react-query';
-import {CategoryModel, TagModel} from '../../../middleware/project';
-import {
-    useCreateProjectMutation,
-    useUpdateProjectMutation,
-} from '../../../mutations/projects.mutations';
-import {Close} from '@radix-ui/react-dialog';
-import {ProjectModel} from '../../../middleware/project';
 
 interface ProjectDialogProps {
     project: ProjectModel | undefined;

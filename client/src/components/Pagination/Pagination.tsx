@@ -114,16 +114,20 @@ const Pagination = ({
                 <div>
                     <p className="text-sm text-gray-700">
                         Showing{' '}
+
                         <span className="font-medium">
                             {pageNumber * pageSize + 1}
                         </span>{' '}
+
                         to{' '}
+
                         <span className="font-medium">
                             {Math.min(
                                 totalElements,
                                 (pageNumber + 1) * pageSize
                             )}
                         </span>{' '}
+
                         of <span className="font-medium">{totalElements}</span>{' '}
                         results
                     </p>
