@@ -43,12 +43,14 @@ import Label from '../../../components/Label/Label';
 import {Tooltip} from '../../../components/Tooltip/Tooltip';
 import {timeout} from 'd3-timer';
 
+type Tag = TagModel | {label: string; value: string};
+
 interface FormProps {
     authorizationName: string;
     componentName: ISelectOption;
     name: string;
     parameters: {[key: string]: object};
-    tags: TagModel[];
+    tags: Tag[];
     /* eslint-disable @typescript-eslint/no-explicit-any */
     [key: string]: any;
 }
@@ -73,7 +75,9 @@ const ConnectionDialog = ({
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] =
         useState<boolean>(true);
-    const [wizardStep, setWizardStep] = useState<'step1' | 'step2'>('step1');
+    const [wizardStep, setWizardStep] = useState<
+        'configuration_step' | 'oauth_step'
+    >('configuration_step');
 
     const {
         control,
@@ -117,7 +121,7 @@ const ConnectionDialog = ({
         data: oAuth2AuthorizationParameters,
     } = useGetConnectionOAuth2AuthorizationParametersQuery(
         getNewConnection(),
-        wizardStep === 'step2'
+        wizardStep === 'oauth_step'
     );
 
     const {
@@ -262,7 +266,7 @@ const ConnectionDialog = ({
                 onClose();
             }
 
-            setWizardStep('step1');
+            setWizardStep('configuration_step');
         }, 300);
     }
 
@@ -398,7 +402,7 @@ const ConnectionDialog = ({
                 <>
                     <Errors errors={errors} />
 
-                    {(wizardStep === 'step1' ||
+                    {(wizardStep === 'configuration_step' ||
                         oAuth2AuthorizationParametersIsLoading) && (
                         <>
                             {!connection?.id && (
@@ -445,7 +449,9 @@ const ConnectionDialog = ({
                                                     setUsePredefinedOAuthApp(
                                                         true
                                                     );
-                                                    setWizardStep('step1');
+                                                    setWizardStep(
+                                                        'configuration_step'
+                                                    );
                                                 }
                                             }}
                                         />
@@ -577,7 +583,7 @@ const ConnectionDialog = ({
                                                         value: inputValue,
                                                         name: inputValue,
                                                     },
-                                                ] as never[]);
+                                                ]);
                                             }}
                                         />
                                     )}
@@ -587,7 +593,7 @@ const ConnectionDialog = ({
                     )}
 
                     {!oAuth2AuthorizationParametersIsLoading &&
-                        wizardStep === 'step2' && (
+                        wizardStep === 'oauth_step' && (
                             <>
                                 <Alert
                                     text={
@@ -614,7 +620,7 @@ const ConnectionDialog = ({
                         )}
 
                     <div className="mt-8 flex justify-end space-x-1">
-                        {wizardStep === 'step2' && (
+                        {wizardStep === 'oauth_step' && (
                             <Button
                                 displayType="lightBorder"
                                 label="Previous"
@@ -622,12 +628,12 @@ const ConnectionDialog = ({
                                 onClick={() => {
                                     createConnectionMutation.reset();
                                     setOAuth2Error(undefined);
-                                    setWizardStep('step1');
+                                    setWizardStep('configuration_step');
                                 }}
                             />
                         )}
 
-                        {wizardStep === 'step1' && (
+                        {wizardStep === 'configuration_step' && (
                             <Button
                                 displayType="lightBorder"
                                 label="Cancel"
@@ -638,17 +644,17 @@ const ConnectionDialog = ({
 
                         {showOAuth2Step && (
                             <>
-                                {wizardStep === 'step1' && (
+                                {wizardStep === 'configuration_step' && (
                                     <Button
                                         label="Next"
                                         type="submit"
                                         onClick={handleSubmit(() => {
-                                            setWizardStep('step2');
+                                            setWizardStep('oauth_step');
                                         })}
                                     />
                                 )}
 
-                                {wizardStep === 'step2' &&
+                                {wizardStep === 'oauth_step' &&
                                     oAuth2AuthorizationParameters?.authorizationUrl &&
                                     oAuth2AuthorizationParameters?.clientId && (
                                         <OAuth2Button
@@ -721,16 +727,17 @@ const RedirectUriInput = ({redirectUri}: {redirectUri: string}) => {
             readOnly={true}
             value={redirectUri}
             trailing={
-                <button
-                    type="button"
-                    className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                <Button
+                    className="-ml-px rounded-l-none rounded-r-md border-gray-300 px-3 py-2 hover:bg-gray-50"
+                    displayType="icon"
+                    icon={
+                        <ClipboardIcon
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                        />
+                    }
                     onClick={() => copyToClipboard(redirectUri ?? '')}
-                >
-                    <ClipboardIcon
-                        className="-ml-0.5 h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                    />
-                </button>
+                />
             }
         />
     );
