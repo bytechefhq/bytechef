@@ -34,19 +34,19 @@ const Projects = () => {
         defaultCurrentState
     );
 
-    const {isLoading: categoriesIsLoading, data: categories} =
+    const {isLoading: categoriesLoading, data: categories} =
         useGetProjectCategoriesQuery();
-    const {isLoading: tagsIsLoading, data: tags} = useGetProjectTagsQuery();
+    const {isLoading: tagsLoading, data: tags} = useGetProjectTagsQuery();
 
     const title =
-        !categoriesIsLoading &&
+        !categoriesLoading &&
         current.type === Type.Category &&
         current.id &&
         categories &&
         categories.length > 0
             ? categories.filter((category) => category.id === current.id)[0]
                   .name!
-            : !tagsIsLoading &&
+            : !tagsLoading &&
               current.type === Type.Tag &&
               tags &&
               tags.length > 0
@@ -85,7 +85,7 @@ const Projects = () => {
                                 toLink=""
                             />
 
-                            {!categoriesIsLoading &&
+                            {!categoriesLoading &&
                                 categories?.map((item) => (
                                     <LeftSidebarMenuItem
                                         key={item.name}
@@ -112,7 +112,7 @@ const Projects = () => {
                     bottomTitle="Tags"
                     bottomBody={
                         <>
-                            {!tagsIsLoading &&
+                            {!tagsLoading &&
                                 (tags && !!tags.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarMenuItem

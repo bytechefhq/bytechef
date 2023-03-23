@@ -65,13 +65,13 @@ const ProjectDialog = ({
     });
 
     const {
-        isLoading: categoriesIsLoading,
+        isLoading: categoriesLoading,
         error: categoriesError,
         data: categories,
     } = useGetProjectCategoriesQuery();
 
     const {
-        isLoading: tagsIsLoading,
+        isLoading: tagsLoading,
         error: tagsError,
         data: tags,
     } = useGetProjectTagsQuery();
@@ -163,11 +163,11 @@ const ProjectDialog = ({
             }
         >
             {categoriesError &&
-                !categoriesIsLoading &&
+                !categoriesLoading &&
                 `An error has occurred: ${categoriesError.message}`}
 
             {tagsError &&
-                !tagsIsLoading &&
+                !tagsLoading &&
                 `An error has occurred: ${tagsError.message}`}
 
             <Input
@@ -183,7 +183,7 @@ const ProjectDialog = ({
                 {...register('description')}
             />
 
-            {!categoriesIsLoading && (
+            {!categoriesLoading && (
                 <Controller
                     control={control}
                     name="category"

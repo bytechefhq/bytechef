@@ -31,15 +31,15 @@ const Connections = () => {
     const [current, setCurrent] = useState<{id?: number | string; type: Type}>(
         defaultCurrentState
     );
-    const {isLoading: componentsIsLoading, data: components} =
+    const {isLoading: componentsLoading, data: components} =
         useGetComponentDefinitionsQuery({connectionInstances: true});
-    const {isLoading: tagsIsLoading, data: tags} = useGetConnectionTagsQuery();
+    const {isLoading: tagsLoading, data: tags} = useGetConnectionTagsQuery();
 
     const title: string = getTitle();
 
     function getTitle(): string {
         if (
-            !componentsIsLoading &&
+            !componentsLoading &&
             current.type === Type.Component &&
             current.id &&
             components &&
@@ -49,7 +49,7 @@ const Connections = () => {
                 (component) => component.name === current.id
             )[0].name!;
         } else if (
-            !tagsIsLoading &&
+            !tagsLoading &&
             current.type === Type.Tag &&
             tags &&
             tags.length > 0
@@ -89,7 +89,7 @@ const Connections = () => {
                                 toLink={''}
                             />
 
-                            {!componentsIsLoading &&
+                            {!componentsLoading &&
                                 components?.map((item) => (
                                     <LeftSidebarMenuItem
                                         key={item.name}
@@ -116,7 +116,7 @@ const Connections = () => {
                     bottomTitle="Tags"
                     bottomBody={
                         <>
-                            {!tagsIsLoading &&
+                            {!tagsLoading &&
                                 (!tags?.length ? (
                                     <p className="px-3 text-xs">No tags.</p>
                                 ) : (
