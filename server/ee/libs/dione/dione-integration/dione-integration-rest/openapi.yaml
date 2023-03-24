@@ -49,7 +49,7 @@ paths:
       operationId: "getIntegrations"
       parameters:
       - name: "categoryIds"
-        description: "A list of the category ids used for filtering integrations."
+        description: "The list of the category ids used for filtering integrations."
         in: "query"
         required: false
         schema:
@@ -58,7 +58,7 @@ paths:
             type: "integer"
             format: "int64"
       - name: "tagIds"
-        description: "A list of tag ids of used for filtering integrations."
+        description: "The list of tag ids of used for filtering integrations."
         in: "query"
         required: false
         schema:
@@ -204,10 +204,10 @@ paths:
             schema:
               type: "object"
               required:
-              - "name"
+              - "label"
               properties:
-                name:
-                  description: "The workflow name."
+                label:
+                  description: "The descriptive name for a workflow."
                   type: "string"
                 description:
                   description: "The workflow description."
@@ -222,7 +222,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Integration"
+                $ref: "../../../../../libs/atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
   /integrations/{id}/tags:
     put:
       description: "Updates tags of an existing integration."
@@ -242,13 +242,7 @@ paths:
         content:
           application/json:
             schema:
-              description: "The request object that contains the array of tags."
-              type: "object"
-              properties:
-                tags:
-                  type: "array"
-                  items:
-                    $ref: "../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+              $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
         "200":
@@ -317,3 +311,11 @@ components:
             readOnly: true
         __version:
           type: "integer"
+    UpdateTagsRequest:
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
