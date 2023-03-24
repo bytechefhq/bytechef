@@ -17,7 +17,7 @@ import * as runtime from '../runtime';
 import type {
   CreateIntegrationWorkflowRequestModel,
   IntegrationModel,
-  UpdateIntegrationTagsRequestModel,
+  UpdateTagsRequestModel,
   WorkflowModel,
 } from '../models';
 import {
@@ -25,8 +25,8 @@ import {
     CreateIntegrationWorkflowRequestModelToJSON,
     IntegrationModelFromJSON,
     IntegrationModelToJSON,
-    UpdateIntegrationTagsRequestModelFromJSON,
-    UpdateIntegrationTagsRequestModelToJSON,
+    UpdateTagsRequestModelFromJSON,
+    UpdateTagsRequestModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
 } from '../models';
@@ -64,7 +64,7 @@ export interface UpdateIntegrationRequest {
 
 export interface UpdateIntegrationTagsRequest {
     id: number;
-    updateIntegrationTagsRequestModel: UpdateIntegrationTagsRequestModel;
+    updateTagsRequestModel: UpdateTagsRequestModel;
 }
 
 /**
@@ -111,7 +111,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Create new workflow and adds it to an existing integration.
      * Create new workflow and adds it to an existing integration.
      */
-    async createIntegrationWorkflowRaw(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
+    async createIntegrationWorkflowRaw(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling createIntegrationWorkflow.');
         }
@@ -134,14 +134,14 @@ export class IntegrationsApi extends runtime.BaseAPI {
             body: CreateIntegrationWorkflowRequestModelToJSON(requestParameters.createIntegrationWorkflowRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));
     }
 
     /**
      * Create new workflow and adds it to an existing integration.
      * Create new workflow and adds it to an existing integration.
      */
-    async createIntegrationWorkflow(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
+    async createIntegrationWorkflow(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
         const response = await this.createIntegrationWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -325,8 +325,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateIntegrationTags.');
         }
 
-        if (requestParameters.updateIntegrationTagsRequestModel === null || requestParameters.updateIntegrationTagsRequestModel === undefined) {
-            throw new runtime.RequiredError('updateIntegrationTagsRequestModel','Required parameter requestParameters.updateIntegrationTagsRequestModel was null or undefined when calling updateIntegrationTags.');
+        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
+            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateIntegrationTags.');
         }
 
         const queryParameters: any = {};
@@ -340,7 +340,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: UpdateIntegrationTagsRequestModelToJSON(requestParameters.updateIntegrationTagsRequestModel),
+            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

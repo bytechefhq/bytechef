@@ -23,31 +23,31 @@ import {
 /**
  * The request object that contains the array of tags.
  * @export
- * @interface UpdateIntegrationTagsRequestModel
+ * @interface UpdateTagsRequestModel
  */
-export interface UpdateIntegrationTagsRequestModel {
+export interface UpdateTagsRequestModel {
     /**
      * 
      * @type {Array<TagModel>}
-     * @memberof UpdateIntegrationTagsRequestModel
+     * @memberof UpdateTagsRequestModel
      */
     tags?: Array<TagModel>;
 }
 
 /**
- * Check if a given object implements the UpdateIntegrationTagsRequestModel interface.
+ * Check if a given object implements the UpdateTagsRequestModel interface.
  */
-export function instanceOfUpdateIntegrationTagsRequestModel(value: object): boolean {
+export function instanceOfUpdateTagsRequestModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function UpdateIntegrationTagsRequestModelFromJSON(json: any): UpdateIntegrationTagsRequestModel {
-    return UpdateIntegrationTagsRequestModelFromJSONTyped(json, false);
+export function UpdateTagsRequestModelFromJSON(json: any): UpdateTagsRequestModel {
+    return UpdateTagsRequestModelFromJSONTyped(json, false);
 }
 
-export function UpdateIntegrationTagsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateIntegrationTagsRequestModel {
+export function UpdateTagsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateTagsRequestModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -57,7 +57,7 @@ export function UpdateIntegrationTagsRequestModelFromJSONTyped(json: any, ignore
     };
 }
 
-export function UpdateIntegrationTagsRequestModelToJSON(value?: UpdateIntegrationTagsRequestModel | null): any {
+export function UpdateTagsRequestModelToJSON(value?: UpdateTagsRequestModel | null): any {
     if (value === undefined) {
         return undefined;
     }

@@ -49,7 +49,7 @@ export interface TaskExecutionModel {
      * @type {Date}
      * @memberof TaskExecutionModel
      */
-    readonly endTime?: Date;
+    readonly endDate?: Date;
     /**
      * 
      * @type {ExecutionErrorModel}
@@ -139,7 +139,7 @@ export interface TaskExecutionModel {
      * @type {Date}
      * @memberof TaskExecutionModel
      */
-    readonly startTime: Date;
+    readonly startDate: Date;
     /**
      * The current status of this task.
      * @type {string}
@@ -193,7 +193,7 @@ export function instanceOfTaskExecutionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "jobId" in value;
     isInstance = isInstance && "priority" in value;
-    isInstance = isInstance && "startTime" in value;
+    isInstance = isInstance && "startDate" in value;
     isInstance = isInstance && "status" in value;
 
     return isInstance;
@@ -211,7 +211,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'endTime': !exists(json, 'endTime') ? undefined : (new Date(json['endTime'])),
+        'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
         'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
         'executionTime': !exists(json, 'executionTime') ? undefined : json['executionTime'],
         'id': !exists(json, 'id') ? undefined : json['id'],
@@ -226,7 +226,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'retryAttempts': !exists(json, 'retryAttempts') ? undefined : json['retryAttempts'],
         'retryDelay': !exists(json, 'retryDelay') ? undefined : json['retryDelay'],
         'retryDelayFactor': !exists(json, 'retryDelayFactor') ? undefined : json['retryDelayFactor'],
-        'startTime': (new Date(json['startTime'])),
+        'startDate': (new Date(json['startDate'])),
         'status': json['status'],
         'taskNumber': !exists(json, 'taskNumber') ? undefined : json['taskNumber'],
         'retryDelayMillis': !exists(json, 'retryDelayMillis') ? undefined : json['retryDelayMillis'],

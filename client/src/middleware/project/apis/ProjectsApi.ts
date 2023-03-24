@@ -17,7 +17,7 @@ import * as runtime from '../runtime';
 import type {
   CreateProjectWorkflowRequestModel,
   ProjectModel,
-  UpdateProjectTagsRequestModel,
+  UpdateTagsRequestModel,
   WorkflowModel,
 } from '../models';
 import {
@@ -25,8 +25,8 @@ import {
     CreateProjectWorkflowRequestModelToJSON,
     ProjectModelFromJSON,
     ProjectModelToJSON,
-    UpdateProjectTagsRequestModelFromJSON,
-    UpdateProjectTagsRequestModelToJSON,
+    UpdateTagsRequestModelFromJSON,
+    UpdateTagsRequestModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
 } from '../models';
@@ -58,6 +58,7 @@ export interface GetProjectWorkflowsRequest {
 
 export interface GetProjectsRequest {
     categoryIds?: Array<number>;
+    projectInstances?: boolean;
     tagIds?: Array<number>;
 }
 
@@ -68,7 +69,7 @@ export interface UpdateProjectRequest {
 
 export interface UpdateProjectTagsRequest {
     id: number;
-    updateProjectTagsRequestModel: UpdateProjectTagsRequestModel;
+    updateTagsRequestModel: UpdateTagsRequestModel;
 }
 
 /**
@@ -115,7 +116,7 @@ export class ProjectsApi extends runtime.BaseAPI {
      * Create new workflow and adds it to an existing project.
      * Create new workflow and adds it to an existing project.
      */
-    async createProjectWorkflowRaw(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectModel>> {
+    async createProjectWorkflowRaw(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling createProjectWorkflow.');
         }
@@ -138,21 +139,21 @@ export class ProjectsApi extends runtime.BaseAPI {
             body: CreateProjectWorkflowRequestModelToJSON(requestParameters.createProjectWorkflowRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));
     }
 
     /**
      * Create new workflow and adds it to an existing project.
      * Create new workflow and adds it to an existing project.
      */
-    async createProjectWorkflow(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
+    async createProjectWorkflow(requestParameters: CreateProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowModel> {
         const response = await this.createProjectWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Delete an project.
-     * Delete an project.
+     * Delete a project.
+     * Delete a project.
      */
     async deleteProjectRaw(requestParameters: DeleteProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -174,8 +175,8 @@ export class ProjectsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Delete an project.
-     * Delete an project.
+     * Delete a project.
+     * Delete a project.
      */
     async deleteProject(requestParameters: DeleteProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteProjectRaw(requestParameters, initOverrides);
@@ -214,8 +215,8 @@ export class ProjectsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an project by id.
-     * Get an project by id.
+     * Get a project by id.
+     * Get a project by id.
      */
     async getProjectRaw(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -237,8 +238,8 @@ export class ProjectsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an project by id.
-     * Get an project by id.
+     * Get a project by id.
+     * Get a project by id.
      */
     async getProject(requestParameters: GetProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectModel> {
         const response = await this.getProjectRaw(requestParameters, initOverrides);
@@ -286,6 +287,10 @@ export class ProjectsApi extends runtime.BaseAPI {
 
         if (requestParameters.categoryIds) {
             queryParameters['categoryIds'] = requestParameters.categoryIds;
+        }
+
+        if (requestParameters.projectInstances !== undefined) {
+            queryParameters['projectInstances'] = requestParameters.projectInstances;
         }
 
         if (requestParameters.tagIds) {
@@ -361,8 +366,8 @@ export class ProjectsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectTags.');
         }
 
-        if (requestParameters.updateProjectTagsRequestModel === null || requestParameters.updateProjectTagsRequestModel === undefined) {
-            throw new runtime.RequiredError('updateProjectTagsRequestModel','Required parameter requestParameters.updateProjectTagsRequestModel was null or undefined when calling updateProjectTags.');
+        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
+            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateProjectTags.');
         }
 
         const queryParameters: any = {};
@@ -376,7 +381,7 @@ export class ProjectsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: UpdateProjectTagsRequestModelToJSON(requestParameters.updateProjectTagsRequestModel),
+            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

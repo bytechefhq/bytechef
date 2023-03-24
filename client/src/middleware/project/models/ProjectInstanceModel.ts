@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ConnectionModel } from './ConnectionModel';
+import {
+    ConnectionModelFromJSON,
+    ConnectionModelFromJSONTyped,
+    ConnectionModelToJSON,
+} from './ConnectionModel';
 import type { ProjectModel } from './ProjectModel';
 import {
     ProjectModelFromJSON,
@@ -33,11 +39,29 @@ import {
  */
 export interface ProjectInstanceModel {
     /**
-     * The configuration of an project instance.
+     * The configuration parameters of an project instance used as workflow input values.
      * @type {{ [key: string]: object; }}
      * @memberof ProjectInstanceModel
      */
-    _configuration?: { [key: string]: object; };
+    configurationParameters?: { [key: string]: object; };
+    /**
+     * The ids of connections used by a project instance.
+     * @type {Array<number>}
+     * @memberof ProjectInstanceModel
+     */
+    connectionIds?: Array<number>;
+    /**
+     * The connections used by a project instance.
+     * @type {Array<ConnectionModel>}
+     * @memberof ProjectInstanceModel
+     */
+    readonly connections?: Array<ConnectionModel>;
+    /**
+     * The description of a project instance.
+     * @type {string}
+     * @memberof ProjectInstanceModel
+     */
+    description?: string;
     /**
      * The created by.
      * @type {string}
@@ -57,17 +81,11 @@ export interface ProjectInstanceModel {
      */
     readonly id?: number;
     /**
-     * The name of a project instance.
-     * @type {string}
+     * The last execution date of a project instance.
+     * @type {Date}
      * @memberof ProjectInstanceModel
      */
-    name: string;
-    /**
-     * 
-     * @type {ProjectModel}
-     * @memberof ProjectInstanceModel
-     */
-    project?: ProjectModel;
+    lastExecutionDate?: Date;
     /**
      * The last modified by.
      * @type {string}
@@ -81,6 +99,30 @@ export interface ProjectInstanceModel {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * The name of a project instance.
+     * @type {string}
+     * @memberof ProjectInstanceModel
+     */
+    name: string;
+    /**
+     * 
+     * @type {ProjectModel}
+     * @memberof ProjectInstanceModel
+     */
+    project?: ProjectModel;
+    /**
+     * Th id of a project.
+     * @type {number}
+     * @memberof ProjectInstanceModel
+     */
+    projectId?: number;
+    /**
+     * The status of a project instance.
+     * @type {string}
+     * @memberof ProjectInstanceModel
+     */
+    status?: ProjectInstanceModelStatusEnum;
+    /**
      * 
      * @type {Array<TagModel>}
      * @memberof ProjectInstanceModel
@@ -93,6 +135,17 @@ export interface ProjectInstanceModel {
      */
     version?: number;
 }
+
+
+/**
+ * @export
+ */
+export const ProjectInstanceModelStatusEnum = {
+    Disabled: 'DISABLED',
+    Enabled: 'ENABLED'
+} as const;
+export type ProjectInstanceModelStatusEnum = typeof ProjectInstanceModelStatusEnum[keyof typeof ProjectInstanceModelStatusEnum];
+
 
 /**
  * Check if a given object implements the ProjectInstanceModel interface.
@@ -114,14 +167,20 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        '_configuration': !exists(json, 'configuration') ? undefined : json['configuration'],
+        'configurationParameters': !exists(json, 'configurationParameters') ? undefined : json['configurationParameters'],
+        'connectionIds': !exists(json, 'connectionIds') ? undefined : json['connectionIds'],
+        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ConnectionModelFromJSON)),
+        'description': !exists(json, 'description') ? undefined : json['description'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'name': json['name'],
-        'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
+        'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'name': json['name'],
+        'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
+        'projectId': !exists(json, 'projectId') ? undefined : json['projectId'],
+        'status': !exists(json, 'status') ? undefined : json['status'],
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': !exists(json, '__version') ? undefined : json['__version'],
     };
@@ -136,9 +195,14 @@ export function ProjectInstanceModelToJSON(value?: ProjectInstanceModel | null):
     }
     return {
         
-        'configuration': value._configuration,
+        'configurationParameters': value.configurationParameters,
+        'connectionIds': value.connectionIds,
+        'description': value.description,
+        'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
         'name': value.name,
         'project': ProjectModelToJSON(value.project),
+        'projectId': value.projectId,
+        'status': value.status,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         '__version': value.version,
     };

@@ -50,7 +50,7 @@ export interface PageModel {
      */
     totalElements?: number;
     /**
-     * A list of elements.
+     * The list of elements.
      * @type {Array<object>}
      * @memberof PageModel
      */

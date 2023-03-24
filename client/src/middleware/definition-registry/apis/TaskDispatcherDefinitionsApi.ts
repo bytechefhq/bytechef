@@ -22,10 +22,87 @@ import {
     TaskDispatcherDefinitionModelToJSON,
 } from '../models';
 
+export interface GetTaskDispatcherDefinitionRequest {
+    taskDispatcherName: string;
+    taskDispatcherVersion: number;
+}
+
+export interface GetTaskDispatcherDefinitionVersionsRequest {
+    taskDispatcherName: string;
+}
+
 /**
  * 
  */
 export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
+
+    /**
+     * Get a task dispatcher definition.
+     * Get a task dispatcher definition.
+     */
+    async getTaskDispatcherDefinitionRaw(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskDispatcherDefinitionModel>> {
+        if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
+            throw new runtime.RequiredError('taskDispatcherName','Required parameter requestParameters.taskDispatcherName was null or undefined when calling getTaskDispatcherDefinition.');
+        }
+
+        if (requestParameters.taskDispatcherVersion === null || requestParameters.taskDispatcherVersion === undefined) {
+            throw new runtime.RequiredError('taskDispatcherVersion','Required parameter requestParameters.taskDispatcherVersion was null or undefined when calling getTaskDispatcherDefinition.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters.taskDispatcherName))).replace(`{${"taskDispatcherVersion"}}`, encodeURIComponent(String(requestParameters.taskDispatcherVersion))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TaskDispatcherDefinitionModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Get a task dispatcher definition.
+     * Get a task dispatcher definition.
+     */
+    async getTaskDispatcherDefinition(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskDispatcherDefinitionModel> {
+        const response = await this.getTaskDispatcherDefinitionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get all task dispatcher definition versions of a task dispatcher definition.
+     * Get all task dispatcher definition versions of a component definition.
+     */
+    async getTaskDispatcherDefinitionVersionsRaw(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionModel>>> {
+        if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
+            throw new runtime.RequiredError('taskDispatcherName','Required parameter requestParameters.taskDispatcherName was null or undefined when calling getTaskDispatcherDefinitionVersions.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/task-dispatcher-definitions/{taskDispatcherName}`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters.taskDispatcherName))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskDispatcherDefinitionModelFromJSON));
+    }
+
+    /**
+     * Get all task dispatcher definition versions of a task dispatcher definition.
+     * Get all task dispatcher definition versions of a component definition.
+     */
+    async getTaskDispatcherDefinitionVersions(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionModel>> {
+        const response = await this.getTaskDispatcherDefinitionVersionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get all task dispatcher definitions.

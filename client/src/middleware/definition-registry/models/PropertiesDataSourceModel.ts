@@ -20,7 +20,7 @@ import { exists, mapValues } from '../runtime';
  */
 export interface PropertiesDataSourceModel {
     /**
-     * A list of property names on which value change the properties should load/reload.
+     * The list of property names on which value change the properties should load/reload.
      * @type {Array<string>}
      * @memberof PropertiesDataSourceModel
      */

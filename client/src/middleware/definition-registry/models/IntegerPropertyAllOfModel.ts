@@ -45,7 +45,7 @@ export interface IntegerPropertyAllOfModel {
      */
     minValue?: number;
     /**
-     * A list of valid property options.
+     * The list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof IntegerPropertyAllOfModel
      */
