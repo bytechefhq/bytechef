@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:14.422631+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.067916+02:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -42,9 +42,9 @@ public class JobModel {
   @JsonProperty("currentTask")
   private Integer currentTask;
 
-  @JsonProperty("endTime")
+  @JsonProperty("endDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime endTime;
+  private LocalDateTime endDate;
 
   @JsonProperty("error")
   private ExecutionErrorModel error;
@@ -76,9 +76,9 @@ public class JobModel {
   @JsonProperty("priority")
   private Integer priority;
 
-  @JsonProperty("startTime")
+  @JsonProperty("startDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime startTime;
+  private LocalDateTime startDate;
 
   /**
    * The job's status.
@@ -188,23 +188,23 @@ public class JobModel {
     this.currentTask = currentTask;
   }
 
-  public JobModel endTime(LocalDateTime endTime) {
-    this.endTime = endTime;
+  public JobModel endDate(LocalDateTime endDate) {
+    this.endDate = endDate;
     return this;
   }
 
   /**
    * The time execution entered end status COMPLETED, STOPPED, FAILED
-   * @return endTime
+   * @return endDate
   */
   @Valid 
-  @Schema(name = "endTime", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public LocalDateTime getEndTime() {
-    return endTime;
+  @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public LocalDateTime getEndDate() {
+    return endDate;
   }
 
-  public void setEndTime(LocalDateTime endTime) {
-    this.endTime = endTime;
+  public void setEndDate(LocalDateTime endDate) {
+    this.endDate = endDate;
   }
 
   public JobModel error(ExecutionErrorModel error) {
@@ -394,23 +394,23 @@ public class JobModel {
     this.priority = priority;
   }
 
-  public JobModel startTime(LocalDateTime startTime) {
-    this.startTime = startTime;
+  public JobModel startDate(LocalDateTime startDate) {
+    this.startDate = startDate;
     return this;
   }
 
   /**
    * The time of when the job began.
-   * @return startTime
+   * @return startDate
   */
   @Valid 
-  @Schema(name = "startTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.REQUIRED)
-  public LocalDateTime getStartTime() {
-    return startTime;
+  @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.REQUIRED)
+  public LocalDateTime getStartDate() {
+    return startDate;
   }
 
-  public void setStartTime(LocalDateTime startTime) {
-    this.startTime = startTime;
+  public void setStartDate(LocalDateTime startDate) {
+    this.startDate = startDate;
   }
 
   public JobModel status(StatusEnum status) {
@@ -446,11 +446,11 @@ public class JobModel {
   }
 
   /**
-   * A list of the webhooks configured.
+   * The list of the webhooks configured.
    * @return webhooks
   */
   @Valid 
-  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "A list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<Map<String, Object>> getWebhooks() {
     return webhooks;
   }
@@ -490,7 +490,7 @@ public class JobModel {
     return Objects.equals(this.createdBy, job.createdBy) &&
         Objects.equals(this.createdDate, job.createdDate) &&
         Objects.equals(this.currentTask, job.currentTask) &&
-        Objects.equals(this.endTime, job.endTime) &&
+        Objects.equals(this.endDate, job.endDate) &&
         Objects.equals(this.error, job.error) &&
         Objects.equals(this.id, job.id) &&
         Objects.equals(this.inputs, job.inputs) &&
@@ -500,7 +500,7 @@ public class JobModel {
         Objects.equals(this.outputs, job.outputs) &&
         Objects.equals(this.parentTaskExecutionId, job.parentTaskExecutionId) &&
         Objects.equals(this.priority, job.priority) &&
-        Objects.equals(this.startTime, job.startTime) &&
+        Objects.equals(this.startDate, job.startDate) &&
         Objects.equals(this.status, job.status) &&
         Objects.equals(this.webhooks, job.webhooks) &&
         Objects.equals(this.workflowId, job.workflowId);
@@ -508,7 +508,7 @@ public class JobModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, currentTask, endTime, error, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, parentTaskExecutionId, priority, startTime, status, webhooks, workflowId);
+    return Objects.hash(createdBy, createdDate, currentTask, endDate, error, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, parentTaskExecutionId, priority, startDate, status, webhooks, workflowId);
   }
 
   @Override
@@ -518,7 +518,7 @@ public class JobModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    currentTask: ").append(toIndentedString(currentTask)).append("\n");
-    sb.append("    endTime: ").append(toIndentedString(endTime)).append("\n");
+    sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
@@ -528,7 +528,7 @@ public class JobModel {
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
     sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
-    sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
+    sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    webhooks: ").append(toIndentedString(webhooks)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");

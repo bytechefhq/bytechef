@@ -20,11 +20,11 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createIntegrationWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:19.439912+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T18:32:20.850700+02:00[Europe/Zagreb]")
 public class CreateIntegrationWorkflowRequestModel {
 
-  @JsonProperty("name")
-  private String name;
+  @JsonProperty("label")
+  private String label;
 
   @JsonProperty("description")
   private String description;
@@ -32,23 +32,23 @@ public class CreateIntegrationWorkflowRequestModel {
   @JsonProperty("definition")
   private String definition;
 
-  public CreateIntegrationWorkflowRequestModel name(String name) {
-    this.name = name;
+  public CreateIntegrationWorkflowRequestModel label(String label) {
+    this.label = label;
     return this;
   }
 
   /**
-   * The workflow name.
-   * @return name
+   * The descriptive name for a workflow.
+   * @return label
   */
   @NotNull 
-  @Schema(name = "name", description = "The workflow name.", requiredMode = Schema.RequiredMode.REQUIRED)
-  public String getName() {
-    return name;
+  @Schema(name = "label", description = "The descriptive name for a workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
+  public String getLabel() {
+    return label;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public CreateIntegrationWorkflowRequestModel description(String description) {
@@ -98,21 +98,21 @@ public class CreateIntegrationWorkflowRequestModel {
       return false;
     }
     CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequest = (CreateIntegrationWorkflowRequestModel) o;
-    return Objects.equals(this.name, createIntegrationWorkflowRequest.name) &&
+    return Objects.equals(this.label, createIntegrationWorkflowRequest.label) &&
         Objects.equals(this.description, createIntegrationWorkflowRequest.description) &&
         Objects.equals(this.definition, createIntegrationWorkflowRequest.definition);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, description, definition);
+    return Objects.hash(label, description, definition);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class CreateIntegrationWorkflowRequestModel {\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("}");
