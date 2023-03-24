@@ -189,12 +189,14 @@ const Project: React.FC = () => {
                     />
                 }
                 leftSidebarBody={
-                    {components && !!flowControls && (
-                        <LeftSidebar
-                            data={{components, flowControls}}
-                            filter={filter}
-                        />
-                    )}
+                    <>
+                        {components && !!flowControls && (
+                            <LeftSidebar
+                                data={{components, flowControls}}
+                                filter={filter}
+                            />
+                        )}
+                    </>
                 }
                 leftSidebarOpen={leftSidebarOpen}
             >
