@@ -133,7 +133,7 @@ const Project: React.FC = () => {
                         <h1 className="mr-6 py-4 pr-4">{project?.name}</h1>
 
                         <div className="my-4 mx-2 flex rounded-md border border-gray-100 bg-white">
-                            {currentWorkflow && projectWorkflows && (
+                            {currentWorkflow && !!projectWorkflows && (
                                 <Select
                                     defaultValue={workflowId}
                                     onValueChange={(value) => {
@@ -189,25 +189,21 @@ const Project: React.FC = () => {
                     />
                 }
                 leftSidebarBody={
-                    <>
-                        {components && flowControls && (
-                            <LeftSidebar
-                                data={{components, flowControls}}
-                                filter={filter}
-                            />
-                        )}
-                    </>
+                    {components && !!flowControls && (
+                        <LeftSidebar
+                            data={{components, flowControls}}
+                            filter={filter}
+                        />
+                    )}
                 }
                 leftSidebarOpen={leftSidebarOpen}
             >
-                <>
-                    {components && flowControls && (
-                        <WorkflowEditor
-                            components={components}
-                            flowControls={flowControls}
-                        />
-                    )}
-                </>
+                {components && !!flowControls && (
+                    <WorkflowEditor
+                        components={components}
+                        flowControls={flowControls}
+                    />
+                )}
             </LayoutContainer>
         </PageLoader>
     );
