@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:14.422631+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.067916+02:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("createdBy")
@@ -41,6 +41,9 @@ public class WorkflowModel {
 
   @JsonProperty("definition")
   private String definition;
+
+  @JsonProperty("description")
+  private String description;
 
   @JsonProperty("format")
   private WorkflowFormatModel format;
@@ -162,17 +165,36 @@ public class WorkflowModel {
   }
 
   /**
-   * Get definition
+   * The definition of a workflow.
    * @return definition
   */
   
-  @Schema(name = "definition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDefinition() {
     return definition;
   }
 
   public void setDefinition(String definition) {
     this.definition = definition;
+  }
+
+  public WorkflowModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The description of a workflow.
+   * @return description
+  */
+  
+  @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public WorkflowModel format(WorkflowFormatModel format) {
@@ -420,6 +442,7 @@ public class WorkflowModel {
     return Objects.equals(this.createdBy, workflow.createdBy) &&
         Objects.equals(this.createdDate, workflow.createdDate) &&
         Objects.equals(this.definition, workflow.definition) &&
+        Objects.equals(this.description, workflow.description) &&
         Objects.equals(this.format, workflow.format) &&
         Objects.equals(this.id, workflow.id) &&
         Objects.equals(this.inputs, workflow.inputs) &&
@@ -435,7 +458,7 @@ public class WorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, definition, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, retry, tasks, version);
+    return Objects.hash(createdBy, createdDate, definition, description, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, retry, tasks, version);
   }
 
   @Override
@@ -445,6 +468,7 @@ public class WorkflowModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    format: ").append(toIndentedString(format)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");

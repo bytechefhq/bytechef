@@ -62,7 +62,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.955206+02:00[Europe/Zagreb]")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @JsonProperty("additionalProperties")
@@ -211,11 +211,11 @@ public class ObjectPropertyModel extends ValuePropertyModel {
   }
 
   /**
-   * A list of valid object property types.
+   * The list of valid object property types.
    * @return properties
   */
   @Valid 
-  @Schema(name = "properties", description = "A list of valid object property types.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "properties", description = "The list of valid object property types.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getProperties() {
     return properties;
   }

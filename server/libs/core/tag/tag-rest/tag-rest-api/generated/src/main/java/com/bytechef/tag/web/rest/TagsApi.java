@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:20.007025+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-24T06:34:54.706604+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "tags", description = "the tags API")
 public interface TagsApi {
@@ -158,7 +158,7 @@ public interface TagsApi {
      * GET /tags : Get all tags.
      * Get all tags.
      *
-     * @return A list of tags. (status code 200)
+     * @return The list of tags. (status code 200)
      */
     @Operation(
         operationId = "getTags",
@@ -166,7 +166,7 @@ public interface TagsApi {
         description = "Get all tags.",
         tags = { "tags" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of tags.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
             })
         }

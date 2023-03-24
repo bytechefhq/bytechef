@@ -7,7 +7,7 @@ package com.bytechef.dione.integration.web.rest;
 
 import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
-import com.bytechef.dione.integration.web.rest.model.UpdateIntegrationTagsRequestModel;
+import com.bytechef.dione.integration.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:19.439912+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T18:32:20.850700+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "the integrations API")
 public interface IntegrationsApi {
@@ -99,7 +99,7 @@ public interface IntegrationsApi {
         tags = { "integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.atlas.web.rest.model.WorkflowModel.class))
             })
         }
     )
@@ -109,7 +109,7 @@ public interface IntegrationsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<IntegrationModel>> createIntegrationWorkflow(
+    default Mono<ResponseEntity<com.bytechef.atlas.web.rest.model.WorkflowModel>> createIntegrationWorkflow(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "CreateIntegrationWorkflowRequestModel", description = "", required = true) @Valid @RequestBody Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
@@ -118,7 +118,7 @@ public interface IntegrationsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"workflowIds\" : [ \"workflowIds\", \"workflowIds\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"integrationVersion\" : 6, \"id\" : 0, \"publishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"category\" : { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, \"status\" : \"PUBLISHED\" }";
+                String exampleString = "{ \"outputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"retry\" : 0, \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" } ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -231,7 +231,7 @@ public interface IntegrationsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "[ { \"outputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"label\" : \"label\", \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"retry\" : 0, \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" } ] }, { \"outputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"label\" : \"label\", \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"retry\" : 0, \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" } ] } ]";
+                String exampleString = "[ { \"outputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"retry\" : 0, \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" } ] }, { \"outputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"key\" : \"{}\" }, { \"key\" : \"{}\" } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"retry\" : 0, \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" } ] } ]";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -245,8 +245,8 @@ public interface IntegrationsApi {
      * GET /integrations : Get integrations.
      * Get integrations.
      *
-     * @param categoryIds A list of the category ids used for filtering integrations. (optional)
-     * @param tagIds A list of tag ids of used for filtering integrations. (optional)
+     * @param categoryIds The list of the category ids used for filtering integrations. (optional)
+     * @param tagIds The list of tag ids of used for filtering integrations. (optional)
      * @return A list of integrations. (status code 200)
      */
     @Operation(
@@ -266,8 +266,8 @@ public interface IntegrationsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(
-        @Parameter(name = "categoryIds", description = "A list of the category ids used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
-        @Parameter(name = "tagIds", description = "A list of tag ids of used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
+        @Parameter(name = "categoryIds", description = "The list of the category ids used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+        @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -333,7 +333,7 @@ public interface IntegrationsApi {
      * Updates tags of an existing integration.
      *
      * @param id The id of an integration. (required)
-     * @param updateIntegrationTagsRequestModel  (required)
+     * @param updateTagsRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -352,12 +352,12 @@ public interface IntegrationsApi {
     )
     default Mono<ResponseEntity<Void>> updateIntegrationTags(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateIntegrationTagsRequestModel", description = "", required = true) @Valid @RequestBody Mono<UpdateIntegrationTagsRequestModel> updateIntegrationTagsRequestModel,
+        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody Mono<UpdateTagsRequestModel> updateTagsRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(updateIntegrationTagsRequestModel).then(Mono.empty());
+        return result.then(updateTagsRequestModel).then(Mono.empty());
 
     }
 

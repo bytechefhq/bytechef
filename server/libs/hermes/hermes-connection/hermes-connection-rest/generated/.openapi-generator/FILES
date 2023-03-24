@@ -1,9 +1,0 @@
-README.md
-pom.xml
-src/main/java/com/bytechef/hermes/connection/web/rest/ApiUtil.java
-src/main/java/com/bytechef/hermes/connection/web/rest/ConnectionsApi.java
-src/main/java/com/bytechef/hermes/connection/web/rest/Oauth2PropertiesApi.java
-src/main/java/com/bytechef/hermes/connection/web/rest/model/ConnectionModel.java
-src/main/java/com/bytechef/hermes/connection/web/rest/model/OAuth2AuthorizationParametersModel.java
-src/main/java/com/bytechef/hermes/connection/web/rest/model/OAuth2PropertiesModel.java
-src/main/java/com/bytechef/hermes/connection/web/rest/model/UpdateConnectionTagsRequestModel.java
