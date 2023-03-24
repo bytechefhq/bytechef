@@ -74,7 +74,7 @@ paths:
       description: "Get connection definition for a component."
       summary: "Get connection definition for a component."
       tags:
-      - "connection-definitions"
+      - "component-definitions"
       operationId: "getComponentConnectionDefinition"
       parameters:
       - name: "componentName"
@@ -101,7 +101,7 @@ paths:
       description: "Get all compatible connection definitions for a component."
       summary: "Get all compatible connection definitions for a component."
       tags:
-      - "connection-definitions"
+      - "component-definitions"
       operationId: "getComponentConnectionDefinitions"
       parameters:
       - name: "componentName"
@@ -134,7 +134,7 @@ paths:
       operationId: "getComponentDefinitionVersions"
       parameters:
       - name: "componentName"
-        description: "The name of the component to get."
+        description: "The name of a component to get."
         required: true
         in: "path"
         schema:
@@ -157,13 +157,13 @@ paths:
       operationId: "getComponentDefinition"
       parameters:
       - name: "componentName"
-        description: "The name of the component to get."
+        description: "The name of a component to get."
         required: true
         in: "path"
         schema:
           type: "string"
       - name: "componentVersion"
-        description: "The version of the component to get."
+        description: "The version of a component to get."
         required: true
         in: "path"
         schema:
@@ -207,6 +207,57 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/TaskDispatcherDefinition"
+  /task-dispatcher-definitions/{taskDispatcherName}:
+    get:
+      description: "Get all task dispatcher definition versions of a task dispatcher\
+        \ definition."
+      summary: "Get all task dispatcher definition versions of a component definition."
+      tags:
+      - "task-dispatcher-definitions"
+      operationId: "getTaskDispatcherDefinitionVersions"
+      parameters:
+      - name: "taskDispatcherName"
+        description: "The name of a task dispatcher to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TaskDispatcherDefinition"
+  /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}:
+    get:
+      description: "Get a task dispatcher definition."
+      summary: "Get a task dispatcher definition."
+      tags:
+      - "task-dispatcher-definitions"
+      operationId: "getTaskDispatcherDefinition"
+      parameters:
+      - name: "taskDispatcherName"
+        description: "The name of a task dispatcher to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "taskDispatcherVersion"
+        description: "The version of a task dispatcher to get."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskDispatcherDefinition"
 components:
   schemas:
     ActionDefinition:
@@ -231,7 +282,7 @@ components:
           items:
             $ref: "#/components/schemas/Property"
         properties:
-          description: "A list of action properties."
+          description: "The list of action properties."
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
@@ -267,7 +318,7 @@ components:
             description: "If the array can contain multiple items."
             type: "boolean"
           options:
-            description: "A list of valid property options."
+            description: "The list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -315,7 +366,7 @@ components:
       type: "object"
       properties:
         actions:
-          description: "A list of all available actions the component can perform."
+          description: "The list of all available actions the component can perform."
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinition"
@@ -362,7 +413,7 @@ components:
       - "version"
       properties:
         actions:
-          description: "A list of all available actions the component can perform."
+          description: "The list of all available actions the component can perform."
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinitionBasic"
@@ -444,7 +495,7 @@ components:
       - type: "object"
         properties:
           options:
-            description: "A list of valid property options."
+            description: "The list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -458,7 +509,7 @@ components:
       - type: "object"
         properties:
           options:
-            description: "A list of valid property options."
+            description: "The list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -515,7 +566,7 @@ components:
             type: "integer"
             format: "int32"
           options:
-            description: "A list of valid property options."
+            description: "The list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -541,7 +592,7 @@ components:
             type: "integer"
             format: "int32"
           options:
-            description: "A list of valid property options."
+            description: "The list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -573,7 +624,7 @@ components:
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
           properties:
-            description: "A list of valid object property types."
+            description: "The list of valid object property types."
             type: "array"
             items:
               $ref: "#/components/schemas/Property"
@@ -611,7 +662,7 @@ components:
       type: "object"
       properties:
         loadOptionsDependsOn:
-          description: "A list of property names on which value change the property\
+          description: "The list of property names on which value change the property\
             \ options should load/reload."
           type: "array"
           items:
@@ -621,7 +672,7 @@ components:
       type: "object"
       properties:
         loadPropertiesDependsOn:
-          description: "A list of property names on which value change the properties\
+          description: "The list of property names on which value change the properties\
             \ should load/reload."
           type: "array"
           items:
@@ -710,7 +761,7 @@ components:
       - type: "object"
         properties:
           options:
-            description: "A list of valid property options."
+            description: "The list of valid property options."
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
@@ -732,7 +783,7 @@ components:
           items:
             $ref: "#/components/schemas/Property"
         properties:
-          description: "A list of task dispatcher properties."
+          description: "The list of task dispatcher properties."
           type: "array"
           items:
             $ref: "#/components/schemas/Property"

@@ -6,6 +6,23 @@ info:
 servers:
 - url: "http://localhost:5173/api"
 paths:
+  /connection-tags:
+    get:
+      description: "Get connection tags."
+      summary: "Get connection tags."
+      tags:
+      - "connection-tags"
+      operationId: "getConnectionTags"
+      responses:
+        "200":
+          description: "A list of connection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "../../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
   /connections:
     get:
       description: "Get connections."
@@ -15,7 +32,7 @@ paths:
       operationId: "getConnections"
       parameters:
       - name: "componentNames"
-        description: "A list of component names used for filtering connections."
+        description: "The list of component names used for filtering connections."
         in: "query"
         required: false
         schema:
@@ -23,7 +40,7 @@ paths:
           items:
             type: "string"
       - name: "tagIds"
-        description: "A list of tag ids of used for filtering connections."
+        description: "The list of tag ids of used for filtering connections."
         in: "query"
         required: false
         schema:
@@ -79,23 +96,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OAuth2AuthorizationParameters"
-  /connections/tags:
-    get:
-      description: "Get connection tags."
-      summary: "Get connection tags."
-      tags:
-      - "connections"
-      operationId: "getConnectionTags"
-      responses:
-        "200":
-          description: "A list of connection tags."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of tags."
-                type: "array"
-                items:
-                  $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
   /connections/{id}:
     delete:
       description: "Delete a connection."
@@ -181,13 +181,7 @@ paths:
         content:
           application/json:
             schema:
-              description: "The request object that contains the array of tags."
-              type: "object"
-              properties:
-                tags:
-                  type: "array"
-                  items:
-                    $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+              $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
         "200":
@@ -266,7 +260,7 @@ components:
         tags:
           type: "array"
           items:
-            $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+            $ref: "../../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         __version:
           type: "integer"
           format: "int32"
@@ -287,8 +281,16 @@ components:
           type: "string"
           readOnly: true
         predefinedApps:
-          description: "A list of predefined OAuth2 apps."
+          description: "The list of predefined OAuth2 apps."
           type: "array"
           readOnly: true
           items:
             type: "string"
+    UpdateTagsRequest:
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
