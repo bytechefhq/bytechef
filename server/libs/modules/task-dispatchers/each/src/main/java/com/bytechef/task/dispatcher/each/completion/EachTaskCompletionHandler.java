@@ -77,7 +77,7 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         if (subTasksLeft == 0) {
             TaskExecution eachTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-            eachTaskExecution.setEndTime(LocalDateTime.now());
+            eachTaskExecution.setEndDate(LocalDateTime.now());
 
             taskCompletionHandler.handle(eachTaskExecution);
             counterService.delete(taskExecution.getParentId());

@@ -83,7 +83,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         List<Object> list = MapValueUtils.getList(
             taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
-        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskStatus.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
@@ -110,8 +110,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
-            taskExecution.setStartTime(LocalDateTime.now());
-            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setStartDate(LocalDateTime.now());
+            taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, taskExecution);

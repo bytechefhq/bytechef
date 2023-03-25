@@ -127,7 +127,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the If
         else {
-            ifTaskExecution.setEndTime(LocalDateTime.now());
+            ifTaskExecution.setEndDate(LocalDateTime.now());
 
             taskCompletionHandler.handle(ifTaskExecution);
         }

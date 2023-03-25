@@ -104,7 +104,7 @@ public class JobServiceRSocketClient implements JobService {
 
     @Override
     public Page<Job> searchJobs(
-        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber) {
 
         throw new UnsupportedOperationException();

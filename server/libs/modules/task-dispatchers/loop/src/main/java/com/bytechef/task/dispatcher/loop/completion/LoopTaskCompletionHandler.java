@@ -124,7 +124,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
-            loopTaskExecution.setEndTime(LocalDateTime.now());
+            loopTaskExecution.setEndDate(LocalDateTime.now());
 
             taskCompletionHandler.handle(loopTaskExecution);
         }

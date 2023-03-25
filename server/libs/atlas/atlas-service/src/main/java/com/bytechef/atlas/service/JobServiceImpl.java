@@ -28,7 +28,6 @@ import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -151,11 +150,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Page<Job> searchJobs(
-        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber) {
 
         return jobRepository.findAll(
-            status, startTime, endTime, workflowId, workflowIds,
+            status, startDate, endDate, workflowId, workflowIds,
             PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
 //        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
     }
@@ -166,7 +165,7 @@ public class JobServiceImpl implements JobService {
             .orElseThrow(IllegalArgumentException::new);
 
         job.setCurrentTask(0);
-        job.setStartTime(new Date());
+        job.setStartDate(LocalDateTime.now());
         job.setStatus(Job.Status.STARTED);
 
         jobRepository.save(job);

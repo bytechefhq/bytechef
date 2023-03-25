@@ -35,11 +35,11 @@ import org.springframework.stereotype.Repository;
 public interface JdbcJobRepository extends PagingAndSortingRepository<Job, Long>, JobRepository, CustomJobRepository {
 
     @Override
-    @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_time >= current_date-1 AND end_time < current_date")
+    @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_date >= current_date-1 AND end_date < current_date")
     int countCompletedJobsYesterday();
 
     @Override
-    @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_time >= current_date")
+    @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_date >= current_date")
     int countCompletedJobsToday();
 
     @Override
