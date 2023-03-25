@@ -17,8 +17,11 @@
 
 package com.bytechef.commons.util;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Date;
 
 /**
  * @author Ivica Cardic
@@ -26,6 +29,12 @@ import java.time.ZoneId;
 public final class LocalDateTimeUtils {
 
     private LocalDateTimeUtils() {
+    }
+
+    public static LocalDateTime getLocalDateTime(Date date) {
+        Instant instant = Instant.ofEpochMilli(date.getTime());
+
+        return LocalDateTime.ofInstant(instant, ZoneOffset.systemDefault());
     }
 
     public static long getTime(LocalDateTime localDateTime) {

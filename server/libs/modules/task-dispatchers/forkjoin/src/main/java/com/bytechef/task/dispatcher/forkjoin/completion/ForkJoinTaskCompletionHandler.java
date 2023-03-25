@@ -141,7 +141,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             long branchesLeft = counterService.decrement(taskExecution.getParentId());
 
             if (branchesLeft == 0) {
-                forkJoinTaskExecution.setEndTime(LocalDateTime.now());
+                forkJoinTaskExecution.setEndDate(LocalDateTime.now());
 
                 taskCompletionHandler.handle(forkJoinTaskExecution);
             }

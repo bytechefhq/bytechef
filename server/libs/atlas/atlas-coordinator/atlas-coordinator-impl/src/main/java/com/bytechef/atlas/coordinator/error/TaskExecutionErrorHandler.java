@@ -32,7 +32,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
-import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -73,7 +73,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
         // set task status to FAILED and persist
 
-        taskExecution.setEndTime(LocalDateTime.now());
+        taskExecution.setEndDate(LocalDateTime.now());
         taskExecution.setStatus(TaskStatus.FAILED);
 
         taskExecution = taskExecutionService.update(taskExecution);
@@ -93,7 +93,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             while (taskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
                 taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-                taskExecution.setEndTime(LocalDateTime.now());
+                taskExecution.setEndDate(LocalDateTime.now());
                 taskExecution.setStatus(TaskStatus.FAILED);
 
                 taskExecution = taskExecutionService.update(taskExecution);
@@ -104,7 +104,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             Assert.notNull(job, String.format("No job found for task %s ", taskExecution.getId()));
 
             job.setStatus(Job.Status.FAILED);
-            job.setEndTime(new Date());
+            job.setEndDate(LocalDateTime.now());
 
             jobService.update(job);
 

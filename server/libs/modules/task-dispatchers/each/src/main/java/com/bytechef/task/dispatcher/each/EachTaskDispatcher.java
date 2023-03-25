@@ -86,14 +86,14 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         Map<String, Object> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
         List<Object> list = MapValueUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
-        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskStatus.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
         if (list.isEmpty()) {
-            taskExecution.setStartTime(LocalDateTime.now());
-            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setStartDate(LocalDateTime.now());
+            taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, taskExecution);

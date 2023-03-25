@@ -70,8 +70,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     @Column("current_task")
     private int currentTask = -1;
 
-    @Column("end_time")
-    private Date endTime;
+    @Column("end_date")
+    private LocalDateTime endDate;
 
     @Column("error")
     private ExecutionError error;
@@ -101,8 +101,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     private int priority = Prioritizable.DEFAULT_PRIORITY;
 
-    @Column("start_time")
-    private Date startTime;
+    @Column("start_date")
+    private LocalDateTime startDate;
 
     @Column
     private Status status;
@@ -175,8 +175,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
      *
      * @return {@link Date}
      */
-    public Date getEndTime() {
-        return endTime;
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
     /**
@@ -225,8 +225,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
      *
      * @return {@link Date}
      */
-    public Date getStartTime() {
-        return startTime;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
     @Override
@@ -282,8 +282,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         this.currentTask = currentTask;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
     }
 
     public void setError(ExecutionError error) {
@@ -316,8 +316,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         this.priority = priority;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
     public void setStatus(Status status) {
@@ -338,9 +338,9 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
             + id + ", workflowId='"
             + workflowId + '\'' + ", status="
             + status + ", label='"
-            + label + '\'' + ", startTime="
-            + startTime + ", endTime="
-            + endTime + ", inputs="
+            + label + '\'' + ", startDate="
+            + startDate + ", endDate="
+            + endDate + ", inputs="
             + inputs + ", outputs="
             + outputs + ", webhooks="
             + webhooks + ", error="

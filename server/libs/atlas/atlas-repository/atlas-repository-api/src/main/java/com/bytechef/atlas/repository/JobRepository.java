@@ -48,7 +48,7 @@ public interface JobRepository {
     Page<Job> findAll(Pageable pageable);
 
     Page<Job> findAll(
-        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Pageable pageable);
 
     Optional<Job> findById(Long id);

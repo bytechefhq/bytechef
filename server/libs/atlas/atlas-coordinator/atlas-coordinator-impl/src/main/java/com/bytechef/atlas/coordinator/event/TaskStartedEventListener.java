@@ -72,8 +72,8 @@ public class TaskStartedEventListener implements EventListener {
             if (taskExecution.getStatus() == TaskStatus.CANCELLED || job.getStatus() != Job.Status.STARTED) {
                 taskDispatcher.dispatch(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId()));
             } else {
-                if (taskExecution.getStartTime() == null && taskExecution.getStatus() != TaskStatus.STARTED) {
-                    taskExecution.setStartTime(workflowEvent.getCreatedDate());
+                if (taskExecution.getStartDate() == null && taskExecution.getStatus() != TaskStatus.STARTED) {
+                    taskExecution.setStartDate(workflowEvent.getCreatedDate());
                     taskExecution.setStatus(TaskStatus.STARTED);
 
                     taskExecution = taskExecutionService.update(taskExecution);

@@ -35,7 +35,8 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.MapValueUtils;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +142,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         }
 
         job.setStatus(Job.Status.COMPLETED);
-        job.setEndTime(new Date());
+        job.setEndDate(LocalDateTime.now());
         job.setCurrentTask(-1);
 
         TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(

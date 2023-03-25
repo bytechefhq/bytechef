@@ -103,7 +103,7 @@ public class Coordinator {
         if (taskExecutions.size() > 0) {
             TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
 
-            currentTaskExecution.setEndTime(LocalDateTime.now());
+            currentTaskExecution.setEndDate(LocalDateTime.now());
             currentTaskExecution.setStatus(TaskStatus.CANCELLED);
 
             taskExecutionService.update(currentTaskExecution);

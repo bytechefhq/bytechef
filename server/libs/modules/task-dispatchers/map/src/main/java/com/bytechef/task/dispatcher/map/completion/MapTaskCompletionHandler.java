@@ -80,7 +80,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
                 .getParentTaskExecutions(taskExecution.getParentId());
             TaskExecution mapTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-            mapTaskExecution.setEndTime(LocalDateTime.now());
+            mapTaskExecution.setEndDate(LocalDateTime.now());
 
             mapTaskExecution.setOutput(
                 childTaskExecutions.stream()

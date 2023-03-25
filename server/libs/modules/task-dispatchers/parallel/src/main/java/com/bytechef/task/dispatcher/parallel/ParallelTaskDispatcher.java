@@ -85,8 +85,8 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 
         if (workflowTasks.isEmpty()) {
-            taskExecution.setStartTime(LocalDateTime.now());
-            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setStartDate(LocalDateTime.now());
+            taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, taskExecution);
