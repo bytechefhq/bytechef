@@ -18,7 +18,6 @@
 package com.bytechef.hermes.connection.domain;
 
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -42,9 +41,8 @@ public final class ConnectionTag implements Persistable<Long> {
     public ConnectionTag() {
     }
 
-    @SuppressFBWarnings("NP")
-    public ConnectionTag(Tag tag) {
-        this.tagId = tag.isNew() ? null : AggregateReference.to(tag.getId());
+    public ConnectionTag(Long tagId) {
+        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
     }
 
     @Override

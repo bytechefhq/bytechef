@@ -20,6 +20,7 @@ package com.bytechef.hermes.connection.facade;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
@@ -27,6 +28,7 @@ import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -57,12 +59,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Connection create(Connection connection) {
-        if (!CollectionUtils.isEmpty(connection.getTags())) {
-            connection.setTags(tagService.save(connection.getTags()));
-        }
+    public ConnectionDTO create(ConnectionDTO connectionDTO) {
+        Connection connection = connectionDTO.toConnection();
 
-        if (connection.getAuthorizationName() != null && connection.containsParameter(Authorization.CODE)) {
+        if (StringUtils.hasText(connection.getAuthorizationName()) &&
+            connection.containsParameter(Authorization.CODE)) {
+
             Authorization authorization = connectionDefinitionService.getAuthorization(
                 connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
@@ -83,7 +85,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             }
         }
 
-        return connectionService.create(connection);
+        List<Tag> tags = connectionDTO.tags();
+
+        if (!CollectionUtils.isEmpty(tags)) {
+            tags = tagService.save(tags);
+
+            connection.setTags(tags);
+        }
+
+        return new ConnectionDTO(connectionService.create(connection), tags);
     }
 
     @Override
@@ -99,17 +109,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public Connection getConnection(Long id) {
+    public ConnectionDTO getConnection(Long id) {
         Connection connection = connectionService.getConnection(id);
 
-        connection.setTags(tagService.getTags(connection.getTagIds()));
-
-        return connection;
+        return new ConnectionDTO(connection, tagService.getTags(connection.getTagIds()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
+    public List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds) {
         List<Connection> connections = connectionService.getConnections(componentNames, tagIds);
 
         List<Tag> tags = tagService.getTags(connections.stream()
@@ -118,18 +126,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .filter(Objects::nonNull)
             .toList());
 
-        for (Connection connection : connections) {
-            connection.setTags(
-                tags.stream()
-                    .filter(tag -> {
+        return com.bytechef.commons.util.CollectionUtils.map(
+            connections,
+            connection -> new ConnectionDTO(
+                connection,
+                com.bytechef.commons.util.CollectionUtils.filter(
+                    tags,
+                    tag -> {
                         List<Long> curTagIds = connection.getTagIds();
 
                         return curTagIds.contains(tag.getId());
-                    })
-                    .toList());
-        }
-
-        return connections;
+                    })));
     }
 
     @Override
@@ -144,20 +151,23 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public Connection update(Long id, List<Tag> tags) {
+    public ConnectionDTO update(Long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
-        return connectionService.update(id, tags);
+        return new ConnectionDTO(
+            connectionService.update(id, com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId)), tags);
     }
 
     @Override
-    public Connection update(Connection connection) {
-        connection
-            .setTags(
-                CollectionUtils.isEmpty(connection.getTags())
-                    ? Collections.emptyList()
-                    : tagService.save(connection.getTags()));
+    public ConnectionDTO update(ConnectionDTO connectionDTO) {
+        List<Tag> tags = CollectionUtils.isEmpty(connectionDTO.tags())
+            ? Collections.emptyList()
+            : tagService.save(connectionDTO.tags());
 
-        return connectionService.update(connection);
+        return new ConnectionDTO(
+            connectionService.update(
+                connectionDTO.id(), connectionDTO.name(),
+                com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId), connectionDTO.version()),
+            tags);
     }
 }
