@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
@@ -91,9 +91,9 @@ public class ConnectionControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testGetConnection() {
         try {
-            Connection connection = getConnection();
+            ConnectionDTO connectionDTO = getConnection();
 
-            when(connectionFacade.getConnection(1L)).thenReturn(connection);
+            when(connectionFacade.getConnection(1L)).thenReturn(connectionDTO);
 
             this.webTestClient
                 .get()
@@ -103,7 +103,7 @@ public class ConnectionControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(ConnectionModel.class)
-                .isEqualTo(connectionMapper.convert(connection)
+                .isEqualTo(connectionMapper.convert(connectionDTO)
                     .parameters(null));
         } catch (Exception exception) {
             Assertions.fail(exception);
@@ -117,7 +117,7 @@ public class ConnectionControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/connections/tags")
+                .uri("/connection-tags")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -138,9 +138,9 @@ public class ConnectionControllerIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testGetConnections() {
-        Connection connection = getConnection();
+        ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections(null, null)).thenReturn(List.of(connection));
+        when(connectionFacade.getConnections(null, null)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -150,11 +150,11 @@ public class ConnectionControllerIntTest {
             .expectStatus()
             .isOk()
             .expectBodyList(ConnectionModel.class)
-            .contains(connectionMapper.convert(connection)
+            .contains(connectionMapper.convert(connectionDTO)
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections(List.of("component1"), null)).thenReturn(List.of(connection));
+        when(connectionFacade.getConnections(List.of("component1"), null)).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -166,7 +166,7 @@ public class ConnectionControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, List.of(1L))).thenReturn(List.of(connection));
+        when(connectionFacade.getConnections(null, List.of(1L))).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -178,7 +178,7 @@ public class ConnectionControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(List.of("component1"), List.of(1L))).thenReturn(List.of(connection));
+        when(connectionFacade.getConnections(List.of("component1"), List.of(1L))).thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -192,7 +192,7 @@ public class ConnectionControllerIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testPostConnection() {
-        Connection connection = getConnection();
+        ConnectionDTO connectionDTO = getConnection();
         ConnectionModel connectionModel = new ConnectionModel().componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"));
@@ -200,7 +200,7 @@ public class ConnectionControllerIntTest {
         when(connectionFacade.create(any())).thenReturn(getConnection());
 
         try {
-            assert connection.getId() != null;
+            assert connectionDTO.id() != null;
             this.webTestClient
                 .post()
                 .uri("/connections")
@@ -212,9 +212,9 @@ public class ConnectionControllerIntTest {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.id")
-                .isEqualTo(connection.getId())
+                .isEqualTo(connectionDTO.id())
                 .jsonPath("$.name")
-                .isEqualTo(connection.getName())
+                .isEqualTo(connectionDTO.name())
                 .jsonPath("$.parameters")
                 .isMap()
                 .jsonPath("$.parameters.key1")
@@ -223,11 +223,9 @@ public class ConnectionControllerIntTest {
             Assertions.fail(exception);
         }
 
-        ArgumentCaptor<Connection> connectionArgumentCaptor = ArgumentCaptor.forClass(Connection.class);
+        ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
         verify(connectionFacade).create(connectionArgumentCaptor.capture());
-
-        connection.setId(null);
 
         org.assertj.core.api.Assertions.assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
@@ -238,12 +236,17 @@ public class ConnectionControllerIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testPutConnection() {
-        Connection connection = getConnection();
+        ConnectionDTO connection = ConnectionDTO.builder()
+            .componentName("componentName")
+            .id(1L)
+            .key("key")
+            .name("name2")
+            .parameters(Map.of("key1", "value1"))
+            .version(1)
+            .build();
         ConnectionModel connectionModel = new ConnectionModel().name("name2");
 
-        connection.setName("name2");
-
-        when(connectionFacade.update(connection)).thenReturn(connection);
+        when(connectionFacade.update(any(ConnectionDTO.class))).thenReturn(connection);
 
         try {
             this.webTestClient
@@ -257,7 +260,7 @@ public class ConnectionControllerIntTest {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.id")
-                .isEqualTo(connection.getId())
+                .isEqualTo(connection.id())
                 .jsonPath("$.name")
                 .isEqualTo("name2");
         } catch (Exception exception) {
@@ -296,16 +299,15 @@ public class ConnectionControllerIntTest {
         Assertions.assertEquals("tag1", capturedTag.getName());
     }
 
-    private static Connection getConnection() {
-        Connection connection = new Connection();
-
-        connection.setComponentName("componentName");
-        connection.setId(1L);
-        connection.setName("name");
-        connection.setParameters(Map.of("key1", "value1"));
-        connection.setVersion(1);
-
-        return connection;
+    private static ConnectionDTO getConnection() {
+        return ConnectionDTO.builder()
+            .componentName("componentName")
+            .id(1L)
+            .key("key")
+            .name("name")
+            .parameters(Map.of("key1", "value1"))
+            .version(1)
+            .build();
     }
 
     @ComponentScan(basePackages = {

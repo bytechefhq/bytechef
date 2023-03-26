@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bytechef.tag.domain.Tag;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -87,19 +86,19 @@ public class ConnectionServiceRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection update(Long id, List<Tag> tags) {
+    public Connection update(long id, List<Long> tagIds) {
         return rSocketRequester
-            .route("updateConnection")
-            .data(Map.of("id", id, "tags", tags))
+            .route("updateConnectionTags")
+            .data(Map.of("id", id, "tagIds", tagIds))
             .retrieveMono(Connection.class)
             .block();
     }
 
     @Override
-    public Connection update(Connection connection) {
+    public Connection update(long id, String name, List<Long> tagIds, int version) {
         return rSocketRequester
             .route("updateConnection")
-            .data(connection)
+            .data(new Connection(id, name, tagIds, version))
             .retrieveMono(Connection.class)
             .block();
     }

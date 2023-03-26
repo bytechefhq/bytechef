@@ -30,6 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = ProjectMapperSpringConfig.class)
 public interface ProjectInstanceModelMapper extends Converter<ProjectInstanceModel, ProjectInstance> {
 
+    @Mapping(target = "connections", ignore = true)
     @Mapping(target = "update", ignore = true)
     @Mapping(target = "tagIds", ignore = true)
     ProjectInstance convert(ProjectInstanceModel projectInstanceModel);

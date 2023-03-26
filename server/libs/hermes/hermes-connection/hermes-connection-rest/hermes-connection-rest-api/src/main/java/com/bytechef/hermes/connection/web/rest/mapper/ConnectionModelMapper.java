@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.connection.web.rest.mapper;
 
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import org.mapstruct.Mapper;
@@ -28,10 +28,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ConnectionMapperSpringConfig.class)
-public interface ConnectionModelMapper extends Converter<ConnectionModel, Connection> {
+public interface ConnectionModelMapper extends Converter<ConnectionModel, ConnectionDTO> {
 
     @Mapping(target = "key", ignore = true)
-    @Mapping(target = "tagIds", ignore = true)
-    @Mapping(target = "update", ignore = true)
-    Connection convert(ConnectionModel connectionModel);
+    ConnectionDTO convert(ConnectionModel connectionModel);
 }

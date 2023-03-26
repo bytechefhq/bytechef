@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.connection.rsocket.service;
 
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -67,6 +68,17 @@ public class ConnectionServiceRSocketController {
 
     @MessageMapping("updateConnection")
     public Mono<Connection> updateConnection(Connection connection) {
-        return Mono.create(sink -> sink.success(connectionService.update(connection)));
+
+        return Mono.create(sink -> sink.success(
+            connectionService.update(
+                connection.getId(), connection.getName(), connection.getTagIds(), connection.getVersion())));
+    }
+
+    @MessageMapping("updateConnectionTags")
+    public Mono<Connection> updateConnectionTags(Map<String, Object> map) {
+
+        return Mono.create(sink -> sink.success(
+            connectionService.update(MapValueUtils.getLong(map, "id"),
+                MapValueUtils.getList(map, "tagIds", Long.class))));
     }
 }

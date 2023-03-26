@@ -116,21 +116,20 @@ public class ConnectionServiceIntTest {
 
         connection.setName("name2");
 
-        Connection updatedConnection = connectionService.update(connection);
+        Connection updatedConnection = connectionService.update(
+            connection.getId(), "name2", List.of(), connection.getVersion());
 
         assertThat(updatedConnection.getName()).isEqualTo("name2");
     }
 
     private static Connection getConnection() {
-        Connection connection = new Connection();
-
-        connection.setComponentName("componentName");
-        connection.setKey("key");
-        connection.setName("name");
-        connection.setParameters(Map.of("key1", "value1"));
-        connection.setVersion(1);
-
-        return connection;
+        return Connection.Builder.builder()
+            .componentName("componentName")
+            .key("key")
+            .name("name")
+            .parameters(Map.of("key1", "value1"))
+            .version(1)
+            .build();
     }
 
     @TestConfiguration
