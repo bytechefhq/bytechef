@@ -18,7 +18,7 @@
 package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.dto.JobParametersDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.springframework.data.domain.Page;
  */
 public interface JobService {
 
-    Job create(JobParameters jobParameters);
+    Job create(JobParametersDTO jobParametersDTO);
 
     Optional<Job> fetchLatestJob();
 

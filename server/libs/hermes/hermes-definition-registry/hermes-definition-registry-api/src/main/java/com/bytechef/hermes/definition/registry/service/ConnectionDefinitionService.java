@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -47,6 +47,6 @@ public interface ConnectionDefinitionService {
 
     Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono();
 
-    OAuth2AuthorizationParameters getOAuth2Parameters(Connection connection);
+    OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection);
 
 }

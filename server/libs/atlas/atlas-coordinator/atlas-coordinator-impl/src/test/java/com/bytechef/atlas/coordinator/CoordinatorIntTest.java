@@ -25,7 +25,7 @@ import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandl
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.facade.JobFacade;
@@ -131,7 +131,7 @@ public class CoordinatorIntTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new Coordinator(null, null, null, jobService, null, null, taskExecutionService);
 
-            jobFacade.create(new JobParameters("aGVsbG8x"));
+            jobFacade.create(new JobParametersDTO("aGVsbG8x"));
         });
     }
 
@@ -182,7 +182,7 @@ public class CoordinatorIntTest {
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
         messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
-        long jobId = jobFacade.create(new JobParameters(Collections.singletonMap("yourName", "me"), workflowId));
+        long jobId = jobFacade.create(new JobParametersDTO(Collections.singletonMap("yourName", "me"), workflowId));
 
         return jobService.getJob(jobId);
     }

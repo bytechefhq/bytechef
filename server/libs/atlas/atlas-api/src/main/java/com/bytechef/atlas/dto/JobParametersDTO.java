@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class JobParameters {
+public class JobParametersDTO {
 
     private Map<String, Object> inputs = Collections.emptyMap();
     private String label;
@@ -40,29 +40,29 @@ public class JobParameters {
     private String workflowId;
     private List<Map<String, Object>> webhooks = Collections.emptyList();
 
-    private JobParameters() {
+    private JobParametersDTO() {
     }
 
-    public JobParameters(String workflowId) {
+    public JobParametersDTO(String workflowId) {
         this.workflowId = workflowId;
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(Map<String, Object> inputs, Long parentTaskExecutionId, String workflowId) {
+    public JobParametersDTO(Map<String, Object> inputs, Long parentTaskExecutionId, String workflowId) {
         this.inputs = inputs;
         this.parentTaskExecutionId = parentTaskExecutionId;
         this.workflowId = workflowId;
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(Map<String, Object> inputs, String workflowId) {
+    public JobParametersDTO(Map<String, Object> inputs, String workflowId) {
         this.inputs = inputs;
         this.workflowId = workflowId;
     }
 
     @Default
-    public JobParameters(Map<String, Object> inputs, String label, Map<String, Object> outputs,
-        Long parentTaskExecutionId, Integer priority, String workflowId, List<Map<String, Object>> webhooks) {
+    public JobParametersDTO(Map<String, Object> inputs, String label, Map<String, Object> outputs,
+                            Long parentTaskExecutionId, Integer priority, String workflowId, List<Map<String, Object>> webhooks) {
 
         if (inputs != null) {
             this.inputs = new HashMap<>(inputs);
@@ -124,7 +124,7 @@ public class JobParameters {
             return false;
         }
 
-        JobParameters workflowParameters = (JobParameters) o;
+        JobParametersDTO workflowParameters = (JobParametersDTO) o;
 
         return Objects.equals(this.inputs, workflowParameters.inputs)
             && Objects.equals(this.label, workflowParameters.label)

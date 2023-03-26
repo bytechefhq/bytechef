@@ -15,19 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.project.dto;
+package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.hermes.project.domain.Project;
-import com.bytechef.hermes.project.domain.ProjectInstance;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
 @SuppressFBWarnings("EI")
-public record ProjectExecution(
-    ProjectInstance instance, Job job, Project project, List<TaskExecution> taskExecutions,
-    Workflow workflow) {
+public record OAuth2AuthorizationParametersDTO(String authorizationUrl, String clientId, List<String> scopes) {
 }

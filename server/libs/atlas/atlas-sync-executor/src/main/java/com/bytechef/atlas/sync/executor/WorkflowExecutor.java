@@ -27,7 +27,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
@@ -192,7 +192,7 @@ public class WorkflowExecutor {
         workerMessageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
         workerMessageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
-        long jobId = jobFacade.create(new JobParameters(inputs, workflowId));
+        long jobId = jobFacade.create(new JobParametersDTO(inputs, workflowId));
 
         return jobService.getJob(jobId);
     }
