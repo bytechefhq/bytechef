@@ -21,8 +21,8 @@ import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -107,7 +107,7 @@ public class ConnectionDefinitionServiceRSocketController {
     }
 
     @MessageMapping("ConnectionDefinitionService.getOAuth2Parameters")
-    public Mono<OAuth2AuthorizationParameters> getOAuth2Parameters(Connection connection) {
+    public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(Connection connection) {
         return Mono.just(connectionDefinitionService.getOAuth2Parameters(connection));
     }
 

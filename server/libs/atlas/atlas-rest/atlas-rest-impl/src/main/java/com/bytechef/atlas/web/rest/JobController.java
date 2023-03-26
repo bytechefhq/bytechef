@@ -19,7 +19,7 @@
 
 package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
@@ -72,10 +72,10 @@ public class JobController implements JobsApi {
     public Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
         Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
         return workflowParametersModelMono.map(workflowParametersModel -> {
-            JobParameters jobParameters = conversionService.convert(
-                workflowParametersModel, JobParameters.class);
+            JobParametersDTO jobParametersDTO = conversionService.convert(
+                workflowParametersModel, JobParametersDTO.class);
 
-            long jobId = jobFacade.create(jobParameters);
+            long jobId = jobFacade.create(jobParametersDTO);
 
             return ResponseEntity.ok(new CreateJob200ResponseModel().jobId(jobId));
         });

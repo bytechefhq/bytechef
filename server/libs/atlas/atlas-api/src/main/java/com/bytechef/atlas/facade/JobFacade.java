@@ -17,12 +17,12 @@
 
 package com.bytechef.atlas.facade;
 
-import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.dto.JobParametersDTO;
 
 /**
  * @author Ivica Cardic
  */
 public interface JobFacade {
 
-    long create(JobParameters jobParameters);
+    long create(JobParametersDTO jobParametersDTO);
 }
