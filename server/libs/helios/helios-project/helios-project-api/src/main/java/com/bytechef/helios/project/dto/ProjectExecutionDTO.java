@@ -15,30 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.service;
+package com.bytechef.helios.project.dto;
 
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.helios.project.domain.Project;
+import com.bytechef.helios.project.domain.ProjectInstance;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface ConnectionService {
-
-    Connection create(Connection connection);
-
-    void delete(long id);
-
-    Connection getConnection(long id);
-
-    List<Connection> getConnections();
-
-    List<Connection> getConnections(List<Long> ids);
-
-    List<Connection> getConnections(List<String> componentNames, List<Long> tagIds);
-
-    Connection update(long id, List<Long> tagIds);
-
-    Connection update(long id, String name, List<Long> tagIds, int version);
+@SuppressFBWarnings("EI")
+public record ProjectExecutionDTO(
+    ProjectInstance instance, Job job, Project project, List<TaskExecution> taskExecutions,
+    Workflow workflow) {
 }
