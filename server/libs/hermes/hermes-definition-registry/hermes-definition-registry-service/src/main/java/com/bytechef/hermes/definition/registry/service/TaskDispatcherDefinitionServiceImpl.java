@@ -17,33 +17,46 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefinitionService {
 
-    private final List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories;
+    private final List<TaskDispatcherDefinition> taskDispatcherDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public TaskDispatcherDefinitionServiceImpl(
-        List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
+    public TaskDispatcherDefinitionServiceImpl(List<TaskDispatcherDefinition> taskDispatcherDefinitions) {
+        this.taskDispatcherDefinitions = taskDispatcherDefinitions;
+    }
 
-        this.taskDispatcherDefinitionFactories = taskDispatcherDefinitionFactories;
+    @Override
+    public Mono<TaskDispatcherDefinition> getTaskDispatcherDefinitionMono(String name, Integer version) {
+        return Mono.just(
+            CollectionUtils.findFirst(
+                taskDispatcherDefinitions,
+                taskDispatcherDefinition -> name.equalsIgnoreCase(taskDispatcherDefinition.getName())
+                    && version == taskDispatcherDefinition.getVersion()));
     }
 
     @Override
     public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono() {
+        return Mono.just(new ArrayList<>(taskDispatcherDefinitions));
+    }
+
+    @Override
+    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono(String name) {
         return Mono.just(
-            taskDispatcherDefinitionFactories.stream()
-                .map(TaskDispatcherDefinitionFactory::getDefinition)
-                .collect(Collectors.toList()));
+            CollectionUtils.filter(
+                taskDispatcherDefinitions,
+                taskDispatcherDefinition -> Objects.equals(taskDispatcherDefinition.getName(), name)));
     }
 }

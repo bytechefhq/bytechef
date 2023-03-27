@@ -37,6 +37,10 @@ public class CoordinatorDefinitionRegistryConfiguration {
     TaskDispatcherDefinitionService taskDispatcherDefinition(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
 
-        return new TaskDispatcherDefinitionServiceImpl(taskDispatcherDefinitionFactories);
+        return new TaskDispatcherDefinitionServiceImpl(
+            taskDispatcherDefinitionFactories
+                .stream()
+                .map(TaskDispatcherDefinitionFactory::getDefinition)
+                .toList());
     }
 }
