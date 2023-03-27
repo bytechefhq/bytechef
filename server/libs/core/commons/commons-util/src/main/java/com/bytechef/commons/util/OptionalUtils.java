@@ -19,6 +19,8 @@ package com.bytechef.commons.util;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author Ivica Cardic
@@ -34,5 +36,26 @@ public final class OptionalUtils {
 
     public static <T> void ifPresent(Optional<T> optional, Consumer<? super T> action) {
         optional.ifPresent(action);
+    }
+
+    public static <T> boolean isPresent(Optional<T> optional) {
+        return optional.isPresent();
+    }
+
+    public static <T> T orElse(Optional<T> optional, T elseObject) {
+        return optional.orElse(elseObject);
+    }
+
+    public static <T> T orElseGet(Optional<T> optional, Supplier<? extends T> supplier) {
+        return optional.orElseGet(supplier);
+    }
+
+    public static <T> void ifPresentOrElse(Optional<T> optional, Consumer<? super T> action, Runnable emptyAction) {
+        optional.ifPresentOrElse(action, emptyAction);
+    }
+
+    public static <T, U> U map(Optional<T> optional, Function<? super T, ? extends U> mapper) {
+        return optional.map(mapper)
+            .orElseThrow(IllegalArgumentException::new);
     }
 }

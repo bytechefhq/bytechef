@@ -29,5 +29,6 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = WorkflowMapperSpringConfig.class)
 public interface WorkflowMapper extends Converter<Workflow, WorkflowModel> {
 
+    @Override
     WorkflowModel convert(Workflow workflow);
 }

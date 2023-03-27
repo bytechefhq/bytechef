@@ -20,6 +20,8 @@ package com.bytechef.atlas.service;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -65,6 +67,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Workflow create(
         String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType) {
         Assert.notNull(format, "'format' must not be null");
@@ -78,11 +81,16 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflow.setNew(true);
 
-        return workflowCrudRepositories.stream()
-            .filter(workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType))
-            .findFirst()
-            .map(workflowCrudRepository -> save(workflow, workflowCrudRepository))
-            .orElseThrow(IllegalArgumentException::new);
+        Workflow savedWorkflow = CollectionUtils.getFirst(
+            workflowCrudRepositories,
+            workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType),
+            workflowCrudRepository -> save(workflow, workflowCrudRepository));
+
+        // Load definition into Workflow instance
+
+        Assert.notNull(savedWorkflow.getId(), "'id' must not  be null");
+
+        return getWorkflow(savedWorkflow.getId());
     }
 
     @Override
@@ -206,12 +214,10 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflow.setDefinition(definition);
 
-        return workflowCrudRepositories.stream()
-            .filter(workflowCrudRepository -> workflowCrudRepository.findById(workflow.getId())
-                .isPresent())
-            .findFirst()
-            .map(workflowCrudRepository -> save(workflow, workflowCrudRepository))
-            .orElseThrow(IllegalArgumentException::new);
+        return CollectionUtils.getFirst(
+            workflowCrudRepositories,
+            workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(workflow.getId())),
+            workflowCrudRepository -> save(workflow, workflowCrudRepository));
     }
 
     @SuppressFBWarnings("NP")
@@ -219,8 +225,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (workflow.isNew()) {
             workflow = workflowCrudRepository.save(workflow);
         } else {
-            Workflow curWorkflow = workflowCrudRepository.findById(workflow.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            Workflow curWorkflow = OptionalUtils.get(workflowCrudRepository.findById(workflow.getId()));
 
             curWorkflow.setDefinition(workflow.getDefinition());
             curWorkflow.setVersion(workflow.getVersion());

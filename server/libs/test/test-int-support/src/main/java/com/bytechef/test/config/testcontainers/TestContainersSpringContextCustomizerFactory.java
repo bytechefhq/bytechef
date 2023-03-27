@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.ContextCustomizerFactory;
@@ -45,12 +46,13 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
     @Override
     public ContextCustomizer createContextCustomizer(
         Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
+
         return (context, mergedConfig) -> {
             ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+            ConfigurableEnvironment configurableEnvironment = context.getEnvironment();
             TestPropertyValues testValues = TestPropertyValues.empty();
 
-            List activeProfiles = Arrays.asList(context.getEnvironment()
-                .getActiveProfiles());
+            List activeProfiles = Arrays.asList(configurableEnvironment.getActiveProfiles());
 
             if (activeProfiles.contains("testint")) {
                 testValues = initPostgreSql(testClass, beanFactory, testValues);
@@ -64,6 +66,7 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
 
     private static TestPropertyValues initRedis(
         Class<?> testClass, ConfigurableListableBeanFactory beanFactory, TestPropertyValues testValues) {
+
         EmbeddedRedis embeddedRedis = AnnotatedElementUtils.findMergedAnnotation(testClass, EmbeddedRedis.class);
 
         if (null != embeddedRedis) {

@@ -66,18 +66,18 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     @Override
     public Mono<ResponseEntity<ActionDefinitionModel>> getActionDefinition(
-        String name, Integer version, String actionName, ServerWebExchange exchange) {
+        String componentName, Integer componentVersion, String actionName, ServerWebExchange exchange) {
 
-        return actionDefinitionService.getComponentDefinitionActionMono(name, version, actionName)
+        return actionDefinitionService.getComponentDefinitionActionMono(componentName, componentVersion, actionName)
             .mapNotNull(actionDefinition -> conversionService.convert(actionDefinition, ActionDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<ComponentDefinitionWithBasicActionsModel>> getComponentDefinition(
-        String name, Integer version, ServerWebExchange exchange) {
+        String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
-        return componentDefinitionService.getComponentDefinitionMono(name, version)
+        return componentDefinitionService.getComponentDefinitionMono(componentName, componentVersion)
             .mapNotNull(componentDefinition -> conversionService.convert(
                 componentDefinition, ComponentDefinitionWithBasicActionsModel.class))
             .map(ResponseEntity::ok);
@@ -123,11 +123,11 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<ComponentDefinitionBasicModel>>> getComponentDefinitionVersions(
-        String name, ServerWebExchange exchange) {
+        String componentName, ServerWebExchange exchange) {
 
         return Mono.just(
             ResponseEntity.ok(
-                componentDefinitionService.getComponentDefinitionsMono(name)
+                componentDefinitionService.getComponentDefinitionsMono(componentName)
                     .mapNotNull(componentDefinitions -> componentDefinitions.stream()
                         .map(componentDefinition -> conversionService.convert(
                             componentDefinition, ComponentDefinitionBasicModel.class))

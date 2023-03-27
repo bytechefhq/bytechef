@@ -20,6 +20,8 @@ package com.bytechef.atlas.service;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.service.config.WorkflowIntTestConfiguration;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,9 +53,7 @@ public class WorkflowServiceIntTest {
 
         workflow = workflowService.create(workflow.getDefinition(), workflow.getFormat(), Workflow.SourceType.JDBC);
 
-        Assertions.assertEquals(
-            workflow, workflowCrudRepository.findById(workflow.getId())
-                .orElseThrow(IllegalArgumentException::new));
+        Assertions.assertEquals(workflow, OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
     }
 
     @Test
@@ -62,8 +62,7 @@ public class WorkflowServiceIntTest {
 
         workflowService.delete(workflow.getId());
 
-        Assertions.assertFalse(workflowCrudRepository.findById(workflow.getId())
-            .isPresent());
+        Assertions.assertFalse(OptionalUtils.isPresent(workflowCrudRepository.findById(workflow.getId())));
     }
 
     @Test
@@ -81,8 +80,7 @@ public class WorkflowServiceIntTest {
 
         workflowCrudRepository.save(getWorkflow());
 
-        Assertions.assertEquals(1, workflowService.getWorkflows()
-            .size());
+        Assertions.assertEquals(1, CollectionUtils.size(workflowService.getWorkflows()));
     }
 
     @Test

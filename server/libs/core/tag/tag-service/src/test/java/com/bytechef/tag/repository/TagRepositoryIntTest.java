@@ -17,6 +17,7 @@
 
 package com.bytechef.tag.repository;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.config.TagIntTestConfiguration;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.test.annotation.EmbeddedSql;
@@ -58,8 +59,7 @@ public class TagRepositoryIntTest {
     public void testDelete() {
         Tag tag = tagRepository.save(new Tag("name"));
 
-        Tag resultTag = tagRepository.findById(tag.getId())
-            .orElseThrow();
+        Tag resultTag = OptionalUtils.get(tagRepository.findById(tag.getId()));
 
         assertThat(resultTag).isEqualTo(tag);
 
