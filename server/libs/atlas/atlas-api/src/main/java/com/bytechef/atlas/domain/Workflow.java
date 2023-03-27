@@ -23,8 +23,11 @@ import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.workflow.mapper.WorkflowReader;
+import com.bytechef.atlas.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.MapValueUtils;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -33,11 +36,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
@@ -133,15 +138,25 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     public Workflow() {
     }
 
-    public Workflow(String id, String definition, Format format, Map<String, Object> source) {
-        Assert.notNull(id, "'id' must not be null");
+    @PersistenceCreator
+    public Workflow(String definition, String id, Format format) throws Exception {
+        this(definition, format, id, WorkflowReader.readWorkflowMap(
+            new WorkflowResource(
+                id,
+                new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
+                format)));
+    }
+
+    public Workflow(String definition, Format format, String id, Map<String, Object> source) {
+        Assert.notNull(definition, "'definition' must not be null");
         Assert.notNull(format, "'format' must not be null");
+        Assert.notNull(id, "'id' must not be null");
         Assert.notNull(source, "'source' must not be null");
 
-        this.id = id;
-        this.format = format;
         this.definition = definition;
+        this.format = format;
         this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
+        this.id = id;
         this.inputs = MapValueUtils.getList(
             source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
         this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
@@ -315,22 +330,5 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
-    }
-
-    public Workflow update(Workflow workflow) {
-        this.definition = workflow.definition;
-        this.description = workflow.description;
-        this.error = workflow.error;
-        this.format = workflow.format;
-        this.id = workflow.id;
-        this.isNew = workflow.isNew;
-        this.inputs = workflow.inputs;
-        this.label = workflow.label;
-        this.outputs = workflow.outputs;
-        this.sourceType = workflow.sourceType;
-        this.retry = workflow.retry;
-        this.tasks = workflow.tasks;
-
-        return this;
     }
 }

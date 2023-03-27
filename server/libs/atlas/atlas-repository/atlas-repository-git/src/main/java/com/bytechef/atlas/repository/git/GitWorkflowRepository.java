@@ -23,9 +23,13 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.git.workflow.GitWorkflowOperations;
 import com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
+import com.bytechef.atlas.workflow.mapper.WorkflowReader;
+import com.bytechef.atlas.workflow.mapper.WorkflowResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,20 +38,16 @@ import java.util.stream.Collectors;
  */
 public class GitWorkflowRepository implements WorkflowRepository {
 
-    private final GitWorkflowOperations gitWorkflowOperations;
-    private final WorkflowMapper workflowMapper;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitWorkflowRepository.class);
 
-    public GitWorkflowRepository(GitWorkflowOperations gitWorkflowOperations, WorkflowMapper workflowMapper) {
+    private final GitWorkflowOperations gitWorkflowOperations;
+
+    public GitWorkflowRepository(GitWorkflowOperations gitWorkflowOperations) {
         this.gitWorkflowOperations = gitWorkflowOperations;
-        this.workflowMapper = workflowMapper;
     }
 
-    public GitWorkflowRepository(
-        String url, String branch, String[] searchPaths, String username, String password,
-        WorkflowMapper workflowMapper) {
-
+    public GitWorkflowRepository(String url, String branch, String[] searchPaths, String username, String password) {
         this.gitWorkflowOperations = new JGitWorkflowOperations(url, branch, searchPaths, username, password);
-        this.workflowMapper = workflowMapper;
     }
 
     @Override
@@ -56,7 +56,8 @@ public class GitWorkflowRepository implements WorkflowRepository {
             List<WorkflowResource> resources = gitWorkflowOperations.getHeadFiles();
 
             return resources.stream()
-                .map(workflowMapper::readValue)
+                .map(GitWorkflowRepository::readWorkflow)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         }
     }
@@ -66,12 +67,22 @@ public class GitWorkflowRepository implements WorkflowRepository {
         synchronized (this) {
             WorkflowResource resource = gitWorkflowOperations.getFile(id);
 
-            return Optional.of(workflowMapper.readValue(resource));
+            return Optional.ofNullable(readWorkflow(resource));
         }
     }
 
     @Override
     public Workflow.SourceType getSourceType() {
         return Workflow.SourceType.GIT;
+    }
+
+    private static Workflow readWorkflow(WorkflowResource resource) {
+        try {
+            return WorkflowReader.readWorkflow(resource);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        return null;
     }
 }

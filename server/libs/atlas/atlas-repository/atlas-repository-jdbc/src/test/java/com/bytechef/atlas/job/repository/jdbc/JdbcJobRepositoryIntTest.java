@@ -24,9 +24,11 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.JobRepository;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -60,8 +62,7 @@ public class JdbcJobRepositoryIntTest {
 
         Assertions.assertEquals(pageTotal + 1, page.getNumberOfElements());
 
-        Job one = jobRepository.findById(job.getId())
-            .orElseThrow();
+        Job one = OptionalUtils.get(jobRepository.findById(job.getId()));
 
         Assertions.assertNotNull(one);
     }
@@ -70,8 +71,7 @@ public class JdbcJobRepositoryIntTest {
     public void testFindById() {
         Job job = jobRepository.save(getJob(Job.Status.CREATED));
 
-        Job resultJob = jobRepository.findById(job.getId())
-            .orElseThrow();
+        Job resultJob = OptionalUtils.get(jobRepository.findById(job.getId()));
 
         resultJob.setId(null);
         resultJob.setStatus(Job.Status.FAILED);
@@ -81,8 +81,7 @@ public class JdbcJobRepositoryIntTest {
 
         job = jobRepository.save(resultJob);
 
-        resultJob = jobRepository.findById(job.getId())
-            .orElseThrow();
+        resultJob = OptionalUtils.get(jobRepository.findById(job.getId()));
 
         Assertions.assertEquals(Job.Status.FAILED, resultJob.getStatus());
     }
@@ -93,8 +92,9 @@ public class JdbcJobRepositoryIntTest {
 
         Job job = jobRepository.save(getJob(Job.Status.CREATED));
 
-        job.setEndDate(LocalDateTime.from(Instant.now()
-            .minus(1, DAYS)));
+        Instant now = Instant.now();
+
+        job.setEndDate(LocalDateTime.ofInstant(now.minus(1, DAYS), ZoneId.systemDefault()));
 
         jobRepository.save(job);
 
@@ -127,8 +127,9 @@ public class JdbcJobRepositoryIntTest {
         for (int i = 0; i < 5; i++) {
             Job completedJobYesterday = jobRepository.save(getJob(Job.Status.COMPLETED));
 
-            completedJobYesterday.setEndDate(LocalDateTime.from(Instant.now()
-                .minus(1, DAYS)));
+            Instant now = Instant.now();
+
+            completedJobYesterday.setEndDate(LocalDateTime.ofInstant(now.minus(1, DAYS), ZoneId.systemDefault()));
 
             jobRepository.save(completedJobYesterday);
         }

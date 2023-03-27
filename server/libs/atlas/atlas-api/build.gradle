@@ -2,6 +2,8 @@ dependencies {
     api "org.springframework.data:spring-data-jdbc"
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-core"
     implementation project(":server:libs:core:commons:commons-data")

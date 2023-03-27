@@ -18,15 +18,14 @@
 package com.bytechef.atlas.repository.resource;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 
 /**
  * @author Ivica Cardic
  */
 public class ClassPathResourceWorkflowRepository extends AbstractResourceWorkflowRepository {
 
-    public ClassPathResourceWorkflowRepository(WorkflowMapper workflowMapper) {
-        super("classpath:workflows/**/*.{json|yml|yaml}", workflowMapper);
+    public ClassPathResourceWorkflowRepository() {
+        super("classpath:workflows/**/*.{json|yml|yaml}");
     }
 
     @Override

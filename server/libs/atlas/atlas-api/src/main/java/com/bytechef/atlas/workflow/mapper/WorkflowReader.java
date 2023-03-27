@@ -15,29 +15,38 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.workflow.mapper;
+package com.bytechef.atlas.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class WorkflowMapperChain implements WorkflowMapper {
+public class WorkflowReader {
 
-    private final List<WorkflowMapperResolver> workflowMapperResolvers;
+    private static final List<WorkflowMapper> workflowMapperResolvers = List.of(
+        new JsonWorkflowMapper(), new YamlWorkflowMapper());
 
-    public WorkflowMapperChain(List<WorkflowMapperResolver> workflowMapperResolvers) {
-        this.workflowMapperResolvers = workflowMapperResolvers;
+    public static Workflow readWorkflow(WorkflowResource workflowResource) throws Exception {
+        WorkflowMapper workflowMapper = getWorkflowMapper(workflowResource);
+
+        return workflowMapper.readWorkflow(workflowResource);
     }
 
-    @Override
-    public Workflow readValue(WorkflowResource workflowResource) {
-        for (WorkflowMapperResolver workflowMapperResolver : workflowMapperResolvers) {
+    public static Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) throws Exception {
+        WorkflowMapper workflowMapper = getWorkflowMapper(workflowResource);
+
+        return workflowMapper.readWorkflowMap(workflowResource);
+    }
+
+    private static WorkflowMapper getWorkflowMapper(WorkflowResource workflowResource) {
+        for (WorkflowMapper workflowMapperResolver : workflowMapperResolvers) {
             WorkflowMapper workflowMapper = workflowMapperResolver.resolve(workflowResource);
 
             if (workflowMapper != null) {
-                return workflowMapper.readValue(workflowResource);
+                return workflowMapper;
             }
         }
 
