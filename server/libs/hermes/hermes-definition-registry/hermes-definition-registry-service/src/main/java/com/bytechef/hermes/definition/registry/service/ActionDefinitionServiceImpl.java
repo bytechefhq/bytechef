@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,8 +45,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitions.stream()
                 .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
-                .flatMap(componentDefinition -> componentDefinition.getActions()
-                    .stream())
+                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
                 .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
                 .map(actionDefinition -> (ActionDefinition) actionDefinition)
                 .findFirst()

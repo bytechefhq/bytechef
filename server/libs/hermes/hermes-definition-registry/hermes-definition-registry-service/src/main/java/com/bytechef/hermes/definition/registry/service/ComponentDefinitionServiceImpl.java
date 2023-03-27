@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
@@ -24,7 +25,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -41,11 +41,10 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public Mono<ComponentDefinition> getComponentDefinitionMono(String name, Integer version) {
         return Mono.just(
-            componentDefinitions.stream()
-                .filter(componentDefinition -> name.equalsIgnoreCase(componentDefinition.getName())
-                    && version == componentDefinition.getVersion())
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new));
+            CollectionUtils.getFirst(
+                componentDefinitions,
+                componentDefinition -> name.equalsIgnoreCase(componentDefinition.getName()) &&
+                    version == componentDefinition.getVersion()));
     }
 
     @Override
@@ -56,8 +55,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public Mono<List<ComponentDefinition>> getComponentDefinitionsMono(String name) {
         return Mono.just(
-            componentDefinitions.stream()
-                .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
-                .collect(Collectors.toList()));
+            CollectionUtils.filter(
+                componentDefinitions,
+                componentDefinition -> Objects.equals(componentDefinition.getName(), name)));
     }
 }

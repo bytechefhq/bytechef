@@ -55,6 +55,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     @Override
     public void executeAuthorizationApply(
         Connection connection, Authorization.AuthorizationContext authorizationContext) {
+
         if (StringUtils.hasText(connection.getAuthorizationName())) {
             Authorization authorization = getAuthorization(
                 connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
@@ -103,12 +104,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion) {
-        return componentDefinitions.stream()
-            .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                componentDefinition.getVersion() == componentVersion)
-            .findFirst()
-            .map(ComponentDefinition::getConnection)
-            .orElseThrow(IllegalArgumentException::new);
+        return CollectionUtils.getFirst(
+            componentDefinitions,
+            componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                componentDefinition.getVersion() == componentVersion,
+            ComponentDefinition::getConnection);
     }
 
     @Override
@@ -140,12 +140,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitionsMono(
         String componentName, int componentVersion) {
 
-        ComponentDefinition componentDefinition = componentDefinitions.stream()
-            .filter(
-                curComponentDefinition -> Objects.equals(curComponentDefinition.getName(), componentName) &&
-                    curComponentDefinition.getVersion() == componentVersion)
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
+        ComponentDefinition componentDefinition = CollectionUtils.getFirst(
+            componentDefinitions,
+            curComponentDefinition -> Objects.equals(curComponentDefinition.getName(), componentName) &&
+                curComponentDefinition.getVersion() == componentVersion);
 
         return Mono.just(
             CollectionUtils.concatDistinct(

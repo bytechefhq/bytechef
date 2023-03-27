@@ -24,7 +24,9 @@ import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -34,8 +36,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.NonNull;
@@ -47,8 +47,6 @@ import org.springframework.util.Assert;
  */
 @Transactional
 public class JobServiceImpl implements JobService {
-
-    private static final Logger log = LoggerFactory.getLogger(JobServiceImpl.class);
 
     private final JobRepository jobRepository;
     private final List<WorkflowRepository> workflowRepositories;
@@ -66,8 +64,7 @@ public class JobServiceImpl implements JobService {
         String workflowId = jobParametersDTO.getWorkflowId();
 
         Workflow workflow = workflowRepositories.stream()
-            .flatMap(workflowRepository -> StreamSupport.stream(workflowRepository.findAll()
-                .spliterator(), false))
+            .flatMap(workflowRepository -> CollectionUtils.stream(workflowRepository.findAll()))
             .filter(curWorkflow -> Objects.equals(workflowId, curWorkflow.getId()))
             .findFirst()
             .orElseThrow(IllegalArgumentException::new);
@@ -116,8 +113,7 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Job getJob(@NonNull long id) {
-        return jobRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        return OptionalUtils.get(jobRepository.findById(id));
     }
 
     @Override
@@ -134,8 +130,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job resume(long id) {
-        Job job = jobRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        Job job = OptionalUtils.get(jobRepository.findById(id));
 
         Assert.notNull(job, String.format("Unknown job %s", id));
         Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
@@ -161,8 +156,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job start(long id) {
-        Job job = jobRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        Job job = OptionalUtils.get(jobRepository.findById(id));
 
         job.setCurrentTask(0);
         job.setStartDate(LocalDateTime.now());
@@ -175,8 +169,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job stop(long id) {
-        Job job = jobRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        Job job = OptionalUtils.get(jobRepository.findById(id));
 
         Assert.isTrue(
             job.getStatus() == Job.Status.STARTED,
