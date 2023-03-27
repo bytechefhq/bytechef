@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -42,9 +43,25 @@ public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatc
     }
 
     @Override
+    public Mono<TaskDispatcherDefinition> getTaskDispatcherDefinitionMono(String name, Integer version) {
+        return rSocketRequester
+            .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinition")
+            .data(Map.of("name", name, "version", version))
+            .retrieveMono(TaskDispatcherDefinition.class);
+    }
+
+    @Override
     public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono() {
         return rSocketRequester
             .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
+            .retrieveMono(new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono(String name) {
+        return rSocketRequester
+            .route("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
+            .data(name)
             .retrieveMono(new ParameterizedTypeReference<>() {});
     }
 }
