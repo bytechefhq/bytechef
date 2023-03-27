@@ -19,7 +19,7 @@
 
 package com.bytechef.atlas.repository.git.workflow;
 
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
+import com.bytechef.atlas.workflow.mapper.WorkflowResource;
 import java.util.List;
 
 /**

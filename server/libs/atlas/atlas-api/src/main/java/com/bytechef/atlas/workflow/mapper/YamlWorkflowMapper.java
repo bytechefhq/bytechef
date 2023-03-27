@@ -17,28 +17,33 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.workflow.mapper;
+package com.bytechef.atlas.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
+import java.util.Map;
+
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class YamlWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
+class YamlWorkflowMapper extends AbstractWorkflowMapper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
 
-    public Workflow readValue(WorkflowResource workflowResource) {
-        return readValue(workflowResource, OBJECT_MAPPER);
+    public Workflow readWorkflow(WorkflowResource workflowResource) {
+        return readWorkflow(workflowResource, OBJECT_MAPPER);
+    }
+
+    @Override
+    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) {
+        return readWorkflowMap(workflowResource, OBJECT_MAPPER);
     }
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getWorkflowFormat() == Workflow.Format.YAML
-            ? this
-            : null;
+        return workflowResource.getWorkflowFormat() == Workflow.Format.YAML ? this : null;
     }
 }

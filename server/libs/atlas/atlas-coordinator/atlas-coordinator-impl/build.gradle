@@ -15,7 +15,6 @@ dependencies {
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation project(":server:libs:atlas:atlas-config")
     testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
-    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")

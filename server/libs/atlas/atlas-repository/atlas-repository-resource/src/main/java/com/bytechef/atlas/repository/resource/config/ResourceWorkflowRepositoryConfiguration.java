@@ -20,7 +20,6 @@ package com.bytechef.atlas.repository.resource.config;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.repository.resource.FilesystemResourceWorkflowRepository;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -36,8 +35,8 @@ public class ResourceWorkflowRepositoryConfiguration {
         prefix = "bytechef",
         name = "workflow-repository.classpath.enabled",
         havingValue = "true")
-    WorkflowRepository classpathBasedWorkflowRepository(WorkflowMapper workflowMapper) {
-        return new ClassPathResourceWorkflowRepository(workflowMapper);
+    WorkflowRepository classpathBasedWorkflowRepository() {
+        return new ClassPathResourceWorkflowRepository();
     }
 
     @Bean
@@ -47,8 +46,7 @@ public class ResourceWorkflowRepositoryConfiguration {
         name = "workflow-repository.filesystem.enabled",
         havingValue = "true")
     WorkflowRepository filesystemBasedWorkflowRepository(
-        @Value("${bytechef.workflow-repository.filesystem.location-pattern}") String locationPattern,
-        WorkflowMapper workflowMapper) {
-        return new FilesystemResourceWorkflowRepository(locationPattern, workflowMapper);
+        @Value("${bytechef.workflow-repository.filesystem.location-pattern}") String locationPattern) {
+        return new FilesystemResourceWorkflowRepository(locationPattern);
     }
 }

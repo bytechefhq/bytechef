@@ -20,7 +20,6 @@ package com.bytechef.atlas.service.config;
 import com.bytechef.atlas.config.WorkflowConfiguration;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringBootConfiguration;
@@ -42,7 +41,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     })
 @EnableAutoConfiguration
 @Import({
-    WorkflowConfiguration.class, WorkflowMapperConfiguration.class
+    WorkflowConfiguration.class
 })
 @SpringBootConfiguration
 public class WorkflowIntTestConfiguration {

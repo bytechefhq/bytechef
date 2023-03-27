@@ -210,6 +210,6 @@ public class WorkflowControllerIntTest {
 
     private static Workflow getWorkflow() throws JsonProcessingException {
         return new Workflow(
-            "1", DEFINITION, Workflow.Format.JSON, OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}));
+            DEFINITION, Workflow.Format.JSON, "1", OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}));
     }
 }

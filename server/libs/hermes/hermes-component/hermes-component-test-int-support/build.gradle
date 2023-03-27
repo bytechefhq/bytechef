@@ -5,7 +5,6 @@ dependencies {
 
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot-test"
-    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":server:libs:core:encryption:encryption-api")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")

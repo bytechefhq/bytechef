@@ -18,15 +18,14 @@
 package com.bytechef.atlas.repository.resource;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 
 /**
  * @author Ivica Cardic
  */
 public class FilesystemResourceWorkflowRepository extends AbstractResourceWorkflowRepository {
 
-    public FilesystemResourceWorkflowRepository(String locationPattern, WorkflowMapper workflowMapper) {
-        super(String.format("file:%s", locationPattern), workflowMapper);
+    public FilesystemResourceWorkflowRepository(String locationPattern) {
+        super(String.format("file:%s", locationPattern));
     }
 
     @Override

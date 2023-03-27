@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.test.config;
 
-import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.atlas.sync.executor.config.WorkflowExecutorConfiguration;
 import com.bytechef.encryption.Encryption;
@@ -47,8 +46,7 @@ import org.springframework.context.annotation.Import;
     })
 @Import({
     ResourceWorkflowRepositoryConfiguration.class,
-    WorkflowExecutorConfiguration.class,
-    WorkflowMapperConfiguration.class
+    WorkflowExecutorConfiguration.class
 })
 @SpringBootConfiguration
 public class ComponentTestIntConfiguration {

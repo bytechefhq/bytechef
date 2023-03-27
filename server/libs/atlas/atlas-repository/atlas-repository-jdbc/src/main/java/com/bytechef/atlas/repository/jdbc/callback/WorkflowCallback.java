@@ -18,14 +18,9 @@
 package com.bytechef.atlas.repository.jdbc.callback;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.data.relational.core.mapping.event.AfterConvertCallback;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
 import org.springframework.stereotype.Component;
 
@@ -34,18 +29,7 @@ import org.springframework.stereotype.Component;
  */
 @Order(1)
 @Component
-public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeConvertCallback<Workflow> {
-
-    private final WorkflowMapper workflowMapper;
-
-    public WorkflowCallback(WorkflowMapper workflowMapper) {
-        this.workflowMapper = workflowMapper;
-    }
-
-    @Override
-    public Workflow onAfterConvert(Workflow workflow) {
-        return readWorkflowDefinition(workflow);
-    }
+public class WorkflowCallback implements BeforeConvertCallback<Workflow> {
 
     @Override
     public Workflow onBeforeConvert(Workflow workflow) {
@@ -56,17 +40,5 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
         }
 
         return workflow;
-    }
-
-    private Workflow readWorkflowDefinition(Workflow workflow) {
-        String definition = workflow.getDefinition();
-
-        Workflow newWorkflow = workflowMapper.readValue(
-            new WorkflowResource(
-                workflow.getId(),
-                new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
-                workflow.getFormat()));
-
-        return workflow.update(newWorkflow);
     }
 }

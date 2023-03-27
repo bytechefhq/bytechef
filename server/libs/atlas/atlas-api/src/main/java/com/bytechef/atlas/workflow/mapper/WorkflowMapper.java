@@ -15,12 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.workflow.mapper;
+package com.bytechef.atlas.workflow.mapper;
+
+import com.bytechef.atlas.domain.Workflow;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowMapperResolver {
+interface WorkflowMapper {
+
+    Workflow readWorkflow(WorkflowResource workflowResource) throws Exception;
+
+    Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) throws Exception;
 
     WorkflowMapper resolve(WorkflowResource resource);
 }

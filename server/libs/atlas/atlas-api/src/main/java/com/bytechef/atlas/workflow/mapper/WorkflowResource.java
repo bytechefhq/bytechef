@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.workflow.mapper;
+package com.bytechef.atlas.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
 

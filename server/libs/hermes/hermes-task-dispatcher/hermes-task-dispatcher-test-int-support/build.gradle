@@ -4,7 +4,6 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot-test"
-    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":server:libs:test:test-int-support")
 }
