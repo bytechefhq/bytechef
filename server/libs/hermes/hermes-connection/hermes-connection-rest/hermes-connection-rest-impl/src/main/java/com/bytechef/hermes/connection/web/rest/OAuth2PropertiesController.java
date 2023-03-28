@@ -46,6 +46,7 @@ public class OAuth2PropertiesController implements Oauth2PropertiesApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<OAuth2PropertiesModel>> getOAuth2Properties(ServerWebExchange exchange) {
         return Mono.just(conversionService.convert(oAuth2Properties, OAuth2PropertiesModel.class))
             .map(ResponseEntity::ok);

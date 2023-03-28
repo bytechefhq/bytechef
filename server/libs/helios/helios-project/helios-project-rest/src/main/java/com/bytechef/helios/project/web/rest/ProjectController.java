@@ -29,7 +29,6 @@ import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
@@ -56,7 +55,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    @Transactional
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectModel>> createProject(
         Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
@@ -67,6 +66,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowModel>> createProjectWorkflow(
         Long id, Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModelMono,
         ServerWebExchange exchange) {
@@ -88,6 +88,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectModel>> duplicateProject(Long id, ServerWebExchange exchange) {
         return Mono.just(
             conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class))
@@ -95,6 +96,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectModel>> getProject(Long id, ServerWebExchange exchange) {
         return Mono.just(
             conversionService.convert(projectFacade.getProject(id), ProjectModel.class))
@@ -126,6 +128,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectModel>> updateProject(
         Long id, Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
