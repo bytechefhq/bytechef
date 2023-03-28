@@ -172,7 +172,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                         }
                                         getRequest={(id, tags) => ({
                                             id: id!,
-                                            updateProjectTagsRequestModel: {
+                                            updateTagsRequestModel: {
                                                 tags: tags || [],
                                             },
                                         })}
