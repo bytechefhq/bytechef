@@ -78,7 +78,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
                 Timestamp startDateTimestamp = rs.getTimestamp("start_date");
 
                 if (startDateTimestamp != null) {
-                    job.setEndDate(LocalDateTimeUtils.getLocalDateTime(startDateTimestamp));
+                    job.setStartDate(LocalDateTimeUtils.getLocalDateTime(startDateTimestamp));
                 }
 
                 job.setStatus(Job.Status.valueOf(rs.getString("status")));
