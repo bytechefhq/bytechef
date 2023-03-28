@@ -49,11 +49,11 @@ public class IntegrationCategoryController implements IntegrationCategoriesApi {
     @Override
     public Mono<ResponseEntity<Flux<CategoryModel>>> getIntegrationCategories(ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    integrationFacade.getIntegrationCategories()
-                        .stream()
-                        .map(category -> conversionService.convert(category, CategoryModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                integrationFacade.getIntegrationCategories()
+                    .stream()
+                    .map(category -> conversionService.convert(category, CategoryModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 }

@@ -53,11 +53,11 @@ public class ProjectExecutionController implements ProjectExecutionsApi {
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                projectFacade
-                    .searchProjectExecutions(
-                        jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
-                    .map(
-                        projectExecution -> conversionService.convert(projectExecution, ProjectExecutionModel.class))));
+            projectFacade
+                .searchProjectExecutions(
+                    jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
+                .map(
+                    projectExecution -> conversionService.convert(projectExecution, ProjectExecutionModel.class)))
+            .map(ResponseEntity::ok);
     }
 }

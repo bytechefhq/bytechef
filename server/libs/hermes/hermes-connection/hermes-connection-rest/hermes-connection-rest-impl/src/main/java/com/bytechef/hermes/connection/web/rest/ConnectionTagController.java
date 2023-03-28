@@ -49,11 +49,11 @@ public class ConnectionTagController implements ConnectionTagsApi {
     @Override
     public Mono<ResponseEntity<Flux<TagModel>>> getConnectionTags(ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    connectionFacade.getConnectionTags()
-                        .stream()
-                        .map(tag -> conversionService.convert(tag, TagModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                connectionFacade.getConnectionTags()
+                    .stream()
+                    .map(tag -> conversionService.convert(tag, TagModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 }

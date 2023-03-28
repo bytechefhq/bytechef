@@ -66,32 +66,31 @@ public class IntegrationController implements IntegrationsApi {
 
     @Override
     public Mono<ResponseEntity<IntegrationModel>> getIntegration(Long id, ServerWebExchange exchange) {
-        return Mono.just(
-            ResponseEntity.ok(
-                conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class)));
+        return Mono.just(conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(
         List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    integrationFacade.searchIntegrations(categoryIds, tagIds)
-                        .stream()
-                        .map(integration -> conversionService.convert(integration, IntegrationModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                integrationFacade.searchIntegrations(categoryIds, tagIds)
+                    .stream()
+                    .map(integration -> conversionService.convert(integration, IntegrationModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<Flux<WorkflowModel>>> getIntegrationWorkflows(Long id, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    integrationFacade.getIntegrationWorkflows(id)
-                        .stream()
-                        .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                integrationFacade.getIntegrationWorkflows(id)
+                    .stream()
+                    .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -99,11 +98,11 @@ public class IntegrationController implements IntegrationsApi {
     public Mono<ResponseEntity<IntegrationModel>> createIntegration(
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
-        return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
-            conversionService.convert(
-                integrationFacade.create(
-                    conversionService.convert(integrationModel, IntegrationDTO.class)),
-                IntegrationModel.class)));
+        return integrationModelMono.map(integrationModel -> conversionService.convert(
+            integrationFacade.create(
+                conversionService.convert(integrationModel, IntegrationDTO.class)),
+            IntegrationModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -111,21 +110,21 @@ public class IntegrationController implements IntegrationsApi {
         Long id, Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
-        return createIntegrationWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
-            conversionService.convert(
-                integrationFacade.addWorkflow(
-                    id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
-                WorkflowModel.class)));
+        return createIntegrationWorkflowRequestModelMono.map(requestModel -> conversionService.convert(
+            integrationFacade.addWorkflow(
+                id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
+            WorkflowModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<IntegrationModel>> updateIntegration(
         Long id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
-        return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
-            conversionService.convert(
-                integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
-                IntegrationModel.class)));
+        return integrationModelMono.map(integrationModel -> conversionService.convert(
+            integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
+            IntegrationModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
