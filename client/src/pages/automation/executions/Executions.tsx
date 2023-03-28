@@ -17,9 +17,9 @@ import {
     ProjectExecutionModelFromJSON,
 } from 'middleware/project';
 import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
-import {useGetInstancesQuery} from 'queries/instances.queries';
 import {
     useGetProjectExecutionsQuery,
+    useGetProjectInstancesQuery,
     useGetProjectsQuery,
 } from 'queries/projects.queries';
 import {useGetWorkflowsQuery} from 'queries/workflows.queries';
@@ -135,10 +135,10 @@ export const Executions = () => {
     const [filterPageNumber, setFilterPageNumber] = useState<number>();
 
     const {
-        data: instances,
-        error: instancesError,
-        isLoading: instancesLoading,
-    } = useGetInstancesQuery();
+        data: projectInstances,
+        error: projectInstancesError,
+        isLoading: projectInstancesLoading,
+    } = useGetProjectInstancesQuery({});
 
     const {
         data: projects,
@@ -285,35 +285,38 @@ export const Executions = () => {
                                 />
                             )}
 
-                            {!instancesLoading && !instancesError && (
-                                <FilterableSelect
-                                    isClearable
-                                    label="Instances"
-                                    name="instances"
-                                    options={
-                                        instances?.map((instance) => ({
-                                            label: instance.name,
-                                            value: (
-                                                instance.id || 0
-                                            ).toString(),
-                                        })) || []
-                                    }
-                                    onChange={(
-                                        value: OnChangeValue<
-                                            ISelectOption,
-                                            false
-                                        >
-                                    ) => {
-                                        if (value) {
-                                            setFilterInstanceId(
-                                                Number(value.value)
-                                            );
-                                        } else {
-                                            setFilterInstanceId(undefined);
+                            {!projectInstancesLoading &&
+                                !projectInstancesError && (
+                                    <FilterableSelect
+                                        isClearable
+                                        label="Instances"
+                                        name="instances"
+                                        options={
+                                            projectInstances?.map(
+                                                (instance) => ({
+                                                    label: instance.name,
+                                                    value: (
+                                                        instance.id || 0
+                                                    ).toString(),
+                                                })
+                                            ) || []
                                         }
-                                    }}
-                                />
-                            )}
+                                        onChange={(
+                                            value: OnChangeValue<
+                                                ISelectOption,
+                                                false
+                                            >
+                                        ) => {
+                                            if (value) {
+                                                setFilterInstanceId(
+                                                    Number(value.value)
+                                                );
+                                            } else {
+                                                setFilterInstanceId(undefined);
+                                            }
+                                        }}
+                                    />
+                                )}
                         </div>
                     </>
                 }
