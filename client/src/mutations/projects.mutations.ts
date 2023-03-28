@@ -1,12 +1,14 @@
-import {QueryClient, useMutation} from '@tanstack/react-query';
+import {useMutation} from '@tanstack/react-query';
 import {
     CreateProjectWorkflowRequest,
+    ProjectInstanceModel,
+    ProjectInstancesApi,
     ProjectModel,
     ProjectsApi,
+    UpdateProjectInstanceTagsRequest,
     UpdateProjectTagsRequest,
     WorkflowModel,
 } from 'middleware/project';
-import {ProjectKeys} from 'queries/projects.queries';
 
 type CreateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
@@ -17,22 +19,39 @@ export const useCreateProjectMutation = (
     mutationProps?: CreateProjectMutationProps
 ) =>
     useMutation({
-        mutationFn: (project: ProjectModel) => {
+        mutationFn: (projectModel: ProjectModel) => {
             return new ProjectsApi().createProject({
-                projectModel: project,
+                projectModel,
             });
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
     });
 
-export interface IProjectWithWorkflows extends ProjectModel {
-    workflows: WorkflowModel[];
-}
+type CreateProjectInstanceMutationProps = {
+    onSuccess?: (
+        result: ProjectInstanceModel,
+        variables: ProjectInstanceModel
+    ) => void;
+    onError?: (error: object, variables: ProjectInstanceModel) => void;
+};
+
+export const useCreateProjectInstanceMutation = (
+    mutationProps?: CreateProjectInstanceMutationProps
+) =>
+    useMutation({
+        mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
+            return new ProjectInstancesApi().createProjectInstance({
+                projectInstanceModel,
+            });
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
 
 type CreateProjectWorkflowRequestMutationProps = {
     onSuccess?: (
-        result: IProjectWithWorkflows,
+        result: WorkflowModel,
         variables: CreateProjectWorkflowRequest
     ) => void;
     onError?: (error: object, variables: CreateProjectWorkflowRequest) => void;
@@ -41,24 +60,9 @@ type CreateProjectWorkflowRequestMutationProps = {
 export const useCreateProjectWorkflowRequestMutation = (
     mutationProps?: CreateProjectWorkflowRequestMutationProps
 ) => {
-    const queryClient = new QueryClient();
-
     return useMutation({
         mutationFn: async (request: CreateProjectWorkflowRequest) => {
-            const project = await new ProjectsApi().createProjectWorkflow(
-                request
-            );
-
-            const workflows = await new ProjectsApi().getProjectWorkflows({
-                id: project.id as number,
-            });
-
-            queryClient.setQueryData(
-                [ProjectKeys.projectWorkflows, {projectId: project.id}],
-                workflows
-            );
-
-            return {...project, workflows};
+            return new ProjectsApi().createProjectWorkflow(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
@@ -76,6 +80,22 @@ export const useDeleteProjectMutation = (
     useMutation({
         mutationFn: (id: number) => {
             return new ProjectsApi().deleteProject({id: id});
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type DeleteProjectInstanceMutationProps = {
+    onSuccess?: (result: void, variables: number) => void;
+    onError?: (error: object, variables: number) => void;
+};
+
+export const useDeleteProjectInstanceMutation = (
+    mutationProps?: DeleteProjectInstanceMutationProps
+) =>
+    useMutation({
+        mutationFn: (id: number) => {
+            return new ProjectInstancesApi().deleteProjectInstance({id: id});
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
@@ -108,10 +128,32 @@ export const useUpdateProjectMutation = (
     mutationProps?: UpdateProjectMutationProps
 ) =>
     useMutation({
-        mutationFn: (project: ProjectModel) => {
+        mutationFn: (projectModel: ProjectModel) => {
             return new ProjectsApi().updateProject({
-                projectModel: project,
-                id: project.id!,
+                projectModel,
+                id: projectModel.id!,
+            });
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type UpdateProjectInstanceMutationProps = {
+    onSuccess?: (
+        result: ProjectInstanceModel,
+        variables: ProjectInstanceModel
+    ) => void;
+    onError?: (error: object, variables: ProjectInstanceModel) => void;
+};
+
+export const useUpdateProjectInstanceMutation = (
+    mutationProps?: UpdateProjectInstanceMutationProps
+) =>
+    useMutation({
+        mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
+            return new ProjectInstancesApi().updateProjectInstance({
+                projectInstanceModel,
+                id: projectInstanceModel.id!,
             });
         },
         onSuccess: mutationProps?.onSuccess,
@@ -129,6 +171,28 @@ export const useUpdateProjectTagsMutation = (
     useMutation({
         mutationFn: (request: UpdateProjectTagsRequest) => {
             return new ProjectsApi().updateProjectTags(request);
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type UpdateProjectInstanceTagsMutationProps = {
+    onSuccess?: (
+        result: void,
+        variables: UpdateProjectInstanceTagsRequest
+    ) => void;
+    onError?: (
+        error: object,
+        variables: UpdateProjectInstanceTagsRequest
+    ) => void;
+};
+
+export const useUpdateProjectInstanceTagsMutation = (
+    mutationProps?: UpdateProjectInstanceTagsMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: UpdateProjectTagsRequest) => {
+            return new ProjectInstancesApi().updateProjectInstanceTags(request);
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
