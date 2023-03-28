@@ -1,19 +1,49 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
+import TextArea from 'components/TextArea/TextArea';
+import {useGetComponentDefinitionQuery} from 'queries/componentDefinitions.queries';
+import {useState} from 'react';
 
 import Select from '../../../../components/Select/Select';
 import {Tooltip} from '../../../../components/Tooltip/Tooltip';
-import useRightSlideOverStore from '../stores/useRightSlideOverStore';
+import useNodeDetailsDialogStore from '../stores/useNodeDetailsDialogStore';
+import TabButton from './TabButton';
 
-const RightSlideOver = () => {
-    const {currentNode, rightSlideOverOpen, setRightSlideOverOpen} =
-        useRightSlideOverStore();
+const tabs = [
+    {
+        label: 'Description',
+        name: 'description',
+    },
+    {
+        label: 'Properties',
+        name: 'properties',
+    },
+    {
+        label: 'Connection',
+        name: 'connection',
+    },
+    {
+        label: 'Output',
+        name: 'output',
+    },
+];
+
+const NodeDetailsDialog = () => {
+    const [activeTab, setActiveTab] = useState('description');
+
+    const {currentNode, nodeDetailsOpen, setNodeDetailsOpen} =
+        useNodeDetailsDialogStore();
+
+    const {data: currentComponent} = useGetComponentDefinitionQuery({
+        componentName: currentNode.name,
+        componentVersion: currentNode.version,
+    });
 
     return (
         <Dialog.Root
-            open={rightSlideOverOpen}
-            onOpenChange={() => setRightSlideOverOpen(!rightSlideOverOpen)}
+            open={nodeDetailsOpen}
+            onOpenChange={() => setNodeDetailsOpen(!nodeDetailsOpen)}
             modal={false}
         >
             <Dialog.Portal>
@@ -21,115 +51,110 @@ const RightSlideOver = () => {
                     className="fixed inset-y-0 right-0 z-10 w-screen max-w-md overflow-hidden border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                 >
-                    <div className="flex h-full flex-col divide-y divide-gray-100 bg-white shadow-xl">
-                        <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
-                            {currentNode.label}
+                    {currentComponent ? (
+                        <div className="flex h-full flex-col divide-y divide-gray-100 bg-white shadow-xl">
+                            <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
+                                {currentNode.label}
 
-                            <Tooltip text="Information">
-                                <InfoCircledIcon className="ml-2 h-4 w-4" />
-                            </Tooltip>
+                                <span className="mx-2 text-sm text-gray-500">
+                                    ({currentNode.name})
+                                </span>
 
-                            <Button
-                                aria-label="Close panel"
-                                className="ml-auto"
-                                displayType="icon"
-                                icon={
-                                    <Cross1Icon
-                                        className="h-3 w-3 cursor-pointer text-gray-900"
-                                        aria-hidden="true"
-                                    />
-                                }
-                                onClick={() => setRightSlideOverOpen(false)}
-                            />
-                        </Dialog.Title>
+                                {currentComponent?.display.description && (
+                                    <Tooltip
+                                        text={
+                                            currentComponent?.display
+                                                .description
+                                        }
+                                    >
+                                        <InfoCircledIcon className="h-4 w-4" />
+                                    </Tooltip>
+                                )}
 
-                        <div className="space-y-4 p-4">
-                            <div>
-                                <label
-                                    htmlFor="location"
-                                    className="block text-sm font-medium text-gray-700"
-                                >
-                                    Location
-                                </label>
+                                <Button
+                                    aria-label="Close panel"
+                                    className="ml-auto"
+                                    displayType="icon"
+                                    icon={
+                                        <Cross1Icon
+                                            className="h-3 w-3 cursor-pointer text-gray-900"
+                                            aria-hidden="true"
+                                        />
+                                    }
+                                    onClick={() => setNodeDetailsOpen(false)}
+                                />
+                            </Dialog.Title>
 
-                                <select
-                                    id="location"
-                                    name="location"
-                                    className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                                    defaultValue="Canada"
-                                >
-                                    <option>United States</option>
+                            <div className="space-y-4 p-4">
+                                <Select
+                                    label="Actions"
+                                    options={currentComponent?.actions.map(
+                                        (action) => ({
+                                            label: action.name!,
+                                            value: action.display.label!,
+                                            description:
+                                                action.display.description,
+                                        })
+                                    )}
+                                    triggerClassName="w-full bg-gray-100"
+                                />
 
-                                    <option>Canada</option>
-
-                                    <option>Mexico</option>
-                                </select>
-                            </div>
-
-                            <div className="flex justify-center space-x-1">
-                                <Button label="Description" />
-
-                                <Button label="Auth" />
-
-                                <Button label="Properties" />
-
-                                <Button label="Output" />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="email"
-                                    className="block text-sm font-medium text-gray-700"
-                                >
-                                    Email
-                                </label>
-
-                                <div className="mt-1">
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        id="email"
-                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                        placeholder="you@example.com"
-                                    />
+                                <div className="flex justify-center space-x-1">
+                                    {tabs.map((tab) => (
+                                        <TabButton
+                                            activeTab={activeTab}
+                                            handleClick={() =>
+                                                setActiveTab(tab.name)
+                                            }
+                                            key={tab.name}
+                                            label={tab.label}
+                                            name={tab.name}
+                                        />
+                                    ))}
                                 </div>
+
+                                {activeTab === 'description' && (
+                                    <TextArea
+                                        label="Node Description"
+                                        labelClassName="Node Description"
+                                        name="nodeDescription"
+                                        placeholder="Write some notes for yourself..."
+                                    />
+                                )}
+
+                                {activeTab === 'properties' && (
+                                    <h1>Properties</h1>
+                                )}
+
+                                {activeTab === 'connection' && (
+                                    <h1>Connection</h1>
+                                )}
+
+                                {activeTab === 'output' && <h1>Output</h1>}
                             </div>
 
-                            <div>
-                                <label
-                                    htmlFor="comment"
-                                    className="block text-sm font-medium text-gray-700"
-                                >
-                                    Add your comment
-                                </label>
-
-                                <div className="mt-1">
-                                    <textarea
-                                        rows={4}
-                                        name="comment"
-                                        id="comment"
-                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                        defaultValue={''}
-                                    />
-                                </div>
+                            <div className="mt-auto flex p-4">
+                                <Select
+                                    defaultValue={currentComponent?.version.toString()}
+                                    options={[
+                                        {label: 'v 1', value: '1'},
+                                        {label: 'v 2', value: '2'},
+                                        {label: 'v 3', value: '3'},
+                                    ]}
+                                />
                             </div>
                         </div>
-
-                        <div className="mt-auto flex p-4">
-                            <Select
-                                defaultValue={'2'}
-                                options={[
-                                    {label: 'v 1', value: '1'},
-                                    {label: 'v 2', value: '2'},
-                                    {label: 'v 3', value: '3'},
-                                ]}
-                            />
+                    ) : (
+                        <div className="flex w-full justify-center p-4">
+                            <span className="text-gray-500">
+                                Something went wrong 👾
+                            </span>
                         </div>
-                    </div>
+                    )}
                 </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
     );
 };
 
-export default RightSlideOver;
+export default NodeDetailsDialog;
