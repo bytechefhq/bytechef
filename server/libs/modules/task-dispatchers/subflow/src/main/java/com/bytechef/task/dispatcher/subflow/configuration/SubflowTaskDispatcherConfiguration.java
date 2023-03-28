@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.subflow.configuration;
 
 import com.bytechef.atlas.coordinator.CoordinatorManager;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
@@ -36,12 +36,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SubflowTaskDispatcherConfiguration {
 
-    @Autowired
-    private JobFacade jobFacade;
+    private final MessageBroker messageBroker;
+
+    public SubflowTaskDispatcherConfiguration(MessageBroker messageBroker) {
+        this.messageBroker = messageBroker;
+    }
 
     @Bean
     TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory() {
-        return (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade);
+        return (taskDispatcher) -> new SubflowTaskDispatcher(messageBroker);
     }
 
     @Configuration
