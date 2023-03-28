@@ -19,7 +19,7 @@ package com.bytechef.dione.integration.facade;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
-import com.bytechef.dione.integration.domain.Integration;
+import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +30,13 @@ import java.util.List;
  */
 public interface IntegrationFacade {
 
-    Integration addWorkflow(long id, String name, String description, String definition);
+    Workflow addWorkflow(long id, String label, String description, String definition);
 
-    Integration create(Integration integration);
+    IntegrationDTO create(IntegrationDTO integrationDTO);
 
     void delete(Long id);
 
-    Integration getIntegration(Long id);
+    IntegrationDTO getIntegration(Long id);
 
     @Transactional(readOnly = true)
     List<Category> getIntegrationCategories();
@@ -45,9 +45,9 @@ public interface IntegrationFacade {
 
     List<Workflow> getIntegrationWorkflows(Long id);
 
-    List<Integration> searchIntegrations(List<Long> categoryIds, List<Long> tagIds);
+    List<IntegrationDTO> searchIntegrations(List<Long> categoryIds, List<Long> tagIds);
 
-    Integration update(Long id, List<Tag> tags);
+    IntegrationDTO update(Long id, List<Tag> tags);
 
-    Integration update(Integration integration);
+    IntegrationDTO update(IntegrationDTO integration);
 }

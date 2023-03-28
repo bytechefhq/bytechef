@@ -27,7 +27,6 @@ import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -98,7 +97,7 @@ public class IntegrationServiceIntTest {
         integration = integrationService.create(integration);
 
         assertThat(integration)
-            .hasFieldOrPropertyWithValue("category", category)
+            .hasFieldOrPropertyWithValue("categoryId", category.getId())
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
@@ -163,27 +162,6 @@ public class IntegrationServiceIntTest {
     public void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration());
 
-        Integration updateIntegration = new Integration();
-
-        updateIntegration.setCategory(integration.getCategory());
-        updateIntegration.setDescription(integration.getDescription());
-        updateIntegration.setIntegrationVersion(integration.getIntegrationVersion());
-        updateIntegration.setId(integration.getId());
-        updateIntegration.setName(integration.getName());
-        updateIntegration.setStatus(integration.getStatus());
-        updateIntegration.setVersion(integration.getVersion());
-        updateIntegration.setTags(integration.getTags());
-        updateIntegration.setWorkflowIds(integration.getWorkflowIds());
-
-        integration = integrationService.update(integration);
-
-        assertThat(integration)
-            .hasFieldOrPropertyWithValue("category", category)
-            .hasFieldOrPropertyWithValue("description", "description")
-            .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("tags", Collections.emptyList())
-            .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow1"));
-
         Tag tag = tagRepository.save(new Tag("tag2"));
 
         integration.setDescription("description2");
@@ -195,26 +173,26 @@ public class IntegrationServiceIntTest {
 
         integration.setCategory(category2);
 
-        integration = integrationService.update(integration);
+        integration = integrationService.update(
+            integration.getId(), integration.getCategoryId(), "description2", "name2", List.of(tag.getId()),
+            List.of("workflow2"));
 
         assertThat(integration)
-            .hasFieldOrPropertyWithValue("category", category2)
+            .hasFieldOrPropertyWithValue("categoryId", category2.getId())
             .hasFieldOrPropertyWithValue("description", "description2")
             .hasFieldOrPropertyWithValue("name", "name2")
-            .hasFieldOrPropertyWithValue("tags", List.of(tag))
+            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
             .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow2"));
     }
 
     private Integration getIntegration() {
-        Integration integration = new Integration();
-
-        integration.setCategory(category);
-        integration.setDescription("description");
-        integration.setIntegrationVersion(1);
-        integration.setName("name");
-        integration.setStatus(Integration.Status.UNPUBLISHED);
-        integration.addWorkflow("workflow1");
-
-        return integration;
+        return Integration.Builder.builder()
+            .categoryId(category.getId())
+            .description("description")
+            .integrationVersion(1)
+            .name("name")
+            .status(Integration.Status.UNPUBLISHED)
+            .workflowIds(List.of("workflow1"))
+            .build();
     }
 }
