@@ -130,7 +130,7 @@ public class ProjectServiceIntTest {
     public void testGetProjects() {
         Project project = projectRepository.save(getProject());
 
-        assertThat(projectService.searchProjects(null, null)).hasSize(1);
+        assertThat(projectService.getProjects()).hasSize(1);
 
         Category category = new Category("category1");
 
@@ -140,9 +140,9 @@ public class ProjectServiceIntTest {
 
         project = projectRepository.save(project);
 
-        assertThat(projectService.searchProjects(List.of(category.getId()), null)).hasSize(1);
+        assertThat(projectService.searchProjects(List.of(category.getId()), null, null)).hasSize(1);
 
-        assertThat(projectService.searchProjects(List.of(Long.MAX_VALUE), null)).hasSize(0);
+        assertThat(projectService.searchProjects(List.of(Long.MAX_VALUE), null, null)).hasSize(0);
 
         Tag tag = new Tag("tag1");
 
@@ -152,12 +152,13 @@ public class ProjectServiceIntTest {
 
         projectRepository.save(project);
 
-        assertThat(projectService.searchProjects(null, List.of(tag.getId()))).hasSize(1);
+        assertThat(projectService.searchProjects(null, List.of(tag.getId()), null)).hasSize(1);
 
-        assertThat(projectService.searchProjects(null, List.of(Long.MAX_VALUE))).hasSize(0);
+        assertThat(projectService.searchProjects(null, List.of(Long.MAX_VALUE), null)).hasSize(0);
 
         assertThatException()
-            .isThrownBy(() -> projectService.searchProjects(List.of(Long.MAX_VALUE), List.of(Long.MAX_VALUE)));
+            .isThrownBy(() -> projectService.searchProjects(
+                List.of(Long.MAX_VALUE), List.of(Long.MAX_VALUE), null));
     }
 
     @Test

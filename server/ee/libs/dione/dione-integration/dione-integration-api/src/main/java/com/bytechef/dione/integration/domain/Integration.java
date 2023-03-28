@@ -109,11 +109,12 @@ public final class Integration implements Persistable<Long> {
 
     @PersistenceCreator
     public Integration(
-        String name, String description, Set<IntegrationTag> integrationTags,
+        String description, Long id, String name, Set<IntegrationTag> integrationTags,
         Set<IntegrationWorkflow> integrationWorkflows) {
 
-        this.name = name;
         this.description = description;
+        this.id = id;
+        this.name = name;
         this.integrationTags.addAll(integrationTags);
         this.integrationWorkflows.addAll(integrationWorkflows);
     }

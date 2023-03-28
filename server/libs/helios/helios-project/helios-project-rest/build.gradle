@@ -17,6 +17,7 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         Category: "com.bytechef.category.web.rest.model.CategoryModel",
+        Connection: "com.bytechef.hermes.connection.web.rest.model.ConnectionModel",
         ExecutionError: "com.bytechef.atlas.web.rest.model.ExecutionErrorModel",
         Job: "com.bytechef.atlas.web.rest.model.JobModel",
         Page: "org.springframework.data.domain.Page",

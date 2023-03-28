@@ -31,7 +31,7 @@ import com.bytechef.category.service.CategoryService;
 import com.bytechef.hermes.project.web.rest.mapper.ProjectMapper;
 import com.bytechef.hermes.project.web.rest.model.ProjectModel;
 import com.bytechef.hermes.project.web.rest.model.CreateProjectWorkflowRequestModel;
-import com.bytechef.hermes.project.web.rest.model.UpdateProjectTagsRequestModel;
+import com.bytechef.hermes.project.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -84,7 +84,7 @@ public class ProjectControllerIntTest {
 
         ArgumentCaptor<Long> argument = ArgumentCaptor.forClass(Long.class);
 
-        verify(projectFacade).delete(argument.capture());
+        verify(projectFacade).deleteProject(argument.capture());
 
         Assertions.assertEquals(1L, argument.getValue());
     }
@@ -137,7 +137,7 @@ public class ProjectControllerIntTest {
     public void testGetProjects() {
         Project project = getProject();
 
-        when(projectFacade.searchProjects(null, null)).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(null, false, null)).thenReturn(List.of(project));
 
         this.webTestClient
             .get()
@@ -150,7 +150,7 @@ public class ProjectControllerIntTest {
             .contains(projectMapper.convert(project))
             .hasSize(1);
 
-        when(projectFacade.searchProjects(List.of(1L), null)).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(List.of(1L), false, null)).thenReturn(List.of(project));
 
         this.webTestClient
             .get()
@@ -162,7 +162,7 @@ public class ProjectControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.searchProjects(null, List.of(1L))).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(null, false, List.of(1L))).thenReturn(List.of(project));
 
         this.webTestClient
             .get()
@@ -174,7 +174,7 @@ public class ProjectControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.searchProjects(List.of(1L), List.of(1L))).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(List.of(1L), false, List.of(1L))).thenReturn(List.of(project));
 
         this.webTestClient
             .get()
@@ -193,7 +193,7 @@ public class ProjectControllerIntTest {
             .name("name")
             .description("description");
 
-        when(projectFacade.create(any())).thenReturn(project);
+        when(projectFacade.createProject(any())).thenReturn(project);
 
         try {
             assert project.getId() != null;
@@ -221,7 +221,7 @@ public class ProjectControllerIntTest {
 
         ArgumentCaptor<Project> integrationArgumentCaptor = ArgumentCaptor.forClass(Project.class);
 
-        verify(projectFacade).create(integrationArgumentCaptor.capture());
+        verify(projectFacade).createProject(integrationArgumentCaptor.capture());
 
         Project capturedProject = integrationArgumentCaptor.getValue();
 
@@ -320,7 +320,7 @@ public class ProjectControllerIntTest {
                 .uri("/projects/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UpdateProjectTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
+                .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
@@ -330,7 +330,7 @@ public class ProjectControllerIntTest {
 
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(projectFacade).update(anyLong(), tagsArgumentCaptor.capture());
+        verify(projectFacade).updateProjectTags(anyLong(), tagsArgumentCaptor.capture());
 
         List<Tag> capturedTags = tagsArgumentCaptor.getValue();
 

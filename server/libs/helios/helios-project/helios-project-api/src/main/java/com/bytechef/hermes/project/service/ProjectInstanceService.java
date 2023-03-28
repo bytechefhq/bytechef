@@ -15,20 +15,32 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.project.web.rest.mapper;
+package com.bytechef.hermes.project.service;
 
-import com.bytechef.hermes.project.dto.ProjectExecution;
-import com.bytechef.hermes.project.web.rest.mapper.config.ProjectMapperSpringConfig;
-import com.bytechef.hermes.project.web.rest.model.ProjectExecutionModel;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.hermes.project.domain.ProjectInstance;
+import com.bytechef.tag.domain.Tag;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectMapperSpringConfig.class)
-public interface ProjectExecutionMapper extends Converter<ProjectExecution, ProjectExecutionModel> {
+public interface ProjectInstanceService {
 
-    @Override
-    ProjectExecutionModel convert(ProjectExecution projectExecution);
+    ProjectInstance create(ProjectInstance projectInstance);
+
+    void delete(long id);
+
+    ProjectInstance getProjectInstance(long id);
+
+    List<Long> getProjectIds();
+
+    List<ProjectInstance> getProjectInstances();
+
+    List<ProjectInstance> searchProjectInstances(List<Long> projectIds, List<Long> tagIds);
+
+    ProjectInstance update(long id, List<Tag> tags);
+
+    ProjectInstance update(ProjectInstance projectInstance);
+
 }

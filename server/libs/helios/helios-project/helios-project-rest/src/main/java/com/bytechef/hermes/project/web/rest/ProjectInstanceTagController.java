@@ -19,17 +19,14 @@ package com.bytechef.hermes.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.project.facade.ProjectFacade;
-import com.bytechef.hermes.project.web.rest.model.ProjectExecutionModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.tag.web.rest.model.TagModel;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
@@ -37,27 +34,24 @@ import java.time.LocalDateTime;
 @RestController
 @ConditionalOnApi
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class ProjectExecutionController implements ProjectExecutionsApi {
+public class ProjectInstanceTagController implements ProjectInstanceTagsApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
 
-    @SuppressFBWarnings("EI")
-    public ProjectExecutionController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public ProjectInstanceTagController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
     }
 
     @Override
-    public Mono<ResponseEntity<Page>> getProjectExecutions(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
-        String workflowId, Integer pageNumber, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<TagModel>>> getProjectInstanceTags(ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
-                projectFacade
-                    .searchProjectExecutions(
-                        jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
-                    .map(
-                        projectExecution -> conversionService.convert(projectExecution, ProjectExecutionModel.class))));
+                Flux.fromIterable(
+                    projectFacade.getProjectInstanceTags()
+                        .stream()
+                        .map(tag -> conversionService.convert(tag, TagModel.class))
+                        .toList())));
     }
 }
