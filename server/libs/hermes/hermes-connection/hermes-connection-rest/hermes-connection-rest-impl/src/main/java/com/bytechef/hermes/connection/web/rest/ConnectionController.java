@@ -23,7 +23,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.OAuth2AuthorizationParametersModel;
-import com.bytechef.hermes.connection.web.rest.model.UpdateConnectionTagsRequestModel;
+import com.bytechef.hermes.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
@@ -124,7 +124,7 @@ public class ConnectionController implements ConnectionsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> updateConnectionTags(
-        Long id, Mono<UpdateConnectionTagsRequestModel> updateConnectionTagsRequestModelMono,
+        Long id, Mono<UpdateTagsRequestModel> updateConnectionTagsRequestModelMono,
         ServerWebExchange exchange) {
 
         return updateConnectionTagsRequestModelMono.map(putConnectionTagsRequestModel -> {

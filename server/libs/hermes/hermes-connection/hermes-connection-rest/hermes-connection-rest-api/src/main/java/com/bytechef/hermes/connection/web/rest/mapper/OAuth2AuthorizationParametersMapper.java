@@ -19,7 +19,7 @@ package com.bytechef.hermes.connection.web.rest.mapper;
 
 import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.hermes.connection.web.rest.model.OAuth2AuthorizationParametersModel;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -28,8 +28,8 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(config = ConnectionMapperSpringConfig.class)
 public interface OAuth2AuthorizationParametersMapper
-    extends Converter<ConnectionDefinitionService.OAuth2AuthorizationParameters, OAuth2AuthorizationParametersModel> {
+    extends Converter<OAuth2AuthorizationParameters, OAuth2AuthorizationParametersModel> {
 
     @Override
-    OAuth2AuthorizationParametersModel convert(ConnectionDefinitionService.OAuth2AuthorizationParameters source);
+    OAuth2AuthorizationParametersModel convert(OAuth2AuthorizationParameters source);
 }
