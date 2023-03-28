@@ -27,7 +27,11 @@ const navigation: {
         href: '/automation/projects',
         icon: FolderPlusIcon,
     },
-    {name: 'Instances', href: '/automation/instances', icon: LightBulbIcon},
+    {
+        name: 'Project Instances',
+        href: '/automation/project-instances',
+        icon: LightBulbIcon,
+    },
     {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
     {
         name: 'Execution History',

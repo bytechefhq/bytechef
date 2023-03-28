@@ -7,7 +7,7 @@ import {ProjectsApi} from './middleware/project';
 import Connections from './pages/automation/connections/Connections';
 import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
 import Executions from './pages/automation/executions/Executions';
-import Instances from './pages/automation/instances/Instances';
+import ProjectInstances from './pages/automation/project-instances/ProjectInstances';
 import Project from './pages/automation/project/Project';
 import Projects from './pages/automation/projects/Projects';
 import Integrations from './pages/embedded/integrations/Integrations';
@@ -52,8 +52,8 @@ export const router = createBrowserRouter([
                         element: <Projects />,
                     },
                     {
-                        path: 'instances',
-                        element: <Instances />,
+                        path: 'project-instances',
+                        element: <ProjectInstances />,
                     },
                     {
                         path: 'connections',
