@@ -18,7 +18,6 @@
 package com.bytechef.dione.integration.service;
 
 import com.bytechef.dione.integration.domain.Integration;
-import com.bytechef.tag.domain.Tag;
 
 import java.util.List;
 
@@ -37,7 +36,8 @@ public interface IntegrationService {
 
     List<Integration> searchIntegrations(List<Long> categoryIds, List<Long> tagIds);
 
-    Integration update(long id, List<Tag> tags);
+    Integration update(long id, List<Long> tagIds);
 
-    Integration update(Integration integration);
+    Integration update(
+        long id, Long categoryId, String description, String name, List<Long> tagIds, List<String> workflowIds);
 }

@@ -19,10 +19,13 @@ package com.bytechef.dione.integration.facade;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.dione.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.category.repository.CategoryRepository;
+import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.dione.integration.repository.IntegrationRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -81,13 +84,7 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        integration = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description", null);
-
-        List<String> workflowIds = integration.getWorkflowIds();
-
-        Workflow workflow = workflowRepository.findById(workflowIds.iterator()
-            .next())
-            .orElseThrow();
+        Workflow workflow = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description", null);
 
         assertThat(workflow.getDescription()).isEqualTo("Description");
         assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
@@ -95,64 +92,68 @@ public class IntegrationFacadeIntTest {
 
     @Test
     public void testCreate() {
-        Integration integration = new Integration();
-
-        integration.setName("name1");
-        integration.setDescription("description");
-        integration.setStatus(Integration.Status.UNPUBLISHED);
-
         Category category = categoryRepository.save(new Category("name"));
 
-        integration.setCategory(category);
-        integration.setTags(List.of(new Tag("tag1")));
+        IntegrationDTO integrationDTO = IntegrationDTO.builder()
+            .category(category)
+            .description("description")
+            .name("name1")
+            .status(Integration.Status.UNPUBLISHED)
+            .tags(List.of(new Tag("tag1")))
+            .build();
 
-        integration = integrationFacade.create(integration);
+        integrationDTO = integrationFacade.create(integrationDTO);
 
-        assertThat(integration.getCategoryId()).isEqualTo(category.getId());
-        assertThat(integration.getDescription()).isEqualTo("description");
-        assertThat(integration.getName()).isEqualTo("name1");
-        assertThat(integration.getId()).isNotNull();
-        assertThat(integration.getTagIds()).hasSize(1);
-        assertThat(integration.getWorkflowIds()).hasSize(0);
+        assertThat(integrationDTO.category()).isEqualTo(category);
+        assertThat(integrationDTO.description()).isEqualTo("description");
+        assertThat(integrationDTO.name()).isEqualTo("name1");
+        assertThat(integrationDTO.id()).isNotNull();
+        assertThat(integrationDTO.tags()).hasSize(1);
+        assertThat(integrationDTO.workflowIds()).hasSize(0);
         assertThat(categoryRepository.count()).isEqualTo(1);
         assertThat(tagRepository.count()).isEqualTo(1);
 
-        integration = new Integration();
+        integrationDTO = IntegrationDTO.builder()
+            .category(category)
+            .description("description")
+            .name("name2")
+            .status(Integration.Status.UNPUBLISHED)
+            .tags(List.of(new Tag("tag1")))
+            .workflowIds(List.of("workflow2"))
+            .build();
 
-        integration.setName("name2");
-        integration.setStatus(Integration.Status.UNPUBLISHED);
-        integration.setWorkflowIds(List.of("workflow2"));
+        integrationDTO = integrationFacade.create(integrationDTO);
 
-        integration = integrationFacade.create(integration);
-
-        assertThat(integration.getWorkflowIds()).hasSize(1);
-        assertThat(integration.getWorkflowIds()).contains("workflow2");
+        assertThat(integrationDTO.workflowIds()).hasSize(1);
+        assertThat(integrationDTO.workflowIds()).contains("workflow2");
     }
 
     @Test
     public void testDelete() {
-        Integration integration1 = new Integration();
+        IntegrationDTO integrationDTO1 = IntegrationDTO.builder()
+            .name("name1")
+            .status(Integration.Status.UNPUBLISHED)
+            .tags(List.of(new Tag("tag1")))
+            .build();
 
-        integration1.setName("name1");
-        integration1.setTags(List.of(new Tag("tag1")));
+        integrationDTO1 = integrationFacade.create(integrationDTO1);
 
-        integration1 = integrationFacade.create(integration1);
+        IntegrationDTO integrationDTO2 = IntegrationDTO.builder()
+            .name("name2")
+            .status(Integration.Status.UNPUBLISHED)
+            .tags(List.of(new Tag("tag1")))
+            .build();
 
-        Integration integration2 = new Integration();
-
-        integration2.setName("name2");
-        integration2.setTags(List.of(new Tag("tag1")));
-
-        integration2 = integrationFacade.create(integration2);
+        integrationDTO2 = integrationFacade.create(integrationDTO2);
 
         assertThat(integrationRepository.count()).isEqualTo(2);
         assertThat(tagRepository.count()).isEqualTo(1);
 
-        integrationFacade.delete(integration1.getId());
+        integrationFacade.delete(integrationDTO1.id());
 
         assertThat(integrationRepository.count()).isEqualTo(1);
 
-        integrationFacade.delete(integration2.getId());
+        integrationFacade.delete(integrationDTO2.id());
 
         assertThat(integrationRepository.count()).isEqualTo(0);
         assertThat(tagRepository.count()).isEqualTo(1);
@@ -176,7 +177,7 @@ public class IntegrationFacadeIntTest {
         integration = integrationRepository.save(integration);
 
         assertThat(integrationFacade.getIntegration(integration.getId()))
-            .isEqualTo(integration)
+            .isEqualTo(new IntegrationDTO(integration, category, List.of(tag1, tag2)))
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
@@ -198,14 +199,14 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        List<Integration> integrations = integrationFacade.searchIntegrations(null, null);
+        List<IntegrationDTO> integrationDTOs = integrationFacade.searchIntegrations(null, null);
 
-        assertThat(integrations).isEqualTo(List.of(integration));
+        assertThat(CollectionUtils.map(integrationDTOs, IntegrationDTO::toIntegration)).isEqualTo(List.of(integration));
 
-        integration = integrations.get(0);
+        IntegrationDTO integrationDTO = integrationDTOs.get(0);
 
-        assertThat(integrationFacade.getIntegration(integration.getId()))
-            .isEqualTo(integration)
+        assertThat(integrationFacade.getIntegration(integrationDTO.id()))
+            .isEqualTo(integrationDTO)
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
@@ -216,10 +217,11 @@ public class IntegrationFacadeIntTest {
         Integration integration = new Integration();
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
+        Tag tag2 = tagRepository.save(new Tag("tag2"));
 
         integration.setName("name");
         integration.setStatus(Integration.Status.UNPUBLISHED);
-        integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
+        integration.setTags(List.of(tag1, tag2));
 
         integrationRepository.save(integration);
 
@@ -233,8 +235,7 @@ public class IntegrationFacadeIntTest {
         integration.setName("name2");
         integration.setStatus(Integration.Status.UNPUBLISHED);
 
-        tag1 = tagRepository.findById(tag1.getId())
-            .orElseThrow();
+        tag1 = OptionalUtils.get(tagRepository.findById(tag1.getId()));
 
         integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
@@ -256,7 +257,7 @@ public class IntegrationFacadeIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testGetIntegrationWorkflows() {
-        Workflow workflow = new Workflow("{}", Workflow.Format.JSON);
+        Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON);
 
         workflow.setNew(true);
 
@@ -277,26 +278,28 @@ public class IntegrationFacadeIntTest {
 
     @Test
     public void testUpdate() {
-        Integration integration = new Integration();
-
-        integration.setName("name");
-        integration.setStatus(Integration.Status.UNPUBLISHED);
-
         Tag tag1 = new Tag("tag1");
 
-        integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
+        IntegrationDTO integrationDTO = IntegrationDTO.builder()
+            .name("name")
+            .status(Integration.Status.UNPUBLISHED)
+            .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
+            .build();
 
-        integration = integrationFacade.create(integration);
+        integrationDTO = integrationFacade.create(integrationDTO);
 
-        assertThat(integration.getTagIds()).hasSize(2);
-        assertThat(integration.getWorkflowIds()).hasSize(0);
+        assertThat(integrationDTO.tags()).hasSize(2);
+        assertThat(integrationDTO.workflowIds()).hasSize(0);
 
-        integration.setTags(List.of(tag1));
+        integrationDTO = IntegrationDTO.builder()
+            .id(integrationDTO.id())
+            .name("name")
+            .status(Integration.Status.UNPUBLISHED)
+            .tags(List.of(tag1))
+            .build();
 
-        integrationRepository.save(integration);
+        integrationDTO = integrationFacade.update(integrationDTO);
 
-        integration = integrationFacade.update(integration);
-
-        assertThat(integration.getTagIds()).hasSize(1);
+        assertThat(integrationDTO.tags()).hasSize(1);
     }
 }
