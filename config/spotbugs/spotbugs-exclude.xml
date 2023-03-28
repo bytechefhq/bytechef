@@ -18,7 +18,6 @@
             <Class name="com.bytechef.atlas.service.ContextServiceIntTest" />
             <Class name="com.bytechef.atlas.service.CounterService" />
             <Class name="com.bytechef.atlas.service.JobService" />
-            <Class name="com.bytechef.atlas.coordinator.event.DeleteContextEventListener" />
             <Class name="com.bytechef.atlas.sync.executor.WorkflowExecutor" />
             <Class name="com.bytechef.hermes.registry.InMemoryDefinitionRegistry" />
             <Class name="com.bytechef.hermes.registry.DefinitionRegistryChain" />
@@ -40,7 +39,6 @@
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcCounterRepository" />
             <Class name="com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver" />
             <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
-            <Class name="com.bytechef.atlas.repository.workflow.mapper.WorkflowMapperChain" />
             <Class name="com.bytechef.hermes.component.domain.Connection" />
             <Class name="com.bytechef.hermes.description.accessor.InMemoryConnectionDescriptorResolver" />
             <Class name="com.bytechef.hermes.description.accessor.ComponentDescriptorDescriptorResolverChain" />
@@ -49,11 +47,6 @@
             <Class name="com.bytechef.hermes.description.accessor.ConnectionDescriptorResolverChain" />
             <Class name="com.bytechef.hermes.description.client.listener.StartupApplicationListener" />
             <Class name="com.bytechef.hermes.description.client.listener.ShutdownApplicationListener" />
-            <Class name="com.bytechef.hermes.description.ext.domain.ExtDescriptor" />
-            <Class name="com.bytechef.hermes.description.ext.web.rest.ExtDescriptorController" />
-            <Class name="com.bytechef.hermes.description.ext.repository.ExtDescriptorRepository" />
-            <Class name="com.bytechef.hermes.description.ext.service.ExtDescriptorService" />
-            <Class name="com.bytechef.hermes.description.ext.service.ExtDescriptorServiceImpl" />
             <Class name="com.bytechef.hermes.connection.web.rest.ConnectionController" />
             <Class name="com.bytechef.hermes.connection.web.rest.ConnectionController$ConnectionCreateDTO" />
             <Class name="com.bytechef.task.dispatcher.map.MapTaskDispatcher$Builder" />
@@ -122,7 +115,6 @@
             <Class name="com.bytechef.hermes.description.accessor.ConnectionDescriptorResolverChain" />
             <Class name="com.bytechef.hermes.description.model.ConnectionDescription1" />
             <Class name="com.bytechef.hermes.component.definition.ActionDefinition" />
-            <Class name="com.bytechef.hermes.description.ext.domain.ExtDescriptor" />
             <Class name="com.bytechef.hermes.component.util.HttpClientUtils" />
             <Class name="com.bytechef.atlas.event.WorkflowEvent" />
             <Class name="com.bytechef.hermes.connection.domain.Connection" />
@@ -163,7 +155,7 @@
         <Or>
             <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
             <Class name="com.bytechef.atlas.repository.resource.AbstractResourceWorkflowRepository" />
-            <Class name="com.bytechef.atlas.repository.workflow.mapper.AbstractWorkflowMapper" />
+            <Class name="com.bytechef.atlas.workflow.mapper.AbstractWorkflowMapper" />
             <Class name="com.bytechef.atlas.worker.Worker" />
             <Class name="com.bytechef.cli.command.componentDefinition.subcomand.InitSubcommand" />
             <Class name="com.bytechef.componentDefinition.task.handler.aws.s3.action.AmazonS3URI" />
@@ -180,7 +172,7 @@
         <Or>
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcJobRepository" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
-            <Class name="com.bytechef.atlas.repository.workflow.mapper.AbstractWorkflowMapper" />
+            <Class name="com.bytechef.atlas.workflow.mapper.AbstractWorkflowMapper" />
             <Class name="com.bytechef.component.odsfile.OdsFileComponentHandlerTest" />
             <Class name="com.bytechef.component.csvfile.CsvFileComponentHandlerTest" />
             <Class name="com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest" />
@@ -213,15 +205,6 @@
             </And>
         </Or>
     </Match>
-    <Match>
-        <!-- TODO Review this issues -->
-        <Bug code="GC" />
-        <And>
-            <Class name="com.bytechef.hermes.description.ext.resolver.AbstractExtTaskDescriptorResolver" />
-            <Method name="resolve" params="java.lang.String, float" />
-        </And>
-    </Match>
-
     <Match>
         <!-- TODO Review this issues -->
         <Bug code="THROWS" />
