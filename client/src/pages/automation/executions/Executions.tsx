@@ -72,8 +72,9 @@ const columns = [
         header: 'Completed time',
         cell: (info) => (
             <>
-                {info.getValue()?.endTime?.toLocaleDateString()}{' '}
-                {info.getValue()?.endTime?.toLocaleTimeString()}
+                {`${info.getValue()?.endDate?.toLocaleDateString()} ${info
+                    .getValue()
+                    ?.endDate?.toLocaleTimeString()}`}
             </>
         ),
     }),
@@ -109,11 +110,11 @@ const jobStatusOptions = [
 function getDuration(
     info: CellContext<ProjectExecutionModel, JobModel | undefined>
 ): string | undefined {
-    const startTime = info.getValue()?.startTime?.getTime();
-    const endTime = info.getValue()?.endTime?.getTime();
+    const startDate = info.getValue()?.startDate?.getTime();
+    const endDate = info.getValue()?.endDate?.getTime();
 
-    if (startTime && endTime) {
-        return `${Math.round((endTime - startTime) / 1000)}s`;
+    if (startDate && endDate) {
+        return `${Math.round((endDate - startDate) / 1000)}s`;
     } else {
         return undefined;
     }
@@ -154,8 +155,8 @@ export const Executions = () => {
         jobStatus: filterStatus,
         projectId: filterProjectId,
         workflowId: filterWorkflowId,
-        jobStartTime: filterStartDate,
-        jobEndTime: filterEndDate,
+        jobStartDate: filterStartDate,
+        jobEndDate: filterEndDate,
         projectInstanceId: filterInstanceId,
         pageNumber: filterPageNumber,
     });
@@ -214,15 +215,15 @@ export const Executions = () => {
                             />
 
                             <DatePicker
-                                label="Start time"
-                                name="jobStartTime"
+                                label="Start date"
+                                name="jobStartDate"
                                 placeholder="Select..."
                                 onChange={setFilterStartDate}
                             />
 
                             <DatePicker
-                                label="End time"
-                                name="jobEndTime"
+                                label="End date"
+                                name="jobEndDate"
                                 placeholder="Select..."
                                 onChange={setFilterEndDate}
                             />
