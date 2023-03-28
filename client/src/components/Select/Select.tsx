@@ -1,4 +1,5 @@
 import {CheckIcon, ChevronDownIcon, ChevronUpIcon} from '@radix-ui/react-icons';
+import {Label} from '@radix-ui/react-label';
 import {
     Content,
     Group,
@@ -6,6 +7,7 @@ import {
     Item,
     ItemIndicator,
     ItemText,
+    Portal,
     Root,
     ScrollDownButton,
     ScrollUpButton,
@@ -13,73 +15,94 @@ import {
     Value,
     Viewport,
 } from '@radix-ui/react-select';
-import React from 'react';
 
 import Button from '../Button/Button';
 
 export interface ISelectOption {
     label: string;
     value: string;
+    description?: string;
 }
 
 type SelectProps = {
-    defaultValue?: string | undefined;
     options: ISelectOption[];
+    defaultValue?: string | undefined;
+    label?: string;
     onValueChange?(value: string): void;
+    triggerClassName?: string;
     value?: string;
 };
 
 const Select = ({
     defaultValue,
+    label,
     options,
     onValueChange,
+    triggerClassName,
     value,
-}: SelectProps): JSX.Element => {
-    return (
+}: SelectProps): JSX.Element => (
+    <fieldset>
+        {label && (
+            <Label className="block text-sm font-medium leading-6 text-gray-900">
+                {label}
+            </Label>
+        )}
+
         <Root
-            defaultValue={defaultValue}
+            defaultValue={defaultValue || options[0].value}
             onValueChange={onValueChange}
             value={value}
         >
             <Trigger asChild aria-label="Select">
-                <Button displayType="light">
+                <Button className={triggerClassName} displayType="light">
                     <Value />
 
-                    <Icon className="ml-2">
+                    <Icon className="ml-auto pl-2">
                         <ChevronDownIcon />
                     </Icon>
                 </Button>
             </Trigger>
 
-            <Content>
-                <ScrollUpButton className="flex items-center justify-center text-gray-700 dark:text-gray-300">
-                    <ChevronUpIcon />
-                </ScrollUpButton>
+            <Portal className="z-20">
+                <Content position="popper" sideOffset={5}>
+                    <ScrollUpButton className="flex items-center justify-center text-gray-700 dark:text-gray-300">
+                        <ChevronUpIcon />
+                    </ScrollUpButton>
 
-                <Viewport className="rounded-lg border border-gray-100 bg-white p-2 shadow-lg dark:bg-gray-800">
-                    <Group>
-                        {options.map((selectItem) => (
-                            <Item
-                                key={selectItem.value}
-                                value={selectItem.value}
-                                className="relative flex cursor-pointer select-none items-center rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none radix-disabled:opacity-50 dark:text-gray-300 dark:focus:bg-gray-900"
-                            >
-                                <ItemText>{selectItem.label}</ItemText>
+                    <Viewport className="rounded-lg border border-gray-100 bg-white p-2 shadow-lg dark:bg-gray-800">
+                        <Group>
+                            {options.map((selectItem) => (
+                                <Item
+                                    key={selectItem.value}
+                                    value={selectItem.value}
+                                    // eslint-disable-next-line tailwindcss/classnames-order
+                                    className="relative flex cursor-pointer select-none items-center rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none radix-disabled:opacity-50 dark:text-gray-300 dark:focus:bg-gray-900"
+                                >
+                                    <ItemIndicator className="absolute left-2 inline-flex items-center">
+                                        <CheckIcon />
+                                    </ItemIndicator>
 
-                                <ItemIndicator className="absolute left-2 inline-flex items-center">
-                                    <CheckIcon />
-                                </ItemIndicator>
-                            </Item>
-                        ))}
-                    </Group>
-                </Viewport>
+                                    <div className="flex flex-col">
+                                        <ItemText>{selectItem.label}</ItemText>
 
-                <ScrollDownButton className="flex items-center justify-center text-gray-700 dark:text-gray-300">
-                    <ChevronDownIcon />
-                </ScrollDownButton>
-            </Content>
+                                        {selectItem.description && (
+                                            <span className="mt-1 text-xs text-gray-500">
+                                                {selectItem.description}
+                                            </span>
+                                        )}
+                                    </div>
+                                </Item>
+                            ))}
+                        </Group>
+                    </Viewport>
+
+                    <ScrollDownButton className="flex items-center justify-center text-gray-700 dark:text-gray-300">
+                        <ChevronDownIcon />
+                    </ScrollDownButton>
+                </Content>
+            </Portal>
         </Root>
-    );
-};
+    </fieldset>
+);
 
 export default Select;
