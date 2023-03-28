@@ -14,7 +14,7 @@ import ReactFlow, {
     useStore,
 } from 'reactflow';
 
-import RightSlideOver from './components/NodeDetailsDialog';
+import NodeDetailsDialog from './components/NodeDetailsDialog';
 import PlaceholderEdge from './edges/PlaceholderEdge';
 import WorkflowEdge from './edges/WorkflowEdge';
 import useHandleDrop from './hooks/useHandleDrop';
@@ -182,7 +182,7 @@ function WorkflowEditor({components, flowControls}: WorkflowEditorProps) {
                 <Workflow components={components} flowControls={flowControls} />
             </ReactFlowProvider>
 
-            <RightSlideOver />
+            <NodeDetailsDialog />
         </>
     );
 }
