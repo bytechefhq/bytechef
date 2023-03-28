@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS project (
     version                  BIGINT       NOT NULL
 );
 
-ALTER TABLE project ADD CONSTRAINT uk_project_name UNIQUE (name);
-
 CREATE TABLE IF NOT EXISTS project_instance (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     name                     VARCHAR(256) NOT NULL,
@@ -29,8 +27,6 @@ CREATE TABLE IF NOT EXISTS project_instance (
     last_modified_by         VARCHAR(256) NOT NULL,
     version                  BIGINT       NOT NULL
 );
-
-ALTER TABLE project_instance ADD CONSTRAINT uk_project_instance_name UNIQUE (name);
 
 CREATE TABLE IF NOT EXISTS project_instance_connection (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
@@ -56,6 +52,8 @@ CREATE TABLE IF NOT EXISTS project_workflow (
     workflow_id              VARCHAR(256) NOT NULL
 );
 
+ALTER TABLE project ADD CONSTRAINT uk_project_name UNIQUE (name);
+ALTER TABLE project_instance ADD CONSTRAINT uk_project_instance_name UNIQUE (name);
 ALTER TABLE project ADD CONSTRAINT fk_project_category FOREIGN KEY (category_id) REFERENCES category (id);
 ALTER TABLE project_instance ADD CONSTRAINT fk_project_instance_project FOREIGN KEY (project_id) REFERENCES project (id);
 ALTER TABLE project_instance_connection ADD CONSTRAINT fk_project_instance_connection_project_instance FOREIGN KEY (project_instance_id) REFERENCES project_instance (id);
