@@ -17,18 +17,20 @@
 
 package com.bytechef.hermes.project.web.rest.mapper;
 
-import com.bytechef.hermes.project.dto.ProjectExecution;
+import com.bytechef.hermes.project.domain.ProjectInstance;
 import com.bytechef.hermes.project.web.rest.mapper.config.ProjectMapperSpringConfig;
-import com.bytechef.hermes.project.web.rest.model.ProjectExecutionModel;
+import com.bytechef.hermes.project.web.rest.model.ProjectInstanceModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectMapperSpringConfig.class)
-public interface ProjectExecutionMapper extends Converter<ProjectExecution, ProjectExecutionModel> {
+public interface ProjectInstanceModelMapper extends Converter<ProjectInstanceModel, ProjectInstance> {
 
-    @Override
-    ProjectExecutionModel convert(ProjectExecution projectExecution);
+    @Mapping(target = "update", ignore = true)
+    @Mapping(target = "tagIds", ignore = true)
+    ProjectInstance convert(ProjectInstanceModel projectInstanceModel);
 }

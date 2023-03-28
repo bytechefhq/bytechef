@@ -109,7 +109,7 @@ public class ProjectFacadeIntTest {
         project.setCategory(category);
         project.setTags(List.of(new Tag("tag1")));
 
-        project = projectFacade.create(project);
+        project = projectFacade.createProject(project);
 
         assertThat(project.getCategoryId()).isEqualTo(category.getId());
         assertThat(project.getDescription()).isEqualTo("description");
@@ -126,7 +126,7 @@ public class ProjectFacadeIntTest {
         project.setStatus(Project.Status.UNPUBLISHED);
         project.setWorkflowIds(List.of("workflow2"));
 
-        project = projectFacade.create(project);
+        project = projectFacade.createProject(project);
 
         assertThat(project.getWorkflowIds()).hasSize(1);
         assertThat(project.getWorkflowIds()).contains("workflow2");
@@ -140,7 +140,7 @@ public class ProjectFacadeIntTest {
         project1.setStatus(Project.Status.UNPUBLISHED);
         project1.setTags(List.of(new Tag("tag1")));
 
-        project1 = projectFacade.create(project1);
+        project1 = projectFacade.createProject(project1);
 
         Project project2 = new Project();
 
@@ -148,16 +148,16 @@ public class ProjectFacadeIntTest {
         project2.setStatus(Project.Status.UNPUBLISHED);
         project2.setTags(List.of(new Tag("tag1")));
 
-        project2 = projectFacade.create(project2);
+        project2 = projectFacade.createProject(project2);
 
         assertThat(projectRepository.count()).isEqualTo(2);
         assertThat(tagRepository.count()).isEqualTo(1);
 
-        projectFacade.delete(project1.getId());
+        projectFacade.deleteProject(project1.getId());
 
         assertThat(projectRepository.count()).isEqualTo(1);
 
-        projectFacade.delete(project2.getId());
+        projectFacade.deleteProject(project2.getId());
 
         assertThat(projectRepository.count()).isEqualTo(0);
         assertThat(tagRepository.count()).isEqualTo(1);
@@ -203,7 +203,7 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        List<Project> projects = projectFacade.searchProjects(null, null);
+        List<Project> projects = projectFacade.searchProjects(null, false, null);
 
         assertThat(projects).isEqualTo(List.of(project));
 
@@ -291,7 +291,7 @@ public class ProjectFacadeIntTest {
 
         project.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
-        project = projectFacade.create(project);
+        project = projectFacade.createProject(project);
 
         assertThat(project.getTagIds()).hasSize(2);
         assertThat(project.getWorkflowIds()).hasSize(1);

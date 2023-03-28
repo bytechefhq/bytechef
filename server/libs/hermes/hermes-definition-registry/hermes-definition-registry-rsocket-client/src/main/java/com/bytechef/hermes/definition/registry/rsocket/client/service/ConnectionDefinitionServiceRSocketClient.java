@@ -24,6 +24,7 @@ import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.rsocket.client.util.ServiceInstanceUtils;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;

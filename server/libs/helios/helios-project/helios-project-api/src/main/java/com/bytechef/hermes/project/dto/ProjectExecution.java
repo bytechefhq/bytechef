@@ -15,24 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.util;
+package com.bytechef.hermes.project.dto;
 
-import java.util.Optional;
-import java.util.function.Consumer;
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.hermes.project.domain.Project;
+import com.bytechef.hermes.project.domain.ProjectInstance;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-/**
- * @author Ivica Cardic
- */
-public final class OptionalUtils {
+import java.util.List;
 
-    private OptionalUtils() {
-    }
-
-    public static <T> T get(Optional<T> optional) {
-        return optional.orElseThrow(IllegalArgumentException::new);
-    }
-
-    public static <T> void ifPresent(Optional<T> optional, Consumer<? super T> action) {
-        optional.ifPresent(action);
-    }
+@SuppressFBWarnings("EI")
+public record ProjectExecution(
+    ProjectInstance instance, Job job, Project project, List<TaskExecution> taskExecutions,
+    Workflow workflow) {
 }

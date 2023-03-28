@@ -56,11 +56,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Optional<Project> fetchProject(String name) {
-        return projectRepository.findByName(name);
-    }
-
-    @Override
     public Project create(Project project) {
         Assert.notNull(project, "'project' must not be null");
         Assert.isNull(project.getId(), "'id' must be null");
@@ -78,17 +73,27 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Optional<Project> fetchProject(String name) {
+        return projectRepository.findByName(name);
+    }
+
+    @Override
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
     }
 
     @Override
     public List<Project> getProjects() {
-        return searchProjects(null, null);
+        return com.bytechef.commons.util.CollectionUtils.toList(projectRepository.findAll(Sort.by("name")));
     }
 
     @Override
-    public List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds) {
+    public List<Project> getProjects(List<Long> ids) {
+        return com.bytechef.commons.util.CollectionUtils.toList(projectRepository.findAllById(ids));
+    }
+
+    @Override
+    public List<Project> searchProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds) {
         Iterable<Project> projectIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
@@ -101,7 +106,15 @@ public class ProjectServiceImpl implements ProjectService {
             projectIterable = projectRepository.findAllByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
         }
 
-        return com.bytechef.commons.util.CollectionUtils.toList(projectIterable);
+        List<Project> projects = com.bytechef.commons.util.CollectionUtils.toList(projectIterable);
+
+        if (ids != null) {
+            projects = projects.stream()
+                .filter(project -> ids.contains(project.getId()))
+                .toList();
+        }
+
+        return projects;
     }
 
     @Override
