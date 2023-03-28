@@ -21,7 +21,7 @@ import com.bytechef.atlas.coordinator.CoordinatorManager;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
