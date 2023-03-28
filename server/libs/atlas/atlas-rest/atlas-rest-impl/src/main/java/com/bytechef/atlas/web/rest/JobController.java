@@ -20,7 +20,7 @@
 package com.bytechef.atlas.web.rest;
 
 import com.bytechef.atlas.dto.JobParametersDTO;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.JobService;
@@ -50,7 +50,7 @@ import reactor.core.publisher.Mono;
 public class JobController implements JobsApi {
 
     private final ConversionService conversionService;
-    private final JobFacade jobFacade;
+    private final JobFactory jobFactory;
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
@@ -58,11 +58,11 @@ public class JobController implements JobsApi {
     @SuppressFBWarnings("EI2")
     public JobController(
         ConversionService conversionService,
-        JobFacade jobFacade, JobService jobService,
+        JobFactory jobFactory, JobService jobService,
         MessageBroker messageBroker,
         TaskExecutionService taskExecutionService) {
         this.conversionService = conversionService;
-        this.jobFacade = jobFacade;
+        this.jobFactory = jobFactory;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
@@ -76,7 +76,7 @@ public class JobController implements JobsApi {
             JobParametersDTO jobParametersDTO = conversionService.convert(
                 workflowParametersModel, JobParametersDTO.class);
 
-            long jobId = jobFacade.create(jobParametersDTO);
+            long jobId = jobFactory.create(jobParametersDTO);
 
             return ResponseEntity.ok(new CreateJob200ResponseModel().jobId(jobId));
         });

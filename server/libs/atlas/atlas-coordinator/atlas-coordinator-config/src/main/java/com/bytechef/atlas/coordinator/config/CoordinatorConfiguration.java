@@ -43,7 +43,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -80,7 +80,7 @@ public class CoordinatorConfiguration {
     private EventPublisher eventPublisher;
 
     @Autowired
-    private JobFacade jobFacade;
+    private JobFactory jobFactory;
 
     @Autowired
     private JobService jobService;
@@ -117,7 +117,7 @@ public class CoordinatorConfiguration {
             errorHandler(),
             eventPublisher,
             jobExecutor(),
-            jobFacade,
+            jobFactory,
             jobService,
             taskCompletionHandler(),
             taskDispatcher(),
