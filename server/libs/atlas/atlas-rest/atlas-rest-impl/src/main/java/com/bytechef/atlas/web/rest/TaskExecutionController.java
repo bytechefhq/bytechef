@@ -49,6 +49,7 @@ public class TaskExecutionController implements TaskExecutionsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<TaskExecutionModel>> getTaskExecution(Long id, ServerWebExchange exchange) {
         return Mono.just(
             conversionService.convert(taskExecutionService.getTaskExecution(id), TaskExecutionModel.class))
