@@ -12,8 +12,6 @@ type EditNodeDialogProps = {
 const EditNodeDialog = ({visible = false, onClose}: EditNodeDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
-    console.log('isOpen: ', isOpen);
-
     function closeDialog() {
         setIsOpen(false);
 
