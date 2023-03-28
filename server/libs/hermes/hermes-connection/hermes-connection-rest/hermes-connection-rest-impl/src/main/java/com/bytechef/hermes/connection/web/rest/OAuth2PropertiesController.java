@@ -47,6 +47,7 @@ public class OAuth2PropertiesController implements Oauth2PropertiesApi {
 
     @Override
     public Mono<ResponseEntity<OAuth2PropertiesModel>> getOAuth2Properties(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(conversionService.convert(oAuth2Properties, OAuth2PropertiesModel.class)));
+        return Mono.just(conversionService.convert(oAuth2Properties, OAuth2PropertiesModel.class))
+            .map(ResponseEntity::ok);
     }
 }

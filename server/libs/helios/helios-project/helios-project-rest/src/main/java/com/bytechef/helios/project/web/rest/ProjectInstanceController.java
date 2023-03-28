@@ -56,11 +56,11 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     public Mono<ResponseEntity<ProjectInstanceModel>> createProjectInstance(
         Mono<ProjectInstanceModel> projectInstanceModelMono, ServerWebExchange exchange) {
 
-        return projectInstanceModelMono.map(projectInstanceModel -> ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.createProjectInstance(
-                    conversionService.convert(projectInstanceModel, ProjectInstanceDTO.class)),
-                ProjectInstanceModel.class)));
+        return projectInstanceModelMono.map(projectInstanceModel -> conversionService.convert(
+            projectFacade.createProjectInstance(
+                conversionService.convert(projectInstanceModel, ProjectInstanceDTO.class)),
+            ProjectInstanceModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -75,8 +75,8 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     @Override
     public Mono<ResponseEntity<ProjectInstanceModel>> getProjectInstance(Long id, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                conversionService.convert(projectFacade.getProjectInstance(id), ProjectInstanceModel.class)));
+            conversionService.convert(projectFacade.getProjectInstance(id), ProjectInstanceModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -84,22 +84,22 @@ public class ProjectInstanceController implements ProjectInstancesApi {
         List<Long> projectIds, List<Long> tagIds, ServerWebExchange exchange) {
 
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    projectFacade.searchProjectInstances(projectIds, tagIds)
-                        .stream()
-                        .map(projectInstance -> conversionService.convert(projectInstance, ProjectInstanceModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                projectFacade.searchProjectInstances(projectIds, tagIds)
+                    .stream()
+                    .map(projectInstance -> conversionService.convert(projectInstance, ProjectInstanceModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<ProjectInstanceModel>> updateProjectInstance(
         Long id, Mono<ProjectInstanceModel> projectInstanceModelMono, ServerWebExchange exchange) {
 
-        return projectInstanceModelMono.map(projectInstanceModel -> ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.update(conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class)),
-                ProjectInstanceModel.class)));
+        return projectInstanceModelMono.map(projectInstanceModel -> conversionService.convert(
+            projectFacade.update(conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class)),
+            ProjectInstanceModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
