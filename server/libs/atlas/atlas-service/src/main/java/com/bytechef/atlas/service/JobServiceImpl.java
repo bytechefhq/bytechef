@@ -151,7 +151,6 @@ public class JobServiceImpl implements JobService {
         return jobRepository.findAll(
             status, startDate, endDate, workflowId, workflowIds,
             PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
-//        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
     }
 
     @Override
