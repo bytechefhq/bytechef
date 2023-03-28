@@ -29,7 +29,11 @@ const navigation: {
     },
     {name: 'Instances', href: '/automation/instances', icon: LightBulbIcon},
     {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
-    {name: 'Executions', href: '/automation/executions', icon: QueueListIcon},
+    {
+        name: 'Execution History',
+        href: '/automation/executions',
+        icon: QueueListIcon,
+    },
 ];
 
 function App() {
