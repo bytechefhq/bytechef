@@ -21,7 +21,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.if_.IfTaskDispatcher;
 import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;

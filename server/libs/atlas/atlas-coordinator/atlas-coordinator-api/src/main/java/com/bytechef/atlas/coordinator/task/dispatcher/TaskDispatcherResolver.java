@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.dispatcher;
+package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.task.Task;
 
