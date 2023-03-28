@@ -54,6 +54,7 @@ const ContextualMenu = ({
                     label: clickedItem.display?.label,
                     name: getFormattedName(clickedItem.name!, nodes),
                     icon: <Component1Icon className="h-8 w-8 text-gray-700" />,
+                    version: clickedItem.version,
                 },
                 position: {
                     x: 0,
@@ -127,17 +128,18 @@ const ContextualMenu = ({
                     if (node.id === placeholderId) {
                         return {
                             ...node,
-                            type: 'workflow',
                             data: {
+                                icon: (
+                                    <Component1Icon className="h-8 w-8 text-gray-700" />
+                                ),
                                 label: clickedItem.display?.label,
                                 name: getFormattedName(
                                     clickedItem.name!,
                                     nodes
                                 ),
-                                icon: (
-                                    <Component1Icon className="h-8 w-8 text-gray-700" />
-                                ),
+                                version: clickedItem.version,
                             },
+                            type: 'workflow',
                         };
                     }
 
