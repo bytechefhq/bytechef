@@ -2,6 +2,7 @@ import {useQuery} from '@tanstack/react-query';
 
 import {
     ConnectionModel,
+    ConnectionTagsApi,
     ConnectionsApi,
     OAuth2AuthorizationParametersModel,
     TagModel,
@@ -52,5 +53,5 @@ export const useGetConnectionsQuery = (filters: {
 
 export const useGetConnectionTagsQuery = () =>
     useQuery<TagModel[], Error>(ConnectionKeys.connectionTags, () =>
-        new ConnectionsApi().getConnectionTags()
+        new ConnectionTagsApi().getConnectionTags()
     );
