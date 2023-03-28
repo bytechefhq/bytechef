@@ -318,6 +318,7 @@ const ConnectionDialog = ({
         return {
             authorizationName: authorizationName,
             componentName: componentName?.value,
+            connectionVersion: 1,
             name: name,
             parameters: {
                 ...parameters,
