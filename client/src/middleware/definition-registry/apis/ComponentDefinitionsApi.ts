@@ -15,12 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  ActionDefinitionModel,
   ComponentDefinitionBasicModel,
   ComponentDefinitionWithBasicActionsModel,
   ConnectionDefinitionBasicModel,
   ConnectionDefinitionModel,
 } from '../models';
 import {
+    ActionDefinitionModelFromJSON,
+    ActionDefinitionModelToJSON,
     ComponentDefinitionBasicModelFromJSON,
     ComponentDefinitionBasicModelToJSON,
     ComponentDefinitionWithBasicActionsModelFromJSON,
@@ -30,6 +33,12 @@ import {
     ConnectionDefinitionModelFromJSON,
     ConnectionDefinitionModelToJSON,
 } from '../models';
+
+export interface GetActionDefinitionRequest {
+    componentName: string;
+    componentVersion: number;
+    actionName: string;
+}
 
 export interface GetComponentConnectionDefinitionRequest {
     componentName: string;
@@ -59,6 +68,46 @@ export interface GetComponentDefinitionsRequest {
  * 
  */
 export class ComponentDefinitionsApi extends runtime.BaseAPI {
+
+    /**
+     * Get an action of a component definition.
+     * Get an action of a component definition.
+     */
+    async getActionDefinitionRaw(requestParameters: GetActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ActionDefinitionModel>> {
+        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
+            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getActionDefinition.');
+        }
+
+        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
+            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getActionDefinition.');
+        }
+
+        if (requestParameters.actionName === null || requestParameters.actionName === undefined) {
+            throw new runtime.RequiredError('actionName','Required parameter requestParameters.actionName was null or undefined when calling getActionDefinition.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/component-definitions/{componentName}/{componentVersion}/actions/{actionName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))).replace(`{${"actionName"}}`, encodeURIComponent(String(requestParameters.actionName))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ActionDefinitionModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Get an action of a component definition.
+     * Get an action of a component definition.
+     */
+    async getActionDefinition(requestParameters: GetActionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ActionDefinitionModel> {
+        const response = await this.getActionDefinitionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get connection definition for a component.
