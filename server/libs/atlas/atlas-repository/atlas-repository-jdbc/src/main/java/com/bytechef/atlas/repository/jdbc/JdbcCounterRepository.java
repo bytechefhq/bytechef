@@ -22,7 +22,7 @@ import com.bytechef.atlas.repository.CounterRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @ConditionalOnProperty(prefix = "bytechef", name = "persistence.provider", havingValue = "jdbc")
-public interface JdbcCounterRepository extends PagingAndSortingRepository<Counter, Long>, CounterRepository {
+public interface JdbcCounterRepository extends ListPagingAndSortingRepository<Counter, Long>, CounterRepository {
 
     @Override
     @Query("SELECT value FROM counter WHERE id = :id FOR UPDATE")
