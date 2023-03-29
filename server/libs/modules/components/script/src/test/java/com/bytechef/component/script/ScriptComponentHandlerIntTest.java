@@ -20,7 +20,7 @@ package com.bytechef.component.script;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 
@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ComponentIntTest
 public class ScriptComponentHandlerIntTest {
 
+    public static final Base64.Encoder ENCODER = Base64.getEncoder();
     private TaskHandler<Object> taskHandler = taskExecution -> {
         Map<String, Object> parameters = taskExecution.getParameters();
 
@@ -45,7 +46,7 @@ public class ScriptComponentHandlerIntTest {
     };
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private ComponentWorkflowTestSupport componentWorkflowTestSupport;
 
     @Disabled
     @Test
@@ -55,9 +56,8 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformJavaScript() {
-        Job job = workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
+        Job job = componentWorkflowTestSupport.execute(
+            ENCODER.encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -69,9 +69,8 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformPython() {
-        Job job = workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
+        Job job = componentWorkflowTestSupport.execute(
+            ENCODER.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -83,9 +82,8 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformR() {
-        Job job = workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
+        Job job = componentWorkflowTestSupport.execute(
+            ENCODER.encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
@@ -97,9 +95,8 @@ public class ScriptComponentHandlerIntTest {
 
     @Test
     public void testPerformRuby() {
-        Job job = workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
+        Job job = componentWorkflowTestSupport.execute(
+            ENCODER.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);

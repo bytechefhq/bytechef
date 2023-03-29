@@ -17,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
@@ -43,7 +43,7 @@ public class EachTaskDispatcherIntTest {
     private TestVarTaskHandler<List<String>, String> testVarTaskHandler;
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @BeforeEach
     void beforeEach() {
@@ -54,7 +54,7 @@ public class EachTaskDispatcherIntTest {
 
     @Test
     public void testEachTaskDispatcher() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("each_v1".getBytes(StandardCharsets.UTF_8)),
             (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(

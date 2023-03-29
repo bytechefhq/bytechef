@@ -22,7 +22,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
@@ -47,13 +47,13 @@ public class JsonFileComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private ComponentWorkflowTestSupport componentWorkflowTestSupport;
 
     @Test
     public void testRead() throws JSONException {
         File sampleFile = getFile("sample_array.json");
 
-        Job job = workflowExecutor.execute(
+        Job job = componentWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
@@ -76,7 +76,7 @@ public class JsonFileComponentHandlerIntTest {
 
     @Test
     public void testWrite() throws JSONException {
-        Job job = workflowExecutor.execute(
+        Job job = componentWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("jsonfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
@@ -92,7 +92,7 @@ public class JsonFileComponentHandlerIntTest {
 
         File sampleFile = getFile("sample_array.json");
 
-        job = workflowExecutor.execute(
+        job = componentWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
