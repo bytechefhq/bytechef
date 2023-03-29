@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -26,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-28T19:25:30.758107+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:44:25.432901+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   @JsonProperty("createdBy")
@@ -48,6 +50,10 @@ public class TaskExecutionModel {
 
   @JsonProperty("id")
   private String id;
+
+  @JsonProperty("input")
+  @Valid
+  private Map<String, Object> input = null;
 
   @JsonProperty("jobId")
   private String jobId;
@@ -255,6 +261,33 @@ public class TaskExecutionModel {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public TaskExecutionModel input(Map<String, Object> input) {
+    this.input = input;
+    return this;
+  }
+
+  public TaskExecutionModel putInputItem(String key, Object inputItem) {
+    if (this.input == null) {
+      this.input = new HashMap<>();
+    }
+    this.input.put(key, inputItem);
+    return this;
+  }
+
+  /**
+   * The input parameters for this task.
+   * @return input
+  */
+  
+  @Schema(name = "input", accessMode = Schema.AccessMode.READ_ONLY, description = "The input parameters for this task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Map<String, Object> getInput() {
+    return input;
+  }
+
+  public void setInput(Map<String, Object> input) {
+    this.input = input;
   }
 
   public TaskExecutionModel jobId(String jobId) {
@@ -595,6 +628,7 @@ public class TaskExecutionModel {
         Objects.equals(this.error, taskExecution.error) &&
         Objects.equals(this.executionTime, taskExecution.executionTime) &&
         Objects.equals(this.id, taskExecution.id) &&
+        Objects.equals(this.input, taskExecution.input) &&
         Objects.equals(this.jobId, taskExecution.jobId) &&
         Objects.equals(this.lastModifiedBy, taskExecution.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, taskExecution.lastModifiedDate) &&
@@ -616,7 +650,7 @@ public class TaskExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, id, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, retry, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, retry, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
   }
 
   @Override
@@ -629,6 +663,7 @@ public class TaskExecutionModel {
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    executionTime: ").append(toIndentedString(executionTime)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    input: ").append(toIndentedString(input)).append("\n");
     sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");

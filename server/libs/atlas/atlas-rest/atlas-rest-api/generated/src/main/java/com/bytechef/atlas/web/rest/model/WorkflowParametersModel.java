@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowParameters", description = "Defines parameters used to execute a workflow.")
 @JsonTypeName("WorkflowParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-28T19:25:30.758107+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:44:25.432901+02:00[Europe/Zagreb]")
 public class WorkflowParametersModel {
 
   @JsonProperty("inputs")
