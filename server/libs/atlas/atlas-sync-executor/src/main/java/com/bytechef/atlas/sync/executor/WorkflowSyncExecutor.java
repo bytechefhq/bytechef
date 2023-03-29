@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.bytechef.commons.util.CollectionUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ public class WorkflowSyncExecutor {
     private final Map<String, TaskHandler<?>> taskHandlerMap;
     private final WorkflowService workflowService;
 
+    @SuppressFBWarnings("EI")
     public WorkflowSyncExecutor(
         ContextService contextService, JobService jobService, EventPublisher eventPublisher,
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
