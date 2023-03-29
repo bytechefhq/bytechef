@@ -26,6 +26,7 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.sync.executor.WorkflowSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.CollectionUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class ComponentWorkflowTestSupport {
     private final Map<String, TaskHandler<?>> taskHandlerMap;
     private final WorkflowService workflowService;
 
+    @SuppressFBWarnings("EI")
     public ComponentWorkflowTestSupport(
         ContextService contextService, JobService jobService, EventPublisher eventPublisher,
         TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
