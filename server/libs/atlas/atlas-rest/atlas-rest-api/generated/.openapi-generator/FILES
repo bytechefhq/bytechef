@@ -9,5 +9,4 @@ src/main/java/com/bytechef/atlas/web/rest/model/JobParametersModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/TaskExecutionModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/WorkflowFormatModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/WorkflowModel.java
-src/main/java/com/bytechef/atlas/web/rest/model/WorkflowParametersModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/WorkflowTaskModel.java
