@@ -59,8 +59,7 @@ public class JobStatusWebhookEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (workflowEvent.getType()
-            .equals(JobStatusWorkflowEvent.JOB_STATUS)) {
+        if (JobStatusWorkflowEvent.JOB_STATUS.equals(workflowEvent.getType())) {
             handleEvent((JobStatusWorkflowEvent) workflowEvent);
         }
     }
@@ -77,8 +76,9 @@ public class JobStatusWebhookEventListener implements EventListener {
         }
 
         for (Map<String, Object> webhook : job.getWebhooks()) {
-            if (JobStatusWorkflowEvent.JOB_STATUS
-                .equals(MapValueUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
+            if (JobStatusWorkflowEvent.JOB_STATUS.equals(
+                MapValueUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
+
                 Map<String, Object> webhookEvent = new HashMap<>(webhook);
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);
