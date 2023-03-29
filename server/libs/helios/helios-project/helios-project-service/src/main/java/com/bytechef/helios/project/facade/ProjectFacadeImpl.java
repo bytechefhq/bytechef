@@ -20,6 +20,8 @@ package com.bytechef.helios.project.facade;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
@@ -41,6 +43,7 @@ import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -59,6 +62,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
     private final ConnectionService connectionService;
+    private final JobFactory jobFactory;
     private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
@@ -68,12 +72,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, ConnectionService connectionService, JobService jobService,
-        ProjectService projectService, ProjectInstanceService projectInstanceService, TagService tagService,
-        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+        CategoryService categoryService, ConnectionService connectionService, JobFactory jobFactory,
+        JobService jobService, ProjectService projectService, ProjectInstanceService projectInstanceService,
+        TagService tagService, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
         this.connectionService = connectionService;
+        this.jobFactory = jobFactory;
         this.jobService = jobService;
         this.projectService = projectService;
         this.projectInstanceService = projectInstanceService;
@@ -139,6 +144,18 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         return new ProjectInstanceDTO(projectInstanceService.create(projectInstance), tags);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NEVER)
+    public long createProjectInstanceJob(long id, String workflowId) {
+        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
+
+        long jobId = jobFactory.create(new JobParametersDTO(projectInstance.getConfigurationParameters(), workflowId));
+
+        projectInstanceService.addJob(id, jobId);
+
+        return jobId;
     }
 
     @Override
@@ -251,10 +268,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public ProjectExecutionDTO getProjectExecution(long id) {
         Job job = jobService.getJob(id);
 
-        // TODO improve fetching of one project, we need project instance
-        Project project = CollectionUtils.getFirst(
-            projectService.getProjects(),
-            curProject -> CollectionUtils.contains(curProject.getWorkflowIds(), job.getWorkflowId()));
+        Project project = OptionalUtils.orElse(projectService.fetchJobProject(id), null);
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(job.getId());
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
@@ -266,16 +280,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public Page<ProjectExecutionDTO> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
-
-        // TODO
-
-//        List<ProjectInstance> projectInstances;
-//
-//        if (projectInstanceId == null) {
-//            projectInstances = projectInstanceService.getProjectInstances();
-//        } else {
-//            projectInstances = List.of(projectInstanceService.getProjectInstance(projectInstanceId));
-//        }
 
         List<Project> projects;
 
@@ -304,7 +308,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         return jobsPage.map(job -> new ProjectExecutionDTO(
             job.getId(),
-            null,
+            OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null),
             job,
             CollectionUtils.getFirst(
                 projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),

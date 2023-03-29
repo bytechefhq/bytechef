@@ -21,6 +21,7 @@ import com.bytechef.helios.project.domain.ProjectInstance;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -30,6 +31,8 @@ public interface ProjectInstanceService {
     ProjectInstance create(ProjectInstance projectInstance);
 
     void delete(long id);
+
+    Optional<ProjectInstance> fetchJobProjectInstance(long jobId);
 
     ProjectInstance getProjectInstance(long id);
 
@@ -44,5 +47,4 @@ public interface ProjectInstanceService {
     ProjectInstance update(
         long id, List<Long> connectionIds, Map<String, Object> configurationParameters, String description, String name,
         Long projectId, ProjectInstance.Status status, List<Long> tagIds, int version);
-
 }
