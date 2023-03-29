@@ -50,14 +50,14 @@ import org.springframework.context.annotation.Primary;
 public class WorkerConfiguration {
 
     @Autowired(required = false)
-    List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
+    private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
 
     @Autowired
     private TaskEvaluator taskEvaluator;
 
     @Bean
-    TaskHandlerResolver defaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
-        return new DefaultTaskHandlerResolver(taskHandlers == null ? Map.of() : taskHandlers);
+    TaskHandlerResolver defaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlerMap) {
+        return new DefaultTaskHandlerResolver(taskHandlerMap == null ? Map.of() : taskHandlerMap);
     }
 
     @Bean

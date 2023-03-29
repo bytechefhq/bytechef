@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -46,13 +46,13 @@ public class XmlFileComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private ComponentWorkflowTestSupport componentWorkflowTestSupport;
 
     @Test
     public void testRead() {
         File sampleFile = getFile("sample.xml");
 
-        Job job = workflowExecutor.execute(
+        Job job = componentWorkflowTestSupport.execute(
             ENCODER.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
@@ -72,7 +72,7 @@ public class XmlFileComponentHandlerIntTest {
 
     @Test
     public void testWrite() {
-        Job job = workflowExecutor.execute(
+        Job job = componentWorkflowTestSupport.execute(
             ENCODER.encodeToString("xmlfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "source",
@@ -87,7 +87,7 @@ public class XmlFileComponentHandlerIntTest {
 
         File sampleFile = getFile("sample.xml");
 
-        job = workflowExecutor.execute(
+        job = componentWorkflowTestSupport.execute(
             ENCODER.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",

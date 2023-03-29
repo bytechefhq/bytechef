@@ -1,9 +1,16 @@
 dependencies {
-    api project(":server:libs:atlas:atlas-sync-executor")
-
+    implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot-test"
+    implementation project(":server:libs:atlas:atlas-api")
+    implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
+    implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
+    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-memory")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
-    implementation project(":server:libs:test:test-int-support")
+    implementation project(":server:libs:atlas:atlas-service")
+    implementation project(":server:libs:atlas:atlas-sync-executor")
+    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
+    implementation project(":server:libs:core:commons:commons-util")
 }

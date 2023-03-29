@@ -17,14 +17,34 @@
 
 package com.bytechef.hermes.component.test.config;
 
+import com.bytechef.atlas.coordinator.event.EventListener;
+import com.bytechef.atlas.coordinator.event.EventListenerChain;
+import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
+import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
+import com.bytechef.atlas.repository.memory.InMemoryJobRepository;
+import com.bytechef.atlas.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
-import com.bytechef.atlas.sync.executor.config.WorkflowExecutorConfiguration;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.ContextServiceImpl;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.CounterServiceImpl;
+import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.JobServiceImpl;
+import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.service.TaskExecutionServiceImpl;
+import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.service.WorkflowServiceImpl;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -32,9 +52,14 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -46,7 +71,6 @@ import org.springframework.context.annotation.Import;
     })
 @Import({
     ResourceWorkflowRepositoryConfiguration.class,
-    WorkflowExecutorConfiguration.class
 })
 @SpringBootConfiguration
 public class ComponentTestIntConfiguration {
@@ -78,6 +102,63 @@ public class ComponentTestIntConfiguration {
         @Bean
         EncryptionKey encryptionKey() {
             return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+        }
+    }
+
+    @TestConfiguration
+    public static class EventConfiguration {
+
+        @Bean
+        EventPublisher eventPublisher(List<EventListener> eventListeners) {
+            EventListener eventListener = new EventListenerChain(eventListeners);
+
+            return eventListener::onApplicationEvent;
+        }
+    }
+
+    @TestConfiguration
+    public static class WorkflowExecutorConfiguration {
+
+        @Bean
+        ContextService contextService() {
+            return new ContextServiceImpl(new InMemoryContextRepository());
+        }
+
+        @Bean
+        CounterService counterService() {
+            return new CounterServiceImpl(new InMemoryCounterRepository());
+        }
+
+        @Bean
+        JobService jobService(List<WorkflowRepository> workflowRepositories, ObjectMapper objectMapper) {
+            return new JobServiceImpl(
+                new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepositories);
+        }
+
+        @Bean
+        TaskExecutionService taskExecutionService() {
+            return new TaskExecutionServiceImpl(taskExecutionRepository());
+        }
+
+        @Bean
+        InMemoryTaskExecutionRepository taskExecutionRepository() {
+            return new InMemoryTaskExecutionRepository();
+        }
+
+        @Bean
+        WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
+            return new WorkflowServiceImpl(new ConcurrentMapCacheManager(), Collections.emptyList(),
+                workflowRepositories);
+        }
+
+        @Bean
+        ComponentWorkflowTestSupport workflowSyncExecutor(
+            ContextService contextService, EventPublisher eventPublisher, JobService jobService,
+            TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+            WorkflowService workflowService) {
+
+            return new ComponentWorkflowTestSupport(
+                contextService, jobService, eventPublisher, taskExecutionService, taskHandlerMap, workflowService);
         }
     }
 }

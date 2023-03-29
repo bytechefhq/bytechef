@@ -15,7 +15,6 @@ subprojects {
         implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
         implementation project(":server:libs:core:commons:commons-util")
 
-        testImplementation project(":server:libs:atlas:atlas-sync-executor")
         testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
         testImplementation project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-test-int-support")
         testImplementation project(":server:libs:test:test-support")

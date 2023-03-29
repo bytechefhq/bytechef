@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.sequence;
 
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
@@ -48,7 +48,7 @@ public class SequenceTaskDispatcherIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @BeforeEach
     void beforeEach() {
@@ -57,7 +57,7 @@ public class SequenceTaskDispatcherIntTest {
 
     @Test
     public void testDispatch() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("sequence_v1".getBytes(StandardCharsets.UTF_8)),
             (
