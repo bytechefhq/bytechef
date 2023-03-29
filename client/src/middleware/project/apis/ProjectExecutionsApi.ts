@@ -16,11 +16,18 @@
 import * as runtime from '../runtime';
 import type {
   PageModel,
+  ProjectExecutionModel,
 } from '../models';
 import {
     PageModelFromJSON,
     PageModelToJSON,
+    ProjectExecutionModelFromJSON,
+    ProjectExecutionModelToJSON,
 } from '../models';
+
+export interface GetProjectExecutionRequest {
+    id: number;
+}
 
 export interface GetProjectExecutionsRequest {
     jobStatus?: GetProjectExecutionsJobStatusEnum;
@@ -36,6 +43,38 @@ export interface GetProjectExecutionsRequest {
  * 
  */
 export class ProjectExecutionsApi extends runtime.BaseAPI {
+
+    /**
+     * Get project execution by id.
+     * Get project executions by id.
+     */
+    async getProjectExecutionRaw(requestParameters: GetProjectExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectExecutionModel>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectExecution.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/project-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectExecutionModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Get project execution by id.
+     * Get project executions by id.
+     */
+    async getProjectExecution(requestParameters: GetProjectExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectExecutionModel> {
+        const response = await this.getProjectExecutionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get project executions.
