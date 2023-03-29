@@ -92,6 +92,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
+  /project-executions/{id}:
+    get:
+      description: "Get project execution by id."
+      summary: "Get project executions by id."
+      tags:
+      - "project-executions"
+      operationId: "getProjectExecution"
+      parameters:
+      - name: "id"
+        description: "The id of a project execution."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "The of project execution object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectExecution"
   /project-instance-tags:
     get:
       description: "Get project instance tags."
@@ -507,6 +529,59 @@ paths:
           description: "Successful operation."
 components:
   schemas:
+    JobBasic:
+      description: "Represents an execution of a workflow."
+      type: "object"
+      required:
+      - "priority"
+      - "status"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        endDate:
+          description: "The time execution entered end status COMPLETED, STOPPED,\
+            \ FAILED"
+          type: "string"
+          format: "date-time"
+        id:
+          description: "Id of the job."
+          type: "string"
+          readOnly: true
+        label:
+          description: "The job's human-readable name."
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        startDate:
+          description: "The time of when the job began."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        status:
+          description: "The job's status."
+          type: "string"
+          enum:
+          - "CREATED"
+          - "STARTED"
+          - "STOPPED"
+          - "FAILED"
+          - "COMPLETED"
+          readOnly: true
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."
@@ -594,10 +669,63 @@ components:
             readOnly: true
         __version:
           type: "integer"
+    ProjectBasic:
+      description: "A group of workflows that make one logical project."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        description:
+          description: "The description of a project."
+          type: "string"
+        id:
+          description: "The id of a project."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a project."
+          type: "string"
+        publishedDate:
+          description: "The published date."
+          type: "string"
+          format: "date-time"
+        projectVersion:
+          description: "The version of a project."
+          type: "integer"
+        status:
+          description: "The status of a project."
+          type: "string"
+          enum:
+          - "PUBLISHED"
+          - "UNPUBLISHED"
     ProjectExecution:
       description: "Contains information about execution of one of project workflows."
       type: "object"
       properties:
+        id:
+          description: "The id of a project execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
         instance:
           $ref: "#/components/schemas/ProjectInstance"
         job:
@@ -610,6 +738,23 @@ components:
             $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
         workflow:
           $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
+    ProjectExecutionBasic:
+      description: "Contains information about execution of one of project workflows."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a project execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        instance:
+          $ref: "#/components/schemas/ProjectInstance"
+        job:
+          $ref: "#/components/schemas/JobBasic"
+        project:
+          $ref: "#/components/schemas/ProjectBasic"
+        workflow:
+          $ref: "#/components/schemas/WorkflowBasic"
     ProjectInstance:
       description: "Contains specific configuration required for the execution of\
         \ project workflows."
@@ -688,6 +833,57 @@ components:
             $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         __version:
           type: "integer"
+    ProjectInstanceBasic:
+      description: "Contains specific configuration required for the execution of\
+        \ project workflows."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        description:
+          description: "The description of a project instance."
+          type: "string"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of a project instance."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastExecutionDate:
+          description: "The last execution date of a project instance."
+          type: "string"
+          format: "date-time"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a project instance."
+          type: "string"
+        projectId:
+          description: "Th id of a project."
+          type: "integer"
+          format: "int64"
+          writeOnly: false
+        status:
+          description: "The status of a project instance."
+          type: "string"
+          enum:
+          - "DISABLED"
+          - "ENABLED"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"
@@ -696,3 +892,37 @@ components:
           type: "array"
           items:
             $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+    WorkflowBasic:
+      description: "The blueprint that describe the execution of a job."
+      type: "object"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        description:
+          description: "The description of a workflow."
+          type: "string"
+          writeOnly: true
+        id:
+          description: "The id of the workflow."
+          type: "string"
+          readOnly: true
+        label:
+          description: "The descriptive name for the workflow"
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
