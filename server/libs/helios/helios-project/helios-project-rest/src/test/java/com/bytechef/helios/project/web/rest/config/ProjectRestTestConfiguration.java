@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.integration.web.rest;
+package com.bytechef.helios.project.web.rest.config;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = {
-    "com.bytechef.atlas.web.rest.mapper",
-    "com.bytechef.category.web.rest.mapper",
-    "com.bytechef.dione.integration.web.rest",
-    "com.bytechef.tag.web.rest.mapper"
+    "com.bytechef.atlas.web.rest",
+    "com.bytechef.category.web.rest",
+    "com.bytechef.helios.project.web.rest",
+    "com.bytechef.tag.web.rest"
 })
 @SpringBootConfiguration
-public class IntegrationRestTestConfiguration {
+public class ProjectRestTestConfiguration {
 }
