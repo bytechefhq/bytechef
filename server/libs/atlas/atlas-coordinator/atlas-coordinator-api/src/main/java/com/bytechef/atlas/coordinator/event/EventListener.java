@@ -26,5 +26,6 @@ import com.bytechef.atlas.event.WorkflowEvent;
  * @since Jun 9, 2017
  */
 public interface EventListener {
+
     void onApplicationEvent(WorkflowEvent workflowEvent);
 }

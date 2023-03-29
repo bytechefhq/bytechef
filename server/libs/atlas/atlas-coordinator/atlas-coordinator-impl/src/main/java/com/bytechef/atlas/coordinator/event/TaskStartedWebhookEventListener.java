@@ -53,8 +53,7 @@ public class TaskStartedWebhookEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (workflowEvent.getType()
-            .equals(TaskStartedWorkflowEvent.TASK_STARTED)) {
+        if (TaskStartedWorkflowEvent.TASK_STARTED.equals(workflowEvent.getType())) {
             handleEvent((TaskStartedWorkflowEvent) workflowEvent);
         }
     }
