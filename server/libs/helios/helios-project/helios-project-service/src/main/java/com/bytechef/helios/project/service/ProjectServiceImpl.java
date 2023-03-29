@@ -73,6 +73,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Optional<Project> fetchJobProject(long jobId) {
+        return projectRepository.findByJobId(jobId);
+    }
+
+    @Override
     public Optional<Project> fetchProject(String name) {
         return projectRepository.findByName(name);
     }
