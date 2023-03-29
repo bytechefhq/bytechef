@@ -248,6 +248,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    public ProjectExecutionDTO getProjectExecution(long id) {
+        Job job = jobService.getJob(id);
+
+        // TODO improve fetching of one project, we need project instance
+        Project project  = CollectionUtils.getFirst(
+            projectService.getProjects(),
+            curProject -> CollectionUtils.contains(curProject.getWorkflowIds(), job.getWorkflowId()));
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(job.getId());
+        Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
+
+        return  new ProjectExecutionDTO(job.getId(), null, job, project, taskExecutions, workflow);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<ProjectExecutionDTO> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
@@ -289,6 +303,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
         return jobsPage.map(job -> new ProjectExecutionDTO(
+            job.getId(),
             null,
             job,
             CollectionUtils.getFirst(
