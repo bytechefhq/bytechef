@@ -21,6 +21,7 @@ import com.bytechef.helios.project.domain.ProjectInstance;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -43,12 +44,13 @@ public interface ProjectInstanceRepository
             WHERE project_instance.project_id IN (:projectIds)
             AND project_instance_tag.tag_id IN (:tagId)
         """)
-    List<ProjectInstance> findAllByProjectIdsAndTagIdsOrderByName(List<Long> projectIds, List<Long> tagIds);
+    List<ProjectInstance> findAllByProjectIdsAndTagIdsOrderByName(
+        @Param("projectIds") List<Long> projectIds, @Param("tagIds") List<Long> tagIds);
 
     @Query("""
             SELECT project_instance.* FROM project_instance
             JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
             WHERE project_instance_tag.tag_id in (:tagIds)
         """)
-    List<ProjectInstance> findAllByTagIdInOrderByName(List<Long> tagIds);
+    List<ProjectInstance> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
 }
