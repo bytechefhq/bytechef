@@ -506,6 +506,11 @@ components:
           description: "Id of the task execution."
           type: "string"
           readOnly: true
+        input:
+          description: "The input parameters for this task."
+          type: "object"
+          additionalProperties: true
+          readOnly: true
         jobId:
           description: "The id of the job for which this task belongs to."
           type: "string"
