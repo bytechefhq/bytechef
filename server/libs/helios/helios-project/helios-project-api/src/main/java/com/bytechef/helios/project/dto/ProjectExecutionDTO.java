@@ -31,6 +31,6 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectExecutionDTO(
-    ProjectInstance instance, Job job, Project project, List<TaskExecution> taskExecutions,
+    long id, ProjectInstance instance, Job job, Project project, List<TaskExecution> taskExecutions,
     Workflow workflow) {
 }

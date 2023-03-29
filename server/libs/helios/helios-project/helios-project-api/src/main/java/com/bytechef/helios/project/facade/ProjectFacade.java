@@ -57,6 +57,7 @@ public interface ProjectFacade {
 
     List<Workflow> getProjectWorkflows(Long id);
 
+    ProjectExecutionDTO getProjectExecution(long id);
     Page<ProjectExecutionDTO> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
