@@ -11,7 +11,6 @@ models/PageModel.ts
 models/TaskExecutionModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
-models/WorkflowParametersModel.ts
 models/WorkflowTaskModel.ts
 models/index.ts
 runtime.ts
