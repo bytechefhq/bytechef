@@ -114,14 +114,8 @@ public class CoordinatorConfiguration {
     @Bean
     Coordinator coordinator() {
         return new Coordinator(
-            errorHandler(),
-            eventPublisher,
-            jobExecutor(),
-            jobFactory,
-            jobService,
-            taskCompletionHandler(),
-            taskDispatcher(),
-            taskExecutionService);
+            errorHandler(), eventPublisher, jobExecutor(), jobFactory, jobService, taskCompletionHandler(),
+            taskDispatcher(), taskExecutionService);
     }
 
     @Bean
@@ -132,12 +126,7 @@ public class CoordinatorConfiguration {
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         return new DefaultTaskCompletionHandler(
-            contextService,
-            eventPublisher,
-            jobExecutor(),
-            jobService,
-            taskEvaluator,
-            taskExecutionService,
+            contextService, eventPublisher, jobExecutor(), jobService, taskEvaluator, taskExecutionService,
             workflowService);
     }
 

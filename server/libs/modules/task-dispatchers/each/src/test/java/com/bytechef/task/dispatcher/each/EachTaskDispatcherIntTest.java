@@ -61,13 +61,10 @@ public class EachTaskDispatcherIntTest {
                 new EachTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService)),
             (
                 contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
-                taskExecutionService) -> List.of(new EachTaskDispatcher(
-                    taskDispatcher,
-                    taskExecutionService,
-                    messageBroker,
-                    contextService,
-                    counterService,
-                    taskEvaluator)),
+                taskExecutionService) -> List.of(
+                    new EachTaskDispatcher(
+                        taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
+                        taskEvaluator)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(
