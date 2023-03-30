@@ -12,9 +12,10 @@ import FilterableSelect, {
 import PageHeader from 'components/PageHeader/PageHeader';
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import {
-    JobModel,
+    JobBasicModel,
+    ProjectExecutionBasicModel,
+    ProjectExecutionBasicModelFromJSON,
     ProjectExecutionModel,
-    ProjectExecutionModelFromJSON,
 } from 'middleware/project';
 import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
 import {
@@ -34,7 +35,7 @@ import PageFooter from '../../../components/PageFooter/PageFooter';
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import Pagination from '../../../components/Pagination/Pagination';
 
-const columnHelper = createColumnHelper<ProjectExecutionModel>();
+const columnHelper = createColumnHelper<ProjectExecutionBasicModel>();
 
 const columns = [
     columnHelper.accessor((row) => row.job, {
@@ -72,9 +73,10 @@ const columns = [
         header: 'Completed date',
         cell: (info) => (
             <>
-                {info.getValue()?.endDate && `${info.getValue()?.endDate?.toLocaleDateString()} ${info
-                    .getValue()
-                    ?.endDate?.toLocaleTimeString()}`}
+                {info.getValue()?.endDate &&
+                    `${info.getValue()?.endDate?.toLocaleDateString()} ${info
+                        .getValue()
+                        ?.endDate?.toLocaleTimeString()}`}
             </>
         ),
     }),
@@ -108,7 +110,7 @@ const jobStatusOptions = [
 ];
 
 function getDuration(
-    info: CellContext<ProjectExecutionModel, JobModel | undefined>
+    info: CellContext<ProjectExecutionBasicModel, JobBasicModel | undefined>
 ): string | undefined {
     const startDate = info.getValue()?.startDate?.getTime();
     const endDate = info.getValue()?.endDate?.getTime();
@@ -357,7 +359,7 @@ export const Executions = () => {
                                         (
                                             projectExecution: ProjectExecutionModel
                                         ) =>
-                                            ProjectExecutionModelFromJSON(
+                                            ProjectExecutionBasicModelFromJSON(
                                                 projectExecution
                                             )
                                     )}
@@ -370,8 +372,8 @@ export const Executions = () => {
     );
 };
 
-const Table = ({data}: {data: ProjectExecutionModel[]}): JSX.Element => {
-    const table = useReactTable<ProjectExecutionModel>({
+const Table = ({data}: {data: ProjectExecutionBasicModel[]}): JSX.Element => {
+    const table = useReactTable<ProjectExecutionBasicModel>({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
