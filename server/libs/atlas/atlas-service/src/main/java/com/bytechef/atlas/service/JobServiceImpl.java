@@ -17,7 +17,6 @@
 
 package com.bytechef.atlas.service;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.JobParametersDTO;
@@ -25,7 +24,6 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -197,11 +195,9 @@ public class JobServiceImpl implements JobService {
 
         Map<String, Object> inputs = jobParametersDTO.getInputs();
 
-        for (Map<String, Object> input : workflow.getInputs()) {
-            if (MapValueUtils.getBoolean(input, WorkflowConstants.REQUIRED, false)) {
-                Assert.isTrue(
-                    inputs.containsKey(input.get(WorkflowConstants.NAME)),
-                    "Missing required param: " + input.get("name"));
+        for (Workflow.Input input : workflow.getInputs()) {
+            if (input.required()) {
+                Assert.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
             }
         }
 

@@ -86,10 +86,6 @@ public class WorkflowTask implements Serializable {
         Assert.notNull(type, "'type' must not be null");
         Assert.notNull(key, "'key' must not be null");
 
-        if (Objects.equals(key, WorkflowConstants.TYPE)) {
-            throw new IllegalArgumentException("'key' cannot have value 'type'");
-        }
-
         WorkflowTask workflowTask;
 
         if (WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS.contains(key)) {

@@ -34,7 +34,6 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.util.MapValueUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -135,10 +134,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         Map<String, Object> source = new HashMap<>();
 
-        for (Map<String, Object> output : workflow.getOutputs()) {
-            source.put(
-                MapValueUtils.getRequiredString(output, WorkflowConstants.NAME),
-                MapValueUtils.getRequiredString(output, WorkflowConstants.VALUE));
+        for (Workflow.Output output : workflow.getOutputs()) {
+            source.put(output.name(), output.value());
         }
 
         job.setStatus(Job.Status.COMPLETED);
