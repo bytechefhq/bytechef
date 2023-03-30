@@ -3,7 +3,7 @@ plugins {
 }
 
 task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    apiPackage = "com.bytechef.atlas.web.rest"
+    apiPackage = "com.bytechef.hermwes.workflow.web.rest"
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
@@ -16,8 +16,8 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     ]
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    modelPackage = "com.bytechef.atlas.web.rest.model"
-    outputDir = "$projectDir/../atlas-rest-api/generated".toString()
+    modelPackage = "com.bytechef.hermwes.workflow.web.rest.model"
+    outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         "Page": "org.springframework.data.domain.Page"
     ]
@@ -27,7 +27,7 @@ task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plug
     generatorName = "typescript-fetch"
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    outputDir = "$rootDir/client/src/middleware/workflow".toString()
+    outputDir = "$rootDir/client/src/middleware/workflow-test".toString()
     typeMappings = [
         DateTime: "Date"
     ]
@@ -37,14 +37,27 @@ tasks.register("generateOpenAPI") {
     dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
 }
 
-dependencies {
-    api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
+sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
 
+dependencies {
+    annotationProcessor libs.org.mapstruct.mapstruct.processor
+    annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
+
+    implementation libs.io.swagger.core.v3.swagger.annotations
+    implementation libs.org.openapitools.jackson.databind.nullable
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "jakarta.validation:jakarta.validation-api"
+    implementation libs.org.mapstruct
+    implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
+    implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-webflux"
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
+    implementation project(":server:libs:core:autoconfigure-annotations")
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-webflux"
     implementation project(":server:libs:core:autoconfigure-annotations")
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
 }

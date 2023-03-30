@@ -1,0 +1,42 @@
+---
+openapi: "3.0.1"
+info:
+  title: "OpenAPI definition"
+  version: "v1"
+servers:
+- url: "http://localhost:5173/api"
+paths:
+  /workflow-tests/{id}:
+    post:
+      description: "Create a request for testing a workflow."
+      summary: "Create a request for testing a workflow."
+      tags:
+      - "workflow-tests"
+      operationId: "testWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of the workflow to test."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        description: "Parameters required to run a workflow, for example '{\"yourName\"\
+          :\"Joe Jones\"}'"
+        content:
+          application/json:
+            schema:
+              description: "The inputs expected by the workflow"
+              type: "object"
+              additionalProperties:
+                type: "object"
+        required: true
+      responses:
+        "200":
+          description: "The output expected by the workflow."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                additionalProperties:
+                  type: "object"
