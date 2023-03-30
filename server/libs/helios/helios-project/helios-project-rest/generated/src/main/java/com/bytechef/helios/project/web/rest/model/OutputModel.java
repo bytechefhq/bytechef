@@ -5,8 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
-import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -18,43 +16,55 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The request object that contains the array of tags.
+ * OutputModel
  */
 
-@Schema(name = "UpdateTagsRequest", description = "The request object that contains the array of tags.")
-@JsonTypeName("UpdateTagsRequest")
+@JsonTypeName("Output")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:18.423931+02:00[Europe/Zagreb]")
-public class UpdateTagsRequestModel {
+public class OutputModel {
 
-  @JsonProperty("tags")
-  @Valid
-  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
+  @JsonProperty("name")
+  private String name;
 
-  public UpdateTagsRequestModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
-    this.tags = tags;
-    return this;
-  }
+  @JsonProperty("value")
+  private Object value;
 
-  public UpdateTagsRequestModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
-    if (this.tags == null) {
-      this.tags = new ArrayList<>();
-    }
-    this.tags.add(tagsItem);
+  public OutputModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * Get tags
-   * @return tags
+   * The name of an output
+   * @return name
   */
-  @Valid 
-  @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
-    return tags;
+  @NotNull 
+  @Schema(name = "name", description = "The name of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  public String getName() {
+    return name;
   }
 
-  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
-    this.tags = tags;
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public OutputModel value(Object value) {
+    this.value = value;
+    return this;
+  }
+
+  /**
+   * The value of an output
+   * @return value
+  */
+  @NotNull 
+  @Schema(name = "value", description = "The value of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  public Object getValue() {
+    return value;
+  }
+
+  public void setValue(Object value) {
+    this.value = value;
   }
 
   @Override
@@ -65,20 +75,22 @@ public class UpdateTagsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateTagsRequestModel updateTagsRequest = (UpdateTagsRequestModel) o;
-    return Objects.equals(this.tags, updateTagsRequest.tags);
+    OutputModel output = (OutputModel) o;
+    return Objects.equals(this.name, output.name) &&
+        Objects.equals(this.value, output.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(tags);
+    return Objects.hash(name, value);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateTagsRequestModel {\n");
-    sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("class OutputModel {\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
     return sb.toString();
   }
