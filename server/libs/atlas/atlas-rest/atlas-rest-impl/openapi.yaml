@@ -377,9 +377,7 @@ components:
           description: "The list of the webhooks configured."
           type: "array"
           items:
-            type: "object"
-            additionalProperties:
-              type: "object"
+            $ref: "#/components/schemas/Webhook"
           readOnly: true
         workflowId:
           type: "string"
@@ -413,9 +411,7 @@ components:
             \ for certain events."
           type: "array"
           items:
-            type: "object"
-            additionalProperties:
-              type: "object"
+            $ref: "#/components/schemas/Webhook"
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."
@@ -567,6 +563,32 @@ components:
           description: "The type of the task."
           type: "string"
           readOnly: true
+    Webhook:
+      description: "Used to register to receive notifications for certain events."
+      type: "object"
+      properties:
+        type:
+          description: null
+          type: "string"
+        url:
+          description: null
+          type: "string"
+        retry:
+          description: null
+          type: "object"
+          properties:
+            initialInterval:
+              description: null
+              type: "integer"
+            maxInterval:
+              description: null
+              type: "integer"
+            maxAttempts:
+              description: null
+              type: "integer"
+            multiplier:
+              description: null
+              type: "integer"
     Workflow:
       description: "The blueprint that describe the execution of a job."
       type: "object"
