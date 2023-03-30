@@ -18,7 +18,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             <label
                 htmlFor={name}
                 className={twMerge(
-                    'block px-2 text-sm font-medium text-gray-700 dark:text-gray-400',
+                    'block text-sm font-medium text-gray-700 dark:text-gray-400',
                     labelClassName
                 )}
             >

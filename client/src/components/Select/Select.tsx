@@ -15,6 +15,7 @@ import {
     Value,
     Viewport,
 } from '@radix-ui/react-select';
+import {twMerge} from 'tailwind-merge';
 
 import Button from '../Button/Button';
 
@@ -26,6 +27,7 @@ export interface ISelectOption {
 
 type SelectProps = {
     options: ISelectOption[];
+    contentClassName?: string;
     defaultValue?: string | undefined;
     label?: string;
     onValueChange?(value: string): void;
@@ -34,6 +36,7 @@ type SelectProps = {
 };
 
 const Select = ({
+    contentClassName,
     defaultValue,
     label,
     options,
@@ -43,7 +46,7 @@ const Select = ({
 }: SelectProps): JSX.Element => (
     <fieldset>
         {label && (
-            <Label className="block text-sm font-medium leading-6 text-gray-900">
+            <Label className="block px-2 text-sm font-medium leading-6 text-gray-900">
                 {label}
             </Label>
         )}
@@ -64,7 +67,14 @@ const Select = ({
             </Trigger>
 
             <Portal className="z-20">
-                <Content position="popper" sideOffset={5}>
+                <Content
+                    className={twMerge(
+                        'max-h-select-content-available-height min-w-select-trigger-width',
+                        contentClassName
+                    )}
+                    position="popper"
+                    sideOffset={5}
+                >
                     <ScrollUpButton className="flex items-center justify-center text-gray-700 dark:text-gray-300">
                         <ChevronUpIcon />
                     </ScrollUpButton>
@@ -86,7 +96,11 @@ const Select = ({
                                         <ItemText>{selectItem.label}</ItemText>
 
                                         {selectItem.description && (
-                                            <span className="mt-1 text-xs text-gray-500">
+                                            // eslint-disable-next-line tailwindcss/no-custom-classname
+                                            <span
+                                                className="mt-1 text-xs text-gray-500 line-clamp-2"
+                                                title={selectItem.description}
+                                            >
                                                 {selectItem.description}
                                             </span>
                                         )}
