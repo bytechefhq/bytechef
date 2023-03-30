@@ -7,8 +7,10 @@ src/main/java/com/bytechef/helios/project/web/rest/ProjectTagsApi.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectsApi.java
 src/main/java/com/bytechef/helios/project/web/rest/model/CreateProjectInstanceJob200ResponseModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/CreateProjectWorkflowRequestModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/InputModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/JobBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/JobParametersModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/OutputModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionModel.java
@@ -16,4 +18,6 @@ src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceBasicMod
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/UpdateTagsRequestModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/WebhookModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/WebhookRetryModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowBasicModel.java

@@ -4,8 +4,10 @@ src/main/java/com/bytechef/atlas/web/rest/TaskExecutionsApi.java
 src/main/java/com/bytechef/atlas/web/rest/WorkflowsApi.java
 src/main/java/com/bytechef/atlas/web/rest/model/CreateJob200ResponseModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/ExecutionErrorModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/InputModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/JobModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/JobParametersModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/OutputModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/TaskExecutionModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/WebhookModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/WebhookRetryModel.java
