@@ -19,13 +19,15 @@
 
 package com.bytechef.atlas.domain;
 
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.priority.Prioritizable;
-import com.bytechef.commons.data.jdbc.wrapper.MapListWrapper;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -110,7 +112,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     private int version;
 
     @Column
-    private MapListWrapper webhooks = new MapListWrapper();
+    private List<Webhook> webhooks = Collections.emptyList();
 
     @Column("workflow_id")
     private String workflowId;
@@ -149,7 +151,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     /**
      * Return the time when the job was originally created.
      *
-     * @return {@link Date}
+     * @return {@link LocalDateTime}
      */
     public LocalDateTime getCreatedDate() {
         return createdDate;
@@ -172,7 +174,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     /**
      * Get time execution entered end status: COMPLETED, STOPPED, FAILED
      *
-     * @return {@link Date}
+     * @return {@link LocalDateTime}
      */
     public LocalDateTime getEndDate() {
         return endDate;
@@ -222,7 +224,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     /**
      * Return the time of when the job began execution.
      *
-     * @return {@link Date}
+     * @return {@link LocalDateTime}
      */
     public LocalDateTime getStartDate() {
         return startDate;
@@ -259,8 +261,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
      *
      * @return {@link List}
      */
-    public List<Map<String, Object>> getWebhooks() {
-        return Collections.unmodifiableList(webhooks.getList());
+    public List<Webhook> getWebhooks() {
+        return Collections.unmodifiableList(webhooks);
     }
 
     /**
@@ -323,8 +325,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         this.status = status;
     }
 
-    public void setWebhooks(List<Map<String, Object>> webhooks) {
-        this.webhooks = new MapListWrapper(webhooks);
+    public void setWebhooks(List<Webhook> webhooks) {
+        this.webhooks = new ArrayList<>(webhooks);
     }
 
     public void setWorkflowId(String workflowId) {
@@ -351,5 +353,26 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
             + createdDate + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
             + lastModifiedDate + '}';
+    }
+
+    public record Webhook(String type, String url, Retry retry) {
+        public Map<String, Object> toMap() {
+            Map<String, Object> map = new HashMap<>();
+
+            map.put(WorkflowConstants.TYPE, type);
+            map.put(WorkflowConstants.URL, url);
+            map.put(
+                WorkflowConstants.RETRY,
+                Map.of(
+                    "initialInterval", retry.initialInterval,
+                    "maxInterval", retry.maxInterval,
+                    "maxAttempts", retry.maxAttempts,
+                    "multiplier", retry.multiplier));
+
+            return map;
+        }
+    }
+
+    public record Retry(Integer initialInterval, Integer maxInterval, Integer maxAttempts, Integer multiplier) {
     }
 }
