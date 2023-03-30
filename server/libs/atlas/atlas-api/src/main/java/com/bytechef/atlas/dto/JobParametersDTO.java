@@ -17,6 +17,7 @@
 
 package com.bytechef.atlas.dto;
 
+import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.priority.Prioritizable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -37,7 +38,7 @@ public class JobParametersDTO {
     private Long parentTaskExecutionId;
     private int priority = Prioritizable.DEFAULT_PRIORITY;
     private String workflowId;
-    private List<Map<String, Object>> webhooks = Collections.emptyList();
+    private List<Job.Webhook> webhooks = Collections.emptyList();
 
     private JobParametersDTO() {
     }
@@ -62,7 +63,7 @@ public class JobParametersDTO {
     @Default
     public JobParametersDTO(
         Map<String, Object> inputs, String label, Long parentTaskExecutionId, Integer priority, String workflowId,
-        List<Map<String, Object>> webhooks) {
+        List<Job.Webhook> webhooks) {
 
         if (inputs != null) {
             this.inputs = new HashMap<>(inputs);
@@ -103,7 +104,7 @@ public class JobParametersDTO {
         return workflowId;
     }
 
-    public List<Map<String, Object>> getWebhooks() {
+    public List<Job.Webhook> getWebhooks() {
         return new ArrayList<>(webhooks);
     }
 

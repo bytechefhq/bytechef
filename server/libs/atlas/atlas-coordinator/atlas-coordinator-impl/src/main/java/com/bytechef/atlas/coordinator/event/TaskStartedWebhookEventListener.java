@@ -24,9 +24,7 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -69,15 +67,13 @@ public class TaskStartedWebhookEventListener implements EventListener {
             return;
         }
 
-        for (Map<String, Object> webhook : job.getWebhooks()) {
-            if (TaskStartedWorkflowEvent.TASK_STARTED.equals(
-                MapValueUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
-                Map<String, Object> webhookEvent = new HashMap<>(webhook);
+        for (Job.Webhook webhook : job.getWebhooks()) {
+            if (TaskStartedWorkflowEvent.TASK_STARTED.equals(webhook.type())) {
+                Map<String, Object> webhookEvent = webhook.toMap();
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);
 
-                rest.postForObject(
-                    MapValueUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
+                rest.postForObject(webhook.url(), webhookEvent, String.class);
             }
         }
     }
