@@ -48,6 +48,7 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
+    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest")
 
     implementation project(":server:libs:modules:components:aws:aws-s3")
     implementation project(":server:libs:modules:components:bash")

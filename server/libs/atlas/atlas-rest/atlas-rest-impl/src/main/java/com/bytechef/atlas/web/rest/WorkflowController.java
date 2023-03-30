@@ -35,7 +35,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -50,7 +49,9 @@ public class WorkflowController implements WorkflowsApi {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowController(ConversionService conversionService, WorkflowService workflowService) {
+    public WorkflowController(
+        ConversionService conversionService, WorkflowService workflowService) {
+
         this.conversionService = conversionService;
         this.workflowService = workflowService;
     }
@@ -68,7 +69,7 @@ public class WorkflowController implements WorkflowsApi {
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowModel>> getWorkflow(String id, ServerWebExchange exchange) {
         return Mono.just(
-            Objects.requireNonNull(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class))
+            conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)
                 .definition(null))
             .map(ResponseEntity::ok);
     }
@@ -80,7 +81,7 @@ public class WorkflowController implements WorkflowsApi {
 
         for (Workflow workflow : workflowService.getWorkflows()) {
             workflowModels.add(
-                Objects.requireNonNull(conversionService.convert(workflow, WorkflowModel.class))
+                conversionService.convert(workflow, WorkflowModel.class)
                     .definition(null));
         }
 
