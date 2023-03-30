@@ -19,6 +19,12 @@ import {
     ExecutionErrorModelFromJSONTyped,
     ExecutionErrorModelToJSON,
 } from './ExecutionErrorModel';
+import type { WebhookModel } from './WebhookModel';
+import {
+    WebhookModelFromJSON,
+    WebhookModelFromJSONTyped,
+    WebhookModelToJSON,
+} from './WebhookModel';
 
 /**
  * Represents an execution of a workflow.
@@ -118,10 +124,10 @@ export interface JobModel {
     readonly status: JobModelStatusEnum;
     /**
      * The list of the webhooks configured.
-     * @type {Array<{ [key: string]: object; }>}
+     * @type {Array<WebhookModel>}
      * @memberof JobModel
      */
-    readonly webhooks?: Array<{ [key: string]: object; }>;
+    readonly webhooks?: Array<WebhookModel>;
     /**
      * 
      * @type {string}
@@ -181,7 +187,7 @@ export function JobModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'priority': json['priority'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
-        'webhooks': !exists(json, 'webhooks') ? undefined : json['webhooks'],
+        'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
     };
 }
