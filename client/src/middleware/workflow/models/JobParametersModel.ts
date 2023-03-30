@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { WebhookModel } from './WebhookModel';
+import {
+    WebhookModelFromJSON,
+    WebhookModelFromJSONTyped,
+    WebhookModelToJSON,
+} from './WebhookModel';
+
 /**
  * Defines parameters used to execute a job.
  * @export
@@ -51,10 +58,10 @@ export interface JobParametersModel {
     workflowId: string;
     /**
      * The list of webhooks to register to receive notifications for certain events.
-     * @type {Array<{ [key: string]: object; }>}
+     * @type {Array<WebhookModel>}
      * @memberof JobParametersModel
      */
-    webhooks?: Array<{ [key: string]: object; }>;
+    webhooks?: Array<WebhookModel>;
 }
 
 /**
@@ -82,7 +89,7 @@ export function JobParametersModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
         'priority': !exists(json, 'priority') ? undefined : json['priority'],
         'workflowId': json['workflowId'],
-        'webhooks': !exists(json, 'webhooks') ? undefined : json['webhooks'],
+        'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
     };
 }
 
@@ -100,7 +107,7 @@ export function JobParametersModelToJSON(value?: JobParametersModel | null): any
         'parentTaskExecutionId': value.parentTaskExecutionId,
         'priority': value.priority,
         'workflowId': value.workflowId,
-        'webhooks': value.webhooks,
+        'webhooks': value.webhooks === undefined ? undefined : ((value.webhooks as Array<any>).map(WebhookModelToJSON)),
     };
 }
 
