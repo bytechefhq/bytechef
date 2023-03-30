@@ -192,10 +192,10 @@ public class JobServiceImpl implements JobService {
         return job.getStatus() == Job.Status.STOPPED || job.getStatus() == Job.Status.FAILED;
     }
 
-    private void validate(JobParametersDTO workflowParameters, Workflow workflow) {
+    private void validate(JobParametersDTO jobParametersDTO, Workflow workflow) {
         // validate inputs
 
-        Map<String, Object> inputs = workflowParameters.getInputs();
+        Map<String, Object> inputs = jobParametersDTO.getInputs();
 
         for (Map<String, Object> input : workflow.getInputs()) {
             if (MapValueUtils.getBoolean(input, WorkflowConstants.REQUIRED, false)) {
@@ -207,7 +207,7 @@ public class JobServiceImpl implements JobService {
 
         // validate webhooks
 
-        for (Map<String, Object> webhook : workflowParameters.getWebhooks()) {
+        for (Map<String, Object> webhook : jobParametersDTO.getWebhooks()) {
             Assert.notNull(webhook.get(WorkflowConstants.TYPE), "must define 'type' on webhook");
             Assert.notNull(webhook.get(WorkflowConstants.URL), "must define 'url' on webhook");
         }

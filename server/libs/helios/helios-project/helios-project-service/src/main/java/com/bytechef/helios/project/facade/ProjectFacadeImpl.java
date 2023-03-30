@@ -159,7 +159,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void deleteProject(Long id) {
+    public void deleteProject(long id) {
         Project project = projectService.getProject(id);
 
         for (String workflowId : project.getWorkflowIds()) {
@@ -174,7 +174,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void deleteProjectInstance(Long projectInstanceId) {
+    public void deleteProjectInstance(long projectInstanceId) {
         projectService.delete(projectInstanceId);
 
 // TODO find a way to delete ll tags not referenced anymore
@@ -195,25 +195,23 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         return new ProjectDTO(
             project,
-            project.getCategoryId() == null
-                ? null : OptionalUtils.get(categoryService.fetchCategory(project.getCategoryId())),
+            project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
             tagService.getTags(project.getTagIds()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ProjectDTO getProject(Long id) {
+    public ProjectDTO getProject(long id) {
         Project project = projectService.getProject(id);
 
         return new ProjectDTO(
             project,
-            project.getCategoryId() == null ? null
-                : OptionalUtils.get(categoryService.fetchCategory(project.getCategoryId())),
+            project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
             tagService.getTags(project.getTagIds()));
     }
 
     @Override
-    public ProjectInstanceDTO getProjectInstance(Long projectInstanceId) {
+    public ProjectInstanceDTO getProjectInstance(long projectInstanceId) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
         return new ProjectInstanceDTO(
             projectInstance,
@@ -258,13 +256,15 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public List<Workflow> getProjectWorkflows(Long id) {
+    @Transactional(readOnly = true)
+    public List<Workflow> getProjectWorkflows(long id) {
         Project project = projectService.getProject(id);
 
         return workflowService.getWorkflows(project.getWorkflowIds());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProjectExecutionDTO getProjectExecution(long id) {
         Job job = jobService.getJob(id);
 
@@ -373,32 +373,22 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         List<Project> projects = projectService.searchProjects(categoryIds, projectIds, tagIds);
 
-        List<Category> categories = categoryService.getCategories(projects.stream()
-            .map(Project::getCategoryId)
-            .filter(Objects::nonNull)
-            .toList());
-
-        List<Tag> tags = tagService.getTags(
-            projects.stream()
-                .flatMap(project -> CollectionUtils.stream(project.getTagIds()))
-                .filter(Objects::nonNull)
-                .toList());
-
         return CollectionUtils.map(
             projects,
             project -> new ProjectDTO(
                 project,
                 CollectionUtils.findFirstOrElse(
-                    categories,
+                    categoryService.getCategories(
+                        CollectionUtils.map(projects, Project::getCategoryId, Objects::nonNull)),
                     category -> Objects.equals(project.getCategoryId(), category.getId()),
                     null),
                 CollectionUtils.filter(
-                    tags,
-                    tag -> {
-                        List<Long> curTagIds = project.getTagIds();
-
-                        return curTagIds.contains(tag.getId());
-                    })));
+                    tagService.getTags(
+                        CollectionUtils.flatMap(
+                            projects, curProject -> CollectionUtils.stream(
+                                curProject.getTagIds()),
+                            Objects::nonNull)),
+                    tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
     }
 
     @Override
@@ -439,16 +429,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO updateProjectTags(Long id, List<Tag> tags) {
+    public ProjectDTO updateProjectTags(long id, List<Tag> tags) {
         tags = org.springframework.util.CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         Project project = projectService.update(id, CollectionUtils.map(tags, Tag::getId));
 
         return new ProjectDTO(
             project,
-            project.getCategoryId() == null
-                ? null
-                : OptionalUtils.get(categoryService.fetchCategory(project.getCategoryId())),
+            project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
             tags);
     }
 
