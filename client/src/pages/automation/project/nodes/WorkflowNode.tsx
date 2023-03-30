@@ -12,11 +12,14 @@ import {twMerge} from 'tailwind-merge';
 
 import EditNodeDialog from '../components/EditNodeDialog';
 import useNodeClickHandler from '../hooks/useNodeClick';
+import useNodeDetailsDialogStore from '../stores/useNodeDetailsDialogStore';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({id, data}: NodeProps) => {
     const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+
+    const {currentNode, nodeDetailsOpen} = useNodeDetailsDialogStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -77,6 +80,8 @@ const WorkflowNode = ({id, data}: NodeProps) => {
         isFirstNode = true;
     }
 
+    const isSelected = currentNode.name === data.name;
+
     return (
         <div
             className="relative flex min-w-[240px] cursor-pointer items-center justify-center"
@@ -106,7 +111,12 @@ const WorkflowNode = ({id, data}: NodeProps) => {
             )}
 
             <Button
-                className="rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:bg-gray-200"
+                className={twMerge(
+                    'rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
+                    isSelected &&
+                        nodeDetailsOpen &&
+                        'border-blue-300 bg-blue-100 shadow-none'
+                )}
                 displayType="icon"
                 icon={data.icon}
                 onClick={handleNodeClick}
