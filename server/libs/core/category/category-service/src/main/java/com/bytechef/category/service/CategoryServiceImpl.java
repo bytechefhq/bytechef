@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 /**
@@ -48,11 +47,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<Category> fetchCategory(Long id) {
-        return categoryRepository.findById(id);
-    }
-
-    @Override
     public Category create(Category category) {
         Assert.notNull(category, "'category' must not be null");
         Assert.isNull(category.getId(), "'category.id' must be null");
@@ -66,6 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> getCategories() {
         return StreamSupport.stream(categoryRepository.findAll(Sort.by("name"))
             .spliterator(), false)
@@ -74,11 +69,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Category getCategory(long id) {
         return OptionalUtils.get(categoryRepository.findById(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> getCategories(List<Long> ids) {
         Assert.notNull(ids, "'ids' must not be null");
 

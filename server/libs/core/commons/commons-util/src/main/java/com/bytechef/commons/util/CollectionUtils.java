@@ -80,15 +80,22 @@ public final class CollectionUtils {
     }
 
     public static <T> boolean contains(List<T> list, T item) {
+        Assert.notNull(list, "'list' must not be null");
+
         return org.springframework.util.CollectionUtils.contains(list.iterator(), item);
     }
 
     public static <T> long count(Iterable<T> iterable) {
+        Assert.notNull(iterable, "'iterable' must not be null");
+
         return StreamSupport.stream(iterable.spliterator(), false)
             .count();
     }
 
     public static <T> List<T> filter(List<T> list, Predicate<? super T> filter) {
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+
         return list.stream()
             .filter(filter)
             .toList();
@@ -104,6 +111,9 @@ public final class CollectionUtils {
     }
 
     public static <T> T findFirstOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+
         return OptionalUtils.orElse(
             list.stream()
                 .filter(filter)
@@ -114,6 +124,10 @@ public final class CollectionUtils {
     public static <T, U, V extends U> U findFirstOrElse(
         Collection<T> list, Predicate<? super T> filter, Function<? super T, V> mapper, V elseObject) {
 
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
+
         Optional<V> optional = list.stream()
             .filter(filter)
             .map(mapper)
@@ -122,7 +136,23 @@ public final class CollectionUtils {
         return OptionalUtils.orElse(optional, elseObject);
     }
 
+    public static <T, R> List<R> flatMap(
+        List<T> list, Function<? super T, ? extends Stream<? extends R>> mapper, Predicate<? super R> filter) {
+
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+
+        return list.stream()
+            .flatMap(mapper)
+            .filter(filter)
+            .toList();
+    }
+
     public static <T> T getFirst(Collection<T> list, Predicate<? super T> filter) {
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+
         return OptionalUtils.get(
             list.stream()
                 .filter(filter)
@@ -131,6 +161,10 @@ public final class CollectionUtils {
 
     public static <T, U> U getFirst(
         Collection<T> list, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
+
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
 
         return OptionalUtils.get(
             list.stream()
@@ -141,9 +175,21 @@ public final class CollectionUtils {
 
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {
         Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
 
         return list.stream()
             .map(mapper)
+            .toList();
+    }
+
+    public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper, Predicate<? super R> filter) {
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+
+        return list.stream()
+            .map(mapper)
+            .filter(filter)
             .toList();
     }
 

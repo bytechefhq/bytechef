@@ -26,6 +26,7 @@ import java.util.List;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -33,6 +34,7 @@ import org.springframework.util.CollectionUtils;
  * @author Ivica Cardic
  */
 @Service
+@Transactional
 public class IntegrationServiceImpl implements IntegrationService {
 
     private final IntegrationRepository integrationRepository;
@@ -71,11 +73,13 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Integration getIntegration(long id) {
         return OptionalUtils.get(integrationRepository.findById(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Integration> searchIntegrations(List<Long> categoryIds, List<Long> tagIds) {
         Iterable<Integration> integrationIterable;
 

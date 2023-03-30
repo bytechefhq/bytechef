@@ -28,6 +28,8 @@ import java.util.Optional;
  */
 public interface ProjectInstanceService {
 
+    void addJob(long projectInstanceId, long jobId);
+
     ProjectInstance create(ProjectInstance projectInstance);
 
     void delete(long id);
