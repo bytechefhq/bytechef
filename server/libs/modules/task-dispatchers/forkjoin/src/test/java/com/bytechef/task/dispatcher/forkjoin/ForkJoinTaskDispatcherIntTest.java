@@ -62,14 +62,13 @@ public class ForkJoinTaskDispatcherIntTest {
             Base64.getEncoder()
                 .encodeToString("fork-join_v1".getBytes(StandardCharsets.UTF_8)),
             (
-                counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
-                    new ForkJoinTaskCompletionHandler(
+                counterService, taskEvaluator, taskExecutionService) -> List.of(
+                    (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
                         taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
                         taskEvaluator)),
             (
-                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
-                taskExecutionService) -> List.of(
-                    new ForkJoinTaskDispatcher(
+                contextService, counterService, messageBroker, taskEvaluator, taskExecutionService) -> List.of(
+                    (taskDispatcher) -> new ForkJoinTaskDispatcher(
                         contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
                         taskExecutionService)),
             () -> Map.of("var", testVarTaskHandler));

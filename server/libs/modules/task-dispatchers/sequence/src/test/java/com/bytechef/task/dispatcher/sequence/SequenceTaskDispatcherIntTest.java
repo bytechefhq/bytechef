@@ -60,17 +60,11 @@ public class SequenceTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("sequence_v1".getBytes(StandardCharsets.UTF_8)),
-            (
-                counterService, taskCompletionHandler, taskDispatcher, taskEvaluator,
-                taskExecutionService) -> List.of(new SequenceTaskCompletionHandler(
-                    contextService,
-                    taskCompletionHandler,
-                    taskDispatcher,
-                    taskEvaluator,
-                    taskExecutionService)),
-            (
-                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
-                taskExecutionService) -> List.of(new SequenceTaskDispatcher(
+            (counterService, taskEvaluator, taskExecutionService) -> List.of(
+                (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
+                    contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService)),
+            (contextService, counterService, messageBroker, taskEvaluator, taskExecutionService) -> List.of(
+                (taskDispatcher) -> new SequenceTaskDispatcher(
                     contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService)),
             () -> Map.of("var", testVarTaskHandler));
 

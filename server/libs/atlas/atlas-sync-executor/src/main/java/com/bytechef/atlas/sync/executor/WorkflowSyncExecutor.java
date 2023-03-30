@@ -62,6 +62,7 @@ public class WorkflowSyncExecutor {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowSyncExecutor.class);
 
     private final ContextService contextService;
+    private SyncMessageBroker coordinatorMessageBroker;
     private final JobService jobService;
     private final EventPublisher eventPublisher;
     private final List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories;
@@ -74,10 +75,24 @@ public class WorkflowSyncExecutor {
     public WorkflowSyncExecutor(
         ContextService contextService, JobService jobService, EventPublisher eventPublisher,
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
+        List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
+        TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
+        WorkflowService workflowService) {
+
+        this(
+            contextService, null, jobService, eventPublisher, taskCompletionHandlerFactories,
+            taskDispatcherResolverFactories, taskExecutionService, taskHandlerMap, workflowService);
+    }
+
+    @SuppressFBWarnings("EI")
+    public WorkflowSyncExecutor(
+        ContextService contextService, SyncMessageBroker coordinatorMessageBroker, JobService jobService,
+        EventPublisher eventPublisher, List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
         Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
 
         this.contextService = contextService;
+        this.coordinatorMessageBroker = coordinatorMessageBroker;
         this.jobService = jobService;
         this.eventPublisher = eventPublisher;
         this.taskCompletionHandlerFactories = taskCompletionHandlerFactories;
@@ -92,9 +107,9 @@ public class WorkflowSyncExecutor {
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs) {
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker workerMessageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(Queues.ERRORS, message -> {
+        workerMessageBroker.receive(Queues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -110,12 +125,18 @@ public class WorkflowSyncExecutor {
 
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(taskHandlerResolverChain)
-            .withMessageBroker(messageBroker)
+            .withMessageBroker(workerMessageBroker)
             .withEventPublisher(eventPublisher)
             .withTaskEvaluator(taskEvaluator)
             .build();
 
-        SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
+        SyncMessageBroker coordinatorMessageBroker;
+
+        if (this.coordinatorMessageBroker == null) {
+            coordinatorMessageBroker = new SyncMessageBroker();
+        } else {
+            coordinatorMessageBroker = this.coordinatorMessageBroker;
+        }
 
         coordinatorMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
 
@@ -143,7 +164,7 @@ public class WorkflowSyncExecutor {
                         taskCompletionHandlerChain, taskDispatcherChain)),
                 Stream.of(defaultTaskCompletionHandler)));
 
-        JobFactory jobFactory = new JobFactoryImpl(contextService, eventPublisher, jobService, messageBroker);
+        JobFactory jobFactory = new JobFactoryImpl(contextService, eventPublisher, jobService, workerMessageBroker);
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
@@ -154,8 +175,8 @@ public class WorkflowSyncExecutor {
             eventPublisher, jobExecutor, jobFactory, jobService, taskCompletionHandlerChain, taskDispatcherChain,
             taskExecutionService);
 
-        messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
+        workerMessageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
+        workerMessageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
         long jobId = jobFactory.create(new JobParametersDTO(inputs, workflowId));
 

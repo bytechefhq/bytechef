@@ -17,8 +17,17 @@
 
 package com.bytechef.task.dispatcher.if_;
 
+import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
+import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -62,9 +71,9 @@ public class IfTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "true", "value2", "false"),
-            getGetTaskCompletionHandlers(),
-            getGetTaskDispatcherResolvers(),
-            getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
         Assertions.assertEquals("true branch", testVarTaskHandler.get("notEqualsResult"));
@@ -75,9 +84,9 @@ public class IfTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "2022-01-01T00:00:00", "value2", "2022-01-01T00:00:01"),
-            getGetTaskCompletionHandlers(),
-            getGetTaskDispatcherResolvers(),
-            getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("afterResult"));
         Assertions.assertEquals("true branch", testVarTaskHandler.get("beforeResult"));
@@ -88,9 +97,9 @@ public class IfTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
-            getGetTaskCompletionHandlers(),
-            getGetTaskDispatcherResolvers(),
-            getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
     }
@@ -100,9 +109,9 @@ public class IfTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
-            getGetTaskCompletionHandlers(),
-            getGetTaskDispatcherResolvers(),
-            getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
         Assertions.assertEquals("true branch", testVarTaskHandler.get("notEqualsResult"));
@@ -117,9 +126,9 @@ public class IfTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
-            getGetTaskCompletionHandlers(),
-            getGetTaskDispatcherResolvers(),
-            getTaskHandlerMap());
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
         Assertions.assertEquals("true branch", testVarTaskHandler.get("notEqualsResult"));
@@ -131,21 +140,25 @@ public class IfTaskDispatcherIntTest {
         Assertions.assertEquals("false branch", testVarTaskHandler.get("regexResult"));
     }
 
-    private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {
-        return () -> Map.of("var", testVarTaskHandler);
+    private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
+        CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+
+        return List.of(
+            (
+                TaskCompletionHandler taskCompletionHandler,
+                TaskDispatcher<? super Task> taskDispatcher) -> new IfTaskCompletionHandler(
+                    contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private static TaskDispatcherWorkflowTestSupport.TaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
-        return (
-            contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
-            taskExecutionService) -> List.of(
-                new IfTaskDispatcher(
-                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
+    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
+        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+        return List.of(
+            (taskDispatcher) -> new IfTaskDispatcher(
+                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private TaskDispatcherWorkflowTestSupport.TaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
-        return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
-            new IfTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
+    private Map<String, TaskHandler<?>> getTaskHandlerMap() {
+        return Map.of("var", testVarTaskHandler);
     }
 }
