@@ -6,6 +6,7 @@
 package com.bytechef.hermwes.workflow.web.rest;
 
 import java.util.Map;
+import com.bytechef.hermwes.workflow.web.rest.model.WorkflowTestResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T09:38:33.843246+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T13:38:51.963850+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-tests", description = "the workflow-tests API")
 public interface WorkflowTestsApi {
@@ -55,7 +56,7 @@ public interface WorkflowTestsApi {
         tags = { "workflow-tests" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output expected by the workflow.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowTestResponseModel.class))
             })
         }
     )
@@ -65,13 +66,20 @@ public interface WorkflowTestsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<Map<String, Object>>> testWorkflow(
+    default Mono<ResponseEntity<WorkflowTestResponseModel>> testWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to test.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "request_body", description = "Parameters required to run a workflow, for example '{\"yourName\":\"Joe Jones\"}'", required = true) @Valid @RequestBody Mono<Map<String, Object>> requestBody,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"taskExecutions\" : [ { \"retryDelayFactor\" : 1, \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"workflowTask\" : { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 3, \"type\" : \"type\", \"parentId\" : \"parentId\", \"executionTime\" : 9, \"output\" : \"{}\", \"retryDelay\" : \"retryDelay\", \"input\" : { \"key\" : \"\" }, \"jobId\" : \"jobId\", \"retryDelayMillis\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"progress\" : 2, \"id\" : \"id\", \"taskNumber\" : 1, \"retry\" : 4, \"retryAttempts\" : 7, \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" }, { \"retryDelayFactor\" : 1, \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"workflowTask\" : { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 3, \"type\" : \"type\", \"parentId\" : \"parentId\", \"executionTime\" : 9, \"output\" : \"{}\", \"retryDelay\" : \"retryDelay\", \"input\" : { \"key\" : \"\" }, \"jobId\" : \"jobId\", \"retryDelayMillis\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"progress\" : 2, \"id\" : \"id\", \"taskNumber\" : 1, \"retry\" : 4, \"retryAttempts\" : 7, \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" } ], \"job\" : { \"outputs\" : { \"key\" : \"{}\" }, \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"currentTask\" : 0, \"label\" : \"label\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"parentTaskExecutionId\" : 6, \"webhooks\" : [ { \"type\" : \"type\", \"url\" : \"url\", \"retry\" : { \"maxAttempts\" : 2, \"multiplier\" : 7, \"initialInterval\" : 5, \"maxInterval\" : 5 } }, { \"type\" : \"type\", \"url\" : \"url\", \"retry\" : { \"maxAttempts\" : 2, \"multiplier\" : 7, \"initialInterval\" : 5, \"maxInterval\" : 5 } } ], \"id\" : \"id\", \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"status\" : \"CREATED\" } }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
         return result.then(requestBody).then(Mono.empty());
 
     }
