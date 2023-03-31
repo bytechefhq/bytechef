@@ -18,12 +18,13 @@
 package com.bytechef.hermes.component.test.workflow;
 
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.sync.executor.WorkflowSyncExecutor;
+import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.CollectionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -55,7 +56,7 @@ public class ComponentWorkflowTestSupport {
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs) {
-        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+        JobSyncExecutor jobSyncExecutor = JobSyncExecutor.builder()
             .contextService(contextService)
             .eventPublisher(eventPublisher)
             .jobService(jobService)
@@ -66,11 +67,11 @@ public class ComponentWorkflowTestSupport {
             .workflowService(workflowService)
             .build();
 
-        return workflowSyncExecutor.execute(workflowId, inputs);
+        return jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
-        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+        JobSyncExecutor jobSyncExecutor = JobSyncExecutor.builder()
             .contextService(contextService)
             .eventPublisher(eventPublisher)
             .jobService(jobService)
@@ -81,6 +82,6 @@ public class ComponentWorkflowTestSupport {
             .workflowService(workflowService)
             .build();
 
-        return workflowSyncExecutor.execute(workflowId, inputs);
+        return jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
     }
 }

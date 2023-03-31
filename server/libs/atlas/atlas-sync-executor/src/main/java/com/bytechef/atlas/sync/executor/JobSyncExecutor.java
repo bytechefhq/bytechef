@@ -50,7 +50,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import com.bytechef.commons.util.CollectionUtils;
@@ -61,14 +60,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowSyncExecutor {
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowSyncExecutor.class);
+public class JobSyncExecutor {
+    private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
     private final JobFactory jobFactory;
     private final JobService jobService;
 
     @SuppressFBWarnings("EI")
-    private WorkflowSyncExecutor(Builder builder) {
+    private JobSyncExecutor(Builder builder) {
         this.jobService = builder.jobService;
 
         SyncMessageBroker syncMessageBroker = builder.syncMessageBroker;
@@ -154,12 +153,8 @@ public class WorkflowSyncExecutor {
         return new Builder();
     }
 
-    public Job execute(String workflowId) {
-        return execute(workflowId, Map.of());
-    }
-
-    public Job execute(String workflowId, Map<String, Object> inputs) {
-        long jobId = jobFactory.create(new JobParametersDTO(inputs, workflowId));
+    public Job execute(JobParametersDTO jobParametersDTO) {
+        long jobId = jobFactory.create(jobParametersDTO);
 
         return jobService.getJob(jobId);
     }
@@ -235,8 +230,8 @@ public class WorkflowSyncExecutor {
             return this;
         }
 
-        public WorkflowSyncExecutor build() {
-            return new WorkflowSyncExecutor(this);
+        public JobSyncExecutor build() {
+            return new JobSyncExecutor(this);
         }
     }
 }
