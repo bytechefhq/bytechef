@@ -95,12 +95,8 @@ public final class Connection implements Persistable<Long> {
         this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
     }
 
-    public Connection(long id, String name, List<Long> tagIds, int version) {
-        this.id = id;
-        this.name = name;
-        this.version = version;
-
-        setTagIds(tagIds);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public boolean containsParameter(String name) {
@@ -309,10 +305,6 @@ public final class Connection implements Persistable<Long> {
         private int version;
 
         private Builder() {
-        }
-
-        public static Builder builder() {
-            return new Builder();
         }
 
         public Builder authorizationName(String authorizationName) {

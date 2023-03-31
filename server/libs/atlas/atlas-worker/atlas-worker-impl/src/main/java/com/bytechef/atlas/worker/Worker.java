@@ -203,7 +203,10 @@ public class Worker {
         throws Exception {
 
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
-            TaskExecution subTaskExecution = TaskExecution.of(taskExecution.getJobId(), subWorkflowTask);
+            TaskExecution subTaskExecution = TaskExecution.builder()
+                .jobId(taskExecution.getJobId())
+                .workflowTask(subWorkflowTask)
+                .build();
 
             subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
@@ -247,31 +250,31 @@ public class Worker {
         private ExecutorService executorService = Executors.newCachedThreadPool();
         private TaskEvaluator taskEvaluator;
 
-        public Builder withTaskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
+        public Builder taskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
             this.taskHandlerResolver = taskHandlerResolver;
 
             return this;
         }
 
-        public Builder withTaskEvaluator(TaskEvaluator taskEvaluator) {
+        public Builder taskEvaluator(TaskEvaluator taskEvaluator) {
             this.taskEvaluator = taskEvaluator;
 
             return this;
         }
 
-        public Builder withMessageBroker(MessageBroker messageBroker) {
+        public Builder messageBroker(MessageBroker messageBroker) {
             this.messageBroker = messageBroker;
 
             return this;
         }
 
-        public Builder withEventPublisher(EventPublisher eventPublisher) {
+        public Builder eventPublisher(EventPublisher eventPublisher) {
             this.eventPublisher = eventPublisher;
 
             return this;
         }
 
-        public Builder withExecutorService(ExecutorService executorService) {
+        public Builder executorService(ExecutorService executorService) {
             this.executorService = executorService;
 
             return this;
@@ -287,9 +290,9 @@ public class Worker {
         private final Future<T> future;
         private final TaskExecution taskExecution;
 
-        TaskExecutionFuture(TaskExecution aTaskExecution, Future<T> aFuture) {
-            taskExecution = Objects.requireNonNull(aTaskExecution);
-            future = Objects.requireNonNull(aFuture);
+        TaskExecutionFuture(TaskExecution taskExecution, Future<T> future) {
+            this.taskExecution = Objects.requireNonNull(taskExecution);
+            this.future = Objects.requireNonNull(future);
         }
 
         @Override

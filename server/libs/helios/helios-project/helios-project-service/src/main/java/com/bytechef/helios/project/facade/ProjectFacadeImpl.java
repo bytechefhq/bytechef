@@ -264,6 +264,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     @Transactional(readOnly = true)
     public ProjectExecutionDTO getProjectExecution(long id) {
         Job job = jobService.getJob(id);

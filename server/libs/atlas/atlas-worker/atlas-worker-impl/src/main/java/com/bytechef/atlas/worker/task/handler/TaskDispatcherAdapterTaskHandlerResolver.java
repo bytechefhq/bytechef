@@ -31,14 +31,15 @@ public class TaskDispatcherAdapterTaskHandlerResolver implements TaskHandlerReso
     private final Map<String, TaskHandler<?>> taskHandlers;
 
     public TaskDispatcherAdapterTaskHandlerResolver(
-        List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories,
-        TaskHandlerResolver taskHandlerResolver,
+        List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories, TaskHandlerResolver taskHandlerResolver,
         TaskEvaluator taskEvaluator) {
-        taskHandlers = taskDispatcherAdapterTaskHandlerFactories.stream()
-            .collect(Collectors.toMap(
-                TaskDispatcherAdapterFactory::getName,
-                taskDispatcherAdapterFactory -> taskDispatcherAdapterFactory.create(taskHandlerResolver,
-                    taskEvaluator)));
+
+        taskHandlers = taskDispatcherAdapterFactories.stream()
+            .collect(
+                Collectors.toMap(
+                    TaskDispatcherAdapterFactory::getName,
+                    taskDispatcherAdapterFactory -> taskDispatcherAdapterFactory.create(
+                        taskHandlerResolver, taskEvaluator)));
     }
 
     @Override

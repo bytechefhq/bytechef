@@ -111,7 +111,7 @@ public class IntegrationRepositoryIntTest {
     }
 
     private static Integration getIntegration(List<String> workflowIds) {
-        return Integration.Builder.builder()
+        return Integration.builder()
             .description("description")
             .integrationVersion(1)
             .name("name")

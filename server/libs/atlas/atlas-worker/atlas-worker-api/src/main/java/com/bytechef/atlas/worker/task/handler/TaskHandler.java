@@ -23,7 +23,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 
 /**
- * A startegy interface used for executing a {@link TaskExecution}.
+ * A strategy interface used for executing a {@link TaskExecution}.
  *
  * @author Arik Cohen
  * @since Jun 12, 2016

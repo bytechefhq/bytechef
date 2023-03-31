@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @TaskDispatcherIntTest
 public class EachTaskDispatcherIntTest {
 
+    public static final Base64.Encoder ENCODER = Base64.getEncoder();
     private TestVarTaskHandler<List<String>, String> testVarTaskHandler;
 
     @Autowired
@@ -55,8 +56,7 @@ public class EachTaskDispatcherIntTest {
     @Test
     public void testEachTaskDispatcher() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("each_v1".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("each_v1".getBytes(StandardCharsets.UTF_8)),
             (counterService, taskEvaluator, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(taskExecutionService,
                     taskCompletionHandler, counterService)),

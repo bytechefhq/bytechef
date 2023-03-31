@@ -20,21 +20,20 @@
 package com.bytechef.atlas.worker.task.handler;
 
 import com.bytechef.atlas.task.Task;
-import java.util.Map;
 
 /**
  * @author Arik Cohen
  */
 public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
 
-    private final Map<String, TaskHandler<?>> taskHandlers;
+    private final TaskHandlerAccessor taskHandlerAccessor;
 
-    public DefaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {
-        this.taskHandlers = taskHandlers;
+    public DefaultTaskHandlerResolver(TaskHandlerAccessor taskHandlerAccessor) {
+        this.taskHandlerAccessor = taskHandlerAccessor;
     }
 
     @Override
     public TaskHandler<?> resolve(Task task) {
-        return taskHandlers.get(task.getType());
+        return taskHandlerAccessor.getTaskHandler(task.getType());
     }
 }

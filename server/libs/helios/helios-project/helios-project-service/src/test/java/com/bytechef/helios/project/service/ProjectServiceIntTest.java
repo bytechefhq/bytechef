@@ -185,7 +185,7 @@ public class ProjectServiceIntTest {
     }
 
     private Project getProject() {
-        return Project.Builder.builder()
+        return Project.builder()
             .categoryId(category.getId())
             .description("description")
             .name("name")

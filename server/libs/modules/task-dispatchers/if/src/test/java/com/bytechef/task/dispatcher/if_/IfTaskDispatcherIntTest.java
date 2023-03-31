@@ -17,15 +17,12 @@
 
 package com.bytechef.task.dispatcher.if_;
 
-import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
@@ -140,19 +137,20 @@ public class IfTaskDispatcherIntTest {
         Assertions.assertEquals("false branch", testVarTaskHandler.get("regexResult"));
     }
 
+    @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
 
         return List.of(
-            (
-                TaskCompletionHandler taskCompletionHandler,
-                TaskDispatcher<? super Task> taskDispatcher) -> new IfTaskCompletionHandler(
-                    contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
+            (taskCompletionHandler, taskDispatcher) -> new IfTaskCompletionHandler(
+                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
+    @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
         TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+
         return List.of(
             (taskDispatcher) -> new IfTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -87,7 +88,7 @@ public final class TaskExecution
     private ExecutionError error;
 
     @Column("execution_time")
-    private long executionTime = 0;
+    private long executionTime;
 
     @Id
     private Long id;
@@ -122,10 +123,10 @@ public final class TaskExecution
     private int retryAttempts;
 
     @Column("retry_delay")
-    private String retryDelay = "1s";
+    private String retryDelay;
 
     @Column("retry_delay_factor")
-    private int retryDelayFactor = 2;
+    private int retryDelayFactor;
 
     @Column("start_date")
     private LocalDateTime startDate;
@@ -134,7 +135,7 @@ public final class TaskExecution
     private TaskStatus status;
 
     @Column("task_number")
-    private int taskNumber = DEFAULT_TASK_NUMBER;
+    private int taskNumber;
 
     @Column("workflow_task")
     private WorkflowTask workflowTask;
@@ -146,57 +147,21 @@ public final class TaskExecution
         this.id = id;
     }
 
-    public TaskExecution(long id, @NonNull WorkflowTask workflowTask) {
-        this(workflowTask);
-
-        this.id = id;
-        this.workflowTask = workflowTask;
-    }
-
     public TaskExecution(@NonNull WorkflowTask workflowTask) {
         Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
         this.workflowTask = workflowTask;
     }
 
-    private TaskExecution(Long jobId, Long parentId, int priority, int taskNumber, WorkflowTask workflowTask) {
-        this.jobId = AggregateReference.to(jobId);
+    public TaskExecution(long id, @NonNull WorkflowTask workflowTask) {
+        Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
-        if (parentId != null) {
-            this.parentId = AggregateReference.to(parentId);
-        }
-
-        this.priority = priority;
-        this.status = TaskStatus.CREATED;
-        this.taskNumber = taskNumber;
+        this.id = id;
         this.workflowTask = workflowTask;
     }
 
-    public static TaskExecution of(long jobId, int priority, WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null");
-
-        return new TaskExecution(jobId, null, priority, DEFAULT_TASK_NUMBER, workflowTask);
-    }
-
-    public static TaskExecution of(
-        long jobId, long parentId, int priority, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null");
-
-        return new TaskExecution(jobId, parentId, priority, DEFAULT_TASK_NUMBER, workflowTask);
-    }
-
-    public static TaskExecution of(
-        long jobId, long parentId, int priority, int taskNumber, @NonNull WorkflowTask workflowTask) {
-
-        Assert.notNull(workflowTask, "'workflowTask' must not be null");
-
-        return new TaskExecution(jobId, parentId, priority, taskNumber, workflowTask);
-    }
-
-    public static TaskExecution of(long jobId, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null");
-
-        return new TaskExecution(jobId, null, 0, DEFAULT_TASK_NUMBER, workflowTask);
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override
@@ -531,5 +496,133 @@ public final class TaskExecution
             + createdDate + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
             + lastModifiedDate + '}';
+    }
+
+    @SuppressFBWarnings("EI")
+    public static final class Builder {
+        private LocalDateTime endDate;
+        private ExecutionError error;
+        private Long id;
+        private Long jobId;
+        private MapWrapper output;
+        private Long parentId;
+        private int priority;
+        private int progress;
+        private int retry;
+        private int retryAttempts;
+        private String retryDelay = "1s";
+        private int retryDelayFactor = 2;
+        private LocalDateTime startDate;
+        private TaskStatus status = TaskStatus.CREATED;
+        private int taskNumber = DEFAULT_TASK_NUMBER;
+        private WorkflowTask workflowTask;
+
+        private Builder() {
+        }
+
+        public Builder endDate(LocalDateTime endDate) {
+            this.endDate = endDate;
+            return this;
+        }
+
+        public Builder error(ExecutionError error) {
+            this.error = error;
+            return this;
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder jobId(Long jobId) {
+            this.jobId = jobId;
+            return this;
+        }
+
+        public Builder output(MapWrapper output) {
+            this.output = output;
+            return this;
+        }
+
+        public Builder parentId(Long parentId) {
+            this.parentId = parentId;
+            return this;
+        }
+
+        public Builder priority(int priority) {
+            this.priority = priority;
+            return this;
+        }
+
+        public Builder progress(int progress) {
+            this.progress = progress;
+            return this;
+        }
+
+        public Builder retry(int retry) {
+            this.retry = retry;
+            return this;
+        }
+
+        public Builder retryAttempts(int retryAttempts) {
+            this.retryAttempts = retryAttempts;
+            return this;
+        }
+
+        public Builder retryDelay(String retryDelay) {
+            this.retryDelay = retryDelay;
+            return this;
+        }
+
+        public Builder retryDelayFactor(int retryDelayFactor) {
+            this.retryDelayFactor = retryDelayFactor;
+            return this;
+        }
+
+        public Builder startDate(LocalDateTime startDate) {
+            this.startDate = startDate;
+            return this;
+        }
+
+        public Builder status(TaskStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder taskNumber(int taskNumber) {
+            this.taskNumber = taskNumber;
+            return this;
+        }
+
+        public Builder workflowTask(WorkflowTask workflowTask) {
+            Assert.notNull(workflowTask, "'workflowTask' must not be null");
+
+            this.workflowTask = workflowTask;
+            return this;
+        }
+
+        public TaskExecution build() {
+
+            TaskExecution taskExecution = new TaskExecution();
+            taskExecution.setEndDate(endDate);
+            taskExecution.setError(error);
+            taskExecution.setId(id);
+            taskExecution.setJobId(jobId);
+            taskExecution.setOutput(output);
+            taskExecution.setParentId(parentId);
+            taskExecution.setPriority(priority);
+            taskExecution.setProgress(progress);
+            taskExecution.setRetry(retry);
+            taskExecution.setRetryAttempts(retryAttempts);
+            taskExecution.setRetryDelay(retryDelay);
+            taskExecution.setRetryDelayFactor(retryDelayFactor);
+            taskExecution.setStartDate(startDate);
+            taskExecution.setStatus(status);
+            taskExecution.setTaskNumber(taskNumber);
+            taskExecution.setWorkflowTask(workflowTask);
+
+            return taskExecution;
+        }
     }
 }

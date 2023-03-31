@@ -119,10 +119,10 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         };
 
         Worker worker = Worker.builder()
-            .withTaskHandlerResolver(taskHandlerResolver)
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+            .taskHandlerResolver(taskHandlerResolver)
+            .messageBroker(messageBroker)
+            .eventPublisher(e -> {})
+            .taskEvaluator(TaskEvaluator.create())
             .build();
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver,
