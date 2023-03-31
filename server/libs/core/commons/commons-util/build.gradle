@@ -1,4 +1,5 @@
 dependencies {
     implementation "io.projectreactor:reactor-core"
     implementation "org.springframework:spring-core"
+    implementation "org.springframework.cloud:spring-cloud-commons"
 }

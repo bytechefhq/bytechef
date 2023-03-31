@@ -65,14 +65,12 @@ import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHa
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -121,12 +119,6 @@ public class WorkflowTestExecutorConfiguration {
                 .workflowService(workflowService)
                 .build(),
             taskExecutionService);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    TaskHandlerAccessor taskHandlerAccessor(Map<String, TaskHandler<?>> taskHandlerMap) {
-        return taskHandlerMap::get;
     }
 
     private EventPublisher getEventPublisher(

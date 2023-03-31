@@ -57,6 +57,7 @@ dependencies {
     implementation project(":server:libs:modules:components:xlsxfile")
     implementation project(":server:libs:modules:components:xmlfile")
     implementation project(":server:libs:modules:components:xmlhelper")
+    implementation project(":server:libs:hermes:hermes-worker:hermes-worker-rsocket")
 
     testImplementation "org.apache.activemq:artemis-jakarta-server"
     testImplementation "org.springframework.boot:spring-boot-starter-artemis"

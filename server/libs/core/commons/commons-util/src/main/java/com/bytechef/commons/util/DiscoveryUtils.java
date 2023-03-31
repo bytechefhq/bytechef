@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.rsocket.client.util;
+package com.bytechef.commons.util;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.util.StringUtils;
 
@@ -36,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
-public class ServiceInstanceUtils {
+public class DiscoveryUtils {
 
     public static ServiceInstance filterServiceInstance(List<ServiceInstance> serviceInstances, String componentName) {
         for (ServiceInstance serviceInstance : serviceInstances) {
@@ -78,14 +76,6 @@ public class ServiceInstanceUtils {
         return List.of();
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<ComponentDefinition> toComponentDefinitions(Object[] objectArray) {
-        return Arrays.stream(objectArray)
-            .map(object -> (List<ComponentDefinition>) object)
-            .flatMap(Collection::stream)
-            .toList();
-    }
-
     private static Set<String> toUniqueInstanceIds(List<ServiceInstance> serviceInstances) {
         Map<String, Set<String>> componentNameInstanceIds = new HashMap<>();
 
@@ -111,14 +101,6 @@ public class ServiceInstanceUtils {
             .stream()
             .flatMap(Collection::stream)
             .collect(Collectors.toSet());
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<ConnectionDefinition> toConnectionDefinitions(Object[] objectArray) {
-        return Arrays.stream(objectArray)
-            .map(object -> (List<ConnectionDefinition>) object)
-            .flatMap(Collection::stream)
-            .toList();
     }
 
     public static URI toWebSocketUri(ServiceInstance serviceInstance) {
