@@ -37,6 +37,15 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                additionalProperties:
-                  type: "object"
+                $ref: "#/components/schemas/WorkflowTestResponse"
+components:
+  schemas:
+    WorkflowTestResponse:
+      type: "object"
+      properties:
+        job:
+          $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Job"
+        taskExecutions:
+          type: "array"
+          items:
+            $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
