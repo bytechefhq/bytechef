@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.helios.project.web.rest.model.JobBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectBasicModel;
-import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceBasicModel;
 import com.bytechef.helios.project.web.rest.model.WorkflowBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -25,14 +25,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectExecutionBasic", description = "Contains information about execution of one of project workflows.")
 @JsonTypeName("ProjectExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:18.423931+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
 public class ProjectExecutionBasicModel {
 
   @JsonProperty("id")
   private Long id;
 
   @JsonProperty("instance")
-  private ProjectInstanceModel instance;
+  private ProjectInstanceBasicModel instance;
 
   @JsonProperty("job")
   private JobBasicModel job;
@@ -62,7 +62,7 @@ public class ProjectExecutionBasicModel {
     this.id = id;
   }
 
-  public ProjectExecutionBasicModel instance(ProjectInstanceModel instance) {
+  public ProjectExecutionBasicModel instance(ProjectInstanceBasicModel instance) {
     this.instance = instance;
     return this;
   }
@@ -73,11 +73,11 @@ public class ProjectExecutionBasicModel {
   */
   @Valid 
   @Schema(name = "instance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public ProjectInstanceModel getInstance() {
+  public ProjectInstanceBasicModel getInstance() {
     return instance;
   }
 
-  public void setInstance(ProjectInstanceModel instance) {
+  public void setInstance(ProjectInstanceBasicModel instance) {
     this.instance = instance;
   }
 
