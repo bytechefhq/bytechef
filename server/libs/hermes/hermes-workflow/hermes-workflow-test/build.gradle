@@ -12,7 +12,6 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-sync-executor")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     implementation project(":server:libs:atlas:atlas-sync-executor")
-    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
     implementation project(":server:libs:modules:components:map")
 
