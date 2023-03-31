@@ -38,7 +38,7 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.WorkflowServiceImpl;
-import com.bytechef.atlas.sync.executor.WorkflowSyncExecutor;
+import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
@@ -104,7 +104,7 @@ public class WorkflowTestExecutorConfiguration {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         return new WorkflowTestExecutor(
-            WorkflowSyncExecutor.builder()
+            JobSyncExecutor.builder()
                 .contextService(contextService)
                 .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))
                 .jobService(jobService)
@@ -119,7 +119,8 @@ public class WorkflowTestExecutorConfiguration {
                 .taskExecutionService(taskExecutionService)
                 .taskHandlerAccessor(taskHandlerAccessor)
                 .workflowService(workflowService)
-                .build());
+                .build(),
+            taskExecutionService);
     }
 
     @Bean
