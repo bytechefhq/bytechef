@@ -17,10 +17,12 @@
 
 package com.bytechef.hermes.workflow.web.rest;
 
-import com.bytechef.atlas.domain.Job;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
 import com.bytechef.hermwes.workflow.web.rest.WorkflowTestsApi;
+import com.bytechef.hermwes.workflow.web.rest.model.WorkflowTestResponseModel;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,18 +39,22 @@ import java.util.Map;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class WorkflowTestController implements WorkflowTestsApi {
 
+    private final ConversionService conversionService;
     private final WorkflowTestExecutor workflowTestExecutor;
 
-    public WorkflowTestController(WorkflowTestExecutor workflowTestExecutor) {
+    public WorkflowTestController(ConversionService conversionService, WorkflowTestExecutor workflowTestExecutor) {
+        this.conversionService = conversionService;
         this.workflowTestExecutor = workflowTestExecutor;
     }
 
     @Override
-    public Mono<ResponseEntity<Map<String, Object>>> testWorkflow(
+    @SuppressFBWarnings("NP")
+    public Mono<ResponseEntity<WorkflowTestResponseModel>> testWorkflow(
         String id, Mono<Map<String, Object>> inputsMono, ServerWebExchange exchange) {
 
         return inputsMono.map(inputs -> workflowTestExecutor.execute(id, inputs))
-            .map(Job::getOutputs)
+            .map(workflowTestResponse -> conversionService.convert(
+                workflowTestResponse, WorkflowTestResponseModel.class))
             .map(ResponseEntity::ok);
     }
 }
