@@ -28,6 +28,9 @@ import org.springframework.context.annotation.Configuration;
 
 import static com.bytechef.hermes.component.constant.Version.VERSION_1;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
 public class MapTaskDispatcherAdapterConfiguration {
 

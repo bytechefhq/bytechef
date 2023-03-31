@@ -19,64 +19,58 @@
 
 package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.config.WorkflowConfiguration;
-import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
-import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
-import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParametersDTO;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.job.JobFactory;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.job.JobFactoryImpl;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.repository.jdbc.JdbcContextRepository;
+import com.bytechef.atlas.repository.jdbc.JdbcJobRepository;
+import com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository;
 import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.ContextServiceImpl;
 import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.JobServiceImpl;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.Worker;
-import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
+import com.bytechef.atlas.service.WorkflowServiceImpl;
+import com.bytechef.atlas.sync.executor.WorkflowSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * @author Arik Cohen
@@ -91,8 +85,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     })
 public class CoordinatorIntTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(CoordinatorIntTest.class);
-
     @Autowired
     private ContextService contextService;
 
@@ -101,9 +93,6 @@ public class CoordinatorIntTest {
 
     @Autowired
     private JobService jobService;
-
-    @Autowired
-    private SyncMessageBroker messageBroker;
 
     @Autowired
     private TaskExecutionService taskExecutionService;
@@ -128,86 +117,69 @@ public class CoordinatorIntTest {
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Coordinator coordinator = new Coordinator(
-                null, null, null, jobFactory, jobService, null, null, taskExecutionService);
+            Coordinator coordinator = Coordinator.builder()
+                .jobFactory(jobFactory)
+                .jobService(jobService)
+                .taskExecutionService(taskExecutionService)
+                .build();
 
-            coordinator.create(new JobParametersDTO("aGVsbG8x"));
+            coordinator.create(new JobParametersDTO(Collections.emptyMap(), "aGVsbG8x"));
         });
     }
 
     private Job executeWorkflow(String workflowId) {
-        messageBroker.receive(Queues.ERRORS, message -> {
-            TaskExecution erroredTaskExecution = (TaskExecution) message;
-
-            ExecutionError error = erroredTaskExecution.getError();
-
-            logger.error(error.getMessage());
-        });
-
         Map<String, TaskHandler<?>> taskHandlerMap = new HashMap<>();
 
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
-        TaskHandlerResolverChain taskHandlerResolver = new TaskHandlerResolverChain();
-
-        taskHandlerResolver.setTaskHandlerResolvers(List.of(new DefaultTaskHandlerResolver(taskHandlerMap)));
-
-        Worker worker = Worker.builder()
-            .withTaskHandlerResolver(taskHandlerResolver)
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withTaskEvaluator(TaskEvaluator.create())
+        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+            .contextService(contextService)
+            .eventPublisher(e -> {})
+            .jobService(jobService)
+            .taskCompletionHandlerFactories(List.of())
+            .taskDispatcherResolverFactories(List.of())
+            .taskExecutionService(taskExecutionService)
+            .taskHandlerAccessor(taskHandlerMap::get)
+            .workflowService(workflowService)
             .build();
 
-        SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
-
-        coordinatorMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
-
-        DefaultTaskDispatcher taskDispatcher = new DefaultTaskDispatcher(coordinatorMessageBroker, List.of());
-
-        JobExecutor jobExecutor = new JobExecutor(
-            contextService, taskDispatcher, taskExecutionService, TaskEvaluator.create(), workflowService);
-
-        DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, e -> {}, jobExecutor, jobService, TaskEvaluator.create(), taskExecutionService,
-            workflowService);
-
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
-        Coordinator coordinator = new Coordinator(
-            e -> {}, e -> {}, jobExecutor, jobFactory, jobService, taskCompletionHandler,
-            (TaskDispatcher) taskDispatcher, taskExecutionService);
-
-        messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
-
-        long jobId = jobFactory.create(new JobParametersDTO(Collections.singletonMap("yourName", "me"), workflowId));
-
-        return jobService.getJob(jobId);
+        return workflowSyncExecutor.execute(workflowId, Collections.singletonMap("yourName", "me"));
     }
 
     @EmbeddedSql
-    @ComponentScan(basePackages = "com.bytechef.atlas")
     @EnableAutoConfiguration
     @Import({
-        ResourceWorkflowRepositoryConfiguration.class,
-        WorkflowConfiguration.class
+        ResourceWorkflowRepositoryConfiguration.class
     })
     @Configuration
     public static class CoordinatorIntTestConfiguration {
 
-        @MockBean
-        private EventPublisher eventPublisher;
-
         @Bean
-        SyncMessageBroker messageBroker() {
-            return new SyncMessageBroker();
+        ContextService contextService(JdbcContextRepository jdbcContextRepository) {
+            return new ContextServiceImpl(jdbcContextRepository);
         }
 
-        @EnableCaching
-        @TestConfiguration
-        public static class CacheConfiguration {
+        @Bean
+        JobFactory jobFactory(ContextService contextService, JobService jobService) {
+            return new JobFactoryImpl(contextService, e -> {}, jobService, new SyncMessageBroker());
+        }
+
+        @Bean
+        JobService jobService(JdbcJobRepository jdbcJobRepository, List<WorkflowRepository> workflowRepositories) {
+            return new JobServiceImpl(jdbcJobRepository, workflowRepositories);
+        }
+
+        @Bean
+        TaskExecutionService taskExecutionService(JdbcTaskExecutionRepository jdbcTaskExecutionRepository) {
+            return new TaskExecutionServiceImpl(jdbcTaskExecutionRepository);
+        }
+
+        @Bean
+        WorkflowService workflowService(
+            List<WorkflowCrudRepository> workflowCrudRepositories, List<WorkflowRepository> workflowRepositories) {
+
+            return new WorkflowServiceImpl(
+                new ConcurrentMapCacheManager(), workflowCrudRepositories, workflowRepositories);
         }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
@@ -234,7 +206,9 @@ public class CoordinatorIntTest {
                     new StringToExecutionErrorConverter(objectMapper),
                     new StringToMapWrapperConverter(objectMapper),
                     new StringToMapListWrapperConverter(objectMapper),
+                    new StringToWebhooksConverter(objectMapper),
                     new StringToWorkflowTaskConverter(objectMapper),
+                    new WebhooksToStringConverter(objectMapper),
                     new WorkflowTaskToStringConverter(objectMapper));
             }
         }

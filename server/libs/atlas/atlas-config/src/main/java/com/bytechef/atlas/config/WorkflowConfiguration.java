@@ -60,7 +60,7 @@ public class WorkflowConfiguration {
     }
 
     @Bean
-    public JobFactory jobFacade(
+    public JobFactory jobFactory(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker) {
 

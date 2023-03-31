@@ -24,7 +24,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -90,33 +89,15 @@ public class ProjectInstance implements Persistable<Long> {
     private AggregateReference<Project, Long> projectId;
 
     @MappedCollection(idColumn = "project_instance_id")
-    private Set<ProjectInstanceConnection> projectInstanceConnections = new HashSet<>();
+    private Set<ProjectInstanceConnection> projectInstanceConnections = Collections.emptySet();
 
     @MappedCollection(idColumn = "project_instance_id")
-    private Set<ProjectInstanceTag> projectInstanceTags = new HashSet<>();
+    private Set<ProjectInstanceTag> projectInstanceTags = Collections.emptySet();
 
     @Version
     private int version;
 
     public ProjectInstance() {
-    }
-
-    @PersistenceCreator
-    public ProjectInstance(
-        MapWrapper configurationParameters, String description, Long id, String name, LocalDateTime lastExecutionDate,
-        AggregateReference<Project, Long> projectId, Set<ProjectInstanceConnection> projectInstanceConnections,
-        Set<ProjectInstanceTag> projectInstanceTags, Status status, int version) {
-
-        this.configurationParameters = configurationParameters;
-        this.description = description;
-        this.id = id;
-        this.lastExecutionDate = lastExecutionDate;
-        this.name = name;
-        this.projectId = projectId;
-        this.projectInstanceConnections.addAll(projectInstanceConnections);
-        this.projectInstanceTags.addAll(projectInstanceTags);
-        this.status = status;
-        this.version = version;
     }
 
     @Override

@@ -60,7 +60,7 @@ public class MapTaskDispatcherConfiguration {
     }
 
     @Bean("mapTaskDispatcherFactory_v1")
-    TaskDispatcherResolverFactory mapTaskDispatcherFactory() {
+    TaskDispatcherResolverFactory mapTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> MapTaskDispatcher.builder()
             .taskDispatcher(taskDispatcher)
             .taskExecutionService(taskExecutionService)

@@ -18,7 +18,9 @@
 package com.bytechef.atlas.job.repository.jdbc.config;
 
 import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
@@ -72,13 +74,15 @@ public class WorkflowRepositoryIntTestConfiguration {
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
+                new StringToWebhooksConverter(objectMapper),
                 new ExecutionErrorToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
                 new MapListWrapperToStringConverter(objectMapper),
-                new WorkflowTaskToStringConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper),
                 new StringToMapListWrapperConverter(objectMapper),
-                new StringToWorkflowTaskConverter(objectMapper));
+                new StringToWorkflowTaskConverter(objectMapper),
+                new WebhooksToStringConverter(objectMapper),
+                new WorkflowTaskToStringConverter(objectMapper));
         }
     }
 }

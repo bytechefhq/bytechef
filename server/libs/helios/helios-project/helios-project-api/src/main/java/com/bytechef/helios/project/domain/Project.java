@@ -117,6 +117,10 @@ public final class Project implements Persistable<Long> {
         this.version = version;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public void addWorkflowId(String workflowId) {
         projectWorkflows.add(new ProjectWorkflow(workflowId));
     }
@@ -314,10 +318,6 @@ public final class Project implements Persistable<Long> {
         private List<String> workflowIds;
 
         private Builder() {
-        }
-
-        public static Builder builder() {
-            return new Builder();
         }
 
         public Builder categoryId(Long categoryId) {

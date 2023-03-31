@@ -111,6 +111,10 @@ public final class Integration implements Persistable<Long> {
         this.integrationWorkflows.addAll(integrationWorkflows);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public void addWorkflowId(String workflowId) {
         integrationWorkflows.add(new IntegrationWorkflow(workflowId));
     }
@@ -308,10 +312,6 @@ public final class Integration implements Persistable<Long> {
         private List<String> workflowIds;
 
         private Builder() {
-        }
-
-        public static Builder builder() {
-            return new Builder();
         }
 
         public Builder categoryId(Long categoryId) {

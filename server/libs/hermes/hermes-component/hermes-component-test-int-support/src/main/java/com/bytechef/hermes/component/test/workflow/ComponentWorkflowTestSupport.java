@@ -55,17 +55,31 @@ public class ComponentWorkflowTestSupport {
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs) {
-        WorkflowSyncExecutor workflowSyncExecutor = new WorkflowSyncExecutor(
-            contextService, jobService, eventPublisher, List.of(), List.of(), taskExecutionService, taskHandlerMap,
-            workflowService);
+        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+            .contextService(contextService)
+            .eventPublisher(eventPublisher)
+            .jobService(jobService)
+            .taskCompletionHandlerFactories(List.of())
+            .taskDispatcherResolverFactories(List.of())
+            .taskExecutionService(taskExecutionService)
+            .taskHandlerAccessor(taskHandlerMap::get)
+            .workflowService(workflowService)
+            .build();
 
         return workflowSyncExecutor.execute(workflowId, inputs);
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
-        WorkflowSyncExecutor workflowSyncExecutor = new WorkflowSyncExecutor(
-            contextService, jobService, eventPublisher, List.of(), List.of(), taskExecutionService,
-            CollectionUtils.concat(this.taskHandlerMap, taskHandlerMap), workflowService);
+        WorkflowSyncExecutor workflowSyncExecutor = WorkflowSyncExecutor.builder()
+            .contextService(contextService)
+            .eventPublisher(eventPublisher)
+            .jobService(jobService)
+            .taskCompletionHandlerFactories(List.of())
+            .taskDispatcherResolverFactories(List.of())
+            .taskExecutionService(taskExecutionService)
+            .taskHandlerAccessor(CollectionUtils.concat(this.taskHandlerMap, taskHandlerMap)::get)
+            .workflowService(workflowService)
+            .build();
 
         return workflowSyncExecutor.execute(workflowId, inputs);
     }

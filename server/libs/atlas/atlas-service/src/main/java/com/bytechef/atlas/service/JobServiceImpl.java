@@ -61,11 +61,10 @@ public class JobServiceImpl implements JobService {
 
         String workflowId = jobParametersDTO.getWorkflowId();
 
-        Workflow workflow = workflowRepositories.stream()
-            .flatMap(workflowRepository -> CollectionUtils.stream(workflowRepository.findAll()))
-            .filter(curWorkflow -> Objects.equals(workflowId, curWorkflow.getId()))
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
+        Workflow workflow = CollectionUtils.getFirstFlat(
+            workflowRepositories,
+            workflowRepository -> CollectionUtils.stream(workflowRepository.findAll()),
+            curWorkflow -> Objects.equals(workflowId, curWorkflow.getId()));
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
 

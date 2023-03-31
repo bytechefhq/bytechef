@@ -110,9 +110,13 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                ifTaskExecution.getJobId(), ifTaskExecution.getId(), ifTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1, subWorkflowTask);
+            TaskExecution subTaskExecution = TaskExecution.builder()
+                .jobId(ifTaskExecution.getJobId())
+                .parentId(ifTaskExecution.getId())
+                .priority(ifTaskExecution.getPriority())
+                .taskNumber(taskExecution.getTaskNumber() + 1)
+                .workflowTask(subWorkflowTask)
+                .build();
 
             Map<String, Object> context = contextService.peek(
                 ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION);

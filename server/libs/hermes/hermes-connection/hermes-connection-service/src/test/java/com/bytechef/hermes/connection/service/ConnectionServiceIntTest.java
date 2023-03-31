@@ -123,7 +123,7 @@ public class ConnectionServiceIntTest {
     }
 
     private static Connection getConnection() {
-        return Connection.Builder.builder()
+        return Connection.builder()
             .componentName("componentName")
             .key("key")
             .name("name")

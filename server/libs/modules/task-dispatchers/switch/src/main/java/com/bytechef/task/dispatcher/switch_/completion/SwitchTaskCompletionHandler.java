@@ -111,9 +111,13 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = TaskExecution.of(
-                switchTaskExecution.getJobId(), switchTaskExecution.getId(), switchTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1, workflowTask);
+            TaskExecution subTaskExecution = TaskExecution.builder()
+                .jobId(switchTaskExecution.getJobId())
+                .parentId(switchTaskExecution.getId())
+                .priority(switchTaskExecution.getPriority())
+                .taskNumber(taskExecution.getTaskNumber() + 1)
+                .workflowTask(workflowTask)
+                .build();
 
             Map<String, Object> context = contextService.peek(
                 switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);

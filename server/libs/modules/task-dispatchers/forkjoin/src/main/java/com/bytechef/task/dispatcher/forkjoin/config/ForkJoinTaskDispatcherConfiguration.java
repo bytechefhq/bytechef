@@ -57,8 +57,8 @@ public class ForkJoinTaskDispatcherConfiguration {
             taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService, taskEvaluator);
     }
 
-    @Bean("forkJoinTaskDispatcherFactory_v1")
-    TaskDispatcherResolverFactory forkTaskDispatcherFactory() {
+    @Bean("forkJoinTaskDispatcherResolverFactory_v1")
+    TaskDispatcherResolverFactory forkTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ForkJoinTaskDispatcher(
             contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
     }

@@ -47,13 +47,13 @@ public class ParallelTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
-    @Bean
+    @Bean("parallelTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory parallelTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
             taskCompletionHandler, taskExecutionService);
     }
 
-    @Bean
+    @Bean("parallelTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory parallelTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ParallelTaskDispatcher(
             contextService, counterService, messageBroker, taskDispatcher, taskExecutionService);
