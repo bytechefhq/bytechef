@@ -6,9 +6,8 @@ import {
     IntegrationTagsApi,
     IntegrationsApi,
     TagModel,
+    WorkflowModel,
 } from 'middleware/integration';
-
-import {WorkflowModel} from '../middleware/workflow';
 
 export const IntegrationKeys = {
     integration: (id: number) => ['integration', id],
