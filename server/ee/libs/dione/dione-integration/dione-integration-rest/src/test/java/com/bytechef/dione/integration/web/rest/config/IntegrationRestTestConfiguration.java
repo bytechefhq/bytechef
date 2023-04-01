@@ -21,7 +21,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = {
-    "com.bytechef.hermes.workflow.web.rest.mapper",
+    "com.bytechef.hermes.workflow.web.rest",
     "com.bytechef.category.web.rest.mapper",
     "com.bytechef.dione.integration.web.rest",
     "com.bytechef.tag.web.rest.mapper"
