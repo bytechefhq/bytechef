@@ -183,7 +183,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../../../libs/atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                  $ref: "../../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Workflow"
     post:
       description: "Create new workflow and adds it to an existing integration."
       summary: "Create new workflow and adds it to an existing integration."
@@ -222,7 +222,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../../../libs/atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                $ref: "../../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Workflow"
   /integrations/{id}/tags:
     put:
       description: "Updates tags of an existing integration."
