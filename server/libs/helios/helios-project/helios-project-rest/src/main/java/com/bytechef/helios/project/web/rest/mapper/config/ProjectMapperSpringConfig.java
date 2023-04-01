@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.project.web.rest.mapper.config;
 
-import com.bytechef.atlas.web.rest.adapter.WorkflowConversionServiceAdapter;
+import com.bytechef.hermes.workflow.web.rest.adapter.WorkflowConversionServiceAdapter;
 import com.bytechef.category.web.rest.mapper.adapter.CategoryConversionServiceAdapter;
 import com.bytechef.helios.project.web.rest.adapter.ProjectConversionServiceAdapter;
 import com.bytechef.hermes.connection.web.rest.adapter.ConnectionConversionServiceAdapter;

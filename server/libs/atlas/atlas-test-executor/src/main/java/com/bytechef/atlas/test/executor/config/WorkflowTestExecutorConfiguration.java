@@ -1,4 +1,4 @@
-package com.bytechef.atlas.web.rest.config;
+package com.bytechef.hermes.workflow.web.rest.config;
 
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.service.ContextService;

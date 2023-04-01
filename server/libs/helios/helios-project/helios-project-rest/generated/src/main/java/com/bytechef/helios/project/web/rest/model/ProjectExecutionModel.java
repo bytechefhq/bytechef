@@ -1,22 +1,19 @@
 package com.bytechef.helios.project.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
-import com.bytechef.helios.project.web.rest.model.ProjectModel;
+
+import com.bytechef.hermes.workflow.web.rest.model.JobModel;
+import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -35,17 +32,17 @@ public class ProjectExecutionModel {
   private ProjectInstanceModel instance;
 
   @JsonProperty("job")
-  private com.bytechef.atlas.web.rest.model.JobModel job;
+  private JobModel job;
 
   @JsonProperty("project")
   private ProjectModel project;
 
   @JsonProperty("taskExecutions")
   @Valid
-  private List<com.bytechef.atlas.web.rest.model.TaskExecutionModel> taskExecutions = null;
+  private List<TaskExecutionModel> taskExecutions = null;
 
   @JsonProperty("workflow")
-  private com.bytechef.atlas.web.rest.model.WorkflowModel workflow;
+  private WorkflowModel workflow;
 
   public ProjectExecutionModel id(Long id) {
     this.id = id;
@@ -56,7 +53,7 @@ public class ProjectExecutionModel {
    * The id of a project execution.
    * @return id
   */
-  
+
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
@@ -75,7 +72,7 @@ public class ProjectExecutionModel {
    * Get instance
    * @return instance
   */
-  @Valid 
+  @Valid
   @Schema(name = "instance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public ProjectInstanceModel getInstance() {
     return instance;
@@ -85,7 +82,7 @@ public class ProjectExecutionModel {
     this.instance = instance;
   }
 
-  public ProjectExecutionModel job(com.bytechef.atlas.web.rest.model.JobModel job) {
+  public ProjectExecutionModel job(JobModel job) {
     this.job = job;
     return this;
   }
@@ -94,13 +91,13 @@ public class ProjectExecutionModel {
    * Get job
    * @return job
   */
-  @Valid 
+  @Valid
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public com.bytechef.atlas.web.rest.model.JobModel getJob() {
+  public JobModel getJob() {
     return job;
   }
 
-  public void setJob(com.bytechef.atlas.web.rest.model.JobModel job) {
+  public void setJob(JobModel job) {
     this.job = job;
   }
 
@@ -113,7 +110,7 @@ public class ProjectExecutionModel {
    * Get project
    * @return project
   */
-  @Valid 
+  @Valid
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public ProjectModel getProject() {
     return project;
@@ -123,12 +120,12 @@ public class ProjectExecutionModel {
     this.project = project;
   }
 
-  public ProjectExecutionModel taskExecutions(List<com.bytechef.atlas.web.rest.model.TaskExecutionModel> taskExecutions) {
+  public ProjectExecutionModel taskExecutions(List<TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
     return this;
   }
 
-  public ProjectExecutionModel addTaskExecutionsItem(com.bytechef.atlas.web.rest.model.TaskExecutionModel taskExecutionsItem) {
+  public ProjectExecutionModel addTaskExecutionsItem(TaskExecutionModel taskExecutionsItem) {
     if (this.taskExecutions == null) {
       this.taskExecutions = new ArrayList<>();
     }
@@ -140,17 +137,17 @@ public class ProjectExecutionModel {
    * Get taskExecutions
    * @return taskExecutions
   */
-  @Valid 
+  @Valid
   @Schema(name = "taskExecutions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<com.bytechef.atlas.web.rest.model.TaskExecutionModel> getTaskExecutions() {
+  public List<TaskExecutionModel> getTaskExecutions() {
     return taskExecutions;
   }
 
-  public void setTaskExecutions(List<com.bytechef.atlas.web.rest.model.TaskExecutionModel> taskExecutions) {
+  public void setTaskExecutions(List<TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
   }
 
-  public ProjectExecutionModel workflow(com.bytechef.atlas.web.rest.model.WorkflowModel workflow) {
+  public ProjectExecutionModel workflow(WorkflowModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -159,13 +156,13 @@ public class ProjectExecutionModel {
    * Get workflow
    * @return workflow
   */
-  @Valid 
+  @Valid
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public com.bytechef.atlas.web.rest.model.WorkflowModel getWorkflow() {
+  public WorkflowModel getWorkflow() {
     return workflow;
   }
 
-  public void setWorkflow(com.bytechef.atlas.web.rest.model.WorkflowModel workflow) {
+  public void setWorkflow(WorkflowModel workflow) {
     this.workflow = workflow;
   }
 

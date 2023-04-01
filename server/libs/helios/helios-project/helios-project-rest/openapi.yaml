@@ -498,7 +498,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                  $ref: "../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Workflow"
     post:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
@@ -537,7 +537,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
+                $ref: "../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Workflow"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
@@ -773,15 +773,15 @@ components:
         instance:
           $ref: "#/components/schemas/ProjectInstance"
         job:
-          $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Job"
+          $ref: "../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Job"
         project:
           $ref: "#/components/schemas/Project"
         taskExecutions:
           type: "array"
           items:
-            $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
+            $ref: "../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
         workflow:
-          $ref: "../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
+          $ref: "../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Workflow"
     ProjectExecutionBasic:
       description: "Contains information about execution of one of project workflows."
       type: "object"
