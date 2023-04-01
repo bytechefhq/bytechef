@@ -10,7 +10,9 @@ type Props = {
     navigation: {
         name: string;
         href: string;
-        icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
+        icon: React.ForwardRefExoticComponent<
+            Omit<React.SVGProps<SVGSVGElement>, 'ref'>
+        >;
     }[];
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (value: boolean) => void;
