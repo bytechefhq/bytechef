@@ -59,7 +59,7 @@ const LayoutContainer = ({
                             leaveFrom="translate-x-0"
                             leaveTo="-translate-x-full"
                         >
-                            <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-white pt-5 pb-4">
+                            <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-white pb-4 pt-5">
                                 <Transition.Child
                                     as={Fragment}
                                     enter="ease-in-out duration-300"
@@ -69,7 +69,7 @@ const LayoutContainer = ({
                                     leaveFrom="opacity-100"
                                     leaveTo="opacity-0"
                                 >
-                                    <div className="absolute top-0 right-0 -mr-14 p-1">
+                                    <div className="absolute right-0 top-0 -mr-14 p-1">
                                         <button
                                             type="button"
                                             className="flex h-12 w-12 items-center justify-center rounded-full focus:bg-gray-600 focus:outline-none"
