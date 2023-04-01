@@ -16,5 +16,6 @@ models/WebhookRetryModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
 models/WorkflowTaskModel.ts
+models/WorkflowTestResponseModel.ts
 models/index.ts
 runtime.ts

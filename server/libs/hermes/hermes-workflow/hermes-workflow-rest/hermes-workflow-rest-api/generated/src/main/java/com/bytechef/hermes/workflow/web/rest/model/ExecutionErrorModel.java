@@ -1,15 +1,20 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -18,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExecutionError", description = "Contains information about an error that happened during execution.")
 @JsonTypeName("ExecutionError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class ExecutionErrorModel {
 
   @JsonProperty("message")
@@ -37,7 +42,7 @@ public class ExecutionErrorModel {
    * The error message.
    * @return message
   */
-
+  
   @Schema(name = "message", description = "The error message.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getMessage() {
     return message;
@@ -64,7 +69,7 @@ public class ExecutionErrorModel {
    * The error stacktrace.
    * @return stackTrace
   */
-
+  
   @Schema(name = "stackTrace", description = "The error stacktrace.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<String> getStackTrace() {
     return stackTrace;

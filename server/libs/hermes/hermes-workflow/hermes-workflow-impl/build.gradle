@@ -1,5 +1,5 @@
 dependencies {
-    api project(":server:libs:atlas:atlas-api")
+    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.springframework:spring-context"
@@ -10,8 +10,6 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-memory")
     implementation project(":server:libs:atlas:atlas-service")
     implementation project(":server:libs:atlas:atlas-sync-executor")
-    implementation project(":server:libs:atlas:atlas-sync-executor")
-    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
     implementation project(":server:libs:modules:components:map")
     implementation project(":server:libs:modules:task-dispatchers:each")
     implementation project(":server:libs:modules:task-dispatchers:forkjoin")

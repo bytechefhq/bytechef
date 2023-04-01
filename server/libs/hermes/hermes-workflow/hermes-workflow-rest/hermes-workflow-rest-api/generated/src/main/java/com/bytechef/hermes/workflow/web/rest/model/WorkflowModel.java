@@ -1,7 +1,11 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.workflow.web.rest.model.InputModel;
+import com.bytechef.hermes.workflow.web.rest.model.OutputModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -10,10 +14,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -22,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("createdBy")
@@ -67,11 +75,11 @@ public class WorkflowModel {
    */
   public enum SourceTypeEnum {
     CLASSPATH("CLASSPATH"),
-
+    
     FILESYSTEM("FILESYSTEM"),
-
+    
     GIT("GIT"),
-
+    
     JDBC("JDBC");
 
     private String value;
@@ -123,7 +131,7 @@ public class WorkflowModel {
    * The created by.
    * @return createdBy
   */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
@@ -142,7 +150,7 @@ public class WorkflowModel {
    * The created date.
    * @return createdDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
@@ -161,7 +169,7 @@ public class WorkflowModel {
    * The definition of a workflow.
    * @return definition
   */
-
+  
   @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDefinition() {
     return definition;
@@ -180,7 +188,7 @@ public class WorkflowModel {
    * The description of a workflow.
    * @return description
   */
-
+  
   @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
@@ -199,7 +207,7 @@ public class WorkflowModel {
    * Get format
    * @return format
   */
-  @Valid
+  @Valid 
   @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public WorkflowFormatModel getFormat() {
     return format;
@@ -218,7 +226,7 @@ public class WorkflowModel {
    * The id of the workflow.
    * @return id
   */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getId() {
     return id;
@@ -245,7 +253,7 @@ public class WorkflowModel {
    * The workflow's expected list of inputs.
    * @return inputs
   */
-  @Valid
+  @Valid 
   @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<InputModel> getInputs() {
     return inputs;
@@ -264,7 +272,7 @@ public class WorkflowModel {
    * The descriptive name for the workflow
    * @return label
   */
-
+  
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLabel() {
     return label;
@@ -283,7 +291,7 @@ public class WorkflowModel {
    * The last modified by.
    * @return lastModifiedBy
   */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
@@ -302,7 +310,7 @@ public class WorkflowModel {
    * The last modified date.
    * @return lastModifiedDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
@@ -329,7 +337,7 @@ public class WorkflowModel {
    * The workflow's list of expected outputs.
    * @return outputs
   */
-  @Valid
+  @Valid 
   @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<OutputModel> getOutputs() {
     return outputs;
@@ -348,7 +356,7 @@ public class WorkflowModel {
    * The type of the source which stores the workflow definition.
    * @return sourceType
   */
-
+  
   @Schema(name = "sourceType", description = "The type of the source which stores the workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public SourceTypeEnum getSourceType() {
     return sourceType;
@@ -367,7 +375,7 @@ public class WorkflowModel {
    * The maximum number of times a task may retry.
    * @return retry
   */
-
+  
   @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getRetry() {
     return retry;
@@ -394,7 +402,7 @@ public class WorkflowModel {
    * The steps that make up the workflow.
    * @return tasks
   */
-  @Valid
+  @Valid 
   @Schema(name = "tasks", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getTasks() {
     return tasks;
@@ -413,7 +421,7 @@ public class WorkflowModel {
    * Get version
    * @return version
   */
-
+  
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
