@@ -1,18 +1,22 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -21,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @JsonProperty("finalize")
@@ -72,7 +76,7 @@ public class WorkflowTaskModel {
    * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
    * @return finalize
   */
-  @Valid
+  @Valid 
   @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getFinalize() {
     return finalize;
@@ -91,7 +95,7 @@ public class WorkflowTaskModel {
    * The human-readable description of the task.
    * @return label
   */
-
+  
   @Schema(name = "label", description = "The human-readable description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLabel() {
     return label;
@@ -110,7 +114,7 @@ public class WorkflowTaskModel {
    * The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
    * @return name
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
@@ -129,7 +133,7 @@ public class WorkflowTaskModel {
    * Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.
    * @return node
   */
-
+  
   @Schema(name = "node", description = "Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getNode() {
     return node;
@@ -156,7 +160,7 @@ public class WorkflowTaskModel {
    * Key-value map of task parameters.
    * @return parameters
   */
-
+  
   @Schema(name = "parameters", description = "Key-value map of task parameters.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Map<String, Object> getParameters() {
     return parameters;
@@ -183,7 +187,7 @@ public class WorkflowTaskModel {
    * The (optional) list of tasks that are to be executed after the successful execution of a task.
    * @return post
   */
-  @Valid
+  @Valid 
   @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the successful execution of a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getPost() {
     return post;
@@ -210,7 +214,7 @@ public class WorkflowTaskModel {
    * The (optional) list of tasks that are to be executed prior to a task.
    * @return pre
   */
-  @Valid
+  @Valid 
   @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getPre() {
     return pre;
@@ -229,7 +233,7 @@ public class WorkflowTaskModel {
    * The timeout expression which describes when a task should be deemed as timed-out.
    * @return timeout
   */
-
+  
   @Schema(name = "timeout", description = "The timeout expression which describes when a task should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getTimeout() {
     return timeout;
@@ -248,7 +252,7 @@ public class WorkflowTaskModel {
    * Type of the task.
    * @return type
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "type", description = "Type of the task.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getType() {
     return type;

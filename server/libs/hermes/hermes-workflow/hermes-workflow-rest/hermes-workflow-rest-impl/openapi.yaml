@@ -274,37 +274,37 @@ paths:
               schema:
                 $ref: "#/components/schemas/Workflow"
   /workflows/{id}/tests:
-      post:
-          description: "Create a request for testing a workflow."
-          summary: "Create a request for testing a workflow."
-          tags:
-              - "workflows"
-          operationId: "testWorkflow"
-          parameters:
-              - name: "id"
-                description: "The id of the workflow to test."
-                in: "path"
-                required: true
-                schema:
-                    type: "string"
-          requestBody:
-              description: "Parameters required to run a workflow, for example '{\"yourName\"\
+    post:
+      description: "Execute a workflow synchronously for testing purposes."
+      summary: "Execute a workflow synchronously for testing purpose."
+      tags:
+      - "workflows"
+      operationId: "testWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of the workflow to test."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        description: "Parameters required to run a workflow, for example '{\"yourName\"\
           :\"Joe Jones\"}'"
-              content:
-                  application/json:
-                      schema:
-                          description: "The inputs expected by the workflow"
-                          type: "object"
-                          additionalProperties:
-                              type: "object"
-              required: true
-          responses:
-              "200":
-                  description: "The output expected by the workflow."
-                  content:
-                      application/json:
-                          schema:
-                              $ref: "#/components/schemas/WorkflowTestResponse"
+        content:
+          application/json:
+            schema:
+              description: "The inputs expected by the workflow"
+              type: "object"
+              additionalProperties:
+                type: "object"
+        required: true
+      responses:
+        "200":
+          description: "The output expected by the workflow."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestResponse"
 components:
   schemas:
     ExecutionError:
@@ -781,11 +781,11 @@ components:
           description: "Type of the task."
           type: "string"
     WorkflowTestResponse:
-        type: "object"
-        properties:
-            job:
-                $ref: "#/components/schemas/Job"
-            taskExecutions:
-                type: "array"
-                items:
-                    $ref: "#/components/schemas/TaskExecution"
+      type: "object"
+      properties:
+        job:
+          $ref: "#/components/schemas/Job"
+        taskExecutions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TaskExecution"

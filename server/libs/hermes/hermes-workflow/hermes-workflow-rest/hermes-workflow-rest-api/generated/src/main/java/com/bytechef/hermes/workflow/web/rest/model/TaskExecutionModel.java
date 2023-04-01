@@ -1,7 +1,9 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.workflow.web.rest.model.ExecutionErrorModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -10,10 +12,14 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -22,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   @JsonProperty("createdBy")
@@ -92,13 +98,13 @@ public class TaskExecutionModel {
    */
   public enum StatusEnum {
     CREATED("CREATED"),
-
+    
     STARTED("STARTED"),
-
+    
     FAILED("FAILED"),
-
+    
     CANCELLED("CANCELLED"),
-
+    
     COMPLETED("COMPLETED");
 
     private String value;
@@ -152,7 +158,7 @@ public class TaskExecutionModel {
    * The created by.
    * @return createdBy
   */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
@@ -171,7 +177,7 @@ public class TaskExecutionModel {
    * The created date.
    * @return createdDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
@@ -190,7 +196,7 @@ public class TaskExecutionModel {
    * The time when a task instance ended (CANCELLED, FAILED, COMPLETED).
    * @return endDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "endDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getEndDate() {
     return endDate;
@@ -209,7 +215,7 @@ public class TaskExecutionModel {
    * Get error
    * @return error
   */
-  @Valid
+  @Valid 
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public ExecutionErrorModel getError() {
     return error;
@@ -228,7 +234,7 @@ public class TaskExecutionModel {
    * The total time in ms for a task to execute (excluding wait time of the task in transit). i.e. actual execution time on a worker node.
    * @return executionTime
   */
-
+  
   @Schema(name = "executionTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The total time in ms for a task to execute (excluding wait time of the task in transit). i.e. actual execution time on a worker node.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getExecutionTime() {
     return executionTime;
@@ -247,7 +253,7 @@ public class TaskExecutionModel {
    * The id of a task execution.
    * @return id
   */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a task execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getId() {
     return id;
@@ -274,7 +280,7 @@ public class TaskExecutionModel {
    * The input parameters for a task.
    * @return input
   */
-
+  
   @Schema(name = "input", accessMode = Schema.AccessMode.READ_ONLY, description = "The input parameters for a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Map<String, Object> getInput() {
     return input;
@@ -293,7 +299,7 @@ public class TaskExecutionModel {
    * The id of a job for which a task belongs to.
    * @return jobId
   */
-
+  
   @Schema(name = "jobId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a job for which a task belongs to.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getJobId() {
     return jobId;
@@ -312,7 +318,7 @@ public class TaskExecutionModel {
    * The last modified by.
    * @return lastModifiedBy
   */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
@@ -331,7 +337,7 @@ public class TaskExecutionModel {
    * The last modified date.
    * @return lastModifiedDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
@@ -350,7 +356,7 @@ public class TaskExecutionModel {
    * The result output generated by the task handler which executed a task.
    * @return output
   */
-
+  
   @Schema(name = "output", accessMode = Schema.AccessMode.READ_ONLY, description = "The result output generated by the task handler which executed a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Object getOutput() {
     return output;
@@ -369,7 +375,7 @@ public class TaskExecutionModel {
    * The id of the parent task, if this is a sub-task.
    * @return parentId
   */
-
+  
   @Schema(name = "parentId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task, if this is a sub-task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getParentId() {
     return parentId;
@@ -388,7 +394,7 @@ public class TaskExecutionModel {
    * The priority value.
    * @return priority
   */
-
+  
   @Schema(name = "priority", accessMode = Schema.AccessMode.READ_ONLY, description = "The priority value.", requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getPriority() {
     return priority;
@@ -407,7 +413,7 @@ public class TaskExecutionModel {
    * The current progress value, a number between 0 and 100.
    * @return progress
   */
-
+  
   @Schema(name = "progress", accessMode = Schema.AccessMode.READ_ONLY, description = "The current progress value, a number between 0 and 100.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getProgress() {
     return progress;
@@ -426,7 +432,7 @@ public class TaskExecutionModel {
    * The maximum number of times that a task may retry.
    * @return retry
   */
-
+  
   @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times that a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getRetry() {
     return retry;
@@ -445,7 +451,7 @@ public class TaskExecutionModel {
    * The number of times that a task has been retried.
    * @return retryAttempts
   */
-
+  
   @Schema(name = "retryAttempts", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of times that a task has been retried.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getRetryAttempts() {
     return retryAttempts;
@@ -464,7 +470,7 @@ public class TaskExecutionModel {
    * The delay to introduce between each retry. Values are to be specified using the ISO-8601 format (excluding the PT prefix). e.g. 10s (ten seconds), 1m (one minute) etc.
    * @return retryDelay
   */
-
+  
   @Schema(name = "retryDelay", accessMode = Schema.AccessMode.READ_ONLY, description = "The delay to introduce between each retry. Values are to be specified using the ISO-8601 format (excluding the PT prefix). e.g. 10s (ten seconds), 1m (one minute) etc.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getRetryDelay() {
     return retryDelay;
@@ -483,7 +489,7 @@ public class TaskExecutionModel {
    * The factor to use in order to calculate the actual delay time between each successive retry -- multiplying by the value of the retryDelay.
    * @return retryDelayFactor
   */
-
+  
   @Schema(name = "retryDelayFactor", accessMode = Schema.AccessMode.READ_ONLY, description = "The factor to use in order to calculate the actual delay time between each successive retry -- multiplying by the value of the retryDelay.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getRetryDelayFactor() {
     return retryDelayFactor;
@@ -502,7 +508,7 @@ public class TaskExecutionModel {
    * The time when a task instance was started.
    * @return startDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
   public LocalDateTime getStartDate() {
     return startDate;
@@ -521,7 +527,7 @@ public class TaskExecutionModel {
    * The current status of a task.
    * @return status
   */
-
+  
   @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The current status of a task.", requiredMode = Schema.RequiredMode.REQUIRED)
   public StatusEnum getStatus() {
     return status;
@@ -540,7 +546,7 @@ public class TaskExecutionModel {
    * The numeric order of the task in the workflow.
    * @return taskNumber
   */
-
+  
   @Schema(name = "taskNumber", accessMode = Schema.AccessMode.READ_ONLY, description = "The numeric order of the task in the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getTaskNumber() {
     return taskNumber;
@@ -559,7 +565,7 @@ public class TaskExecutionModel {
    * The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.
    * @return retryDelayMillis
   */
-
+  
   @Schema(name = "retryDelayMillis", accessMode = Schema.AccessMode.READ_ONLY, description = "The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getRetryDelayMillis() {
     return retryDelayMillis;
@@ -578,7 +584,7 @@ public class TaskExecutionModel {
    * Get workflowTask
    * @return workflowTask
   */
-  @Valid
+  @Valid 
   @Schema(name = "workflowTask", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public WorkflowTaskModel getWorkflowTask() {
     return workflowTask;
@@ -597,7 +603,7 @@ public class TaskExecutionModel {
    * The type of the task.
    * @return type
   */
-
+  
   @Schema(name = "type", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getType() {
     return type;

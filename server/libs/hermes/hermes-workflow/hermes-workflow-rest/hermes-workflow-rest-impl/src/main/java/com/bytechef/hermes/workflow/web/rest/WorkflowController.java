@@ -21,9 +21,11 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowTestResponseModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -48,13 +50,16 @@ public class WorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;
     private final WorkflowService workflowService;
+    private final WorkflowTestExecutor workflowTestExecutor;
 
     @SuppressFBWarnings("EI2")
     public WorkflowController(
-        ConversionService conversionService, WorkflowService workflowService) {
+        ConversionService conversionService, WorkflowService workflowService,
+        WorkflowTestExecutor workflowTestExecutor) {
 
         this.conversionService = conversionService;
         this.workflowService = workflowService;
+        this.workflowTestExecutor = workflowTestExecutor;
     }
 
     @Override

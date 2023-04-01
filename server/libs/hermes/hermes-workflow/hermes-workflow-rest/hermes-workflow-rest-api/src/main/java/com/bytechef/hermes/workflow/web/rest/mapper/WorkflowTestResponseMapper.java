@@ -18,9 +18,8 @@
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
 import com.bytechef.hermes.workflow.test.dto.WorkflowTestResponse;
-import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowExtMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
-import com.bytechef.hermwes.workflow.web.rest.model.WorkflowTestResponseModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowTestResponseModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
