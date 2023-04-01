@@ -44,7 +44,7 @@ const WorkflowNodesListItem = ({
 
                 {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
 
-                <p className="text-left text-xs text-gray-500 line-clamp-2">
+                <p className="line-clamp-2 text-left text-xs text-gray-500">
                     {node.display?.description}
                 </p>
             </div>
@@ -87,7 +87,7 @@ const WorkflowNodesList = ({
                     />
                 ))
             ) : (
-                <span className="block py-2 px-3 text-xs text-gray-500">
+                <span className="block px-3 py-2 text-xs text-gray-500">
                     No components found.
                 </span>
             )}
@@ -112,7 +112,7 @@ const WorkflowNodesList = ({
                     )
                 )
             ) : (
-                <span className="block py-2 px-3 text-xs text-gray-500">
+                <span className="block px-3 py-2 text-xs text-gray-500">
                     No flow controls found.
                 </span>
             )}
