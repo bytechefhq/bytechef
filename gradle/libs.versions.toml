@@ -26,10 +26,10 @@ com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.
 com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.2"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
-com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-5"
+com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-7"
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
-com-jayway-jsonpath-json-path = "com.jayway.jsonpath:json-path:2.7.0"
+com-jayway-jsonpath-json-path = "com.jayway.jsonpath:json-path:2.8.0"
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 com-zaxxer-HikariCP = "com.zaxxer:HikariCP:5.0.1"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
@@ -37,7 +37,7 @@ info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", versio
 io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.4"
 io-rsocket-rsocket-core = "io.rsocket:rsocket-core:1.1.3"
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.9"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.12"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.13"
 jakarta-annotation-jakarta-annotation-api = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 jakarta-jms-jakarta-jms-api = "jakarta.jms:jakarta.jms-api:3.1.0"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
@@ -79,7 +79,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.32"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.37"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.17.0"
@@ -88,6 +88,6 @@ com-github-spotbugs = "com.github.spotbugs:5.0.14"
 com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.1"
 com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.0"
-org-openapi-generator = "org.openapi.generator:6.4.0"
+org-openapi-generator = "org.openapi.generator:6.5.0"
 org-sonarqube = "org.sonarqube:4.0.0.2929"
 org-springframework-boot = "org.springframework.boot:3.0.5"
