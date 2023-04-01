@@ -43,7 +43,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @ConditionalOnApi
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
-@SuppressFBWarnings("EI")
 public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     private final ActionDefinitionService actionDefinitionService;
@@ -52,6 +51,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
 
+    @SuppressFBWarnings("EI")
     public ComponentDefinitionController(
         ActionDefinitionService actionDefinitionService, ConnectionDefinitionService connectionDefinitionService,
         ConversionService conversionService, ComponentDefinitionFacade componentDefinitionFacade,
