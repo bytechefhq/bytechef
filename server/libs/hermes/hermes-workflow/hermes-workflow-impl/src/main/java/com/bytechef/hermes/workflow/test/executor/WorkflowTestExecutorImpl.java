@@ -29,20 +29,22 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowTestExecutor {
+public class WorkflowTestExecutorImpl implements WorkflowTestExecutor {
 
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskExecutionService taskExecutionService;
 
-    public WorkflowTestExecutor(JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
+    public WorkflowTestExecutorImpl(JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskExecutionService = taskExecutionService;
     }
 
+    @Override
     public WorkflowTestResponse execute(String workflowId) {
         return execute(workflowId, Map.of());
     }
 
+    @Override
     @SuppressFBWarnings("NP")
     public WorkflowTestResponse execute(String workflowId, Map<String, Object> inputs) {
         Job job = jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
