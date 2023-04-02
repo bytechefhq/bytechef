@@ -37,6 +37,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -139,30 +140,25 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
         Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks = MapValueUtils
-            .getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList())
-            .stream()
-            .map(WorkflowTask::of)
-            .toList();
+        List<WorkflowTask> caseWorkflowTasks = CollectionUtils.map(
+            MapValueUtils.getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList()),
+            WorkflowTask::of);
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a branch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
             Object key = MapValueUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
-            List<WorkflowTask> subWorkflowTasks = MapValueUtils
-                .getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList())
-                .stream()
-                .map(WorkflowTask::of)
-                .toList();
+            List<WorkflowTask> subWorkflowTasks = CollectionUtils.map(
+                MapValueUtils.getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList()),
+                WorkflowTask::of);
 
             if (key.equals(expression)) {
                 return subWorkflowTasks;
             }
         }
 
-        return MapValueUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList())
-            .stream()
-            .map(WorkflowTask::of)
-            .toList();
+        return CollectionUtils.map(
+            MapValueUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList()),
+            WorkflowTask::of);
     }
 }
