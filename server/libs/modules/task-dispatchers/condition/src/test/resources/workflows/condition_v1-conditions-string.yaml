@@ -1,0 +1,154 @@
+---
+label: "If Task String Operands"
+inputs:
+- name: "value1"
+  type: "string"
+  required: true
+- name: "value2"
+  type: "string"
+  required: true
+tasks:
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "EQUALS"
+        value2: "${value2}"
+    combineOperation: "ANY"
+    caseTrue:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "NOT_EQUALS"
+        value2: "${value2}"
+    combineOperation: "ANY"
+    caseTrue:
+    - name: "notEqualsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "notEqualsResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "CONTAINS"
+        value2: "${value2}"
+    combineOperation: "ANY"
+    caseTrue:
+    - name: "containsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "containsResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "NOT_CONTAINS"
+        value2: "${value2}"
+    combineOperation: "ANY"
+    caseTrue:
+    - name: "notContainsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "notContainsResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "STARTS_WITH"
+        value2: "${value2}"
+    combineOperation: "any"
+    caseTrue:
+    - name: "startsWithResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "startsWithResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "ENDS_WITH"
+        value2: "${value2}"
+    combineOperation: "any"
+    caseTrue:
+    - name: "endsWithResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "endsWithResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "EMPTY"
+        value2: "${value2}"
+    combineOperation: "ANY"
+    caseTrue:
+    - name: "isEmptyResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "isEmptyResult"
+      type: "var"
+      parameters:
+        value: "false branch"
+- type: "condition/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${value1}"
+        operation: "REGEX"
+        value2: "${value2}"
+    combineOperation: "ANY"
+    caseTrue:
+    - name: "regexResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "regexResult"
+      type: "var"
+      parameters:
+        value: "false branch"

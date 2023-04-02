@@ -54,10 +54,10 @@
             <Class name="com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher" />
             <Class name="com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher" />
-            <Class name="com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.branch.BranchTaskDispatcher" />
             <Class name="com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler" />
-            <Class name="com.bytechef.task.dispatcher.if_.IfTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher" />
             <Class name="com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher" />
