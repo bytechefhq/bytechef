@@ -25,25 +25,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
-  @JsonProperty("display")
   private DisplayModel display;
 
-  @JsonProperty("exampleOutput")
   private Object exampleOutput;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("outputSchema")
   @Valid
-  private List<PropertyModel> outputSchema = null;
+  private List<@Valid PropertyModel> outputSchema;
 
-  @JsonProperty("properties")
   @Valid
-  private List<PropertyModel> properties = null;
+  private List<@Valid PropertyModel> properties;
 
   public ActionDefinitionModel display(DisplayModel display) {
     this.display = display;
@@ -56,6 +51,7 @@ public class ActionDefinitionModel {
   */
   @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
   }
@@ -75,6 +71,7 @@ public class ActionDefinitionModel {
   */
   
   @Schema(name = "exampleOutput", description = "The example value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleOutput")
   public Object getExampleOutput() {
     return exampleOutput;
   }
@@ -94,6 +91,7 @@ public class ActionDefinitionModel {
   */
   
   @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -102,7 +100,7 @@ public class ActionDefinitionModel {
     this.name = name;
   }
 
-  public ActionDefinitionModel outputSchema(List<PropertyModel> outputSchema) {
+  public ActionDefinitionModel outputSchema(List<@Valid PropertyModel> outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
@@ -121,15 +119,16 @@ public class ActionDefinitionModel {
   */
   @Valid 
   @Schema(name = "outputSchema", description = "The output schema of an execution result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getOutputSchema() {
+  @JsonProperty("outputSchema")
+  public List<@Valid PropertyModel> getOutputSchema() {
     return outputSchema;
   }
 
-  public void setOutputSchema(List<PropertyModel> outputSchema) {
+  public void setOutputSchema(List<@Valid PropertyModel> outputSchema) {
     this.outputSchema = outputSchema;
   }
 
-  public ActionDefinitionModel properties(List<PropertyModel> properties) {
+  public ActionDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
@@ -148,11 +147,12 @@ public class ActionDefinitionModel {
   */
   @Valid 
   @Schema(name = "properties", description = "The list of action properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getProperties() {
+  @JsonProperty("properties")
+  public List<@Valid PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<PropertyModel> properties) {
+  public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
 

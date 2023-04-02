@@ -23,15 +23,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExecutionError", description = "Contains information about an error that happened during execution.")
 @JsonTypeName("ExecutionError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
 public class ExecutionErrorModel {
 
-  @JsonProperty("message")
   private String message;
 
-  @JsonProperty("stackTrace")
   @Valid
-  private List<String> stackTrace = null;
+  private List<String> stackTrace;
 
   public ExecutionErrorModel message(String message) {
     this.message = message;
@@ -44,6 +42,7 @@ public class ExecutionErrorModel {
   */
   
   @Schema(name = "message", description = "The error message.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("message")
   public String getMessage() {
     return message;
   }
@@ -71,6 +70,7 @@ public class ExecutionErrorModel {
   */
   
   @Schema(name = "stackTrace", description = "The error stacktrace.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("stackTrace")
   public List<String> getStackTrace() {
     return stackTrace;
   }

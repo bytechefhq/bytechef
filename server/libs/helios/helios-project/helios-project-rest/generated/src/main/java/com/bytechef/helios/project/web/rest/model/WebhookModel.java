@@ -22,16 +22,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Webhook", description = "Used to register to receive notifications for certain events.")
 @JsonTypeName("Webhook")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class WebhookModel {
 
-  @JsonProperty("type")
   private String type;
 
-  @JsonProperty("url")
   private String url;
 
-  @JsonProperty("retry")
   private WebhookRetryModel retry;
 
   public WebhookModel type(String type) {
@@ -45,6 +42,7 @@ public class WebhookModel {
   */
   
   @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("type")
   public String getType() {
     return type;
   }
@@ -64,6 +62,7 @@ public class WebhookModel {
   */
   
   @Schema(name = "url", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("url")
   public String getUrl() {
     return url;
   }
@@ -83,6 +82,7 @@ public class WebhookModel {
   */
   @Valid 
   @Schema(name = "retry", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("retry")
   public WebhookRetryModel getRetry() {
     return retry;
   }

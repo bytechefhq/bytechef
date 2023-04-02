@@ -26,28 +26,38 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
-  @JsonProperty("inputs")
   @Valid
-  private Map<String, Object> inputs = null;
+  private Map<String, Object> inputs = new HashMap<>();
 
-  @JsonProperty("label")
   private String label;
 
-  @JsonProperty("parentTaskExecutionId")
   private String parentTaskExecutionId;
 
-  @JsonProperty("priority")
   private Integer priority;
 
-  @JsonProperty("workflowId")
   private String workflowId;
 
-  @JsonProperty("webhooks")
   @Valid
-  private List<WebhookModel> webhooks = null;
+  private List<@Valid WebhookModel> webhooks;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link JobParametersModel#JobParametersModel(String)}
+   */
+  @Deprecated
+  public JobParametersModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public JobParametersModel(String workflowId) {
+    this.workflowId = workflowId;
+  }
 
   public JobParametersModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
@@ -68,6 +78,7 @@ public class JobParametersModel {
   */
   
   @Schema(name = "inputs", description = "The inputs expected by the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
   public Map<String, Object> getInputs() {
     return inputs;
   }
@@ -87,6 +98,7 @@ public class JobParametersModel {
   */
   
   @Schema(name = "label", description = "The job's human-readable name", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
   public String getLabel() {
     return label;
   }
@@ -106,6 +118,7 @@ public class JobParametersModel {
   */
   
   @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Used for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("parentTaskExecutionId")
   public String getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
@@ -125,6 +138,7 @@ public class JobParametersModel {
   */
   
   @Schema(name = "priority", description = "The priority value used during execution of individual tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("priority")
   public Integer getPriority() {
     return priority;
   }
@@ -144,6 +158,7 @@ public class JobParametersModel {
   */
   @NotNull 
   @Schema(name = "workflowId", description = "Id of the workflow to execute.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workflowId")
   public String getWorkflowId() {
     return workflowId;
   }
@@ -152,7 +167,7 @@ public class JobParametersModel {
     this.workflowId = workflowId;
   }
 
-  public JobParametersModel webhooks(List<WebhookModel> webhooks) {
+  public JobParametersModel webhooks(List<@Valid WebhookModel> webhooks) {
     this.webhooks = webhooks;
     return this;
   }
@@ -171,11 +186,12 @@ public class JobParametersModel {
   */
   @Valid 
   @Schema(name = "webhooks", description = "The list of webhooks to register to receive notifications for certain events.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<WebhookModel> getWebhooks() {
+  @JsonProperty("webhooks")
+  public List<@Valid WebhookModel> getWebhooks() {
     return webhooks;
   }
 
-  public void setWebhooks(List<WebhookModel> webhooks) {
+  public void setWebhooks(List<@Valid WebhookModel> webhooks) {
     this.webhooks = webhooks;
   }
 

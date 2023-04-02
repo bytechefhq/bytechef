@@ -26,32 +26,25 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
-  @JsonProperty("display")
   private DisplayModel display;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("outputSchema")
   @Valid
-  private List<PropertyModel> outputSchema = null;
+  private List<@Valid PropertyModel> outputSchema;
 
-  @JsonProperty("properties")
   @Valid
-  private List<PropertyModel> properties = null;
+  private List<@Valid PropertyModel> properties;
 
-  @JsonProperty("resources")
   private ResourcesModel resources;
 
-  @JsonProperty("version")
   private Integer version;
 
-  @JsonProperty("taskProperties")
   @Valid
-  private List<PropertyModel> taskProperties = null;
+  private List<@Valid PropertyModel> taskProperties;
 
   public TaskDispatcherDefinitionModel display(DisplayModel display) {
     this.display = display;
@@ -64,6 +57,7 @@ public class TaskDispatcherDefinitionModel {
   */
   @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
   }
@@ -83,6 +77,7 @@ public class TaskDispatcherDefinitionModel {
   */
   
   @Schema(name = "name", description = "The task dispatcher name..", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -91,7 +86,7 @@ public class TaskDispatcherDefinitionModel {
     this.name = name;
   }
 
-  public TaskDispatcherDefinitionModel outputSchema(List<PropertyModel> outputSchema) {
+  public TaskDispatcherDefinitionModel outputSchema(List<@Valid PropertyModel> outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
@@ -110,15 +105,16 @@ public class TaskDispatcherDefinitionModel {
   */
   @Valid 
   @Schema(name = "outputSchema", description = "The output schema of a task dispatching result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getOutputSchema() {
+  @JsonProperty("outputSchema")
+  public List<@Valid PropertyModel> getOutputSchema() {
     return outputSchema;
   }
 
-  public void setOutputSchema(List<PropertyModel> outputSchema) {
+  public void setOutputSchema(List<@Valid PropertyModel> outputSchema) {
     this.outputSchema = outputSchema;
   }
 
-  public TaskDispatcherDefinitionModel properties(List<PropertyModel> properties) {
+  public TaskDispatcherDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
@@ -137,11 +133,12 @@ public class TaskDispatcherDefinitionModel {
   */
   @Valid 
   @Schema(name = "properties", description = "The list of task dispatcher properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getProperties() {
+  @JsonProperty("properties")
+  public List<@Valid PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<PropertyModel> properties) {
+  public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
 
@@ -156,6 +153,7 @@ public class TaskDispatcherDefinitionModel {
   */
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("resources")
   public ResourcesModel getResources() {
     return resources;
   }
@@ -175,6 +173,7 @@ public class TaskDispatcherDefinitionModel {
   */
   
   @Schema(name = "version", description = "The version of a task dispatcher.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("version")
   public Integer getVersion() {
     return version;
   }
@@ -183,7 +182,7 @@ public class TaskDispatcherDefinitionModel {
     this.version = version;
   }
 
-  public TaskDispatcherDefinitionModel taskProperties(List<PropertyModel> taskProperties) {
+  public TaskDispatcherDefinitionModel taskProperties(List<@Valid PropertyModel> taskProperties) {
     this.taskProperties = taskProperties;
     return this;
   }
@@ -202,11 +201,12 @@ public class TaskDispatcherDefinitionModel {
   */
   @Valid 
   @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getTaskProperties() {
+  @JsonProperty("taskProperties")
+  public List<@Valid PropertyModel> getTaskProperties() {
     return taskProperties;
   }
 
-  public void setTaskProperties(List<PropertyModel> taskProperties) {
+  public void setTaskProperties(List<@Valid PropertyModel> taskProperties) {
     this.taskProperties = taskProperties;
   }
 

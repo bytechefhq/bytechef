@@ -20,10 +20,9 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createProjectInstanceJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class CreateProjectInstanceJob200ResponseModel {
 
-  @JsonProperty("jobId")
   private Long jobId;
 
   public CreateProjectInstanceJob200ResponseModel jobId(Long jobId) {
@@ -37,6 +36,7 @@ public class CreateProjectInstanceJob200ResponseModel {
   */
   
   @Schema(name = "jobId", description = "The id of an executed job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("jobId")
   public Long getJobId() {
     return jobId;
   }

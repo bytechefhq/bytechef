@@ -22,14 +22,29 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ActionDefinitionBasicModel {
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("display")
   private DisplayModel display;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link ActionDefinitionBasicModel#ActionDefinitionBasicModel(String, DisplayModel)}
+   */
+  @Deprecated
+  public ActionDefinitionBasicModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ActionDefinitionBasicModel(String name, DisplayModel display) {
+    this.name = name;
+    this.display = display;
+  }
 
   public ActionDefinitionBasicModel name(String name) {
     this.name = name;
@@ -42,6 +57,7 @@ public class ActionDefinitionBasicModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -61,6 +77,7 @@ public class ActionDefinitionBasicModel {
   */
   @NotNull @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
   }

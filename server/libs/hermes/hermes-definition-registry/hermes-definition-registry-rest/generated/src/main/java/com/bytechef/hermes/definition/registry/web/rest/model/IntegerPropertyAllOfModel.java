@@ -24,20 +24,16 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("IntegerProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class IntegerPropertyAllOfModel {
 
-  @JsonProperty("maxValue")
   private Integer maxValue;
 
-  @JsonProperty("minValue")
   private Integer minValue;
 
-  @JsonProperty("options")
   @Valid
-  private List<OptionModel> options = null;
+  private List<@Valid OptionModel> options;
 
-  @JsonProperty("optionsDataSource")
   private OptionsDataSourceModel optionsDataSource;
 
   public IntegerPropertyAllOfModel maxValue(Integer maxValue) {
@@ -51,6 +47,7 @@ public class IntegerPropertyAllOfModel {
   */
   
   @Schema(name = "maxValue", description = "The maximum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxValue")
   public Integer getMaxValue() {
     return maxValue;
   }
@@ -70,6 +67,7 @@ public class IntegerPropertyAllOfModel {
   */
   
   @Schema(name = "minValue", description = "The minimum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("minValue")
   public Integer getMinValue() {
     return minValue;
   }
@@ -78,7 +76,7 @@ public class IntegerPropertyAllOfModel {
     this.minValue = minValue;
   }
 
-  public IntegerPropertyAllOfModel options(List<OptionModel> options) {
+  public IntegerPropertyAllOfModel options(List<@Valid OptionModel> options) {
     this.options = options;
     return this;
   }
@@ -97,11 +95,12 @@ public class IntegerPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<OptionModel> getOptions() {
+  @JsonProperty("options")
+  public List<@Valid OptionModel> getOptions() {
     return options;
   }
 
-  public void setOptions(List<OptionModel> options) {
+  public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
 
@@ -116,6 +115,7 @@ public class IntegerPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("optionsDataSource")
   public OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }

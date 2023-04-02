@@ -24,15 +24,13 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowTestResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
 public class WorkflowTestResponseModel {
 
-  @JsonProperty("job")
   private JobModel job;
 
-  @JsonProperty("taskExecutions")
   @Valid
-  private List<TaskExecutionModel> taskExecutions = null;
+  private List<@Valid TaskExecutionModel> taskExecutions;
 
   public WorkflowTestResponseModel job(JobModel job) {
     this.job = job;
@@ -45,6 +43,7 @@ public class WorkflowTestResponseModel {
   */
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("job")
   public JobModel getJob() {
     return job;
   }
@@ -53,7 +52,7 @@ public class WorkflowTestResponseModel {
     this.job = job;
   }
 
-  public WorkflowTestResponseModel taskExecutions(List<TaskExecutionModel> taskExecutions) {
+  public WorkflowTestResponseModel taskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
     return this;
   }
@@ -72,11 +71,12 @@ public class WorkflowTestResponseModel {
   */
   @Valid 
   @Schema(name = "taskExecutions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<TaskExecutionModel> getTaskExecutions() {
+  @JsonProperty("taskExecutions")
+  public List<@Valid TaskExecutionModel> getTaskExecutions() {
     return taskExecutions;
   }
 
-  public void setTaskExecutions(List<TaskExecutionModel> taskExecutions) {
+  public void setTaskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
   }
 

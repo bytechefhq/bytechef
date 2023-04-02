@@ -27,20 +27,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 @JsonTypeName("Authorization")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class AuthorizationModel {
 
-  @JsonProperty("display")
   private DisplayModel display;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("properties")
   @Valid
-  private List<PropertyModel> properties = null;
+  private List<@Valid PropertyModel> properties;
 
-  @JsonProperty("type")
   private AuthorizationTypeModel type;
 
   public AuthorizationModel display(DisplayModel display) {
@@ -54,6 +50,7 @@ public class AuthorizationModel {
   */
   @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
   }
@@ -73,6 +70,7 @@ public class AuthorizationModel {
   */
   
   @Schema(name = "name", description = "The authorization name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -81,7 +79,7 @@ public class AuthorizationModel {
     this.name = name;
   }
 
-  public AuthorizationModel properties(List<PropertyModel> properties) {
+  public AuthorizationModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
@@ -100,11 +98,12 @@ public class AuthorizationModel {
   */
   @Valid 
   @Schema(name = "properties", description = "Properties of the connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getProperties() {
+  @JsonProperty("properties")
+  public List<@Valid PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<PropertyModel> properties) {
+  public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
 
@@ -119,6 +118,7 @@ public class AuthorizationModel {
   */
   @Valid 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("type")
   public AuthorizationTypeModel getType() {
     return type;
   }

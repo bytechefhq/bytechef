@@ -1,19 +1,25 @@
 package com.bytechef.helios.project.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
+import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobModel;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -22,26 +28,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectExecution", description = "Contains information about execution of one of project workflows.")
 @JsonTypeName("ProjectExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class ProjectExecutionModel {
 
-  @JsonProperty("id")
   private Long id;
 
-  @JsonProperty("instance")
   private ProjectInstanceModel instance;
 
-  @JsonProperty("job")
   private JobModel job;
 
-  @JsonProperty("project")
   private ProjectModel project;
 
-  @JsonProperty("taskExecutions")
   @Valid
-  private List<TaskExecutionModel> taskExecutions = null;
+  private List<@Valid TaskExecutionModel> taskExecutions;
 
-  @JsonProperty("workflow")
   private WorkflowModel workflow;
 
   public ProjectExecutionModel id(Long id) {
@@ -53,8 +53,9 @@ public class ProjectExecutionModel {
    * The id of a project execution.
    * @return id
   */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public Long getId() {
     return id;
   }
@@ -72,8 +73,9 @@ public class ProjectExecutionModel {
    * Get instance
    * @return instance
   */
-  @Valid
+  @Valid 
   @Schema(name = "instance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("instance")
   public ProjectInstanceModel getInstance() {
     return instance;
   }
@@ -91,8 +93,9 @@ public class ProjectExecutionModel {
    * Get job
    * @return job
   */
-  @Valid
+  @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("job")
   public JobModel getJob() {
     return job;
   }
@@ -110,8 +113,9 @@ public class ProjectExecutionModel {
    * Get project
    * @return project
   */
-  @Valid
+  @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("project")
   public ProjectModel getProject() {
     return project;
   }
@@ -120,7 +124,7 @@ public class ProjectExecutionModel {
     this.project = project;
   }
 
-  public ProjectExecutionModel taskExecutions(List<TaskExecutionModel> taskExecutions) {
+  public ProjectExecutionModel taskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
     return this;
   }
@@ -137,13 +141,14 @@ public class ProjectExecutionModel {
    * Get taskExecutions
    * @return taskExecutions
   */
-  @Valid
+  @Valid 
   @Schema(name = "taskExecutions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<TaskExecutionModel> getTaskExecutions() {
+  @JsonProperty("taskExecutions")
+  public List<@Valid TaskExecutionModel> getTaskExecutions() {
     return taskExecutions;
   }
 
-  public void setTaskExecutions(List<TaskExecutionModel> taskExecutions) {
+  public void setTaskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
   }
 
@@ -156,8 +161,9 @@ public class ProjectExecutionModel {
    * Get workflow
    * @return workflow
   */
-  @Valid
+  @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflow")
   public WorkflowModel getWorkflow() {
     return workflow;
   }

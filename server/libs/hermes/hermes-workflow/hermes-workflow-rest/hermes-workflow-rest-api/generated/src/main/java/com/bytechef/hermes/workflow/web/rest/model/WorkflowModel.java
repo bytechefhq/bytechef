@@ -30,45 +30,34 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
 public class WorkflowModel {
 
-  @JsonProperty("createdBy")
   private String createdBy;
 
-  @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("definition")
   private String definition;
 
-  @JsonProperty("description")
   private String description;
 
-  @JsonProperty("format")
   private WorkflowFormatModel format;
 
-  @JsonProperty("id")
   private String id;
 
-  @JsonProperty("inputs")
   @Valid
-  private List<InputModel> inputs = null;
+  private List<@Valid InputModel> inputs;
 
-  @JsonProperty("label")
   private String label;
 
-  @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
-  @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("outputs")
   @Valid
-  private List<OutputModel> outputs = null;
+  private List<@Valid OutputModel> outputs;
 
   /**
    * The type of the source which stores the workflow definition.
@@ -109,17 +98,13 @@ public class WorkflowModel {
     }
   }
 
-  @JsonProperty("sourceType")
   private SourceTypeEnum sourceType;
 
-  @JsonProperty("retry")
   private Integer retry;
 
-  @JsonProperty("tasks")
   @Valid
-  private List<WorkflowTaskModel> tasks = null;
+  private List<@Valid WorkflowTaskModel> tasks;
 
-  @JsonProperty("__version")
   private Integer version;
 
   public WorkflowModel createdBy(String createdBy) {
@@ -133,6 +118,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
@@ -152,6 +138,7 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -171,6 +158,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("definition")
   public String getDefinition() {
     return definition;
   }
@@ -190,6 +178,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "description", description = "The description of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
   public String getDescription() {
     return description;
   }
@@ -209,6 +198,7 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("format")
   public WorkflowFormatModel getFormat() {
     return format;
   }
@@ -228,6 +218,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public String getId() {
     return id;
   }
@@ -236,7 +227,7 @@ public class WorkflowModel {
     this.id = id;
   }
 
-  public WorkflowModel inputs(List<InputModel> inputs) {
+  public WorkflowModel inputs(List<@Valid InputModel> inputs) {
     this.inputs = inputs;
     return this;
   }
@@ -255,11 +246,12 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<InputModel> getInputs() {
+  @JsonProperty("inputs")
+  public List<@Valid InputModel> getInputs() {
     return inputs;
   }
 
-  public void setInputs(List<InputModel> inputs) {
+  public void setInputs(List<@Valid InputModel> inputs) {
     this.inputs = inputs;
   }
 
@@ -274,6 +266,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
   public String getLabel() {
     return label;
   }
@@ -293,6 +286,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -312,6 +306,7 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -320,7 +315,7 @@ public class WorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public WorkflowModel outputs(List<OutputModel> outputs) {
+  public WorkflowModel outputs(List<@Valid OutputModel> outputs) {
     this.outputs = outputs;
     return this;
   }
@@ -339,11 +334,12 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<OutputModel> getOutputs() {
+  @JsonProperty("outputs")
+  public List<@Valid OutputModel> getOutputs() {
     return outputs;
   }
 
-  public void setOutputs(List<OutputModel> outputs) {
+  public void setOutputs(List<@Valid OutputModel> outputs) {
     this.outputs = outputs;
   }
 
@@ -358,6 +354,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "sourceType", description = "The type of the source which stores the workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sourceType")
   public SourceTypeEnum getSourceType() {
     return sourceType;
   }
@@ -377,6 +374,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("retry")
   public Integer getRetry() {
     return retry;
   }
@@ -385,7 +383,7 @@ public class WorkflowModel {
     this.retry = retry;
   }
 
-  public WorkflowModel tasks(List<WorkflowTaskModel> tasks) {
+  public WorkflowModel tasks(List<@Valid WorkflowTaskModel> tasks) {
     this.tasks = tasks;
     return this;
   }
@@ -404,11 +402,12 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "tasks", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<WorkflowTaskModel> getTasks() {
+  @JsonProperty("tasks")
+  public List<@Valid WorkflowTaskModel> getTasks() {
     return tasks;
   }
 
-  public void setTasks(List<WorkflowTaskModel> tasks) {
+  public void setTasks(List<@Valid WorkflowTaskModel> tasks) {
     this.tasks = tasks;
   }
 
@@ -423,6 +422,7 @@ public class WorkflowModel {
   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
   public Integer getVersion() {
     return version;
   }
