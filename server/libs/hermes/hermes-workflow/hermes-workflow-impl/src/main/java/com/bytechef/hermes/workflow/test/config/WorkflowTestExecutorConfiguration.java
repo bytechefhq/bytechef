@@ -48,6 +48,8 @@ import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutorImpl;
+import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
+import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher;
@@ -141,6 +143,8 @@ public class WorkflowTestExecutorConfiguration {
         TaskExecutionService taskExecutionService) {
 
         return List.of(
+            (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
+                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                 taskExecutionService, taskCompletionHandler, counterService),
             (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
@@ -179,6 +183,8 @@ public class WorkflowTestExecutorConfiguration {
         TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
 
         return List.of(
+            (taskDispatcher) -> new BranchTaskDispatcher(
+                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskDispatcher) -> new EachTaskDispatcher(
                 taskDispatcher, taskExecutionService, messageBroker, contextService, counterService, taskEvaluator),
             (taskDispatcher) -> new ForkJoinTaskDispatcher(
