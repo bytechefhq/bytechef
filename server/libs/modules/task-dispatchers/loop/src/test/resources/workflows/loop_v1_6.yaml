@@ -12,7 +12,7 @@ tasks:
           type: "var"
           parameters:
             value: "${1 + itemIndex}"
-        - type: "if/v1"
+        - type: "condition/v1"
           parameters:
             conditions:
             - number:

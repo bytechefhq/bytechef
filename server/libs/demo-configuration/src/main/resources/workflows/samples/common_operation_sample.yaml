@@ -42,7 +42,7 @@ tasks:
   parameters:
     description: "Print created Json object `jsonObject1` in log with INFO log level"
     text: "Payload in the file ${jsonObject1}"
-- type: "if/v1"
+- type: "condition/v1"
   parameters:
     conditions:
     - string:
@@ -84,7 +84,7 @@ tasks:
   parameters:
     list: "${jsonArray}"
     iteratee:
-      type: "if/v1"
+      type: "condition/v1"
       parameters:
         rawExpression: true
         expression: "${item.count > 1000 and item.count lt 20000}"
