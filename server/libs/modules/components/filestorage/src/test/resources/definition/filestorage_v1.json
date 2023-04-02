@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Reads data from the file.",
-      "label": "Read from file"
+      "title": "Read from file"
     },
     "name": "read",
     "outputSchema": [ {
@@ -43,7 +43,7 @@
   }, {
     "display": {
       "description": "Writes the data to the file.",
-      "label": "Write to file"
+      "title": "Write to file"
     },
     "name": "write",
     "outputSchema": [ {
@@ -91,7 +91,7 @@
   }, {
     "display": {
       "description": "Download thr file from the URL.",
-      "label": "Download file"
+      "title": "Download file"
     },
     "name": "download",
     "outputSchema": [ {
@@ -139,7 +139,7 @@
   } ],
   "display": {
     "description": "Reads and writes data from a file",
-    "label": "File Storage"
+    "title": "File Storage"
   },
   "name": "fileStorage",
   "version": 1

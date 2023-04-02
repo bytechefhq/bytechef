@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Executes custom Java code.",
-      "label": "Java"
+      "title": "Java"
     },
     "name": "java",
     "outputSchema": [ {
@@ -82,7 +82,7 @@
   }, {
     "display": {
       "description": "Executes custom JavaScript code.",
-      "label": "JavaScript"
+      "title": "JavaScript"
     },
     "name": "javascript",
     "outputSchema": [ {
@@ -162,7 +162,7 @@
   }, {
     "display": {
       "description": "Executes custom Python code.",
-      "label": "Python"
+      "title": "Python"
     },
     "name": "python",
     "outputSchema": [ {
@@ -242,7 +242,7 @@
   }, {
     "display": {
       "description": "Executes custom R code.",
-      "label": "R"
+      "title": "R"
     },
     "name": "r",
     "outputSchema": [ {
@@ -322,7 +322,7 @@
   }, {
     "display": {
       "description": "Executes custom Ruby code.",
-      "label": "Ruby"
+      "title": "Ruby"
     },
     "name": "ruby",
     "outputSchema": [ {
@@ -402,7 +402,7 @@
   } ],
   "display": {
     "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
-    "label": "Script"
+    "title": "Script"
   },
   "name": "script",
   "version": 1

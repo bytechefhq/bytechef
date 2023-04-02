@@ -1,7 +1,7 @@
 {
   "actions": [ {
     "display": {
-      "label": "Set value"
+      "title": "Set value"
     },
     "name": "set",
     "properties": [ {
@@ -41,7 +41,7 @@
   } ],
   "display": {
     "description": "Sets a value which can then be referenced in other tasks.",
-    "label": "Var"
+    "title": "Var"
   },
   "name": "var",
   "version": 1

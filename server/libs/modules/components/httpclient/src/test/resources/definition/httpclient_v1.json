@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "The request method to use.",
-      "label": "GET"
+      "title": "GET"
     },
     "name": "get",
     "outputSchema": [ {
@@ -124,7 +124,7 @@
   }, {
     "display": {
       "description": "The request method to use.",
-      "label": "POST"
+      "title": "POST"
     },
     "name": "post",
     "outputSchema": [ {
@@ -503,7 +503,7 @@
   }, {
     "display": {
       "description": "The request method to use.",
-      "label": "PUT"
+      "title": "PUT"
     },
     "name": "put",
     "outputSchema": [ {
@@ -970,7 +970,7 @@
   }, {
     "display": {
       "description": "The request method to use.",
-      "label": "PATCH"
+      "title": "PATCH"
     },
     "name": "patch",
     "outputSchema": [ {
@@ -1437,7 +1437,7 @@
   }, {
     "display": {
       "description": "The request method to use.",
-      "label": "DELETE"
+      "title": "DELETE"
     },
     "name": "delete",
     "outputSchema": [ {
@@ -1697,7 +1697,7 @@
   }, {
     "display": {
       "description": "The request method to use.",
-      "label": "HEAD"
+      "title": "HEAD"
     },
     "name": "head",
     "outputSchema": [ {
@@ -1959,7 +1959,7 @@
     "authorizationRequired": false,
     "authorizations": [ {
       "display": {
-        "label": "API Key"
+        "title": "API Key"
       },
       "properties": [ {
         "label": "Key",
@@ -1992,7 +1992,7 @@
       "type": "API_KEY"
     }, {
       "display": {
-        "label": "Bearer Token"
+        "title": "Bearer Token"
       },
       "properties": [ {
         "label": "Token",
@@ -2005,7 +2005,7 @@
       "type": "BEARER_TOKEN"
     }, {
       "display": {
-        "label": "Basic Auth"
+        "title": "Basic Auth"
       },
       "properties": [ {
         "label": "Username",
@@ -2024,7 +2024,7 @@
       "type": "BASIC_AUTH"
     }, {
       "display": {
-        "label": "Digest Auth"
+        "title": "Digest Auth"
       },
       "properties": [ {
         "label": "Username",
@@ -2043,7 +2043,7 @@
       "type": "DIGEST_AUTH"
     }, {
       "display": {
-        "label": "OAuth2 Authorization Code"
+        "title": "OAuth2 Authorization Code"
       },
       "properties": [ {
         "label": "Authorization URL",
@@ -2080,7 +2080,7 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     }, {
       "display": {
-        "label": "OAuth2 Implicit Code"
+        "title": "OAuth2 Implicit Code"
       },
       "properties": [ {
         "label": "Authorization URL",
@@ -2111,7 +2111,7 @@
       "type": "OAUTH2_IMPLICIT_CODE"
     }, {
       "display": {
-        "label": "OAuth2 Client Credentials"
+        "title": "OAuth2 Client Credentials"
       },
       "properties": [ {
         "label": "Token URL",
@@ -2143,7 +2143,7 @@
     } ],
     "componentDisplay": {
       "description": "Makes an HTTP request and returns the response data.",
-      "label": "HTTP Client"
+      "title": "HTTP Client"
     },
     "componentName": "httpClient",
     "connectionVersion": 1,
@@ -2156,7 +2156,7 @@
   },
   "display": {
     "description": "Makes an HTTP request and returns the response data.",
-    "label": "HTTP Client"
+    "title": "HTTP Client"
   },
   "name": "httpClient",
   "version": 1

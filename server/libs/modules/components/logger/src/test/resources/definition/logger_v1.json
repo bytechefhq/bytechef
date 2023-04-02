@@ -1,7 +1,7 @@
 {
   "actions": [ {
     "display": {
-      "label": "Debug"
+      "title": "Debug"
     },
     "name": "debug",
     "properties": [ {
@@ -11,7 +11,7 @@
     } ]
   }, {
     "display": {
-      "label": "Error"
+      "title": "Error"
     },
     "name": "error",
     "properties": [ {
@@ -21,7 +21,7 @@
     } ]
   }, {
     "display": {
-      "label": "Info"
+      "title": "Info"
     },
     "name": "info",
     "properties": [ {
@@ -31,7 +31,7 @@
     } ]
   }, {
     "display": {
-      "label": "Warn"
+      "title": "Warn"
     },
     "name": "warn",
     "properties": [ {
@@ -42,7 +42,7 @@
   } ],
   "display": {
     "description": "Logs a value to the system log.",
-    "label": "Logger"
+    "title": "Logger"
   },
   "name": "logger",
   "version": 1

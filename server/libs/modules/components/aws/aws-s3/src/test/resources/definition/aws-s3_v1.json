@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Get the AWS S3 object.",
-      "label": "Get Object"
+      "title": "Get Object"
     },
     "name": "getObject",
     "outputSchema": [ {
@@ -51,7 +51,7 @@
   }, {
     "display": {
       "description": "Get the url of an AWS S3 object.",
-      "label": "Get URL"
+      "title": "Get URL"
     },
     "name": "getUrl",
     "outputSchema": [ {
@@ -69,7 +69,7 @@
   }, {
     "display": {
       "description": "Get the list AWS S3 objects.",
-      "label": "List Objects"
+      "title": "List Objects"
     },
     "name": "listObjects",
     "outputSchema": [ {
@@ -113,7 +113,7 @@
   }, {
     "display": {
       "description": "Get the url of an pre-signed AWS S3 object.",
-      "label": "Get Pre-signed Object"
+      "title": "Get Pre-signed Object"
     },
     "name": "presignGetObject",
     "outputSchema": [ {
@@ -131,7 +131,7 @@
   }, {
     "display": {
       "description": "Store an object to AWS S3.",
-      "label": "Put Object"
+      "title": "Put Object"
     },
     "name": "putObject",
     "outputSchema": [ {
@@ -185,7 +185,7 @@
   } ],
   "display": {
     "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-    "label": "AWS S3"
+    "title": "AWS S3"
   },
   "name": "aws-s3",
   "version": 1
