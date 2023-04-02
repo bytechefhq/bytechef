@@ -31,9 +31,9 @@ public sealed interface Display permits DefinitionDSL.ModifiableDisplay {
 
     String getIcon();
 
-    String getLabel();
-
     String getSubtitle();
 
     String[] getTags();
+
+    String getTitle();
 }

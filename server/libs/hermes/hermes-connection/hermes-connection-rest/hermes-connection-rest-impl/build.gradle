@@ -11,12 +11,15 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         "useSpringBoot3": "true"
     ]
     generatorName = "spring"
+    importMappings = [
+        "TagModel": "com.bytechef.tag.web.rest.model.TagModel",
+    ]
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.hermes.connection.web.rest.model"
     outputDir = "$projectDir/../hermes-connection-rest-api/generated".toString()
     schemaMappings = [
-        Tag: "com.bytechef.tag.web.rest.model.TagModel"
+        Tag: "TagModel"
     ]
 }
 

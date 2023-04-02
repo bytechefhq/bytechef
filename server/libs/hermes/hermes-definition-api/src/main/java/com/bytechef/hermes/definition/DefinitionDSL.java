@@ -185,15 +185,15 @@ public class DefinitionDSL {
         private String category;
         private String description;
         private String icon;
-        private String label;
+        private String title;
         private String subtitle;
         private String[] tags;
 
         private ModifiableDisplay() {
         }
 
-        private ModifiableDisplay(String label) {
-            this.label = label;
+        private ModifiableDisplay(String title) {
+            this.title = title;
         }
 
         public ModifiableDisplay category(String category) {
@@ -242,11 +242,6 @@ public class DefinitionDSL {
         }
 
         @Override
-        public String getLabel() {
-            return label;
-        }
-
-        @Override
         public String getSubtitle() {
             return subtitle;
         }
@@ -254,6 +249,11 @@ public class DefinitionDSL {
         @Override
         public String[] getTags() {
             return tags == null ? null : tags.clone();
+        }
+
+        @Override
+        public String getTitle() {
+            return title;
         }
     }
 
