@@ -221,7 +221,7 @@ const ConnectionDialog = ({
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
         !oAuth2PropertiesLoading &&
         oAuth2Properties?.predefinedApps?.includes(
-            connectionDefinition?.componentName || ''
+            componentDefinition?.name || ''
         );
 
     const showAuthorizationProperties =
@@ -611,8 +611,7 @@ const ConnectionDialog = ({
                                             {`Excellent! You can connect and create the `}
                                             <span className="font-semibold">
                                                 {
-                                                    connectionDefinition
-                                                        ?.componentDisplay
+                                                    componentDefinition?.display
                                                         ?.title
                                                 }
                                             </span>
