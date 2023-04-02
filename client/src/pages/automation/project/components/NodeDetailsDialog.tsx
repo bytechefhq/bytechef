@@ -1,14 +1,17 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
-import TextArea from 'components/TextArea/TextArea';
 import {useGetComponentDefinitionQuery} from 'queries/componentDefinitions.queries';
 import {useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
 import {Tooltip} from '../../../../components/Tooltip/Tooltip';
-import useNodeDetailsDialogStore from '../stores/useNodeDetailsDialogStore';
-import TabButton from './TabButton';
+import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import ConnectionTab from './node-details-tabs/ConnectionTab';
+import DescriptionTab from './node-details-tabs/DescriptionTab';
+import OutputTab from './node-details-tabs/OutputTab';
+import PropertiesTab from './node-details-tabs/PropertiesTab';
 
 const tabs = [
     {
@@ -52,7 +55,7 @@ const NodeDetailsDialog = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-0 right-0 z-10 w-screen max-w-md overflow-hidden border-l bg-white shadow-lg"
+                    className="fixed inset-y-0 right-2 top-16 bottom-2 z-10 w-screen max-w-md overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                 >
                     {currentComponent ? (
@@ -133,39 +136,58 @@ const NodeDetailsDialog = () => {
 
                                 <div className="border-t border-gray-100" />
 
-                                <div className="flex justify-center space-x-1 p-4">
-                                    {tabs.map((tab) => (
-                                        <TabButton
-                                            activeTab={activeTab}
-                                            handleClick={() =>
-                                                setActiveTab(tab.name)
-                                            }
-                                            key={tab.name}
-                                            label={tab.label}
-                                            name={tab.name}
-                                        />
-                                    ))}
+                                <div className="mb-4 flex justify-center pt-4">
+                                    {tabs.map((tab) => {
+                                        if (
+                                            tab.name === 'connection' &&
+                                            !currentComponent.connection
+                                        ) {
+                                            return;
+                                        } else {
+                                            return (
+                                                <Button
+                                                    className={twMerge(
+                                                        'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                                        activeTab ===
+                                                            tab.name &&
+                                                            'border-blue-500 text-blue-500 hover:text-blue-500'
+                                                    )}
+                                                    onClick={() =>
+                                                        setActiveTab(tab.name)
+                                                    }
+                                                    key={tab.name}
+                                                    label={tab.label}
+                                                    name={tab.name}
+                                                />
+                                            );
+                                        }
+                                    })}
                                 </div>
 
                                 <div className="px-4 py-2">
                                     {activeTab === 'description' && (
-                                        <TextArea
-                                            label="Description"
-                                            labelClassName="px-2"
-                                            name="nodeDescription"
-                                            placeholder="Write some notes for yourself..."
+                                        <DescriptionTab
+                                            currentComponent={currentComponent}
                                         />
                                     )}
 
                                     {activeTab === 'properties' && (
-                                        <h1>Properties</h1>
+                                        <PropertiesTab
+                                            currentComponent={currentComponent}
+                                        />
                                     )}
 
                                     {activeTab === 'connection' && (
-                                        <h1>Connection</h1>
+                                        <ConnectionTab
+                                            currentComponent={currentComponent}
+                                        />
                                     )}
 
-                                    {activeTab === 'output' && <h1>Output</h1>}
+                                    {activeTab === 'output' && (
+                                        <OutputTab
+                                            currentComponent={currentComponent}
+                                        />
+                                    )}
                                 </div>
                             </div>
 
