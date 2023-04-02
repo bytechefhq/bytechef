@@ -25,31 +25,25 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ObjectProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ObjectPropertyAllOfModel {
 
-  @JsonProperty("additionalProperties")
   @Valid
-  private List<PropertyModel> additionalProperties = null;
+  private List<@Valid PropertyModel> additionalProperties;
 
-  @JsonProperty("multipleValues")
   private Boolean multipleValues;
 
-  @JsonProperty("objectType")
   private String objectType;
 
-  @JsonProperty("options")
   @Valid
-  private List<OptionModel> options = null;
+  private List<@Valid OptionModel> options;
 
-  @JsonProperty("optionsDataSource")
   private OptionsDataSourceModel optionsDataSource;
 
-  @JsonProperty("properties")
   @Valid
-  private List<PropertyModel> properties = null;
+  private List<@Valid PropertyModel> properties;
 
-  public ObjectPropertyAllOfModel additionalProperties(List<PropertyModel> additionalProperties) {
+  public ObjectPropertyAllOfModel additionalProperties(List<@Valid PropertyModel> additionalProperties) {
     this.additionalProperties = additionalProperties;
     return this;
   }
@@ -68,11 +62,12 @@ public class ObjectPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "additionalProperties", description = "Types of dynamically defined properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getAdditionalProperties() {
+  @JsonProperty("additionalProperties")
+  public List<@Valid PropertyModel> getAdditionalProperties() {
     return additionalProperties;
   }
 
-  public void setAdditionalProperties(List<PropertyModel> additionalProperties) {
+  public void setAdditionalProperties(List<@Valid PropertyModel> additionalProperties) {
     this.additionalProperties = additionalProperties;
   }
 
@@ -87,6 +82,7 @@ public class ObjectPropertyAllOfModel {
   */
   
   @Schema(name = "multipleValues", description = "If the object can contain multiple additional properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("multipleValues")
   public Boolean getMultipleValues() {
     return multipleValues;
   }
@@ -106,6 +102,7 @@ public class ObjectPropertyAllOfModel {
   */
   
   @Schema(name = "objectType", description = "The object type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("objectType")
   public String getObjectType() {
     return objectType;
   }
@@ -114,7 +111,7 @@ public class ObjectPropertyAllOfModel {
     this.objectType = objectType;
   }
 
-  public ObjectPropertyAllOfModel options(List<OptionModel> options) {
+  public ObjectPropertyAllOfModel options(List<@Valid OptionModel> options) {
     this.options = options;
     return this;
   }
@@ -133,11 +130,12 @@ public class ObjectPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<OptionModel> getOptions() {
+  @JsonProperty("options")
+  public List<@Valid OptionModel> getOptions() {
     return options;
   }
 
-  public void setOptions(List<OptionModel> options) {
+  public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
 
@@ -152,6 +150,7 @@ public class ObjectPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("optionsDataSource")
   public OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
@@ -160,7 +159,7 @@ public class ObjectPropertyAllOfModel {
     this.optionsDataSource = optionsDataSource;
   }
 
-  public ObjectPropertyAllOfModel properties(List<PropertyModel> properties) {
+  public ObjectPropertyAllOfModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
@@ -179,11 +178,12 @@ public class ObjectPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "properties", description = "The list of valid object property types.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getProperties() {
+  @JsonProperty("properties")
+  public List<@Valid PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<PropertyModel> properties) {
+  public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
 

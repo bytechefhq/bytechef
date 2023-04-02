@@ -25,24 +25,20 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ArrayProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ArrayPropertyAllOfModel {
 
-  @JsonProperty("items")
   @Valid
-  private List<PropertyModel> items = null;
+  private List<@Valid PropertyModel> items;
 
-  @JsonProperty("multipleValues")
   private Boolean multipleValues;
 
-  @JsonProperty("options")
   @Valid
-  private List<OptionModel> options = null;
+  private List<@Valid OptionModel> options;
 
-  @JsonProperty("optionsDataSource")
   private OptionsDataSourceModel optionsDataSource;
 
-  public ArrayPropertyAllOfModel items(List<PropertyModel> items) {
+  public ArrayPropertyAllOfModel items(List<@Valid PropertyModel> items) {
     this.items = items;
     return this;
   }
@@ -61,11 +57,12 @@ public class ArrayPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "items", description = "Types of the array items.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getItems() {
+  @JsonProperty("items")
+  public List<@Valid PropertyModel> getItems() {
     return items;
   }
 
-  public void setItems(List<PropertyModel> items) {
+  public void setItems(List<@Valid PropertyModel> items) {
     this.items = items;
   }
 
@@ -80,6 +77,7 @@ public class ArrayPropertyAllOfModel {
   */
   
   @Schema(name = "multipleValues", description = "If the array can contain multiple items.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("multipleValues")
   public Boolean getMultipleValues() {
     return multipleValues;
   }
@@ -88,7 +86,7 @@ public class ArrayPropertyAllOfModel {
     this.multipleValues = multipleValues;
   }
 
-  public ArrayPropertyAllOfModel options(List<OptionModel> options) {
+  public ArrayPropertyAllOfModel options(List<@Valid OptionModel> options) {
     this.options = options;
     return this;
   }
@@ -107,11 +105,12 @@ public class ArrayPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<OptionModel> getOptions() {
+  @JsonProperty("options")
+  public List<@Valid OptionModel> getOptions() {
     return options;
   }
 
-  public void setOptions(List<OptionModel> options) {
+  public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
 
@@ -126,6 +125,7 @@ public class ArrayPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("optionsDataSource")
   public OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }

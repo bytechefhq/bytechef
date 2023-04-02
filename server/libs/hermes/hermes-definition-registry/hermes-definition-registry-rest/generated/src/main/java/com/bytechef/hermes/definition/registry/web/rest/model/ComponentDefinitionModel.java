@@ -27,29 +27,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ComponentDefinitionModel {
 
-  @JsonProperty("actions")
   @Valid
-  private List<ActionDefinitionModel> actions = null;
+  private List<@Valid ActionDefinitionModel> actions;
 
-  @JsonProperty("connection")
   private ConnectionDefinitionModel connection;
 
-  @JsonProperty("display")
   private DisplayModel display;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("resources")
   private ResourcesModel resources;
 
-  @JsonProperty("version")
   private Integer version;
 
-  public ComponentDefinitionModel actions(List<ActionDefinitionModel> actions) {
+  public ComponentDefinitionModel actions(List<@Valid ActionDefinitionModel> actions) {
     this.actions = actions;
     return this;
   }
@@ -68,11 +62,12 @@ public class ComponentDefinitionModel {
   */
   @Valid 
   @Schema(name = "actions", description = "The list of all available actions the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<ActionDefinitionModel> getActions() {
+  @JsonProperty("actions")
+  public List<@Valid ActionDefinitionModel> getActions() {
     return actions;
   }
 
-  public void setActions(List<ActionDefinitionModel> actions) {
+  public void setActions(List<@Valid ActionDefinitionModel> actions) {
     this.actions = actions;
   }
 
@@ -87,6 +82,7 @@ public class ComponentDefinitionModel {
   */
   @Valid 
   @Schema(name = "connection", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connection")
   public ConnectionDefinitionModel getConnection() {
     return connection;
   }
@@ -106,6 +102,7 @@ public class ComponentDefinitionModel {
   */
   @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
   }
@@ -125,6 +122,7 @@ public class ComponentDefinitionModel {
   */
   
   @Schema(name = "name", description = "The name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -144,6 +142,7 @@ public class ComponentDefinitionModel {
   */
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("resources")
   public ResourcesModel getResources() {
     return resources;
   }
@@ -163,6 +162,7 @@ public class ComponentDefinitionModel {
   */
   
   @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("version")
   public Integer getVersion() {
     return version;
   }

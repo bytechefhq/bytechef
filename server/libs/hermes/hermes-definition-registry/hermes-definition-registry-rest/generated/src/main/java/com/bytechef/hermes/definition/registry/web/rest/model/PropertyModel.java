@@ -2,18 +2,7 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.ArrayPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.BooleanPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -45,63 +34,42 @@ import jakarta.annotation.Generated;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
   @JsonSubTypes.Type(value = ArrayPropertyModel.class, name = "ARRAY"),
-  @JsonSubTypes.Type(value = ArrayPropertyModel.class, name = "ArrayProperty"),
   @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BOOLEAN"),
-  @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BooleanProperty"),
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DATE"),
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DATE_TIME"),
   @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DYNAMIC_PROPERTIES"),
-  @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DateProperty"),
-  @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DateTimeProperty"),
-  @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DynamicPropertiesProperty"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
-  @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "IntegerProperty"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
-  @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NumberProperty"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
   @JsonSubTypes.Type(value = OneOfPropertyModel.class, name = "ONE_OF"),
-  @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "ObjectProperty"),
-  @JsonSubTypes.Type(value = OneOfPropertyModel.class, name = "OneOfProperty"),
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING"),
-  @JsonSubTypes.Type(value = StringPropertyModel.class, name = "StringProperty"),
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class PropertyModel {
 
-  @JsonProperty("advancedOption")
   private Boolean advancedOption;
 
-  @JsonProperty("description")
   private String description;
 
-  @JsonProperty("displayCondition")
   private String displayCondition;
 
-  @JsonProperty("expressionEnabled")
   private Boolean expressionEnabled;
 
-  @JsonProperty("hidden")
   private Boolean hidden;
 
-  @JsonProperty("label")
   private String label;
 
-  @JsonProperty("metadata")
   @Valid
-  private Map<String, Object> metadata = null;
+  private Map<String, Object> metadata = new HashMap<>();
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("placeholder")
   private String placeholder;
 
-  @JsonProperty("required")
   private Boolean required;
 
-  @JsonProperty("type")
   private PropertyTypeModel type;
 
   public PropertyModel advancedOption(Boolean advancedOption) {
@@ -115,6 +83,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "advancedOption", description = "If the property should be grouped under advanced options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("advancedOption")
   public Boolean getAdvancedOption() {
     return advancedOption;
   }
@@ -134,6 +103,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "description", description = "The property description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
   public String getDescription() {
     return description;
   }
@@ -153,6 +123,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "displayCondition", description = "Defines rules when a property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("displayCondition")
   public String getDisplayCondition() {
     return displayCondition;
   }
@@ -172,6 +143,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "expressionEnabled", description = "Defines if the property can contain expressions or only constant values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("expressionEnabled")
   public Boolean getExpressionEnabled() {
     return expressionEnabled;
   }
@@ -191,6 +163,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "hidden", description = "If the property should be visible or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("hidden")
   public Boolean getHidden() {
     return hidden;
   }
@@ -210,6 +183,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "label", description = "The property label.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
   public String getLabel() {
     return label;
   }
@@ -237,6 +211,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "metadata", description = "The additional data that can be used during processing.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("metadata")
   public Map<String, Object> getMetadata() {
     return metadata;
   }
@@ -256,6 +231,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "name", description = "The property name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -275,6 +251,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "placeholder", description = "The property placeholder.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("placeholder")
   public String getPlaceholder() {
     return placeholder;
   }
@@ -294,6 +271,7 @@ public class PropertyModel {
   */
   
   @Schema(name = "required", description = "If the property is required or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("required")
   public Boolean getRequired() {
     return required;
   }
@@ -313,6 +291,7 @@ public class PropertyModel {
   */
   @Valid 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("type")
   public PropertyTypeModel getType() {
     return type;
   }

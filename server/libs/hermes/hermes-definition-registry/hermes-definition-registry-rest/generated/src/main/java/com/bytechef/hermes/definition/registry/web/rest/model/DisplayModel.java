@@ -23,27 +23,21 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Display", description = "A display information.")
 @JsonTypeName("Display")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class DisplayModel {
 
-  @JsonProperty("category")
   private String category;
 
-  @JsonProperty("description")
   private String description;
 
-  @JsonProperty("icon")
   private String icon;
 
-  @JsonProperty("label")
-  private String label;
-
-  @JsonProperty("subtitle")
   private String subtitle;
 
-  @JsonProperty("tags")
   @Valid
-  private List<String> tags = null;
+  private List<String> tags;
+
+  private String title;
 
   public DisplayModel category(String category) {
     this.category = category;
@@ -56,6 +50,7 @@ public class DisplayModel {
   */
   
   @Schema(name = "category", description = "The category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("category")
   public String getCategory() {
     return category;
   }
@@ -75,6 +70,7 @@ public class DisplayModel {
   */
   
   @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
   public String getDescription() {
     return description;
   }
@@ -94,31 +90,13 @@ public class DisplayModel {
   */
   
   @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
   public String getIcon() {
     return icon;
   }
 
   public void setIcon(String icon) {
     this.icon = icon;
-  }
-
-  public DisplayModel label(String label) {
-    this.label = label;
-    return this;
-  }
-
-  /**
-   * The label.
-   * @return label
-  */
-  
-  @Schema(name = "label", description = "The label.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
   }
 
   public DisplayModel subtitle(String subtitle) {
@@ -132,6 +110,7 @@ public class DisplayModel {
   */
   
   @Schema(name = "subtitle", description = "The additional explanation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("subtitle")
   public String getSubtitle() {
     return subtitle;
   }
@@ -159,12 +138,33 @@ public class DisplayModel {
   */
   
   @Schema(name = "tags", description = "Tags for categorization.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("tags")
   public List<String> getTags() {
     return tags;
   }
 
   public void setTags(List<String> tags) {
     this.tags = tags;
+  }
+
+  public DisplayModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The title.
+   * @return title
+  */
+  
+  @Schema(name = "title", description = "The title.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   @Override
@@ -179,14 +179,14 @@ public class DisplayModel {
     return Objects.equals(this.category, display.category) &&
         Objects.equals(this.description, display.description) &&
         Objects.equals(this.icon, display.icon) &&
-        Objects.equals(this.label, display.label) &&
         Objects.equals(this.subtitle, display.subtitle) &&
-        Objects.equals(this.tags, display.tags);
+        Objects.equals(this.tags, display.tags) &&
+        Objects.equals(this.title, display.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, description, icon, label, subtitle, tags);
+    return Objects.hash(category, description, icon, subtitle, tags, title);
   }
 
   @Override
@@ -196,9 +196,9 @@ public class DisplayModel {
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    subtitle: ").append(toIndentedString(subtitle)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();
   }

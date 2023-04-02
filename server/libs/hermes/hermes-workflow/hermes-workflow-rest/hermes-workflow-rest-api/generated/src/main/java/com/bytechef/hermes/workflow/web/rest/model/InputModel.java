@@ -20,20 +20,32 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
 public class InputModel {
 
-  @JsonProperty("label")
   private String label;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("required")
   private Boolean required = false;
 
-  @JsonProperty("type")
   private String type;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link InputModel#InputModel(String)}
+   */
+  @Deprecated
+  public InputModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public InputModel(String name) {
+    this.name = name;
+  }
 
   public InputModel label(String label) {
     this.label = label;
@@ -46,6 +58,7 @@ public class InputModel {
   */
   
   @Schema(name = "label", description = "The string of an input", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
   public String getLabel() {
     return label;
   }
@@ -65,6 +78,7 @@ public class InputModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The name of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -84,6 +98,7 @@ public class InputModel {
   */
   
   @Schema(name = "required", description = "If an input is required, or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("required")
   public Boolean getRequired() {
     return required;
   }
@@ -103,6 +118,7 @@ public class InputModel {
   */
   
   @Schema(name = "type", description = "The type of an input, for example \\\"string\\\"", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("type")
   public String getType() {
     return type;
   }

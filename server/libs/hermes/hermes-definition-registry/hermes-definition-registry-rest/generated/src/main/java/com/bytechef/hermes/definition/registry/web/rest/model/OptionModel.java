@@ -21,19 +21,15 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class OptionModel {
 
-  @JsonProperty("description")
   private String description;
 
-  @JsonProperty("displayCondition")
   private String displayCondition;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("value")
   private Object value;
 
   public OptionModel description(String description) {
@@ -47,6 +43,7 @@ public class OptionModel {
   */
   
   @Schema(name = "description", description = "Description of the option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
   public String getDescription() {
     return description;
   }
@@ -66,6 +63,7 @@ public class OptionModel {
   */
   
   @Schema(name = "displayCondition", description = "Defines rules when a property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("displayCondition")
   public String getDisplayCondition() {
     return displayCondition;
   }
@@ -85,6 +83,7 @@ public class OptionModel {
   */
   
   @Schema(name = "name", description = "The name of an option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -104,6 +103,7 @@ public class OptionModel {
   */
   
   @Schema(name = "value", description = "The value of an option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("value")
   public Object getValue() {
     return value;
   }

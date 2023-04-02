@@ -2,6 +2,8 @@ package com.bytechef.dione.integration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.category.web.rest.model.CategoryModel;
+import com.bytechef.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,40 +28,30 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T18:32:20.850700+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:04.031022+02:00[Europe/Zagreb]")
 public class IntegrationModel {
 
-  @JsonProperty("category")
-  private com.bytechef.category.web.rest.model.CategoryModel category;
+  private CategoryModel category;
 
-  @JsonProperty("createdBy")
   private String createdBy;
 
-  @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("id")
   private Long id;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("description")
   private String description;
 
-  @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
-  @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("publishedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime publishedDate;
 
-  @JsonProperty("integrationVersion")
   private Integer integrationVersion;
 
   /**
@@ -97,21 +89,33 @@ public class IntegrationModel {
     }
   }
 
-  @JsonProperty("status")
   private StatusEnum status;
 
-  @JsonProperty("tags")
   @Valid
-  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
+  private List<@Valid TagModel> tags;
 
-  @JsonProperty("workflowIds")
   @Valid
-  private List<String> workflowIds = null;
+  private List<String> workflowIds;
 
-  @JsonProperty("__version")
   private Integer version;
 
-  public IntegrationModel category(com.bytechef.category.web.rest.model.CategoryModel category) {
+  /**
+   * Default constructor
+   * @deprecated Use {@link IntegrationModel#IntegrationModel(String)}
+   */
+  @Deprecated
+  public IntegrationModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public IntegrationModel(String name) {
+    this.name = name;
+  }
+
+  public IntegrationModel category(CategoryModel category) {
     this.category = category;
     return this;
   }
@@ -122,11 +126,12 @@ public class IntegrationModel {
   */
   @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public com.bytechef.category.web.rest.model.CategoryModel getCategory() {
+  @JsonProperty("category")
+  public CategoryModel getCategory() {
     return category;
   }
 
-  public void setCategory(com.bytechef.category.web.rest.model.CategoryModel category) {
+  public void setCategory(CategoryModel category) {
     this.category = category;
   }
 
@@ -141,6 +146,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
@@ -160,6 +166,7 @@ public class IntegrationModel {
   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -179,6 +186,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public Long getId() {
     return id;
   }
@@ -198,6 +206,7 @@ public class IntegrationModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The name of the integration.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -217,6 +226,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "description", description = "The description of the integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
   public String getDescription() {
     return description;
   }
@@ -236,6 +246,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -255,6 +266,7 @@ public class IntegrationModel {
   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -274,6 +286,7 @@ public class IntegrationModel {
   */
   @Valid 
   @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("publishedDate")
   public LocalDateTime getPublishedDate() {
     return publishedDate;
   }
@@ -293,6 +306,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "integrationVersion", description = "The version of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationVersion")
   public Integer getIntegrationVersion() {
     return integrationVersion;
   }
@@ -312,6 +326,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "status", description = "A status of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("status")
   public StatusEnum getStatus() {
     return status;
   }
@@ -320,12 +335,12 @@ public class IntegrationModel {
     this.status = status;
   }
 
-  public IntegrationModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public IntegrationModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public IntegrationModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
+  public IntegrationModel addTagsItem(TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -339,11 +354,12 @@ public class IntegrationModel {
   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
+  @JsonProperty("tags")
+  public List<@Valid TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
 
@@ -366,6 +382,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "workflowIds", description = "The workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowIds")
   public List<String> getWorkflowIds() {
     return workflowIds;
   }
@@ -385,6 +402,7 @@ public class IntegrationModel {
   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
   public Integer getVersion() {
     return version;
   }

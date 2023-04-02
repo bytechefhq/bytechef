@@ -21,11 +21,26 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
-  @JsonProperty("workflowId")
   private String workflowId;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link JobParametersModel#JobParametersModel(String)}
+   */
+  @Deprecated
+  public JobParametersModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public JobParametersModel(String workflowId) {
+    this.workflowId = workflowId;
+  }
 
   public JobParametersModel workflowId(String workflowId) {
     this.workflowId = workflowId;
@@ -38,6 +53,7 @@ public class JobParametersModel {
   */
   @NotNull 
   @Schema(name = "workflowId", description = "Id of the workflow to execute.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workflowId")
   public String getWorkflowId() {
     return workflowId;
   }

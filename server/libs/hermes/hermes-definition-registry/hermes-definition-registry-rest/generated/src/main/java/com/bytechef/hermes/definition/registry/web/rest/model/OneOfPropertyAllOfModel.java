@@ -23,14 +23,13 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OneOfProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class OneOfPropertyAllOfModel {
 
-  @JsonProperty("types")
   @Valid
-  private List<PropertyModel> types = null;
+  private List<@Valid PropertyModel> types;
 
-  public OneOfPropertyAllOfModel types(List<PropertyModel> types) {
+  public OneOfPropertyAllOfModel types(List<@Valid PropertyModel> types) {
     this.types = types;
     return this;
   }
@@ -49,11 +48,12 @@ public class OneOfPropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "types", description = "Possible types of properties that can be used.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getTypes() {
+  @JsonProperty("types")
+  public List<@Valid PropertyModel> getTypes() {
     return types;
   }
 
-  public void setTypes(List<PropertyModel> types) {
+  public void setTypes(List<@Valid PropertyModel> types) {
     this.types = types;
   }
 

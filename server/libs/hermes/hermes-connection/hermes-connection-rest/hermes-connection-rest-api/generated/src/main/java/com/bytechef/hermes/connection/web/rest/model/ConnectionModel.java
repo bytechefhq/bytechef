@@ -2,6 +2,7 @@ package com.bytechef.hermes.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,51 +28,56 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-26T06:48:59.929614+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:19:29.675799+02:00[Europe/Zagreb]")
 public class ConnectionModel {
 
-  @JsonProperty("active")
   private Boolean active;
 
-  @JsonProperty("authorizationName")
   private String authorizationName;
 
-  @JsonProperty("componentName")
   private String componentName;
 
-  @JsonProperty("connectionVersion")
   private Integer connectionVersion;
 
-  @JsonProperty("createdBy")
   private String createdBy;
 
-  @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("id")
   private Long id;
 
-  @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
-  @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("parameters")
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
-  @JsonProperty("tags")
   @Valid
-  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
+  private List<@Valid TagModel> tags;
 
-  @JsonProperty("__version")
   private Integer version;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link ConnectionModel#ConnectionModel(String, String, Map<String, Object>)}
+   */
+  @Deprecated
+  public ConnectionModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ConnectionModel(String componentName, String name, Map<String, Object> parameters) {
+    this.componentName = componentName;
+    this.name = name;
+    this.parameters = parameters;
+  }
 
   public ConnectionModel active(Boolean active) {
     this.active = active;
@@ -84,6 +90,7 @@ public class ConnectionModel {
   */
   
   @Schema(name = "active", description = "If a connection is used in any of active workflows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("active")
   public Boolean getActive() {
     return active;
   }
@@ -103,6 +110,7 @@ public class ConnectionModel {
   */
   
   @Schema(name = "authorizationName", description = "The name of an authorization used by this connection. Used for HTTP based services.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationName")
   public String getAuthorizationName() {
     return authorizationName;
   }
@@ -122,6 +130,7 @@ public class ConnectionModel {
   */
   @NotNull 
   @Schema(name = "componentName", description = "The name of a component that uses this connection.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentName")
   public String getComponentName() {
     return componentName;
   }
@@ -141,6 +150,7 @@ public class ConnectionModel {
   */
   
   @Schema(name = "connectionVersion", description = "The version of a component that uses this connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionVersion")
   public Integer getConnectionVersion() {
     return connectionVersion;
   }
@@ -160,6 +170,7 @@ public class ConnectionModel {
   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
@@ -179,6 +190,7 @@ public class ConnectionModel {
   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -198,6 +210,7 @@ public class ConnectionModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The name of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -217,6 +230,7 @@ public class ConnectionModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public Long getId() {
     return id;
   }
@@ -236,6 +250,7 @@ public class ConnectionModel {
   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -255,6 +270,7 @@ public class ConnectionModel {
   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -269,6 +285,9 @@ public class ConnectionModel {
   }
 
   public ConnectionModel putParametersItem(String key, Object parametersItem) {
+    if (this.parameters == null) {
+      this.parameters = new HashMap<>();
+    }
     this.parameters.put(key, parametersItem);
     return this;
   }
@@ -279,6 +298,7 @@ public class ConnectionModel {
   */
   @NotNull 
   @Schema(name = "parameters", description = "The parameters of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("parameters")
   public Map<String, Object> getParameters() {
     return parameters;
   }
@@ -287,12 +307,12 @@ public class ConnectionModel {
     this.parameters = parameters;
   }
 
-  public ConnectionModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public ConnectionModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public ConnectionModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
+  public ConnectionModel addTagsItem(TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -306,11 +326,12 @@ public class ConnectionModel {
   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
+  @JsonProperty("tags")
+  public List<@Valid TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
 
@@ -325,6 +346,7 @@ public class ConnectionModel {
   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
   public Integer getVersion() {
     return version;
   }

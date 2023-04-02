@@ -28,68 +28,49 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
-  @JsonProperty("createdBy")
   private String createdBy;
 
-  @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("endDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime endDate;
 
-  @JsonProperty("error")
   private ExecutionErrorModel error;
 
-  @JsonProperty("executionTime")
   private Long executionTime;
 
-  @JsonProperty("id")
   private String id;
 
-  @JsonProperty("input")
   @Valid
-  private Map<String, Object> input = null;
+  private Map<String, Object> input = new HashMap<>();
 
-  @JsonProperty("jobId")
   private String jobId;
 
-  @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
-  @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("output")
   private Object output;
 
-  @JsonProperty("parentId")
   private String parentId;
 
-  @JsonProperty("priority")
   private Integer priority;
 
-  @JsonProperty("progress")
   private Integer progress;
 
-  @JsonProperty("retry")
   private Integer retry;
 
-  @JsonProperty("retryAttempts")
   private Integer retryAttempts;
 
-  @JsonProperty("retryDelay")
   private String retryDelay;
 
-  @JsonProperty("retryDelayFactor")
   private Integer retryDelayFactor;
 
-  @JsonProperty("startDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime startDate;
 
@@ -134,20 +115,34 @@ public class TaskExecutionModel {
     }
   }
 
-  @JsonProperty("status")
   private StatusEnum status;
 
-  @JsonProperty("taskNumber")
   private Integer taskNumber;
 
-  @JsonProperty("retryDelayMillis")
   private Long retryDelayMillis;
 
-  @JsonProperty("workflowTask")
   private WorkflowTaskModel workflowTask;
 
-  @JsonProperty("type")
   private String type;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link TaskExecutionModel#TaskExecutionModel(String, Integer, LocalDateTime, StatusEnum)}
+   */
+  @Deprecated
+  public TaskExecutionModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public TaskExecutionModel(String jobId, Integer priority, LocalDateTime startDate, StatusEnum status) {
+    this.jobId = jobId;
+    this.priority = priority;
+    this.startDate = startDate;
+    this.status = status;
+  }
 
   public TaskExecutionModel createdBy(String createdBy) {
     this.createdBy = createdBy;
@@ -160,6 +155,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
@@ -179,6 +175,7 @@ public class TaskExecutionModel {
   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -198,6 +195,7 @@ public class TaskExecutionModel {
   */
   @Valid 
   @Schema(name = "endDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("endDate")
   public LocalDateTime getEndDate() {
     return endDate;
   }
@@ -217,6 +215,7 @@ public class TaskExecutionModel {
   */
   @Valid 
   @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("error")
   public ExecutionErrorModel getError() {
     return error;
   }
@@ -236,6 +235,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "executionTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The total time in ms for a task to execute (excluding wait time of the task in transit). i.e. actual execution time on a worker node.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("executionTime")
   public Long getExecutionTime() {
     return executionTime;
   }
@@ -255,6 +255,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a task execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public String getId() {
     return id;
   }
@@ -282,6 +283,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "input", accessMode = Schema.AccessMode.READ_ONLY, description = "The input parameters for a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("input")
   public Map<String, Object> getInput() {
     return input;
   }
@@ -301,6 +303,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "jobId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a job for which a task belongs to.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("jobId")
   public String getJobId() {
     return jobId;
   }
@@ -320,6 +323,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -339,6 +343,7 @@ public class TaskExecutionModel {
   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -358,6 +363,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "output", accessMode = Schema.AccessMode.READ_ONLY, description = "The result output generated by the task handler which executed a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("output")
   public Object getOutput() {
     return output;
   }
@@ -377,6 +383,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "parentId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task, if this is a sub-task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("parentId")
   public String getParentId() {
     return parentId;
   }
@@ -396,6 +403,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "priority", accessMode = Schema.AccessMode.READ_ONLY, description = "The priority value.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("priority")
   public Integer getPriority() {
     return priority;
   }
@@ -415,6 +423,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "progress", accessMode = Schema.AccessMode.READ_ONLY, description = "The current progress value, a number between 0 and 100.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("progress")
   public Integer getProgress() {
     return progress;
   }
@@ -434,6 +443,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times that a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("retry")
   public Integer getRetry() {
     return retry;
   }
@@ -453,6 +463,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "retryAttempts", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of times that a task has been retried.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("retryAttempts")
   public Integer getRetryAttempts() {
     return retryAttempts;
   }
@@ -472,6 +483,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "retryDelay", accessMode = Schema.AccessMode.READ_ONLY, description = "The delay to introduce between each retry. Values are to be specified using the ISO-8601 format (excluding the PT prefix). e.g. 10s (ten seconds), 1m (one minute) etc.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("retryDelay")
   public String getRetryDelay() {
     return retryDelay;
   }
@@ -491,6 +503,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "retryDelayFactor", accessMode = Schema.AccessMode.READ_ONLY, description = "The factor to use in order to calculate the actual delay time between each successive retry -- multiplying by the value of the retryDelay.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("retryDelayFactor")
   public Integer getRetryDelayFactor() {
     return retryDelayFactor;
   }
@@ -510,6 +523,7 @@ public class TaskExecutionModel {
   */
   @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("startDate")
   public LocalDateTime getStartDate() {
     return startDate;
   }
@@ -529,6 +543,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The current status of a task.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("status")
   public StatusEnum getStatus() {
     return status;
   }
@@ -548,6 +563,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "taskNumber", accessMode = Schema.AccessMode.READ_ONLY, description = "The numeric order of the task in the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("taskNumber")
   public Integer getTaskNumber() {
     return taskNumber;
   }
@@ -567,6 +583,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "retryDelayMillis", accessMode = Schema.AccessMode.READ_ONLY, description = "The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("retryDelayMillis")
   public Long getRetryDelayMillis() {
     return retryDelayMillis;
   }
@@ -586,6 +603,7 @@ public class TaskExecutionModel {
   */
   @Valid 
   @Schema(name = "workflowTask", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowTask")
   public WorkflowTaskModel getWorkflowTask() {
     return workflowTask;
   }
@@ -605,6 +623,7 @@ public class TaskExecutionModel {
   */
   
   @Schema(name = "type", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("type")
   public String getType() {
     return type;
   }
