@@ -107,7 +107,7 @@ public class JdbcComponentHandler implements ComponentHandler {
     private ComponentDefinition getComponentDefinition(String name, Display display) {
         return component(name)
             .display(
-                display(display.getLabel())
+                display(display.getTitle())
                     .description(display.getDescription())
                     .icon(display.getIcon()))
             .connection(

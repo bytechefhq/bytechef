@@ -11,21 +11,33 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         "useSpringBoot3": "true"
     ]
     generatorName = "spring"
+    importMappings = [
+        CategoryModel: "com.bytechef.category.web.rest.model.CategoryModel",
+        ConnectionModel: "com.bytechef.hermes.connection.web.rest.model.ConnectionModel",
+        ExecutionErrorModel: "com.bytechef.hermes.workflow.web.rest.model.ExecutionErrorModel",
+        JobModel: "com.bytechef.hermes.workflow.web.rest.model.JobModel",
+        PageModel: "org.springframework.data.domain.Page",
+        TagModel: "com.bytechef.tag.web.rest.model.TagModel",
+        TaskExecutionModel: "com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel",
+        WorkflowModel: "com.bytechef.hermes.workflow.web.rest.model.WorkflowModel",
+        WorkflowFormatModel: "com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel",
+        WorkflowTaskModel: "com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel"
+    ]
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.helios.project.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
-        Category: "com.bytechef.category.web.rest.model.CategoryModel",
-        Connection: "com.bytechef.hermes.connection.web.rest.model.ConnectionModel",
-        ExecutionError: "com.bytechef.hermes.workflow.web.rest.model.ExecutionErrorModel",
-        Job: "com.bytechef.hermes.workflow.web.rest.model.JobModel",
+        Category: "CategoryModel",
+        Connection: "ConnectionModel",
+        ExecutionError: "ExecutionErrorModel",
+        Job: "JobModel",
         Page: "org.springframework.data.domain.Page",
-        Tag: "com.bytechef.tag.web.rest.model.TagModel",
-        TaskExecution: "com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel",
-        Workflow: "com.bytechef.hermes.workflow.web.rest.model.WorkflowModel",
-        WorkflowFormat: "com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel",
-        WorkflowTask: "com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel"
+        Tag: "TagModel",
+        TaskExecution: "TaskExecutionModel",
+        Workflow: "WorkflowModel",
+        WorkflowFormat: "WorkflowFormatModel",
+        WorkflowTask: "WorkflowTaskModel"
     ]
 }
 
