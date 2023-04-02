@@ -2,7 +2,7 @@
   "actions": [ {
     "display": {
       "description": "Reads data from a XML file.",
-      "label": "Read from file"
+      "title": "Read from file"
     },
     "name": "read",
     "outputSchema": [ {
@@ -81,7 +81,7 @@
   }, {
     "display": {
       "description": "Writes the data to a XML file.",
-      "label": "Write to file"
+      "title": "Write to file"
     },
     "name": "write",
     "outputSchema": [ {
@@ -139,7 +139,7 @@
   } ],
   "display": {
     "description": "Reads and writes data from a XML file.",
-    "label": "XML File"
+    "title": "XML File"
   },
   "name": "xmlFile",
   "version": 1
