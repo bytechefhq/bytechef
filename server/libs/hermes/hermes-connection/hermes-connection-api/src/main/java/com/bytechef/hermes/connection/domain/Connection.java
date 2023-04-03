@@ -26,10 +26,8 @@ import java.util.Set;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.component.Context;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -270,10 +268,6 @@ public final class Connection implements Persistable<Long> {
         this.version = version;
     }
 
-    public Context.Connection toContextConnection() {
-        return new ConnectionImpl(this);
-    }
-
     @Override
     public String toString() {
         return "Connection{" + ", id="
@@ -366,37 +360,6 @@ public final class Connection implements Persistable<Long> {
             connection.setTagIds(tagIds);
 
             return connection;
-        }
-    }
-
-    private static class ConnectionImpl implements Context.Connection {
-        private final Map<String, Object> parameters;
-
-        public ConnectionImpl(Connection connection) {
-            this.parameters = connection.getParameters();
-        }
-
-        @Override
-        public boolean containsParameter(String name) {
-            return parameters.containsKey(name);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> T getParameter(String name) {
-            return (T) MapValueUtils.get(parameters, name);
-        }
-
-        @Override
-        public <T> T getParameter(String name, T defaultValue) {
-            return MapValueUtils.get(parameters, name, new ParameterizedTypeReference<>() {}, defaultValue);
-        }
-
-        @Override
-        public String toString() {
-            return "ConnectionImpl{" +
-                ", parameters=" + parameters +
-                '}';
         }
     }
 }

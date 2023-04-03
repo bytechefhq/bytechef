@@ -37,9 +37,8 @@ public interface ConnectionDefinitionService {
 
     Optional<String> fetchBaseUri(Connection connection);
 
-    Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion);
-
-    ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion);
+    Authorization.AuthorizationType getAuthorizationType(
+        String authorizationName, String componentName, int connectionVersion);
 
     Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(String componentName, int componentVersion);
 
@@ -48,5 +47,4 @@ public interface ConnectionDefinitionService {
     Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono();
 
     OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection);
-
 }
