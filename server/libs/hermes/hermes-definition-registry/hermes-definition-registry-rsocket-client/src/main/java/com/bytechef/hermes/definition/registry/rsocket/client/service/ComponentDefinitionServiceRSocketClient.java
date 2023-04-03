@@ -20,11 +20,9 @@ package com.bytechef.hermes.definition.registry.rsocket.client.service;
 import com.bytechef.commons.util.DiscoveryUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -35,7 +33,6 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@Component
 public class ComponentDefinitionServiceRSocketClient implements ComponentDefinitionService {
 
     private static final String WORKER_SERVICE_APP = "worker-service-app";
@@ -44,8 +41,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
     private final RSocketRequester.Builder rSocketRequesterBuilder;
 
     public ComponentDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+        DiscoveryClient discoveryClient, RSocketRequester.Builder rSocketRequesterBuilder) {
 
         this.discoveryClient = discoveryClient;
         this.rSocketRequesterBuilder = rSocketRequesterBuilder;

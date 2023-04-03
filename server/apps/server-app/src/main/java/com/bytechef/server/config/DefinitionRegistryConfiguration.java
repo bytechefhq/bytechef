@@ -15,19 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.config;
+package com.bytechef.server.config;
 
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.service.LocalConnectionDefinitionService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,8 +39,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='worker-service-app'")
-public class WorkerDefinitionRegistryConfiguration {
+public class DefinitionRegistryConfiguration {
 
     @Bean
     ActionDefinitionService actionDefinitionService(List<ComponentDefinition> componentDefinitions) {
@@ -58,7 +59,18 @@ public class WorkerDefinitionRegistryConfiguration {
     }
 
     @Bean
-    LocalConnectionDefinitionService localConnectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
+    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
         return new ConnectionDefinitionServiceImpl(componentDefinitions);
+    }
+
+    @Bean
+    TaskDispatcherDefinitionService taskDispatcherDefinitionService(
+        List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
+
+        return new TaskDispatcherDefinitionServiceImpl(
+            taskDispatcherDefinitionFactories
+                .stream()
+                .map(TaskDispatcherDefinitionFactory::getDefinition)
+                .toList());
     }
 }

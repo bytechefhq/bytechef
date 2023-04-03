@@ -19,17 +19,16 @@ package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.util.MonoUtils;
 import com.bytechef.commons.util.DiscoveryUtils;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -42,7 +41,6 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Component
 public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefinitionService {
 
     private static final String WORKER_SERVICE_APP = "worker-service-app";
@@ -51,11 +49,15 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     private final RSocketRequester.Builder rSocketRequesterBuilder;
 
     public ConnectionDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+        DiscoveryClient discoveryClient, RSocketRequester.Builder rSocketRequesterBuilder) {
 
         this.discoveryClient = discoveryClient;
         this.rSocketRequesterBuilder = rSocketRequesterBuilder;
+    }
+
+    @Override
+    public boolean connectionExists(String componentName, int connectionVersion) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -161,6 +163,11 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
                 .route("ConnectionDefinitionService.getOAuth2Parameters")
                 .data(connection)
                 .retrieveMono(OAuth2AuthorizationParametersDTO.class));
+    }
+
+    @Override
+    public Context.Connection toContextConnection(Connection connection) {
+        throw new UnsupportedOperationException();
     }
 
     private URI getWebsocketUri(Connection connection) {
