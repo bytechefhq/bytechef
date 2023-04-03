@@ -25,7 +25,7 @@ import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.service.LocalConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 
 import java.io.InputStream;
@@ -36,14 +36,14 @@ import java.util.Optional;
  */
 public class ContextImpl implements Context {
 
-    private final LocalConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final TaskExecution taskExecution;
 
     public ContextImpl(
-        LocalConnectionDefinitionService connectionDefinitionService,
+        ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService,
         EventPublisher eventPublisher,
         FileStorageService fileStorageService,

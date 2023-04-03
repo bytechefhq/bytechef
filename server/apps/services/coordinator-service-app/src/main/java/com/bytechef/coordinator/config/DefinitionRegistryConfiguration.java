@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.config;
+package com.bytechef.coordinator.config;
 
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,11 +29,10 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='coordinator-service-app'")
-public class CoordinatorDefinitionRegistryConfiguration {
+public class DefinitionRegistryConfiguration {
 
     @Bean
-    TaskDispatcherDefinitionService taskDispatcherDefinition(
+    TaskDispatcherDefinitionService taskDispatcherDefinitionService(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
 
         return new TaskDispatcherDefinitionServiceImpl(

@@ -2,6 +2,5 @@ dependencies {
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
     implementation "org.springframework:spring-context"
-    implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation project(":server:libs:core:commons:commons-util")
 }

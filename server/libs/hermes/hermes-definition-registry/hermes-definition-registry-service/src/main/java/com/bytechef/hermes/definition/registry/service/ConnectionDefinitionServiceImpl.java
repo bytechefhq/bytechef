@@ -38,7 +38,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class ConnectionDefinitionServiceImpl implements LocalConnectionDefinitionService {
+public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
 
     private final List<ComponentDefinition> componentDefinitions;
     private final List<ConnectionDefinition> connectionDefinitions;

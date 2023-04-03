@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -30,6 +31,8 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public interface ConnectionDefinitionService {
+
+    boolean connectionExists(String componentName, int connectionVersion);
 
     void executeAuthorizationApply(Connection connection, Authorization.AuthorizationContext authorizationContext);
 
@@ -47,4 +50,6 @@ public interface ConnectionDefinitionService {
     Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono();
 
     OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection);
+
+    Context.Connection toContextConnection(Connection connection);
 }
