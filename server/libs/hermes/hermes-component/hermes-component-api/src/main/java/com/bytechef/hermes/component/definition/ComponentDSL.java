@@ -1054,4 +1054,72 @@ public final class ComponentDSL extends DefinitionDSL {
             return version;
         }
     }
+
+    public static final class ModifiableOutputSchemaDataSource implements OutputSchemaDataSource {
+
+        private final BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction;
+
+        public ModifiableOutputSchemaDataSource(
+            BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction) {
+
+            this.outputSchemaFunction = outputSchemaFunction;
+        }
+
+        @Override
+        public BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> getOutputSchemaFunction() {
+            return outputSchemaFunction;
+        }
+    }
+
+    public static class ModifiableTriggerDefinition implements TriggerDefinition {
+
+        private ComponentDefinition componentDefinition;
+        private Display display;
+
+        @Override
+        public Boolean getBatch() {
+            return null;
+        }
+
+        @Override
+        @JsonIgnore
+        public ComponentDefinition getComponent() {
+            return componentDefinition;
+        }
+
+        @Override
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public Object getExampleOutput() {
+            return null;
+        }
+
+        @Override
+        public ExampleOutputDataSource getExampleOutputDataSource() {
+            return null;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public List<Property<? extends Property<?>>> getOutputSchema() {
+            return null;
+        }
+
+        @Override
+        public OutputSchemaDataSource getOutputSchemaDataSource() {
+            return null;
+        }
+
+        @Override
+        public List<Property<?>> getProperties() {
+            return null;
+        }
+    }
 }
