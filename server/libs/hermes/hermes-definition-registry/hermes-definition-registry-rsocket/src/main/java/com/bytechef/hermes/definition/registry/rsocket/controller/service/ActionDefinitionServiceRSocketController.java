@@ -24,6 +24,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,5 +44,11 @@ public class ActionDefinitionServiceRSocketController {
     public Mono<ActionDefinition> getComponentDefinitionAction(Map<String, Object> map) {
         return actionDefinitionService.getComponentDefinitionActionMono(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"), (String) map.get("actionName"));
+    }
+
+    @MessageMapping("ActionDefinitionService.getComponentDefinitionActions")
+    public Mono<List<ActionDefinition>> getComponentDefinitionActions(Map<String, Object> map) {
+        return actionDefinitionService.getComponentDefinitionActionsMono(
+            (String) map.get("componentName"), (Integer) map.get("componentVersion"));
     }
 }

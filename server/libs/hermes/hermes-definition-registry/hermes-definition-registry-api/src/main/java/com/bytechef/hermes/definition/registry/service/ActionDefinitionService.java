@@ -20,6 +20,8 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
@@ -27,4 +29,6 @@ public interface ActionDefinitionService {
 
     Mono<ActionDefinition> getComponentDefinitionActionMono(
         String componentName, int componentVersion, String actionName);
+
+    Mono<List<ActionDefinition>> getComponentDefinitionActionsMono(String componentName, int componentVersion);
 }

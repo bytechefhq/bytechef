@@ -51,4 +51,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new));
     }
+
+    @Override
+    public Mono<List<ActionDefinition>> getComponentDefinitionActionsMono(String componentName, int componentVersion) {
+        return Mono.just(
+            componentDefinitions.stream()
+                .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                    componentVersion == componentDefinition.getVersion())
+                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
+                .map(actionDefinition -> (ActionDefinition) actionDefinition)
+                .toList());
+    }
 }
