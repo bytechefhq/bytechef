@@ -49,7 +49,18 @@
         "react/prop-types": "off",
         "react/react-in-jsx-scope": "off",
         "tailwindcss/classnames-order": "warn",
-        "tailwindcss/no-custom-classname": "warn",
+        "tailwindcss/no-custom-classname": [
+            "warn",
+            {
+                "whitelist": [
+                    "animate-slide-down",
+                    "animate-slide-up",
+                    "line-clamp-2",
+                    "nowheel",
+                    "w-112"
+                ]
+            }
+        ],
         "tailwindcss/no-contradicting-classname": "error"
     }
 }

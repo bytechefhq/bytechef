@@ -42,8 +42,6 @@ const WorkflowNodesListItem = ({
                     {node.display?.label}
                 </p>
 
-                {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
-
                 <p className="line-clamp-2 text-left text-xs text-gray-500">
                     {node.display?.description}
                 </p>
