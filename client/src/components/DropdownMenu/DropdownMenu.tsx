@@ -36,7 +36,6 @@ const DropdownMenu = ({id = 0, menuItems}: DropdownMenuProps): JSX.Element => (
         <Portal>
             <Content
                 align="end"
-                // eslint-disable-next-line tailwindcss/no-custom-classname
                 className="rounded-lg border border-gray-50 bg-white p-1.5 shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-800"
                 id={id.toString()}
             >
