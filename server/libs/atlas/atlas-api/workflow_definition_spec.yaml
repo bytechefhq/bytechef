@@ -32,7 +32,7 @@ schemas:
           oneOf:
           - $ref: "#/schemas/Task"
           - $ref: "#/schemas/TaskDispatcher"
-      retry:
+      maxRetries:
         description: "The maximum number of times a task may retry."
         type: "integer"
         format: "int32"

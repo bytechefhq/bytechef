@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS task_execution (
     status                   VARCHAR(256) NOT NULL,
     progress                 INT not          NULL,
     priority                 INT          NOT NULL,
-    retry                    INT          NOT NULL,
+    max_retries              INT          NOT NULL,
     retry_attempts           INT          NOT NULL,
     retry_delay              VARCHAR(256) NOT NULL,
     retry_delay_factor       INT          NOT NULL,
