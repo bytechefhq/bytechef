@@ -19,7 +19,7 @@ package com.bytechef.component.randomhelper.action;
 
 import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
@@ -34,14 +34,14 @@ public class RandomHelperRandomFloatAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(RANDOM_FLOAT)
         .display(display("Float").description("Generates a random float value."))
-        .perform(RandomHelperRandomFloatAction::performNextFloat);
+        .execute(RandomHelperRandomFloatAction::executeNextFloat);
 
     /**
      * Generates a random float.
      */
-    public static Object performNextFloat(Context context, Parameters parameters) {
-        int startInclusive = parameters.getInteger("startInclusive", 0);
-        int endInclusive = parameters.getInteger("endInclusive", 100);
+    public static Object executeNextFloat(Context context, InputParameters inputParameters) {
+        int startInclusive = inputParameters.getInteger("startInclusive", 0);
+        int endInclusive = inputParameters.getInteger("endInclusive", 100);
 
         return nextFloat(startInclusive, endInclusive);
     }

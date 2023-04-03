@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import java.io.File;
@@ -40,7 +40,7 @@ public class FilesystemRmAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(RM)
         .display(display("Remove").description("Removes the content of a directory."))
-        .perform(FilesystemRmAction::performRm);
+        .execute(FilesystemRmAction::executeRm);
 
     /**
      * Deletes a file, never throwing an exception. If file is a directory, delete it and all subdirectories.
@@ -49,8 +49,8 @@ public class FilesystemRmAction {
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    public static Object performRm(Context context, Parameters parameters) {
-        File file = new File(parameters.getRequiredString("path"));
+    public static Object executeRm(Context context, InputParameters inputParameters) {
+        File file = new File(inputParameters.getRequiredString("path"));
 
         try {
             return deleteRecursively(file.toPath());

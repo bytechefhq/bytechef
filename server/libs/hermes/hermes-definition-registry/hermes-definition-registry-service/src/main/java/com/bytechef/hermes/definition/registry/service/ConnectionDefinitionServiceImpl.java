@@ -31,8 +31,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
@@ -126,14 +124,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = getAuthorization(
             connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
-        Function<Context.Connection, String> authorizationUrlFunction = authorization.getAuthorizationUrlFunction();
-        Function<Context.Connection, String> clientIdFunction = authorization.getClientIdFunction();
-        Function<Context.Connection, List<String>> scopesFunction = authorization.getScopesFunction();
+        Authorization.AuthorizationUrlFunction authorizationUrlFunction = authorization.getAuthorizationUrl();
+        Authorization.ClientIdFunction clientIdFunction = authorization.getClientId();
+        Authorization.ScopesFunction scopesFunction = authorization.getScopes();
+
+        Context.Connection contextConnection = toContextConnection(connection);
 
         return new OAuth2AuthorizationParametersDTO(
-            authorizationUrlFunction.apply(connection.toContextConnection()),
-            clientIdFunction.apply(connection.toContextConnection()),
-            scopesFunction.apply(connection.toContextConnection()));
+            authorizationUrlFunction.apply(contextConnection), clientIdFunction.apply(contextConnection),
+            scopesFunction.apply(contextConnection));
     }
 
     @Override
@@ -147,7 +146,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         return Mono.just(
             CollectionUtils.concatDistinct(
-                componentDefinition.applyFilterCompatibleConnectionDefinitionsFunction(
+                componentDefinition.applyFilterCompatibleConnectionDefinitions(
                     componentDefinition, connectionDefinitions),
                 List.of(componentDefinition.getConnection())));
     }

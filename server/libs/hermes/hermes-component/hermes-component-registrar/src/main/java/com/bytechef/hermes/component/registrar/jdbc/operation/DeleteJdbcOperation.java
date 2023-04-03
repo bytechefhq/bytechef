@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.registrar.jdbc.operation;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,14 +41,15 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, Parameters parameters) {
+    public Map<String, Integer> execute(Context context, InputParameters inputParameters) {
         Map<String, Integer> result;
 
-        String deleteKey = parameters.getString(JdbcConstants.DELETE_KEY, "id");
+        String deleteKey = inputParameters.getString(JdbcConstants.DELETE_KEY, "id");
         @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) parameters.getList(JdbcConstants.ROWS, Map.class, Collections.emptyList());
-        String schema = parameters.getString(JdbcConstants.SCHEMA, "public");
-        String table = parameters.getRequiredString(JdbcConstants.TABLE);
+        List<Map<String, ?>> rows = (List) inputParameters.getList(JdbcConstants.ROWS, Map.class,
+            Collections.emptyList());
+        String schema = inputParameters.getString(JdbcConstants.SCHEMA, "public");
+        String table = inputParameters.getRequiredString(JdbcConstants.TABLE);
 
         if (rows.isEmpty()) {
             result = Map.of("rows", 0);

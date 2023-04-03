@@ -20,7 +20,7 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.POST;
@@ -67,9 +67,9 @@ public class HttpClientPostAction {
                     RESPONSE_FORMAT)),
             string().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
             fileEntry().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
-        .perform(HttpClientPostAction::performPost);
+        .execute(HttpClientPostAction::executePost);
 
-    public static Object performPost(Context context, Parameters parameters) {
-        return HttpClientActionUtils.execute(context, parameters, RequestMethod.POST);
+    public static Object executePost(Context context, InputParameters inputParameters) {
+        return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.POST);
     }
 }

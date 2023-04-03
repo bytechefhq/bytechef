@@ -33,25 +33,25 @@ public class LoggerComponentHandlerTest {
 
     @Disabled
     @Test
-    public void testPerformDebug() {
+    public void testExecuteDebug() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformError() {
+    public void testExecuteError() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformInfo() {
+    public void testExecuteInfo() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformWarn() {
+    public void testExecuteWarn() {
         // TODO
     }
 }

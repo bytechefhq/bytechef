@@ -18,7 +18,7 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.XmlUtils;
@@ -62,10 +62,10 @@ public class XmlFileWriteAction {
                 .defaultValue("file.xml")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .perform(XmlFileWriteAction::performWrite);
+        .execute(XmlFileWriteAction::executeWrite);
 
-    public static Context.FileEntry performWrite(Context context, Parameters parameters) {
-        Object source = parameters.getRequired(SOURCE);
+    public static Context.FileEntry executeWrite(Context context, InputParameters inputParameters) {
+        Object source = inputParameters.getRequired(SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -75,12 +75,12 @@ public class XmlFileWriteAction {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                parameters.getString(FILENAME) == null
+                inputParameters.getString(FILENAME) == null
                     ? "file.xml"
-                    : parameters.getString(FILENAME),
+                    : inputParameters.getString(FILENAME),
                 inputStream);
         } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to handle action " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }
     }
 }

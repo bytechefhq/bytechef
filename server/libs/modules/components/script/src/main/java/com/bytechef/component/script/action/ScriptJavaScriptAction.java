@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
 
@@ -50,9 +50,9 @@ public class ScriptJavaScriptAction {
                 .description("Add your JavaScript custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR))
         .outputSchema(oneOf())
-        .perform(ScriptJavaScriptAction::performJavaScript);
+        .execute(ScriptJavaScriptAction::executeJavaScript);
 
-    public static Object performJavaScript(Context context, Parameters parameters) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("js", parameters);
+    public static Object executeJavaScript(Context context, InputParameters inputParameters) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("js", inputParameters);
     }
 }

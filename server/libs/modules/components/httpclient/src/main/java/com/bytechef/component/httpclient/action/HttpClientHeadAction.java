@@ -20,7 +20,7 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.HEAD;
@@ -47,9 +47,9 @@ public class HttpClientHeadAction {
 
             HttpClientActionUtils.options(false)))
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
-        .perform(HttpClientHeadAction::performHead);
+        .execute(HttpClientHeadAction::executeHead);
 
-    public static Object performHead(Context context, Parameters parameters) {
-        return HttpClientActionUtils.execute(context, parameters, RequestMethod.HEAD);
+    public static Object executeHead(Context context, InputParameters inputParameters) {
+        return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.HEAD);
     }
 }

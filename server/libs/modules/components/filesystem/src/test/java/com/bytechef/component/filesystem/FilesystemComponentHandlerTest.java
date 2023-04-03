@@ -27,7 +27,7 @@ import com.bytechef.component.filesystem.action.FilesystemReadFileAction;
 import com.bytechef.component.filesystem.action.FilesystemRmAction;
 import com.bytechef.component.filesystem.action.FilesystemWriteFileAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.File;
@@ -59,49 +59,49 @@ public class FilesystemComponentHandlerTest {
 
     @Disabled
     @Test
-    public void testPerformCreateDir() {
+    public void testExecuteCreateDir() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformCreateTempDir() {
+    public void testExecuteCreateTempDir() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformDelete() {
+    public void testExecuteDelete() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformDownload() {
+    public void testExecuteDownload() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformGetFilePath() {
+    public void testExecuteGetFilePath() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformList() {
+    public void testExecuteList() {
         // TODO
     }
 
     @Test
-    public void testPerformReadFile() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    public void testExecuteReadFile() {
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getSampleFile();
 
-        Mockito.when(parameters.getRequiredString(FILENAME))
+        Mockito.when(inputParameters.getRequiredString(FILENAME))
             .thenReturn(file.getAbsolutePath());
 
-        FilesystemReadFileAction.performReadFile(context, parameters);
+        FilesystemReadFileAction.executeReadFile(context, inputParameters);
 
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -112,34 +112,34 @@ public class FilesystemComponentHandlerTest {
     }
 
     @Test
-    public void testPerformWriteFile() throws IOException {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    public void testExecuteWriteFile() throws IOException {
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getSampleFile();
 
-        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+        Mockito.when(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))
             .thenReturn(Mockito.mock(Context.FileEntry.class));
-        Mockito.when(parameters.getRequiredString(FILENAME))
+        Mockito.when(inputParameters.getRequiredString(FILENAME))
             .thenReturn(file.getAbsolutePath());
 
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
-        assertThat(FilesystemWriteFileAction.performWriteFile(context, parameters))
+        assertThat(FilesystemWriteFileAction.executeWriteFile(context, inputParameters))
             .hasFieldOrPropertyWithValue("bytes", 5L);
     }
 
     @Test
     public void testList1() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getLsFile();
 
-        Mockito.when(parameters.getRequiredString("path"))
+        Mockito.when(inputParameters.getRequiredString("path"))
             .thenReturn(file.getAbsolutePath());
-        Mockito.when(parameters.getBoolean("recursive", false))
+        Mockito.when(inputParameters.getBoolean("recursive", false))
             .thenReturn(true);
 
-        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.performLs(context,
-            parameters);
+        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(context,
+            inputParameters);
 
         Assertions.assertEquals(
             Set.of("C.txt", "B.txt", "A.txt"),
@@ -150,16 +150,16 @@ public class FilesystemComponentHandlerTest {
 
     @Test
     public void testList2() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getLsFile();
 
-        Mockito.when(parameters.getRequiredString("path"))
+        Mockito.when(inputParameters.getRequiredString("path"))
             .thenReturn(file.getAbsolutePath());
-        Mockito.when(parameters.getBoolean("recursive", false))
+        Mockito.when(inputParameters.getBoolean("recursive", false))
             .thenReturn(true);
 
-        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.performLs(context,
-            parameters);
+        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(context,
+            inputParameters);
 
         Assertions.assertEquals(
             Set.of("sub1/C.txt", "B.txt", "A.txt"),
@@ -170,14 +170,13 @@ public class FilesystemComponentHandlerTest {
 
     @Test
     public void testList3() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         File file = getLsFile();
 
-        Mockito.when(parameters.getRequiredString("path"))
+        Mockito.when(inputParameters.getRequiredString("path"))
             .thenReturn(file.getAbsolutePath());
 
-        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.performLs(context,
-            parameters);
+        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(context, inputParameters);
 
         Assertions.assertEquals(
             Set.of("B.txt", "A.txt"),
@@ -188,15 +187,15 @@ public class FilesystemComponentHandlerTest {
 
     @Test
     public void testCreateDir1() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
         String tempDir = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
             .toString()
             .replace("-", "");
 
-        Mockito.when(parameters.getRequiredString("path"))
+        Mockito.when(inputParameters.getRequiredString("path"))
             .thenReturn(tempDir);
 
-        FilesystemMkdirAction.performMkdir(context, parameters);
+        FilesystemMkdirAction.executeMkdir(context, inputParameters);
 
         Assertions.assertTrue(new File(tempDir).exists());
     }
@@ -204,12 +203,12 @@ public class FilesystemComponentHandlerTest {
     @Test
     public void testCreateDir2() {
         Assertions.assertThrows(ComponentExecutionException.class, () -> {
-            Parameters parameters = Mockito.mock(Parameters.class);
+            InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-            Mockito.when(parameters.getRequiredString("path"))
+            Mockito.when(inputParameters.getRequiredString("path"))
                 .thenReturn("/no/such/thing");
 
-            FilesystemMkdirAction.performMkdir(context, parameters);
+            FilesystemMkdirAction.executeMkdir(context, inputParameters);
         });
     }
 
@@ -220,12 +219,12 @@ public class FilesystemComponentHandlerTest {
 
         Assertions.assertTrue(tempDir.exists());
 
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getRequiredString("path"))
+        Mockito.when(inputParameters.getRequiredString("path"))
             .thenReturn(tempDir.getAbsolutePath());
 
-        FilesystemRmAction.performRm(context, parameters);
+        FilesystemRmAction.executeRm(context, inputParameters);
 
         Assertions.assertFalse(tempDir.exists());
     }

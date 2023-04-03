@@ -20,7 +20,8 @@ package com.bytechef.component.script.engine;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
+
 import java.util.function.Function;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
@@ -35,18 +36,18 @@ public class PolyglotEngine {
     private static final Engine engine = Engine.newBuilder()
         .build();
 
-    public Object execute(String languageId, Parameters parameters) {
+    public Object execute(String languageId, InputParameters inputParameters) {
         try (Context polyglotContext = Context.newBuilder()
             .engine(engine)
             .allowAllAccess(true)
             .build()) {
-            polyglotContext.eval(languageId, parameters.getString(SCRIPT));
+            polyglotContext.eval(languageId, inputParameters.getString(SCRIPT));
 
             Function<ProxyObject, Object> performFunction = polyglotContext.getBindings(languageId)
                 .getMember("perform")
                 .as(new TypeLiteral<>() {});
 
-            return performFunction.apply(ProxyObject.fromMap(parameters.getMap(INPUT)));
+            return performFunction.apply(ProxyObject.fromMap(inputParameters.getMap(INPUT)));
         }
     }
 }

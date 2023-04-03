@@ -36,6 +36,7 @@ public class DataSourceFactory {
 
     public DataSource getDataSource(
         Context.Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+
         Assert.notNull(connection, "'connectionParameters' must not be null");
         Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
         Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");

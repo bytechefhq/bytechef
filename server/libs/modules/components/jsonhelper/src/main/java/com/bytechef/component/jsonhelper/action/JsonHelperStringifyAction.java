@@ -18,7 +18,7 @@
 package com.bytechef.component.jsonhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.JsonUtils;
 
@@ -42,10 +42,10 @@ public class JsonHelperStringifyAction {
             .description("The data to convert to JSON string.")
             .required(true))
         .outputSchema(string())
-        .perform(JsonHelperStringifyAction::performStringify);
+        .execute(JsonHelperStringifyAction::executeStringify);
 
-    public static String performStringify(Context context, Parameters parameters) {
-        Object input = parameters.getRequired(SOURCE);
+    public static String executeStringify(Context context, InputParameters inputParameters) {
+        Object input = inputParameters.getRequired(SOURCE);
 
         return JsonUtils.write(input);
     }

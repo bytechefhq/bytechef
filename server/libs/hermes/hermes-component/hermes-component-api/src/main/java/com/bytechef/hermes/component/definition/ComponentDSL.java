@@ -17,14 +17,11 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
-import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -38,10 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.bytechef.hermes.component.constant.Version;
 
@@ -71,13 +65,13 @@ public final class ComponentDSL extends DefinitionDSL {
     }
 
     public static ModifiableExampleOutputDataSource exampleOutputDataSource(
-        BiFunction<Context.Connection, Parameters, Object> exampleOutputFunction) {
+        ExampleOutputDataSource.ExampleOutputFunction exampleOutputFunction) {
 
         return new ModifiableExampleOutputDataSource(exampleOutputFunction);
     }
 
     public static ModifiableComponentPropertiesDataSource propertiesDataSource(
-        BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> propertiesFunction,
+        ComponentPropertiesDataSource.PropertiesFunction propertiesFunction,
         String... propertiesDependOnPropertyNames) {
 
         return new ModifiableComponentPropertiesDataSource(propertiesFunction,
@@ -104,29 +98,29 @@ public final class ComponentDSL extends DefinitionDSL {
     }
 
     public static ModifiableComponentOptionsDataSource optionsDataSource(
-        BiFunction<Context.Connection, Parameters, List<Option>> optionsFunction,
-        String... loadOptionsDependOnPropertyNames) {
+        ComponentOptionsDataSource.OptionsFunction optionsFunction, String... loadOptionsDependOnPropertyNames) {
 
         return new ModifiableComponentOptionsDataSource(optionsFunction, List.of(loadOptionsDependOnPropertyNames));
     }
 
     public static ModifiableOutputSchemaDataSource outputSchemaDataSource(
-        BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction) {
+        OutputSchemaDataSource.OutputSchemaFunction outputSchemaFunction) {
 
         return new ModifiableOutputSchemaDataSource(outputSchemaFunction);
     }
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
+        private String componentName;
         private Display display;
         private Object exampleOutput;
-        private Map<String, Object> metadata;
-        private String name;
-        private List<Property<? extends Property<?>>> outputSchema;
-        private List<Property<?>> properties;
 
         @JsonIgnore
-        private BiFunction<Context, Parameters, Object> performFunction;
+        private ExecuteFunction execute;
+        private Map<String, Object> metadata;
+        private String name;
+        private List<? extends Property<?>> outputSchema;
+        private List<? extends Property<?>> properties;
         private ExampleOutputDataSource exampleOutputDataSource;
         private OutputSchemaDataSource outputSchemaDataSource;
 
@@ -145,6 +139,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableActionDefinition exampleOutput(Object exampleOutput) {
             this.exampleOutput = exampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition execute(ExecuteFunction execute) {
+            this.execute = execute;
 
             return this;
         }
@@ -186,16 +186,41 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition perform(BiFunction<Context, Parameters, Object> performFunction) {
-            this.performFunction = performFunction;
-
-            return this;
-        }
-
         public <P extends Property<?>> ModifiableActionDefinition properties(P... properties) {
             this.properties = List.of(properties);
 
             return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            ModifiableActionDefinition that = (ModifiableActionDefinition) o;
+
+            return name.equals(that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
+        }
+
+        @Override
+        public Boolean getBatch() {
+            return null;
+        }
+
+        @Override
+        @JsonIgnore
+        public String getComponentName() {
+            return componentName;
         }
 
         public Display getDisplay() {
@@ -205,6 +230,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Object getExampleOutput() {
             return exampleOutput;
+        }
+
+        @Override
+        public Optional<ExecuteFunction> getExecute() {
+            return Optional.ofNullable(execute);
         }
 
         @Override
@@ -223,7 +253,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Property<? extends Property<?>>> getOutputSchema() {
+        public List<? extends Property<?>> getOutputSchema() {
             return outputSchema;
         }
 
@@ -233,30 +263,37 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Property<?>> getProperties() {
+        public List<? extends Property<?>> getProperties() {
             return properties;
         }
 
         @Override
-        public Optional<BiFunction<Context, Parameters, Object>> getPerformFunction() {
-            return Optional.ofNullable(performFunction);
+        public Resources getResources() {
+            return null;
+        }
+
+        private ModifiableActionDefinition componentName(String componentName) {
+            this.componentName = componentName;
+
+            return this;
         }
     }
 
     public static final class ModifiableAuthorization implements Authorization {
 
         @JsonIgnore
-        private Optional<Function<Context.Connection, String>> acquireFunction;
+        private Optional<AcquireFunction> acquire;
 
         @JsonIgnore
-        private BiConsumer<AuthorizationContext, Context.Connection> applyConsumer;
+        private ApplyConsumer apply;
 
         @JsonIgnore
-        private QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> authorizationCallbackFunction = (
+        private AuthorizationCallbackFunction authorizationCallback = (
             connection, code, redirectUri, codeVerifier) -> {
-            Function<Context.Connection, String> clientIdFunction = getClientIdFunction();
-            Function<Context.Connection, String> clientSecretFunction = getClientSecretFunction();
-            Function<Context.Connection, String> tokenUrlFunction = getTokenUrlFunction();
+
+            ClientIdFunction clientIdFunction = getClientId();
+            ClientSecretFunction clientSecretFunction = getClientSecret();
+            TokenUrlFunction tokenUrlFunction = getTokenUrl();
 
             Map<String, Object> payload = new HashMap<>() {
                 {
@@ -294,16 +331,13 @@ public final class ComponentDSL extends DefinitionDSL {
         };
 
         @JsonIgnore
-        private Function<Context.Connection, String> authorizationUrlFunction = connection -> connection
-            .getParameter(AUTHORIZATION_URL);
+        private AuthorizationUrlFunction authorizationUrl = connection -> connection.getParameter(AUTHORIZATION_URL);
 
         @JsonIgnore
-        private Function<Context.Connection, String> clientIdFunction = connection -> connection
-            .getParameter(CLIENT_ID);
+        private ClientIdFunction clientId = connection -> connection.getParameter(CLIENT_ID);
 
         @JsonIgnore
-        private Function<Context.Connection, String> clientSecretFunction = connection -> connection
-            .getParameter(CLIENT_SECRET);
+        private ClientSecretFunction clientSecret = connection -> connection.getParameter(CLIENT_SECRET);
 
         @JsonIgnore
         private List<Object> detectOn;
@@ -313,17 +347,17 @@ public final class ComponentDSL extends DefinitionDSL {
         @JsonIgnore
         private List<Object> refreshOn;
 
-        private List<Property<?>> properties;
+        private List<? extends Property<?>> properties;
 
         @JsonIgnore
-        private Function<Context.Connection, String> refreshFunction;
+        private RefreshFunction refresh;
 
         @JsonIgnore
-        private Function<Context.Connection, String> refreshUrlFunction = connection -> {
+        private RefreshUrlFunction refreshUrl = connection -> {
             String refreshUrl = connection.getParameter(REFRESH_URL);
 
             if (refreshUrl == null) {
-                Function<Context.Connection, String> tokeUrlFunction = getTokenUrlFunction();
+                TokenUrlFunction tokeUrlFunction = getTokenUrl();
 
                 refreshUrl = tokeUrlFunction.apply(connection);
             }
@@ -333,7 +367,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @JsonIgnore
         @SuppressWarnings("unchecked")
-        private Function<Context.Connection, List<String>> scopesFunction = connection -> {
+        private ScopesFunction scopes = connection -> {
             Object scopes = connection.getParameter(SCOPES);
 
             if (scopes instanceof List<?>) {
@@ -350,14 +384,12 @@ public final class ComponentDSL extends DefinitionDSL {
         };
 
         @JsonIgnore
-        private Function<Context.Connection, String> tokenUrlFunction = connection -> connection
-            .getParameter(TOKEN_URL);
+        private TokenUrlFunction tokenUrl = connection -> connection.getParameter(TOKEN_URL);
 
         private String name;
 
         @JsonIgnore
-        private BiFunction<String, String, Pkce> pkceFunction = (verifier, challenge) -> new Pkce(verifier, challenge,
-            "SHA256");
+        private PkceFunction pkce = (verifier, challenge) -> new Pkce(verifier, challenge, "SHA256");
         private AuthorizationType type;
 
         private ModifiableAuthorization() {
@@ -366,51 +398,50 @@ public final class ComponentDSL extends DefinitionDSL {
         private ModifiableAuthorization(String name, AuthorizationType type) {
             this.name = Objects.requireNonNull(name);
             this.type = Objects.requireNonNull(type);
-            this.applyConsumer = type.getDefaultApplyConsumer();
+            this.apply = type.getDefaultApply();
         }
 
-        public ModifiableAuthorization acquire(Function<Context.Connection, String> acquireFunction) {
-            if (acquireFunction != null) {
-                this.acquireFunction = Optional.of(acquireFunction);
+        public ModifiableAuthorization acquire(AcquireFunction acquire) {
+            if (acquire != null) {
+                this.acquire = Optional.of(acquire);
             }
 
             return this;
         }
 
-        public ModifiableAuthorization apply(BiConsumer<AuthorizationContext, Context.Connection> applyConsumer) {
-            if (applyConsumer != null) {
-                this.applyConsumer = applyConsumer;
+        public ModifiableAuthorization apply(ApplyConsumer apply) {
+            if (apply != null) {
+                this.apply = apply;
             }
 
             return this;
         }
 
-        public ModifiableAuthorization authorizationCallback(
-            QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> authorizationCallbackFunction) {
-            this.authorizationCallbackFunction = authorizationCallbackFunction;
+        public ModifiableAuthorization authorizationCallback(AuthorizationCallbackFunction authorizationCallback) {
+            this.authorizationCallback = authorizationCallback;
 
             return this;
         }
 
-        public ModifiableAuthorization authorizationUrl(Function<Context.Connection, String> authorizationUrlFunction) {
-            if (authorizationUrlFunction != null) {
-                this.authorizationUrlFunction = authorizationUrlFunction;
+        public ModifiableAuthorization authorizationUrl(AuthorizationUrlFunction authorizationUrl) {
+            if (authorizationUrl != null) {
+                this.authorizationUrl = authorizationUrl;
             }
 
             return this;
         }
 
-        public ModifiableAuthorization clientId(Function<Context.Connection, String> clientIdFunction) {
-            if (clientIdFunction != null) {
-                this.clientIdFunction = clientIdFunction;
+        public ModifiableAuthorization clientId(ClientIdFunction clientId) {
+            if (clientId != null) {
+                this.clientId = clientId;
             }
 
             return this;
         }
 
-        public ModifiableAuthorization clientSecret(Function<Context.Connection, String> clientSecretFunction) {
-            if (clientSecretFunction != null) {
-                this.clientSecretFunction = clientSecretFunction;
+        public ModifiableAuthorization clientSecret(ClientSecretFunction clientSecret) {
+            if (clientSecret != null) {
+                this.clientSecret = clientSecret;
             }
 
             return this;
@@ -438,9 +469,9 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableAuthorization pkce(BiFunction<String, String, Pkce> pkceFunction) {
-            if (pkceFunction != null) {
-                this.pkceFunction = pkceFunction;
+        public ModifiableAuthorization pkce(PkceFunction pkce) {
+            if (pkce != null) {
+                this.pkce = pkce;
             }
 
             return this;
@@ -454,64 +485,64 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableAuthorization refresh(Function<Context.Connection, String> refreshFunction) {
-            this.refreshFunction = refreshFunction;
+        public ModifiableAuthorization refresh(RefreshFunction refresh) {
+            this.refresh = refresh;
 
             return this;
         }
 
-        public ModifiableAuthorization refreshUrl(Function<Context.Connection, String> refreshUrlFunction) {
-            if (refreshUrlFunction != null) {
-                this.refreshUrlFunction = refreshUrlFunction;
+        public ModifiableAuthorization refreshUrl(RefreshUrlFunction refreshUrl) {
+            if (refreshUrl != null) {
+                this.refreshUrl = refreshUrl;
             }
 
             return this;
         }
 
-        public ModifiableAuthorization scopes(Function<Context.Connection, List<String>> scopesFunction) {
-            if (scopesFunction != null) {
-                this.scopesFunction = scopesFunction;
+        public ModifiableAuthorization scopes(ScopesFunction scopes) {
+            if (scopes != null) {
+                this.scopes = scopes;
             }
 
             return this;
         }
 
-        public ModifiableAuthorization tokenUrl(Function<Context.Connection, String> tokenUrlFunction) {
-            if (tokenUrlFunction != null) {
-                this.tokenUrlFunction = tokenUrlFunction;
+        public ModifiableAuthorization tokenUrl(TokenUrlFunction tokenUrl) {
+            if (tokenUrl != null) {
+                this.tokenUrl = tokenUrl;
             }
 
             return this;
         }
 
         @Override
-        public Optional<Function<Context.Connection, String>> getAcquireFunction() {
-            return acquireFunction;
+        public Optional<AcquireFunction> getAcquire() {
+            return acquire;
         }
 
         @Override
-        public BiConsumer<AuthorizationContext, Context.Connection> getApplyConsumer() {
-            return applyConsumer;
+        public ApplyConsumer getApply() {
+            return apply;
         }
 
         @Override
-        public QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction() {
-            return authorizationCallbackFunction;
+        public AuthorizationCallbackFunction getAuthorizationCallback() {
+            return authorizationCallback;
         }
 
         @Override
-        public Function<Context.Connection, String> getAuthorizationUrlFunction() {
-            return authorizationUrlFunction;
+        public AuthorizationUrlFunction getAuthorizationUrl() {
+            return authorizationUrl;
         }
 
         @Override
-        public Function<Context.Connection, String> getClientIdFunction() {
-            return clientIdFunction;
+        public ClientIdFunction getClientId() {
+            return clientId;
         }
 
         @Override
-        public Function<Context.Connection, String> getClientSecretFunction() {
-            return clientSecretFunction;
+        public ClientSecretFunction getClientSecret() {
+            return clientSecret;
         }
 
         @Override
@@ -535,33 +566,33 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public BiFunction<String, String, Pkce> getPkceFunction() {
-            return pkceFunction;
+        public PkceFunction getPkce() {
+            return pkce;
         }
 
         @Override
-        public List<Property<?>> getProperties() {
+        public List<? extends Property<?>> getProperties() {
             return properties;
         }
 
         @Override
-        public Optional<Function<Context.Connection, String>> getRefreshFunction() {
-            return Optional.ofNullable(refreshFunction);
+        public Optional<RefreshFunction> getRefresh() {
+            return Optional.ofNullable(refresh);
         }
 
         @Override
-        public Function<Context.Connection, String> getRefreshUrlFunction() {
-            return refreshUrlFunction;
+        public RefreshUrlFunction getRefreshUrl() {
+            return refreshUrl;
         }
 
         @Override
-        public Function<Context.Connection, List<String>> getScopesFunction() {
-            return scopesFunction;
+        public ScopesFunction getScopes() {
+            return scopes;
         }
 
         @Override
-        public Function<Context.Connection, String> getTokenUrlFunction() {
-            return tokenUrlFunction;
+        public TokenUrlFunction getTokenUrl() {
+            return tokenUrl;
         }
 
         @Override
@@ -577,12 +608,13 @@ public final class ComponentDSL extends DefinitionDSL {
         private Display display;
 
         @JsonIgnore
-        private BiFunction<ComponentDefinition, List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction;
+        private FilterCompatibleConnectionDefinitionsFunction filterCompatibleConnectionDefinitions;
 
         private Map<String, Object> metadata;
         private String name;
         private Resources resources;
         private int version = Version.VERSION_1;
+        private List<? extends TriggerDefinition> triggers;
 
         private ModifiableComponentDefinition() {
         }
@@ -593,7 +625,9 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition actions(ActionDefinition... actionDefinitions) {
             if (actionDefinitions != null) {
-                this.actions = List.of(actionDefinitions);
+                this.actions = Stream.of(actionDefinitions)
+                    .map(actionDefinition -> ((ModifiableActionDefinition) actionDefinition).componentName(this.name))
+                    .toList();
             }
 
             return this;
@@ -601,7 +635,9 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition actions(ModifiableActionDefinition... actionDefinitions) {
             if (actionDefinitions != null) {
-                this.actions = List.of(actionDefinitions);
+                this.actions = Stream.of(actionDefinitions)
+                    .map(actionDefinition -> actionDefinition.componentName(this.name))
+                    .toList();
             }
 
             return this;
@@ -609,15 +645,18 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
             this.connection = ((ModifiableConnectionDefinition) connectionDefinition)
-                .componentDisplay(this.display)
-                .componentName(this.name);
+                .componentName(this.name)
+                .display(this.display)
+                .name(this.name);
 
             return this;
         }
 
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
-            this.connection = connectionDefinition.componentDisplay(this.display)
-                .componentName(this.name);
+            this.connection = connectionDefinition
+                .componentName(this.name)
+                .display(this.display)
+                .name(this.name);
 
             return this;
         }
@@ -628,10 +667,10 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition filterCompatibleConnectionDefinitionsFunction(
-            BiFunction<ComponentDefinition, List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction) {
+        public ModifiableComponentDefinition filterCompatibleConnectionDefinitions(
+            FilterCompatibleConnectionDefinitionsFunction filterCompatibleConnectionDefinitions) {
 
-            this.filterCompatibleConnectionDefinitionsFunction = filterCompatibleConnectionDefinitionsFunction;
+            this.filterCompatibleConnectionDefinitions = filterCompatibleConnectionDefinitions;
 
             return this;
         }
@@ -659,6 +698,28 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition triggers(TriggerDefinition... triggerDefinitions) {
+            if (triggerDefinitions != null) {
+                this.triggers = Stream.of(triggerDefinitions)
+                    .map(
+                        triggerDefinition -> ((ModifiableTriggerDefinition) triggerDefinition)
+                            .componentName(this.name))
+                    .toList();
+            }
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition triggers(ModifiableTriggerDefinition... triggerDefinitions) {
+            if (triggerDefinitions != null) {
+                this.triggers = Stream.of(triggerDefinitions)
+                    .map(triggerDefinition -> triggerDefinition.componentName(this.name))
+                    .toList();
+            }
+
+            return this;
+        }
+
         public ModifiableComponentDefinition version(int version) {
             this.version = version;
 
@@ -666,13 +727,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitionsFunction(
+        public List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitions(
             ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
 
             List<ConnectionDefinition> filteredConnectionDefinitions = Collections.emptyList();
 
-            if (filterCompatibleConnectionDefinitionsFunction != null) {
-                filteredConnectionDefinitions = filterCompatibleConnectionDefinitionsFunction.apply(
+            if (filterCompatibleConnectionDefinitions != null) {
+                filteredConnectionDefinitions = filterCompatibleConnectionDefinitions.apply(
                     componentDefinition, connectionDefinitions);
             }
 
@@ -700,8 +761,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public BiFunction<ComponentDefinition, List<ConnectionDefinition>, List<ConnectionDefinition>> getFilterCompatibleConnectionDefinitionsFunction() {
-            return filterCompatibleConnectionDefinitionsFunction;
+        public FilterCompatibleConnectionDefinitionsFunction getFilterCompatibleConnectionDefinitions() {
+            return filterCompatibleConnectionDefinitions;
         }
 
         @SuppressWarnings("unchecked")
@@ -737,6 +798,11 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public List<? extends TriggerDefinition> getTriggers() {
+            return triggers;
+        }
+
+        @Override
         public int getVersion() {
             return version;
         }
@@ -746,52 +812,39 @@ public final class ComponentDSL extends DefinitionDSL {
         implements ComponentOptionsDataSource {
 
         @JsonIgnore
-        private BiFunction<Context.Connection, Parameters, List<Option>> optionsFunction;
+        private OptionsFunction options;
 
         private ModifiableComponentOptionsDataSource(
-            BiFunction<Context.Connection, Parameters, List<Option>> optionsFunction,
-            List<String> loadOptionsDependOnPropertyNames) {
+            OptionsFunction options, List<String> loadOptionsDependOnPropertyNames) {
 
             super(loadOptionsDependOnPropertyNames);
 
-            this.optionsFunction = optionsFunction;
+            this.options = options;
         }
 
         @Override
-        public BiFunction<Context.Connection, Parameters, List<Option>> getOptionsFunction() {
-            return optionsFunction;
+        public OptionsFunction getOptions() {
+            return options;
         }
     }
 
-    public static final class ModifiableOutputSchemaDataSource implements OutputSchemaDataSource {
+    public static final class ModifiableComponentPropertiesDataSource
+        extends DefinitionDSL.ModifiablePropertiesDataSource implements ComponentPropertiesDataSource {
 
-        private final BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction;
+        @JsonIgnore
+        private PropertiesFunction properties;
 
-        public ModifiableOutputSchemaDataSource(
-            BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction) {
+        private ModifiableComponentPropertiesDataSource(
+            PropertiesFunction properties, List<String> loadPropertiesDependOnPropertyNames) {
 
-            this.outputSchemaFunction = outputSchemaFunction;
+            super(loadPropertiesDependOnPropertyNames);
+
+            this.properties = properties;
         }
 
         @Override
-        public BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> getOutputSchemaFunction() {
-            return outputSchemaFunction;
-        }
-    }
-
-    public static final class ModifiableExampleOutputDataSource implements ExampleOutputDataSource {
-
-        private final BiFunction<Context.Connection, Parameters, Object> exampleOutputFunction;
-
-        public ModifiableExampleOutputDataSource(
-            BiFunction<Context.Connection, Parameters, Object> exampleOutputFunction) {
-
-            this.exampleOutputFunction = exampleOutputFunction;
-        }
-
-        @Override
-        public BiFunction<Context.Connection, Parameters, Object> getExampleOutputFunction() {
-            return exampleOutputFunction;
+        public PropertiesFunction getProperties() {
+            return properties;
         }
     }
 
@@ -801,17 +854,18 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<? extends Authorization> authorizations;
 
         @JsonIgnore
-        private Function<Context.Connection, String> baseUriFunction = (
-            connection) -> connection.containsParameter(BASE_URI) ? connection.getParameter(BASE_URI) : null;
-
-        private Display componentDisplay;
+        private BaseUriFunction baseUri = (connection) -> connection.containsParameter(BASE_URI)
+            ? connection.getParameter(BASE_URI)
+            : null;
         private String componentName;
-        private int connectionVersion = 1;
+        private Display display;
+        private String name;
         private List<? extends Property<?>> properties;
         private Resources resources;
 
         @JsonIgnore
-        private Consumer<Context.Connection> testConsumer;
+        private TestConsumer test;
+        private int version = 1;
 
         private ModifiableConnectionDefinition() {
         }
@@ -830,16 +884,16 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableConnectionDefinition baseUri(Function<Context.Connection, String> baseUriFunction) {
-            if (baseUriFunction != null) {
-                this.baseUriFunction = baseUriFunction;
+        public ModifiableConnectionDefinition baseUri(BaseUriFunction baseUri) {
+            if (baseUri != null) {
+                this.baseUri = baseUri;
             }
 
             return this;
         }
 
-        public ModifiableConnectionDefinition connectionVersion(int connectionVersion) {
-            this.connectionVersion = connectionVersion;
+        public ModifiableConnectionDefinition version(int version) {
+            this.version = version;
 
             return this;
         }
@@ -858,8 +912,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableConnectionDefinition testConsumer(Consumer<Context.Connection> testConsumer) {
-            this.testConsumer = testConsumer;
+        public ModifiableConnectionDefinition test(TestConsumer test) {
+            this.test = test;
 
             return this;
         }
@@ -881,7 +935,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
             ModifiableConnectionDefinition that = (ModifiableConnectionDefinition) o;
 
-            return componentName.equals(that.componentName) && connectionVersion == that.connectionVersion;
+            return componentName.equals(that.componentName) && version == that.version;
         }
 
         @Override
@@ -891,7 +945,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public int hashCode() {
-            return Objects.hash(componentName, connectionVersion);
+            return Objects.hash(componentName, version);
         }
 
         @Override
@@ -913,23 +967,29 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Function<Context.Connection, String> getBaseUriFunction() {
-            return baseUriFunction;
+        public BaseUriFunction getBaseUri() {
+            return baseUri;
         }
 
         @Override
-        public Display getComponentDisplay() {
-            return componentDisplay;
-        }
-
-        @Override
+        @JsonIgnore
         public String getComponentName() {
             return componentName;
         }
 
         @Override
-        public int getConnectionVersion() {
-            return connectionVersion;
+        public Display getDisplay() {
+            return display;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public int getVersion() {
+            return version;
         }
 
         @Override
@@ -943,14 +1003,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<Consumer<Context.Connection>> getTestConsumer() {
-            return Optional.ofNullable(testConsumer);
-        }
-
-        private ModifiableConnectionDefinition componentDisplay(Display componentDisplay) {
-            this.componentDisplay = componentDisplay;
-
-            return this;
+        public Optional<TestConsumer> getTest() {
+            return Optional.ofNullable(test);
         }
 
         private ModifiableConnectionDefinition componentName(String componentName) {
@@ -958,26 +1012,31 @@ public final class ComponentDSL extends DefinitionDSL {
 
             return this;
         }
+
+        private ModifiableConnectionDefinition display(Display display) {
+            this.display = display;
+
+            return this;
+        }
+
+        private ModifiableConnectionDefinition name(String name) {
+            this.name = name;
+
+            return this;
+        }
     }
 
-    public static final class ModifiableComponentPropertiesDataSource
-        extends DefinitionDSL.ModifiablePropertiesDataSource implements ComponentPropertiesDataSource {
+    public static final class ModifiableExampleOutputDataSource implements ExampleOutputDataSource {
 
-        @JsonIgnore
-        private BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> propertiesFunction;
+        private final ExampleOutputFunction exampleOutput;
 
-        private ModifiableComponentPropertiesDataSource(
-            BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> propertiesFunction,
-            List<String> loadPropertiesDependOnPropertyNames) {
-
-            super(loadPropertiesDependOnPropertyNames);
-
-            this.propertiesFunction = propertiesFunction;
+        public ModifiableExampleOutputDataSource(ExampleOutputFunction exampleOutput) {
+            this.exampleOutput = exampleOutput;
         }
 
         @Override
-        public BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> getPropertiesFunction() {
-            return propertiesFunction;
+        public ExampleOutputFunction getExampleOutput() {
+            return exampleOutput;
         }
     }
 
@@ -1057,24 +1116,167 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableOutputSchemaDataSource implements OutputSchemaDataSource {
 
-        private final BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction;
+        private final OutputSchemaFunction outputSchema;
 
-        public ModifiableOutputSchemaDataSource(
-            BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> outputSchemaFunction) {
-
-            this.outputSchemaFunction = outputSchemaFunction;
+        public ModifiableOutputSchemaDataSource(OutputSchemaFunction outputSchema) {
+            this.outputSchema = outputSchema;
         }
 
         @Override
-        public BiFunction<Context.Connection, Parameters, List<? extends Property<?>>> getOutputSchemaFunction() {
-            return outputSchemaFunction;
+        public OutputSchemaFunction getOutputSchema() {
+            return outputSchema;
         }
     }
 
     public static class ModifiableTriggerDefinition implements TriggerDefinition {
 
-        private ComponentDefinition componentDefinition;
+        private String componentName;
         private Display display;
+        private Object exampleOutput;
+        private ExampleOutputDataSource exampleOutputDataSource;
+        private String name;
+        private List<? extends Property<?>> outputSchema;
+        private OutputSchemaDataSource outputSchemaDataSource;
+        private List<? extends Property<?>> properties;
+        private Resources resources;
+        private TriggerType type;
+        private ManualEnableConsumer manualEnable;
+        private ManualDisableConsumer manualDisable;
+        private PollDisableConsumer pollDisable;
+        private PollEnableConsumer pollEnable;
+        private PollFunction poll;
+        private WebhookDisableConsumer webhookDisable;
+        private WebhookEnableFunction webhookEnable;
+        private WebhookRefreshFunction webhookRefresh;
+        private WebhookRequestFunction webhookRequest;
+
+        public ModifiableTriggerDefinition display(Display display) {
+            this.display = display;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition exampleOutput(Object exampleOutput) {
+            this.exampleOutput = exampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
+            this.exampleOutputDataSource = exampleOutputDataSource;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition name(String name) {
+            this.name = name;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition outputSchema(List<? extends Property<?>> outputSchema) {
+            this.outputSchema = outputSchema;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition outputSchemaDataSource(OutputSchemaDataSource outputSchemaDataSource) {
+            this.outputSchemaDataSource = outputSchemaDataSource;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition properties() {
+            this.properties = properties;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition resources(Resources resources) {
+            this.resources = resources;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition type(TriggerType type) {
+            this.type = type;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition manualEnable(ManualEnableConsumer manualEnable) {
+            this.manualEnable = manualEnable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition manualDisable(ManualDisableConsumer manualDisable) {
+            this.manualDisable = manualDisable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition pollDisable(PollDisableConsumer pollDisable) {
+            this.pollDisable = pollDisable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition pollEnable(PollEnableConsumer pollEnable) {
+            this.pollEnable = pollEnable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition poll(PollFunction poll) {
+            this.poll = poll;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition webhookDisable(WebhookDisableConsumer webhookDisable) {
+            this.webhookDisable = webhookDisable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition webhookEnable(WebhookEnableFunction webhookEnable) {
+            this.webhookEnable = webhookEnable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition webhookRefresh(WebhookRefreshFunction webhookRefresh) {
+            this.webhookRefresh = webhookRefresh;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition webhookRequest(WebhookRequestFunction webhookRequest) {
+            this.webhookRequest = webhookRequest;
+
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            ModifiableTriggerDefinition that = (ModifiableTriggerDefinition) o;
+
+            return name.equals(that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
+        }
 
         @Override
         public Boolean getBatch() {
@@ -1083,8 +1285,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         @JsonIgnore
-        public ComponentDefinition getComponent() {
-            return componentDefinition;
+        public String getComponentName() {
+            return componentName;
         }
 
         @Override
@@ -1094,32 +1296,93 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public Object getExampleOutput() {
-            return null;
+            return exampleOutput;
         }
 
         @Override
         public ExampleOutputDataSource getExampleOutputDataSource() {
-            return null;
+            return exampleOutputDataSource;
         }
 
         @Override
         public String getName() {
-            return null;
+            return name;
         }
 
         @Override
-        public List<Property<? extends Property<?>>> getOutputSchema() {
-            return null;
+        public List<? extends Property<?>> getOutputSchema() {
+            return outputSchema;
         }
 
         @Override
         public OutputSchemaDataSource getOutputSchemaDataSource() {
-            return null;
+            return outputSchemaDataSource;
         }
 
         @Override
-        public List<Property<?>> getProperties() {
-            return null;
+        public List<? extends Property<?>> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public Resources getResources() {
+            return resources;
+        }
+
+        @Override
+        public TriggerType getType() {
+            return type;
+        }
+
+        @Override
+        public Optional<ManualEnableConsumer> getManualEnable() {
+            return Optional.ofNullable(manualEnable);
+        }
+
+        @Override
+        public Optional<ManualDisableConsumer> getManualDisable() {
+            return Optional.ofNullable(manualDisable);
+        }
+
+        @Override
+        public Optional<PollDisableConsumer> getPollDisable() {
+            return Optional.ofNullable(pollDisable);
+        }
+
+        @Override
+        public Optional<PollEnableConsumer> getPollEnable() {
+            return Optional.ofNullable(pollEnable);
+        }
+
+        @Override
+        public Optional<PollFunction> getPoll() {
+            return Optional.ofNullable(poll);
+        }
+
+        @Override
+        public Optional<WebhookDisableConsumer> getWebhookDisable() {
+            return Optional.ofNullable(webhookDisable);
+        }
+
+        @Override
+        public Optional<WebhookEnableFunction> getWebhookEnable() {
+            return Optional.ofNullable(webhookEnable);
+        }
+
+        @Override
+        public Optional<WebhookRefreshFunction> getWebhookRefresh() {
+            return Optional.ofNullable(webhookRefresh);
+        }
+
+        @Override
+        public Optional<WebhookRequestFunction> getWebhookRequest() {
+            return Optional.ofNullable(webhookRequest);
+        }
+
+        private ModifiableTriggerDefinition componentName(String componentName) {
+            this.componentName = componentName;
+
+            return this;
         }
     }
 }

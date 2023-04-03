@@ -50,12 +50,12 @@ public class ScriptComponentHandlerIntTest {
 
     @Disabled
     @Test
-    public void testPerformJava() {
+    public void testExecuteJava() {
         // TODO
     }
 
     @Test
-    public void testPerformJavaScript() {
+    public void testExecuteJavaScript() {
         Job job = componentWorkflowTestSupport.execute(
             ENCODER.encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
@@ -68,7 +68,7 @@ public class ScriptComponentHandlerIntTest {
     }
 
     @Test
-    public void testPerformPython() {
+    public void testExecutePython() {
         Job job = componentWorkflowTestSupport.execute(
             ENCODER.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
@@ -81,7 +81,7 @@ public class ScriptComponentHandlerIntTest {
     }
 
     @Test
-    public void testPerformR() {
+    public void testExecuteR() {
         Job job = componentWorkflowTestSupport.execute(
             ENCODER.encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
@@ -94,7 +94,7 @@ public class ScriptComponentHandlerIntTest {
     }
 
     @Test
-    public void testPerformRuby() {
+    public void testExecuteRuby() {
         Job job = componentWorkflowTestSupport.execute(
             ENCODER.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3), Map.of("var/v1/set", taskHandler));

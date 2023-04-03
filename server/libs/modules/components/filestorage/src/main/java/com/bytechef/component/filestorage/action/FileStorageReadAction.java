@@ -18,7 +18,7 @@
 package com.bytechef.component.filestorage.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_ENTRY;
@@ -41,9 +41,9 @@ public class FileStorageReadAction {
                 "The object property which contains a reference to the file to read from.")
             .required(true))
         .outputSchema(string())
-        .perform(FileStorageReadAction::performRead);
+        .execute(FileStorageReadAction::executeRead);
 
-    public static String performRead(Context context, Parameters parameters) {
-        return context.readFileToString(parameters.get(FILE_ENTRY, Context.FileEntry.class));
+    public static String executeRead(Context context, InputParameters inputParameters) {
+        return context.readFileToString(inputParameters.get(FILE_ENTRY, Context.FileEntry.class));
     }
 }

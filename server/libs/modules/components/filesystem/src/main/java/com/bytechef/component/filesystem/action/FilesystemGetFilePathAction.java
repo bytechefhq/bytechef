@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import java.io.File;
@@ -44,7 +44,7 @@ public class FilesystemGetFilePathAction {
             .description("The path to full filename.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .perform(FilesystemGetFilePathAction::performGetFilePath)
+        .execute(FilesystemGetFilePathAction::executeGetFilePath)
         .outputSchema(string())
         .exampleOutput("/data");
 
@@ -56,8 +56,8 @@ public class FilesystemGetFilePathAction {
      * This method will handle a file in either Unix or Windows format. The method is entirely text based and returns
      * the text before the last forward or backslash.
      */
-    public static String performGetFilePath(Context context, Parameters parameters) {
-        String filename = parameters.getRequiredString("filename");
+    public static String executeGetFilePath(Context context, InputParameters inputParameters) {
+        String filename = inputParameters.getRequiredString("filename");
 
         return filename.substring(0, filename.lastIndexOf(File.separator));
     }

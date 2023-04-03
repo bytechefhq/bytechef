@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.component.filestorage.action.FileStorageReadAction;
 import com.bytechef.component.filestorage.action.FileStorageWriteAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -49,15 +49,15 @@ public class FileStorageComponentHandlerTest {
     }
 
     @Test
-    public void testPerformRead() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    public void testExecuteRead() {
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
         Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+        Mockito.when(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))
             .thenReturn(fileEntry);
 
-        FileStorageReadAction.performRead(context, parameters);
+        FileStorageReadAction.executeRead(context, inputParameters);
 
         ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(Context.FileEntry.class);
 
@@ -69,22 +69,22 @@ public class FileStorageComponentHandlerTest {
 
     @Disabled
     @Test
-    public void testPerformDownload() {
+    public void testExecuteDownload() {
         // TODO
     }
 
     @Test
-    public void testPerformWrite() {
+    public void testExecuteWrite() {
         File file = getFile();
 
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getRequired(CONTENT))
+        Mockito.when(inputParameters.getRequired(CONTENT))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(parameters.getString(FILENAME, "file.txt"))
+        Mockito.when(inputParameters.getString(FILENAME, "file.txt"))
             .thenReturn("file.txt");
 
-        FileStorageWriteAction.performWrite(context, parameters);
+        FileStorageWriteAction.executeWrite(context, inputParameters);
 
         ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -95,16 +95,16 @@ public class FileStorageComponentHandlerTest {
         assertThat(contentArgumentCaptor.getValue()).isEqualTo(Files.contentOf(file, StandardCharsets.UTF_8));
         assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
 
-        parameters = Mockito.mock(Parameters.class);
+        inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getRequired(CONTENT))
+        Mockito.when(inputParameters.getRequired(CONTENT))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(parameters.getString(FILENAME, "file.txt"))
+        Mockito.when(inputParameters.getString(FILENAME, "file.txt"))
             .thenReturn("test.txt");
 
         Mockito.reset(context);
 
-        FileStorageWriteAction.performWrite(context, parameters);
+        FileStorageWriteAction.executeWrite(context, inputParameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
