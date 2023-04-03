@@ -22,6 +22,7 @@ import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionWithBasicActionsModel;
@@ -65,7 +66,17 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<ActionDefinitionModel>> getActionDefinition(
+    public Mono<ResponseEntity<ComponentDefinitionWithBasicActionsModel>> getComponentDefinition(
+        String componentName, Integer componentVersion, ServerWebExchange exchange) {
+
+        return componentDefinitionService.getComponentDefinitionMono(componentName, componentVersion)
+            .mapNotNull(componentDefinition -> conversionService.convert(
+                componentDefinition, ComponentDefinitionWithBasicActionsModel.class))
+            .map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Mono<ResponseEntity<ActionDefinitionModel>> getComponentActionDefinition(
         String componentName, Integer componentVersion, String actionName, ServerWebExchange exchange) {
 
         return actionDefinitionService.getComponentDefinitionActionMono(componentName, componentVersion, actionName)
@@ -74,12 +85,16 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<ComponentDefinitionWithBasicActionsModel>> getComponentDefinition(
+    public Mono<ResponseEntity<Flux<ActionDefinitionBasicModel>>> getComponentActionDefinitions(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
-        return componentDefinitionService.getComponentDefinitionMono(componentName, componentVersion)
-            .mapNotNull(componentDefinition -> conversionService.convert(
-                componentDefinition, ComponentDefinitionWithBasicActionsModel.class))
+        return Mono.just(
+                connectionDefinitionService.getComponentConnectionDefinitionsMono(componentName, componentVersion)
+                    .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
+                        .map(connectionDefinition -> conversionService.convert(
+                            connectionDefinition, ActionDefinitionBasicModel.class))
+                        .toList())
+                    .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }
 
