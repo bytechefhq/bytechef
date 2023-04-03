@@ -385,13 +385,13 @@ public class HttpClientUtilsTest {
         Mockito.doAnswer(invocation -> {
             Authorization.AuthorizationContext authorizationContext = invocation.getArgument(0);
 
-            authorization.getApplyConsumer()
+            authorization.getApply()
                 .accept(authorizationContext, connection);
 
             return null;
         })
-            .when(context)
-            .applyConnectionAuthorization(Mockito.any());
+            .when(connection)
+            .applyAuthorization(Mockito.any());
     }
 
     private static class TestHttpResponse implements HttpResponse<Object> {
@@ -456,8 +456,18 @@ public class HttpClientUtilsTest {
         }
 
         @Override
+        public void applyAuthorization(Authorization.AuthorizationContext authorizationContext) {
+
+        }
+
+        @Override
         public boolean containsParameter(String name) {
             return parameters.containsKey(name);
+        }
+
+        @Override
+        public Optional<String> fetchBaseUri() {
+            return Optional.empty();
         }
 
         @Override

@@ -17,9 +17,12 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -32,6 +35,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnExpression("'${spring.application.name}'=='platform-service-app'")
 public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatcherDefinitionService {
 
     private final RSocketRequester rSocketRequester;
@@ -47,14 +51,18 @@ public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatc
         return rSocketRequester
             .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinition")
             .data(Map.of("name", name, "version", version))
-            .retrieveMono(TaskDispatcherDefinition.class);
+            .retrieveMono(TaskDispatcherDSL.ModifiableTaskDispatcherDefinition.class)
+            .map(taskDispatcherDefinition -> taskDispatcherDefinition);
     }
 
     @Override
     public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono() {
         return rSocketRequester
             .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+            .retrieveMono(
+                new ParameterizedTypeReference<List<TaskDispatcherDSL.ModifiableTaskDispatcherDefinition>>() {})
+            .map(taskDispatcherDefinitions -> CollectionUtils.map(
+                taskDispatcherDefinitions, taskDispatcherDefinition -> taskDispatcherDefinition));
     }
 
     @Override
@@ -62,6 +70,9 @@ public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatc
         return rSocketRequester
             .route("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
             .data(name)
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+            .retrieveMono(
+                new ParameterizedTypeReference<List<TaskDispatcherDSL.ModifiableTaskDispatcherDefinition>>() {})
+            .map(taskDispatcherDefinitions -> CollectionUtils.map(
+                taskDispatcherDefinitions, taskDispatcherDefinition -> taskDispatcherDefinition));
     }
 }

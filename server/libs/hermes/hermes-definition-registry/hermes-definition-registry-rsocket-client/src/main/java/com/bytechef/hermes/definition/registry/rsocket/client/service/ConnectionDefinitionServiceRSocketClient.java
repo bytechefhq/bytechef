@@ -97,19 +97,17 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion) {
+    public Authorization.AuthorizationType getAuthorizationType(
+        String authorizationName, String componentName, int connectionVersion) {
         return MonoUtils.get(
             rSocketRequesterBuilder
                 .websocket(getWebsocketUri(componentName))
-                .route("ConnectionDefinitionService.getAuthorization")
+                .route("ConnectionDefinitionService.getAuthorizationType")
                 .data(
                     Map.of(
                         "authorizationName", authorizationName,
                         "componentName", componentName,
                         "connectionVersion", connectionVersion))
-                .retrieveMono(ComponentDSL.ModifiableAuthorization.class));
-    }
-
     @Override
     public ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion) {
         return MonoUtils.get(getComponentConnectionDefinitionMono(componentName, componentVersion));

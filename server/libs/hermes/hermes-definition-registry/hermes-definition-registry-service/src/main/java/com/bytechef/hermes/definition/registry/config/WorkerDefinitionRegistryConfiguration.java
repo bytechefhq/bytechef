@@ -23,10 +23,10 @@ import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.LocalConnectionDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,7 +58,7 @@ public class WorkerDefinitionRegistryConfiguration {
     }
 
     @Bean
-    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
+    LocalConnectionDefinitionService localConnectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
         return new ConnectionDefinitionServiceImpl(componentDefinitions);
     }
 }

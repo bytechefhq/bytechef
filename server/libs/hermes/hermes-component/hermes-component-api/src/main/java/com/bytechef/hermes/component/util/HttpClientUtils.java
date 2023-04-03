@@ -233,7 +233,7 @@ public final class HttpClientUtils {
             }
         }
 
-        acceptAuthorizationApplyConsumer(context, headers, queryParameters);
+        applyAuthorization(context, headers, queryParameters);
 
         if (configuration.isFollowRedirect()) {
             builder.followRedirects(java.net.http.HttpClient.Redirect.NORMAL);
@@ -260,7 +260,8 @@ public final class HttpClientUtils {
         Context context, String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
         Map<String, List<String>> queryParameters, Payload payload) {
 
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
+        HttpRequest.Builder httpRequestBuilder = HttpRequest
+            .newBuilder()
             .method(requestMethod.name(), createBodyPublisher(context, payload));
 
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
@@ -335,14 +336,17 @@ public final class HttpClientUtils {
                 MediaType.parse(fileEntry.getMimeType())));
     }
 
-    private static void acceptAuthorizationApplyConsumer(
+    private static void applyAuthorization(
         Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters) {
 
         if (context == null) {
             return;
         }
 
-        context.applyConnectionAuthorization(new AuthorizationContextImpl(headers, queryParameters));
+        context
+            .fetchConnection()
+            .ifPresent(
+                connection -> connection.applyAuthorization(new AuthorizationContextImpl(headers, queryParameters)));
     }
 
     private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
@@ -369,7 +373,8 @@ public final class HttpClientUtils {
             return uriString;
         }
 
-        return context.fetchConnectionBaseUri()
+        return context.fetchConnection()
+            .map(Context.Connection::fetchBaseUri)
             .map(baseUri -> baseUri + uriString)
             .orElse(uriString);
     }
