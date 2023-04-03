@@ -17,11 +17,18 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -29,9 +36,17 @@ import java.util.List;
 @JsonDeserialize(as = ComponentDSL.ModifiableTriggerDefinition.class)
 public interface TriggerDefinition {
 
+    enum TriggerType {
+        DYNAMIC_WEBHOOK,
+        HYBRID,
+        MANUAL,
+        POLLING,
+        STATIC_WEBHOOK
+    }
+
     Boolean getBatch();
 
-    ComponentDefinition getComponent();
+    String getComponentName();
 
     Display getDisplay();
 
@@ -41,9 +56,235 @@ public interface TriggerDefinition {
 
     String getName();
 
-    List<Property<? extends Property<?>>> getOutputSchema();
+    List<? extends Property<?>> getOutputSchema();
 
     OutputSchemaDataSource getOutputSchemaDataSource();
 
-    List<Property<?>> getProperties();
+    List<? extends Property<?>> getProperties();
+
+    Resources getResources();
+
+    TriggerType getType();
+
+    Optional<ManualEnableConsumer> getManualEnable();
+
+    Optional<ManualDisableConsumer> getManualDisable();
+
+    Optional<PollDisableConsumer> getPollDisable();
+
+    Optional<PollEnableConsumer> getPollEnable();
+
+    Optional<PollFunction> getPoll();
+
+    Optional<WebhookDisableConsumer> getWebhookDisable();
+
+    Optional<WebhookEnableFunction> getWebhookEnable();
+
+    Optional<WebhookRefreshFunction> getWebhookRefresh();
+
+    Optional<WebhookRequestFunction> getWebhookRequest();
+
+    /**
+     *
+     */
+    interface Emitter {
+
+        /**
+         *
+         * @param parameters
+         */
+        void emit(Map<String, Object> parameters);
+    }
+
+    /**
+     *
+     */
+    interface WebhookHeaderParameters {
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        String getValue(String name);
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        String[] getValues(String name);
+    }
+
+    /**
+     *
+     */
+    interface WebhookPayload {
+
+        /**
+         *
+         * @return
+         */
+        Object getValue();
+    }
+
+    /**
+     *
+     */
+    interface WebhookQueryParameters {
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        String getValue(String name);
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        String[] getValues(String name);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ManualEnableConsumer {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         * @param emitter
+         */
+        void accept(Connection connection, InputParameters inputParameters, Emitter emitter);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ManualDisableConsumer {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         */
+        void accept(Connection connection, InputParameters inputParameters);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface PollDisableConsumer {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         */
+        void accept(Connection connection, InputParameters inputParameters);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface PollEnableConsumer {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         */
+        void accept(Connection connection, InputParameters inputParameters);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface PollFunction {
+
+        PollOutput apply(Context context, InputParameters inputParameters, Map<String, Object> closureParameters);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookDisableConsumer {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         */
+        void accept(Connection connection, InputParameters inputParameters);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookEnableFunction {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         */
+        WebhookEnableOutput apply(Connection connection, InputParameters inputParameters, String webhookUrl);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookRequestFunction {
+
+        /**
+         *
+         * @param context
+         * @param inputParameters
+         * @param headerParameters
+         * @param queryParameters
+         * @param payload
+         * @return
+         */
+        Object apply(
+            Context context, InputParameters inputParameters, WebhookHeaderParameters headerParameters,
+            WebhookQueryParameters queryParameters, WebhookPayload payload);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookRefreshFunction {
+
+        WebhookEnableOutput apply(WebhookEnableOutput webhookEnableOutput);
+    }
+
+    /**
+     *
+     * @param result
+     * @param closureParameters
+     * @param pollImmediately
+     */
+    record PollOutput(Object result, Map<String, Object> closureParameters, boolean pollImmediately) {
+    }
+
+    /**
+     *
+     * @param parameters
+     * @param webhookExpirationDate
+     */
+    record WebhookEnableOutput(Map<String, Object> parameters, LocalDateTime webhookExpirationDate) {
+    }
 }

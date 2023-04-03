@@ -29,12 +29,12 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ParametersImpl implements Parameters {
+public class InputParametersImpl implements InputParameters {
 
     private final Map<String, Object> parameters;
 
     @SuppressFBWarnings("EI2")
-    public ParametersImpl(Map<String, Object> parameters) {
+    public InputParametersImpl(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 

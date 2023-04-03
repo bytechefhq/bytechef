@@ -19,7 +19,7 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AmazonS3Uri;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -46,15 +46,15 @@ public class AwsS3PresignGetObjectAction {
             .description("The AWS S3 uri.")
             .required(true))
         .outputSchema(string())
-        .perform(AwsS3PresignGetObjectAction::performGetPresignedObject);
+        .execute(AwsS3PresignGetObjectAction::performGetPresignedObject);
 
-    public static String performGetPresignedObject(Context context, Parameters parameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(parameters.getRequiredString(URI));
+    public static String performGetPresignedObject(Context context, InputParameters inputParameters) {
+        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
 
         try (S3Presigner s3Presigner = S3Presigner.create()) {
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(builder -> builder
                 .signatureDuration(
-                    Duration.parse("PT" + parameters.getRequiredString("signatureDuration")))
+                    Duration.parse("PT" + inputParameters.getRequiredString("signatureDuration")))
                 .getObjectRequest(por -> por.bucket(amazonS3Uri.getBucket())
                     .key(amazonS3Uri.getKey())));
 

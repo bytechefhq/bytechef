@@ -19,7 +19,7 @@ package com.bytechef.component.randomhelper.action;
 
 import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
@@ -46,14 +46,14 @@ public class RandomHelperRandomIntAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .perform(RandomHelperRandomIntAction::performNextInt);
+        .execute(RandomHelperRandomIntAction::executeNextInt);
 
     /**
      * Generates a random integer.
      */
-    public static int performNextInt(Context context, Parameters parameters) {
-        int startInclusive = parameters.getInteger("startInclusive", 0);
-        int endInclusive = parameters.getInteger("endInclusive", 100);
+    public static int executeNextInt(Context context, InputParameters inputParameters) {
+        int startInclusive = inputParameters.getInteger("startInclusive", 0);
+        int endInclusive = inputParameters.getInteger("endInclusive", 100);
 
         return nextInt(startInclusive, endInclusive);
     }

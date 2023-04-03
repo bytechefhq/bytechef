@@ -18,21 +18,25 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
  */
 @JsonDeserialize(as = ComponentDSL.ModifiableActionDefinition.class)
 public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
+
+    Boolean getBatch();
+
+    String getComponentName();
 
     Display getDisplay();
 
@@ -44,16 +48,33 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
 
     String getName();
 
-    List<Property<? extends Property<?>>> getOutputSchema();
+    List<? extends Property<?>> getOutputSchema();
 
     OutputSchemaDataSource getOutputSchemaDataSource();
 
-    List<Property<?>> getProperties();
+    List<? extends Property<?>> getProperties();
 
     /**
-     * The code that should be performed when an action is executed as a task when running inside the workflow engine.
+     * The code that should be executed when an action runs as a task inside the workflow engine.
      *
-     * @return an optional perform function implementation
+     * @return an optional execute function implementation
      */
-    Optional<BiFunction<Context, Parameters, Object>> getPerformFunction();
+    Optional<ExecuteFunction> getExecute();
+
+    Resources getResources();
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ExecuteFunction {
+
+        /**
+         *
+         * @param context
+         * @param inputParameters
+         * @return
+         */
+        Object apply(Context context, InputParameters inputParameters);
+    }
 }

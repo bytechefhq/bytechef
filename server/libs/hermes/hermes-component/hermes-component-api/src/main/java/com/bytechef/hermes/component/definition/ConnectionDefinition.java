@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
@@ -25,8 +25,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Used for specifying a connection.
@@ -38,25 +36,54 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
     String BASE_URI = "baseUri";
 
-    boolean isAuthorizationRequired();
-
     boolean containsAuthorizations();
 
     Authorization getAuthorization(String authorizationName);
 
     List<? extends Authorization> getAuthorizations();
 
-    Function<Context.Connection, String> getBaseUriFunction();
-
-    Display getComponentDisplay();
+    BaseUriFunction getBaseUri();
 
     String getComponentName();
 
-    int getConnectionVersion();
+    Display getDisplay();
+
+    String getName();
 
     List<? extends Property<?>> getProperties();
 
     Resources getResources();
 
-    Optional<Consumer<Context.Connection>> getTestConsumer();
+    Optional<TestConsumer> getTest();
+
+    int getVersion();
+
+    boolean isAuthorizationRequired();
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface BaseUriFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface TestConsumer {
+
+        /**
+         *
+         * @param connection
+         */
+        void accept(Connection connection);
+    }
 }

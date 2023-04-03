@@ -23,7 +23,7 @@ import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstant
 import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants.TABLE;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
 import com.bytechef.hermes.component.registrar.jdbc.operation.config.JdbcActionIntTestConfiguration;
@@ -80,18 +80,18 @@ public class InsertJdbcActionIntTest {
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
 
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getList(COLUMNS, String.class, List.of()))
+        Mockito.when(inputParameters.getList(COLUMNS, String.class, List.of()))
             .thenReturn(List.of("id", "name"));
-        Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
+        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
             .thenReturn(List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")));
-        Mockito.when(parameters.getString(SCHEMA, "public"))
+        Mockito.when(inputParameters.getString(SCHEMA, "public"))
             .thenReturn("public");
-        Mockito.when(parameters.getRequiredString(TABLE))
+        Mockito.when(inputParameters.getRequiredString(TABLE))
             .thenReturn("test");
 
-        Map<String, Integer> result = insertJdbcOperation.execute(context, parameters);
+        Map<String, Integer> result = insertJdbcOperation.execute(context, inputParameters);
 
         Assertions.assertEquals(2, result.get("rows"));
     }

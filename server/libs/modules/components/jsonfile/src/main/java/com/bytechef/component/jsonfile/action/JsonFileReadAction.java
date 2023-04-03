@@ -19,7 +19,7 @@ package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
@@ -95,19 +95,19 @@ public class JsonFileReadAction {
         .outputSchema(
             array().displayCondition("%s === true".formatted(IS_ARRAY)),
             object().displayCondition("%s === false".formatted(IS_ARRAY)))
-        .perform(JsonFileReadAction::performRead);
+        .execute(JsonFileReadAction::executeRead);
 
     @SuppressWarnings("unchecked")
-    public static Object performRead(Context context, Parameters parameters)
+    public static Object executeRead(Context context, InputParameters inputParameters)
         throws ComponentExecutionException {
 
-        JsonFileTaskConstants.FileType fileType = getFileType(parameters);
-        Context.FileEntry fileEntry = parameters.getRequired(FILE_ENTRY, Context.FileEntry.class);
-        boolean isArray = parameters.getBoolean(IS_ARRAY, true);
+        JsonFileTaskConstants.FileType fileType = getFileType(inputParameters);
+        Context.FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, Context.FileEntry.class);
+        boolean isArray = inputParameters.getBoolean(IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = parameters.getString(PATH);
+            String path = inputParameters.getString(PATH);
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
@@ -127,12 +127,12 @@ public class JsonFileReadAction {
                         .map(line -> (Map<String, ?>) JsonUtils.read(line, Map.class))
                         .collect(Collectors.toList());
                 } catch (IOException ioException) {
-                    throw new ComponentExecutionException("Unable to open json file " + parameters, ioException);
+                    throw new ComponentExecutionException("Unable to open json file " + inputParameters, ioException);
                 }
             }
 
-            Integer pageSize = parameters.getInteger(PAGE_SIZE);
-            Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
+            Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+            Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 
@@ -155,8 +155,8 @@ public class JsonFileReadAction {
         return result;
     }
 
-    public static JsonFileTaskConstants.FileType getFileType(Parameters parameters) {
-        String fileType = parameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name());
+    public static JsonFileTaskConstants.FileType getFileType(InputParameters inputParameters) {
+        String fileType = inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name());
 
         return JsonFileTaskConstants.FileType.valueOf(fileType.toUpperCase());
     }

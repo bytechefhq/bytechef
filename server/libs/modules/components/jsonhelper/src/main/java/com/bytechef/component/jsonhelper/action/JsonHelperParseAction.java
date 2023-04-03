@@ -18,7 +18,7 @@
 package com.bytechef.component.jsonhelper.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.JsonUtils;
 
@@ -42,10 +42,10 @@ public class JsonHelperParseAction {
             .description("The JSON string to convert to the data.")
             .required(true))
         .outputSchema(oneOf())
-        .perform(JsonHelperParseAction::performParse);
+        .execute(JsonHelperParseAction::executeParse);
 
-    public static Object performParse(Context context, Parameters parameters) {
-        Object input = parameters.getRequired(SOURCE);
+    public static Object executeParse(Context context, InputParameters inputParameters) {
+        Object input = inputParameters.getRequired(SOURCE);
 
         return JsonUtils.read((String) input);
     }

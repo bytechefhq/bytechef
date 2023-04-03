@@ -67,7 +67,7 @@ public class OpenApiClient {
     }
 
     private String createUri(
-        Map<String, Object> metadata, Map<String, Object> parameters, List<Property<?>> properties) {
+        Map<String, Object> metadata, Map<String, Object> parameters, List<? extends Property<?>> properties) {
 
         String path = (String) metadata.get("path");
 
@@ -83,7 +83,7 @@ public class OpenApiClient {
 
     private Payload getPayload(
         BodyContentType bodyContentType, String mimeType, Map<String, Object> parameters,
-        List<Property<?>> properties) {
+        List<? extends Property<?>> properties) {
         Payload payload = null;
 
         if (bodyContentType != null) {
@@ -122,7 +122,7 @@ public class OpenApiClient {
 
     private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
         ResponseFormat responseFormat = null;
-        List<Property<?>> outputProperties = actionDefinition.getOutputSchema();
+        List<? extends Property<?>> outputProperties = actionDefinition.getOutputSchema();
 
         if (outputProperties != null && !outputProperties.isEmpty()) {
             Property<?> property = outputProperties.get(0);
@@ -134,7 +134,7 @@ public class OpenApiClient {
     }
 
     private Map<String, List<String>> getValuesMap(
-        Map<String, Object> parameters, List<Property<?>> properties, PropertyType propertyType) {
+        Map<String, Object> parameters, List<? extends Property<?>> properties, PropertyType propertyType) {
 
         Map<String, List<String>> valuesMap = new HashMap<>();
 

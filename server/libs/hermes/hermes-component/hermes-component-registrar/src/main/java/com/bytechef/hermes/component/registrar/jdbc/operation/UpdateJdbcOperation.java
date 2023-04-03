@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.registrar.jdbc.operation;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
 import java.util.Arrays;
 import java.util.List;
@@ -40,13 +40,13 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     }
 
     @Override
-    public Map<String, Integer> execute(Context context, Parameters parameters) {
-        List<String> columns = parameters.getList(JdbcConstants.COLUMNS, String.class, List.of());
+    public Map<String, Integer> execute(Context context, InputParameters inputParameters) {
+        List<String> columns = inputParameters.getList(JdbcConstants.COLUMNS, String.class, List.of());
         @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) parameters.getList(JdbcConstants.ROWS, Map.class, List.of());
-        String schema = parameters.getString(JdbcConstants.SCHEMA, "public");
-        String table = parameters.getRequiredString(JdbcConstants.TABLE);
-        String updateKey = parameters.getString(JdbcConstants.UPDATE_KEY, "id");
+        List<Map<String, ?>> rows = (List) inputParameters.getList(JdbcConstants.ROWS, Map.class, List.of());
+        String schema = inputParameters.getString(JdbcConstants.SCHEMA, "public");
+        String table = inputParameters.getRequiredString(JdbcConstants.TABLE);
+        String updateKey = inputParameters.getString(JdbcConstants.UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
             OptionalUtils.get(context.fetchConnection()),
