@@ -24,7 +24,6 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-git")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
-//    implementation project(":server:libs:atlas:atlas-rsocket-client")
     implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
