@@ -365,7 +365,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
             map.put(WorkflowConstants.TYPE, type);
             map.put(WorkflowConstants.URL, url);
             map.put(
-                WorkflowConstants.RETRY,
+                WorkflowConstants.MAX_RETRIES,
                 Map.of(
                     "initialInterval", retry.initialInterval(),
                     "maxInterval", retry.maxInterval(),

@@ -128,7 +128,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private SourceType sourceType;
 
     @Transient
-    private int retry;
+    private int maxRetries;
 
     @Transient
     private List<WorkflowTask> tasks = Collections.emptyList();
@@ -172,7 +172,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             map -> new Output(
                 MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
                 MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
-        this.retry = MapValueUtils.getInteger(source, WorkflowConstants.RETRY, 0);
+        this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
         this.tasks = MapValueUtils
             .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
             .stream()
@@ -283,8 +283,8 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
      *
      * @return int the maximum number of retries.
      */
-    public int getRetry() {
-        return retry;
+    public int getMaxRetries() {
+        return maxRetries;
     }
 
     /** Returns the steps that make up the workflow. */
@@ -332,7 +332,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             ", inputs=" + inputs +
             ", outputs=" + outputs +
             ", error=" + error +
-            ", retry=" + retry +
+            ", maxRetries=" + maxRetries +
             ", tasks=" + tasks +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +
