@@ -207,6 +207,18 @@ public final class CollectionUtils {
             .toList();
     }
 
+    public static <T, R> List<R> mapDistinct(List<T> list, Function<? super T, R> mapper, Predicate<? super R> filter) {
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
+        Assert.notNull(filter, "'filter' must not be null");
+
+        return list.stream()
+            .map(mapper)
+            .filter(filter)
+            .distinct()
+            .toList();
+    }
+
     public static int size(Collection<?> collection) {
         Assert.notNull(collection, "'collection' must not be null");
 

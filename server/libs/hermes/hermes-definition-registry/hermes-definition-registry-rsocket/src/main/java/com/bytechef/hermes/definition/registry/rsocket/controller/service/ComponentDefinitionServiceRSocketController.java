@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.controller.service;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,17 +41,17 @@ public class ComponentDefinitionServiceRSocketController {
     }
 
     @MessageMapping("ComponentDefinitionService.getComponentDefinitions")
-    public Mono<List<ComponentDefinition>> getComponentDefinitions() {
+    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions() {
         return componentDefinitionService.getComponentDefinitionsMono();
     }
 
     @MessageMapping("ComponentDefinitionService.getComponentDefinitionsForName")
-    public Mono<List<ComponentDefinition>> getComponentDefinitions(String name) {
+    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(String name) {
         return componentDefinitionService.getComponentDefinitionsMono(name);
     }
 
     @MessageMapping("ComponentDefinitionService.getComponentDefinition")
-    public Mono<ComponentDefinition> getComponentDefinition(Map<String, Object> map) {
+    public Mono<ComponentDefinitionDTO> getComponentDefinition(Map<String, Object> map) {
         return componentDefinitionService.getComponentDefinitionMono((String) map.get("name"),
             (Integer) map.get("version"));
     }

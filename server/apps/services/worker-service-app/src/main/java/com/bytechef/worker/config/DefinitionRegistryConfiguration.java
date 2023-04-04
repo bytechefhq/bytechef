@@ -20,9 +20,9 @@ package com.bytechef.worker.config;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
@@ -36,6 +36,8 @@ import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServic
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -106,6 +108,11 @@ public class DefinitionRegistryConfiguration {
         @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
 
         return new ConnectionDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    }
+
+    @Bean
+    TriggerDefinitionService triggerDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new TriggerDefinitionServiceImpl(componentDefinitions);
     }
 
     /**
@@ -189,7 +196,7 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(
+        public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinitionMono(
             String componentName, int componentVersion) {
 
             return connectionDefinitionService.getComponentConnectionDefinitionMono(
@@ -197,14 +204,14 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitionsMono(
+        public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitionsMono(
             String componentName, int version) {
 
             return connectionDefinitionService.getComponentConnectionDefinitionsMono(componentName, version);
         }
 
         @Override
-        public Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono() {
+        public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono() {
             return connectionDefinitionService.getConnectionDefinitionsMono();
         }
 
