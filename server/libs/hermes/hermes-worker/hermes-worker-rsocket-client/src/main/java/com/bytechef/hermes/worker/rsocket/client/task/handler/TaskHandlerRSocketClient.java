@@ -18,7 +18,7 @@
 package com.bytechef.hermes.worker.rsocket.client.task.handler;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.commons.discovery.util.DiscoveryUtils;
+import com.bytechef.commons.rsocket.util.RSocketUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -51,10 +51,7 @@ public class TaskHandlerRSocketClient {
     @SuppressFBWarnings("NP")
     public Object handle(String type, TaskExecution taskExecution) {
         try {
-            return rSocketRequesterBuilder
-                .websocket(DiscoveryUtils.toWebSocketUri(
-                    DiscoveryUtils.filterServiceInstance(
-                        discoveryClient.getInstances(WORKER_SERVICE_APP), StringUtils.split(type, "/")[0])))
+            return getRSocketRequester(StringUtils.split(type, "/")[0])
                 .route("TaskHandler.handle")
                 .data(Map.of("type", type, "taskExecution", taskExecution))
                 .retrieveMono(Object.class)
@@ -63,5 +60,10 @@ public class TaskHandlerRSocketClient {
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private RSocketRequester getRSocketRequester(String componentName) {
+        return RSocketUtils.getRSocketRequester(
+            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, rSocketRequesterBuilder);
     }
 }
