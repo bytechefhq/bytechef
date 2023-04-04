@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
-import com.bytechef.commons.util.DiscoveryUtils;
+import com.bytechef.commons.rsocket.util.RSocketUtils;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -49,10 +49,7 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
     public Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
         String componentName, int componentVersion, String actionName) {
 
-        return rSocketRequesterBuilder
-            .websocket(DiscoveryUtils.toWebSocketUri(
-                DiscoveryUtils.filterServiceInstance(
-                    discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
+        return getRSocketRequester(componentName)
             .route("ActionDefinitionService.getComponentActionDefinition")
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", actionName))
@@ -63,13 +60,15 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
     public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(
         String componentName, int componentVersion) {
 
-        return rSocketRequesterBuilder
-            .websocket(DiscoveryUtils.toWebSocketUri(
-                DiscoveryUtils.filterServiceInstance(
-                    discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
+        return getRSocketRequester(componentName)
             .route("ActionDefinitionService.getComponentActionDefinitions")
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(new ParameterizedTypeReference<>() {});
+    }
+
+    private RSocketRequester getRSocketRequester(String componentName) {
+        return RSocketUtils.getRSocketRequester(
+            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, rSocketRequesterBuilder);
     }
 }

@@ -17,8 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
-import com.bytechef.commons.util.MonoUtils;
-import com.bytechef.commons.util.DiscoveryUtils;
+import com.bytechef.commons.reactor.util.MonoUtils;
+import com.bytechef.commons.discovery.util.DiscoveryUtils;
+import com.bytechef.commons.rsocket.util.RSocketUtils;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
@@ -28,7 +29,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -63,8 +63,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
         Authorization.AuthorizationContext authorizationContext) {
 
         Map<String, Map<String, List<String>>> authorizationContextMap = MonoUtils.get(
-            rSocketRequesterBuilder
-                .websocket(getWebsocketUri(componentName))
+            getRSocketRequester(componentName)
                 .route("ConnectionDefinitionService.executeAuthorizationApply")
                 .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
                 .retrieveMono(new ParameterizedTypeReference<>() {}));
@@ -79,8 +78,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
         String redirectUri) {
 
         return MonoUtils.get(
-            rSocketRequesterBuilder
-                .websocket(getWebsocketUri(componentName))
+            getRSocketRequester(componentName)
                 .route("ConnectionDefinitionService.executeAuthorizationCallback")
                 .data(new AuthorizationCallbackRequest(
                     new Connection(componentName, connectionVersion, connectionParameters, authorizationName),
@@ -94,8 +92,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
 
         return Optional.ofNullable(
             MonoUtils.get(
-                rSocketRequesterBuilder
-                    .websocket(getWebsocketUri(componentName))
+                getRSocketRequester(componentName)
                     .route("ConnectionDefinitionService.fetchBaseUri")
                     .data(new Connection(componentName, connectionVersion, connectionParameters, null))
                     .retrieveMono(String.class)));
@@ -106,8 +103,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
         String authorizationName, String componentName, int connectionVersion) {
 
         return MonoUtils.get(
-            rSocketRequesterBuilder
-                .websocket(getWebsocketUri(componentName))
+            getRSocketRequester(componentName)
                 .route("ConnectionDefinitionService.getAuthorizationType")
                 .data(
                     Map.of(
@@ -120,10 +116,8 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     @Override
     public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinitionMono(
         String componentName, int componentVersion) {
-        return rSocketRequesterBuilder
-            .websocket(DiscoveryUtils.toWebSocketUri(
-                DiscoveryUtils.filterServiceInstance(
-                    discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
+
+        return getRSocketRequester(componentName)
             .route("ConnectionDefinitionService.getComponentConnectionDefinition")
             .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(ConnectionDefinitionDTO.class)
@@ -137,8 +131,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
                 .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(DiscoveryUtils.toWebSocketUri(serviceInstance))
+                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
                     .route("ConnectionDefinitionService.getComponentConnectionDefinitions")
                     .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
                     .retrieveMono(
@@ -152,8 +145,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
                 .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(DiscoveryUtils.toWebSocketUri(serviceInstance))
+                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
                     .route("ConnectionDefinitionService.getConnectionDefinitions")
                     .retrieveMono(
                         new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
@@ -167,17 +159,15 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
         String authorizationName) {
 
         return MonoUtils.get(
-            rSocketRequesterBuilder
-                .websocket(getWebsocketUri(componentName))
+            getRSocketRequester(componentName)
                 .route("ConnectionDefinitionService.getOAuth2Parameters")
                 .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
                 .retrieveMono(OAuth2AuthorizationParametersDTO.class));
     }
 
-    private URI getWebsocketUri(String componentName) {
-        return DiscoveryUtils.toWebSocketUri(
-            DiscoveryUtils.filterServiceInstance(
-                discoveryClient.getInstances("worker-service-app"), componentName));
+    private RSocketRequester getRSocketRequester(String componentName) {
+        return RSocketUtils.getRSocketRequester(
+            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, rSocketRequesterBuilder);
     }
 
     @SuppressWarnings("unchecked")

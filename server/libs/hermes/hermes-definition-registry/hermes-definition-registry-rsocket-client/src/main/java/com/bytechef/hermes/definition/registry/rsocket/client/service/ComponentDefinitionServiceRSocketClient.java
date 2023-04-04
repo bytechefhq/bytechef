@@ -17,7 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
-import com.bytechef.commons.util.DiscoveryUtils;
+import com.bytechef.commons.discovery.util.DiscoveryUtils;
+import com.bytechef.commons.rsocket.util.RSocketUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -49,10 +50,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
 
     @Override
     public Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version) {
-        return rSocketRequesterBuilder
-            .websocket(DiscoveryUtils.toWebSocketUri(
-                DiscoveryUtils.filterServiceInstance(
-                    discoveryClient.getInstances(WORKER_SERVICE_APP), name)))
+        return getRSocketRequester(name)
             .route("ComponentDefinitionService.getComponentDefinition")
             .data(Map.of("name", name, "version", version))
             .retrieveMono(ComponentDefinitionDTO.class);
@@ -63,8 +61,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
                 .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(DiscoveryUtils.toWebSocketUri(serviceInstance))
+                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
                     .route("ComponentDefinitionService.getComponentDefinitions")
                     .retrieveMono(
                         new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
@@ -77,8 +74,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
                 .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(DiscoveryUtils.toWebSocketUri(serviceInstance))
+                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
                     .route("ComponentDefinitionService.getComponentDefinitionsForName")
                     .data(name)
                     .retrieveMono(
@@ -93,5 +89,10 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
             .map(object -> (List<ComponentDefinitionDTO>) object)
             .flatMap(Collection::stream)
             .toList();
+    }
+
+    private RSocketRequester getRSocketRequester(String componentName) {
+        return RSocketUtils.getRSocketRequester(
+            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, rSocketRequesterBuilder);
     }
 }

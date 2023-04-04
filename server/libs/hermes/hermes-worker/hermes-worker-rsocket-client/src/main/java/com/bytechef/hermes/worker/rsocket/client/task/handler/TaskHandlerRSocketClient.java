@@ -18,7 +18,7 @@
 package com.bytechef.hermes.worker.rsocket.client.task.handler;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.commons.util.DiscoveryUtils;
+import com.bytechef.commons.discovery.util.DiscoveryUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
