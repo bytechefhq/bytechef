@@ -29,7 +29,6 @@ import org.springframework.util.MimeTypeUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.tcp.TcpClient;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
@@ -63,9 +62,9 @@ public class RSocketConfiguration {
             .map(serviceInstance -> LoadbalanceTarget.from(
                 serviceInstance.getHost() + serviceInstance.getPort(),
                 WebsocketClientTransport.create(
-                    HttpClient.from(TcpClient.create()
+                    HttpClient.newConnection()
                         .host(serviceInstance.getHost())
-                        .port(serviceInstance.getPort())),
+                        .port(serviceInstance.getPort()),
                     "/rsocket")))
             .collect(Collectors.toList());
     }

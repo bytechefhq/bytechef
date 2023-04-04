@@ -1,0 +1,5 @@
+dependencies {
+    implementation "org.springframework:spring-core"
+    implementation "org.springframework.cloud:spring-cloud-commons"
+    implementation project(":server:libs:core:commons:commons-util")
+}

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.util;
+package com.bytechef.commons.reactor.util;
 
 import reactor.core.publisher.Mono;
 

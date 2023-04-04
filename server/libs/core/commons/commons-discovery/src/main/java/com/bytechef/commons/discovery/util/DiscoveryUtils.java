@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.util;
+package com.bytechef.commons.discovery.util;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.util.StringUtils;

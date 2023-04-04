@@ -17,7 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.facade;
 
-import com.bytechef.commons.util.DiscoveryUtils;
+import com.bytechef.commons.discovery.util.DiscoveryUtils;
+import com.bytechef.commons.rsocket.util.RSocketUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -53,8 +54,7 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances("worker-service-app"))
                 .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(DiscoveryUtils.toWebSocketUri(serviceInstance))
+                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
                     .route("ComponentDefinitionFacade.getComponentDefinitions")
                     .data(new HashMap<>() {
                         {
