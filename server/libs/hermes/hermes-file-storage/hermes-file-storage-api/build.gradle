@@ -1,6 +1,4 @@
 dependencies {
-    api project(":server:libs:hermes:hermes-component:hermes-component-api")
-
     implementation "org.springframework:spring-core"
     implementation "org.springframework.boot:spring-boot"
     implementation libs.org.apache.tika.tika.core
