@@ -43,9 +43,9 @@ public class OpenApiComponentTaskHandlerBeanDefinitionLoader
             .addConstructorArgValue(actionDefinition)
             .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgReference("connectionService")
-            .addConstructorArgValue(openApiComponentHandler)
             .addConstructorArgReference("eventPublisher")
             .addConstructorArgReference("fileStorageService")
+            .addConstructorArgValue(openApiComponentHandler)
             .getBeanDefinition();
     }
 }

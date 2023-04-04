@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.task.handler;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -48,13 +49,12 @@ public abstract class AbstractComponentTaskHandlerBeanDefinitionLoader<T extends
             componentTaskHandlerFactories.add(
                 new ComponentTaskHandlerBeanDefinition(
                     componentDefinition,
-                    componentDefinition.getActions()
-                        .stream()
-                        .map(actionDefinition -> new TaskHandlerBeanDefinitionEntry(
+                    CollectionUtils.map(
+                        componentDefinition.getActions(),
+                        actionDefinition -> new TaskHandlerBeanDefinitionEntry(
                             actionDefinition.getName(),
                             getBeanDefinition(
-                                actionDefinition, componentDefinition.getConnection(), componentDefinitionFactory)))
-                        .toList()));
+                                actionDefinition, componentDefinition.getConnection(), componentDefinitionFactory)))));
         }
 
         return componentTaskHandlerFactories;

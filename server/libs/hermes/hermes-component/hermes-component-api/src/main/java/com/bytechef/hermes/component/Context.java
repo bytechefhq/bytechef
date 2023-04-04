@@ -43,13 +43,9 @@ public interface Context {
 
         void applyAuthorization(Authorization.AuthorizationContext authorizationContext);
 
-        boolean containsParameter(String name);
-
         Optional<String> fetchBaseUri();
 
-        <T> T getParameter(String name);
-
-        <T> T getParameter(String name, T defaultValue);
+        InputParameters getParameters();
     }
 
     interface FileEntry {

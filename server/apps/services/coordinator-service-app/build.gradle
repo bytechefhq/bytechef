@@ -27,6 +27,7 @@ dependencies {
     implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
+    implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rsocket")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")

@@ -106,7 +106,8 @@ public class QueryJdbcActionIntTest {
 
                     @Override
                     public DataSource getDataSource(
-                        Context.Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
+                        InputParameters connectionParameters, String databaseJdbcName, String jdbcDriverClassNamee) {
+
                         return dataSource;
                     }
                 },

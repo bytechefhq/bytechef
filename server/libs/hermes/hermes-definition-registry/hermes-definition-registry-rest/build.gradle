@@ -44,6 +44,7 @@ dependencies {
     implementation libs.org.mapstruct
     implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
     implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-webflux"
     implementation libs.io.swagger.core.v3.swagger.annotations
     implementation project(":server:libs:core:autoconfigure-annotations")

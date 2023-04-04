@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -250,13 +251,16 @@ public class ConnectionFacadeIntTest {
     @TestConfiguration
     public static class ConnectionFacadeIntTestConfiguration {
 
+        @MockBean
+        ConnectionDefinitionService connectionDefinitionService;
+
         @Bean
         ConnectionFacade connectionFacade(
             ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
             OAuth2Properties oAuth2Properties, TagService tagService) {
 
-            return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, oAuth2Properties,
-                tagService);
+            return new ConnectionFacadeImpl(
+                connectionDefinitionService, connectionService, oAuth2Properties, tagService);
         }
 
         @Bean

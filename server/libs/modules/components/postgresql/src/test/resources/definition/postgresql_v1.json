@@ -392,12 +392,11 @@
   } ],
   "connection": {
     "authorizationRequired": false,
-    "componentDisplay": {
+    "display": {
       "description": "Query, insert nd update data from PostgreSQL.",
       "title": "PostgreSQL"
     },
-    "componentName": "postgresql",
-    "connectionVersion": 1,
+    "name": "postgresql",
     "properties": [ {
       "label": "Host",
       "required": true,
@@ -428,7 +427,8 @@
       "name": "password",
       "type": "STRING",
       "controlType": "INPUT_PASSWORD"
-    } ]
+    } ],
+    "version": 1
   },
   "display": {
     "description": "Query, insert nd update data from PostgreSQL.",

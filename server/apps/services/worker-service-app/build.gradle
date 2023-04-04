@@ -20,6 +20,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-redis")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
     implementation project(":server:libs:core:category:category-service")
+    implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
