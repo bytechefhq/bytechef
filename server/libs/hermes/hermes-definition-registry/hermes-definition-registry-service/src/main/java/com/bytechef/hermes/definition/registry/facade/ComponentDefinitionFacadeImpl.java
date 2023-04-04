@@ -22,6 +22,7 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -45,35 +46,35 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
 
     @Override
     public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(
-        Boolean connectionDefinitions, Boolean connectionInstances) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions) {
 
         List<Connection> connections = connectionService.getConnections();
 
         return componentDefinitionService.getComponentDefinitionsMono()
             .map(componentDefinitions -> componentDefinitions.stream()
                 .filter(componentDefinition -> {
-                    if (connectionDefinitions == null && connectionInstances == null) {
-                        return true;
-                    }
-                    if (connectionDefinitions != null && connectionDefinitions &&
-                        connectionInstances != null && connectionInstances) {
-
-                        if (componentDefinition.connection() == null) {
-                            return false;
-                        } else {
-                            return connections.stream()
-                                .anyMatch(connection -> Objects.equals(connection.getComponentName(),
-                                    componentDefinition.name()));
-                        }
-                    } else if (connectionDefinitions != null && connectionDefinitions) {
-                        return componentDefinition.connection() != null;
-                    } else if (connectionInstances != null && connectionInstances) {
-                        return connections.stream()
-                            .anyMatch(connection -> Objects.equals(connection.getComponentName(),
-                                componentDefinition.name()));
-                    } else {
+                    if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.actions())) {
                         return false;
                     }
+
+                    if (connectionDefinitions != null && componentDefinition.connection() == null) {
+                        return false;
+                    }
+
+                    if (connectionInstances != null &&
+                        !com.bytechef.commons.util.CollectionUtils.anyMatch(
+                            connections,
+                            connection -> Objects.equals(connection.getComponentName(), componentDefinition.name()))) {
+
+                        return false;
+                    }
+
+                    if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.triggers())) {
+                        return false;
+                    }
+
+                    return true;
                 })
                 .distinct()
                 .toList());

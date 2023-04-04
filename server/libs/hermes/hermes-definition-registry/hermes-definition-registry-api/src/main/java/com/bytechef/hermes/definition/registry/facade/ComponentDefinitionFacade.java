@@ -28,5 +28,6 @@ import java.util.List;
 public interface ComponentDefinitionFacade {
 
     Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(
-        Boolean connectionDefinitions, Boolean connectionInstances);
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions);
 }

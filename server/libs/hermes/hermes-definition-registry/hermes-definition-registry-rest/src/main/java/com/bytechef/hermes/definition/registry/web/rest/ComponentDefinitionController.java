@@ -129,10 +129,12 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<ComponentDefinitionBasicModel>>> getComponentDefinitions(
-        Boolean connectionDefinitions, Boolean connectionInstances, ServerWebExchange exchange) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions, ServerWebExchange exchange) {
 
         return Mono.just(
-            componentDefinitionFacade.getComponentDefinitions(connectionDefinitions, connectionInstances)
+            componentDefinitionFacade.getComponentDefinitions(
+                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
                 .mapNotNull(componentDefinitions -> componentDefinitions.stream()
                     .map(componentDefinition -> conversionService.convert(
                         componentDefinition, ComponentDefinitionBasicModel.class))
