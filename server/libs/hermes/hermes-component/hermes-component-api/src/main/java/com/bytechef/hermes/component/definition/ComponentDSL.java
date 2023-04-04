@@ -37,14 +37,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.bytechef.hermes.component.constant.Version;
-
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 
 /**
  * @author Ivica Cardic
  */
 public final class ComponentDSL extends DefinitionDSL {
+
+    public static final int VERSION_1 = 1;
 
     public static ModifiableActionDefinition action(String name) {
         return new ModifiableActionDefinition(name);
@@ -213,6 +213,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @SuppressFBWarnings("NP")
         public Boolean getBatch() {
             return null;
         }
@@ -289,7 +290,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @JsonIgnore
         private AuthorizationCallbackFunction authorizationCallback = (
-            connection, code, redirectUri, codeVerifier) -> {
+            connectionParameters, code, redirectUri, codeVerifier) -> {
 
             ClientIdFunction clientIdFunction = getClientId();
             ClientSecretFunction clientSecretFunction = getClientSecret();
@@ -297,8 +298,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
             Map<String, Object> payload = new HashMap<>() {
                 {
-                    put("client_id", clientIdFunction.apply(connection));
-                    put("client_secret", clientSecretFunction.apply(connection));
+                    put("client_id", clientIdFunction.apply(connectionParameters));
+                    put("client_secret", clientSecretFunction.apply(connectionParameters));
                     put("code", code);
                     put("grant_type", "authorization_code");
                     put("redirect_uri", redirectUri);
@@ -309,7 +310,7 @@ public final class ComponentDSL extends DefinitionDSL {
                 payload.put("code_verifier", codeVerifier);
             }
 
-            HttpClientUtils.Response response = HttpClientUtils.post(tokenUrlFunction.apply(connection))
+            HttpClientUtils.Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
                 .payload(
                     HttpClientUtils.Payload.of(payload, HttpClientUtils.BodyContentType.FORM_URL_ENCODED))
                 .configuration(responseFormat(ResponseFormat.JSON))
@@ -327,17 +328,21 @@ public final class ComponentDSL extends DefinitionDSL {
             Map<String, Object> body = (Map<String, Object>) response.body();
 
             return new AuthorizationCallbackResponse(
-                (String) body.get(ACCESS_TOKEN), (String) body.get(REFRESH_TOKEN), Map.of());
+                (String) body.get(Authorization.ACCESS_TOKEN),
+                (String) body.get(Authorization.REFRESH_TOKEN), Map.of());
         };
 
         @JsonIgnore
-        private AuthorizationUrlFunction authorizationUrl = connection -> connection.getParameter(AUTHORIZATION_URL);
+        private AuthorizationUrlFunction authorizationUrl = connectionParameters -> connectionParameters
+            .getString(Authorization.AUTHORIZATION_URL);
 
         @JsonIgnore
-        private ClientIdFunction clientId = connection -> connection.getParameter(CLIENT_ID);
+        private ClientIdFunction clientId = connectionParameters -> connectionParameters
+            .getString(Authorization.CLIENT_ID);
 
         @JsonIgnore
-        private ClientSecretFunction clientSecret = connection -> connection.getParameter(CLIENT_SECRET);
+        private ClientSecretFunction clientSecret = connectionParameters -> connectionParameters.getString(
+            Authorization.CLIENT_SECRET);
 
         @JsonIgnore
         private List<Object> detectOn;
@@ -353,13 +358,13 @@ public final class ComponentDSL extends DefinitionDSL {
         private RefreshFunction refresh;
 
         @JsonIgnore
-        private RefreshUrlFunction refreshUrl = connection -> {
-            String refreshUrl = connection.getParameter(REFRESH_URL);
+        private RefreshUrlFunction refreshUrl = connectionParameters -> {
+            String refreshUrl = connectionParameters.getString(Authorization.REFRESH_URL);
 
             if (refreshUrl == null) {
                 TokenUrlFunction tokeUrlFunction = getTokenUrl();
 
-                refreshUrl = tokeUrlFunction.apply(connection);
+                refreshUrl = tokeUrlFunction.apply(connectionParameters);
             }
 
             return refreshUrl;
@@ -367,8 +372,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @JsonIgnore
         @SuppressWarnings("unchecked")
-        private ScopesFunction scopes = connection -> {
-            Object scopes = connection.getParameter(SCOPES);
+        private ScopesFunction scopes = connectionParameters -> {
+            Object scopes = connectionParameters.getString(Authorization.SCOPES);
 
             if (scopes instanceof List<?>) {
                 return (List<String>) scopes;
@@ -384,7 +389,8 @@ public final class ComponentDSL extends DefinitionDSL {
         };
 
         @JsonIgnore
-        private TokenUrlFunction tokenUrl = connection -> connection.getParameter(TOKEN_URL);
+        private TokenUrlFunction tokenUrl = connectionParameters -> connectionParameters
+            .getString(Authorization.TOKEN_URL);
 
         private String name;
 
@@ -613,7 +619,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Map<String, Object> metadata;
         private String name;
         private Resources resources;
-        private int version = Version.VERSION_1;
+        private int version = VERSION_1;
         private List<? extends TriggerDefinition> triggers;
 
         private ModifiableComponentDefinition() {
@@ -799,7 +805,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public List<? extends TriggerDefinition> getTriggers() {
-            return triggers;
+            return triggers == null ? null : new ArrayList<>(triggers);
         }
 
         @Override
@@ -854,8 +860,8 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<? extends Authorization> authorizations;
 
         @JsonIgnore
-        private BaseUriFunction baseUri = (connection) -> connection.containsParameter(BASE_URI)
-            ? connection.getParameter(BASE_URI)
+        private BaseUriFunction baseUri = (connectionParameters) -> connectionParameters.containsKey(BASE_URI)
+            ? connectionParameters.getString(BASE_URI)
             : null;
         private String componentName;
         private Display display;
@@ -1013,6 +1019,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        @SuppressWarnings("PMD")
         private ModifiableConnectionDefinition display(Display display) {
             this.display = display;
 
@@ -1046,7 +1053,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String jdbcDriverClassName;
         private Display display;
         private Resources resources;
-        private double version = Version.VERSION_1;
+        private double version = VERSION_1;
         private final String name;
 
         private ModifiableJdbcComponentDefinition(String name) {
@@ -1174,8 +1181,10 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition outputSchema(List<? extends Property<?>> outputSchema) {
-            this.outputSchema = outputSchema;
+        public <P extends Property<?>> ModifiableTriggerDefinition outputSchema(P... outputSchema) {
+            if (outputSchema != null) {
+                this.outputSchema = List.of(outputSchema);
+            }
 
             return this;
         }
@@ -1186,8 +1195,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition properties() {
-            this.properties = properties;
+        public <P extends Property<?>> ModifiableTriggerDefinition properties(P... properties) {
+            this.properties = List.of(properties);
 
             return this;
         }
@@ -1279,6 +1288,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @SuppressFBWarnings("NP")
         public Boolean getBatch() {
             return null;
         }

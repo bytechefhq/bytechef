@@ -4,8 +4,8 @@ dependencies {
     implementation "org.springframework:spring-core"
     implementation "org.springframework.boot:spring-boot"
     implementation libs.org.apache.tika.tika.core
-    implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation project(":server:libs:atlas:atlas-api")
     testImplementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+    testImplementation project(":server:libs:core:commons:commons-util")
 }

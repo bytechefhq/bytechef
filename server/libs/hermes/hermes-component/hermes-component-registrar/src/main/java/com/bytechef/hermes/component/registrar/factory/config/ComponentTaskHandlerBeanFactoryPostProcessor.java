@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.factory.config;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.registrar.oas.task.handler.OpenApiComponentTaskHandlerBeanDefinitionLoader;
 import com.bytechef.hermes.component.registrar.task.handler.ComponentTaskHandlerBeanDefinitionLoader;
@@ -46,12 +47,10 @@ public class ComponentTaskHandlerBeanFactoryPostProcessor implements BeanFactory
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        List<ComponentTaskHandlerBeanDefinition> componentTaskHandlerFactories = componentTaskHandlerBeanDefinitionLoaders
-            .stream()
-            .flatMap(componentTaskHandlerBeanDefinitionLoader -> componentTaskHandlerBeanDefinitionLoader
-                .loadComponentTaskHandlerBeanDefinitions()
-                .stream())
-            .toList();
+        List<ComponentTaskHandlerBeanDefinition> componentTaskHandlerFactories = CollectionUtils.flatMap(
+            componentTaskHandlerBeanDefinitionLoaders,
+            componentTaskHandlerBeanDefinitionLoader -> CollectionUtils.stream(
+                componentTaskHandlerBeanDefinitionLoader.loadComponentTaskHandlerBeanDefinitions()));
 
         for (ComponentTaskHandlerBeanDefinition componentTaskHandlerBeanDefinition : componentTaskHandlerFactories) {
             ComponentDefinition componentDefinition = componentTaskHandlerBeanDefinition.componentDefinition();
@@ -59,10 +58,6 @@ public class ComponentTaskHandlerBeanFactoryPostProcessor implements BeanFactory
             beanFactory.registerSingleton(
                 getBeanName(componentDefinition.getName(), componentDefinition.getVersion(), "ComponentDefinition"),
                 componentDefinition);
-        }
-
-        for (ComponentTaskHandlerBeanDefinition componentTaskHandlerBeanDefinition : componentTaskHandlerFactories) {
-            ComponentDefinition componentDefinition = componentTaskHandlerBeanDefinition.componentDefinition();
 
             for (TaskHandlerBeanDefinitionEntry taskHandlerBeanDefinitionEntry : componentTaskHandlerBeanDefinition
                 .taskHandlerBeanDefinitionEntries()) {

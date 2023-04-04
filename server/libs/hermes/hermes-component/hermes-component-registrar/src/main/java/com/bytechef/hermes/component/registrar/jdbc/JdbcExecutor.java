@@ -45,7 +45,8 @@ public class JdbcExecutor {
     }
 
     public int[] batchUpdate(Context.Connection connection, String sql, SqlParameterSource[] batchArgs) {
-        DataSource dataSource = dataSourceFactory.getDataSource(connection, databaseJdbcName, jdbcDriverClassName);
+        DataSource dataSource = dataSourceFactory.getDataSource(
+            connection.getParameters(), databaseJdbcName, jdbcDriverClassName);
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 
@@ -69,6 +70,6 @@ public class JdbcExecutor {
 
     private NamedParameterJdbcTemplate getJdbcTemplate(Context.Connection connection) {
         return new NamedParameterJdbcTemplate(
-            dataSourceFactory.getDataSource(connection, databaseJdbcName, jdbcDriverClassName));
+            dataSourceFactory.getDataSource(connection.getParameters(), databaseJdbcName, jdbcDriverClassName));
     }
 }

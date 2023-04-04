@@ -142,6 +142,17 @@ public final class CollectionUtils {
     }
 
     public static <T, R> List<R> flatMap(
+        List<T> list, Function<? super T, ? extends Stream<? extends R>> mapper) {
+
+        Assert.notNull(list, "'list' must not be null");
+        Assert.notNull(mapper, "'mapper' must not be null");
+
+        return list.stream()
+            .flatMap(mapper)
+            .toList();
+    }
+
+    public static <T, R> List<R> flatMap(
         List<T> list, Function<? super T, ? extends Stream<? extends R>> mapper, Predicate<? super R> filter) {
 
         Assert.notNull(list, "'list' must not be null");

@@ -25,5 +25,5 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ConnectionDefinitionBasicDTO(Display display, String name, Resources resources) {
+public record ConnectionDefinitionBasicDTO(Display display, String name, Resources resources, int version) {
 }

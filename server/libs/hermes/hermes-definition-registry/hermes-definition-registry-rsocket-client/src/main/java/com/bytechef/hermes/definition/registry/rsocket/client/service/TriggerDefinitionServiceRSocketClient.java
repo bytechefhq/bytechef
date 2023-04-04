@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.util.DiscoveryUtils;
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
@@ -31,14 +31,14 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ActionDefinitionServiceRSocketClient implements ActionDefinitionService {
+public class TriggerDefinitionServiceRSocketClient implements TriggerDefinitionService {
 
     private static final String WORKER_SERVICE_APP = "worker-service-app";
 
     private final DiscoveryClient discoveryClient;
     private final RSocketRequester.Builder rSocketRequesterBuilder;
 
-    public ActionDefinitionServiceRSocketClient(
+    public TriggerDefinitionServiceRSocketClient(
         DiscoveryClient discoveryClient, RSocketRequester.Builder rSocketRequesterBuilder) {
 
         this.discoveryClient = discoveryClient;
@@ -46,28 +46,28 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
     }
 
     @Override
-    public Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
-        String componentName, int componentVersion, String actionName) {
+    public Mono<TriggerDefinitionDTO> getComponentTriggerDefinitionMono(
+        String componentName, int componentVersion, String triggerName) {
 
         return rSocketRequesterBuilder
             .websocket(DiscoveryUtils.toWebSocketUri(
                 DiscoveryUtils.filterServiceInstance(
                     discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
-            .route("ActionDefinitionService.getComponentActionDefinition")
+            .route("TriggerDefinitionService.getComponentTriggerDefinition")
             .data(
-                Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", actionName))
-            .retrieveMono(ActionDefinitionDTO.class);
+                Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", triggerName))
+            .retrieveMono(TriggerDefinitionDTO.class);
     }
 
     @Override
-    public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(
+    public Mono<List<TriggerDefinitionDTO>> getComponentTriggerDefinitions(
         String componentName, int componentVersion) {
 
         return rSocketRequesterBuilder
             .websocket(DiscoveryUtils.toWebSocketUri(
                 DiscoveryUtils.filterServiceInstance(
                     discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
-            .route("ActionDefinitionService.getComponentActionDefinitions")
+            .route("TriggerDefinitionService.getComponentTriggerDefinitions")
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(new ParameterizedTypeReference<>() {});

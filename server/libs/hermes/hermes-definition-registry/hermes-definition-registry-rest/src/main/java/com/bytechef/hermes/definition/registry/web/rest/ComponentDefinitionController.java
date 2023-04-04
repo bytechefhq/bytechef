@@ -84,7 +84,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     public Mono<ResponseEntity<ActionDefinitionModel>> getComponentActionDefinition(
         String componentName, Integer componentVersion, String actionName, ServerWebExchange exchange) {
 
-        return actionDefinitionService.getComponentDefinitionActionMono(componentName, componentVersion, actionName)
+        return actionDefinitionService.getComponentActionDefinitionMono(componentName, componentVersion, actionName)
             .mapNotNull(actionDefinition -> conversionService.convert(actionDefinition, ActionDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
@@ -94,7 +94,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return Mono.just(
-            actionDefinitionService.getComponentDefinitionActionsMono(componentName, componentVersion)
+            actionDefinitionService.getComponentActionDefinitionsMono(componentName, componentVersion)
                 .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
                     .map(actionDefinition -> conversionService.convert(
                         actionDefinition, ActionDefinitionBasicModel.class))
@@ -133,7 +133,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         Boolean triggerDefinitions, ServerWebExchange exchange) {
 
         return Mono.just(
-            componentDefinitionFacade.getComponentDefinitions(
+            componentDefinitionFacade.getComponentDefinitionsMono(
                 actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
                 .mapNotNull(componentDefinitions -> componentDefinitions.stream()
                     .map(componentDefinition -> conversionService.convert(
@@ -161,7 +161,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     public Mono<ResponseEntity<TriggerDefinitionModel>> getComponentTriggerDefinition(
         String componentName, Integer componentVersion, String triggerName, ServerWebExchange exchange) {
 
-        return triggerDefinitionService.getComponentDefinitionTriggerMono(componentName, componentVersion, triggerName)
+        return triggerDefinitionService.getComponentTriggerDefinitionMono(componentName, componentVersion, triggerName)
             .mapNotNull(triggerDefinition -> conversionService.convert(triggerDefinition, TriggerDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
@@ -171,7 +171,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return Mono.just(
-            triggerDefinitionService.getComponentDefinitionTriggersMono(componentName, componentVersion)
+            triggerDefinitionService.getComponentTriggerDefinitions(componentName, componentVersion)
                 .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
                     .map(triggerDefinition -> conversionService.convert(
                         triggerDefinition, TriggerDefinitionBasicModel.class))

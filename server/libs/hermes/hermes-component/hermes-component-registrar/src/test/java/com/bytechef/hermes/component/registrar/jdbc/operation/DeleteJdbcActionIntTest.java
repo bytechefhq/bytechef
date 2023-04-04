@@ -113,7 +113,8 @@ public class DeleteJdbcActionIntTest {
                 new DataSourceFactory() {
                     @Override
                     public DataSource getDataSource(
-                        Context.Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        InputParameters connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
+
                         return dataSource;
                     }
                 },

@@ -74,8 +74,6 @@
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDisplay" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDefinition" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ConnectionDefinition" />
-            <Class name="com.bytechef.hermes.component.ContextImpl" />
-            <Class name="com.bytechef.hermes.component.ComponentAdapterTaskHandler" />
             <Class name="com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory" />
             <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
             <Class name="com.bytechef.atlas.domain.Counter" />
@@ -86,7 +84,6 @@
             <Class name="com.bytechef.atlas.domain.TaskExecution"/>
             <Class name="com.bytechef.atlas.domain.Job"/>
             <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties"/>
-            <Class name="com.bytechef.atlas.domain.JobSummary"/>
             <Class name="com.bytechef.atlas.service.ContextService"/>
             <Class name="com.bytechef.atlas.service.WorkflowService"/>
         </Or>

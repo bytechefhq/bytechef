@@ -39,7 +39,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Mono<ActionDefinitionDTO> getComponentDefinitionActionMono(
+    public Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
         String componentName, int componentVersion, String actionName) {
 
         return Mono.just(
@@ -55,7 +55,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Mono<List<ActionDefinitionDTO>> getComponentDefinitionActionsMono(
+    public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(
         String componentName, int componentVersion) {
         return Mono.just(
             componentDefinitions.stream()

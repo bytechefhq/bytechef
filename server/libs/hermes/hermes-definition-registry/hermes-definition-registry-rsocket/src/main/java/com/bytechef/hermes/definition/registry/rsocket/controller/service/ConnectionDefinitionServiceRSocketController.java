@@ -18,7 +18,6 @@
 package com.bytechef.hermes.definition.registry.rsocket.controller.service;
 
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -46,7 +45,8 @@ public class ConnectionDefinitionServiceRSocketController {
 
     @MessageMapping("ConnectionDefinitionService.fetchBaseUri")
     public Mono<String> fetchBaseUri(Connection connection) {
-        return connectionDefinitionService.fetchBaseUri(connection)
+        return connectionDefinitionService.fetchBaseUri(
+            connection.componentName, connection.connectionVersion, connection.parameters)
             .map(Mono::just)
             .orElse(Mono.empty());
     }
@@ -56,18 +56,9 @@ public class ConnectionDefinitionServiceRSocketController {
         Map<String, List<String>> returnHeaders = new HashMap<>();
         Map<String, List<String>> returnQueryParameters = new HashMap<>();
 
-        connectionDefinitionService.executeAuthorizationApply(connection, new Authorization.AuthorizationContext() {
-
-            @Override
-            public void setHeaders(Map<String, List<String>> headers) {
-                returnHeaders.putAll(headers);
-            }
-
-            @Override
-            public void setQueryParameters(Map<String, List<String>> queryParameters) {
-                returnQueryParameters.putAll(queryParameters);
-            }
-        });
+        connectionDefinitionService.executeAuthorizationApply(
+            connection.componentName, connection.connectionVersion, connection.parameters, connection.authorizationName,
+            new Authorization.AuthorizationContext(returnHeaders, returnQueryParameters, new HashMap<>()));
 
         return Mono.just(Map.of("headers", returnHeaders, "queryParameters", returnQueryParameters));
     }
@@ -75,9 +66,13 @@ public class ConnectionDefinitionServiceRSocketController {
     @MessageMapping("ConnectionDefinitionService.executeAuthorizationCallback")
     public Mono<Authorization.AuthorizationCallbackResponse> executeAuthorizationCallback(
         AuthorizationCallbackRequest authorizationCallbackRequest) {
+
+        Connection connection = authorizationCallbackRequest.connection();
+
         return Mono.just(
             connectionDefinitionService.executeAuthorizationCallback(
-                authorizationCallbackRequest.connection(), authorizationCallbackRequest.redirectUri()));
+                connection.componentName, connection.connectionVersion, connection.parameters,
+                connection.authorizationName, authorizationCallbackRequest.redirectUri()));
     }
 
     @MessageMapping("ConnectionDefinitionService.getAuthorizationType")
@@ -107,9 +102,15 @@ public class ConnectionDefinitionServiceRSocketController {
 
     @MessageMapping("ConnectionDefinitionService.getOAuth2Parameters")
     public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(Connection connection) {
-        return Mono.just(connectionDefinitionService.getOAuth2Parameters(connection));
+        return Mono.just(connectionDefinitionService.getOAuth2Parameters(
+            connection.componentName, connection.connectionVersion, connection.parameters,
+            connection.authorizationName));
     }
 
-    record AuthorizationCallbackRequest(Connection connection, String redirectUri) {
+    private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {
+    }
+
+    private record Connection(
+        String componentName, int connectionVersion, Map<String, Object> parameters, String authorizationName) {
     }
 }

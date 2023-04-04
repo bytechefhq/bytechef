@@ -19,9 +19,7 @@ package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.util.MonoUtils;
 import com.bytechef.commons.util.DiscoveryUtils;
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -61,13 +59,14 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
 
     @Override
     public void executeAuthorizationApply(
-        Connection connection, Authorization.AuthorizationContext authorizationContext) {
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        Authorization.AuthorizationContext authorizationContext) {
 
         Map<String, Map<String, List<String>>> authorizationContextMap = MonoUtils.get(
             rSocketRequesterBuilder
-                .websocket(getWebsocketUri(connection))
+                .websocket(getWebsocketUri(componentName))
                 .route("ConnectionDefinitionService.executeAuthorizationApply")
-                .data(connection)
+                .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
                 .retrieveMono(new ParameterizedTypeReference<>() {}));
 
         authorizationContext.setHeaders(authorizationContextMap.get("header"));
@@ -76,24 +75,29 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
 
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        Connection connection, String redirectUri) {
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        String redirectUri) {
 
         return MonoUtils.get(
             rSocketRequesterBuilder
-                .websocket(getWebsocketUri(connection))
+                .websocket(getWebsocketUri(componentName))
                 .route("ConnectionDefinitionService.executeAuthorizationCallback")
-                .data(Map.of("connection", connection, "redirectUri", redirectUri))
+                .data(new AuthorizationCallbackRequest(
+                    new Connection(componentName, connectionVersion, connectionParameters, authorizationName),
+                    redirectUri))
                 .retrieveMono(Authorization.AuthorizationCallbackResponse.class));
     }
 
     @Override
-    public Optional<String> fetchBaseUri(Connection connection) {
+    public Optional<String> fetchBaseUri(
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters) {
+
         return Optional.ofNullable(
             MonoUtils.get(
                 rSocketRequesterBuilder
-                    .websocket(getWebsocketUri(connection))
+                    .websocket(getWebsocketUri(componentName))
                     .route("ConnectionDefinitionService.fetchBaseUri")
-                    .data(connection)
+                    .data(new Connection(componentName, connectionVersion, connectionParameters, null))
                     .retrieveMono(String.class)));
     }
 
@@ -158,22 +162,16 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection) {
+    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+        String authorizationName) {
+
         return MonoUtils.get(
             rSocketRequesterBuilder
-                .websocket(getWebsocketUri(connection))
+                .websocket(getWebsocketUri(componentName))
                 .route("ConnectionDefinitionService.getOAuth2Parameters")
-                .data(connection)
+                .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
                 .retrieveMono(OAuth2AuthorizationParametersDTO.class));
-    }
-
-    @Override
-    public Context.Connection toContextConnection(Connection connection) {
-        throw new UnsupportedOperationException();
-    }
-
-    private URI getWebsocketUri(Connection connection) {
-        return getWebsocketUri(connection.getComponentName());
     }
 
     private URI getWebsocketUri(String componentName) {
@@ -188,5 +186,12 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
             .map(object -> (List<ConnectionDefinitionDTO>) object)
             .flatMap(Collection::stream)
             .toList();
+    }
+
+    private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {
+    }
+
+    private record Connection(
+        String componentName, int connectionVersion, Map<String, Object> parameters, String authorizationName) {
     }
 }
