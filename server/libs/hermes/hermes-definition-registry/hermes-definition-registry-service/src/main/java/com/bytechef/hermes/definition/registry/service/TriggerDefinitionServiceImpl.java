@@ -18,9 +18,9 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
@@ -29,48 +29,48 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class ActionDefinitionServiceImpl implements ActionDefinitionService {
+public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private final List<ComponentDefinition> componentDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public ActionDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
+    public TriggerDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
         this.componentDefinitions = componentDefinitions;
     }
 
     @Override
-    public Mono<ActionDefinitionDTO> getComponentDefinitionActionMono(
-        String componentName, int componentVersion, String actionName) {
+    public Mono<TriggerDefinitionDTO> getComponentDefinitionTriggerMono(
+        String componentName, int componentVersion, String triggerName) {
 
         return Mono.just(
             componentDefinitions.stream()
-                .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                .filter(componentDefinition -> triggerName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
-                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
-                .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
-                .map(actionDefinition -> (ActionDefinition) actionDefinition)
+                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getTriggers()))
+                .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))
+                .map(actionDefinition -> (TriggerDefinition) actionDefinition)
                 .findFirst()
-                .map(this::toActionDefinitionDTO)
+                .map(this::toTriggerDefinitionDTO)
                 .orElseThrow(IllegalArgumentException::new));
     }
 
     @Override
-    public Mono<List<ActionDefinitionDTO>> getComponentDefinitionActionsMono(
+    public Mono<List<TriggerDefinitionDTO>> getComponentDefinitionTriggersMono(
         String componentName, int componentVersion) {
         return Mono.just(
             componentDefinitions.stream()
                 .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
-                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
-                .map(actionDefinition -> (ActionDefinition) actionDefinition)
-                .map(this::toActionDefinitionDTO)
+                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getTriggers()))
+                .map(triggerDefinition -> (TriggerDefinition) triggerDefinition)
+                .map(this::toTriggerDefinitionDTO)
                 .toList());
     }
 
-    private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
-        return new ActionDefinitionDTO(
-            actionDefinition.getBatch(), actionDefinition.getDisplay(), actionDefinition.getExampleOutput(),
-            actionDefinition.getName(), actionDefinition.getOutputSchema(), actionDefinition.getProperties(),
-            actionDefinition.getResources());
+    private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
+        return new TriggerDefinitionDTO(
+            triggerDefinition.getBatch(), triggerDefinition.getDisplay(), triggerDefinition.getExampleOutput(),
+            triggerDefinition.getName(), triggerDefinition.getOutputSchema(), triggerDefinition.getProperties(),
+            triggerDefinition.getResources(), triggerDefinition.getType());
     }
 }

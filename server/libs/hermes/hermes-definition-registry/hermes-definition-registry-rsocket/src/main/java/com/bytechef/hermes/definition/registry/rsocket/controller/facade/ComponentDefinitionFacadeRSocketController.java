@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.controller.facade;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,7 +41,7 @@ public class ComponentDefinitionFacadeRSocketController {
     }
 
     @MessageMapping("ComponentDefinitionFacade.getComponentDefinitions")
-    public Mono<List<ComponentDefinition>> getComponentDefinitions(Map<String, Boolean> map) {
+    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(Map<String, Boolean> map) {
 
         return componentDefinitionFacade.getComponentDefinitions(
             map.get("connectionDefinitions"), map.get("connectionInstances"));

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.util.DiscoveryUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -46,7 +46,7 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
     }
 
     @Override
-    public Mono<ActionDefinition> getComponentDefinitionActionMono(
+    public Mono<ActionDefinitionDTO> getComponentDefinitionActionMono(
         String componentName, int componentVersion, String actionName) {
 
         return rSocketRequesterBuilder
@@ -56,11 +56,13 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
             .route("ActionDefinitionService.getComponentDefinitionAction")
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", actionName))
-            .retrieveMono(ActionDefinition.class);
+            .retrieveMono(ActionDefinitionDTO.class);
     }
 
     @Override
-    public Mono<List<ActionDefinition>> getComponentDefinitionActionsMono(String componentName, int componentVersion) {
+    public Mono<List<ActionDefinitionDTO>> getComponentDefinitionActionsMono(
+        String componentName, int componentVersion) {
+
         return rSocketRequesterBuilder
             .websocket(DiscoveryUtils.toWebSocketUri(
                 DiscoveryUtils.filterServiceInstance(

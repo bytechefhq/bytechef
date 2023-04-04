@@ -15,15 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.service;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record OAuth2AuthorizationParametersDTO(String authorizationUrl, String clientId, List<String> scopes) {
+public interface TriggerDefinitionService {
+
+    Mono<TriggerDefinitionDTO> getComponentDefinitionTriggerMono(
+        String componentName, int componentVersion, String triggerName);
+
+    Mono<List<TriggerDefinitionDTO>> getComponentDefinitionTriggersMono(String componentName, int componentVersion);
 }

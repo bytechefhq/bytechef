@@ -29,6 +29,8 @@ import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServi
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -72,5 +74,10 @@ public class DefinitionRegistryConfiguration {
                 .stream()
                 .map(TaskDispatcherDefinitionFactory::getDefinition)
                 .toList());
+    }
+
+    @Bean
+    TriggerDefinitionService triggerDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new TriggerDefinitionServiceImpl(componentDefinitions);
     }
 }

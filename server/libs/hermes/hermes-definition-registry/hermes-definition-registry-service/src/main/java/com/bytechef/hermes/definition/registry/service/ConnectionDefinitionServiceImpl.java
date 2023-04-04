@@ -24,6 +24,8 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
+import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -46,11 +48,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     @SuppressFBWarnings("EI2")
     public ConnectionDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
         this.componentDefinitions = componentDefinitions;
-        this.connectionDefinitions = componentDefinitions.stream()
-            .map(ComponentDefinition::getConnection)
-            .filter(Objects::nonNull)
-            .distinct()
-            .toList();
+        this.connectionDefinitions = CollectionUtils.mapDistinct(
+            componentDefinitions,
+            ComponentDefinition::getConnection,
+            Objects::nonNull);
     }
 
     @Override
@@ -113,30 +114,21 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return authorization.getType();
     }
 
-    public ConnectionDefinition getComponentConnectionDefinition(String componentName, int connectionVersion) {
-        return CollectionUtils.getFirst(
-            componentDefinitions,
-            componentDefinition -> {
-                ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
-
-                return componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                    connectionDefinition.getVersion() == connectionVersion;
-            },
-            ComponentDefinition::getConnection);
+    @Override
+    public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinitionMono(
+        String componentName, int componentVersion) {
+        return Mono.just(
+            toConnectionDefinitionDTO(
+                CollectionUtils.getFirst(
+                    componentDefinitions,
+                    componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                        componentDefinition.getVersion() == componentVersion,
+                    ComponentDefinition::getConnection)));
     }
 
     @Override
-    public Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(String componentName, int componentVersion) {
-        return Mono.just(CollectionUtils.getFirst(
-            componentDefinitions,
-            componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                componentDefinition.getVersion() == componentVersion,
-            ComponentDefinition::getConnection));
-    }
-
-    @Override
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono() {
-        return Mono.just(connectionDefinitions);
+    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono() {
+        return Mono.just(CollectionUtils.map(connectionDefinitions, this::toConnectionDefinitionDTO));
     }
 
     @Override
@@ -156,7 +148,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitionsMono(
+    public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitionsMono(
         String componentName, int componentVersion) {
 
         ComponentDefinition componentDefinition = CollectionUtils.getFirst(
@@ -165,10 +157,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 curComponentDefinition.getVersion() == componentVersion);
 
         return Mono.just(
-            CollectionUtils.concatDistinct(
-                componentDefinition.applyFilterCompatibleConnectionDefinitions(
-                    componentDefinition, connectionDefinitions),
-                List.of(componentDefinition.getConnection())));
+            CollectionUtils.map(
+                CollectionUtils.concatDistinct(
+                    componentDefinition.applyFilterCompatibleConnectionDefinitions(
+                        componentDefinition, connectionDefinitions),
+                    List.of(componentDefinition.getConnection())),
+                this::toConnectionDefinitionDTO));
     }
 
     @Override
@@ -182,9 +176,37 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return connectionDefinition.getAuthorization(authorizationName);
     }
 
+    private ConnectionDefinition getComponentConnectionDefinition(String componentName, int connectionVersion) {
+        return CollectionUtils.getFirst(
+            componentDefinitions,
+            componentDefinition -> {
+                ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
+
+                return componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                    connectionDefinition.getVersion() == connectionVersion;
+            },
+            ComponentDefinition::getConnection);
+    }
+
+    private List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {
+        return CollectionUtils.map(
+            authorizations,
+            authorization -> new AuthorizationDTO(
+                authorization.getDisplay(), authorization.getName(), authorization.getProperties(),
+                authorization.getType()));
+    }
+
+    private ConnectionDefinitionDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
+        return new ConnectionDefinitionDTO(
+            connectionDefinition.isAuthorizationRequired(),
+            toAuthorizationDTOs(connectionDefinition.getAuthorizations()), connectionDefinition.getDisplay(),
+            connectionDefinition.getName(), connectionDefinition.getProperties(), connectionDefinition.getResources(),
+            connectionDefinition.getVersion());
+    }
+
     private class ContextConnection implements Context.Connection {
 
-        private Connection connection;
+        private final Connection connection;
         private final Map<String, Object> parameters;
 
         public ContextConnection(Connection connection) {
