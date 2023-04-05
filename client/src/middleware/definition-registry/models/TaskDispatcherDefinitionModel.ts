@@ -43,13 +43,13 @@ export interface TaskDispatcherDefinitionModel {
      * @type {DisplayModel}
      * @memberof TaskDispatcherDefinitionModel
      */
-    display?: DisplayModel;
+    display: DisplayModel;
     /**
      * The task dispatcher name..
      * @type {string}
      * @memberof TaskDispatcherDefinitionModel
      */
-    name?: string;
+    name: string;
     /**
      * The output schema of a task dispatching result.
      * @type {Array<PropertyModel>}
@@ -73,7 +73,7 @@ export interface TaskDispatcherDefinitionModel {
      * @type {number}
      * @memberof TaskDispatcherDefinitionModel
      */
-    version?: number;
+    version: number;
     /**
      * Properties used to define tasks to be dispatched.
      * @type {Array<PropertyModel>}
@@ -87,6 +87,9 @@ export interface TaskDispatcherDefinitionModel {
  */
 export function instanceOfTaskDispatcherDefinitionModel(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "display" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "version" in value;
 
     return isInstance;
 }
@@ -101,12 +104,12 @@ export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
-        'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'display': DisplayModelFromJSON(json['display']),
+        'name': json['name'],
         'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'version': !exists(json, 'version') ? undefined : json['version'],
+        'version': json['version'],
         'taskProperties': !exists(json, 'taskProperties') ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyModelFromJSON)),
     };
 }

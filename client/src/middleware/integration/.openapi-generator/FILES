@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/IntegrationCategoriesApi.ts
 apis/IntegrationTagsApi.ts
 apis/IntegrationsApi.ts

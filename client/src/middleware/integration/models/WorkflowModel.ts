@@ -121,7 +121,7 @@ export interface WorkflowModel {
      * @type {number}
      * @memberof WorkflowModel
      */
-    readonly retry?: number;
+    readonly maxRetries?: number;
     /**
      * The steps that make up the workflow.
      * @type {Array<WorkflowTaskModel>}
@@ -180,7 +180,7 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'outputs': !exists(json, 'outputs') ? undefined : ((json['outputs'] as Array<any>).map(OutputModelFromJSON)),
         'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
-        'retry': !exists(json, 'retry') ? undefined : json['retry'],
+        'maxRetries': !exists(json, 'maxRetries') ? undefined : json['maxRetries'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'version': !exists(json, '__version') ? undefined : json['__version'],
     };

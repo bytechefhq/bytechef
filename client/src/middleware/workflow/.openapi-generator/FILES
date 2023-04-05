@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/JobsApi.ts
 apis/TaskExecutionsApi.ts
 apis/WorkflowsApi.ts
