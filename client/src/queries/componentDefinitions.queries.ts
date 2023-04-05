@@ -24,7 +24,10 @@ export const useGetComponentDefinitionQuery = (
 ) =>
     useQuery<ComponentDefinitionModel, Error>(
         ComponentDefinitionKeys.componentDefinition(request),
-        () => new ComponentDefinitionsApi().getComponentDefinition(request)
+        () => new ComponentDefinitionsApi().getComponentDefinition(request),
+        {
+            enabled: !!request.componentName,
+        }
     );
 
 export const useGetComponentDefinitionsQuery = (
