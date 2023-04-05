@@ -70,14 +70,6 @@ public final class ComponentDSL extends DefinitionDSL {
         return new ModifiableExampleOutputDataSource(exampleOutputFunction);
     }
 
-    public static ModifiableComponentPropertiesDataSource propertiesDataSource(
-        ComponentPropertiesDataSource.PropertiesFunction propertiesFunction,
-        String... propertiesDependOnPropertyNames) {
-
-        return new ModifiableComponentPropertiesDataSource(propertiesFunction,
-            List.of(propertiesDependOnPropertyNames));
-    }
-
     public static ModifiableProperty.ModifiableObjectProperty fileEntry() {
         return fileEntry(null);
     }
@@ -107,6 +99,18 @@ public final class ComponentDSL extends DefinitionDSL {
         OutputSchemaDataSource.OutputSchemaFunction outputSchemaFunction) {
 
         return new ModifiableOutputSchemaDataSource(outputSchemaFunction);
+    }
+
+    public static ModifiableComponentPropertiesDataSource propertiesDataSource(
+        ComponentPropertiesDataSource.PropertiesFunction propertiesFunction,
+        String... propertiesDependOnPropertyNames) {
+
+        return new ModifiableComponentPropertiesDataSource(propertiesFunction,
+            List.of(propertiesDependOnPropertyNames));
+    }
+
+    public static ModifiableTriggerDefinition trigger(String name) {
+        return new ModifiableTriggerDefinition(name);
     }
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
@@ -1156,6 +1160,13 @@ public final class ComponentDSL extends DefinitionDSL {
         private WebhookEnableFunction webhookEnable;
         private WebhookRefreshFunction webhookRefresh;
         private WebhookRequestFunction webhookRequest;
+
+        private ModifiableTriggerDefinition() {
+        }
+
+        private ModifiableTriggerDefinition(String name) {
+            this.name = Objects.requireNonNull(name);
+        }
 
         public ModifiableTriggerDefinition display(Display display) {
             this.display = display;
