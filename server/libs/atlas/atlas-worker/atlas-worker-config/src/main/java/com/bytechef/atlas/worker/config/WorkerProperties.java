@@ -35,7 +35,7 @@ public class WorkerProperties {
         return subscriptions;
     }
 
-    public void setSubscriptions(Map<String, Object> aSubscriptions) {
-        subscriptions = aSubscriptions;
+    public void setSubscriptions(Map<String, Object> subscriptions) {
+        this.subscriptions = subscriptions;
     }
 }
