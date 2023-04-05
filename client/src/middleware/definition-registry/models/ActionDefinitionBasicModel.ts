@@ -19,6 +19,12 @@ import {
     DisplayModelFromJSONTyped,
     DisplayModelToJSON,
 } from './DisplayModel';
+import type { ResourcesModel } from './ResourcesModel';
+import {
+    ResourcesModelFromJSON,
+    ResourcesModelFromJSONTyped,
+    ResourcesModelToJSON,
+} from './ResourcesModel';
 
 /**
  * An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
@@ -38,6 +44,12 @@ export interface ActionDefinitionBasicModel {
      * @memberof ActionDefinitionBasicModel
      */
     display: DisplayModel;
+    /**
+     * 
+     * @type {ResourcesModel}
+     * @memberof ActionDefinitionBasicModel
+     */
+    resources?: ResourcesModel;
 }
 
 /**
@@ -63,6 +75,7 @@ export function ActionDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscrim
         
         'name': json['name'],
         'display': DisplayModelFromJSON(json['display']),
+        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
     };
 }
 
@@ -77,6 +90,7 @@ export function ActionDefinitionBasicModelToJSON(value?: ActionDefinitionBasicMo
         
         'name': value.name,
         'display': DisplayModelToJSON(value.display),
+        'resources': ResourcesModelToJSON(value.resources),
     };
 }
 

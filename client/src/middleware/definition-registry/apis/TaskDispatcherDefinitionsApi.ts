@@ -15,9 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
+  TaskDispatcherDefinitionBasicModel,
   TaskDispatcherDefinitionModel,
 } from '../models';
 import {
+    TaskDispatcherDefinitionBasicModelFromJSON,
+    TaskDispatcherDefinitionBasicModelToJSON,
     TaskDispatcherDefinitionModelFromJSON,
     TaskDispatcherDefinitionModelToJSON,
 } from '../models';
@@ -73,10 +76,10 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all task dispatcher definition versions of a task dispatcher definition.
-     * Get all task dispatcher definition versions of a component definition.
+     * Get all task dispatcher definition versions of a task dispatcher.
+     * Get all task dispatcher definition versions of a task dispatcher.
      */
-    async getTaskDispatcherDefinitionVersionsRaw(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionModel>>> {
+    async getTaskDispatcherDefinitionVersionsRaw(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionBasicModel>>> {
         if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
             throw new runtime.RequiredError('taskDispatcherName','Required parameter requestParameters.taskDispatcherName was null or undefined when calling getTaskDispatcherDefinitionVersions.');
         }
@@ -86,20 +89,20 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/task-dispatcher-definitions/{taskDispatcherName}`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters.taskDispatcherName))),
+            path: `/task-dispatcher-definitions/{taskDispatcherName}/versions`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters.taskDispatcherName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskDispatcherDefinitionModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskDispatcherDefinitionBasicModelFromJSON));
     }
 
     /**
-     * Get all task dispatcher definition versions of a task dispatcher definition.
-     * Get all task dispatcher definition versions of a component definition.
+     * Get all task dispatcher definition versions of a task dispatcher.
+     * Get all task dispatcher definition versions of a task dispatcher.
      */
-    async getTaskDispatcherDefinitionVersions(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionModel>> {
+    async getTaskDispatcherDefinitionVersions(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionBasicModel>> {
         const response = await this.getTaskDispatcherDefinitionVersionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
