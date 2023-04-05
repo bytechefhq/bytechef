@@ -3,10 +3,11 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TriggerTypeModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -18,38 +19,39 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
+ * A trigger definition defines ways to trigger workflows from the outside services.
  */
 
-@Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
-@JsonTypeName("ComponentDefinitionBasic")
+@Schema(name = "TriggerDefinitionBasic", description = "A trigger definition defines ways to trigger workflows from the outside services.")
+@JsonTypeName("TriggerDefinitionBasic")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
-public class ComponentDefinitionBasicModel {
+public class TriggerDefinitionBasicModel {
 
   private DisplayModel display;
 
   private String name;
 
-  private ResourcesModel resources;
+  private TriggerTypeModel type;
 
   /**
    * Default constructor
-   * @deprecated Use {@link ComponentDefinitionBasicModel#ComponentDefinitionBasicModel(DisplayModel, String)}
+   * @deprecated Use {@link TriggerDefinitionBasicModel#TriggerDefinitionBasicModel(DisplayModel, String, TriggerTypeModel)}
    */
   @Deprecated
-  public ComponentDefinitionBasicModel() {
+  public TriggerDefinitionBasicModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ComponentDefinitionBasicModel(DisplayModel display, String name) {
+  public TriggerDefinitionBasicModel(DisplayModel display, String name, TriggerTypeModel type) {
     this.display = display;
     this.name = name;
+    this.type = type;
   }
 
-  public ComponentDefinitionBasicModel display(DisplayModel display) {
+  public TriggerDefinitionBasicModel display(DisplayModel display) {
     this.display = display;
     return this;
   }
@@ -69,17 +71,17 @@ public class ComponentDefinitionBasicModel {
     this.display = display;
   }
 
-  public ComponentDefinitionBasicModel name(String name) {
+  public TriggerDefinitionBasicModel name(String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The name of a component.
+   * The action name.
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -89,24 +91,24 @@ public class ComponentDefinitionBasicModel {
     this.name = name;
   }
 
-  public ComponentDefinitionBasicModel resources(ResourcesModel resources) {
-    this.resources = resources;
+  public TriggerDefinitionBasicModel type(TriggerTypeModel type) {
+    this.type = type;
     return this;
   }
 
   /**
-   * Get resources
-   * @return resources
+   * Get type
+   * @return type
   */
-  @Valid 
-  @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("resources")
-  public ResourcesModel getResources() {
-    return resources;
+  @NotNull @Valid 
+  @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("type")
+  public TriggerTypeModel getType() {
+    return type;
   }
 
-  public void setResources(ResourcesModel resources) {
-    this.resources = resources;
+  public void setType(TriggerTypeModel type) {
+    this.type = type;
   }
 
   @Override
@@ -117,24 +119,24 @@ public class ComponentDefinitionBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ComponentDefinitionBasicModel componentDefinitionBasic = (ComponentDefinitionBasicModel) o;
-    return Objects.equals(this.display, componentDefinitionBasic.display) &&
-        Objects.equals(this.name, componentDefinitionBasic.name) &&
-        Objects.equals(this.resources, componentDefinitionBasic.resources);
+    TriggerDefinitionBasicModel triggerDefinitionBasic = (TriggerDefinitionBasicModel) o;
+    return Objects.equals(this.display, triggerDefinitionBasic.display) &&
+        Objects.equals(this.name, triggerDefinitionBasic.name) &&
+        Objects.equals(this.type, triggerDefinitionBasic.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, resources);
+    return Objects.hash(display, name, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ComponentDefinitionBasicModel {\n");
+    sb.append("class TriggerDefinitionBasicModel {\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

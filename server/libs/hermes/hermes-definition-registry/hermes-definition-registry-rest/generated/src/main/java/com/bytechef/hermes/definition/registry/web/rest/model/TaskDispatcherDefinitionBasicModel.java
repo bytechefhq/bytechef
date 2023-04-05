@@ -18,13 +18,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Definition of a connection to an outside service.
+ * A task dispatcher defines a strategy for dispatching tasks to be executed.
  */
 
-@Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
-@JsonTypeName("ConnectionDefinitionBasic")
+@Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
+@JsonTypeName("TaskDispatcherDefinitionBasic")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
-public class ConnectionDefinitionBasicModel {
+public class TaskDispatcherDefinitionBasicModel {
 
   private DisplayModel display;
 
@@ -32,27 +32,24 @@ public class ConnectionDefinitionBasicModel {
 
   private ResourcesModel resources;
 
-  private Integer version;
-
   /**
    * Default constructor
-   * @deprecated Use {@link ConnectionDefinitionBasicModel#ConnectionDefinitionBasicModel(DisplayModel, String, Integer)}
+   * @deprecated Use {@link TaskDispatcherDefinitionBasicModel#TaskDispatcherDefinitionBasicModel(DisplayModel, String)}
    */
   @Deprecated
-  public ConnectionDefinitionBasicModel() {
+  public TaskDispatcherDefinitionBasicModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ConnectionDefinitionBasicModel(DisplayModel display, String name, Integer version) {
+  public TaskDispatcherDefinitionBasicModel(DisplayModel display, String name) {
     this.display = display;
     this.name = name;
-    this.version = version;
   }
 
-  public ConnectionDefinitionBasicModel display(DisplayModel display) {
+  public TaskDispatcherDefinitionBasicModel display(DisplayModel display) {
     this.display = display;
     return this;
   }
@@ -72,17 +69,17 @@ public class ConnectionDefinitionBasicModel {
     this.display = display;
   }
 
-  public ConnectionDefinitionBasicModel name(String name) {
+  public TaskDispatcherDefinitionBasicModel name(String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The connection name.
+   * The task dispatcher name..
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The connection name.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The task dispatcher name..", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -92,7 +89,7 @@ public class ConnectionDefinitionBasicModel {
     this.name = name;
   }
 
-  public ConnectionDefinitionBasicModel resources(ResourcesModel resources) {
+  public TaskDispatcherDefinitionBasicModel resources(ResourcesModel resources) {
     this.resources = resources;
     return this;
   }
@@ -112,26 +109,6 @@ public class ConnectionDefinitionBasicModel {
     this.resources = resources;
   }
 
-  public ConnectionDefinitionBasicModel version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-  /**
-   * The version of a connection.
-   * @return version
-  */
-  @NotNull 
-  @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("version")
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -140,26 +117,24 @@ public class ConnectionDefinitionBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ConnectionDefinitionBasicModel connectionDefinitionBasic = (ConnectionDefinitionBasicModel) o;
-    return Objects.equals(this.display, connectionDefinitionBasic.display) &&
-        Objects.equals(this.name, connectionDefinitionBasic.name) &&
-        Objects.equals(this.resources, connectionDefinitionBasic.resources) &&
-        Objects.equals(this.version, connectionDefinitionBasic.version);
+    TaskDispatcherDefinitionBasicModel taskDispatcherDefinitionBasic = (TaskDispatcherDefinitionBasicModel) o;
+    return Objects.equals(this.display, taskDispatcherDefinitionBasic.display) &&
+        Objects.equals(this.name, taskDispatcherDefinitionBasic.name) &&
+        Objects.equals(this.resources, taskDispatcherDefinitionBasic.resources);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, resources, version);
+    return Objects.hash(display, name, resources);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConnectionDefinitionBasicModel {\n");
+    sb.append("class TaskDispatcherDefinitionBasicModel {\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

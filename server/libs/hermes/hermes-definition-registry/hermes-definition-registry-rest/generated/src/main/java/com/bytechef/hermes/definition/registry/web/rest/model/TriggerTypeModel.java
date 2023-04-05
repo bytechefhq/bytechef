@@ -17,35 +17,25 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Authorization type.
+ * Gets or Sets TriggerType
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
-public enum AuthorizationTypeModel {
+public enum TriggerTypeModel {
   
-  API_KEY("API_KEY"),
+  DYNAMIC_WEBHOOK("DYNAMIC_WEBHOOK"),
   
-  BASIC_AUTH("BASIC_AUTH"),
+  HYBRID("HYBRID"),
   
-  BEARER_TOKEN("BEARER_TOKEN"),
+  MANUAL("MANUAL"),
   
-  CUSTOM("CUSTOM"),
+  POLLING("POLLING"),
   
-  DIGEST_AUTH("DIGEST_AUTH"),
-  
-  OAUTH2_AUTHORIZATION_CODE("OAUTH2_AUTHORIZATION_CODE"),
-  
-  OAUTH2_AUTHORIZATION_CODE_PKCE("OAUTH2_AUTHORIZATION_CODE_PKCE"),
-  
-  OAUTH2_CLIENT_CREDENTIALS("OAUTH2_CLIENT_CREDENTIALS"),
-  
-  OAUTH2_IMPLICIT_CODE("OAUTH2_IMPLICIT_CODE"),
-  
-  OAUTH2_RESOURCE_OWNER_PASSWORD("OAUTH2_RESOURCE_OWNER_PASSWORD");
+  STATIC_WEBHOOK("STATIC_WEBHOOK");
 
   private String value;
 
-  AuthorizationTypeModel(String value) {
+  TriggerTypeModel(String value) {
     this.value = value;
   }
 
@@ -60,8 +50,8 @@ public enum AuthorizationTypeModel {
   }
 
   @JsonCreator
-  public static AuthorizationTypeModel fromValue(String value) {
-    for (AuthorizationTypeModel b : AuthorizationTypeModel.values()) {
+  public static TriggerTypeModel fromValue(String value) {
+    for (TriggerTypeModel b : TriggerTypeModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:20.252283+02:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   private String createdBy;
@@ -100,7 +100,7 @@ public class WorkflowModel {
 
   private SourceTypeEnum sourceType;
 
-  private Integer retry;
+  private Integer maxRetries;
 
   @Valid
   private List<@Valid WorkflowTaskModel> tasks;
@@ -363,24 +363,24 @@ public class WorkflowModel {
     this.sourceType = sourceType;
   }
 
-  public WorkflowModel retry(Integer retry) {
-    this.retry = retry;
+  public WorkflowModel maxRetries(Integer maxRetries) {
+    this.maxRetries = maxRetries;
     return this;
   }
 
   /**
    * The maximum number of times a task may retry.
-   * @return retry
+   * @return maxRetries
   */
   
-  @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("retry")
-  public Integer getRetry() {
-    return retry;
+  @Schema(name = "maxRetries", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxRetries")
+  public Integer getMaxRetries() {
+    return maxRetries;
   }
 
-  public void setRetry(Integer retry) {
-    this.retry = retry;
+  public void setMaxRetries(Integer maxRetries) {
+    this.maxRetries = maxRetries;
   }
 
   public WorkflowModel tasks(List<@Valid WorkflowTaskModel> tasks) {
@@ -452,14 +452,14 @@ public class WorkflowModel {
         Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate) &&
         Objects.equals(this.outputs, workflow.outputs) &&
         Objects.equals(this.sourceType, workflow.sourceType) &&
-        Objects.equals(this.retry, workflow.retry) &&
+        Objects.equals(this.maxRetries, workflow.maxRetries) &&
         Objects.equals(this.tasks, workflow.tasks) &&
         Objects.equals(this.version, workflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, definition, description, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, retry, tasks, version);
+    return Objects.hash(createdBy, createdDate, definition, description, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, maxRetries, tasks, version);
   }
 
   @Override
@@ -478,7 +478,7 @@ public class WorkflowModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
     sb.append("    sourceType: ").append(toIndentedString(sourceType)).append("\n");
-    sb.append("    retry: ").append(toIndentedString(retry)).append("\n");
+    sb.append("    maxRetries: ").append(toIndentedString(maxRetries)).append("\n");
     sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
