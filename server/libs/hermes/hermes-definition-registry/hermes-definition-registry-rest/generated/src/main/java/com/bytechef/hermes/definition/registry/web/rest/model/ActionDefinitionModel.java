@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -25,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
   private DisplayModel display;
@@ -40,6 +41,25 @@ public class ActionDefinitionModel {
   @Valid
   private List<@Valid PropertyModel> properties;
 
+  private ResourcesModel resources;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link ActionDefinitionModel#ActionDefinitionModel(DisplayModel, String)}
+   */
+  @Deprecated
+  public ActionDefinitionModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ActionDefinitionModel(DisplayModel display, String name) {
+    this.display = display;
+    this.name = name;
+  }
+
   public ActionDefinitionModel display(DisplayModel display) {
     this.display = display;
     return this;
@@ -49,8 +69,8 @@ public class ActionDefinitionModel {
    * Get display
    * @return display
   */
-  @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
@@ -89,8 +109,8 @@ public class ActionDefinitionModel {
    * The action name.
    * @return name
   */
-  
-  @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -156,6 +176,26 @@ public class ActionDefinitionModel {
     this.properties = properties;
   }
 
+  public ActionDefinitionModel resources(ResourcesModel resources) {
+    this.resources = resources;
+    return this;
+  }
+
+  /**
+   * Get resources
+   * @return resources
+  */
+  @Valid 
+  @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("resources")
+  public ResourcesModel getResources() {
+    return resources;
+  }
+
+  public void setResources(ResourcesModel resources) {
+    this.resources = resources;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -169,12 +209,13 @@ public class ActionDefinitionModel {
         Objects.equals(this.exampleOutput, actionDefinition.exampleOutput) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputSchema, actionDefinition.outputSchema) &&
-        Objects.equals(this.properties, actionDefinition.properties);
+        Objects.equals(this.properties, actionDefinition.properties) &&
+        Objects.equals(this.resources, actionDefinition.resources);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, exampleOutput, name, outputSchema, properties);
+    return Objects.hash(display, exampleOutput, name, outputSchema, properties, resources);
   }
 
   @Override
@@ -186,6 +227,7 @@ public class ActionDefinitionModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+    sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("}");
     return sb.toString();
   }

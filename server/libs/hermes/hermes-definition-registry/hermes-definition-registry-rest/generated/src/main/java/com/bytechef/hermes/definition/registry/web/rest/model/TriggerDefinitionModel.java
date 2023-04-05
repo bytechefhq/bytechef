@@ -5,9 +5,11 @@ import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TriggerTypeModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -21,15 +23,17 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A task dispatcher defines a strategy for dispatching tasks to be executed.
+ * A trigger definition defines ways to trigger workflows from the outside services.
  */
 
-@Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
-@JsonTypeName("TaskDispatcherDefinition")
+@Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
+@JsonTypeName("TriggerDefinition")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
-public class TaskDispatcherDefinitionModel {
+public class TriggerDefinitionModel {
 
   private DisplayModel display;
+
+  private Object exampleOutput;
 
   private String name;
 
@@ -41,30 +45,27 @@ public class TaskDispatcherDefinitionModel {
 
   private ResourcesModel resources;
 
-  private Integer version;
-
-  @Valid
-  private List<@Valid PropertyModel> taskProperties;
+  private TriggerTypeModel type;
 
   /**
    * Default constructor
-   * @deprecated Use {@link TaskDispatcherDefinitionModel#TaskDispatcherDefinitionModel(DisplayModel, String, Integer)}
+   * @deprecated Use {@link TriggerDefinitionModel#TriggerDefinitionModel(DisplayModel, String, TriggerTypeModel)}
    */
   @Deprecated
-  public TaskDispatcherDefinitionModel() {
+  public TriggerDefinitionModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public TaskDispatcherDefinitionModel(DisplayModel display, String name, Integer version) {
+  public TriggerDefinitionModel(DisplayModel display, String name, TriggerTypeModel type) {
     this.display = display;
     this.name = name;
-    this.version = version;
+    this.type = type;
   }
 
-  public TaskDispatcherDefinitionModel display(DisplayModel display) {
+  public TriggerDefinitionModel display(DisplayModel display) {
     this.display = display;
     return this;
   }
@@ -84,17 +85,37 @@ public class TaskDispatcherDefinitionModel {
     this.display = display;
   }
 
-  public TaskDispatcherDefinitionModel name(String name) {
+  public TriggerDefinitionModel exampleOutput(Object exampleOutput) {
+    this.exampleOutput = exampleOutput;
+    return this;
+  }
+
+  /**
+   * The example value of the action's output.
+   * @return exampleOutput
+  */
+  
+  @Schema(name = "exampleOutput", description = "The example value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleOutput")
+  public Object getExampleOutput() {
+    return exampleOutput;
+  }
+
+  public void setExampleOutput(Object exampleOutput) {
+    this.exampleOutput = exampleOutput;
+  }
+
+  public TriggerDefinitionModel name(String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The task dispatcher name..
+   * The action name.
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The task dispatcher name..", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The action name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -104,12 +125,12 @@ public class TaskDispatcherDefinitionModel {
     this.name = name;
   }
 
-  public TaskDispatcherDefinitionModel outputSchema(List<@Valid PropertyModel> outputSchema) {
+  public TriggerDefinitionModel outputSchema(List<@Valid PropertyModel> outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
 
-  public TaskDispatcherDefinitionModel addOutputSchemaItem(PropertyModel outputSchemaItem) {
+  public TriggerDefinitionModel addOutputSchemaItem(PropertyModel outputSchemaItem) {
     if (this.outputSchema == null) {
       this.outputSchema = new ArrayList<>();
     }
@@ -118,11 +139,11 @@ public class TaskDispatcherDefinitionModel {
   }
 
   /**
-   * The output schema of a task dispatching result.
+   * The output schema of an execution result.
    * @return outputSchema
   */
   @Valid 
-  @Schema(name = "outputSchema", description = "The output schema of a task dispatching result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "outputSchema", description = "The output schema of an execution result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchema")
   public List<@Valid PropertyModel> getOutputSchema() {
     return outputSchema;
@@ -132,12 +153,12 @@ public class TaskDispatcherDefinitionModel {
     this.outputSchema = outputSchema;
   }
 
-  public TaskDispatcherDefinitionModel properties(List<@Valid PropertyModel> properties) {
+  public TriggerDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
 
-  public TaskDispatcherDefinitionModel addPropertiesItem(PropertyModel propertiesItem) {
+  public TriggerDefinitionModel addPropertiesItem(PropertyModel propertiesItem) {
     if (this.properties == null) {
       this.properties = new ArrayList<>();
     }
@@ -146,11 +167,11 @@ public class TaskDispatcherDefinitionModel {
   }
 
   /**
-   * The list of task dispatcher properties.
+   * The list of action properties.
    * @return properties
   */
   @Valid 
-  @Schema(name = "properties", description = "The list of task dispatcher properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "properties", description = "The list of action properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
   public List<@Valid PropertyModel> getProperties() {
     return properties;
@@ -160,7 +181,7 @@ public class TaskDispatcherDefinitionModel {
     this.properties = properties;
   }
 
-  public TaskDispatcherDefinitionModel resources(ResourcesModel resources) {
+  public TriggerDefinitionModel resources(ResourcesModel resources) {
     this.resources = resources;
     return this;
   }
@@ -180,52 +201,24 @@ public class TaskDispatcherDefinitionModel {
     this.resources = resources;
   }
 
-  public TaskDispatcherDefinitionModel version(Integer version) {
-    this.version = version;
+  public TriggerDefinitionModel type(TriggerTypeModel type) {
+    this.type = type;
     return this;
   }
 
   /**
-   * The version of a task dispatcher.
-   * @return version
+   * Get type
+   * @return type
   */
-  @NotNull 
-  @Schema(name = "version", description = "The version of a task dispatcher.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("version")
-  public Integer getVersion() {
-    return version;
+  @NotNull @Valid 
+  @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("type")
+  public TriggerTypeModel getType() {
+    return type;
   }
 
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
-  public TaskDispatcherDefinitionModel taskProperties(List<@Valid PropertyModel> taskProperties) {
-    this.taskProperties = taskProperties;
-    return this;
-  }
-
-  public TaskDispatcherDefinitionModel addTaskPropertiesItem(PropertyModel taskPropertiesItem) {
-    if (this.taskProperties == null) {
-      this.taskProperties = new ArrayList<>();
-    }
-    this.taskProperties.add(taskPropertiesItem);
-    return this;
-  }
-
-  /**
-   * Properties used to define tasks to be dispatched.
-   * @return taskProperties
-  */
-  @Valid 
-  @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("taskProperties")
-  public List<@Valid PropertyModel> getTaskProperties() {
-    return taskProperties;
-  }
-
-  public void setTaskProperties(List<@Valid PropertyModel> taskProperties) {
-    this.taskProperties = taskProperties;
+  public void setType(TriggerTypeModel type) {
+    this.type = type;
   }
 
   @Override
@@ -236,32 +229,32 @@ public class TaskDispatcherDefinitionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TaskDispatcherDefinitionModel taskDispatcherDefinition = (TaskDispatcherDefinitionModel) o;
-    return Objects.equals(this.display, taskDispatcherDefinition.display) &&
-        Objects.equals(this.name, taskDispatcherDefinition.name) &&
-        Objects.equals(this.outputSchema, taskDispatcherDefinition.outputSchema) &&
-        Objects.equals(this.properties, taskDispatcherDefinition.properties) &&
-        Objects.equals(this.resources, taskDispatcherDefinition.resources) &&
-        Objects.equals(this.version, taskDispatcherDefinition.version) &&
-        Objects.equals(this.taskProperties, taskDispatcherDefinition.taskProperties);
+    TriggerDefinitionModel triggerDefinition = (TriggerDefinitionModel) o;
+    return Objects.equals(this.display, triggerDefinition.display) &&
+        Objects.equals(this.exampleOutput, triggerDefinition.exampleOutput) &&
+        Objects.equals(this.name, triggerDefinition.name) &&
+        Objects.equals(this.outputSchema, triggerDefinition.outputSchema) &&
+        Objects.equals(this.properties, triggerDefinition.properties) &&
+        Objects.equals(this.resources, triggerDefinition.resources) &&
+        Objects.equals(this.type, triggerDefinition.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, outputSchema, properties, resources, version, taskProperties);
+    return Objects.hash(display, exampleOutput, name, outputSchema, properties, resources, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TaskDispatcherDefinitionModel {\n");
+    sb.append("class TriggerDefinitionModel {\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    exampleOutput: ").append(toIndentedString(exampleOutput)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
-    sb.append("    taskProperties: ").append(toIndentedString(taskProperties)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

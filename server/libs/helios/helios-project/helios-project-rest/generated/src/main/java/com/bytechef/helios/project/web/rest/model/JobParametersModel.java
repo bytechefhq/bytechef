@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:18.190488+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   private String workflowId;

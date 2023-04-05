@@ -2,10 +2,11 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,13 +28,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
 public class ComponentDefinitionModel {
 
   @Valid
-  private List<@Valid ActionDefinitionModel> actions;
+  private List<@Valid ActionDefinitionBasicModel> actions;
 
-  private ConnectionDefinitionModel connection;
+  private ConnectionDefinitionBasicModel connection;
 
   private DisplayModel display;
 
@@ -41,14 +42,35 @@ public class ComponentDefinitionModel {
 
   private ResourcesModel resources;
 
+  @Valid
+  private List<@Valid TriggerDefinitionBasicModel> triggers;
+
   private Integer version;
 
-  public ComponentDefinitionModel actions(List<@Valid ActionDefinitionModel> actions) {
+  /**
+   * Default constructor
+   * @deprecated Use {@link ComponentDefinitionModel#ComponentDefinitionModel(DisplayModel, String, Integer)}
+   */
+  @Deprecated
+  public ComponentDefinitionModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ComponentDefinitionModel(DisplayModel display, String name, Integer version) {
+    this.display = display;
+    this.name = name;
+    this.version = version;
+  }
+
+  public ComponentDefinitionModel actions(List<@Valid ActionDefinitionBasicModel> actions) {
     this.actions = actions;
     return this;
   }
 
-  public ComponentDefinitionModel addActionsItem(ActionDefinitionModel actionsItem) {
+  public ComponentDefinitionModel addActionsItem(ActionDefinitionBasicModel actionsItem) {
     if (this.actions == null) {
       this.actions = new ArrayList<>();
     }
@@ -63,15 +85,15 @@ public class ComponentDefinitionModel {
   @Valid 
   @Schema(name = "actions", description = "The list of all available actions the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actions")
-  public List<@Valid ActionDefinitionModel> getActions() {
+  public List<@Valid ActionDefinitionBasicModel> getActions() {
     return actions;
   }
 
-  public void setActions(List<@Valid ActionDefinitionModel> actions) {
+  public void setActions(List<@Valid ActionDefinitionBasicModel> actions) {
     this.actions = actions;
   }
 
-  public ComponentDefinitionModel connection(ConnectionDefinitionModel connection) {
+  public ComponentDefinitionModel connection(ConnectionDefinitionBasicModel connection) {
     this.connection = connection;
     return this;
   }
@@ -83,11 +105,11 @@ public class ComponentDefinitionModel {
   @Valid 
   @Schema(name = "connection", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connection")
-  public ConnectionDefinitionModel getConnection() {
+  public ConnectionDefinitionBasicModel getConnection() {
     return connection;
   }
 
-  public void setConnection(ConnectionDefinitionModel connection) {
+  public void setConnection(ConnectionDefinitionBasicModel connection) {
     this.connection = connection;
   }
 
@@ -100,8 +122,8 @@ public class ComponentDefinitionModel {
    * Get display
    * @return display
   */
-  @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
@@ -120,8 +142,8 @@ public class ComponentDefinitionModel {
    * The name.
    * @return name
   */
-  
-  @Schema(name = "name", description = "The name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "name", description = "The name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -151,6 +173,34 @@ public class ComponentDefinitionModel {
     this.resources = resources;
   }
 
+  public ComponentDefinitionModel triggers(List<@Valid TriggerDefinitionBasicModel> triggers) {
+    this.triggers = triggers;
+    return this;
+  }
+
+  public ComponentDefinitionModel addTriggersItem(TriggerDefinitionBasicModel triggersItem) {
+    if (this.triggers == null) {
+      this.triggers = new ArrayList<>();
+    }
+    this.triggers.add(triggersItem);
+    return this;
+  }
+
+  /**
+   * The list of all available triggers the component can perform.
+   * @return triggers
+  */
+  @Valid 
+  @Schema(name = "triggers", description = "The list of all available triggers the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("triggers")
+  public List<@Valid TriggerDefinitionBasicModel> getTriggers() {
+    return triggers;
+  }
+
+  public void setTriggers(List<@Valid TriggerDefinitionBasicModel> triggers) {
+    this.triggers = triggers;
+  }
+
   public ComponentDefinitionModel version(Integer version) {
     this.version = version;
     return this;
@@ -160,8 +210,8 @@ public class ComponentDefinitionModel {
    * The version of a component.
    * @return version
   */
-  
-  @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("version")
   public Integer getVersion() {
     return version;
@@ -185,12 +235,13 @@ public class ComponentDefinitionModel {
         Objects.equals(this.display, componentDefinition.display) &&
         Objects.equals(this.name, componentDefinition.name) &&
         Objects.equals(this.resources, componentDefinition.resources) &&
+        Objects.equals(this.triggers, componentDefinition.triggers) &&
         Objects.equals(this.version, componentDefinition.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, connection, display, name, resources, version);
+    return Objects.hash(actions, connection, display, name, resources, triggers, version);
   }
 
   @Override
@@ -202,6 +253,7 @@ public class ComponentDefinitionModel {
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

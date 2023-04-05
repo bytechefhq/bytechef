@@ -2,7 +2,6 @@ README.md
 pom.xml
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/ApiUtil.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/ComponentDefinitionsApi.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/ConnectionDefinitionsApi.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/TaskDispatcherDefinitionsApi.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ActionDefinitionModel.java
@@ -13,7 +12,6 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/Authorizati
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/BooleanPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDefinitionModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDefinitionWithBasicActionsModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ControlTypeModel.java
@@ -38,6 +36,10 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyMod
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ResourcesModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/StringPropertyModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TaskDispatcherDefinitionModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerDefinitionBasicModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerDefinitionModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerTypeModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ValuePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ValuePropertyModel.java
