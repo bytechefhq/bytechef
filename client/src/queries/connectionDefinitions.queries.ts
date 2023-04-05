@@ -1,8 +1,8 @@
 import {useQuery} from '@tanstack/react-query';
 
 import {
-    ComponentDefinitionsApi,
     ConnectionDefinitionModel,
+    ConnectionDefinitionsApi,
     GetComponentConnectionDefinitionRequest,
 } from '../middleware/definition-registry';
 
@@ -19,7 +19,7 @@ export const useGetConnectionDefinitionQuery = (
     useQuery<ConnectionDefinitionModel, Error>(
         ConnectDefinitionKeys.connectionDefinitionDetails(request),
         () =>
-            new ComponentDefinitionsApi().getComponentConnectionDefinition(
+            new ConnectionDefinitionsApi().getComponentConnectionDefinition(
                 request!
             ),
         {
