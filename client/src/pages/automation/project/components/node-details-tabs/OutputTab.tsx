@@ -1,11 +1,11 @@
-import {ComponentDefinitionWithBasicActionsModel} from 'middleware/definition-registry';
+import {ComponentDefinitionModel} from 'middleware/definition-registry';
 
 const OutputTab = ({
     currentComponent,
 }: {
-    currentComponent: ComponentDefinitionWithBasicActionsModel;
+    currentComponent: ComponentDefinitionModel;
 }) => {
-    return <div>Output for {currentComponent.display.label}</div>;
+    return <div>Output for {currentComponent.display.title}</div>;
 };
 
 export default OutputTab;
