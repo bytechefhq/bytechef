@@ -96,7 +96,7 @@ public class Coordinator {
     }
 
     public void start(Long jobId) {
-        Job job = jobService.start(jobId);
+        Job job = jobService.setStatusToStarted(jobId);
 
         jobExecutor.execute(job);
 
@@ -114,7 +114,7 @@ public class Coordinator {
      * @return The stopped {@link Job}
      */
     public Job stop(Long jobId) {
-        Job job = jobService.stop(jobId);
+        Job job = jobService.setStatusToStopped(jobId);
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
@@ -146,7 +146,7 @@ public class Coordinator {
      * @return The resumed job
      */
     public Job resume(Long jobId) {
-        Job job = jobService.resume(jobId);
+        Job job = jobService.resumeToStatusStarted(jobId);
 
         jobExecutor.execute(job);
 
