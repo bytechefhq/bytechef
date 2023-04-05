@@ -43,15 +43,15 @@ public interface JobService {
 
     Job getTaskExecutionJob(long taskExecutionId);
 
-    Job resume(long id);
+    Job resumeToStatusStarted(long id);
 
     Page<Job> searchJobs(
         String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber);
 
-    Job start(long id);
+    Job setStatusToStarted(long id);
 
-    Job stop(long id);
+    Job setStatusToStopped(long id);
 
     Job update(Job job);
 }

@@ -126,7 +126,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job resume(long id) {
+    public Job resumeToStatusStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id));
 
         Assert.notNull(job, String.format("Unknown job %s", id));
@@ -151,7 +151,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job start(long id) {
+    public Job setStatusToStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id));
 
         job.setCurrentTask(0);
@@ -164,7 +164,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job stop(long id) {
+    public Job setStatusToStopped(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id));
 
         Assert.isTrue(
