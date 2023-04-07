@@ -1,12 +1,13 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
+import {useGetActionDefinitionQuery} from 'queries/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from 'queries/componentDefinitions.queries';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
-import {Tooltip} from '../../../../components/Tooltip/Tooltip';
+import Tooltip from '../../../../components/Tooltip/Tooltip';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
@@ -34,6 +35,7 @@ const tabs = [
 
 const NodeDetailsDialog = () => {
     const [activeTab, setActiveTab] = useState('description');
+    const [currentActionName, setCurrentActionName] = useState('');
 
     const {currentNode, nodeDetailsOpen, setNodeDetailsOpen} =
         useNodeDetailsDialogStore();
@@ -47,6 +49,17 @@ const NodeDetailsDialog = () => {
 
     const firstAction =
         currentComponent?.actions && currentComponent?.actions[0];
+
+    const {data: currentAction, refetch: refetchCurrentAction} =
+        useGetActionDefinitionQuery(
+            {
+                componentName: currentComponent?.name as string,
+                componentVersion: currentComponent?.version as number,
+                actionName: currentActionName || (firstAction?.name as string),
+            },
+            currentActionName,
+            !!currentComponent
+        );
 
     return (
         <Dialog.Root
@@ -93,8 +106,8 @@ const NodeDetailsDialog = () => {
                                 />
                             </Dialog.Title>
 
-                            <div className="flex flex-col">
-                                <div className="p-4">
+                            <div className="flex h-full flex-col">
+                                <div className="border-b border-gray-100 p-4">
                                     {singleActionComponent && !!firstAction ? (
                                         <>
                                             <span className="block px-2 text-sm font-medium leading-6">
@@ -115,29 +128,28 @@ const NodeDetailsDialog = () => {
                                             </div>
                                         </>
                                     ) : (
-                                        <>
-                                            {currentComponent?.actions && (
-                                                <Select
-                                                    contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
-                                                    label="Actions"
-                                                    options={currentComponent?.actions.map(
-                                                        (action) => ({
-                                                            label: action
-                                                                .display.title!,
-                                                            value: action.name,
-                                                            description:
-                                                                action.display
-                                                                    .description,
-                                                        })
-                                                    )}
-                                                    triggerClassName="w-full bg-gray-100"
-                                                />
+                                        <Select
+                                            contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
+                                            label="Actions"
+                                            options={currentComponent?.actions?.map(
+                                                (action) => ({
+                                                    label: action.display
+                                                        .title!,
+                                                    value: action.name,
+                                                    description:
+                                                        action.display
+                                                            .description,
+                                                })
                                             )}
-                                        </>
+                                            triggerClassName="w-full bg-gray-100"
+                                            onValueChange={(value) => {
+                                                setCurrentActionName(value);
+
+                                                refetchCurrentAction();
+                                            }}
+                                        />
                                     )}
                                 </div>
-
-                                <div className="border-t border-gray-100" />
 
                                 <div className="mb-4 flex justify-center pt-4">
                                     {tabs.map((tab) => {
@@ -167,29 +179,27 @@ const NodeDetailsDialog = () => {
                                     })}
                                 </div>
 
-                                <div className="px-4 py-2">
+                                <div className="h-full flex-[1_1_1px] overflow-scroll px-4 py-2">
                                     {activeTab === 'description' && (
                                         <DescriptionTab
-                                            currentComponent={currentComponent}
+                                            component={currentComponent}
                                         />
                                     )}
 
                                     {activeTab === 'properties' && (
                                         <PropertiesTab
-                                            currentComponent={currentComponent}
+                                            component={currentComponent}
                                         />
                                     )}
 
                                     {activeTab === 'connection' && (
                                         <ConnectionTab
-                                            currentComponent={currentComponent}
+                                            component={currentComponent}
                                         />
                                     )}
 
                                     {activeTab === 'output' && (
-                                        <OutputTab
-                                            currentComponent={currentComponent}
-                                        />
+                                        <OutputTab action={currentAction!} />
                                     )}
                                 </div>
                             </div>
