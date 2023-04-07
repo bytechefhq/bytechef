@@ -9,38 +9,39 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {OnChangeValue} from 'react-select';
 
-import Alert from '../../../components/Alert/Alert';
-import Checkbox from '../../../components/Checkbox/Checkbox';
+import Alert from '../../../../components/Alert/Alert';
+import Checkbox from '../../../../components/Checkbox/Checkbox';
 import FilterableSelect, {
     ISelectOption,
-} from '../../../components/FilterableSelect/FilterableSelect';
-import Label from '../../../components/Label/Label';
-import NativeSelect from '../../../components/NativeSelect/NativeSelect';
-import Properties from '../../../components/Properties/Properties';
-import {Tooltip} from '../../../components/Tooltip/Tooltip';
-import useCopyToClipboard from '../../../hooks/useCopyToClipboard';
-import {ConnectionModel, TagModel} from '../../../middleware/connection';
+} from '../../../../components/FilterableSelect/FilterableSelect';
+import Label from '../../../../components/Label/Label';
+import NativeSelect from '../../../../components/NativeSelect/NativeSelect';
+import Properties from '../../../../components/Properties/Properties';
+import Tooltip from '../../../../components/Tooltip/Tooltip';
+import useCopyToClipboard from '../../../../hooks/useCopyToClipboard';
+import {ConnectionModel, TagModel} from '../../../../middleware/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
-} from '../../../middleware/definition-registry';
+    ComponentDefinitionWithBasicActionsModel,
+} from '../../../../middleware/definition-registry';
 import {
     useCreateConnectionMutation,
     useUpdateConnectionMutation,
-} from '../../../mutations/connections.mutations';
+} from '../../../../mutations/connections.mutations';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
-} from '../../../queries/componentDefinitions.queries';
-import {useGetConnectionDefinitionQuery} from '../../../queries/connectionDefinitions.queries';
+} from '../../../../queries/componentDefinitions.queries';
+import {useGetConnectionDefinitionQuery} from '../../../../queries/connectionDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionOAuth2AuthorizationParametersQuery,
     useGetConnectionTagsQuery,
-} from '../../../queries/connections.queries';
-import {useGetOAuth2PropertiesQuery} from '../../../queries/oauth2Properties.queries';
-import OAuth2Button from './components/OAuth2Button';
-import {AuthTokenPayload} from './oauth2/useOAuth2';
+} from '../../../../queries/connections.queries';
+import {useGetOAuth2PropertiesQuery} from '../../../../queries/oauth2Properties.queries';
+import {AuthTokenPayload} from '../oauth2/useOAuth2';
+import OAuth2Button from './OAuth2Button';
 
 type Tag = TagModel | {label: string; value: string};
 
@@ -55,6 +56,7 @@ interface FormProps {
 }
 
 interface ConnectionDialogProps {
+    component?: ComponentDefinitionWithBasicActionsModel;
     connection?: ConnectionModel | undefined;
     showTrigger?: boolean;
     visible?: boolean;
@@ -62,18 +64,23 @@ interface ConnectionDialogProps {
 }
 
 const ConnectionDialog = ({
+    component,
     connection,
     showTrigger = true,
     visible = false,
     onClose,
 }: ConnectionDialogProps) => {
     const [authorizationName, setAuthorizationName] = useState<string>();
+
     const [componentDefinition, setComponentDefinition] =
         useState<ComponentDefinitionBasicModel>();
+
     const [isOpen, setIsOpen] = useState(visible);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
+
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] =
         useState<boolean>(true);
+
     const [wizardStep, setWizardStep] = useState<
         'configuration_step' | 'oauth_step'
     >('configuration_step');
@@ -276,21 +283,10 @@ const ConnectionDialog = ({
         }, 300);
     }
 
-    function handleOnTokenSuccess(payload: AuthTokenPayload) {
-        if (payload.access_token) {
-            /* eslint-disable @typescript-eslint/no-explicit-any */
-            return saveConnection(payload as any);
-        }
-    }
-
     async function handleOnCodeSuccess(code: string) {
         if (code) {
             await saveConnection({code: code} as any);
         }
-    }
-
-    function handleOnOAuth2Error(error: string) {
-        setOAuth2Error(error);
     }
 
     function getAuthorizationType(): string {
@@ -412,7 +408,7 @@ const ConnectionDialog = ({
                     {(wizardStep === 'configuration_step' ||
                         oAuth2AuthorizationParametersLoading) && (
                         <>
-                            {!connection?.id && (
+                            {!connection?.id && !component && (
                                 <Controller
                                     control={control}
                                     name="componentName"
@@ -450,12 +446,15 @@ const ConnectionDialog = ({
                                                     setAuthorizationName(
                                                         undefined
                                                     );
+
                                                     setComponentDefinition(
                                                         value.componentDefinition
                                                     );
+
                                                     setUsePredefinedOAuthApp(
                                                         true
                                                     );
+
                                                     setWizardStep(
                                                         'configuration_step'
                                                     );
@@ -463,6 +462,15 @@ const ConnectionDialog = ({
                                             }}
                                         />
                                     )}
+                                />
+                            )}
+
+                            {component && (
+                                <Input
+                                    label="Component"
+                                    defaultValue={component.display.label}
+                                    disabled
+                                    name="defaultComponentName"
                                 />
                             )}
 
@@ -636,7 +644,9 @@ const ConnectionDialog = ({
                                 type="button"
                                 onClick={() => {
                                     createConnectionMutation.reset();
+
                                     setOAuth2Error(undefined);
+
                                     setWizardStep('configuration_step');
                                 }}
                             />
@@ -689,10 +699,18 @@ const ConnectionDialog = ({
                                                 getAuth();
                                             }}
                                             onCodeSuccess={handleOnCodeSuccess}
-                                            onTokenSuccess={
-                                                handleOnTokenSuccess
+                                            onTokenSuccess={(
+                                                payload: AuthTokenPayload
+                                            ) => {
+                                                if (payload.access_token) {
+                                                    return saveConnection(
+                                                        payload as any
+                                                    );
+                                                }
+                                            }}
+                                            onError={(error: string) =>
+                                                setOAuth2Error(error)
                                             }
-                                            onError={handleOnOAuth2Error}
                                         />
                                     )}
                             </>

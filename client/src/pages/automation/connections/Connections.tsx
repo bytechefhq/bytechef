@@ -8,8 +8,8 @@ import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
 import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
 import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions.queries';
 import {useGetConnectionTagsQuery} from '../../../queries/connections.queries';
-import ConnectionDialog from './ConnectionDialog';
 import ConnectionList from './ConnectionList';
+import ConnectionDialog from './components/ConnectionDialog';
 
 export enum Type {
     Component,
