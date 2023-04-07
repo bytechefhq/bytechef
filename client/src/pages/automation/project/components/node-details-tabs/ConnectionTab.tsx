@@ -2,17 +2,18 @@ import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
 import Select from 'components/Select/Select';
 import {ComponentDefinitionModel} from 'middleware/definition-registry';
+import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
 import {useGetConnectionsQuery} from 'queries/connections.queries';
+import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useNodeDetailsDialogStore';
 
-const ConnectionTab = ({
-    currentComponent,
-}: {
-    currentComponent: ComponentDefinitionModel;
-}) => {
+const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
+    const [showEditConnectionDialog, setShowEditConnectionDialog] =
+        useState(false);
+
     const {data: connections} = useGetConnectionsQuery({
-        componentNames: [currentComponent.name!],
+        componentNames: [component.connection!.name!],
     });
 
     const {showConnectionNote, setShowConnectionNote} =
@@ -20,7 +21,7 @@ const ConnectionTab = ({
 
     return (
         <>
-            {connections && (
+            {!!connections?.length && (
                 <div className="flex space-x-2">
                     <Select
                         contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
@@ -35,7 +36,7 @@ const ConnectionTab = ({
                     <Button
                         className="mt-auto bg-blue-500 p-2"
                         icon={<PlusIcon className="h-5 w-5" />}
-                        onClick={() => console.log('add connection')}
+                        onClick={() => setShowEditConnectionDialog(true)}
                         title="Create a new connection"
                     />
                 </div>
@@ -60,6 +61,15 @@ const ConnectionTab = ({
                         only.
                     </p>
                 </div>
+            )}
+
+            {showEditConnectionDialog && (
+                <ConnectionDialog
+                    component={component}
+                    showTrigger={false}
+                    visible
+                    onClose={() => setShowEditConnectionDialog(false)}
+                />
             )}
         </>
     );
