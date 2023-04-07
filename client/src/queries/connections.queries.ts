@@ -42,13 +42,17 @@ export const useGetConnectionOAuth2AuthorizationParametersQuery = (
         }
     );
 
-export const useGetConnectionsQuery = (filters: {
-    componentNames?: string[];
-    tagIds?: number[];
-}) =>
+export const useGetConnectionsQuery = (
+    filters: {
+        componentNames?: string[];
+        tagIds?: number[];
+    },
+    enabledCondition?: boolean
+) =>
     useQuery<ConnectionModel[], Error>(
         ConnectionKeys.connectionList(filters),
-        () => new ConnectionsApi().getConnections(filters)
+        () => new ConnectionsApi().getConnections(filters),
+        {enabled: false || enabledCondition}
     );
 
 export const useGetConnectionTagsQuery = () =>
