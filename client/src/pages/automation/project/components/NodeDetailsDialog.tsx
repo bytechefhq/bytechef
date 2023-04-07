@@ -131,7 +131,7 @@ const NodeDetailsDialog = () => {
                                         <Select
                                             contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
                                             label="Actions"
-                                            options={currentComponent?.actions?.map(
+                                            options={currentComponent.actions!.map(
                                                 (action) => ({
                                                     label: action.display
                                                         .title!,

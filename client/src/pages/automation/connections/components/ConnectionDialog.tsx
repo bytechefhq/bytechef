@@ -23,7 +23,7 @@ import {ConnectionModel, TagModel} from '../../../../middleware/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
-    ComponentDefinitionWithBasicActionsModel,
+    ComponentDefinitionModel,
 } from '../../../../middleware/definition-registry';
 import {
     useCreateConnectionMutation,
@@ -56,7 +56,7 @@ interface FormProps {
 }
 
 interface ConnectionDialogProps {
-    component?: ComponentDefinitionWithBasicActionsModel;
+    component?: ComponentDefinitionModel;
     connection?: ConnectionModel | undefined;
     showTrigger?: boolean;
     visible?: boolean;
@@ -468,7 +468,7 @@ const ConnectionDialog = ({
                             {component && (
                                 <Input
                                     label="Component"
-                                    defaultValue={component.display.label}
+                                    defaultValue={component.display.title}
                                     disabled
                                     name="defaultComponentName"
                                 />
