@@ -3,7 +3,7 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import React, {ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {Tooltip} from '../Tooltip/Tooltip';
+import Tooltip from '../Tooltip/Tooltip';
 
 type InputProps = {
     description?: string;
@@ -24,6 +24,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {
             className,
             description,
+            disabled,
             fieldsetClassName,
             label,
             labelClassName,
@@ -72,10 +73,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             error
                                 ? 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500 dark:text-rose-500'
                                 : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:placeholder:text-gray-600 dark:focus:ring-sky-500',
+                            disabled &&
+                                'cursor-not-allowed bg-gray-100 text-gray-500',
                             trailing &&
                                 'rounded-none rounded-l-md bg-gray-50 text-gray-700 outline-0 focus:border-gray-300 focus:ring-0',
                             className,
                         ])}
+                        disabled={disabled}
                         id={name}
                         name={name}
                         ref={ref}
