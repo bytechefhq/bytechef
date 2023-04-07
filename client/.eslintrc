@@ -55,6 +55,10 @@
                 "whitelist": [
                     "animate-slide-down",
                     "animate-slide-up",
+                    "animate-slide-up-fade",
+                    "animate-slide-down-fade",
+                    "animate-slide-left-fade",
+                    "animate-slide-right-fade",
                     "line-clamp-2",
                     "nowheel",
                     "w-112"
