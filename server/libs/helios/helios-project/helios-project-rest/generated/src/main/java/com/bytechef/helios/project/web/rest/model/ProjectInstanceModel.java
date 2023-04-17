@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-16T12:25:34.168337+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-17T15:19:30.968957+02:00[Europe/Zagreb]")
 public class ProjectInstanceModel {
 
   private String description;
@@ -40,6 +40,9 @@ public class ProjectInstanceModel {
   private LocalDateTime createdDate;
 
   private Long id;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime lastExecutionDate;
 
   private String lastModifiedBy;
 
@@ -191,6 +194,26 @@ public class ProjectInstanceModel {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public ProjectInstanceModel lastExecutionDate(LocalDateTime lastExecutionDate) {
+    this.lastExecutionDate = lastExecutionDate;
+    return this;
+  }
+
+  /**
+   * The last execution date.
+   * @return lastExecutionDate
+  */
+  @Valid 
+  @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastExecutionDate")
+  public LocalDateTime getLastExecutionDate() {
+    return lastExecutionDate;
+  }
+
+  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
+    this.lastExecutionDate = lastExecutionDate;
   }
 
   public ProjectInstanceModel lastModifiedBy(String lastModifiedBy) {
@@ -402,6 +425,7 @@ public class ProjectInstanceModel {
         Objects.equals(this.createdBy, projectInstance.createdBy) &&
         Objects.equals(this.createdDate, projectInstance.createdDate) &&
         Objects.equals(this.id, projectInstance.id) &&
+        Objects.equals(this.lastExecutionDate, projectInstance.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, projectInstance.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectInstance.lastModifiedDate) &&
         Objects.equals(this.name, projectInstance.name) &&
@@ -415,7 +439,7 @@ public class ProjectInstanceModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, id, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, status, tags, version);
+    return Objects.hash(description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, status, tags, version);
   }
 
   @Override
@@ -426,6 +450,7 @@ public class ProjectInstanceModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
