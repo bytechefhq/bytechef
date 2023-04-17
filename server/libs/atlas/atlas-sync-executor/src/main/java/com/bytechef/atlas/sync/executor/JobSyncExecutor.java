@@ -28,13 +28,13 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -76,7 +76,7 @@ public class JobSyncExecutor {
             syncMessageBroker = new SyncMessageBroker();
         }
 
-        syncMessageBroker.receive(Queues.ERRORS, message -> {
+        syncMessageBroker.receive(TaskQueues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -99,7 +99,7 @@ public class JobSyncExecutor {
             .taskEvaluator(builder.taskEvaluator)
             .build();
 
-        syncMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
+        syncMessageBroker.receive(TaskQueues.TASKS, o -> worker.handle((TaskExecution) o));
 
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
@@ -144,16 +144,16 @@ public class JobSyncExecutor {
             .taskExecutionService(builder.taskExecutionService)
             .build();
 
-        syncMessageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        syncMessageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
+        syncMessageBroker.receive(TaskQueues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
+        syncMessageBroker.receive(TaskQueues.JOBS, jobId -> coordinator.start((Long) jobId));
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public Job execute(JobParametersDTO jobParametersDTO) {
-        long jobId = jobFactory.create(jobParametersDTO);
+    public Job execute(JobParameters jobParameters) {
+        long jobId = jobFactory.create(jobParameters);
 
         return jobService.getJob(jobId);
     }

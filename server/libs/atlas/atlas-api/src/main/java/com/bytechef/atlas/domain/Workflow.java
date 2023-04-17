@@ -30,6 +30,7 @@ import com.bytechef.commons.util.MapValueUtils;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -176,7 +176,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
                 MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
         this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
         this.tasks = MapValueUtils
-            .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
+            .getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList())
             .stream()
             .map(WorkflowTask::of)
             .toList();
@@ -291,7 +291,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     /** Returns the steps that make up the workflow. */
     public List<WorkflowTask> getTasks() {
-        return tasks;
+        return new ArrayList<>(tasks);
     }
 
     public int getVersion() {

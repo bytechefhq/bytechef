@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
@@ -55,7 +54,7 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
             result = Map.of("rows", 0);
         } else {
             int[] rowsAffected = jdbcExecutor.batchUpdate(
-                OptionalUtils.get(context.fetchConnection()),
+                context.getConnection(),
                 "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
                 SqlParameterSourceUtils.createBatch(rows.toArray()));
 

@@ -18,8 +18,10 @@
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -31,4 +33,6 @@ public interface WorkflowMapper extends Converter<Workflow, WorkflowModel> {
 
     @Override
     WorkflowModel convert(Workflow workflow);
+
+    WorkflowTaskModel map(WorkflowTask workflowTask);
 }

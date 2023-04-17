@@ -66,11 +66,7 @@ public class WorkflowTask implements Serializable {
     public static WorkflowTask of(Map<String, Object> source) {
         Assert.notNull(source, "'source' must not be null");
 
-        WorkflowTask workflowTask = new WorkflowTask();
-
-        workflowTask.putAll(source);
-
-        return workflowTask;
+        return new WorkflowTask(source);
     }
 
     public static WorkflowTask of(String type) {
@@ -95,6 +91,16 @@ public class WorkflowTask implements Serializable {
                 Map.of(
                     WorkflowConstants.TYPE, type, WorkflowConstants.PARAMETERS, Collections.singletonMap(key, value)));
         }
+
+        return workflowTask;
+    }
+
+    public static WorkflowTask of(WorkflowTask workflowTask, String key, Object value) {
+        workflowTask = new WorkflowTask(workflowTask.toMap());
+
+        workflowTask.parameters = new HashMap<>(workflowTask.parameters);
+
+        workflowTask.parameters.put(key, value);
 
         return workflowTask;
     }
@@ -304,16 +310,6 @@ public class WorkflowTask implements Serializable {
         }
 
         this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
-    }
-
-    public WorkflowTask putParameter(String key, Object value) {
-        WorkflowTask workflowTask = new WorkflowTask(toMap());
-
-        workflowTask.parameters = new HashMap<>(workflowTask.parameters);
-
-        workflowTask.parameters.put(key, value);
-
-        return workflowTask;
     }
 
     private static class WorkflowTaskConverter implements Converter<Map, WorkflowTask> {

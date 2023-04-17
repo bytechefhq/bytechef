@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
@@ -56,7 +56,7 @@ public class WorkerMessageBrokerConfiguration {
                 listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
+                listenerEndpointRegistrar, TaskQueues.CONTROL, 1, worker, "handle");
         };
     }
 }

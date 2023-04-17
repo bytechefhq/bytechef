@@ -35,7 +35,7 @@ public class TaskDispatcherDefinitionMapper {
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel> {
 
         @Override
-        TaskDispatcherDefinitionModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinition);
+        TaskDispatcherDefinitionModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
@@ -43,6 +43,6 @@ public class TaskDispatcherDefinitionMapper {
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionBasicModel> {
 
         @Override
-        TaskDispatcherDefinitionBasicModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinition);
+        TaskDispatcherDefinitionBasicModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinitionDTO);
     }
 }

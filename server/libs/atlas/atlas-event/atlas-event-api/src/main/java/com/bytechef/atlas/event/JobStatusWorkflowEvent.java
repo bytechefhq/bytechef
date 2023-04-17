@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.event;
 
-import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.Job.Status;
 import org.springframework.util.Assert;
 
 /**
@@ -28,13 +28,12 @@ public class JobStatusWorkflowEvent extends AbstractWorkflowEvent {
     public static final String JOB_STATUS = "job.status";
 
     private Long jobId;
-    private Job.Status status;
+    private Status status;
 
-    public JobStatusWorkflowEvent() {
-        this.type = JOB_STATUS;
+    private JobStatusWorkflowEvent() {
     }
 
-    public JobStatusWorkflowEvent(Long jobId, Job.Status status) {
+    public JobStatusWorkflowEvent(Long jobId, Status status) {
         Assert.notNull(jobId, "'jobId' must not be null");
         Assert.notNull(status, "'status' must not be null");
 
@@ -47,7 +46,7 @@ public class JobStatusWorkflowEvent extends AbstractWorkflowEvent {
         return jobId;
     }
 
-    public Job.Status getJobStatus() {
+    public Status getStatus() {
         return status;
     }
 

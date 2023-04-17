@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.model.JobParametersModel;
 import org.mapstruct.Mapper;
@@ -27,8 +27,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = WorkflowMapperSpringConfig.class)
-public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParametersDTO> {
+public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
 
     @Override
-    JobParametersDTO convert(JobParametersModel jobParametersModel);
+    JobParameters convert(JobParametersModel jobParametersModel);
 }

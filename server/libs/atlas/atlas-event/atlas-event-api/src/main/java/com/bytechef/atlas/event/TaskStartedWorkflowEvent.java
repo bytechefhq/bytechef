@@ -29,8 +29,7 @@ public class TaskStartedWorkflowEvent extends AbstractWorkflowEvent {
     private Long jobId;
     private Long taskExecutionId;
 
-    public TaskStartedWorkflowEvent() {
-        this.type = TASK_STARTED;
+    private TaskStartedWorkflowEvent() {
     }
 
     public TaskStartedWorkflowEvent(Long taskExecutionId) {

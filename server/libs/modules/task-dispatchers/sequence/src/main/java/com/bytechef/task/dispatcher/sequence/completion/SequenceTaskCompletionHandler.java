@@ -33,6 +33,7 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -97,11 +98,9 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             contextService.push(sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
         }
 
-        List<WorkflowTask> subWorkflowTasks = MapValueUtils
-            .getList(sequenceTaskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
-            .stream()
-            .map(WorkflowTask::of)
-            .toList();
+        List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
+            sequenceTaskExecution.getParameters(), TASKS, new ParameterizedTypeReference<>() {},
+            Collections.emptyList());
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());

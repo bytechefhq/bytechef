@@ -19,8 +19,8 @@
 
 package com.bytechef.atlas.message.broker.kafka.config;
 
-import com.bytechef.atlas.message.broker.Exchanges;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.WorkflowExchange;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.atlas.message.broker.kafka.KafkaMessageBroker;
@@ -44,8 +44,6 @@ import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListenerConfigurer;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistrar;
 import org.springframework.kafka.config.MethodKafkaListenerEndpoint;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -74,18 +72,16 @@ public class KafkaMessageBrokerConfiguration
     private BeanFactory beanFactory;
 
     @Autowired(required = false)
-    private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
+    private List<MessageBrokerConfigurer<KafkaListenerEndpointRegistrar>> messageBrokerConfigurers = Collections
+        .emptyList();
 
     @Autowired
     private MessageHandlerMethodFactory messageHandlerMethodFactory;
 
-    @Autowired
-    private Map<String, Object> consumerConfigs;
-
     @Override
-    @SuppressWarnings("unchecked")
     public void configureKafkaListeners(KafkaListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<KafkaListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
+
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }
@@ -95,8 +91,8 @@ public class KafkaMessageBrokerConfiguration
         KafkaListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
 
-        if (Objects.equals(queueName, Queues.CONTROL)) {
-            queueName = Exchanges.CONTROL + "/" + Exchanges.CONTROL;
+        if (Objects.equals(queueName, TaskQueues.CONTROL)) {
+            queueName = WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL;
         }
 
         Class<?> delegateClass = delegate.getClass();
@@ -139,8 +135,8 @@ public class KafkaMessageBrokerConfiguration
     }
 
     @Bean
-    Map<String, Object> producerConfigs(KafkaProperties aKafkaProperties) {
-        Map<String, Object> props = aKafkaProperties.buildProducerProperties();
+    Map<String, Object> producerConfigs(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = kafkaProperties.buildProducerProperties();
 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
@@ -216,14 +212,6 @@ public class KafkaMessageBrokerConfiguration
         messageHandlerMethodFactory.setMessageConverter(messageConverter);
 
         return messageHandlerMethodFactory;
-    }
-
-    private KafkaListenerContainerFactory createContainerFactory(int concurrency) {
-        ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
-
-        factory.setConcurrency(concurrency);
-
-        return factory;
     }
 
     private MethodKafkaListenerEndpoint<String, String> createListenerEndpoint(

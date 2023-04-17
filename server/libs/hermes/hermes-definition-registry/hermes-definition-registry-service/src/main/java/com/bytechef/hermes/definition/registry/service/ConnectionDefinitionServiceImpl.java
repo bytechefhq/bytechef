@@ -65,7 +65,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public void executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+        String authorizationName,
         AuthorizationContext authorizationContext) {
 
         Authorization authorization = getAuthorization(componentName, connectionVersion, authorizationName);
@@ -78,7 +79,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+        String authorizationName,
         String redirectUri) {
 
         Authorization authorization = getAuthorization(componentName, connectionVersion, authorizationName);

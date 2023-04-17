@@ -23,6 +23,8 @@ import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,6 +54,7 @@ public class ConnectionRepositoryIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testDelete() {
         Connection connection = connectionRepository.save(getConnection());
 
@@ -77,6 +80,7 @@ public class ConnectionRepositoryIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Connection connection = connectionRepository.save(getConnection());
 

@@ -75,8 +75,9 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return componentDefinitionService.getComponentDefinitionMono(componentName, componentVersion)
-            .mapNotNull(componentDefinition -> conversionService.convert(
-                componentDefinition, ComponentDefinitionModel.class))
+            .mapNotNull(
+                componentDefinition -> conversionService.convert(
+                    componentDefinition, ComponentDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -95,10 +96,12 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return Mono.just(
             actionDefinitionService.getComponentActionDefinitionsMono(componentName, componentVersion)
-                .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
-                    .map(actionDefinition -> conversionService.convert(
-                        actionDefinition, ActionDefinitionBasicModel.class))
-                    .toList())
+                .mapNotNull(
+                    connectionDefinitions -> connectionDefinitions.stream()
+                        .map(
+                            actionDefinition -> conversionService.convert(
+                                actionDefinition, ActionDefinitionBasicModel.class))
+                        .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }
@@ -108,8 +111,9 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return connectionDefinitionService.getComponentConnectionDefinitionMono(componentName, componentVersion)
-            .mapNotNull(connectionDefinition -> conversionService.convert(
-                connectionDefinition, ConnectionDefinitionModel.class))
+            .mapNotNull(
+                connectionDefinition -> conversionService.convert(
+                    connectionDefinition, ConnectionDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -119,10 +123,12 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return Mono.just(
             connectionDefinitionService.getComponentConnectionDefinitionsMono(componentName, componentVersion)
-                .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
-                    .map(connectionDefinition -> conversionService.convert(
-                        connectionDefinition, ConnectionDefinitionBasicModel.class))
-                    .toList())
+                .mapNotNull(
+                    connectionDefinitions -> connectionDefinitions.stream()
+                        .map(
+                            connectionDefinition -> conversionService.convert(
+                                connectionDefinition, ConnectionDefinitionBasicModel.class))
+                        .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }
@@ -133,12 +139,15 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         Boolean triggerDefinitions, ServerWebExchange exchange) {
 
         return Mono.just(
-            componentDefinitionFacade.getComponentDefinitionsMono(
-                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
-                .mapNotNull(componentDefinitions -> componentDefinitions.stream()
-                    .map(componentDefinition -> conversionService.convert(
-                        componentDefinition, ComponentDefinitionBasicModel.class))
-                    .toList())
+            componentDefinitionFacade
+                .getComponentDefinitionsMono(
+                    actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
+                .mapNotNull(
+                    componentDefinitions -> componentDefinitions.stream()
+                        .map(
+                            componentDefinition -> conversionService.convert(
+                                componentDefinition, ComponentDefinitionBasicModel.class))
+                        .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }
@@ -149,10 +158,12 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return Mono.just(
             componentDefinitionService.getComponentDefinitionsMono(componentName)
-                .mapNotNull(componentDefinitions -> componentDefinitions.stream()
-                    .map(componentDefinition -> conversionService.convert(
-                        componentDefinition, ComponentDefinitionBasicModel.class))
-                    .toList())
+                .mapNotNull(
+                    componentDefinitions -> componentDefinitions.stream()
+                        .map(
+                            componentDefinition -> conversionService.convert(
+                                componentDefinition, ComponentDefinitionBasicModel.class))
+                        .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }
@@ -172,10 +183,12 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
         return Mono.just(
             triggerDefinitionService.getComponentTriggerDefinitions(componentName, componentVersion)
-                .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
-                    .map(triggerDefinition -> conversionService.convert(
-                        triggerDefinition, TriggerDefinitionBasicModel.class))
-                    .toList())
+                .mapNotNull(
+                    connectionDefinitions -> connectionDefinitions.stream()
+                        .map(
+                            triggerDefinition -> conversionService.convert(
+                                triggerDefinition, TriggerDefinitionBasicModel.class))
+                        .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }

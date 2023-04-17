@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.message.broker.redis.listener;
 
-import com.bytechef.atlas.message.broker.Exchanges;
+import com.bytechef.atlas.message.broker.WorkflowExchange;
 import com.bytechef.atlas.message.broker.redis.serializer.RedisMessageSerializer;
 import com.oblac.jrsmq.QueueMessage;
 import com.oblac.jrsmq.RedisSMQ;
@@ -65,12 +65,13 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         invokerConsumer.accept(message.toString());
     }
 
-    public void registerListenerEndpoint(String queueName, Object delegate, String methodName, Exchanges exchanges) {
+    public void registerListenerEndpoint(
+        String queueName, Object delegate, String methodName, WorkflowExchange workflowExchange) {
         invokerMap.put(queueName, (String message) -> invoke(delegate, methodName, message));
 
         checkQueueExists(queueName);
 
-        if (exchanges == Exchanges.TASKS) {
+        if (workflowExchange == WorkflowExchange.TASKS) {
             executorService.submit(() -> periodicallyCheckQueueForMessage(queueName));
         }
     }

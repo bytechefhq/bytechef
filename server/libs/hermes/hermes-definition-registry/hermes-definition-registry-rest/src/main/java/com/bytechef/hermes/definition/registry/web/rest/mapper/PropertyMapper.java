@@ -30,6 +30,7 @@ import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyMode
 import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TimePropertyModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.CollectionUtils;
@@ -98,6 +99,11 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
         return map(stringProperty);
     }
 
+    @Override
+    default TimePropertyModel visit(Property.TimeProperty timeProperty) {
+        return map(timeProperty);
+    }
+
     ArrayPropertyModel map(Property.ArrayProperty arrayProperty);
 
     BooleanPropertyModel map(Property.BooleanProperty booleanProperty);
@@ -117,6 +123,8 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
     ObjectPropertyModel map(Property.ObjectProperty objectProperty);
 
     StringPropertyModel map(Property.StringProperty stringProperty);
+
+    TimePropertyModel map(Property.TimeProperty timeProperty);
 
     default List<PropertyModel> map(List<? extends Property<?>> properties) {
         if (CollectionUtils.isEmpty(properties)) {

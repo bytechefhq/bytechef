@@ -53,14 +53,14 @@ public class ConnectionDefinitionServiceRSocketController {
 
     @MessageMapping("ConnectionDefinitionService.executeAuthorizationApply")
     public Mono<Map<String, Map<String, List<String>>>> executeAuthorizationApply(Connection connection) {
-        Map<String, List<String>> returnHeaders = new HashMap<>();
-        Map<String, List<String>> returnQueryParameters = new HashMap<>();
+        Map<String, List<String>> headers = new HashMap<>();
+        Map<String, List<String>> queryParameters = new HashMap<>();
 
         connectionDefinitionService.executeAuthorizationApply(
             connection.componentName, connection.connectionVersion, connection.parameters, connection.authorizationName,
-            new Authorization.AuthorizationContext(returnHeaders, returnQueryParameters, new HashMap<>()));
+            new Authorization.AuthorizationContext(headers, queryParameters, new HashMap<>()));
 
-        return Mono.just(Map.of("headers", returnHeaders, "queryParameters", returnQueryParameters));
+        return Mono.just(Map.of("headers", headers, "queryParameters", queryParameters));
     }
 
     @MessageMapping("ConnectionDefinitionService.executeAuthorizationCallback")

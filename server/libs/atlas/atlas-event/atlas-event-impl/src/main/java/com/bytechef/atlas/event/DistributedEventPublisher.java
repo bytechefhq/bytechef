@@ -20,7 +20,7 @@
 package com.bytechef.atlas.event;
 
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import java.util.Objects;
 
 /**
@@ -37,6 +37,6 @@ public class DistributedEventPublisher implements EventPublisher {
 
     @Override
     public void publishEvent(WorkflowEvent workflowEvent) {
-        messageBroker.send(Queues.EVENTS, workflowEvent);
+        messageBroker.send(TaskQueues.EVENTS, workflowEvent);
     }
 }
