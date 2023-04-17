@@ -68,7 +68,7 @@ public class JdbcComponentTaskHandlerBeanDefinitionLoader implements ComponentTa
     private BeanDefinition getBeanDefinition(
         ActionDefinition actionDefinition, JdbcComponentHandler jdbcComponentHandler) {
 
-        return BeanDefinitionBuilder.genericBeanDefinition(JdbcComponentTaskHandler.class)
+        return BeanDefinitionBuilder.genericBeanDefinition(JdbcComponentActionTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
             .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgReference("connectionService")

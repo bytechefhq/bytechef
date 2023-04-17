@@ -19,13 +19,14 @@ package com.bytechef.hermes.component.registrar.task.handler;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.ContextImpl;
-import com.bytechef.hermes.component.util.ContextSupplier;
+import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -34,17 +35,18 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class DefaultComponentTaskHandler implements TaskHandler<Object> {
+public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
+
+    protected final ComponentHandler componentHandler;
 
     private final ActionDefinition actionDefinition;
     private final ConnectionDefinitionService connectionDefinitionService;
-    protected final ComponentHandler componentHandler;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public DefaultComponentTaskHandler(
+    public DefaultComponentActionTaskHandler(
         ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
         ComponentHandler componentHandler, ConnectionService connectionService, EventPublisher eventPublisher,
         FileStorageService fileStorageService) {
@@ -58,16 +60,23 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) {
-        Context context = new ContextImpl(
-            connectionDefinitionService, connectionService, eventPublisher, fileStorageService, taskExecution);
+    public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
+        ActionContext context = new ContextImpl(
+            connectionDefinitionService, connectionService, eventPublisher, fileStorageService,
+            taskExecution.getParameters(), taskExecution.getId());
 
-        return ContextSupplier.get(
-            context,
-            () -> actionDefinition.getExecute()
-                .map(executeFunction -> executeFunction.apply(
-                    context, new InputParametersImpl(taskExecution.getParameters())))
-                .orElseGet(() -> componentHandler.handle(
-                    actionDefinition, context, new InputParametersImpl(taskExecution.getParameters()))));
+        return ComponentContextSupplier.get(
+            context, componentHandler.getDefinition(),
+            () -> {
+                try {
+                    return actionDefinition.getExecute()
+                        .map(executeFunction -> executeFunction.apply(
+                            context, new InputParametersImpl(taskExecution.getParameters())))
+                        .orElseGet(() -> componentHandler.handleAction(
+                            actionDefinition, context, new InputParametersImpl(taskExecution.getParameters())));
+                } catch (Exception e) {
+                    throw new TaskExecutionException(e.getMessage(), e);
+                }
+            });
     }
 }

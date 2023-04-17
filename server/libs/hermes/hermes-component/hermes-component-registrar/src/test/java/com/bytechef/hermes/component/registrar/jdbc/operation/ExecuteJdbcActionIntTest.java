@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
@@ -65,7 +66,7 @@ public class ExecuteJdbcActionIntTest {
         Context context = Mockito.mock(Context.class);
 
         Mockito.when(context.fetchConnection())
-            .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
+            .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
         InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
@@ -106,7 +107,7 @@ public class ExecuteJdbcActionIntTest {
 
                     @Override
                     public DataSource getDataSource(
-                        InputParameters connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
 
                         return dataSource;
                     }
