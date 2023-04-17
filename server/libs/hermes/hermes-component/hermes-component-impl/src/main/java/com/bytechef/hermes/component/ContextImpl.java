@@ -45,7 +45,7 @@ import static com.bytechef.hermes.component.definition.ConnectionDefinition.CONN
 public class ContextImpl implements ActionContext, TriggerContext {
 
     static {
-        MapValueUtils.addConverter(new FileEntryConverter());
+        MapValueUtils.addConverter(new ContextFileEntryConverter());
     }
 
     private final ConnectionDefinitionService connectionDefinitionService;
@@ -121,7 +121,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
         return new ContextConnection(connection, connectionDefinitionService);
     }
 
-    private static class FileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
+    private static class ContextFileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
 
         @Override
         public Context.FileEntry convert(Map<?, ?> source) {
