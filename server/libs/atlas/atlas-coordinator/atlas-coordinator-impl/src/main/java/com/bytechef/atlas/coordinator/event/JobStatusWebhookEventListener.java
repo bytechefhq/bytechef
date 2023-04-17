@@ -111,12 +111,12 @@ public class JobStatusWebhookEventListener implements EventListener {
             (retry.initialInterval() == null
                 ? Duration.of(2, ChronoUnit.SECONDS)
                 : Duration.of(retry.initialInterval(), ChronoUnit.SECONDS))
-                .toMillis());
+                    .toMillis());
         backOffPolicy.setMaxInterval(
             (retry.maxInterval() == null
                 ? Duration.of(2, ChronoUnit.SECONDS)
                 : Duration.of(retry.maxInterval(), ChronoUnit.SECONDS))
-                .toMillis());
+                    .toMillis());
         backOffPolicy.setMultiplier(
             retry.multiplier() == null
                 ? 2.0

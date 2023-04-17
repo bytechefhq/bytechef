@@ -34,7 +34,7 @@ public class TriggerDefinitionMapper {
         extends Converter<TriggerDefinitionDTO, TriggerDefinitionModel> {
 
         @Override
-        TriggerDefinitionModel convert(TriggerDefinitionDTO triggerDefinition);
+        TriggerDefinitionModel convert(TriggerDefinitionDTO triggerDefinitionDTO);
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)

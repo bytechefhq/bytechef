@@ -32,16 +32,26 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
+import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 /**
  * @author Ivica Cardic
  */
 public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
+    private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
+        .display(display("Manual"))
+        .triggers(trigger("trigger"));
+
     private final List<ComponentDefinition> componentDefinitions;
 
     @SuppressFBWarnings("EI2")
     public ComponentDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
-        this.componentDefinitions = componentDefinitions;
+        this.componentDefinitions = CollectionUtils.concat(
+            componentDefinitions,
+            MANUAL_COMPONENT_DEFINITION);
     }
 
     @Override
@@ -109,7 +119,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     private TriggerDefinitionBasicDTO toTriggerDefinitionBasicDTO(TriggerDefinition triggerDefinition) {
         return new TriggerDefinitionBasicDTO(
-            triggerDefinition.getBatch(), triggerDefinition.getDisplay(), triggerDefinition.getName(),
+            triggerDefinition.isBatch(), triggerDefinition.getDisplay(), triggerDefinition.getName(),
             triggerDefinition.getResources(), triggerDefinition.getType());
     }
 }

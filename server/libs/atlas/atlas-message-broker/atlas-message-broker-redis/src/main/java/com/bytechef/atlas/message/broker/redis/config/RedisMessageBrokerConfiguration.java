@@ -17,8 +17,8 @@
 
 package com.bytechef.atlas.message.broker.redis.config;
 
-import com.bytechef.atlas.message.broker.Exchanges;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.WorkflowExchange;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.atlas.message.broker.redis.listener.RedisListenerEndpointRegistrar;
@@ -59,7 +59,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private final List<MessageBrokerConfigurer> messageBrokerConfigurers;
+    private final List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers;
     private final RedisConnectionFactory redisConnectionFactory;
     private RedisListenerEndpointRegistrar redisListenerEndpointRegistrar;
     private RedisMessageListenerContainer redisMessageListenerContainer;
@@ -68,7 +68,8 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
 
     @SuppressFBWarnings("EI2")
     public RedisMessageBrokerConfiguration(
-        @Autowired(required = false) List<MessageBrokerConfigurer> messageBrokerConfigurers,
+        @Autowired(
+            required = false) List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers,
         RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper,
         RedisProperties redisProperties) {
 
@@ -92,7 +93,8 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
         redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
             executorService, redisMessageSerializer, redisSMQ);
 
-        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<RedisListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
+
             messageBrokerConfigurer.configure(redisListenerEndpointRegistrar, this);
         }
 
@@ -121,7 +123,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
 
     @Bean
     ChannelTopic channelTopic() {
-        return new ChannelTopic(Exchanges.CONTROL + "/" + Exchanges.CONTROL);
+        return new ChannelTopic(WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL);
     }
 
     @Bean
@@ -139,14 +141,14 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
         RedisListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
 
-        Exchanges exchanges = Exchanges.TASKS;
+        WorkflowExchange workflowExchange = WorkflowExchange.TASKS;
 
-        if (Objects.equals(queueName, Queues.CONTROL)) {
-            exchanges = Exchanges.CONTROL;
-            queueName = Exchanges.CONTROL + "/" + Exchanges.CONTROL;
+        if (Objects.equals(queueName, TaskQueues.CONTROL)) {
+            workflowExchange = WorkflowExchange.CONTROL;
+            queueName = WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL;
         }
 
-        listenerEndpointRegistrar.registerListenerEndpoint(queueName, delegate, methodName, exchanges);
+        listenerEndpointRegistrar.registerListenerEndpoint(queueName, delegate, methodName, workflowExchange);
     }
 
     private static int getTimeout(Duration timeout) {

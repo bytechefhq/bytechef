@@ -19,11 +19,10 @@ package com.bytechef.atlas.job;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,8 +48,8 @@ public class JobFactoryImpl implements JobFactory {
 
     @Override
     @SuppressFBWarnings("NP")
-    public long create(JobParametersDTO jobParametersDTO) {
-        Job job = jobService.create(jobParametersDTO);
+    public long create(JobParameters jobParameters) {
+        Job job = jobService.create(jobParameters);
 
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
@@ -58,7 +57,7 @@ public class JobFactoryImpl implements JobFactory {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        messageBroker.send(Queues.JOBS, job.getId());
+        messageBroker.send(TaskQueues.JOBS, job.getId());
 
         return job.getId();
     }

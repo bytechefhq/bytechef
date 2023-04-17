@@ -23,5 +23,6 @@ import com.bytechef.atlas.domain.TaskExecution;
  * @author Ivica Cardic
  */
 public interface TaskDispatcherPreSendProcessor {
+
     TaskExecution process(TaskExecution taskExecution);
 }

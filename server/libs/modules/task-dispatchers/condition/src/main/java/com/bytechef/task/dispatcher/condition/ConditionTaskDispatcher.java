@@ -25,7 +25,7 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
@@ -37,6 +37,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -80,17 +81,13 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
         List<WorkflowTask> subWorkflowTasks;
 
         if (ConditionTaskUtils.resolveCase(taskExecution)) {
-            subWorkflowTasks = MapValueUtils
-                .getList(taskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
-                .stream()
-                .map(WorkflowTask::of)
-                .toList();
+            subWorkflowTasks = MapValueUtils.getList(
+                taskExecution.getParameters(), CASE_TRUE, new ParameterizedTypeReference<>() {},
+                Collections.emptyList());
         } else {
-            subWorkflowTasks = MapValueUtils
-                .getList(taskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
-                .stream()
-                .map(WorkflowTask::of)
-                .toList();
+            subWorkflowTasks = MapValueUtils.getList(
+                taskExecution.getParameters(), CASE_FALSE, new ParameterizedTypeReference<>() {},
+                Collections.emptyList());
         }
 
         if (subWorkflowTasks.size() > 0) {
@@ -118,7 +115,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+            messageBroker.send(TaskQueues.COMPLETIONS, taskExecution);
         }
     }
 

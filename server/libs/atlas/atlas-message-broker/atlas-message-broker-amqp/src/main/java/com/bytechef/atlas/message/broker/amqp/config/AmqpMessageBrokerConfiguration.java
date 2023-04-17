@@ -19,8 +19,8 @@
 
 package com.bytechef.atlas.message.broker.amqp.config;
 
-import com.bytechef.atlas.message.broker.Exchanges;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.WorkflowExchange;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.amqp.AmqpMessageBroker;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
@@ -65,9 +65,9 @@ public class AmqpMessageBrokerConfiguration
     @Autowired
     private ConnectionFactory connectionFactory;
 
-    @SuppressWarnings("rawtypes")
     @Autowired(required = false)
-    private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
+    private List<MessageBrokerConfigurer<RabbitListenerEndpointRegistrar>> messageBrokerConfigurers = Collections
+        .emptyList();
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -78,7 +78,8 @@ public class AmqpMessageBrokerConfiguration
     @Override
     @SuppressWarnings("unchecked")
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<RabbitListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
+
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }
@@ -95,7 +96,7 @@ public class AmqpMessageBrokerConfiguration
         Exchange exchange;
         Queue queue;
 
-        if (Objects.equals(queueName, Queues.CONTROL)) {
+        if (Objects.equals(queueName, TaskQueues.CONTROL)) {
             exchange = controlExchange();
             queue = controlQueue();
         } else {
@@ -104,7 +105,7 @@ public class AmqpMessageBrokerConfiguration
             Map<String, Object> args = new HashMap<String, Object>();
 
             args.put("x-dead-letter-exchange", "");
-            args.put("x-dead-letter-routing-key", Queues.DLQ);
+            args.put("x-dead-letter-routing-key", TaskQueues.DLQ);
 
             queue = new Queue(queueName, true, false, false, args);
         }
@@ -133,17 +134,17 @@ public class AmqpMessageBrokerConfiguration
 
     @Bean
     Queue dlqQueue() {
-        return new Queue(Queues.DLQ);
+        return new Queue(TaskQueues.DLQ);
     }
 
     @Bean
     Queue controlQueue() {
-        return new Queue(Exchanges.CONTROL + "/" + Exchanges.CONTROL, true, true, true);
+        return new Queue(WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL, true, true, true);
     }
 
     @Bean
     Exchange tasksExchange() {
-        return ExchangeBuilder.directExchange(Exchanges.TASKS.toString())
+        return ExchangeBuilder.directExchange(WorkflowExchange.TASKS.toString())
             .durable(true)
             .build();
     }
@@ -152,15 +153,16 @@ public class AmqpMessageBrokerConfiguration
     Exchange controlExchange() {
         // TODO It should probably be topic exchange: https://www.baeldung.com/java-rabbitmq-exchanges-queues-bindings
 
-        return ExchangeBuilder.fanoutExchange(Exchanges.CONTROL.toString())
+        return ExchangeBuilder.fanoutExchange(WorkflowExchange.CONTROL.toString())
             .durable(true)
             .build();
     }
 
-    private SimpleRabbitListenerContainerFactory createContainerFactory(int aConcurrency) {
-        SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory = new SimpleRabbitListenerContainerFactory();
+    private SimpleRabbitListenerContainerFactory createContainerFactory(int concurrentConsumers) {
+        SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory =
+            new SimpleRabbitListenerContainerFactory();
 
-        simpleRabbitListenerContainerFactory.setConcurrentConsumers(aConcurrency);
+        simpleRabbitListenerContainerFactory.setConcurrentConsumers(concurrentConsumers);
         simpleRabbitListenerContainerFactory.setConnectionFactory(connectionFactory);
         simpleRabbitListenerContainerFactory.setDefaultRequeueRejected(false);
         simpleRabbitListenerContainerFactory.setMessageConverter(jacksonAmqpMessageConverter(objectMapper));

@@ -35,6 +35,7 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -139,9 +140,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
 
     private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution conditionTaskExecution, String caseTrue) {
         return MapValueUtils.getList(
-            conditionTaskExecution.getParameters(), caseTrue, Map.class, Collections.emptyList())
-            .stream()
-            .map(WorkflowTask::of)
-            .toList();
+            conditionTaskExecution.getParameters(), caseTrue, new ParameterizedTypeReference<>() {},
+            Collections.emptyList());
     }
 }

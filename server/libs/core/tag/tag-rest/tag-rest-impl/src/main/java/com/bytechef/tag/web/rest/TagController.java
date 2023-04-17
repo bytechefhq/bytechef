@@ -72,17 +72,19 @@ public class TagController implements TagsApi {
 
     @Override
     public Mono<ResponseEntity<TagModel>> createTag(Mono<TagModel> tagModelMono, ServerWebExchange exchange) {
-        return tagModelMono.map(tagModel -> conversionService.convert(
-            tagService.create(conversionService.convert(tagModel, Tag.class)),
-            TagModel.class))
+        return tagModelMono.map(
+            tagModel -> conversionService.convert(
+                tagService.create(conversionService.convert(tagModel, Tag.class)),
+                TagModel.class))
             .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<TagModel>> updateTag(Long id, Mono<TagModel> tagModelMono, ServerWebExchange exchange) {
-        return tagModelMono.map(tagModel -> conversionService.convert(
-            tagService.update(conversionService.convert(tagModel.id(id), Tag.class)),
-            TagModel.class))
+        return tagModelMono.map(
+            tagModel -> conversionService.convert(
+                tagService.update(conversionService.convert(tagModel.id(id), Tag.class)),
+                TagModel.class))
             .map(ResponseEntity::ok);
     }
 }

@@ -25,6 +25,7 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -54,6 +55,7 @@ public class SubflowTaskDispatcherConfiguration {
         private final TaskEvaluator taskEvaluator;
         private final TaskExecutionService taskExecutionService;
 
+        @SuppressFBWarnings("EI")
         public SubflowJobStatusEventListenerConfiguration(
             JobService jobService, MessageBroker messageBroker, TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService) {

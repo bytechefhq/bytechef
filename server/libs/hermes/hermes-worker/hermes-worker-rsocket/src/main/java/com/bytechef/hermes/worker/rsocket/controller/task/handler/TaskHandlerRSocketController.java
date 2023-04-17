@@ -38,7 +38,7 @@ public class TaskHandlerRSocketController {
     }
 
     @MessageMapping("TaskHandler.handle")
-    public Mono<Object> handleTask(TaskHandlerHandleRequest taskHandlerHandleRequest) {
+    public Mono<Object> handle(TaskHandlerHandleRequest taskHandlerHandleRequest) {
         TaskHandler<?> taskHandler = taskHandlerAccessor.getTaskHandler(taskHandlerHandleRequest.type());
 
         try {

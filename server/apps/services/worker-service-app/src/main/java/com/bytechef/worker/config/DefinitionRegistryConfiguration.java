@@ -75,6 +75,7 @@ public class DefinitionRegistryConfiguration {
     ComponentDefinitionFacadeRSocketClient componentDefinitionFacadeRSocketClient(
         DiscoveryClient discoveryClient,
         @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+
         return new ComponentDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
     }
 

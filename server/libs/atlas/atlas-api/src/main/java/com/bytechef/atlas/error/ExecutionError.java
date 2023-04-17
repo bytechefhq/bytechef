@@ -20,6 +20,7 @@
 package com.bytechef.atlas.error;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class ExecutionError implements Serializable {
      * @return an array of stack trace elements representing the stack trace pertaining to this error.
      */
     public List<String> getStackTrace() {
-        return stackTrace;
+        return new ArrayList<>(stackTrace);
     }
 
     @Override

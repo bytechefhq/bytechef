@@ -21,7 +21,7 @@ package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.task.Task;
 
 import java.util.List;
@@ -29,10 +29,10 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
@@ -41,7 +41,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     private final MessageBroker messageBroker;
     private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
 
-    private static final String DEFAULT_QUEUE = Queues.TASKS;
+    private static final String DEFAULT_QUEUE = TaskQueues.TASKS;
 
     public DefaultTaskDispatcher(
         MessageBroker messageBroker, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
@@ -53,8 +53,6 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        Assert.notNull(messageBroker, "message broker not configured");
-
         for (TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
             taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
         }

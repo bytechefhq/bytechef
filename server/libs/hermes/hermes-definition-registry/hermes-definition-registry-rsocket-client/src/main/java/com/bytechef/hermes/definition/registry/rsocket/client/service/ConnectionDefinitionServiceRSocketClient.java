@@ -68,7 +68,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
                 .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
                 .retrieveMono(new ParameterizedTypeReference<>() {}));
 
-        authorizationContext.setHeaders(authorizationContextMap.get("header"));
+        authorizationContext.setHeaders(authorizationContextMap.get("headers"));
         authorizationContext.setQueryParameters(authorizationContextMap.get("queryParameters"));
     }
 

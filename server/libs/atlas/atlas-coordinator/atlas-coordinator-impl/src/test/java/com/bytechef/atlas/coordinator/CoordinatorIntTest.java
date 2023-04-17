@@ -20,7 +20,7 @@
 package com.bytechef.atlas.coordinator;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
@@ -123,7 +123,7 @@ public class CoordinatorIntTest {
                 .taskExecutionService(taskExecutionService)
                 .build();
 
-            coordinator.create(new JobParametersDTO(Collections.emptyMap(), "aGVsbG8x"));
+            coordinator.create(new JobParameters(Collections.emptyMap(), "aGVsbG8x"));
         });
     }
 
@@ -143,7 +143,7 @@ public class CoordinatorIntTest {
             .workflowService(workflowService)
             .build();
 
-        return jobSyncExecutor.execute(new JobParametersDTO(Collections.singletonMap("yourName", "me"), workflowId));
+        return jobSyncExecutor.execute(new JobParameters(Collections.singletonMap("yourName", "me"), workflowId));
     }
 
     @EmbeddedSql
