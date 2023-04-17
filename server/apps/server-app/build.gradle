@@ -6,6 +6,7 @@ springBoot {
 }
 
 dependencies {
+    implementation libs.com.github.kagkarlsson.db.scheduler.spring.boot.starter
     implementation "org.apache.activemq:artemis-jakarta-server"
     implementation "org.springframework.boot:spring-boot-starter-artemis"
     implementation "org.springframework.boot:spring-boot-starter-cache"
