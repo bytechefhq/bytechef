@@ -62,14 +62,14 @@ public class NewMessageTrigger {
         .listenerDisable(NewMessageTrigger::listenerDisable);
 
     protected static void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
         try {
             com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(
                 connection.getString(HOSTNAME), connection.getInteger(PORT, 5672), connection.getString(USERNAME),
                 connection.getString(PASSWORD));
 
-            CONNECTION_MAP.put(workflowInstanceId, rabbitMqConnection);
+            CONNECTION_MAP.put(workflowExecutionId, rabbitMqConnection);
 
             Channel channel = rabbitMqConnection.createChannel();
 
@@ -78,7 +78,7 @@ public class NewMessageTrigger {
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
 
-                ListenerTriggerUtils.emit(workflowInstanceId, JsonUtils.read(message));
+                ListenerTriggerUtils.emit(workflowExecutionId, JsonUtils.read(message));
             };
 
             channel.basicConsume(inputParameters.getString(QUEUE), true, deliverCallback, consumerTag -> {});
@@ -88,9 +88,9 @@ public class NewMessageTrigger {
     }
 
     protected static void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
-        com.rabbitmq.client.Connection rabbitmqConnection = CONNECTION_MAP.remove(workflowInstanceId);
+        com.rabbitmq.client.Connection rabbitmqConnection = CONNECTION_MAP.remove(workflowExecutionId);
 
         try {
             rabbitmqConnection.close();

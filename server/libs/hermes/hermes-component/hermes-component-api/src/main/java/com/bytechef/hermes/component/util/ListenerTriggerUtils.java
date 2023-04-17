@@ -27,12 +27,12 @@ public abstract class ListenerTriggerUtils {
     static ListenerEmitter listenerEmitter;
 
     /**
-     * @param workflowInstanceId
+     * @param workflowExecutionId
      * @param output
      */
     @SuppressFBWarnings("UWF")
-    public static void emit(String workflowInstanceId, Object output) {
-        listenerEmitter.emit(workflowInstanceId, output);
+    public static void emit(String workflowExecutionId, Object output) {
+        listenerEmitter.emit(workflowExecutionId, output);
     }
 
     /**
@@ -43,6 +43,6 @@ public abstract class ListenerTriggerUtils {
         /**
          * @param output
          */
-        void emit(String workflowInstanceId, Object output);
+        void emit(String workflowExecutionId, Object output);
     }
 }
