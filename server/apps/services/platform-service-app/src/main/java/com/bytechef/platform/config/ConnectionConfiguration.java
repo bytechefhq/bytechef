@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.config;
+package com.bytechef.platform.config;
 
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.facade.ConnectionFacadeImpl;
-import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;
@@ -39,10 +38,5 @@ public class ConnectionConfiguration {
         OAuth2Properties oAuth2Properties, TagService tagService) {
 
         return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, oAuth2Properties, tagService);
-    }
-
-    @Bean
-    ConnectionService connectionService(ConnectionRepository connectionRepository) {
-        return new ConnectionServiceImpl(connectionRepository);
     }
 }
