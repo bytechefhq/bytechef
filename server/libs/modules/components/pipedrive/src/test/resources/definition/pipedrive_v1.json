@@ -1,13 +1,14 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Returns all deals. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/getting-all-deals\" target=\"_blank\" rel=\"noopener noreferrer\">getting all deals</a>.",
       "title": "Get all deals"
     },
     "exampleOutput": "{\"success\":true,\"data\":[{\"id\":1,\"creator_user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"person_id\":{\"active_flag\":true,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"37244499911\",\"primary\":true}],\"value\":1101},\"org_id\":{\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":5},\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-11-28 16:19:50\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"2019-11-27 11:40:36\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false}],\"related_objects\":{\"user\":{\"8877\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true}},\"organization\":{\"5\":{\"id\":5,\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"person\":{\"1101\":{\"active_flag\":true,\"id\":1101,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"3421787767\",\"primary\":true}],\"owner_id\":8877}},\"stage\":{\"2\":{\"id\":2,\"company_id\":123,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":null,\"add_time\":\"2015-12-08 13:54:06\",\"update_time\":\"2015-12-08 13:54:06\",\"pipeline_name\":\"Pipeline\",\"pipeline_deal_probability\":true}},\"pipeline\":{\"1\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":0,\"active\":true,\"deal_probability\":true,\"add_time\":\"2015-12-08 10:00:24\",\"update_time\":\"2015-12-08 10:00:24\"}}},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false,\"next_start\":1}}}",
     "metadata": {
-      "path": "/deals",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/deals"
     },
     "name": "getDeals",
     "outputSchema": [ {
@@ -1020,6 +1021,7 @@
       "controlType": "SELECT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Adds a new deal. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the dealFields and look for `key` values. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/creating-a-deal\" target=\"_blank\" rel=\"noopener noreferrer\">adding a deal</a>.",
       "title": "Add a deal"
@@ -1028,8 +1030,8 @@
     "metadata": {
       "path": "/deals",
       "mimeType": "application/json",
-      "bodyContentType": "JSON",
-      "requestMethod": "POST"
+      "method": "POST",
+      "bodyContentType": "JSON"
     },
     "name": "addDeal",
     "outputSchema": [ {
@@ -2025,14 +2027,15 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Searches all deals by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found deals can be filtered by the person ID and the organization ID.",
       "title": "Search deals"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"items\":[{\"result_score\":1.22,\"item\":{\"id\":1,\"type\":\"deal\",\"title\":\"Jane Doe deal\",\"value\":100,\"currency\":\"USD\",\"status\":\"open\",\"visible_to\":3,\"owner\":{\"id\":1},\"stage\":{\"id\":1,\"name\":\"Lead In\"},\"person\":{\"id\":1,\"name\":\"Jane Doe\"},\"organization\":null,\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}",
     "metadata": {
-      "path": "/deals/search",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/deals/search"
     },
     "name": "searchDeals",
     "outputSchema": [ {
@@ -2409,14 +2412,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Marks a deal as deleted. After 30 days, the deal will be permanently deleted.",
       "title": "Delete a deal"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"id\":123}}",
     "metadata": {
-      "path": "/deals/{id}",
-      "requestMethod": "DELETE"
+      "method": "DELETE",
+      "path": "/deals/{id}"
     },
     "name": "deleteDeal",
     "outputSchema": [ {
@@ -2462,14 +2466,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns the details of a specific deal. Note that this also returns some additional fields which are not present when asking for all deals – such as deal age and stay in pipeline stages. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of dealFields. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/getting-details-of-a-deal\" target=\"_blank\" rel=\"noopener noreferrer\">getting details of a deal</a>.",
       "title": "Get details of a deal"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"id\":1,\"creator_user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"person_id\":{\"active_flag\":true,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"37244499911\",\"primary\":true}],\"value\":1101},\"org_id\":{\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":5},\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-11-28 16:19:50\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false,\"average_time_to_won\":{\"y\":0,\"m\":0,\"d\":0,\"h\":0,\"i\":20,\"s\":49,\"total_seconds\":1249},\"average_stage_progress\":4.99,\"age\":{\"y\":0,\"m\":6,\"d\":14,\"h\":8,\"i\":57,\"s\":26,\"total_seconds\":17139446},\"stay_in_pipeline_stages\":{\"times_in_stages\":{\"1\":15721267,\"2\":1288449,\"3\":4368,\"4\":3315,\"5\":26460},\"order_of_stages\":[1,2,3,4,5]},\"last_activity\":null,\"next_activity\":null},\"additional_data\":{\"dropbox_email\":\"company+deal1@pipedrivemail.com\"},\"related_objects\":{\"user\":{\"8877\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true}},\"organization\":{\"2\":{\"id\":2,\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"person\":{\"1101\":{\"active_flag\":true,\"id\":1101,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"3421787767\",\"primary\":true}],\"owner_id\":8877}},\"stage\":{\"2\":{\"id\":2,\"company_id\":123,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":null,\"add_time\":\"2015-12-08 13:54:06\",\"update_time\":\"2015-12-08 13:54:06\",\"pipeline_name\":\"Pipeline\",\"pipeline_deal_probability\":true}},\"pipeline\":{\"1\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":0,\"active\":true,\"deal_probability\":true,\"add_time\":\"2015-12-08 10:00:24\",\"update_time\":\"2015-12-08 10:00:24\"}}}}",
     "metadata": {
-      "path": "/deals/{id}",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/deals/{id}"
     },
     "name": "getDeal",
     "outputSchema": [ {
@@ -3528,14 +3533,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest. Pagination can be controlled using `limit` and `start` query parameters. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields' structure from deals.\n",
       "title": "Get all leads"
     },
     "exampleOutput": "{\"success\":true,\"data\":[{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}]}",
     "metadata": {
-      "path": "/leads",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/leads"
     },
     "name": "getLeads",
     "outputSchema": [ {
@@ -3876,6 +3882,7 @@
       } ]
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Creates a lead. A lead always has to be linked to a person or an organization or both. All leads created through the Pipedrive API will have a lead source `API` assigned. Here's the tutorial for <a href=\"https://pipedrive.readme.io/docs/adding-a-lead\" target=\"_blank\" rel=\"noopener noreferrer\">adding a lead</a>. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields' structure from deals. See an example given in the <a href=\"https://pipedrive.readme.io/docs/updating-custom-field-value\" target=\"_blank\" rel=\"noopener noreferrer\">updating custom fields' values tutorial</a>.",
       "title": "Add a lead"
@@ -3884,8 +3891,8 @@
     "metadata": {
       "path": "/leads",
       "mimeType": "application/json",
-      "bodyContentType": "JSON",
-      "requestMethod": "POST"
+      "method": "POST",
+      "bodyContentType": "JSON"
     },
     "name": "addLead",
     "outputSchema": [ {
@@ -4171,14 +4178,15 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Deletes a specific lead.",
       "title": "Delete a lead"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\"}}",
     "metadata": {
-      "path": "/leads/{id}",
-      "requestMethod": "DELETE"
+      "method": "DELETE",
+      "path": "/leads/{id}"
     },
     "name": "deleteLead",
     "outputSchema": [ {
@@ -4222,14 +4230,15 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns details of a specific lead. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields’ structure from deals.",
       "title": "Get one lead"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}}",
     "metadata": {
-      "path": "/leads/{id}",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/leads/{id}"
     },
     "name": "getLead",
     "outputSchema": [ {
@@ -4420,14 +4429,15 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Searches all leads by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found leads can be filtered by the person ID and the organization ID.",
       "title": "Search leads"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.29,\"item\":{\"id\":\"39c433f0-8a4c-11ec-8728-09968f0a1ca0\",\"type\":\"lead\",\"title\":\"John Doe lead\",\"owner\":{\"id\":1},\"person\":{\"id\":1,\"name\":\"John Doe\"},\"organization\":{\"id\":1,\"name\":\"John company\"},\"phones\":[],\"emails\":[\"john@doe.com\"],\"custom_fields\":[],\"notes\":[],\"value\":100,\"currency\":\"USD\",\"visible_to\":3,\"is_archived\":false}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}",
     "metadata": {
-      "path": "/leads/search",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/leads/search"
     },
     "name": "searchLeads",
     "outputSchema": [ {
@@ -4786,14 +4796,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns all organizations.",
       "title": "Get all organizations"
     },
     "exampleOutput": "{\"success\":true,\"data\":[{\"id\":1,\"company_id\":77,\"owner_id\":{\"id\":10,\"name\":\"Will Smith\",\"email\":\"will.smith@pipedrive.com\",\"has_pic\":0,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true,\"value\":10},\"name\":\"Bolt\",\"open_deals_count\":1,\"related_open_deals_count\":2,\"closed_deals_count\":3,\"related_closed_deals_count\":1,\"email_messages_count\":2,\"people_count\":1,\"activities_count\":2,\"done_activities_count\":1,\"undone_activities_count\":0,\"files_count\":0,\"notes_count\":0,\"followers_count\":1,\"won_deals_count\":0,\"related_won_deals_count\":0,\"lost_deals_count\":0,\"related_lost_deals_count\":0,\"active_flag\":true,\"picture_id\":{\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg\"},\"value\":101},\"country_code\":\"USA\",\"first_char\":\"b\",\"update_time\":\"2020-09-08 12:14:11\",\"add_time\":\"2020-02-25 10:04:08\",\"visible_to\":\"3\",\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":34,\"last_activity_date\":\"2019-11-28\",\"label\":7,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"address_subpremise\":\"\",\"address_street_number\":\"3a\",\"address_route\":\"Mustamäe tee\",\"address_sublocality\":\"Kristiine\",\"address_locality\":\"Tallinn\",\"address_admin_area_level_1\":\"Harju maakond\",\"address_admin_area_level_2\":\"\",\"address_country\":\"Estonia\",\"address_postal_code\":\"10616\",\"address_formatted_address\":\"Mustamäe tee 3a, 10616 Tallinn, Estonia\",\"owner_name\":\"John Doe\",\"cc_email\":\"org@pipedrivemail.com\"}],\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false,\"next_start\":100}},\"related_objects\":{\"organization\":{\"1\":{\"id\":1,\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"user\":{\"123\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true}},\"picture\":{\"1\":{\"id\":1,\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"}}}}}",
     "metadata": {
-      "path": "/organizations",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/organizations"
     },
     "name": "getOrganizations",
     "outputSchema": [ {
@@ -5558,6 +5569,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Adds a new organization. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the organizationFields and look for `key` values. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/adding-an-organization\" target=\"_blank\" rel=\"noopener noreferrer\">adding an organization</a>.",
       "title": "Add an organization"
@@ -5566,8 +5578,8 @@
     "metadata": {
       "path": "/organizations",
       "mimeType": "application/json",
-      "bodyContentType": "JSON",
-      "requestMethod": "POST"
+      "method": "POST",
+      "bodyContentType": "JSON"
     },
     "name": "addOrganization",
     "outputSchema": [ {
@@ -6267,14 +6279,15 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.",
       "title": "Search organizations"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.316,\"item\":{\"id\":1,\"type\":\"organization\",\"name\":\"Organization name\",\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"visible_to\":3,\"owner\":{\"id\":1},\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}",
     "metadata": {
-      "path": "/organizations/search",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/organizations/search"
     },
     "name": "searchOrganization",
     "outputSchema": [ {
@@ -6520,14 +6533,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Marks an organization as deleted. After 30 days, the organization will be permanently deleted.",
       "title": "Delete an organization"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"id\":123}}",
     "metadata": {
-      "path": "/organizations/{id}",
-      "requestMethod": "DELETE"
+      "method": "DELETE",
+      "path": "/organizations/{id}"
     },
     "name": "deleteOrganization",
     "outputSchema": [ {
@@ -6573,14 +6587,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns the details of an organization. Note that this also returns some additional fields which are not present when asking for all organizations. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of organizationFields.",
       "title": "Get details of an organization"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"allOf\":[{\"id\":1,\"company_id\":77,\"owner_id\":{\"id\":10,\"name\":\"Will Smith\",\"email\":\"will.smith@pipedrive.com\",\"has_pic\":0,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true,\"value\":10},\"name\":\"Bolt\",\"open_deals_count\":1,\"related_open_deals_count\":2,\"closed_deals_count\":3,\"related_closed_deals_count\":1,\"email_messages_count\":2,\"people_count\":1,\"activities_count\":2,\"done_activities_count\":1,\"undone_activities_count\":0,\"files_count\":0,\"notes_count\":0,\"followers_count\":1,\"won_deals_count\":0,\"related_won_deals_count\":0,\"lost_deals_count\":0,\"related_lost_deals_count\":0,\"active_flag\":true,\"picture_id\":{\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg\"},\"value\":101},\"country_code\":\"USA\",\"first_char\":\"b\",\"update_time\":\"2020-09-08 12:14:11\",\"add_time\":\"2020-02-25 10:04:08\",\"visible_to\":\"3\",\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":34,\"last_activity_date\":\"2019-11-28\",\"label\":7,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"address_subpremise\":\"\",\"address_street_number\":\"3a\",\"address_route\":\"Mustamäe tee\",\"address_sublocality\":\"Kristiine\",\"address_locality\":\"Tallinn\",\"address_admin_area_level_1\":\"Harju maakond\",\"address_admin_area_level_2\":\"\",\"address_country\":\"Estonia\",\"address_postal_code\":\"10616\",\"address_formatted_address\":\"Mustamäe tee 3a, 10616 Tallinn, Estonia\",\"owner_name\":\"John Doe\",\"cc_email\":\"org@pipedrivemail.com\"},{\"type\":\"object\",\"properties\":{\"last_activity\":{\"id\":8,\"company_id\":22122,\"user_id\":1234,\"done\":false,\"type\":\"deadline\",\"reference_type\":\"scheduler-service\",\"reference_id\":7,\"conference_meeting_client\":\"871b8bc88d3a1202\",\"conference_meeting_url\":\"https://pipedrive.zoom.us/link\",\"conference_meeting_id\":\"01758746701\",\"due_date\":\"2020-06-09\",\"due_time\":\"10:00\",\"duration\":\"01:00\",\"busy_flag\":true,\"add_time\":\"2020-06-08 12:37:56\",\"marked_as_done_time\":\"2020-08-08 08:08:38\",\"last_notification_time\":\"2020-08-08 12:37:56\",\"last_notification_user_id\":7655,\"notification_language_id\":1,\"subject\":\"Deadline\",\"public_description\":\"This is a description\",\"calendar_sync_include_context\":\"\",\"location\":\"Mustamäe tee 3, Tallinn, Estonia\",\"org_id\":5,\"person_id\":1101,\"deal_id\":300,\"lead_id\":\"46c3b0e1-db35-59ca-1828-4817378dff71\",\"active_flag\":true,\"update_time\":\"2020-08-08 12:37:56\",\"update_user_id\":5596,\"gcal_event_id\":\"\",\"google_calendar_id\":\"\",\"google_calendar_etag\":\"\",\"source_timezone\":\"\",\"rec_rule\":\"RRULE:FREQ=WEEKLY;BYDAY=WE\",\"rec_rule_extension\":\"\",\"rec_master_activity_id\":1,\"series\":[],\"note\":\"A note for the activity\",\"created_by_user_id\":1234,\"location_subpremise\":\"\",\"location_street_number\":\"3\",\"location_route\":\"Mustamäe tee\",\"location_sublocality\":\"Kristiine\",\"location_locality\":\"Tallinn\",\"location_admin_area_level_1\":\"Harju maakond\",\"location_admin_area_level_2\":\"\",\"location_country\":\"Estonia\",\"location_postal_code\":\"10616\",\"location_formatted_address\":\"Mustamäe tee 3, 10616 Tallinn, Estonia\",\"attendees\":[{\"email_address\":\"attendee@pipedrivemail.com\",\"is_organizer\":0,\"name\":\"Attendee\",\"person_id\":25312,\"status\":\"noreply\",\"user_id\":null}],\"participants\":[{\"person_id\":17985,\"primary_flag\":false},{\"person_id\":1101,\"primary_flag\":true}],\"org_name\":\"Organization\",\"person_name\":\"Person\",\"deal_title\":\"Deal\",\"owner_name\":\"Creator\",\"person_dropbox_bcc\":\"company@pipedrivemail.com\",\"deal_dropbox_bcc\":\"company+deal300@pipedrivemail.com\",\"assigned_to_user_id\":1235,\"file\":{\"id\":\"376892,\",\"clean_name\":\"Audio 10:55:07.m4a\",\"url\":\"https://pipedrive-files.s3-eu-west-1.amazonaws.com/Audio-recording.m4a\"}},\"next_activity\":null,\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false,\"next_start\":100}},\"related_objects\":{\"organization\":{\"1\":{\"id\":1,\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"user\":{\"123\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true}},\"picture\":{\"1\":{\"id\":1,\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"}}}}}}]}}",
     "metadata": {
-      "path": "/organizations/{id}",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/organizations/{id}"
     },
     "name": "getOrganization",
     "outputSchema": [ {
@@ -7316,14 +7331,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns all persons.",
       "title": "Get all persons"
     },
     "exampleOutput": "{\"success\":true,\"data\":[{\"id\":1,\"company_id\":12,\"owner_id\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true,\"value\":123},\"org_id\":{\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":1234},\"name\":\"Will Smith\",\"first_name\":\"Will\",\"last_name\":\"Smith\",\"open_deals_count\":2,\"related_open_deals_count\":2,\"closed_deals_count\":3,\"related_closed_deals_count\":3,\"participant_open_deals_count\":1,\"participant_closed_deals_count\":1,\"email_messages_count\":1,\"activities_count\":1,\"done_activities_count\":1,\"undone_activities_count\":2,\"files_count\":2,\"notes_count\":2,\"followers_count\":3,\"won_deals_count\":3,\"related_won_deals_count\":3,\"lost_deals_count\":1,\"related_lost_deals_count\":1,\"active_flag\":true,\"phone\":[{\"value\":\"12345\",\"primary\":true,\"label\":\"work\"}],\"email\":[{\"value\":\"12345@email.com\",\"primary\":true,\"label\":\"work\"}],\"primary_email\":\"12345@email.com\",\"first_char\":\"w\",\"update_time\":\"2020-05-08 05:30:20\",\"add_time\":\"2017-10-18 13:23:07\",\"visible_to\":\"3\",\"marketing_status\":\"no_consent\",\"picture_id\":{\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"},\"value\":4},\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":34,\"last_activity_date\":\"2019-11-28\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":1,\"org_name\":\"Organization name\",\"owner_name\":\"Jane Doe\",\"cc_email\":\"org@pipedrivemail.com\"}],\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false,\"next_start\":100}},\"related_objects\":{\"organization\":{\"1\":{\"id\":1,\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"user\":{\"123\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true}},\"picture\":{\"1\":{\"id\":1,\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"}}}}}",
     "metadata": {
-      "path": "/persons",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/persons"
     },
     "name": "getPersons",
     "outputSchema": [ {
@@ -8155,6 +8171,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Adds a new person. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the personFields and look for `key` values.<br>If a company uses the [Campaigns product](https://pipedrive.readme.io/docs/campaigns-in-pipedrive-api), then this endpoint will also accept and return the `data.marketing_status` field.",
       "title": "Add a person"
@@ -8163,8 +8180,8 @@
     "metadata": {
       "path": "/persons",
       "mimeType": "application/json",
-      "bodyContentType": "JSON",
-      "requestMethod": "POST"
+      "method": "POST",
+      "bodyContentType": "JSON"
     },
     "name": "addPerson",
     "outputSchema": [ {
@@ -8895,14 +8912,15 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Searches all persons by name, email, phone, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found persons can be filtered by organization ID.",
       "title": "Search persons"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.5092,\"item\":{\"id\":1,\"type\":\"person\",\"name\":\"Jane Doe\",\"phones\":[\"+372 555555555\"],\"emails\":[\"jane@pipedrive.com\"],\"visible_to\":3,\"owner\":{\"id\":1},\"organization\":{\"id\":1,\"name\":\"Organization name\",\"address\":null},\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}",
     "metadata": {
-      "path": "/persons/search",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/persons/search"
     },
     "name": "searchPersons",
     "outputSchema": [ {
@@ -9218,14 +9236,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Marks a person as deleted. After 30 days, the person will be permanently deleted.",
       "title": "Delete a person"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"id\":12}}",
     "metadata": {
-      "path": "/persons/{id}",
-      "requestMethod": "DELETE"
+      "method": "DELETE",
+      "path": "/persons/{id}"
     },
     "name": "deletePerson",
     "outputSchema": [ {
@@ -9271,14 +9290,15 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns the details of a person. Note that this also returns some additional fields which are not present when asking for all persons. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of personFields.<br>If a company uses the [Campaigns product](https://pipedrive.readme.io/docs/campaigns-in-pipedrive-api), then this endpoint will also return the `data.marketing_status` field.",
       "title": "Get details of a person"
     },
     "exampleOutput": "{\"success\":true,\"data\":{\"id\":1,\"company_id\":12,\"owner_id\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true,\"value\":123},\"org_id\":{\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":1234},\"name\":\"Will Smith\",\"first_name\":\"Will\",\"last_name\":\"Smith\",\"open_deals_count\":2,\"related_open_deals_count\":2,\"closed_deals_count\":3,\"related_closed_deals_count\":3,\"participant_open_deals_count\":1,\"participant_closed_deals_count\":1,\"email_messages_count\":1,\"activities_count\":1,\"done_activities_count\":1,\"undone_activities_count\":2,\"files_count\":2,\"notes_count\":2,\"followers_count\":3,\"won_deals_count\":3,\"related_won_deals_count\":3,\"lost_deals_count\":1,\"related_lost_deals_count\":1,\"active_flag\":true,\"phone\":[{\"value\":\"12345\",\"primary\":true,\"label\":\"work\"}],\"email\":[{\"value\":\"12345@email.com\",\"primary\":true,\"label\":\"work\"}],\"primary_email\":\"12345@email.com\",\"first_char\":\"w\",\"update_time\":\"2020-05-08 05:30:20\",\"add_time\":\"2017-10-18 13:23:07\",\"visible_to\":\"3\",\"marketing_status\":\"no_consent\",\"picture_id\":{\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"},\"value\":4},\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":34,\"last_activity_date\":\"2019-11-28\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":1,\"org_name\":\"Organization name\",\"owner_name\":\"Jane Doe\",\"cc_email\":\"org@pipedrivemail.com\"},\"additional_data\":{\"dropbox_email\":\"test@email.com\"},\"related_objects\":{\"organization\":{\"1\":{\"id\":1,\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"user\":{\"123\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true}},\"picture\":{\"1\":{\"id\":1,\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"}}}}}",
     "metadata": {
-      "path": "/persons/{id}",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/persons/{id}"
     },
     "name": "getPerson",
     "outputSchema": [ {
@@ -10015,7 +10035,7 @@
     } ]
   } ],
   "connection": {
-    "authorizationRequired": true,
+    "authorizationRequired": false,
     "authorizations": [ {
       "display": {
         "title": "API Key"
@@ -10069,5 +10089,2668 @@
     "title": "Pipedrive"
   },
   "name": "pipedrive",
-  "version": 1
+  "version": 1,
+  "triggers": [ {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "This trigger activates whenever a new activity is added.",
+      "title": "New Activity"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "exampleOutput": "{\n    \"id\": 8,\n    \"company_id\": 22122,\n    \"user_id\": 1234,\n    \"done\": false,\n    \"type\": \"deadline\",\n    \"reference_type\": \"scheduler-service\",\n    \"reference_id\": 7,\n    \"conference_meeting_client\": \"871b8bc88d3a1202\",\n    \"conference_meeting_url\": \"https://pipedrive.zoom.us/link\",\n    \"conference_meeting_id\": \"01758746701\",\n    \"due_date\": \"2020-06-09\",\n    \"due_time\": \"10:00\",\n    \"duration\": \"01:00\",\n    \"busy_flag\": true,\n    \"add_time\": \"2020-06-08 12:37:56\",\n    \"marked_as_done_time\": \"2020-08-08 08:08:38\",\n    \"last_notification_time\": \"2020-08-08 12:37:56\",\n    \"last_notification_user_id\": 7655,\n    \"notification_language_id\": 1,\n    \"subject\": \"Deadline\",\n    \"public_description\": \"This is a description\",\n    \"calendar_sync_include_context\": \"\",\n    \"location\": \"Mustamäe tee 3, Tallinn, Estonia\",\n    \"org_id\": 5,\n    \"person_id\": 1101,\n    \"deal_id\": 300,\n    \"lead_id\": \"46c3b0e1-db35-59ca-1828-4817378dff71\",\n    \"project_id\": null,\n    \"active_flag\": true,\n    \"update_time\": \"2020-08-08 12:37:56\",\n    \"update_user_id\": 5596,\n    \"gcal_event_id\": \"\",\n    \"google_calendar_id\": \"\",\n    \"google_calendar_etag\": \"\",\n    \"source_timezone\": \"\",\n    \"rec_rule\": \"RRULE:FREQ=WEEKLY;BYDAY=WE\",\n    \"rec_rule_extension\": \"\",\n    \"rec_master_activity_id\": 1,\n    \"series\":\n    [],\n    \"note\": \"A note for the activity\",\n    \"created_by_user_id\": 1234,\n    \"location_subpremise\": \"\",\n    \"location_street_number\": \"3\",\n    \"location_route\": \"Mustamäe tee\",\n    \"location_sublocality\": \"Kristiine\",\n    \"location_locality\": \"Tallinn\",\n    \"location_admin_area_level_1\": \"Harju maakond\",\n    \"location_admin_area_level_2\": \"\",\n    \"location_country\": \"Estonia\",\n    \"location_postal_code\": \"10616\",\n    \"location_formatted_address\": \"Mustamäe tee 3, 10616 Tallinn, Estonia\",\n    \"attendees\":\n    [\n        {\n            \"email_address\": \"attendee@pipedrivemail.com\",\n            \"is_organizer\": 0,\n            \"name\": \"Attendee\",\n            \"person_id\": 25312,\n            \"status\": \"noreply\",\n            \"user_id\": null\n        }\n    ],\n    \"participants\":\n    [\n        {\n            \"person_id\": 17985,\n            \"primary_flag\": false\n        },\n        {\n            \"person_id\": 1101,\n            \"primary_flag\": true\n        }\n    ],\n    \"org_name\": \"Organization\",\n    \"person_name\": \"Person\",\n    \"deal_title\": \"Deal\",\n    \"owner_name\": \"Creator\",\n    \"person_dropbox_bcc\": \"company@pipedrivemail.com\",\n    \"deal_dropbox_bcc\": \"company+deal300@pipedrivemail.com\",\n    \"assigned_to_user_id\": 1235,\n    \"file\":\n    {\n        \"id\": \"376892,\",\n        \"clean_name\": \"Audio 10:55:07.m4a\",\n        \"url\": \"https://pipedrive-files.s3-eu-west-1.amazonaws.com/Audio-recording.m4a\"\n    }\n}\n",
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "company_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "user_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "done",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "type",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "reference_type",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "reference_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "conference_meeting_client",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "conference_meeting_url",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "conference_meeting_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "due_date",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "due_time",
+        "type": "TIME",
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "controlType": "TIME"
+      }, {
+        "name": "duration",
+        "type": "TIME",
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "controlType": "TIME"
+      }, {
+        "name": "busy_flag",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "add_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "marked_as_done_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "last_notification_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "last_notification_user_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "notification_language_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "subject",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "public_description",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "calendar_sync_include_context",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "org_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "person_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "deal_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "lead_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "active_flag",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "update_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "update_user_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "gcal_event_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "google_calendar_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "google_calendar_etag",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "source_timezone",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "rec_rule",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "rec_rule_extension",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "rec_master_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "series",
+        "type": "ARRAY",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "note",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "created_by_user_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "location_subpremise",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_street_number",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_route",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_sublocality",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_locality",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_admin_area_level_1",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_admin_area_level_2",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_country",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_postal_code",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "location_formatted_address",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "attendees",
+        "type": "ARRAY",
+        "items": [ {
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "email_address",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "is_organizer",
+            "type": "INTEGER",
+            "controlType": "INPUT_INTEGER"
+          }, {
+            "name": "name",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "person_id",
+            "type": "INTEGER",
+            "controlType": "INPUT_INTEGER"
+          }, {
+            "name": "status",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "user_id",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "participants",
+        "type": "ARRAY",
+        "items": [ {
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "person_id",
+            "type": "INTEGER",
+            "controlType": "INPUT_INTEGER"
+          }, {
+            "name": "primary_flag",
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "org_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "person_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "deal_title",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "owner_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "person_dropbox_bcc",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "deal_dropbox_bcc",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "assigned_to_user_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "file",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "clean_name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "url",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "newActivity",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "This trigger activates whenever a new deal is added.",
+      "title": "New Deal"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "exampleOutput": "{\n    \"id\": 1,\n    \"creator_user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"person_id\":\n    {\n        \"active_flag\": true,\n        \"name\": \"Person\",\n        \"email\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"person@pipedrive.com\",\n                \"primary\": true\n            }\n        ],\n        \"phone\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"37244499911\",\n                \"primary\": true\n            }\n        ],\n        \"value\": 1101\n    },\n    \"org_id\":\n    {\n        \"name\": \"Organization\",\n        \"people_count\": 2,\n        \"owner_id\": 8877,\n        \"address\": \"\",\n        \"active_flag\": true,\n        \"cc_email\": \"org@pipedrivemail.com\",\n        \"value\": 5\n    },\n    \"stage_id\": 2,\n    \"title\": \"Deal One\",\n    \"value\": 5000,\n    \"currency\": \"EUR\",\n    \"add_time\": \"2019-05-29 04:21:51\",\n    \"update_time\": \"2019-11-28 16:19:50\",\n    \"stage_change_time\": \"2019-11-28 15:41:22\",\n    \"active\": true,\n    \"deleted\": false,\n    \"status\": \"open\",\n    \"probability\": null,\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": null,\n    \"last_activity_date\": null,\n    \"lost_reason\": null,\n    \"visible_to\": \"1\",\n    \"close_time\": null,\n    \"pipeline_id\": 1,\n    \"won_time\": \"2019-11-27 11:40:36\",\n    \"first_won_time\": \"2019-11-27 11:40:36\",\n    \"lost_time\": \"\",\n    \"products_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 2,\n    \"followers_count\": 0,\n    \"email_messages_count\": 4,\n    \"activities_count\": 1,\n    \"done_activities_count\": 0,\n    \"undone_activities_count\": 1,\n    \"participants_count\": 1,\n    \"expected_close_date\": \"2019-06-29\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": \"11\",\n    \"stage_order_nr\": 2,\n    \"person_name\": \"Person\",\n    \"org_name\": \"Organization\",\n    \"next_activity_subject\": \"Call\",\n    \"next_activity_type\": \"call\",\n    \"next_activity_duration\": \"00:30:00\",\n    \"next_activity_note\": \"Note content\",\n    \"formatted_value\": \"€5,000\",\n    \"weighted_value\": 5000,\n    \"formatted_weighted_value\": \"€5,000\",\n    \"weighted_value_currency\": \"EUR\",\n    \"rotten_time\": null,\n    \"owner_name\": \"Creator\",\n    \"cc_email\": \"company+deal1@pipedrivemail.com\",\n    \"org_hidden\": false,\n    \"person_hidden\": false\n}\n",
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "creator_user_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "user_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "person_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "ARRAY",
+          "items": [ {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "properties": [ {
+              "name": "label",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "value",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "primary",
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
+            } ],
+            "controlType": "JSON_BUILDER"
+          } ],
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "phone",
+          "type": "ARRAY",
+          "items": [ {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "properties": [ {
+              "name": "label",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "value",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "primary",
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
+            } ],
+            "controlType": "JSON_BUILDER"
+          } ],
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "org_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "people_count",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "owner_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "address",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "cc_email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "stage_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "title",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "value",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "currency",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "add_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "update_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "stage_change_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "active",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "deleted",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "status",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "probability",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "next_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "next_activity_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "lost_reason",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "visible_to",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "close_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "pipeline_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "won_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "first_won_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "lost_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "products_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "files_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "notes_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "followers_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "email_messages_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "done_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "undone_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "participants_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "expected_close_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "last_incoming_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "last_outgoing_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "label",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "stage_order_nr",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "person_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "org_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_subject",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_type",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_duration",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_note",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "formatted_value",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "weighted_value",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "formatted_weighted_value",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "weighted_value_currency",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "rotten_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "owner_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "cc_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "org_hidden",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "person_hidden",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "newDeal",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "This trigger activates whenever a new organization is added.",
+      "title": "New Organization"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "exampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 77,\n    \"owner_id\":\n    {\n        \"id\": 10,\n        \"name\": \"Will Smith\",\n        \"email\": \"will.smith@pipedrive.com\",\n        \"has_pic\": 0,\n        \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n        \"active_flag\": true,\n        \"value\": 10\n    },\n    \"name\": \"Bolt\",\n    \"open_deals_count\": 1,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 1,\n    \"email_messages_count\": 2,\n    \"people_count\": 1,\n    \"activities_count\": 2,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 0,\n    \"followers_count\": 1,\n    \"won_deals_count\": 0,\n    \"related_won_deals_count\": 0,\n    \"lost_deals_count\": 0,\n    \"related_lost_deals_count\": 0,\n    \"active_flag\": true,\n    \"picture_id\":\n    {\n        \"item_type\": \"person\",\n        \"item_id\": 25,\n        \"active_flag\": true,\n        \"add_time\": \"2020-09-08 08:17:52\",\n        \"update_time\": \"0000-00-00 00:00:00\",\n        \"added_by_user_id\": 967055,\n        \"pictures\":\n        {\n            \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg\",\n            \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg\"\n        },\n        \"value\": 101\n    },\n    \"country_code\": \"USA\",\n    \"first_char\": \"b\",\n    \"update_time\": \"2020-09-08 12:14:11\",\n    \"add_time\": \"2020-02-25 10:04:08\",\n    \"visible_to\": \"3\",\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"label\": 7,\n    \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n    \"address_subpremise\": \"\",\n    \"address_street_number\": \"3a\",\n    \"address_route\": \"Mustamäe tee\",\n    \"address_sublocality\": \"Kristiine\",\n    \"address_locality\": \"Tallinn\",\n    \"address_admin_area_level_1\": \"Harju maakond\",\n    \"address_admin_area_level_2\": \"\",\n    \"address_country\": \"Estonia\",\n    \"address_postal_code\": \"10616\",\n    \"address_formatted_address\": \"Mustamäe tee 3a, 10616 Tallinn, Estonia\",\n    \"owner_name\": \"John Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n}\n",
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "company_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "owner_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "email_messages_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "people_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "done_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "undone_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "files_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "notes_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "followers_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "active_flag",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "picture_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "item_type",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "item_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "add_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "update_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "added_by_user_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pictures",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "128",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "512",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "country_code",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "first_char",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "update_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "add_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "visible_to",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "next_activity_time",
+        "type": "TIME",
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "controlType": "TIME"
+      }, {
+        "name": "next_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "label",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "address",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_subpremise",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_street_number",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_route",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_sublocality",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_locality",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_admin_area_level_1",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_admin_area_level_2",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_country",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_postal_code",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_formatted_address",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "owner_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "cc_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "newOrganization",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "This trigger activates whenever a new person is added.",
+      "title": "New Person"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "exampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 12,\n    \"owner_id\": {\n      \"id\": 123,\n      \"name\": \"Jane Doe\",\n      \"email\": \"jane@pipedrive.com\",\n      \"has_pic\": 1,\n      \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n      \"active_flag\": true,\n      \"value\": 123\n    },\n    \"org_id\": {\n      \"name\": \"Org Name\",\n      \"people_count\": 1,\n      \"owner_id\": 123,\n      \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n      \"active_flag\": true,\n      \"cc_email\": \"org@pipedrivemail.com\",\n      \"value\": 1234\n    },\n    \"name\": \"Will Smith\",\n    \"first_name\": \"Will\",\n    \"last_name\": \"Smith\",\n    \"open_deals_count\": 2,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 3,\n    \"participant_open_deals_count\": 1,\n    \"participant_closed_deals_count\": 1,\n    \"email_messages_count\": 1,\n    \"activities_count\": 1,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 2,\n    \"files_count\": 2,\n    \"notes_count\": 2,\n    \"followers_count\": 3,\n    \"won_deals_count\": 3,\n    \"related_won_deals_count\": 3,\n    \"lost_deals_count\": 1,\n    \"related_lost_deals_count\": 1,\n    \"active_flag\": true,\n    \"phone\": [\n      {\n        \"value\": \"12345\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"email\": [\n      {\n        \"value\": \"12345@email.com\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"primary_email\": \"12345@email.com\",\n    \"first_char\": \"w\",\n    \"update_time\": \"2020-05-08 05:30:20\",\n    \"add_time\": \"2017-10-18 13:23:07\",\n    \"visible_to\": \"3\",\n    \"marketing_status\": \"no_consent\",\n    \"picture_id\": {\n      \"item_type\": \"person\",\n      \"item_id\": 25,\n      \"active_flag\": true,\n      \"add_time\": \"2020-09-08 08:17:52\",\n      \"update_time\": \"0000-00-00 00:00:00\",\n      \"added_by_user_id\": 967055,\n      \"pictures\": {\n        \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\n        \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"\n      },\n      \"value\": 4\n    },\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": 1,\n    \"org_name\": \"Organization name\",\n    \"owner_name\": \"Jane Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n  }\n",
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "company_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "owner_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "org_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "people_count",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "owner_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "address",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "cc_email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "first_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "last_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "participant_open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "participant_closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "email_messages_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "done_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "undone_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "files_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "notes_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "followers_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "active_flag",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "phone",
+        "type": "ARRAY",
+        "items": [ {
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "label",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "value",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "primary",
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "email",
+        "type": "ARRAY",
+        "items": [ {
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "label",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "value",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "primary",
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "primary_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "first_char",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "update_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "add_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "visible_to",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "marketing_status",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "picture_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "item_type",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "item_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "add_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "update_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "added_by_user_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pictures",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "128",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "512",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "next_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "next_activity_time",
+        "type": "TIME",
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "controlType": "TIME"
+      }, {
+        "name": "next_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "last_incoming_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "last_outgoing_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "label",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "org_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "owner_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "cc_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "newPerson",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "This trigger activates whenever an existing deal is updated.",
+      "title": "Updated Deal"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "exampleOutput": "{\n    \"id\": 1,\n    \"creator_user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"user_id\":\n    {\n        \"id\": 8877,\n        \"name\": \"Creator\",\n        \"email\": \"john.doe@pipedrive.com\",\n        \"has_pic\": false,\n        \"pic_hash\": null,\n        \"active_flag\": true,\n        \"value\": 8877\n    },\n    \"person_id\":\n    {\n        \"active_flag\": true,\n        \"name\": \"Person\",\n        \"email\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"person@pipedrive.com\",\n                \"primary\": true\n            }\n        ],\n        \"phone\":\n        [\n            {\n                \"label\": \"work\",\n                \"value\": \"37244499911\",\n                \"primary\": true\n            }\n        ],\n        \"value\": 1101\n    },\n    \"org_id\":\n    {\n        \"name\": \"Organization\",\n        \"people_count\": 2,\n        \"owner_id\": 8877,\n        \"address\": \"\",\n        \"active_flag\": true,\n        \"cc_email\": \"org@pipedrivemail.com\",\n        \"value\": 5\n    },\n    \"stage_id\": 2,\n    \"title\": \"Deal One\",\n    \"value\": 5000,\n    \"currency\": \"EUR\",\n    \"add_time\": \"2019-05-29 04:21:51\",\n    \"update_time\": \"2019-11-28 16:19:50\",\n    \"stage_change_time\": \"2019-11-28 15:41:22\",\n    \"active\": true,\n    \"deleted\": false,\n    \"status\": \"open\",\n    \"probability\": null,\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": null,\n    \"last_activity_date\": null,\n    \"lost_reason\": null,\n    \"visible_to\": \"1\",\n    \"close_time\": null,\n    \"pipeline_id\": 1,\n    \"won_time\": \"2019-11-27 11:40:36\",\n    \"first_won_time\": \"2019-11-27 11:40:36\",\n    \"lost_time\": \"\",\n    \"products_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 2,\n    \"followers_count\": 0,\n    \"email_messages_count\": 4,\n    \"activities_count\": 1,\n    \"done_activities_count\": 0,\n    \"undone_activities_count\": 1,\n    \"participants_count\": 1,\n    \"expected_close_date\": \"2019-06-29\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": \"11\",\n    \"stage_order_nr\": 2,\n    \"person_name\": \"Person\",\n    \"org_name\": \"Organization\",\n    \"next_activity_subject\": \"Call\",\n    \"next_activity_type\": \"call\",\n    \"next_activity_duration\": \"00:30:00\",\n    \"next_activity_note\": \"Note content\",\n    \"formatted_value\": \"€5,000\",\n    \"weighted_value\": 5000,\n    \"formatted_weighted_value\": \"€5,000\",\n    \"weighted_value_currency\": \"EUR\",\n    \"rotten_time\": null,\n    \"owner_name\": \"Creator\",\n    \"cc_email\": \"company+deal1@pipedrivemail.com\",\n    \"org_hidden\": false,\n    \"person_hidden\": false\n}\n",
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "creator_user_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "user_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "person_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "ARRAY",
+          "items": [ {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "properties": [ {
+              "name": "label",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "value",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "primary",
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
+            } ],
+            "controlType": "JSON_BUILDER"
+          } ],
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "phone",
+          "type": "ARRAY",
+          "items": [ {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "properties": [ {
+              "name": "label",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "value",
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
+            }, {
+              "name": "primary",
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
+            } ],
+            "controlType": "JSON_BUILDER"
+          } ],
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "org_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "people_count",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "owner_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "address",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "cc_email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "stage_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "title",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "value",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "currency",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "add_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "update_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "stage_change_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "active",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "deleted",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "status",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "probability",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "next_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "next_activity_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "lost_reason",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "visible_to",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "close_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "pipeline_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "won_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "first_won_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "lost_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "products_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "files_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "notes_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "followers_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "email_messages_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "done_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "undone_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "participants_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "expected_close_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "last_incoming_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "last_outgoing_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "label",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "stage_order_nr",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "person_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "org_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_subject",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_type",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_duration",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_note",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "formatted_value",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "weighted_value",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "formatted_weighted_value",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "weighted_value_currency",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "rotten_time",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "owner_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "cc_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "org_hidden",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "person_hidden",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "updatedDeal",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "This trigger activates whenever an existing organization is updated.",
+      "title": "Updated Organization"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "exampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 77,\n    \"owner_id\":\n    {\n        \"id\": 10,\n        \"name\": \"Will Smith\",\n        \"email\": \"will.smith@pipedrive.com\",\n        \"has_pic\": 0,\n        \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n        \"active_flag\": true,\n        \"value\": 10\n    },\n    \"name\": \"Bolt\",\n    \"open_deals_count\": 1,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 1,\n    \"email_messages_count\": 2,\n    \"people_count\": 1,\n    \"activities_count\": 2,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 0,\n    \"files_count\": 0,\n    \"notes_count\": 0,\n    \"followers_count\": 1,\n    \"won_deals_count\": 0,\n    \"related_won_deals_count\": 0,\n    \"lost_deals_count\": 0,\n    \"related_lost_deals_count\": 0,\n    \"active_flag\": true,\n    \"picture_id\":\n    {\n        \"item_type\": \"person\",\n        \"item_id\": 25,\n        \"active_flag\": true,\n        \"add_time\": \"2020-09-08 08:17:52\",\n        \"update_time\": \"0000-00-00 00:00:00\",\n        \"added_by_user_id\": 967055,\n        \"pictures\":\n        {\n            \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cf14ac8f269_128.jpg\",\n            \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb2ac8f269_512.jpg\"\n        },\n        \"value\": 101\n    },\n    \"country_code\": \"USA\",\n    \"first_char\": \"b\",\n    \"update_time\": \"2020-09-08 12:14:11\",\n    \"add_time\": \"2020-02-25 10:04:08\",\n    \"visible_to\": \"3\",\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"label\": 7,\n    \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n    \"address_subpremise\": \"\",\n    \"address_street_number\": \"3a\",\n    \"address_route\": \"Mustamäe tee\",\n    \"address_sublocality\": \"Kristiine\",\n    \"address_locality\": \"Tallinn\",\n    \"address_admin_area_level_1\": \"Harju maakond\",\n    \"address_admin_area_level_2\": \"\",\n    \"address_country\": \"Estonia\",\n    \"address_postal_code\": \"10616\",\n    \"address_formatted_address\": \"Mustamäe tee 3a, 10616 Tallinn, Estonia\",\n    \"owner_name\": \"John Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n}\n",
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "company_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "owner_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "email_messages_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "people_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "done_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "undone_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "files_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "notes_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "followers_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "active_flag",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "picture_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "item_type",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "item_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "add_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "update_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "added_by_user_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pictures",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "128",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "512",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "country_code",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "first_char",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "update_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "add_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "visible_to",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "next_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "next_activity_time",
+        "type": "TIME",
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "controlType": "TIME"
+      }, {
+        "name": "next_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "label",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "address",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_subpremise",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_street_number",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_route",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_sublocality",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_locality",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_admin_area_level_1",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_admin_area_level_2",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_country",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_postal_code",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "address_formatted_address",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "owner_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "cc_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "updatedOrganization",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "This trigger activates whenever an existing person is updated.",
+      "title": "Updated Person"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "exampleOutput": "{\n    \"id\": 1,\n    \"company_id\": 12,\n    \"owner_id\": {\n      \"id\": 123,\n      \"name\": \"Jane Doe\",\n      \"email\": \"jane@pipedrive.com\",\n      \"has_pic\": 1,\n      \"pic_hash\": \"2611ace8ac6a3afe2f69ed56f9e08c6b\",\n      \"active_flag\": true,\n      \"value\": 123\n    },\n    \"org_id\": {\n      \"name\": \"Org Name\",\n      \"people_count\": 1,\n      \"owner_id\": 123,\n      \"address\": \"Mustamäe tee 3a, 10615 Tallinn\",\n      \"active_flag\": true,\n      \"cc_email\": \"org@pipedrivemail.com\",\n      \"value\": 1234\n    },\n    \"name\": \"Will Smith\",\n    \"first_name\": \"Will\",\n    \"last_name\": \"Smith\",\n    \"open_deals_count\": 2,\n    \"related_open_deals_count\": 2,\n    \"closed_deals_count\": 3,\n    \"related_closed_deals_count\": 3,\n    \"participant_open_deals_count\": 1,\n    \"participant_closed_deals_count\": 1,\n    \"email_messages_count\": 1,\n    \"activities_count\": 1,\n    \"done_activities_count\": 1,\n    \"undone_activities_count\": 2,\n    \"files_count\": 2,\n    \"notes_count\": 2,\n    \"followers_count\": 3,\n    \"won_deals_count\": 3,\n    \"related_won_deals_count\": 3,\n    \"lost_deals_count\": 1,\n    \"related_lost_deals_count\": 1,\n    \"active_flag\": true,\n    \"phone\": [\n      {\n        \"value\": \"12345\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"email\": [\n      {\n        \"value\": \"12345@email.com\",\n        \"primary\": true,\n        \"label\": \"work\"\n      }\n    ],\n    \"primary_email\": \"12345@email.com\",\n    \"first_char\": \"w\",\n    \"update_time\": \"2020-05-08 05:30:20\",\n    \"add_time\": \"2017-10-18 13:23:07\",\n    \"visible_to\": \"3\",\n    \"marketing_status\": \"no_consent\",\n    \"picture_id\": {\n      \"item_type\": \"person\",\n      \"item_id\": 25,\n      \"active_flag\": true,\n      \"add_time\": \"2020-09-08 08:17:52\",\n      \"update_time\": \"0000-00-00 00:00:00\",\n      \"added_by_user_id\": 967055,\n      \"pictures\": {\n        \"128\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\n        \"512\": \"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"\n      },\n      \"value\": 4\n    },\n    \"next_activity_date\": \"2019-11-29\",\n    \"next_activity_time\": \"11:30:00\",\n    \"next_activity_id\": 128,\n    \"last_activity_id\": 34,\n    \"last_activity_date\": \"2019-11-28\",\n    \"last_incoming_mail_time\": \"2019-05-29 18:21:42\",\n    \"last_outgoing_mail_time\": \"2019-05-30 03:45:35\",\n    \"label\": 1,\n    \"org_name\": \"Organization name\",\n    \"owner_name\": \"Jane Doe\",\n    \"cc_email\": \"org@pipedrivemail.com\"\n  }\n",
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "company_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "owner_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "has_pic",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pic_hash",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "org_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "people_count",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "owner_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "address",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "cc_email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "first_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "last_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "participant_open_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "participant_closed_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "email_messages_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "done_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "undone_activities_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "files_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "notes_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "followers_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_won_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "related_lost_deals_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "active_flag",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "name": "phone",
+        "type": "ARRAY",
+        "items": [ {
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "label",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "value",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "primary",
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "email",
+        "type": "ARRAY",
+        "items": [ {
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "label",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "value",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "primary",
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "primary_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "first_char",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "update_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "add_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "visible_to",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "marketing_status",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "picture_id",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "item_type",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "item_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "active_flag",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "add_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "update_time",
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
+        }, {
+          "name": "added_by_user_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "name": "pictures",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "128",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "512",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
+          "controlType": "JSON_BUILDER"
+        }, {
+          "name": "value",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "next_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "next_activity_time",
+        "type": "TIME",
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "controlType": "TIME"
+      }, {
+        "name": "next_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_id",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "last_activity_date",
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "name": "last_incoming_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "last_outgoing_mail_time",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "label",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "org_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "owner_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "cc_email",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "updatedPerson",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  } ]
 }

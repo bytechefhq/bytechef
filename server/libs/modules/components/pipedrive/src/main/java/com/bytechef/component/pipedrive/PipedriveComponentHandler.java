@@ -17,9 +17,19 @@
 
 package com.bytechef.component.pipedrive;
 
+import com.bytechef.component.pipedrive.trigger.NewActivityTrigger;
+import com.bytechef.component.pipedrive.trigger.NewDealTrigger;
+import com.bytechef.component.pipedrive.trigger.NewOrganizationTrigger;
+import com.bytechef.component.pipedrive.trigger.NewPersonTrigger;
+import com.bytechef.component.pipedrive.trigger.UpdatedDealTrigger;
+import com.bytechef.component.pipedrive.trigger.UpdatedOrganizationTrigger;
+import com.bytechef.component.pipedrive.trigger.UpdatedPersonTrigger;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.google.auto.service.AutoService;
+
+import java.util.List;
 
 /**
  * @generated
@@ -32,5 +42,17 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
     public DefinitionDSL.ModifiableDisplay modifyDisplay(DefinitionDSL.ModifiableDisplay modifiableDisplay) {
         return modifiableDisplay.description(
             "The first CRM designed by salespeople, for salespeople. Do more to grow your business.");
+    }
+
+    @Override
+    public List<TriggerDefinition> getTriggers() {
+        return List.of(
+            NewActivityTrigger.TRIGGER_DEFINITION,
+            NewDealTrigger.TRIGGER_DEFINITION,
+            NewOrganizationTrigger.TRIGGER_DEFINITION,
+            NewPersonTrigger.TRIGGER_DEFINITION,
+            UpdatedDealTrigger.TRIGGER_DEFINITION,
+            UpdatedOrganizationTrigger.TRIGGER_DEFINITION,
+            UpdatedPersonTrigger.TRIGGER_DEFINITION);
     }
 }

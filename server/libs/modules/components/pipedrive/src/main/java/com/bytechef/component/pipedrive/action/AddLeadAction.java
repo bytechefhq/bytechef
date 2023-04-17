@@ -48,7 +48,7 @@ public class AddLeadAction {
                     "Creates a lead. A lead always has to be linked to a person or an organization or both. All leads created through the Pipedrive API will have a lead source `API` assigned. Here's the tutorial for <a href=\"https://pipedrive.readme.io/docs/adding-a-lead\" target=\"_blank\" rel=\"noopener noreferrer\">adding a lead</a>. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields' structure from deals. See an example given in the <a href=\"https://pipedrive.readme.io/docs/updating-custom-field-value\" target=\"_blank\" rel=\"noopener noreferrer\">updating custom fields' values tutorial</a>."))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/leads", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
@@ -60,7 +60,7 @@ public class AddLeadAction {
                     "The ID of the user which will be the owner of the created lead. If not provided, the user making the request will be used.")
                 .required(false),
             array("label_ids")
-                .items(string(null).description("The IDs of the lead labels which will be associated with the lead"))
+                .items(string().description("The IDs of the lead labels which will be associated with the lead"))
                 .placeholder("Add")
                 .label("Label_ids")
                 .description("The IDs of the lead labels which will be associated with the lead")
@@ -110,7 +110,7 @@ public class AddLeadAction {
                     .description("The ID of the user who created the lead")
                     .required(false),
                 array("label_ids")
-                    .items(string(null).description("The IDs of the lead labels which are associated with the lead"))
+                    .items(string().description("The IDs of the lead labels which are associated with the lead"))
                     .placeholder("Add")
                     .label("Label_ids")
                     .description("The IDs of the lead labels which are associated with the lead")

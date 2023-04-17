@@ -47,7 +47,7 @@ public class AddDealAction {
                     "Adds a new deal. Note that you can supply additional custom fields along with the request that are not described here. These custom fields are different for each Pipedrive account and can be recognized by long hashes as keys. To determine which custom fields exists, fetch the dealFields and look for `key` values. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/creating-a-deal\" target=\"_blank\" rel=\"noopener noreferrer\">adding a deal</a>."))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/deals", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))

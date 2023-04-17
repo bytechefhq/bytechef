@@ -40,7 +40,7 @@ public class AddPetAction {
                 .description("Add a new pet to the store"))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/pet", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))

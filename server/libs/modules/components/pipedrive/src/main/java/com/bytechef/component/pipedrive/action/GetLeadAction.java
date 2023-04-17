@@ -47,7 +47,7 @@ public class GetLeadAction {
                     "Returns details of a specific lead. If a lead contains custom fields, the fields' values will be included in the response in the same format as with the `Deals` endpoints. If a custom field's value hasn't been set for the lead, it won't appear in the response. Please note that leads do not have a separate set of custom fields, instead they inherit the custom fields’ structure from deals."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/leads/{id}"
 
             ))
@@ -72,7 +72,7 @@ public class GetLeadAction {
                     .description("The ID of the user who created the lead")
                     .required(false),
                 array("label_ids")
-                    .items(string(null).description("The IDs of the lead labels which are associated with the lead"))
+                    .items(string().description("The IDs of the lead labels which are associated with the lead"))
                     .placeholder("Add")
                     .label("Label_ids")
                     .description("The IDs of the lead labels which are associated with the lead")

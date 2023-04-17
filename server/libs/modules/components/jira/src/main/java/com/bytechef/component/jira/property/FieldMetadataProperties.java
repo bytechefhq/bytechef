@@ -50,8 +50,7 @@ public class FieldMetadataProperties {
         bool("hasDefaultValue").label("HasDefaultValue")
             .description("Whether the field has a default value.")
             .required(false),
-        array("operations")
-            .items(string(null).description("The list of operations that can be performed on the field."))
+        array("operations").items(string().description("The list of operations that can be performed on the field."))
             .placeholder("Add")
             .label("Operations")
             .description("The list of operations that can be performed on the field.")

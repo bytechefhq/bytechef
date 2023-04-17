@@ -49,7 +49,7 @@ public class SearchResultsProperties {
             .label("Issues")
             .description("The list of issues found by the search.")
             .required(false),
-        array("warningMessages").items(string(null).description("Any warnings related to the JQL query."))
+        array("warningMessages").items(string().description("Any warnings related to the JQL query."))
             .placeholder("Add")
             .label("WarningMessages")
             .description("Any warnings related to the JQL query.")

@@ -45,7 +45,7 @@ public class SearchPersonsAction {
                     "Searches all persons by name, email, phone, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found persons can be filtered by organization ID."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/persons/search"
 
             ))
@@ -116,12 +116,12 @@ public class SearchPersonsAction {
                                     string("name").label("Name")
                                         .description("The name of the person")
                                         .required(false),
-                                    array("phones").items(string(null).description("An array of phone numbers"))
+                                    array("phones").items(string().description("An array of phone numbers"))
                                         .placeholder("Add")
                                         .label("Phones")
                                         .description("An array of phone numbers")
                                         .required(false),
-                                    array("emails").items(string(null).description("An array of email addresses"))
+                                    array("emails").items(string().description("An array of email addresses"))
                                         .placeholder("Add")
                                         .label("Emails")
                                         .description("An array of email addresses")
@@ -142,12 +142,12 @@ public class SearchPersonsAction {
                                             .required(false))
                                         .label("Organization")
                                         .required(false),
-                                    array("custom_fields").items(string(null).description("Custom fields"))
+                                    array("custom_fields").items(string().description("Custom fields"))
                                         .placeholder("Add")
                                         .label("Custom_fields")
                                         .description("Custom fields")
                                         .required(false),
-                                    array("notes").items(string(null).description("An array of notes"))
+                                    array("notes").items(string().description("An array of notes"))
                                         .placeholder("Add")
                                         .label("Notes")
                                         .description("An array of notes")

@@ -40,7 +40,7 @@ public class UpdatePetAction {
                 .description("Update an existing pet by Id"))
         .metadata(
             Map.of(
-                "requestMethod", "PUT",
+                "method", "PUT",
                 "path", "/pet", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))

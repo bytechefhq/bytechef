@@ -38,7 +38,7 @@ public class DeletePetAction {
                 .description("delete a pet"))
         .metadata(
             Map.of(
-                "requestMethod", "DELETE",
+                "method", "DELETE",
                 "path", "/pet/{petId}"
 
             ))
