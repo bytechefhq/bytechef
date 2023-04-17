@@ -18,7 +18,6 @@
 package com.bytechef.commons.util;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -71,11 +70,6 @@ public final class MapValueUtils {
         return conversionService.convert(value, returnType);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T get(Map<String, Object> map, String key, ParameterizedTypeReference<T> returnType) {
-        return get(map, key, (Class<T>) ((ParameterizedType) returnType.getType()).getRawType());
-    }
-
     public static <T> T get(Map<String, Object> map, String key, Class<T> returnType, T defaultValue) {
         T value = get(map, key, returnType);
 
@@ -84,13 +78,6 @@ public final class MapValueUtils {
         }
 
         return value;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T get(
-        Map<String, Object> map, String key, ParameterizedTypeReference<T> returnType, T defaultValue) {
-
-        return get(map, key, (Class<T>) ((ParameterizedType) returnType.getType()).getRawType(), defaultValue);
     }
 
     @SuppressWarnings("unchecked")
@@ -329,7 +316,7 @@ public final class MapValueUtils {
                         Object value = entry.getValue();
 
                         if (value != null && conversionService.canConvert(value.getClass(), valueType)) {
-                            entry = Map.entry(entry.getKey(), conversionService.convert(entry.getValue(), valueType));
+                            entry = Map.entry(entry.getKey(), conversionService.convert(value, valueType));
                         }
                     }
 
