@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.test.dto;
+package com.bytechef.hermes.workflow.web.rest.mapper;
 
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.util.List;
+import com.bytechef.hermes.workflow.test.dto.WorkflowResponse;
+import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowResponseModel;
+import org.mapstruct.Mapper;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record WorkflowTestResponse(Job job, List<TaskExecution> taskExecutions) {
+@Mapper(config = WorkflowMapperSpringConfig.class)
+public interface WorkflowResponseMapper extends Converter<WorkflowResponse, WorkflowResponseModel> {
+
+    @Override
+    WorkflowResponseModel convert(WorkflowResponse workflowResponse);
 }
