@@ -2,7 +2,7 @@
 info:
   title: "Workflow Definition Specification"
   description: "Workflow Definition structs."
-  version: "v1"
+  version: "1"
 schemas:
   WorkflowDefinition:
     description: "Workflows are the blueprints that describe the execution of a job."

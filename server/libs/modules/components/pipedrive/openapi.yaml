@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Pipedrive API v1"
+  title: "Pipedrive API"
   version: "1.0.0"
 servers:
 - url: "https://api.pipedrive.com/v1"

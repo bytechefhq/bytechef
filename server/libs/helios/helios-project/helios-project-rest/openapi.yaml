@@ -1,8 +1,8 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "OpenAPI definition"
-  version: "v1"
+  title: "Project API"
+  version: "1"
 servers:
 - url: "http://localhost:5173/api"
 paths:
@@ -213,12 +213,14 @@ paths:
           type: "integer"
           format: "int64"
       requestBody:
-        description: "Parameters required to run a job, for example '{\"workflowId\"\
-          :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/JobParameters"
+              type: "object"
+              properties:
+                workflowId:
+                  description: "The id of the workflow to execute."
+                  type: "string"
         required: true
       responses:
         "200":
@@ -617,15 +619,6 @@ components:
           - "FAILED"
           - "COMPLETED"
           readOnly: true
-    JobParameters:
-      description: "Defines parameters used to execute a job."
-      type: "object"
-      required:
-      - "workflowId"
-      properties:
-        workflowId:
-          description: "Id of the workflow to execute."
-          type: "string"
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."
@@ -800,31 +793,12 @@ components:
         workflow:
           $ref: "#/components/schemas/WorkflowBasic"
     ProjectInstance:
-      description: "Contains specific configuration required for the execution of\
-        \ project workflows."
+      description: "Contains configurations and connections required for the execution\
+        \ of project workflows."
       type: "object"
       required:
       - "name"
       properties:
-        configurationParameters:
-          description: "The configuration parameters of an project instance used as\
-            \ workflow input values."
-          type: "object"
-          additionalProperties:
-            type: "object"
-        connectionIds:
-          description: "The ids of connections used by a project instance."
-          type: "array"
-          items:
-            type: "integer"
-            format: "int64"
-          writeOnly: true
-        connections:
-          description: "The connections used by a project instance."
-          type: "array"
-          items:
-            $ref: "../../../hermes/hermes-connection/hermes-connection-rest/hermes-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
-          readOnly: true
         description:
           description: "The description of a project instance."
           type: "string"
@@ -842,10 +816,6 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
-        lastExecutionDate:
-          description: "The last execution date of a project instance."
-          type: "string"
-          format: "date-time"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
@@ -865,6 +835,10 @@ components:
           type: "integer"
           format: "int64"
           writeOnly: false
+        projectInstanceWorkflows:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ProjectInstanceWorkflow"
         status:
           description: "The status of a project instance."
           type: "string"
@@ -878,8 +852,8 @@ components:
         __version:
           type: "integer"
     ProjectInstanceBasic:
-      description: "Contains specific configuration required for the execution of\
-        \ project workflows."
+      description: "Contains configurations and connections required for the execution\
+        \ of project workflows."
       type: "object"
       required:
       - "name"
@@ -901,10 +875,6 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
-        lastExecutionDate:
-          description: "The last execution date of a project instance."
-          type: "string"
-          format: "date-time"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
@@ -928,6 +898,74 @@ components:
           enum:
           - "DISABLED"
           - "ENABLED"
+    ProjectInstanceWorkflow:
+      description: "Contains configuration and connections required for the execution\
+        \ of a particular project workflow."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        inputParameters:
+          description: "The input parameters of an project instance used as workflow\
+            \ input values."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        connectionIds:
+          description: "The ids of connections used by a project instance."
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          writeOnly: true
+        connections:
+          description: "The connections used by a project instance."
+          type: "array"
+          items:
+            $ref: "../../../hermes/hermes-connection/hermes-connection-rest/hermes-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
+          readOnly: true
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        enabled:
+          description: "If a workflow is enabled or not in the project instance."
+          type: "boolean"
+        id:
+          description: "The id of a project instance."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastExecutionDate:
+          description: "The last execution date of a project instance."
+          type: "string"
+          format: "date-time"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        projectInstance:
+          $ref: "#/components/schemas/ProjectInstanceBasic"
+        projectInstanceId:
+          description: "Th id of a project instance."
+          type: "integer"
+          format: "int64"
+          writeOnly: false
+        workflowId:
+          description: "The id of a workflow."
+          type: "integer"
+        __version:
+          type: "integer"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"

@@ -1,8 +1,8 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "OpenAPI definition"
-  version: "v1"
+  title: "Definition API"
+  version: "1"
 servers:
 - url: "http://localhost:5173/api"
 paths:
@@ -573,6 +573,7 @@ components:
       - "MULTI_SELECT"
       - "SELECT"
       - "TEXT_AREA"
+      - "TIME"
     DateProperty:
       description: "A date property type."
       type: "object"
@@ -658,6 +659,11 @@ components:
               $ref: "#/components/schemas/Option"
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
+    NullProperty:
+      description: "A null property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/Property"
     NumberProperty:
       description: "A number property type."
       type: "object"
@@ -813,6 +819,7 @@ components:
           DATE_TIME: "#/components/schemas/DateTimeProperty"
           DYNAMIC_PROPERTIES: "#/components/schemas/DynamicPropertiesProperty"
           INTEGER: "#/components/schemas/IntegerProperty"
+          "NULL": "#/components/schemas/NullProperty"
           NUMBER: "#/components/schemas/NumberProperty"
           STRING: "#/components/schemas/StringProperty"
           OBJECT: "#/components/schemas/ObjectProperty"
@@ -832,6 +839,7 @@ components:
       - "STRING"
       - "OBJECT"
       - "ONE_OF"
+      - "TIME"
     Resources:
       description: "A set of available resources."
       type: "object"
@@ -902,6 +910,22 @@ components:
           type: "string"
         resources:
           $ref: "#/components/schemas/Resources"
+    TimeProperty:
+      description: "A time property."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          hour:
+            description: "The hour."
+            type: "integer"
+          minute:
+            description: "The minute."
+            type: "integer"
+          second:
+            description: "The second."
+            type: "integer"
     TriggerDefinition:
       description: "A trigger definition defines ways to trigger workflows from the\
         \ outside services."
@@ -954,7 +978,7 @@ components:
       enum:
       - "DYNAMIC_WEBHOOK"
       - "HYBRID"
-      - "MANUAL"
+      - "LISTENER"
       - "POLLING"
       - "STATIC_WEBHOOK"
     ValueProperty:
