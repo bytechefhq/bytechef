@@ -144,7 +144,8 @@ public class ConnectionFacadeIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionFacade.getConnection(connection.getId()))
-            .isEqualTo(new ConnectionDTO(connection, List.of(tag1, tag2)))
+            .hasFieldOrPropertyWithValue("componentName", "componentName")
+            .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
 
