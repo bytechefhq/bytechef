@@ -30,20 +30,22 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
-    String authorizationName, String componentName, int connectionVersion, String createdBy, LocalDateTime createdDate,
-    Long id, String lastModifiedBy, LocalDateTime lastModifiedDate, String name, Map<String, Object> parameters,
-    List<Tag> tags, int version) {
+    boolean active, String authorizationName, String componentName, int connectionVersion, String createdBy,
+    LocalDateTime createdDate, Long id, String lastModifiedBy, LocalDateTime lastModifiedDate, String name,
+    Map<String, Object> parameters, List<Tag> tags, int version) {
 
-    public ConnectionDTO(Connection connection, List<Tag> tags) {
+    public ConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
         this(
-            connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion(),
+            active, connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion(),
             connection.getCreatedBy(), connection.getCreatedDate(), connection.getId(), connection.getLastModifiedBy(),
             connection.getLastModifiedDate(), connection.getName(), connection.getParameters(), tags,
             connection.getVersion());
     }
 
-    public ConnectionDTO(String componentName, long id, String name, Map<String, Object> parameters, int version) {
-        this(null, componentName, 0, null, null, id, null, null, name, parameters, null, version);
+    public ConnectionDTO(
+        boolean active, String componentName, long id, String name, Map<String, Object> parameters, int version) {
+
+        this(active, null, componentName, 0, null, null, id, null, null, name, parameters, null, version);
     }
 
     public Connection toConnection() {
@@ -67,6 +69,7 @@ public record ConnectionDTO(
 
     @SuppressFBWarnings("EI")
     public static final class Builder {
+        private boolean active;
         private String authorizationName;
         private String componentName;
         private int connectionVersion;
@@ -81,6 +84,11 @@ public record ConnectionDTO(
         private int version;
 
         private Builder() {
+        }
+
+        public Builder active(boolean active) {
+            this.active = active;
+            return this;
         }
 
         public Builder authorizationName(String authorizationName) {
@@ -145,7 +153,7 @@ public record ConnectionDTO(
 
         public ConnectionDTO build() {
             return new ConnectionDTO(
-                authorizationName, componentName, connectionVersion, createdBy, createdDate, id, lastModifiedBy,
+                active, authorizationName, componentName, connectionVersion, createdBy, createdDate, id, lastModifiedBy,
                 lastModifiedDate, name, parameters, tags, version);
         }
     }
