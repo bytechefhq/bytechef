@@ -3,12 +3,13 @@ ch-qos-logback = "1.4.6"
 checkstyle = "10.6.0"
 com-fasterxml-jackson-core = "2.14.2"
 com-fasterxml-jackson-dataformat = "2.14.2"
+com-github-kagkarlsson = "11.7"
 com-google-auto-service = "1.0.1"
-info-picocli = "4.7.1"
-org-mapstruct = "1.5.3.Final"
+info-picocli = "4.7.2"
+org-mapstruct = "1.5.4.Final"
 org-mapstruct-extensions-spring = "1.0.0"
 org-springframework-boot = "3.0.5"
-org-springframework-cloud = "4.0.1"
+org-springframework-cloud = "4.0.2"
 org-springframework-cloud-dependencies = "2022.0.2"
 org-testcontainers = "1.18.0"
 pmd = "6.54.0"
@@ -23,7 +24,9 @@ com-fasterxml-jackson-dataformat-jackson-dataformat-csv = { module = "com.faster
 com-fasterxml-jackson-dataformat-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "com-fasterxml-jackson-dataformat" }
 com-fasterxml-jackson-dataformat-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "com-fasterxml-jackson-dataformat" }
 com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
-com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.2"
+com-github-kagkarlsson-db-scheduler = { module = "com.github.kagkarlsson:db-scheduler", version.ref = "com-github-kagkarlsson" }
+com-github-kagkarlsson-db-scheduler-spring-boot-starter = { module = "com.github.kagkarlsson:db-scheduler-spring-boot-starter", version.ref = "com-github-kagkarlsson" }
+com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.4"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
 com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-7"
@@ -34,7 +37,7 @@ com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 com-zaxxer-HikariCP = "com.zaxxer:HikariCP:5.0.1"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
-io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.4"
+io-projectreactor-reactor-core = "io.projectreactor:reactor-core:3.5.5"
 io-rsocket-rsocket-core = "io.rsocket:rsocket-core:1.1.3"
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.9"
 io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.13"
@@ -79,10 +82,10 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.38"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.47"
 
 [plugins]
-com-diffplug-spotless = "com.diffplug.spotless:6.17.0"
+com-diffplug-spotless = "com.diffplug.spotless:6.18.0"
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.46.0"
 com-github-spotbugs = "com.github.spotbugs:5.0.14"
 com-google-cloud-tools-jib = "com.google.cloud.tools.jib:3.3.1"
