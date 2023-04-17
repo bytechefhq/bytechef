@@ -17,8 +17,10 @@
 
 package com.bytechef.helios.project.web.rest.mapper;
 
+import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
 import com.bytechef.helios.project.web.rest.mapper.config.ProjectMapperSpringConfig;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowModel;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.helios.project.domain.Project;
@@ -37,7 +39,13 @@ public interface ProjectInstanceMapper extends Converter<ProjectInstanceDTO, Pro
     @Override
     ProjectInstanceModel convert(ProjectInstanceDTO projectInstanceDTO);
 
+    @Mapping(target = "projectInstance", ignore = true)
+    @Mapping(target = "inputParameters", ignore = true)
+    @Mapping(target = "connections", ignore = true)
+    ProjectInstanceWorkflowModel map(ProjectInstanceWorkflow projectInstanceWorkflow);
+
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "parameters", source = "parameters")
     @Mapping(target = "tags", ignore = true)
     ConnectionModel map(Connection connection);
 

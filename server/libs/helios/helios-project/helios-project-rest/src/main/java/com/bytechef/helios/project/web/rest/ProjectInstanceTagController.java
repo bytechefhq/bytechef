@@ -18,7 +18,7 @@
 package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.helios.project.facade.ProjectFacade;
+import com.bytechef.helios.project.facade.ProjectInstanceFacade;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -38,19 +38,21 @@ import reactor.core.publisher.Mono;
 public class ProjectInstanceTagController implements ProjectInstanceTagsApi {
 
     private final ConversionService conversionService;
-    private final ProjectFacade projectFacade;
+    private final ProjectInstanceFacade projectInstanceFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceTagController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public ProjectInstanceTagController(
+        ConversionService conversionService, ProjectInstanceFacade projectInstanceFacade) {
+
         this.conversionService = conversionService;
-        this.projectFacade = projectFacade;
+        this.projectInstanceFacade = projectInstanceFacade;
     }
 
     @Override
     public Mono<ResponseEntity<Flux<TagModel>>> getProjectInstanceTags(ServerWebExchange exchange) {
         return Mono.just(
             Flux.fromIterable(
-                projectFacade.getProjectInstanceTags()
+                projectInstanceFacade.getProjectInstanceTags()
                     .stream()
                     .map(tag -> conversionService.convert(tag, TagModel.class))
                     .toList()))

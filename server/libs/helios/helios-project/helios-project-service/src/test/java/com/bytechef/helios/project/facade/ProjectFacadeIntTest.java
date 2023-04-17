@@ -19,6 +19,10 @@ package com.bytechef.helios.project.facade;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.Project;
@@ -27,14 +31,19 @@ import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.repository.ProjectRepository;
+import com.bytechef.helios.project.service.ProjectInstanceService;
+import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
+import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -303,5 +312,20 @@ public class ProjectFacadeIntTest {
         projectDTO = projectFacade.update(projectDTO);
 
         assertThat(projectDTO.tags()).hasSize(1);
+    }
+
+    @TestConfiguration
+    public static class ProjectFacadeIntTestConfiguration {
+
+        @Bean
+        ProjectFacade projectFacade(
+            CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
+            ProjectService projectService, TaskExecutionService taskExecutionService, TagService tagService,
+            WorkflowService workflowService) {
+
+            return new ProjectFacadeImpl(
+                categoryService, jobService, projectInstanceService, projectService, taskExecutionService, tagService,
+                workflowService);
+        }
     }
 }

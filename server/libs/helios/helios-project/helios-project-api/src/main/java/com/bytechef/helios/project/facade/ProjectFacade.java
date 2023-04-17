@@ -20,7 +20,6 @@ package com.bytechef.helios.project.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.project.dto.ProjectExecutionDTO;
-import com.bytechef.helios.project.dto.ProjectInstanceDTO;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.data.domain.Page;
@@ -37,23 +36,13 @@ public interface ProjectFacade {
 
     ProjectDTO createProject(ProjectDTO projectDTO);
 
-    ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstance);
-
-    long createProjectInstanceJob(long id, String workflowId);
-
     void deleteProject(long id);
-
-    void deleteProjectInstance(long projectInstanceId);
 
     ProjectDTO duplicateProject(long id);
 
     ProjectDTO getProject(long id);
 
-    ProjectInstanceDTO getProjectInstance(long projectInstanceId);
-
     List<Category> getProjectCategories();
-
-    List<Tag> getProjectInstanceTags();
 
     List<Tag> getProjectTags();
 
@@ -65,16 +54,10 @@ public interface ProjectFacade {
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
 
-    List<ProjectInstanceDTO> searchProjectInstances(List<Long> projectIds, List<Long> tagIds);
-
     List<ProjectDTO> searchProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds);
 
     ProjectDTO update(ProjectDTO project);
 
-    ProjectInstanceDTO update(ProjectInstanceDTO projectInstance);
-
-    ProjectInstanceDTO updateProjectInstanceTags(Long projectInstanceId, List<Tag> tags);
-
-    ProjectDTO updateProjectTags(long id, List<Tag> tags);
+    void updateProjectTags(long id, List<Tag> tags);
 
 }
