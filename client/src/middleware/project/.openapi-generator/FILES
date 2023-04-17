@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/ProjectCategoriesApi.ts
 apis/ProjectExecutionsApi.ts
 apis/ProjectInstanceTagsApi.ts
@@ -10,12 +9,12 @@ index.ts
 models/CategoryModel.ts
 models/ConnectionModel.ts
 models/CreateProjectInstanceJob200ResponseModel.ts
+models/CreateProjectInstanceJobRequestModel.ts
 models/CreateProjectWorkflowRequestModel.ts
 models/ExecutionErrorModel.ts
 models/InputModel.ts
 models/JobBasicModel.ts
 models/JobModel.ts
-models/JobParametersModel.ts
 models/OutputModel.ts
 models/PageModel.ts
 models/ProjectBasicModel.ts
@@ -23,6 +22,7 @@ models/ProjectExecutionBasicModel.ts
 models/ProjectExecutionModel.ts
 models/ProjectInstanceBasicModel.ts
 models/ProjectInstanceModel.ts
+models/ProjectInstanceWorkflowModel.ts
 models/ProjectModel.ts
 models/TagModel.ts
 models/TaskExecutionModel.ts
