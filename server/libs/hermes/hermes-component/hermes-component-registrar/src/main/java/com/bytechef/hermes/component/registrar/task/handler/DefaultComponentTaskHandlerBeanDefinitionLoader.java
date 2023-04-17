@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.registrar.task.handler;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
@@ -34,11 +33,10 @@ public class DefaultComponentTaskHandlerBeanDefinitionLoader
     }
 
     @Override
-    protected BeanDefinition getBeanDefinition(
-        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition,
-        ComponentHandler componentHandler) {
+    protected BeanDefinition getComponentActionTaskHandlerBeanDefinition(
+        ActionDefinition actionDefinition, ComponentHandler componentHandler) {
 
-        return BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentTaskHandler.class)
+        return BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentActionTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
             .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgValue(componentHandler)

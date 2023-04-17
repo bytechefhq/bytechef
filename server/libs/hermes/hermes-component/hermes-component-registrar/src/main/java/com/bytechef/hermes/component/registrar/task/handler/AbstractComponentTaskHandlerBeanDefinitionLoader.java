@@ -17,12 +17,13 @@
 
 package com.bytechef.hermes.component.registrar.task.handler;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,21 +47,61 @@ public abstract class AbstractComponentTaskHandlerBeanDefinitionLoader<T extends
         for (T componentDefinitionFactory : ServiceLoader.load(componentDefinitionFactoryClass)) {
             ComponentDefinition componentDefinition = componentDefinitionFactory.getDefinition();
 
-            componentTaskHandlerFactories.add(
-                new ComponentTaskHandlerBeanDefinition(
-                    componentDefinition,
-                    CollectionUtils.map(
+            List<TaskHandlerBeanDefinitionEntry> taskHandlerBeanDefinitionEntries = new ArrayList<>();
+
+            if (!CollectionUtils.isEmpty(componentDefinition.getActions())) {
+                taskHandlerBeanDefinitionEntries.addAll(
+                    com.bytechef.commons.util.CollectionUtils.map(
                         componentDefinition.getActions(),
                         actionDefinition -> new TaskHandlerBeanDefinitionEntry(
                             actionDefinition.getName(),
-                            getBeanDefinition(
-                                actionDefinition, componentDefinition.getConnection(), componentDefinitionFactory)))));
+                            getComponentActionTaskHandlerBeanDefinition(
+                                actionDefinition, componentDefinitionFactory))));
+            }
+
+            if (!CollectionUtils.isEmpty(componentDefinition.getTriggers())) {
+                for (TriggerDefinition triggerDefinition : componentDefinition.getTriggers()) {
+                    BeanDefinition triggeBeanDefinition = getComponentTriggerTaskHandlerBeanDefinition(
+                        triggerDefinition, componentDefinitionFactory);
+
+                    if (triggeBeanDefinition != null) {
+                        taskHandlerBeanDefinitionEntries.add(
+                            new TaskHandlerBeanDefinitionEntry(
+                                triggerDefinition.getName(),
+                                getComponentTriggerTaskHandlerBeanDefinition(
+                                    triggerDefinition, componentDefinitionFactory)));
+                    }
+                }
+            }
+
+            componentTaskHandlerFactories.add(
+                new ComponentTaskHandlerBeanDefinition(componentDefinition, taskHandlerBeanDefinitionEntries));
         }
 
         return componentTaskHandlerFactories;
     }
 
-    protected abstract BeanDefinition getBeanDefinition(
-        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition, T componentDefinitionFactory);
+    protected abstract BeanDefinition getComponentActionTaskHandlerBeanDefinition(
+        ActionDefinition actionDefinition, T componentDefinitionFactory);
 
+    protected BeanDefinition getComponentTriggerTaskHandlerBeanDefinition(
+        TriggerDefinition triggerDefinition, T componentDefinitionFactory) {
+
+        BeanDefinition beanDefinition = null;
+
+        TriggerDefinition.TriggerType triggerType = triggerDefinition.getType();
+
+        if (triggerType != TriggerDefinition.TriggerType.LISTENER) {
+            beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentTriggerTaskHandler.class)
+                .addConstructorArgValue(componentDefinitionFactory)
+                .addConstructorArgReference("connectionDefinitionService")
+                .addConstructorArgReference("connectionService")
+                .addConstructorArgReference("eventPublisher")
+                .addConstructorArgReference("fileStorageService")
+                .addConstructorArgValue(triggerDefinition)
+                .getBeanDefinition();
+        }
+
+        return beanDefinition;
+    }
 }

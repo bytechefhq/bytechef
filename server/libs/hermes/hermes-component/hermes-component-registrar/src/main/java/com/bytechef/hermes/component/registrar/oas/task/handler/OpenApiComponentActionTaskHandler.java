@@ -21,12 +21,12 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.registrar.oas.OpenApiClient;
-import com.bytechef.hermes.component.util.ContextSupplier;
+import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -35,7 +35,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
+public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
 
     private static final OpenApiClient OPEN_API_CLIENT = new OpenApiClient();
 
@@ -47,7 +47,7 @@ public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
     private final OpenApiComponentHandler openApiComponentHandler;
 
     @SuppressFBWarnings("EI2")
-    public OpenApiComponentTaskHandler(
+    public OpenApiComponentActionTaskHandler(
         ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService,
         OpenApiComponentHandler openApiComponentHandler) {
@@ -62,15 +62,16 @@ public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
 
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        Context context = new ContextImpl(
-            connectionDefinitionService, connectionService, eventPublisher, fileStorageService, taskExecution);
+        ActionContext context = new ContextImpl(
+            connectionDefinitionService, connectionService, eventPublisher, fileStorageService,
+            taskExecution.getParameters(), taskExecution.getId());
 
-        return ContextSupplier.get(
-            context,
+        return ComponentContextSupplier.get(
+            context, openApiComponentHandler.getDefinition(),
             () -> {
                 try {
                     return openApiComponentHandler.postExecute(
-                        actionDefinition, OPEN_API_CLIENT.execute(actionDefinition, context, taskExecution));
+                        actionDefinition, OPEN_API_CLIENT.execute(actionDefinition, taskExecution));
                 } catch (Exception e) {
                     throw new TaskExecutionException(e.getMessage(), e);
                 }

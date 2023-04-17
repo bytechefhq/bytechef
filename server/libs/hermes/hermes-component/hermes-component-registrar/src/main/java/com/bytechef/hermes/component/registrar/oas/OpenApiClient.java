@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
+import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
 import org.springframework.util.StringUtils;
@@ -45,25 +45,24 @@ public class OpenApiClient {
 
     private static final String TYPE = "type";
 
-    public HttpClientUtils.Response execute(
-        ActionDefinition actionDefinition, Context context, TaskExecution taskExecution) {
+    public HttpClientUtils.Response execute(ActionDefinition actionDefinition, TaskExecution taskExecution) {
         Map<String, Object> metadata = actionDefinition.getMetadata();
 
         return exchange(
             createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
-            MapValueUtils.get(metadata, "requestMethod", RequestMethod.class))
-            .configuration(
-                HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
-            .headers(
-                getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
-            .payload(
-                getPayload(
-                    MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
-                    MapValueUtils.getString(metadata, "mimeType"),
-                    taskExecution.getParameters(), actionDefinition.getProperties()))
-            .queryParameters(
-                getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
-            .execute();
+            MapValueUtils.get(metadata, "method", RequestMethod.class))
+                .configuration(
+                    HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
+                .headers(
+                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
+                .body(
+                    getBody(
+                        MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
+                        MapValueUtils.getString(metadata, "mimeType"),
+                        taskExecution.getParameters(), actionDefinition.getProperties()))
+                .queryParameters(
+                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
+                .execute();
     }
 
     private String createUri(
@@ -81,43 +80,46 @@ public class OpenApiClient {
         return path;
     }
 
-    private Payload getPayload(
+    private Body getBody(
         BodyContentType bodyContentType, String mimeType, Map<String, Object> parameters,
         List<? extends Property<?>> properties) {
-        Payload payload = null;
+
+        HttpClientUtils.Body body = null;
 
         if (bodyContentType != null) {
             for (Property<?> property : properties) {
-                if (Objects.equals(MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class),
-                    PropertyType.BODY)) {
-                    payload = switch (bodyContentType) {
-                        case BINARY -> Payload.of(
-                            MapValueUtils.getRequired(parameters, property.getName(), Context.FileEntry.class),
-                            mimeType);
-                        case FORM_DATA, FORM_URL_ENCODED -> Payload.of(
-                            MapValueUtils.getRequiredMap(parameters, property.getName()));
-                        case JSON, XML -> {
-                            if (property.getType() == Property.Type.ARRAY) {
-                                yield Payload.of(
-                                    MapValueUtils.getRequiredList(parameters, property.getName(), Object.class));
-                            } else if (property.getType() == Property.Type.OBJECT) {
-                                yield Payload.of(
-                                    MapValueUtils.getRequiredMap(parameters, property.getName()));
-                            } else {
-                                yield Payload.of(
-                                    MapValueUtils.getRequiredString(parameters, property.getName()));
-                            }
-                        }
-                        case RAW -> Payload.of(MapValueUtils.getRequiredString(parameters, property.getName()),
-                            mimeType);
-                    };
+                if (!Objects.equals(
+                    MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
 
-                    break;
+                    continue;
                 }
+
+                body = switch (bodyContentType) {
+                    case BINARY -> HttpClientUtils.Body.of(
+                        MapValueUtils.getRequired(parameters, property.getName(), Context.FileEntry.class),
+                        mimeType);
+                    case FORM_DATA, FORM_URL_ENCODED -> HttpClientUtils.Body.of(
+                        MapValueUtils.getRequiredMap(parameters, property.getName()));
+                    case JSON, XML -> {
+                        if (property.getType() == Property.Type.ARRAY) {
+                            yield Body.of(
+                                MapValueUtils.getRequiredList(parameters, property.getName(), Object.class));
+                        } else if (property.getType() == Property.Type.OBJECT) {
+                            yield HttpClientUtils.Body.of(
+                                MapValueUtils.getRequiredMap(parameters, property.getName()));
+                        } else {
+                            yield Body.of(
+                                MapValueUtils.getRequiredString(parameters, property.getName()));
+                        }
+                    }
+                    case RAW ->
+                        HttpClientUtils.Body.of(
+                            MapValueUtils.getRequiredString(parameters, property.getName()), mimeType);
+                };
             }
         }
 
-        return payload;
+        return body;
     }
 
     private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
