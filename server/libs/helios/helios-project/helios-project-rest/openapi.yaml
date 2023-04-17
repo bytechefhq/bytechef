@@ -816,6 +816,11 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
+        lastExecutionDate:
+          description: "The last execution date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
@@ -874,6 +879,10 @@ components:
           description: "The id of a project instance."
           type: "integer"
           format: "int64"
+          readOnly: true
+        lastExecutionDate:
+          description: "The last execution date."
+          type: "string"
           readOnly: true
         lastModifiedBy:
           description: "The last modified by."
