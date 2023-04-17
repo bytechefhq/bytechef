@@ -105,7 +105,7 @@
             <Class name="com.bytechef.hermes.definition.Property$SingleValueProperty" />
             <Class name="com.bytechef.hermes.definition.Property$ValueProperty" />
             <Class name="com.bytechef.hermes.definition.Property$ArrayProperty" />
-            <Class name="com.bytechef.hermes.componentDefinition.web.rest.accessor.InMemoryComponentDescriptorAccessor" />
+            <Class name="com.bytechef.hermes.componentDefinitionDTO.web.rest.accessor.InMemoryComponentDescriptorAccessor" />
             <Class name="com.bytechef.hermes.description.accessor.InMemoryConnectionDescriptorResolver" />
             <Class name="com.bytechef.hermes.description.accessor.ConnectionDescriptorResolverChain" />
             <Class name="com.bytechef.hermes.description.model.ConnectionDescription1" />
@@ -121,13 +121,6 @@
             <Class name="com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL$TaskDispatcherDefinition" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentOperation" />
             <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
-            <Class name="com.bytechef.atlas.domain.Counter" />
-            <Class name="com.bytechef.atlas.domain.Context"/>
-            <Class name="com.bytechef.atlas.task.WorkflowTask" />
-            <Class name="com.bytechef.atlas.error.ExecutionError" />
-            <Class name="com.bytechef.atlas.domain.Workflow" />
-            <Class name="com.bytechef.atlas.domain.TaskExecution"/>
-            <Class name="com.bytechef.atlas.domain.Job"/>
         </Or>
     </Match>
     <Match>
@@ -152,28 +145,13 @@
             <Class name="com.bytechef.atlas.repository.resource.AbstractResourceWorkflowRepository" />
             <Class name="com.bytechef.atlas.workflow.mapper.AbstractWorkflowMapper" />
             <Class name="com.bytechef.atlas.worker.Worker" />
-            <Class name="com.bytechef.cli.command.componentDefinition.subcomand.InitSubcommand" />
-            <Class name="com.bytechef.componentDefinition.task.handler.aws.s3.action.AmazonS3URI" />
+            <Class name="com.bytechef.cli.command.componentDefinitionDTO.subcomand.InitSubcommand" />
+            <Class name="com.bytechef.componentDefinitionDTO.task.handler.aws.s3.action.AmazonS3URI" />
             <Class name="com.bytechef.hermes.component.util.HttpClientUtils" />
             <Class name="com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler" />
             <Class name="com.bytechef.encryption.Encryption" />
             <Class name="com.bytechef.encryption.filesystem.FileSystemEncryptionKey" />
             <Class name="com.bytechef.hermes.description.client.listener.ShutdownApplicationListener" />
-        </Or>
-    </Match>
-    <Match>
-        <!-- TODO Review this issues -->
-        <Bug code="NP" />
-        <Or>
-            <Class name="com.bytechef.atlas.repository.jdbc.JdbcJobRepository" />
-            <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
-            <Class name="com.bytechef.atlas.workflow.mapper.AbstractWorkflowMapper" />
-            <Class name="com.bytechef.component.odsfile.OdsFileComponentHandlerTest" />
-            <Class name="com.bytechef.component.csvfile.CsvFileComponentHandlerTest" />
-            <Class name="com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest" />
-            <Class name="com.bytechef.component.xmlfile.XmlFileComponentHandlerTest" />
-            <Class name="com.bytechef.hermes.connection.service.ConnectionServiceIntTest"/>
-            <Class name="com.bytechef.hermes.connection.repository.ConnectionRepositoryIntTest"/>
         </Or>
     </Match>
     <Match>
@@ -193,7 +171,7 @@
         <!-- TODO Review this issues -->
         <Bug code="RCN" />
         <Or>
-            <Class name="com.bytechef.componentDefinition.io.task.handler.IoTaskHandler" />
+            <Class name="com.bytechef.componentDefinitionDTO.io.task.handler.IoTaskHandler" />
             <And>
                 <Class name="com.bytechef.hermes.file.storage.filesystem.service.FilesystemFileStorageService" />
                 <Method name="deleteFiles" params="long"/>
