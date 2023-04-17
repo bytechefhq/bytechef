@@ -244,6 +244,12 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return error;
     }
 
+    public <T> T getExtension(Class<T> extensionClass) {
+        // TODO
+
+        return null;
+    }
+
     public Format getFormat() {
         return format;
     }

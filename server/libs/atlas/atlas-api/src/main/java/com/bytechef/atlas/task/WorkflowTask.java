@@ -144,6 +144,12 @@ public class WorkflowTask implements Serializable {
         return Collections.unmodifiableList(finalize);
     }
 
+    public <T> T getExtension(Class<T> extensionClass) {
+        // TODO
+
+        return null;
+    }
+
     /**
      * Get the human-readable description of the task.
      *
