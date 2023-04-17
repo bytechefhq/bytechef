@@ -69,9 +69,6 @@ public final class Connection implements Persistable<Long> {
     @Id
     private Long id;
 
-    @Column
-    private String key;
-
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -162,10 +159,6 @@ public final class Connection implements Persistable<Long> {
         return id;
     }
 
-    public String getKey() {
-        return key;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -234,10 +227,6 @@ public final class Connection implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -272,8 +261,7 @@ public final class Connection implements Persistable<Long> {
     public String toString() {
         return "Connection{" + ", id="
             + id + ", name='"
-            + name + '\'' + ", key='"
-            + key + '\'' + "authorizationName='"
+            + name + '\'' + "authorizationName='"
             + authorizationName + '\'' + ", componentName='"
             + componentName + ", connectionVersion='"
             + connectionVersion + ", connectionTags="
@@ -292,7 +280,6 @@ public final class Connection implements Persistable<Long> {
         private String componentName;
         private int connectionVersion;
         private Long id;
-        private String key;
         private String name;
         private Map<String, Object> parameters;
         private List<Long> tagIds;
@@ -318,11 +305,6 @@ public final class Connection implements Persistable<Long> {
 
         public Builder id(Long id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder key(String key) {
-            this.key = key;
             return this;
         }
 
@@ -353,7 +335,6 @@ public final class Connection implements Persistable<Long> {
             connection.setComponentName(componentName);
             connection.setConnectionVersion(connectionVersion);
             connection.setId(id);
-            connection.setKey(key);
             connection.setName(name);
             connection.setParameters(parameters);
             connection.setVersion(version);

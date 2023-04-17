@@ -31,19 +31,19 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
     String authorizationName, String componentName, int connectionVersion, String createdBy, LocalDateTime createdDate,
-    Long id, String key, String lastModifiedBy, LocalDateTime lastModifiedDate, String name,
-    Map<String, Object> parameters, List<Tag> tags, int version) {
+    Long id, String lastModifiedBy, LocalDateTime lastModifiedDate, String name, Map<String, Object> parameters,
+    List<Tag> tags, int version) {
 
     public ConnectionDTO(Connection connection, List<Tag> tags) {
         this(
             connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion(),
-            connection.getCreatedBy(), connection.getCreatedDate(), connection.getId(), connection.getKey(),
-            connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
-            connection.getParameters(), tags, connection.getVersion());
+            connection.getCreatedBy(), connection.getCreatedDate(), connection.getId(), connection.getLastModifiedBy(),
+            connection.getLastModifiedDate(), connection.getName(), connection.getParameters(), tags,
+            connection.getVersion());
     }
 
     public ConnectionDTO(String componentName, long id, String name, Map<String, Object> parameters, int version) {
-        this(null, componentName, 0, null, null, id, null, null, null, name, parameters, null, version);
+        this(null, componentName, 0, null, null, id, null, null, name, parameters, null, version);
     }
 
     public Connection toConnection() {
@@ -53,7 +53,6 @@ public record ConnectionDTO(
         connection.setComponentName(componentName);
         connection.setConnectionVersion(connectionVersion);
         connection.setId(id);
-        connection.setKey(key);
         connection.setName(name);
         connection.setParameters(parameters);
         connection.setTags(tags);
@@ -74,7 +73,6 @@ public record ConnectionDTO(
         private String createdBy;
         private LocalDateTime createdDate;
         private Long id;
-        private String key;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
         private String name;
@@ -115,11 +113,6 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder key(String key) {
-            this.key = key;
-            return this;
-        }
-
         public Builder lastModifiedBy(String lastModifiedBy) {
             this.lastModifiedBy = lastModifiedBy;
             return this;
@@ -152,7 +145,7 @@ public record ConnectionDTO(
 
         public ConnectionDTO build() {
             return new ConnectionDTO(
-                authorizationName, componentName, connectionVersion, createdBy, createdDate, id, key, lastModifiedBy,
+                authorizationName, componentName, connectionVersion, createdBy, createdDate, id, lastModifiedBy,
                 lastModifiedDate, name, parameters, tags, version);
         }
     }
