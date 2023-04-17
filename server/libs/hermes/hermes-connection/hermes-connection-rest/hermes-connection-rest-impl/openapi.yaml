@@ -215,6 +215,7 @@ components:
         active:
           description: "If a connection is used in any of active workflows."
           type: "boolean"
+          readOnly: true
         authorizationName:
           description: "The name of an authorization used by this connection. Used\
             \ for HTTP based services."
