@@ -1,0 +1,635 @@
+{
+  "display": {
+    "description": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+    "title": "Schedule"
+  },
+  "name": "schedule",
+  "version": 1,
+  "triggers": [ {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "Schedule workflows to execute at a specific time either on a daily basis or selected days of the week.",
+      "title": "Every day"
+    },
+    "dynamicWebhookDisable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookEnable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": false,
+      "present": true
+    },
+    "listenerDisable": {
+      "empty": false,
+      "present": true
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "datetime",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "hour",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "minute",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "dayOfWeek",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "1",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "2",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "3",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "4",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "5",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "6",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        }, {
+          "name": "7",
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "timezone",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "everyDay",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "properties": [ {
+      "description": "The hour at which a workflow will be triggered.",
+      "label": "Hour",
+      "required": true,
+      "name": "hour",
+      "type": "INTEGER",
+      "defaultValue": 0,
+      "maxValue": 23,
+      "minValue": 0,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "The minute at which a workflow will be triggered.",
+      "label": "Minute",
+      "required": true,
+      "name": "minute",
+      "type": "INTEGER",
+      "defaultValue": 0,
+      "maxValue": 59,
+      "minValue": 0,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "Days at which a workflow will be triggered.",
+      "label": "Day of week",
+      "name": "dayOfWeek",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "label": "Monday",
+        "name": "1",
+        "type": "BOOLEAN",
+        "defaultValue": true,
+        "controlType": "CHECKBOX"
+      }, {
+        "label": "Tuesday",
+        "name": "2",
+        "type": "BOOLEAN",
+        "defaultValue": true,
+        "controlType": "CHECKBOX"
+      }, {
+        "label": "Wednesday",
+        "name": "3",
+        "type": "BOOLEAN",
+        "defaultValue": true,
+        "controlType": "CHECKBOX"
+      }, {
+        "label": "Thursday",
+        "name": "4",
+        "type": "BOOLEAN",
+        "defaultValue": true,
+        "controlType": "CHECKBOX"
+      }, {
+        "label": "Friday",
+        "name": "5",
+        "type": "BOOLEAN",
+        "defaultValue": true,
+        "controlType": "CHECKBOX"
+      }, {
+        "label": "Saturday",
+        "name": "6",
+        "type": "BOOLEAN",
+        "defaultValue": true,
+        "controlType": "CHECKBOX"
+      }, {
+        "label": "Sunday",
+        "name": "7",
+        "type": "BOOLEAN",
+        "defaultValue": true,
+        "controlType": "CHECKBOX"
+      } ],
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "The timezone at which the cron expression will be scheduled.",
+      "label": "Timezone",
+      "name": "timezone",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "LISTENER",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "Schedule workflows to execute at a specific day of the week.",
+      "title": "Every week"
+    },
+    "dynamicWebhookDisable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookEnable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": false,
+      "present": true
+    },
+    "listenerDisable": {
+      "empty": false,
+      "present": true
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "datetime",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "hour",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "minute",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "dayOfWeek",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "timezone",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "everyWeek",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "properties": [ {
+      "description": "The hour at which a workflow will be triggered.",
+      "label": "Hour",
+      "required": true,
+      "name": "hour",
+      "type": "INTEGER",
+      "defaultValue": 0,
+      "maxValue": 23,
+      "minValue": 0,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "The minute at which a workflow will be triggered.",
+      "label": "Minute",
+      "required": true,
+      "name": "minute",
+      "type": "INTEGER",
+      "defaultValue": 0,
+      "maxValue": 59,
+      "minValue": 0,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "Days at which a workflow will be triggered.",
+      "label": "Day of week",
+      "required": true,
+      "name": "dayOfWeek",
+      "type": "INTEGER",
+      "options": [ {
+        "name": "Monday",
+        "value": 1
+      }, {
+        "name": "Tuesday",
+        "value": 2
+      }, {
+        "name": "Wednesday",
+        "value": 3
+      }, {
+        "name": "Thursday",
+        "value": 4
+      }, {
+        "name": "Friday",
+        "value": 5
+      }, {
+        "name": "Saturday",
+        "value": 6
+      }, {
+        "name": "Sunday",
+        "value": 7
+      } ],
+      "controlType": "SELECT"
+    }, {
+      "description": "The timezone at which the cron expression will be scheduled.",
+      "label": "Timezone",
+      "name": "timezone",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "LISTENER",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "Schedule workflows to execute at a specific time in month.",
+      "title": "Every month"
+    },
+    "dynamicWebhookDisable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookEnable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": false,
+      "present": true
+    },
+    "listenerDisable": {
+      "empty": false,
+      "present": true
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "datetime",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "hour",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "minute",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "dayOfMonth",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "timezone",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "everyMonth",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "properties": [ {
+      "description": "The hour at which a workflow will be triggered.",
+      "label": "Hour",
+      "required": true,
+      "name": "hour",
+      "type": "INTEGER",
+      "defaultValue": 0,
+      "maxValue": 23,
+      "minValue": 0,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "The minute at which a workflow will be triggered.",
+      "label": "Minute",
+      "required": true,
+      "name": "minute",
+      "type": "INTEGER",
+      "defaultValue": 0,
+      "maxValue": 59,
+      "minValue": 0,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "The day of the month  at which a workflow will be triggered.",
+      "label": "Day of month",
+      "required": true,
+      "name": "dayOfMonth",
+      "type": "INTEGER",
+      "maxValue": 31,
+      "minValue": 1,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "The timezone at which the cron expression will be scheduled.",
+      "label": "Timezone",
+      "name": "timezone",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "LISTENER",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "Schedule workflows to execute periodically, for example every minute or day, based on a set interval.",
+      "title": "Interval"
+    },
+    "dynamicWebhookDisable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookEnable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": false,
+      "present": true
+    },
+    "listenerDisable": {
+      "empty": false,
+      "present": true
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "datetime",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "interval",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "name": "timeUnit",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "interval",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "properties": [ {
+      "description": "The hour at which a workflow will be triggered.",
+      "label": "Interval",
+      "required": true,
+      "name": "interval",
+      "type": "INTEGER",
+      "minValue": 1,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "description": "Days at which a workflow will be triggered.",
+      "label": "Day of week",
+      "required": true,
+      "name": "timeUnit",
+      "type": "INTEGER",
+      "options": [ {
+        "name": "Minute",
+        "value": 1
+      }, {
+        "name": "Hour",
+        "value": 2
+      }, {
+        "name": "Day",
+        "value": 3
+      }, {
+        "name": "Month",
+        "value": 4
+      } ],
+      "controlType": "SELECT"
+    } ],
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "LISTENER",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  }, {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "Schedule workflows to execute based on a custom schedule.",
+      "title": "Cron"
+    },
+    "dynamicWebhookDisable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookEnable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": false,
+      "present": true
+    },
+    "listenerDisable": {
+      "empty": false,
+      "present": true
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "datetime",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "expression",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "name": "timezone",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "cron",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "properties": [ {
+      "description": "The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week]",
+      "label": "Expression",
+      "required": true,
+      "name": "expression",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "The timezone at which the cron expression will be scheduled.",
+      "label": "Timezone",
+      "name": "timezone",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "LISTENER",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  } ]
+}

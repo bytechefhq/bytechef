@@ -1,0 +1,5 @@
+dependencies {
+    implementation libs.com.github.kagkarlsson.db.scheduler
+    implementation "org.springframework:spring-context"
+    implementation project(":server:libs:core:commons:commons-util")
+}
