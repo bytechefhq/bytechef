@@ -17,8 +17,10 @@
 
 package com.bytechef.helios.project.web.rest.mapper;
 
+import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.helios.project.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.helios.project.web.rest.mapper.config.ProjectMapperSpringConfig;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -34,4 +36,7 @@ public interface ProjectInstanceWorkflowMapper
     @Override
     @Mapping(target = "connections", ignore = true)
     ProjectInstanceWorkflowModel convert(ProjectInstanceWorkflowDTO projectInstanceWorkflowDTO);
+
+    @Mapping(target = "lastExecutionDate", ignore = true)
+    ProjectInstanceBasicModel map(ProjectInstance projectInstance);
 }

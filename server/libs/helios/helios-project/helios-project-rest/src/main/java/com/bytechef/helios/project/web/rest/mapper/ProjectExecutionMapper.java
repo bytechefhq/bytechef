@@ -37,6 +37,7 @@ public interface ProjectExecutionMapper extends Converter<ProjectExecutionDTO, P
     @Override
     ProjectExecutionModel convert(ProjectExecutionDTO projectExecutionDTO);
 
+    @Mapping(target = "lastExecutionDate", ignore = true)
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "projectInstanceWorkflows", ignore = true)
     @Mapping(target = "tags", ignore = true)

@@ -33,6 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -79,6 +80,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstanceDTO.projectInstanceWorkflows());
 
         return new ProjectInstanceDTO(
+            getLastExecutionDate(projectInstance.getId()),
             projectInstanceService.create(projectInstance), projectInstanceWorkflows,
             projectService.getProject(projectInstance.getProjectId()), tags);
     }
@@ -110,6 +112,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     public ProjectInstanceDTO getProjectInstance(long projectInstanceId) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
         return new ProjectInstanceDTO(
+            getLastExecutionDate(projectInstance.getId()),
             projectInstance,
             projectInstanceWorkflowService.getProjectInstanceWorkflows(projectInstanceId),
             projectService.getProject(projectInstance.getProjectId()),
@@ -151,6 +154,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return CollectionUtils.map(
             projectInstances,
             projectInstance -> new ProjectInstanceDTO(
+                getLastExecutionDate(projectInstance.getId()),
                 projectInstance,
                 CollectionUtils.filter(
                     projectInstanceWorkflows,
@@ -177,6 +181,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstanceDTO.projectInstanceWorkflows());
 
         return new ProjectInstanceDTO(
+            getLastExecutionDate(projectInstanceDTO.id()),
             projectInstanceService.update(
                 projectInstanceDTO.id(), projectInstanceDTO.description(), projectInstanceDTO.name(),
                 projectInstanceDTO.status(), CollectionUtils.map(tags, Tag::getId), projectInstanceDTO.version()),
@@ -190,5 +195,32 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         tags = org.springframework.util.CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         projectInstanceService.update(projectInstanceId, CollectionUtils.map(tags, Tag::getId));
+    }
+
+    private LocalDateTime getLastExecutionDate(long projectInstanceId) {
+        LocalDateTime lastExecutionDate = null;
+
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
+            .getProjectInstanceWorkflows(projectInstanceId);
+
+        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+            LocalDateTime curLastExecutionDate = projectInstanceWorkflow.getLastExecutionDate();
+
+            if (curLastExecutionDate == null) {
+                continue;
+            }
+
+            if (lastExecutionDate == null) {
+                lastExecutionDate = curLastExecutionDate;
+
+                continue;
+            }
+
+            if (curLastExecutionDate.isAfter(lastExecutionDate)) {
+                lastExecutionDate = curLastExecutionDate;
+            }
+        }
+
+        return lastExecutionDate;
     }
 }
