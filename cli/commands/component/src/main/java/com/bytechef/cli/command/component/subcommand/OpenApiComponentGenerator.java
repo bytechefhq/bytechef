@@ -1357,7 +1357,7 @@ public class OpenApiComponentGenerator {
                     } else {
                         builder.add(
                             "array($S).items($L)",
-                            propertyName == null ? "array" : propertyName,
+                            propertyName == null ? "items" : propertyName,
                             getSchemaCodeBlock(
                                 null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
                     }
