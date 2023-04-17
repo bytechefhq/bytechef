@@ -24,10 +24,12 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.Modifiabl
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNullProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableNumberProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableTimeProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -35,6 +37,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +63,9 @@ import java.util.Map;
     @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
 })
 // CHECKSTYLE:OFF
-public sealed interface Property<P extends Property<P>> permits ModifiableProperty, Property.DynamicPropertiesProperty, Property.OneOfProperty, Property.ValueProperty {
+public sealed interface Property<P extends Property<P>>
+    permits ModifiableProperty, Property.DynamicPropertiesProperty, Property.NullProperty, Property.OneOfProperty,
+    Property.ValueProperty {
 
     enum ControlType {
         CHECKBOX,
@@ -78,6 +83,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         MULTI_SELECT,
         SELECT,
         TEXT_AREA,
+        TIME,
     }
 
     enum Type {
@@ -90,7 +96,8 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         NUMBER,
         OBJECT,
         ONE_OF,
-        STRING
+        STRING,
+        TIME,
     }
 
     Object accept(PropertyVisitor propertyVisitor);
@@ -130,6 +137,8 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
         Object visit(IntegerProperty integerProperty);
 
+        Object visit(NullProperty nullProperty);
+
         Object visit(NumberProperty numberProperty);
 
         Object visit(OneOfProperty oneOfProperty);
@@ -137,9 +146,11 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         Object visit(ObjectProperty objectProperty);
 
         Object visit(StringProperty stringProperty);
+
+        Object visit(TimeProperty timeProperty);
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty.class)
+    @JsonDeserialize(as = ModifiableDynamicPropertiesProperty.class)
     sealed interface DynamicPropertiesProperty
         extends Property<DynamicPropertiesProperty> permits ModifiableDynamicPropertiesProperty {
 
@@ -153,9 +164,10 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         List<? extends Property<?>> getTypes();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableValueProperty.class)
+    @JsonDeserialize(as = ModifiableValueProperty.class)
     sealed interface ValueProperty<V, P extends ValueProperty<V, P>> extends
-        Property<P> permits ArrayProperty, BooleanProperty, DateProperty, DateTimeProperty, IntegerProperty, NumberProperty, ObjectProperty, StringProperty, ModifiableValueProperty {
+        Property<P> permits ArrayProperty, BooleanProperty, DateProperty, DateTimeProperty, IntegerProperty,
+        NumberProperty, ObjectProperty, StringProperty, TimeProperty, ModifiableValueProperty {
 
         ControlType getControlType();
 
@@ -164,7 +176,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         V getExampleValue();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableArrayProperty.class)
+    @JsonDeserialize(as = ModifiableArrayProperty.class)
     sealed interface ArrayProperty
         extends ValueProperty<Object[], ArrayProperty> permits ModifiableArrayProperty {
 
@@ -177,12 +189,12 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         OptionsDataSource getOptionsDataSource();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty.class)
+    @JsonDeserialize(as = ModifiableBooleanProperty.class)
     sealed interface BooleanProperty extends
         ValueProperty<Boolean, BooleanProperty> permits ModifiableBooleanProperty {
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableDateProperty.class)
+    @JsonDeserialize(as = ModifiableDateProperty.class)
     sealed interface DateProperty
         extends ValueProperty<LocalDate, DateProperty> permits ModifiableDateProperty {
 
@@ -191,7 +203,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         OptionsDataSource getOptionsDataSource();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty.class)
+    @JsonDeserialize(as = ModifiableDateTimeProperty.class)
     sealed interface DateTimeProperty extends
         ValueProperty<LocalDateTime, DateTimeProperty> permits ModifiableDateTimeProperty {
 
@@ -200,7 +212,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         OptionsDataSource getOptionsDataSource();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty.class)
+    @JsonDeserialize(as = ModifiableIntegerProperty.class)
     sealed interface IntegerProperty extends
         ValueProperty<Integer, IntegerProperty> permits ModifiableIntegerProperty {
 
@@ -213,7 +225,12 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         OptionsDataSource getOptionsDataSource();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableNumberProperty.class)
+    @JsonDeserialize(as = ModifiableNullProperty.class)
+    sealed interface NullProperty extends Property<NullProperty> permits ModifiableNullProperty {
+
+    }
+
+    @JsonDeserialize(as = ModifiableNumberProperty.class)
     sealed interface NumberProperty
         extends ValueProperty<Double, NumberProperty> permits ModifiableNumberProperty {
 
@@ -228,7 +245,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         OptionsDataSource getOptionsDataSource();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableObjectProperty.class)
+    @JsonDeserialize(as = ModifiableObjectProperty.class)
     sealed interface ObjectProperty
         extends ValueProperty<Object, ObjectProperty> permits ModifiableObjectProperty {
 
@@ -245,13 +262,24 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         List<? extends Property<?>> getProperties();
     }
 
-    @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableStringProperty.class)
+    @JsonDeserialize(as = ModifiableStringProperty.class)
     sealed interface StringProperty
         extends ValueProperty<String, StringProperty> permits ModifiableStringProperty {
 
         List<Option<?>> getOptions();
 
         OptionsDataSource getOptionsDataSource();
+    }
+
+    @JsonDeserialize(as = ModifiableTimeProperty.class)
+    sealed interface TimeProperty extends
+        ValueProperty<LocalTime, TimeProperty> permits ModifiableTimeProperty {
+
+        int getHour();
+
+        int getMinute();
+
+        int getSecond();
     }
 }
 // CHECKSTYLE:ON
