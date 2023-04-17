@@ -42,7 +42,7 @@ public class FindPetsByStatusAction {
                 .description("Multiple status values can be provided with comma separated strings"))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/pet/findByStatus"
 
             ))
@@ -53,7 +53,7 @@ public class FindPetsByStatusAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)))
-        .outputSchema(array("array").items(object().properties(PetProperties.PROPERTIES))
+        .outputSchema(array().items(object().properties(PetProperties.PROPERTIES))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

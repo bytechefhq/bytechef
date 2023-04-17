@@ -40,7 +40,7 @@ public class DeleteDealAction {
                 .description("Marks a deal as deleted. After 30 days, the deal will be permanently deleted."))
         .metadata(
             Map.of(
-                "requestMethod", "DELETE",
+                "method", "DELETE",
                 "path", "/deals/{id}"
 
             ))

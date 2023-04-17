@@ -38,7 +38,7 @@ public class UpdatePetWithFormAction {
                 .description(""))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/pet/{petId}"
 
             ))

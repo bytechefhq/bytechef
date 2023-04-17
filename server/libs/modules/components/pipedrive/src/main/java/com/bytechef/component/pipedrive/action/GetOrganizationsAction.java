@@ -42,7 +42,7 @@ public class GetOrganizationsAction {
                 .description("Returns all organizations."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/organizations"
 
             ))

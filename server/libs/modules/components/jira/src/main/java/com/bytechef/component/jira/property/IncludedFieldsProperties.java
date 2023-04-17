@@ -29,15 +29,15 @@ import java.util.List;
  * @generated
  */
 public class IncludedFieldsProperties {
-    public static final List<Property> PROPERTIES = List.of(array("actuallyIncluded").items(string(null))
+    public static final List<Property> PROPERTIES = List.of(array("actuallyIncluded").items(string())
         .placeholder("Add")
         .label("ActuallyIncluded")
         .required(false),
-        array("excluded").items(string(null))
+        array("excluded").items(string())
             .placeholder("Add")
             .label("Excluded")
             .required(false),
-        array("included").items(string(null))
+        array("included").items(string())
             .placeholder("Add")
             .label("Included")
             .required(false));

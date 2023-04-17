@@ -42,11 +42,11 @@ public class FindPetsByTagsAction {
                     "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/pet/findByTags"
 
             ))
-        .properties(array("tags").items(string(null))
+        .properties(array("tags").items(string())
             .placeholder("Add")
             .label("Tags")
             .description("Tags to filter by")
@@ -54,7 +54,7 @@ public class FindPetsByTagsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)))
-        .outputSchema(array("array").items(object().properties(PetProperties.PROPERTIES))
+        .outputSchema(array().items(object().properties(PetProperties.PROPERTIES))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

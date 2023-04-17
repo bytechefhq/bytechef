@@ -64,7 +64,8 @@ public abstract class AbstractPipedriveComponentHandler implements OpenApiCompon
             GetOrganizationAction.ACTION_DEFINITION, GetPersonsAction.ACTION_DEFINITION,
             AddPersonAction.ACTION_DEFINITION, SearchPersonsAction.ACTION_DEFINITION,
             DeletePersonAction.ACTION_DEFINITION, GetPersonAction.ACTION_DEFINITION))
-        .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION));
+        .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION))
+        .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

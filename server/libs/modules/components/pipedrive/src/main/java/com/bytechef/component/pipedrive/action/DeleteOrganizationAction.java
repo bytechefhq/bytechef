@@ -41,7 +41,7 @@ public class DeleteOrganizationAction {
                     "Marks an organization as deleted. After 30 days, the organization will be permanently deleted."))
         .metadata(
             Map.of(
-                "requestMethod", "DELETE",
+                "method", "DELETE",
                 "path", "/organizations/{id}"
 
             ))

@@ -40,7 +40,7 @@ public class PlaceOrderAction {
                 .description("Place a new order in the store"))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/store/order", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))

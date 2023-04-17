@@ -37,7 +37,7 @@ public class DeleteUserAction {
                 .description("This can only be done by the logged in user."))
         .metadata(
             Map.of(
-                "requestMethod", "DELETE",
+                "method", "DELETE",
                 "path", "/user/{username}"
 
             ))

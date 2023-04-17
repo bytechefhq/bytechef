@@ -17,6 +17,7 @@
 
 package com.bytechef.component.petstore.connection;
 
+import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.hermes.component.definition.Authorization.KEY;
@@ -26,7 +27,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
@@ -39,35 +39,31 @@ public class PetstoreConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri(connection -> "https://petstore3.swagger.io/api/v3")
         .authorizations(authorization(
-            Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE.name()
-                .toLowerCase(),
-            Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE)
-            .display(
-                display("OAuth2 Implicit"))
-            .properties(
-                string(CLIENT_ID)
-                    .label("Client Id")
-                    .required(true),
-                string(CLIENT_SECRET)
-                    .label("Client Secret")
-                    .required(true))
-            .authorizationUrl(connection -> "https://petstore3.swagger.io/oauth/authorize")
-            .scopes(connection -> List.of("write:pets", "read:pets")),
-            authorization(
-                Authorization.AuthorizationType.API_KEY.name()
-                    .toLowerCase(),
-                Authorization.AuthorizationType.API_KEY)
+            AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
                 .display(
-                    display("API Key"))
+                    display("OAuth2 Implicit"))
                 .properties(
-                    string(KEY)
-                        .label("Key")
-                        .required(true)
-                        .defaultValue("api_key")
-                        .hidden(true),
-                    string(VALUE)
-                        .label("Value")
-                        .required(true)
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl(connection -> "https://petstore3.swagger.io/oauth/authorize")
+                .scopes(connection -> List.of("write:pets", "read:pets")),
+            authorization(
+                AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
+                    .display(
+                        display("API Key"))
+                    .properties(
+                        string(KEY)
+                            .label("Key")
+                            .required(true)
+                            .defaultValue("api_key")
+                            .hidden(true),
+                        string(VALUE)
+                            .label("Value")
+                            .required(true)
 
-                ));
+                    ));
 }

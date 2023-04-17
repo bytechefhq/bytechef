@@ -38,7 +38,7 @@ public class GetInventoryAction {
                 .description("Returns a map of status codes to quantities"))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/store/inventory"
 
             ))

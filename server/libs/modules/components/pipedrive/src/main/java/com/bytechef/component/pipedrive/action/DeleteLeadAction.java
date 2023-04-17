@@ -40,7 +40,7 @@ public class DeleteLeadAction {
                 .description("Deletes a specific lead."))
         .metadata(
             Map.of(
-                "requestMethod", "DELETE",
+                "method", "DELETE",
                 "path", "/leads/{id}"
 
             ))

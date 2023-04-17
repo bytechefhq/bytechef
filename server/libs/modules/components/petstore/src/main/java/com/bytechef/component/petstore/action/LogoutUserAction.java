@@ -35,7 +35,7 @@ public class LogoutUserAction {
                 .description(""))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/user/logout"
 
             ))

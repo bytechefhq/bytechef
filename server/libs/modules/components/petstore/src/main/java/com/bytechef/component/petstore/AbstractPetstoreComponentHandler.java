@@ -63,7 +63,8 @@ public abstract class AbstractPetstoreComponentHandler implements OpenApiCompone
             CreateUserAction.ACTION_DEFINITION, CreateUsersWithListInputAction.ACTION_DEFINITION,
             LoginUserAction.ACTION_DEFINITION, LogoutUserAction.ACTION_DEFINITION, DeleteUserAction.ACTION_DEFINITION,
             GetUserByNameAction.ACTION_DEFINITION, UpdateUserAction.ACTION_DEFINITION))
-        .connection(modifyConnection(PetstoreConnection.CONNECTION_DEFINITION));
+        .connection(modifyConnection(PetstoreConnection.CONNECTION_DEFINITION))
+        .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

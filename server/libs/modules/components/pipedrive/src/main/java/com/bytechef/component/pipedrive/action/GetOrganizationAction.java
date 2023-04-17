@@ -42,7 +42,7 @@ public class GetOrganizationAction {
                     "Returns the details of an organization. Note that this also returns some additional fields which are not present when asking for all organizations. Also note that custom fields appear as long hashes in the resulting data. These hashes can be mapped against the `key` value of organizationFields."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/organizations/{id}"
 
             ))
@@ -54,22 +54,22 @@ public class GetOrganizationAction {
                     "type", PropertyType.PATH)))
         .outputSchema(
             object()
-                .properties(object("additional_data").properties(object("followers").properties(string("name")
-                    .label("Name")
-                    .description("The name of the follower")
-                    .required(false),
-                    integer("id").label("Id")
-                        .description("The ID of the follower associated with the item")
+                .properties(object("additional_data").properties(object("followers")
+                    .properties(string("name").label("Name")
+                        .description("The name of the follower")
                         .required(false),
-                    integer("user_id").label("User_id")
-                        .description("The user ID of the follower")
-                        .required(false),
-                    string("email").label("Email")
-                        .description("The email of the follower")
-                        .required(false),
-                    string("pic_hash").label("Pic_hash")
-                        .description("The follower picture hash")
-                        .required(false))
+                        integer("id").label("Id")
+                            .description("The ID of the follower associated with the item")
+                            .required(false),
+                        integer("user_id").label("User_id")
+                            .description("The user ID of the follower")
+                            .required(false),
+                        string("email").label("Email")
+                            .description("The email of the follower")
+                            .required(false),
+                        string("pic_hash").label("Pic_hash")
+                            .description("The follower picture hash")
+                            .required(false))
                     .label("Followers")
                     .description("The follower that is associated with the item")
                     .required(false),

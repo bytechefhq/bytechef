@@ -40,7 +40,8 @@ public abstract class AbstractJiraComponentHandler implements OpenApiComponentHa
                     .description("Jira Cloud platform REST API documentation")))
         .actions(modifyActions(CreateIssueAction.ACTION_DEFINITION, GetIssueAction.ACTION_DEFINITION,
             SearchForIssuesUsingJqlAction.ACTION_DEFINITION))
-        .connection(modifyConnection(JiraConnection.CONNECTION_DEFINITION));
+        .connection(modifyConnection(JiraConnection.CONNECTION_DEFINITION))
+        .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {

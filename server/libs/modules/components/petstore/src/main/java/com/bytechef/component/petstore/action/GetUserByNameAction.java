@@ -40,7 +40,7 @@ public class GetUserByNameAction {
                 .description(""))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/user/{username}"
 
             ))

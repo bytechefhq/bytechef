@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Add member to list",
       "title": "Add a new member to the list."
@@ -8,8 +9,8 @@
     "metadata": {
       "path": "/lists/{listId}/members",
       "mimeType": "application/json",
-      "bodyContentType": "JSON",
-      "requestMethod": "POST"
+      "method": "POST",
+      "bodyContentType": "JSON"
     },
     "name": "addMemberToList",
     "outputSchema": [ {
@@ -679,7 +680,7 @@
     } ]
   } ],
   "connection": {
-    "authorizationRequired": true,
+    "authorizationRequired": false,
     "authorizations": [ {
       "display": {
         "title": "OAuth2 Authorization Code"
@@ -712,5 +713,133 @@
     "title": "Mailchimp"
   },
   "name": "mailchimp",
-  "version": 1
+  "version": 1,
+  "triggers": [ {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "Triggers when an Audience subscriber is added to the list.",
+      "title": "Subscribe"
+    },
+    "dynamicWebhookDisable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookEnable": {
+      "empty": false,
+      "present": true
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": false,
+      "present": true
+    },
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": true,
+      "present": false
+    },
+    "listenerDisable": {
+      "empty": true,
+      "present": false
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "name": "data",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "name": "email",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "email_type",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "id",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "ip_opt",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "ip_signup",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "list_id",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "name": "merges",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "name": "EMAIL",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "FNAME",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "INTERESTS",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "name": "LNAME",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "name": "fired_at",
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "name": "type",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "subscribe",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "properties": [ {
+      "description": "The list id of intended audience to which you would like to add the contact.",
+      "label": "List Id",
+      "name": "listId",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  } ]
 }

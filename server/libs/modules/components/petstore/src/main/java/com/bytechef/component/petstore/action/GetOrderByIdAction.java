@@ -41,7 +41,7 @@ public class GetOrderByIdAction {
                     "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/store/order/{orderId}"
 
             ))
