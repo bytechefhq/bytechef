@@ -17,9 +17,6 @@
 
 package com.bytechef.component.odsfile;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
@@ -32,6 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,7 +63,8 @@ public class OdsFileComponentHandlerIntTest {
                     .storeFileContent(sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))
                     .toMap()));
 
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        Assertions.assertThat(job.getStatus())
+            .isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
@@ -83,11 +83,12 @@ public class OdsFileComponentHandlerIntTest {
                 "rows",
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        Assertions.assertThat(job.getStatus())
+            .isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat(((Map) outputs.get("writeOdsFile")).get(WorkflowConstants.NAME))
+        Assertions.assertThat(((Map) outputs.get("writeOdsFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.ods");
 
         File sampleFile = getFile("sample_header.ods");
@@ -103,7 +104,7 @@ public class OdsFileComponentHandlerIntTest {
 
         outputs = job.getOutputs();
 
-        assertEquals(
+        JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
             new JSONArray((List<?>) outputs.get("readOdsFile")),
             true);

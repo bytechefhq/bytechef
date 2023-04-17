@@ -23,7 +23,6 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.IS_ARRAY;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_NUMBER;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.xmlfile.action.XmlFileReadAction;
 import com.bytechef.component.xmlfile.action.XmlFileWriteAction;
@@ -55,7 +54,6 @@ import org.mockito.Mockito;
 public class XmlFileComponentHandlerTest {
 
     private static final Context context = Mockito.mock(Context.class);
-    private static final XmlFileComponentHandler xmlFileComponentHandler = new XmlFileComponentHandler();
 
     public static final String TEST_XML = "test.xml";
     public static final String FILE_XML = "file.xml";
@@ -87,7 +85,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(inputParameters.getBoolean(IS_ARRAY, true))
             .thenReturn(false);
 
-        assertThat((Map<String, ?>) XmlFileReadAction.executeRead(context, inputParameters))
+        Assertions.assertThat((Map<String, ?>) XmlFileReadAction.executeRead(context, inputParameters))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
     }
 
@@ -109,7 +107,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(inputParameters.getInteger(PAGE_SIZE))
             .thenReturn(null);
 
-        assertThat((List<?>) XmlFileReadAction.executeRead(context, inputParameters))
+        Assertions.assertThat((List<?>) XmlFileReadAction.executeRead(context, inputParameters))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
 
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
@@ -126,7 +124,7 @@ public class XmlFileComponentHandlerTest {
         Mockito.when(inputParameters.getInteger(PAGE_SIZE))
             .thenReturn(2);
 
-        assertThat(((List<?>) XmlFileReadAction.executeRead(context, inputParameters)).size())
+        Assertions.assertThat(((List<?>) XmlFileReadAction.executeRead(context, inputParameters)).size())
             .isEqualTo(2);
     }
 
@@ -148,7 +146,8 @@ public class XmlFileComponentHandlerTest {
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
-        assertThat(XmlUtils.read(inputStreamArgumentCaptor.getValue(), new TypeReference<Map<String, Object>>() {}))
+        Assertions.assertThat(
+            XmlUtils.read(inputStreamArgumentCaptor.getValue(), new TypeReference<Map<String, Object>>() {}))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo(FILE_XML);
@@ -169,7 +168,8 @@ public class XmlFileComponentHandlerTest {
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
 
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo(TEST_XML);
+        Assertions.assertThat(filenameArgumentCaptor.getValue())
+            .isEqualTo(TEST_XML);
     }
 
     @Test
@@ -190,10 +190,11 @@ public class XmlFileComponentHandlerTest {
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
-        assertThat(XmlUtils.read(inputStreamArgumentCaptor.getValue(), List.class))
+        Assertions.assertThat(XmlUtils.read(inputStreamArgumentCaptor.getValue(), List.class))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
 
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo(FILE_XML);
+        Assertions.assertThat(filenameArgumentCaptor.getValue())
+            .isEqualTo(FILE_XML);
 
         Mockito.reset(context);
 
@@ -211,7 +212,8 @@ public class XmlFileComponentHandlerTest {
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
 
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo(TEST_XML);
+        Assertions.assertThat(filenameArgumentCaptor.getValue())
+            .isEqualTo(TEST_XML);
     }
 
     private File getFile(String filename) {

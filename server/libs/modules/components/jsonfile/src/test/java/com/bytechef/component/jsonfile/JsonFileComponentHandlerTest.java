@@ -24,7 +24,6 @@ import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.IS_
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_NUMBER;
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.PAGE_SIZE;
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.SOURCE;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.jsonfile.action.JsonFileReadAction;
@@ -258,7 +257,8 @@ public class JsonFileComponentHandlerTest {
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
 
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("test.json");
+        Assertions.assertThat(filenameArgumentCaptor.getValue())
+            .isEqualTo("test.json");
     }
 
     @Test
@@ -306,7 +306,8 @@ public class JsonFileComponentHandlerTest {
         Mockito.verify(context)
             .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
 
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("test.jsonl");
+        Assertions.assertThat(filenameArgumentCaptor.getValue())
+            .isEqualTo("test.jsonl");
     }
 
     private File getFile(String filename) {

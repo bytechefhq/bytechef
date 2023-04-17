@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Reads data from a XML file.",
       "title": "Read from file"
@@ -79,6 +80,7 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Writes the data to a XML file.",
       "title": "Write to file"

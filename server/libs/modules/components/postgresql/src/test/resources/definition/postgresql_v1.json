@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Execute an SQL query.",
       "title": "Query"
@@ -49,6 +50,7 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Insert rows in database.",
       "title": "Insert"
@@ -133,6 +135,7 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Update rows in database.",
       "title": "Update"
@@ -224,6 +227,7 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Delete rows from database.",
       "title": "Delete"
@@ -304,6 +308,7 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Execute an SQL DML or DML statement.",
       "title": "Execute"

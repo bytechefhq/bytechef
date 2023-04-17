@@ -1,27 +1,28 @@
 {
   "actions": [ {
+    "batch": false,
     "name": "map",
     "properties": [ {
       "description": "List of items to iterate over.",
       "label": "List of items",
       "name": "list",
       "type": "ARRAY",
-      "controlType": "JSON_BUILDER",
-      "multipleValues": true
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     }, {
       "description": "The name of the item variable.",
       "label": "Item Var",
       "name": "itemVar",
       "type": "STRING",
-      "controlType": "INPUT_TEXT",
-      "defaultValue": "item"
+      "defaultValue": "item",
+      "controlType": "INPUT_TEXT"
     }, {
       "description": "The name of the index variable.",
       "label": "Item Index",
       "name": "itemIndex",
       "type": "STRING",
-      "controlType": "INPUT_TEXT",
-      "defaultValue": "itemIndex"
+      "defaultValue": "itemIndex",
+      "controlType": "INPUT_TEXT"
     } ]
   } ],
   "display": {
