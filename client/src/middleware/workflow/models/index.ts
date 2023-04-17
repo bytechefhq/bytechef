@@ -12,5 +12,5 @@ export * from './WebhookModel';
 export * from './WebhookRetryModel';
 export * from './WorkflowFormatModel';
 export * from './WorkflowModel';
+export * from './WorkflowResponseModel';
 export * from './WorkflowTaskModel';
-export * from './WorkflowTestResponseModel';
