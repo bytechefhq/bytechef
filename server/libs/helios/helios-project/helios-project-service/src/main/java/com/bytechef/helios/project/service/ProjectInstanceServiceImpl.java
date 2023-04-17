@@ -18,8 +18,7 @@
 package com.bytechef.helios.project.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.project.domain.ProjectInstanceJob;
-import com.bytechef.helios.project.repository.ProjectInstanceJobRepository;
+import com.bytechef.helios.project.domain.ProjectInstance.Status;
 import com.bytechef.helios.project.repository.ProjectInstanceRepository;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import org.springframework.data.domain.Sort;
@@ -29,7 +28,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -39,22 +37,11 @@ import java.util.Optional;
 @Transactional
 public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
-    private final ProjectInstanceJobRepository projectInstanceJobRepository;
     private final ProjectInstanceRepository projectInstanceRepository;
 
-    public ProjectInstanceServiceImpl(
-        ProjectInstanceJobRepository projectInstanceJobRepository,
-        ProjectInstanceRepository projectInstanceRepository) {
+    public ProjectInstanceServiceImpl(ProjectInstanceRepository projectInstanceRepository) {
 
-        this.projectInstanceJobRepository = projectInstanceJobRepository;
         this.projectInstanceRepository = projectInstanceRepository;
-    }
-
-    @Override
-    public void addJob(long projectInstanceId, long jobId) {
-        ProjectInstanceJob projectInstanceJob = new ProjectInstanceJob(projectInstanceId, jobId);
-
-        projectInstanceJobRepository.save(projectInstanceJob);
     }
 
     @Override
@@ -65,7 +52,7 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
         Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be empty");
         Assert.notNull(projectInstance.getName(), "'projectId' must not be empty");
 
-        projectInstance.setStatus(ProjectInstance.Status.DISABLED);
+        projectInstance.setStatus(Status.DISABLED);
 
         return projectInstanceRepository.save(projectInstance);
     }
@@ -78,6 +65,11 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     public Optional<ProjectInstance> fetchJobProjectInstance(long jobId) {
         return projectInstanceRepository.findByJobId(jobId);
+    }
+
+    @Override
+    public ProjectInstance getJobProjectInstance(long jobId) {
+        return OptionalUtils.get(projectInstanceRepository.findByJobId(jobId));
     }
 
     @Override
@@ -126,24 +118,18 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
         return projectInstanceRepository.save(projectInstance);
     }
 
+    @Override
     public ProjectInstance update(
-        long id, List<Long> connectionIds, Map<String, Object> configurationParameters, String description, String name,
-        Long projectId, ProjectInstance.Status status, List<Long> tagIds, int version) {
-
-        Assert.notNull(projectId, "'projectId' must not be empty");
+        long id, String description, String name, Status status, List<Long> tagIds, int version) {
 
         ProjectInstance projectInstance = getProjectInstance(id);
 
-        projectInstance.setConnectionIds(connectionIds);
-        projectInstance.setConfigurationParameters(configurationParameters);
         projectInstance.setDescription(description);
-        projectInstance.setId(id);
         projectInstance.setName(name);
-        projectInstance.setProjectId(projectId);
         projectInstance.setStatus(status);
         projectInstance.setTagIds(tagIds);
         projectInstance.setVersion(version);
 
-        return projectInstanceRepository.save(projectInstance.update(projectInstance));
+        return projectInstanceRepository.save(projectInstance);
     }
 }

@@ -20,30 +20,22 @@ package com.bytechef.helios.project.facade;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.dto.JobParametersDTO;
-import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.domain.Category;
+import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.Project;
-import com.bytechef.helios.project.dto.ProjectExecutionDTO;
-import com.bytechef.helios.project.dto.ProjectInstanceDTO;
-import com.bytechef.helios.project.service.ProjectService;
-import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.category.service.CategoryService;
-import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.helios.project.dto.ProjectDTO;
+import com.bytechef.helios.project.dto.ProjectExecutionDTO;
 import com.bytechef.helios.project.service.ProjectInstanceService;
+import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -56,13 +48,10 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@Service
 @Transactional
 public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
-    private final ConnectionService connectionService;
-    private final JobFactory jobFactory;
     private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
@@ -72,18 +61,16 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, ConnectionService connectionService, JobFactory jobFactory,
-        JobService jobService, ProjectService projectService, ProjectInstanceService projectInstanceService,
-        TagService tagService, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+        CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
+        ProjectService projectService, TaskExecutionService taskExecutionService, TagService tagService,
+        WorkflowService workflowService) {
 
         this.categoryService = categoryService;
-        this.connectionService = connectionService;
-        this.jobFactory = jobFactory;
         this.jobService = jobService;
-        this.projectService = projectService;
         this.projectInstanceService = projectInstanceService;
-        this.tagService = tagService;
+        this.projectService = projectService;
         this.taskExecutionService = taskExecutionService;
+        this.tagService = tagService;
         this.workflowService = workflowService;
     }
 
@@ -132,33 +119,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
-        ProjectInstance projectInstance = projectInstanceDTO.toProjectInstance();
-
-        List<Tag> tags = projectInstanceDTO.tags();
-
-        if (!org.springframework.util.CollectionUtils.isEmpty(tags)) {
-            tags = tagService.save(tags);
-
-            projectInstance.setTags(tags);
-        }
-
-        return new ProjectInstanceDTO(projectInstanceService.create(projectInstance), tags);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.NEVER)
-    public long createProjectInstanceJob(long id, String workflowId) {
-        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
-
-        long jobId = jobFactory.create(new JobParametersDTO(projectInstance.getConfigurationParameters(), workflowId));
-
-        projectInstanceService.addJob(id, jobId);
-
-        return jobId;
-    }
-
-    @Override
     public void deleteProject(long id) {
         Project project = projectService.getProject(id);
 
@@ -167,15 +127,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         projectService.delete(id);
-
-// TODO find a way to delete ll tags not referenced anymore
-//        project.getTagIds()
-//            .forEach(tagService::delete);
-    }
-
-    @Override
-    public void deleteProjectInstance(long projectInstanceId) {
-        projectService.delete(projectInstanceId);
 
 // TODO find a way to delete ll tags not referenced anymore
 //        project.getTagIds()
@@ -211,14 +162,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectInstanceDTO getProjectInstance(long projectInstanceId) {
-        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
-        return new ProjectInstanceDTO(
-            projectInstance,
-            projectService.getProject(projectInstance.getProjectId()), tagService.getTags(projectInstance.getTagIds()));
-    }
-
-    @Override
     public List<Category> getProjectCategories() {
         List<Project> projects = projectService.getProjects();
 
@@ -228,18 +171,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
             .toList();
 
         return categoryService.getCategories(categoryIds);
-    }
-
-    @Override
-    public List<Tag> getProjectInstanceTags() {
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances();
-
-        List<Long> tagIds = projectInstances.stream()
-            .map(ProjectInstance::getTagIds)
-            .flatMap(Collection::stream)
-            .toList();
-
-        return tagService.getTags(tagIds);
     }
 
     @Override
@@ -320,50 +251,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public List<ProjectInstanceDTO> searchProjectInstances(List<Long> projectIds, List<Long> tagIds) {
-        List<ProjectInstance> projectInstances = projectInstanceService.searchProjectInstances(projectIds, tagIds);
-
-        List<Connection> connections = connectionService.getConnections(
-            projectInstances.stream()
-                .flatMap(project -> CollectionUtils.stream(project.getConnectionIds()))
-                .filter(Objects::nonNull)
-                .toList());
-
-        List<Project> projects = projectService.getProjects(
-            projectInstances.stream()
-                .map(project -> project.getProjectId())
-                .filter(Objects::nonNull)
-                .toList());
-
-        List<Tag> tags = tagService.getTags(
-            projectInstances.stream()
-                .flatMap(project -> CollectionUtils.stream(project.getTagIds()))
-                .filter(Objects::nonNull)
-                .toList());
-
-        return CollectionUtils.map(
-            projectInstances,
-            projectInstance -> new ProjectInstanceDTO(
-                projectInstance,
-                CollectionUtils.filter(
-                    connections,
-                    connection -> {
-                        List<Long> curConnectionIds = projectInstance.getConnectionIds();
-
-                        return curConnectionIds.contains(connection.getId());
-                    }),
-                CollectionUtils.getFirst(
-                    projects, project -> Objects.equals(project.getId(), projectInstance.getProjectId())),
-                CollectionUtils.filter(
-                    tags,
-                    tag -> {
-                        List<Long> curTagIds = projectInstance.getTagIds();
-
-                        return curTagIds.contains(tag.getId());
-                    })));
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<ProjectDTO> searchProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds) {
         List<Long> projectIds = null;
@@ -407,35 +294,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectInstanceDTO update(ProjectInstanceDTO projectInstanceDTO) {
-        List<Tag> tags = org.springframework.util.CollectionUtils.isEmpty(projectInstanceDTO.tags())
-            ? Collections.emptyList()
-            : tagService.save(projectInstanceDTO.tags());
-
-        return new ProjectInstanceDTO(
-            projectInstanceService.update(
-                projectInstanceDTO.id(), projectInstanceDTO.connectionIds(),
-                projectInstanceDTO.configurationParameters(), projectInstanceDTO.description(),
-                projectInstanceDTO.name(), projectInstanceDTO.projectId(),
-                projectInstanceDTO.status(), CollectionUtils.map(tags, Tag::getId), projectInstanceDTO.version()),
-            tags);
-    }
-
-    @Override
-    public ProjectInstanceDTO updateProjectInstanceTags(Long projectInstanceId, List<Tag> tags) {
-        tags = org.springframework.util.CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
-
-        return new ProjectInstanceDTO(
-            projectInstanceService.update(projectInstanceId, CollectionUtils.map(tags, Tag::getId)), tags);
-    }
-
-    @Override
-    public ProjectDTO updateProjectTags(long id, List<Tag> tags) {
+    public void updateProjectTags(long id, List<Tag> tags) {
         tags = org.springframework.util.CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         Project project = projectService.update(id, CollectionUtils.map(tags, Tag::getId));
 
-        return new ProjectDTO(
+        new ProjectDTO(
             project,
             project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
             tags);

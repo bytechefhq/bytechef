@@ -76,18 +76,10 @@ public final class ProjectWorkflow implements Persistable<Long> {
         return id == null;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
-    }
-
     @Override
     public String toString() {
         return "ProjectWorkflow{" + ", id='"
             + id + '\'' + ", workflowId='"
-            + workflowId + '\'' + '}';
+            + workflowId + "'}";
     }
 }
