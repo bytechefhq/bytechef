@@ -4,7 +4,7 @@
     <artifactId>openapi-spring</artifactId>
     <packaging>jar</packaging>
     <name>openapi-spring</name>
-    <version>v1</version>
+    <version>1</version>
     <properties>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

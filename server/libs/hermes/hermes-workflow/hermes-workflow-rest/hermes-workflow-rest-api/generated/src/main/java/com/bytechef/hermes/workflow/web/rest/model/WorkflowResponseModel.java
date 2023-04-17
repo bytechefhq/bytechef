@@ -20,19 +20,19 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * WorkflowTestResponseModel
+ * WorkflowResponseModel
  */
 
-@JsonTypeName("WorkflowTestResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:20.252283+02:00[Europe/Zagreb]")
-public class WorkflowTestResponseModel {
+@JsonTypeName("WorkflowResponse")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-14T13:37:25.780236+02:00[Europe/Zagreb]")
+public class WorkflowResponseModel {
 
   private JobModel job;
 
   @Valid
   private List<@Valid TaskExecutionModel> taskExecutions;
 
-  public WorkflowTestResponseModel job(JobModel job) {
+  public WorkflowResponseModel job(JobModel job) {
     this.job = job;
     return this;
   }
@@ -52,12 +52,12 @@ public class WorkflowTestResponseModel {
     this.job = job;
   }
 
-  public WorkflowTestResponseModel taskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
+  public WorkflowResponseModel taskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
     this.taskExecutions = taskExecutions;
     return this;
   }
 
-  public WorkflowTestResponseModel addTaskExecutionsItem(TaskExecutionModel taskExecutionsItem) {
+  public WorkflowResponseModel addTaskExecutionsItem(TaskExecutionModel taskExecutionsItem) {
     if (this.taskExecutions == null) {
       this.taskExecutions = new ArrayList<>();
     }
@@ -88,9 +88,9 @@ public class WorkflowTestResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowTestResponseModel workflowTestResponse = (WorkflowTestResponseModel) o;
-    return Objects.equals(this.job, workflowTestResponse.job) &&
-        Objects.equals(this.taskExecutions, workflowTestResponse.taskExecutions);
+    WorkflowResponseModel workflowResponse = (WorkflowResponseModel) o;
+    return Objects.equals(this.job, workflowResponse.job) &&
+        Objects.equals(this.taskExecutions, workflowResponse.taskExecutions);
   }
 
   @Override
@@ -101,7 +101,7 @@ public class WorkflowTestResponseModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowTestResponseModel {\n");
+    sb.append("class WorkflowResponseModel {\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
     sb.append("    taskExecutions: ").append(toIndentedString(taskExecutions)).append("\n");
     sb.append("}");
