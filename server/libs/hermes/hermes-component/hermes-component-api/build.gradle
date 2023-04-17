@@ -2,6 +2,7 @@ version="1.0"
 
 dependencies {
     api project(":server:libs:hermes:hermes-definition-api")
+    api project(":server:libs:core:commons:commons-util")
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
@@ -10,6 +11,5 @@ dependencies {
     implementation "com.jayway.jsonpath:json-path"
     implementation libs.com.github.mizosoft.methanol
     implementation "org.slf4j:slf4j-api"
-    implementation libs.io.swagger.core.v3.swagger.annotations
     implementation libs.org.apache.tika.tika.core
 }

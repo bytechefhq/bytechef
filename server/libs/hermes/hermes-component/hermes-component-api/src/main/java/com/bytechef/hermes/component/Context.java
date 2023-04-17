@@ -29,9 +29,11 @@ public interface Context {
 
     Optional<Connection> fetchConnection();
 
+    Connection getConnection();
+
     InputStream getFileStream(FileEntry fileEntry);
 
-    void publishProgressEvent(int progress);
+    void publishActionProgressEvent(int progress);
 
     String readFileToString(FileEntry fileEntry);
 
@@ -39,13 +41,13 @@ public interface Context {
 
     FileEntry storeFileContent(String fileName, InputStream inputStream);
 
-    interface Connection {
+    interface Connection extends InputParameters {
 
         void applyAuthorization(Authorization.AuthorizationContext authorizationContext);
 
         Optional<String> fetchBaseUri();
 
-        InputParameters getParameters();
+        String getBaseUri();
     }
 
     interface FileEntry {

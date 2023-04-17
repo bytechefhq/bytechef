@@ -40,7 +40,6 @@ public class ComponentDefinitionTest {
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
             registerModule(new JavaTimeModule());
-
             setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
     };
@@ -52,7 +51,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"display":{"description":"description","title":"title"},"name":"name"}
+                {"batch":false,"display":{"description":"description","title":"title"},"name":"name"}
                 """,
             action);
     }

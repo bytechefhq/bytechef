@@ -20,14 +20,12 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Option;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableComponentOptionsDataSource.class)
 public sealed interface ComponentOptionsDataSource
     extends com.bytechef.hermes.definition.OptionsDataSource permits ComponentDSL.ModifiableComponentOptionsDataSource {
 
