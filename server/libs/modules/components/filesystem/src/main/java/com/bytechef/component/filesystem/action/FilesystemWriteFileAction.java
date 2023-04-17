@@ -64,7 +64,8 @@ public class FilesystemWriteFileAction {
         String fileName = inputParameters.getRequiredString(FILENAME);
 
         try (
-            InputStream inputStream = context.getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
+            InputStream inputStream = context
+                .getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
             return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create file " + inputParameters, ioException);

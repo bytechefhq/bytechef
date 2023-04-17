@@ -50,7 +50,6 @@ import org.mockito.Mockito;
 public class FilesystemComponentHandlerTest {
 
     private static final Context context = Mockito.mock(Context.class);
-    private static final FilesystemComponentHandler filesystemComponentHandler = new FilesystemComponentHandler();
 
     @Test
     public void testGetComponentDefinition() {

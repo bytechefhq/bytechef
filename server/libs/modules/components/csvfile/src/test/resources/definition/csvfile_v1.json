@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Reads data from a csv file.",
       "title": "Read from file"
@@ -88,6 +89,7 @@
       "controlType": "CHECKBOX"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Writes the data to a csv file.",
       "title": "Write to file"

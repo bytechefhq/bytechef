@@ -21,7 +21,7 @@ package com.bytechef.component.map;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -86,19 +86,19 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test3() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(Queues.COMPLETIONS, t -> {
+        messageBroker.receive(TaskQueues.COMPLETIONS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getOutput());
         });
 
-        messageBroker.receive(Queues.ERRORS, t -> {
+        messageBroker.receive(TaskQueues.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
 
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.EVENTS, t -> {});
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];
 

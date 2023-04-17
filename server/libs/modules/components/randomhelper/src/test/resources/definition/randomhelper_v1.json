@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Generates a random integer value.",
       "title": "Int"
@@ -21,6 +22,7 @@
       "defaultValue": 100
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Generates a random float value.",
       "title": "Float"

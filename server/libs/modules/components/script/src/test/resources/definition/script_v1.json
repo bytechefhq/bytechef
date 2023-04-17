@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Executes custom Java code.",
       "title": "Java"
@@ -80,6 +81,7 @@
       "controlType": "CODE_EDITOR"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Executes custom JavaScript code.",
       "title": "JavaScript"
@@ -160,6 +162,7 @@
       "controlType": "CODE_EDITOR"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Executes custom Python code.",
       "title": "Python"
@@ -240,6 +243,7 @@
       "controlType": "CODE_EDITOR"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Executes custom R code.",
       "title": "R"
@@ -320,6 +324,7 @@
       "controlType": "CODE_EDITOR"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Executes custom Ruby code.",
       "title": "Ruby"

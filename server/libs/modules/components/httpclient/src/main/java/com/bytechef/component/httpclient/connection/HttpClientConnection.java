@@ -23,6 +23,7 @@ import com.bytechef.hermes.definition.Property;
 
 import static com.bytechef.hermes.component.definition.Authorization.ADD_TO;
 import static com.bytechef.hermes.component.definition.Authorization.AUTHORIZATION_URL;
+import static com.bytechef.hermes.component.definition.Authorization.HEADER_PREFIX;
 import static com.bytechef.hermes.component.definition.ConnectionDefinition.BASE_URI;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
@@ -47,107 +48,116 @@ public class HttpClientConnection {
         .authorizations(
             authorization(Authorization.AuthorizationType.API_KEY.name()
                 .toLowerCase(), Authorization.AuthorizationType.API_KEY)
-                .display(display("API Key"))
-                .properties(
-                    string(KEY)
-                        .label("Key")
-                        .required(true)
-                        .defaultValue(Authorization.API_TOKEN),
-                    string(VALUE).label("Value")
-                        .required(true),
-                    string(ADD_TO)
-                        .label("Add to")
-                        .required(true)
-                        .options(
-                            option(
-                                "Header", Authorization.ApiTokenLocation.HEADER.name()),
-                            option(
-                                "QueryParams",
-                                Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()))),
+                    .display(display("API Key"))
+                    .properties(
+                        string(KEY)
+                            .label("Key")
+                            .required(true)
+                            .defaultValue(Authorization.API_TOKEN),
+                        string(VALUE).label("Value")
+                            .required(true),
+                        string(ADD_TO)
+                            .label("Add to")
+                            .required(true)
+                            .options(
+                                option(
+                                    "Header", Authorization.ApiTokenLocation.HEADER.name()),
+                                option(
+                                    "QueryParams",
+                                    Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()))),
             authorization(
                 Authorization.AuthorizationType.BEARER_TOKEN
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.BEARER_TOKEN)
-                .display(display("Bearer Token"))
-                .properties(string(TOKEN).label("Token")
-                    .required(true)),
+                    .display(display("Bearer Token"))
+                    .properties(string(TOKEN).label("Token")
+                        .required(true)),
             authorization(
                 Authorization.AuthorizationType.BASIC_AUTH.name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.BASIC_AUTH)
-                .display(display("Basic Auth"))
-                .properties(
-                    string(USERNAME).label("Username")
-                        .required(true),
-                    string(PASSWORD).label("Password")
-                        .required(true)),
+                    .display(display("Basic Auth"))
+                    .properties(
+                        string(USERNAME).label("Username")
+                            .required(true),
+                        string(PASSWORD).label("Password")
+                            .required(true)),
             authorization(
                 Authorization.AuthorizationType.DIGEST_AUTH.name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.DIGEST_AUTH)
-                .display(display("Digest Auth"))
-                .properties(
-                    string(USERNAME).label("Username")
-                        .required(true),
-                    string(PASSWORD).label("Password")
-                        .required(true)),
+                    .display(display("Digest Auth"))
+                    .properties(
+                        string(USERNAME).label("Username")
+                            .required(true),
+                        string(PASSWORD).label("Password")
+                            .required(true)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .display(display("OAuth2 Authorization Code"))
-                .properties(
-                    string(AUTHORIZATION_URL)
-                        .label("Authorization URL")
-                        .required(true),
-                    string(TOKEN_URL).label("Token URL")
-                        .required(true),
-                    string(CLIENT_ID).label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true),
-                    string(SCOPES)
-                        .label("Scopes")
-                        .description("Optional comma-delimited list of scopes")
-                        .controlType(Property.ControlType.TEXT_AREA)),
+                    .display(display("OAuth2 Authorization Code"))
+                    .properties(
+                        string(AUTHORIZATION_URL)
+                            .label("Authorization URL")
+                            .required(true),
+                        string(TOKEN_URL).label("Token URL")
+                            .required(true),
+                        string(CLIENT_ID).label("Client Id")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .required(true),
+                        string(HEADER_PREFIX)
+                            .label("Header Prefix")
+                            .defaultValue(Authorization.BEARER),
+                        string(SCOPES)
+                            .label("Scopes")
+                            .description("Optional comma-delimited list of scopes")
+                            .controlType(Property.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE)
-                .display(display("OAuth2 Implicit Code"))
-                .properties(
-                    string(AUTHORIZATION_URL)
-                        .label("Authorization URL")
-                        .required(true),
-                    string(CLIENT_ID).label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true),
-                    string(SCOPES)
-                        .label("Scopes")
-                        .description("Optional comma-delimited list of scopes")
-                        .controlType(Property.ControlType.TEXT_AREA)),
+                    .display(display("OAuth2 Implicit Code"))
+                    .properties(
+                        string(AUTHORIZATION_URL)
+                            .label("Authorization URL")
+                            .required(true),
+                        string(CLIENT_ID).label("Client Id")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .required(true),
+                        string(HEADER_PREFIX)
+                            .label("Header Prefix")
+                            .defaultValue(Authorization.BEARER),
+                        string(SCOPES)
+                            .label("Scopes")
+                            .description("Optional comma-delimited list of scopes")
+                            .controlType(Property.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
-                .display(display("OAuth2 Client Credentials"))
-                .properties(
-                    string(TOKEN_URL).label("Token URL")
-                        .required(true),
-                    string(CLIENT_ID).label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true),
-                    string(SCOPES)
-                        .label("Scopes")
-                        .description("Optional comma-delimited list of scopes")
-                        .controlType(Property.ControlType.TEXT_AREA)));
+                    .display(display("OAuth2 Client Credentials"))
+                    .properties(
+                        string(TOKEN_URL).label("Token URL")
+                            .required(true),
+                        string(CLIENT_ID).label("Client Id")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .required(true),
+                        string(HEADER_PREFIX)
+                            .label("Header Prefix")
+                            .defaultValue(Authorization.BEARER),
+                        string(SCOPES)
+                            .label("Scopes")
+                            .description("Optional comma-delimited list of scopes")
+                            .controlType(Property.ControlType.TEXT_AREA)));
 }

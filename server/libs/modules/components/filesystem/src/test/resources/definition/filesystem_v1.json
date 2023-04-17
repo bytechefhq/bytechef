@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "title": "Read from file"
     },
@@ -41,6 +42,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "title": "Write to file"
     },
@@ -95,12 +97,14 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Creates a temporary directory oon the filesystem.",
       "title": "Create Temp Directory"
     },
     "name": "createTempDir"
   }, {
+    "batch": false,
     "display": {
       "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
       "title": "File Path"
@@ -121,18 +125,21 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Lists a content of directory for the given path.",
       "title": "List"
     },
     "name": "ls"
   }, {
+    "batch": false,
     "display": {
       "description": "Creates a directory.",
       "title": "Create"
     },
     "name": "mkdir"
   }, {
+    "batch": false,
     "display": {
       "description": "Removes the content of a directory.",
       "title": "Remove"

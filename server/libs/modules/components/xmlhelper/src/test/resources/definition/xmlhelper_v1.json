@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Converts the XML string to object/array.",
       "title": "Convert from XML string"
@@ -19,6 +20,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Writes the object/array to a XML string.",
       "title": "Convert to XML string"

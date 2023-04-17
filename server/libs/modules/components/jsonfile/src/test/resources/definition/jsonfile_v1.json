@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Reads data from a JSON file.",
       "title": "Read from file"
@@ -94,6 +95,7 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Writes the data to a JSON file.",
       "title": "Write to file"
