@@ -1,0 +1,70 @@
+
+/*
+ * Copyright 2021 <your company/name>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.datastorage.action;
+
+import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
+
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.VALUE_TO_ADD;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.definition.DefinitionDSL.display;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
+
+/**
+ * @author Ivica Cardic
+ */
+public class AtomicIncrementAction {
+
+    public final ActionDefinition actionDefinition = action("atomicIncrement")
+        .display(display("Atomic Increment").description(
+            "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions."))
+        .properties(
+            string(KEY)
+                .label("Key")
+                .description("The identifier of a value to increment.")
+                .required(true),
+            string(SCOPE)
+                .label("Scope")
+                .description("The namespace to obtain a value from.")
+                .options(SCOPE_OPTIONS)
+                .required(true),
+            integer(VALUE_TO_ADD)
+                .label("Value to add")
+                .description(
+                    "The value that can be added to the existing numeric value, which may have a negative value.")
+                .defaultValue(1))
+        .execute(this::execute);
+
+    private final DataStorageService dataStorageService;
+
+    public AtomicIncrementAction(DataStorageService dataStorageService) {
+        this.dataStorageService = dataStorageService;
+    }
+
+    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(dataStorageService.toString());
+
+        return null;
+    }
+}
