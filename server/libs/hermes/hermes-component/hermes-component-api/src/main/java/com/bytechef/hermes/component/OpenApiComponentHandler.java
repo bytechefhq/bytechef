@@ -19,6 +19,7 @@ package com.bytechef.hermes.component;
 
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.DefinitionDSL;
 
 import java.util.List;
@@ -52,8 +53,18 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
         return connectionDefinition;
     }
 
+    default ComponentDSL.ModifiableAuthorization modifyAuthorization(
+        ComponentDSL.ModifiableAuthorization authorization) {
+
+        return authorization;
+    }
+
     default DefinitionDSL.ModifiableDisplay modifyDisplay(DefinitionDSL.ModifiableDisplay modifiableDisplay) {
         return modifiableDisplay;
+    }
+
+    default List<TriggerDefinition> getTriggers() {
+        return List.of();
     }
 
     default Object postExecute(ActionDefinition actionDefinition, Object result) {

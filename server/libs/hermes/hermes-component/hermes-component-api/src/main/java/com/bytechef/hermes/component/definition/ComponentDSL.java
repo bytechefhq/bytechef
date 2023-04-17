@@ -44,7 +44,7 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
  */
 public final class ComponentDSL extends DefinitionDSL {
 
-    public static final int VERSION_1 = 1;
+    private static final int VERSION_1 = 1;
 
     public static ModifiableActionDefinition action(String name) {
         return new ModifiableActionDefinition(name);
@@ -115,17 +115,21 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
+        private boolean batch;
         private String componentName;
         private Display display;
         private Object exampleOutput;
 
         @JsonIgnore
         private ExecuteFunction execute;
+        private ExampleOutputDataSource exampleOutputDataSource;
+
+        @JsonIgnore
+        private HelpFunction help;
         private Map<String, Object> metadata;
         private String name;
         private List<? extends Property<?>> outputSchema;
         private List<? extends Property<?>> properties;
-        private ExampleOutputDataSource exampleOutputDataSource;
         private OutputSchemaDataSource outputSchemaDataSource;
 
         private ModifiableActionDefinition() {
@@ -135,7 +139,13 @@ public final class ComponentDSL extends DefinitionDSL {
             this.name = Objects.requireNonNull(name);
         }
 
-        public ModifiableActionDefinition display(ModifiableDisplay display) {
+        public ModifiableActionDefinition batch(boolean batch) {
+            this.batch = batch;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition display(Display display) {
             this.display = display;
 
             return this;
@@ -155,6 +165,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableActionDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
             this.exampleOutputDataSource = exampleOutputDataSource;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition help(HelpFunction help) {
+            this.help = help;
 
             return this;
         }
@@ -218,8 +234,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         @SuppressFBWarnings("NP")
-        public Boolean getBatch() {
-            return null;
+        public boolean getBatch() {
+            return batch;
         }
 
         @Override
@@ -245,6 +261,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public ExampleOutputDataSource getExampleOutputDataSource() {
             return exampleOutputDataSource;
+        }
+
+        @Override
+        public Optional<HelpFunction> getHelp() {
+            return Optional.ofNullable(help);
         }
 
         @Override
@@ -315,21 +336,20 @@ public final class ComponentDSL extends DefinitionDSL {
             }
 
             HttpClientUtils.Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
-                .payload(
-                    HttpClientUtils.Payload.of(payload, HttpClientUtils.BodyContentType.FORM_URL_ENCODED))
+                .body(
+                    HttpClientUtils.Body.of(payload, HttpClientUtils.BodyContentType.FORM_URL_ENCODED))
                 .configuration(responseFormat(ResponseFormat.JSON))
                 .execute();
 
-            if (response.statusCode() != 200) {
+            if (response.getStatusCode() != 200) {
                 throw new ComponentExecutionException("Invalid claim");
             }
 
-            if (response.body() == null) {
+            if (response.getBody() == null) {
                 throw new ComponentExecutionException("Invalid claim");
             }
 
-            @SuppressWarnings("unchecked")
-            Map<String, Object> body = (Map<String, Object>) response.body();
+            Map<?, ?> body = (Map<?, ?>) response.getBody();
 
             return new AuthorizationCallbackResponse(
                 (String) body.get(Authorization.ACCESS_TOKEN),
@@ -465,7 +485,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableAuthorization display(ModifiableDisplay display) {
+        public ModifiableAuthorization display(Display display) {
             this.display = display;
 
             return this;
@@ -614,7 +634,7 @@ public final class ComponentDSL extends DefinitionDSL {
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
         private List<? extends ActionDefinition> actions;
-        private ConnectionDefinition connection;
+        private ModifiableConnectionDefinition connection;
         private Display display;
 
         @JsonIgnore
@@ -730,6 +750,17 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition triggers(List<TriggerDefinition> triggerDefinitions) {
+            if (triggerDefinitions != null) {
+                this.triggers = triggerDefinitions.stream()
+                    .map(
+                        triggerDefinition -> ((ModifiableTriggerDefinition) triggerDefinition).componentName(this.name))
+                    .toList();
+            }
+
+            return this;
+        }
+
         public ModifiableComponentDefinition version(int version) {
             this.version = version;
 
@@ -783,7 +814,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @SuppressWarnings("unchecked")
         @Override
-        public ConnectionDefinition getConnection() {
+        public ModifiableConnectionDefinition getConnection() {
             return connection;
         }
 
@@ -803,6 +834,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @SuppressFBWarnings("EI")
         public Resources getResources() {
             return resources;
         }
@@ -860,8 +892,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
-        private Boolean authorizationRequired;
-        private List<? extends Authorization> authorizations;
+        private boolean authorizationRequired;
+        private List<? extends ModifiableAuthorization> authorizations;
 
         @JsonIgnore
         private BaseUriFunction baseUri = (connectionParameters) -> connectionParameters.containsKey(BASE_URI)
@@ -880,7 +912,18 @@ public final class ComponentDSL extends DefinitionDSL {
         private ModifiableConnectionDefinition() {
         }
 
-        public ModifiableConnectionDefinition authorizationRequired(Boolean authorizationRequired) {
+        @SuppressWarnings("unchecked")
+        public <P extends Property<?>> ModifiableConnectionDefinition append(P property) {
+            if (this.properties == null) {
+                this.properties = new ArrayList<>();
+            }
+
+            ((List<Property<?>>) this.properties).add(property);
+
+            return this;
+        }
+
+        public ModifiableConnectionDefinition authorizationRequired(boolean authorizationRequired) {
             this.authorizationRequired = authorizationRequired;
 
             return this;
@@ -950,7 +993,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public boolean isAuthorizationRequired() {
-            return (authorizationRequired == null || authorizationRequired) && containsAuthorizations();
+            return authorizationRequired && containsAuthorizations();
         }
 
         @Override
@@ -959,7 +1002,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Authorization getAuthorization(String authorizationName) {
+        public ModifiableAuthorization getAuthorization(String authorizationName) {
             if (authorizations == null) {
                 throw new ComponentExecutionException("Authorization %s does not exist".formatted(authorizationName));
             }
@@ -972,7 +1015,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<? extends Authorization> getAuthorizations() {
+        public List<? extends ModifiableAuthorization> getAuthorizations() {
             return authorizations == null ? null : new ArrayList<>(authorizations);
         }
 
@@ -1004,10 +1047,11 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public List<? extends Property<?>> getProperties() {
-            return properties;
+            return properties == null ? null : new ArrayList<>(properties);
         }
 
         @Override
+        @SuppressFBWarnings("EI")
         public Resources getResources() {
             return resources;
         }
@@ -1056,9 +1100,9 @@ public final class ComponentDSL extends DefinitionDSL {
         private String databaseJdbcName;
         private String jdbcDriverClassName;
         private Display display;
+        private final String name;
         private Resources resources;
         private double version = VERSION_1;
-        private final String name;
 
         private ModifiableJdbcComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -1076,7 +1120,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableJdbcComponentDefinition display(ModifiableDisplay display) {
+        public ModifiableJdbcComponentDefinition display(Display display) {
             this.display = display;
 
             return this;
@@ -1110,6 +1154,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @SuppressFBWarnings("EI")
         public Resources getResources() {
             return resources;
         }
@@ -1141,31 +1186,48 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static class ModifiableTriggerDefinition implements TriggerDefinition {
 
+        private boolean batch;
         private String componentName;
+        private DeduplicateFunction deduplicate;
         private Display display;
+        private DynamicWebhookDisableConsumer dynamicWebhookDisable;
+        private DynamicWebhookEnableFunction dynamicWebhookEnable;
+        private DynamicWebhookRefreshFunction dynamicWebhookRefresh;
+        private DynamicWebhookRequestFunction dynamicWebhookRequest;
         private Object exampleOutput;
         private ExampleOutputDataSource exampleOutputDataSource;
-        private String name;
+        private boolean executeWorkflowSynchronously;
+        private HelpFunction help;
+        private ListenerEnableConsumer listenerEnable;
+        private ListenerDisableConsumer listenerDisable;
         private List<? extends Property<?>> outputSchema;
+        private String name;
         private OutputSchemaDataSource outputSchemaDataSource;
+        private PollFunction poll;
         private List<? extends Property<?>> properties;
         private Resources resources;
+        private StaticWebhookRequestFunction staticWebhookRequest;
         private TriggerType type;
-        private ManualEnableConsumer manualEnable;
-        private ManualDisableConsumer manualDisable;
-        private PollDisableConsumer pollDisable;
-        private PollEnableConsumer pollEnable;
-        private PollFunction poll;
-        private WebhookDisableConsumer webhookDisable;
-        private WebhookEnableFunction webhookEnable;
-        private WebhookRefreshFunction webhookRefresh;
-        private WebhookRequestFunction webhookRequest;
+        private boolean webhookBodyRaw;
+        private WebhookValidateFunction webhookValidate;
 
         private ModifiableTriggerDefinition() {
         }
 
         private ModifiableTriggerDefinition(String name) {
             this.name = Objects.requireNonNull(name);
+        }
+
+        public ModifiableTriggerDefinition batch(boolean batch) {
+            this.batch = batch;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition deduplicate(DeduplicateFunction deduplicate) {
+            this.deduplicate = deduplicate;
+
+            return this;
         }
 
         public ModifiableTriggerDefinition display(Display display) {
@@ -1182,6 +1244,54 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableTriggerDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
             this.exampleOutputDataSource = exampleOutputDataSource;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition executeWorkflowSynchronously(boolean executeWorkflowSynchronously) {
+            this.executeWorkflowSynchronously = executeWorkflowSynchronously;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition dynamicWebhookDisable(DynamicWebhookDisableConsumer dynamicWebhookDisable) {
+            this.dynamicWebhookDisable = dynamicWebhookDisable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition dynamicWebhookEnable(DynamicWebhookEnableFunction dynamicWebhookEnable) {
+            this.dynamicWebhookEnable = dynamicWebhookEnable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition dynamicWebhookRefresh(DynamicWebhookRefreshFunction webhookRefresh) {
+            this.dynamicWebhookRefresh = webhookRefresh;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition dynamicWebhookRequest(DynamicWebhookRequestFunction dynamicWebhookRequest) {
+            this.dynamicWebhookRequest = dynamicWebhookRequest;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition help(HelpFunction help) {
+            this.help = help;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition listenerEnable(ListenerEnableConsumer listenerEnable) {
+            this.listenerEnable = listenerEnable;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition listenerDisable(ListenerDisableConsumer listenerDisable) {
+            this.listenerDisable = listenerDisable;
 
             return this;
         }
@@ -1206,6 +1316,12 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableTriggerDefinition poll(PollFunction poll) {
+            this.poll = poll;
+
+            return this;
+        }
+
         public <P extends Property<?>> ModifiableTriggerDefinition properties(P... properties) {
             this.properties = List.of(properties);
 
@@ -1218,62 +1334,26 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableTriggerDefinition staticWebhookRequest(StaticWebhookRequestFunction staticWebhookRequest) {
+            this.staticWebhookRequest = staticWebhookRequest;
+
+            return this;
+        }
+
         public ModifiableTriggerDefinition type(TriggerType type) {
             this.type = type;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition manualEnable(ManualEnableConsumer manualEnable) {
-            this.manualEnable = manualEnable;
+        public ModifiableTriggerDefinition webhookBodyRaw(boolean webhookBodyRaw) {
+            this.webhookBodyRaw = webhookBodyRaw;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition manualDisable(ManualDisableConsumer manualDisable) {
-            this.manualDisable = manualDisable;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition pollDisable(PollDisableConsumer pollDisable) {
-            this.pollDisable = pollDisable;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition pollEnable(PollEnableConsumer pollEnable) {
-            this.pollEnable = pollEnable;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition poll(PollFunction poll) {
-            this.poll = poll;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition webhookDisable(WebhookDisableConsumer webhookDisable) {
-            this.webhookDisable = webhookDisable;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition webhookEnable(WebhookEnableFunction webhookEnable) {
-            this.webhookEnable = webhookEnable;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition webhookRefresh(WebhookRefreshFunction webhookRefresh) {
-            this.webhookRefresh = webhookRefresh;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition webhookRequest(WebhookRequestFunction webhookRequest) {
-            this.webhookRequest = webhookRequest;
+        public ModifiableTriggerDefinition webhookValidate(WebhookValidateFunction webhookValidate) {
+            this.webhookValidate = webhookValidate;
 
             return this;
         }
@@ -1299,9 +1379,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        @SuppressFBWarnings("NP")
-        public Boolean getBatch() {
-            return null;
+        public boolean isBatch() {
+            return batch;
+        }
+
+        @Override
+        public boolean isExecuteWorkflowSynchronously() {
+            return executeWorkflowSynchronously;
         }
 
         @Override
@@ -1316,6 +1400,31 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public Optional<DeduplicateFunction> getDeduplicate() {
+            return Optional.ofNullable(deduplicate);
+        }
+
+        @Override
+        public Optional<DynamicWebhookDisableConsumer> getDynamicWebhookDisable() {
+            return Optional.ofNullable(dynamicWebhookDisable);
+        }
+
+        @Override
+        public Optional<DynamicWebhookEnableFunction> getDynamicWebhookEnable() {
+            return Optional.ofNullable(dynamicWebhookEnable);
+        }
+
+        @Override
+        public Optional<DynamicWebhookRefreshFunction> getDynamicWebhookRefresh() {
+            return Optional.ofNullable(dynamicWebhookRefresh);
+        }
+
+        @Override
+        public Optional<DynamicWebhookRequestFunction> getDynamicWebhookRequest() {
+            return Optional.ofNullable(dynamicWebhookRequest);
+        }
+
+        @Override
         public Object getExampleOutput() {
             return exampleOutput;
         }
@@ -1323,6 +1432,21 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public ExampleOutputDataSource getExampleOutputDataSource() {
             return exampleOutputDataSource;
+        }
+
+        @Override
+        public Optional<HelpFunction> getHelp() {
+            return Optional.ofNullable(help);
+        }
+
+        @Override
+        public Optional<ListenerEnableConsumer> getListenerEnable() {
+            return Optional.ofNullable(listenerEnable);
+        }
+
+        @Override
+        public Optional<ListenerDisableConsumer> getListenerDisable() {
+            return Optional.ofNullable(listenerDisable);
         }
 
         @Override
@@ -1341,6 +1465,11 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public Optional<PollFunction> getPoll() {
+            return Optional.ofNullable(poll);
+        }
+
+        @Override
         public List<? extends Property<?>> getProperties() {
             return properties;
         }
@@ -1351,53 +1480,23 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public Optional<StaticWebhookRequestFunction> getStaticWebhookRequest() {
+            return Optional.ofNullable(staticWebhookRequest);
+        }
+
+        @Override
         public TriggerType getType() {
             return type;
         }
 
         @Override
-        public Optional<ManualEnableConsumer> getManualEnable() {
-            return Optional.ofNullable(manualEnable);
+        public boolean getWebhookBodyRaw() {
+            return webhookBodyRaw;
         }
 
         @Override
-        public Optional<ManualDisableConsumer> getManualDisable() {
-            return Optional.ofNullable(manualDisable);
-        }
-
-        @Override
-        public Optional<PollDisableConsumer> getPollDisable() {
-            return Optional.ofNullable(pollDisable);
-        }
-
-        @Override
-        public Optional<PollEnableConsumer> getPollEnable() {
-            return Optional.ofNullable(pollEnable);
-        }
-
-        @Override
-        public Optional<PollFunction> getPoll() {
-            return Optional.ofNullable(poll);
-        }
-
-        @Override
-        public Optional<WebhookDisableConsumer> getWebhookDisable() {
-            return Optional.ofNullable(webhookDisable);
-        }
-
-        @Override
-        public Optional<WebhookEnableFunction> getWebhookEnable() {
-            return Optional.ofNullable(webhookEnable);
-        }
-
-        @Override
-        public Optional<WebhookRefreshFunction> getWebhookRefresh() {
-            return Optional.ofNullable(webhookRefresh);
-        }
-
-        @Override
-        public Optional<WebhookRequestFunction> getWebhookRequest() {
-            return Optional.ofNullable(webhookRequest);
+        public Optional<WebhookValidateFunction> getWebhookValidate() {
+            return Optional.ofNullable(webhookValidate);
         }
 
         private ModifiableTriggerDefinition componentName(String componentName) {

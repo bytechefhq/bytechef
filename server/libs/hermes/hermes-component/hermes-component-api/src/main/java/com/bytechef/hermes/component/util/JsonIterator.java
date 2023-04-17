@@ -35,7 +35,7 @@ final class JsonIterator implements Iterator<Map<String, ?>> {
     private final JsonParser jsonParser;
     private final ObjectMapper objectMapper;
     private Map<String, ?> value;
-    private JsonToken lastJsonToken = null;
+    private JsonToken lastJsonToken;
 
     public JsonIterator(JsonParser jsonParser, ObjectMapper objectMapper) {
         this.jsonParser = jsonParser;

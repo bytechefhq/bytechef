@@ -15,35 +15,34 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-public sealed interface ExampleOutputDataSource permits ComponentDSL.ModifiableExampleOutputDataSource {
+public abstract class ListenerTriggerUtils {
+
+    static ListenerEmitter listenerEmitter;
 
     /**
-     * The function that returns an example output.
-     *
-     * @return The function implementation
+     * @param workflowInstanceId
+     * @param output
      */
-    ExampleOutputFunction getExampleOutput();
+    @SuppressFBWarnings("UWF")
+    public static void emit(String workflowInstanceId, Object output) {
+        listenerEmitter.emit(workflowInstanceId, output);
+    }
 
     /**
      *
      */
-    @FunctionalInterface
-    interface ExampleOutputFunction {
+    interface ListenerEmitter {
 
         /**
-         *
-         * @param connection
-         * @param inputParameters
-         * @return
+         * @param output
          */
-        Object apply(Context.Connection connection, InputParameters inputParameters);
+        void emit(String workflowInstanceId, Object output);
     }
 }
