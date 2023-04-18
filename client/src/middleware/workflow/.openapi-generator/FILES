@@ -13,6 +13,7 @@ models/PageModel.ts
 models/TaskExecutionModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts
+models/WorkflowConnectionModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
 models/WorkflowResponseModel.ts

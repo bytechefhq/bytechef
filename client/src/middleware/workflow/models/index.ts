@@ -10,6 +10,7 @@ export * from './PageModel';
 export * from './TaskExecutionModel';
 export * from './WebhookModel';
 export * from './WebhookRetryModel';
+export * from './WorkflowConnectionModel';
 export * from './WorkflowFormatModel';
 export * from './WorkflowModel';
 export * from './WorkflowResponseModel';
