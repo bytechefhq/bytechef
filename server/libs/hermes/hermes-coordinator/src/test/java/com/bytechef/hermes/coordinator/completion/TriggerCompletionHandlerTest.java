@@ -15,26 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.facade;
+package com.bytechef.hermes.coordinator.completion;
 
-import com.bytechef.atlas.domain.Workflow.Format;
-import com.bytechef.atlas.domain.Workflow.SourceType;
-import com.bytechef.hermes.workflow.WorkflowDTO;
-
-import java.util.List;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowFacade {
+public class TriggerCompletionHandlerTest {
 
-    WorkflowDTO create(String definition, Format format, SourceType sourceType);
-
-    WorkflowDTO getWorkflow(String id);
-
-    List<WorkflowDTO> getWorkflows();
-
-    List<WorkflowDTO> getWorkflows(List<String> workflowIds);
-
-    WorkflowDTO update(String id, String definition);
+    @Disabled
+    @Test
+    public void testHandle() {
+        // TODO
+    }
 }
