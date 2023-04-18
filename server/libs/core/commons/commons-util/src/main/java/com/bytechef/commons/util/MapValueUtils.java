@@ -84,11 +84,11 @@ public final class MapValueUtils {
     public static <T> T[] getArray(Map<String, Object> map, String key, Class<T> elementType) {
         Object value = get(map, key);
 
-        if (value.getClass()
-            .isArray()
-            && value.getClass()
-                .getComponentType()
-                .equals(elementType)) {
+        Class<?> valueClass = value.getClass();
+
+        Class<?> valueComponentType = valueClass.getComponentType();
+
+        if (valueClass.isArray() && valueComponentType.equals(elementType)) {
             return (T[]) value;
         }
 
