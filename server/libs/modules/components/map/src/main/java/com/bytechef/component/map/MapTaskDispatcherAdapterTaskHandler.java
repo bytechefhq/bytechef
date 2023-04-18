@@ -66,7 +66,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(TaskQueues.COMPLETIONS, message -> {
+        messageBroker.receive(TaskQueues.TASKS_COMPLETIONS, message -> {
             TaskExecution completionTaskExecution = (TaskExecution) message;
 
             result.add(completionTaskExecution.getOutput());
@@ -74,7 +74,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
 
-        messageBroker.receive(TaskQueues.ERRORS, message -> {
+        messageBroker.receive(TaskQueues.TASKS_ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();

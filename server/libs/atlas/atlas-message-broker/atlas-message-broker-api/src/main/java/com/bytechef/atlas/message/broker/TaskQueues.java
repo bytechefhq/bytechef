@@ -27,14 +27,14 @@ import java.util.UUID;
  */
 public final class TaskQueues {
 
-    public static final String COMPLETIONS = "completions";
-    public static final String CONTROL = "x.control." + UUID.randomUUID();
-    public static final String DLQ = "dlq";
-    public static final String ERRORS = "errors";
-    public static final String EVENTS = "events";
-    public static final String JOBS = "jobs";
-    public static final String RESTARTS = "restarts";
-    public static final String SUBFLOWS = "subflows";
-    public static final String STOPS = "stops";
     public static final String TASKS = "tasks";
+    public static final String TASKS_COMPLETIONS = "tasks.completions";
+    public static final String TASKS_CONTROL = "tasks.x.control." + UUID.randomUUID();
+    public static final String TASKS_DLQ = "tasks.dlq";
+    public static final String TASKS_ERRORS = "tasks.errors";
+    public static final String TASKS_EVENTS = "tasks.events";
+    public static final String TASKS_JOBS = "tasks.jobs";
+    public static final String TASKS_RESTARTS = "tasks.restarts";
+    public static final String TASKS_STOPS = "tasks.stops";
+    public static final String TASKS_SUBFLOWS = "tasks.subflows";
 }

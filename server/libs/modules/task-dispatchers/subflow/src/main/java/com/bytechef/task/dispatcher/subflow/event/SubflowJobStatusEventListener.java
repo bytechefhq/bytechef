@@ -81,7 +81,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     TaskExecution subflowTaskExecution = taskExecutionService.getTaskExecution(
                         job.getParentTaskExecutionId());
 
-                    messageBroker.send(TaskQueues.STOPS, subflowTaskExecution.getJobId());
+                    messageBroker.send(TaskQueues.TASKS_STOPS, subflowTaskExecution.getJobId());
 
                     break;
                 }
@@ -91,7 +91,7 @@ public class SubflowJobStatusEventListener implements EventListener {
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
-                    messageBroker.send(TaskQueues.ERRORS, erroredTaskExecution);
+                    messageBroker.send(TaskQueues.TASKS_ERRORS, erroredTaskExecution);
 
                     break;
                 }
@@ -109,7 +109,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                             completionTaskExecution, Map.of("execution", Map.of("output", output)));
                     }
 
-                    messageBroker.send(TaskQueues.COMPLETIONS, completionTaskExecution);
+                    messageBroker.send(TaskQueues.TASKS_COMPLETIONS, completionTaskExecution);
 
                     break;
                 }
