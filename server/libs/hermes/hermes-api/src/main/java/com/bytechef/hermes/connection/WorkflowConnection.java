@@ -20,5 +20,5 @@ package com.bytechef.hermes.connection;
 /**
  * @author Ivica Cardic
  */
-public record WorkflowConnection(String componentName, int connectionVersion, String name) {
+public record WorkflowConnection(String componentName, int connectionVersion, Long id) {
 }
