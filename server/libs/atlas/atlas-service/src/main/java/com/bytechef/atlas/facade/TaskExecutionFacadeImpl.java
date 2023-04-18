@@ -33,6 +33,7 @@ public class TaskExecutionFacadeImpl implements TaskExecutionFacade {
     private final ContextService contextService;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public TaskExecutionFacadeImpl(ContextService contextService, TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskExecutionService = taskExecutionService;

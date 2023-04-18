@@ -21,7 +21,9 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.hermes.workflow.WorkflowDTO;
 import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
+import com.bytechef.hermes.workflow.facade.WorkflowFacade;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
@@ -49,14 +51,17 @@ import java.util.Map;
 public class WorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;
+    private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
     private final WorkflowExecutor testWorkflowExecutor;
 
     @SuppressFBWarnings("EI2")
     public WorkflowController(
-        ConversionService conversionService, WorkflowService workflowService, WorkflowExecutor testWorkflowExecutor) {
+        ConversionService conversionService, WorkflowFacade workflowFacade, WorkflowService workflowService,
+        WorkflowExecutor testWorkflowExecutor) {
 
         this.conversionService = conversionService;
+        this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
         this.testWorkflowExecutor = testWorkflowExecutor;
     }
@@ -76,7 +81,7 @@ public class WorkflowController implements WorkflowsApi {
     public Mono<ResponseEntity<WorkflowModel>> getWorkflow(String id, ServerWebExchange exchange) {
         return Mono
             .just(
-                conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)
+                conversionService.convert(workflowFacade.getWorkflow(id), WorkflowModel.class)
                     .definition(null))
             .map(ResponseEntity::ok);
     }
@@ -86,9 +91,9 @@ public class WorkflowController implements WorkflowsApi {
     public Mono<ResponseEntity<Flux<WorkflowModel>>> getWorkflows(ServerWebExchange exchange) {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
-        for (Workflow workflow : workflowService.getWorkflows()) {
+        for (WorkflowDTO workflowDTO : workflowFacade.getWorkflows()) {
             workflowModels.add(
-                conversionService.convert(workflow, WorkflowModel.class)
+                conversionService.convert(workflowDTO, WorkflowModel.class)
                     .definition(null));
         }
 
@@ -128,7 +133,7 @@ public class WorkflowController implements WorkflowsApi {
         return workflowModelMono
             .map(
                 workflowModel -> conversionService.convert(
-                    workflowService.update(id, workflowModel.getDefinition()), WorkflowModel.class))
+                    workflowFacade.update(id, workflowModel.getDefinition()), WorkflowModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -137,7 +142,7 @@ public class WorkflowController implements WorkflowsApi {
         WorkflowModel.SourceTypeEnum sourceTypeEnum = workflowModel.getSourceType();
 
         return conversionService.convert(
-            workflowService.create(
+            workflowFacade.create(
                 workflowModel.getDefinition(),
                 Workflow.Format.valueOf(workflowFormatModel.name()),
                 Workflow.SourceType.valueOf(sourceTypeEnum.name())),

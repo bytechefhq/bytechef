@@ -35,6 +35,8 @@ import com.bytechef.helios.project.dto.ProjectExecutionDTO;
 import com.bytechef.atlas.dto.TaskExecutionDTO;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.workflow.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -80,7 +82,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public Workflow addWorkflow(long id, String label, String description, String definition) {
+    public WorkflowDTO addWorkflow(long id, String label, String description, String definition) {
         if (definition == null) {
             definition = "{\"description\": \"%s\", \"label\": \"%s\", \"tasks\": []}"
                 .formatted(description, label);
@@ -90,7 +92,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         projectService.addWorkflow(id, workflow.getId());
 
-        return workflow;
+        return new WorkflowDTO(WorkflowConnection.of(workflow), workflow);
     }
 
     @Override
@@ -193,10 +195,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Workflow> getProjectWorkflows(long id) {
+    public List<WorkflowDTO> getProjectWorkflows(long id) {
         Project project = projectService.getProject(id);
 
-        return workflowService.getWorkflows(project.getWorkflowIds());
+        return CollectionUtils.map(
+            workflowService.getWorkflows(project.getWorkflowIds()),
+            workflow -> new WorkflowDTO(WorkflowConnection.of(workflow), workflow));
     }
 
     @Override

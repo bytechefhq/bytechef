@@ -18,6 +18,8 @@
 package com.bytechef.atlas.config;
 
 import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.facade.TaskExecutionFacade;
+import com.bytechef.atlas.facade.TaskExecutionFacadeImpl;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
 import com.bytechef.atlas.message.broker.MessageBroker;
@@ -50,17 +52,17 @@ import java.util.List;
 public class WorkflowConfiguration {
 
     @Bean
-    public ContextService contextService(ContextRepository contextRepository) {
+    ContextService contextService(ContextRepository contextRepository) {
         return new ContextServiceImpl(contextRepository);
     }
 
     @Bean
-    public CounterService counterService(CounterRepository counterRepository) {
+    CounterService counterService(CounterRepository counterRepository) {
         return new CounterServiceImpl(counterRepository);
     }
 
     @Bean
-    public JobFactory jobFactory(
+    JobFactory jobFactory(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker) {
 
@@ -68,17 +70,22 @@ public class WorkflowConfiguration {
     }
 
     @Bean
-    public JobService jobService(JobRepository jobRepository, List<WorkflowRepository> workflowRepositories) {
+    JobService jobService(JobRepository jobRepository, List<WorkflowRepository> workflowRepositories) {
         return new JobServiceImpl(jobRepository, workflowRepositories);
     }
 
     @Bean
-    public TaskExecutionService taskExecutionService(TaskExecutionRepository taskExecutionRepository) {
+    TaskExecutionFacade taskExecutionFacade(ContextService contextService, TaskExecutionService taskExecutionService) {
+        return new TaskExecutionFacadeImpl(contextService, taskExecutionService);
+    }
+
+    @Bean
+    TaskExecutionService taskExecutionService(TaskExecutionRepository taskExecutionRepository) {
         return new TaskExecutionServiceImpl(taskExecutionRepository);
     }
 
     @Bean
-    public WorkflowService workflowService(
+    WorkflowService workflowService(
         CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
 
