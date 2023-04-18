@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.project.dto;
+package com.bytechef.atlas.dto;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
@@ -33,9 +33,9 @@ import java.util.Map;
 public record TaskExecutionDTO(
     String createdBy, LocalDateTime createdDate, LocalDateTime endDate, ExecutionError error, long executionTime,
     Long id, Map<String, Object> input, Long jobId, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    int maxRetries,
-    Object output, Long parentId, int priority, int progress, int retryAttempts, String retryDelay,
-    int retryDelayFactor, LocalDateTime startDate, TaskStatus status, int taskNumber, WorkflowTask workflowTask) {
+    int maxRetries, Object output, Long parentId, int priority, int progress, int retryAttempts, String retryDelay,
+    int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate, TaskStatus status, int taskNumber,
+    String type, WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(Map<String, Object> input, TaskExecution taskExecution) {
         this(
@@ -44,7 +44,8 @@ public record TaskExecutionDTO(
             taskExecution.getJobId(), taskExecution.getLastModifiedBy(), taskExecution.getLastModifiedDate(),
             taskExecution.getMaxRetries(), taskExecution.getOutput(), taskExecution.getParentId(),
             taskExecution.getPriority(), taskExecution.getProgress(), taskExecution.getRetryAttempts(),
-            taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(), taskExecution.getStartDate(),
-            taskExecution.getStatus(), taskExecution.getTaskNumber(), taskExecution.getWorkflowTask());
+            taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(), taskExecution.getRetryDelayMillis(),
+            taskExecution.getStartDate(), taskExecution.getStatus(), taskExecution.getTaskNumber(),
+            taskExecution.getType(), taskExecution.getWorkflowTask());
     }
 }
