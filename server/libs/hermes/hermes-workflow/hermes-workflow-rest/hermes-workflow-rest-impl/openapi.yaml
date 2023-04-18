@@ -656,6 +656,10 @@ components:
       description: "The blueprint that describe the execution of a job."
       type: "object"
       properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
         createdBy:
           description: "The created by."
           type: "string"
@@ -724,6 +728,16 @@ components:
             $ref: "#/components/schemas/WorkflowTask"
           readOnly: true
         __version:
+          type: "integer"
+    WorkflowConnection:
+      type: "object"
+      required:
+      - "componentName"
+      - "connectionVersion"
+      properties:
+        componentName:
+          type: "string"
+        connectionVersion:
           type: "integer"
     WorkflowFormat:
       type: "string"
