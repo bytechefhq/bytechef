@@ -139,6 +139,10 @@ public final class Context implements Persistable<Long> {
         return getClass().hashCode();
     }
 
+    public Classname getClassname() {
+        return Classname.valueOf(classnameId);
+    }
+
     public Integer getClassnameId() {
         return classnameId;
     }

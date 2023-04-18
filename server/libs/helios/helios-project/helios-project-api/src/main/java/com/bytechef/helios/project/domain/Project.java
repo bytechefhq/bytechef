@@ -47,7 +47,25 @@ import org.springframework.util.CollectionUtils;
 public final class Project implements Persistable<Long> {
 
     public enum Status {
-        PUBLISHED, UNPUBLISHED
+        PUBLISHED(1), UNPUBLISHED(0);
+
+        private final int id;
+
+        Status(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Status valueOf(int id) {
+            return switch (id) {
+                case 0 -> Status.UNPUBLISHED;
+                case 1 -> Status.PUBLISHED;
+                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+            };
+        }
     }
 
     @Column("category_id")
@@ -91,7 +109,7 @@ public final class Project implements Persistable<Long> {
     private LocalDateTime publishedDate;
 
     @Column
-    private Status status;
+    private int status;
 
     @Version
     private int version;
@@ -113,7 +131,7 @@ public final class Project implements Persistable<Long> {
         this.projectVersion = projectVersion;
         this.projectWorkflows.addAll(projectWorkflows);
         this.publishedDate = publishedDate;
-        this.status = status;
+        this.status = status.getId();
         this.version = version;
     }
 
@@ -187,7 +205,7 @@ public final class Project implements Persistable<Long> {
     }
 
     public Status getStatus() {
-        return status;
+        return Status.valueOf(status);
     }
 
     public List<Long> getTagIds() {
@@ -251,7 +269,7 @@ public final class Project implements Persistable<Long> {
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.status = status.getId();
     }
 
     public void setTagIds(List<Long> tagIds) {

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS context (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     stack_id                 BIGINT       NOT NULL,
-    sub_stack_id             BIGINT       NULL,
+    sub_stack_id             BIGINT           NULL,
     classname_id             INT          NOT NULL,
     value                    TEXT         NOT NULL,
     created_date             TIMESTAMP    NOT NULL,
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS counter (
 CREATE TABLE IF NOT EXISTS job (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     workflow_id              VARCHAR(256) NOT NULL,
-    parent_task_execution_id BIGINT       NULL,
-    status                   VARCHAR(256) NOT NULL,
+    parent_task_execution_id BIGINT           NULL,
+    status                   INT          NOT NULL,
     label                    VARCHAR(256)     NULL,
     current_task             INT          NOT NULL,
     start_date               TIMESTAMP        NULL,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS job (
 CREATE TABLE IF NOT EXISTS task_execution (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     job_id                   BIGSERIAL    NOT NULL,
-    parent_id                BIGINT       NULL,
+    parent_id                BIGINT           NULL,
     status                   VARCHAR(256) NOT NULL,
     progress                 INT not          NULL,
     priority                 INT          NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS task_execution (
 CREATE TABLE IF NOT EXISTS workflow (
     id					     VARCHAR(256) NOT NULL PRIMARY KEY,
     definition    			 TEXT         NOT NULL,
-    format     			     VARCHAR(256) NOT NULL,
+    format     			     INT          NOT NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               VARCHAR(256) NOT NULL,
     last_modified_date       TIMESTAMP    NOT NULL,
