@@ -11,6 +11,7 @@ src/main/java/com/bytechef/hermes/workflow/web/rest/model/OutputModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/TaskExecutionModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/WebhookModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/WebhookRetryModel.java
+src/main/java/com/bytechef/hermes/workflow/web/rest/model/WorkflowConnectionModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/WorkflowFormatModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/WorkflowModel.java
 src/main/java/com/bytechef/hermes/workflow/web/rest/model/WorkflowResponseModel.java
