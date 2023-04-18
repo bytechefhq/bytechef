@@ -17,8 +17,22 @@
 
 package com.bytechef.hermes.connection;
 
+import com.bytechef.atlas.domain.Workflow;
+
+import java.util.List;
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
 public record WorkflowConnection(String componentName, int connectionVersion, Long id) {
+
+    public static List<WorkflowConnection> of(Workflow workflow) {
+        return workflow.getTasks()
+            .stream()
+            .map(workflowTask -> workflowTask.fetchExtension(WorkflowConnection.class))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toList();
+    }
 }

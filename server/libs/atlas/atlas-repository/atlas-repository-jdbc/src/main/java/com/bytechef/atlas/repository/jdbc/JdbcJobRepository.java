@@ -36,15 +36,15 @@ public interface JdbcJobRepository
     extends ListPagingAndSortingRepository<Job, Long>, JobRepository, CustomJobRepository {
 
     @Override
-    @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_date >= current_date-1 AND end_date < current_date")
+    @Query("SELECT COUNT(*) FROM job WHERE status=3 AND end_date >= current_date-1 AND end_date < current_date")
     int countCompletedJobsYesterday();
 
     @Override
-    @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_date >= current_date")
+    @Query("SELECT COUNT(*) FROM job WHERE status=3 AND end_date >= current_date")
     int countCompletedJobsToday();
 
     @Override
-    @Query("SELECT count(*) FROM job WHERE status='STARTED'")
+    @Query("SELECT count(*) FROM job WHERE status=2")
     int countRunningJobs();
 
     @Override

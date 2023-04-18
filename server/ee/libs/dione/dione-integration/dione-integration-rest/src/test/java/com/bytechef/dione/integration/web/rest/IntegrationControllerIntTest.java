@@ -33,6 +33,7 @@ import com.bytechef.dione.integration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.integration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.hermes.workflow.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,6 +48,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +119,8 @@ public class IntegrationControllerIntTest {
         try {
             Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of());
 
-            when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(List.of(workflow));
+            when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(
+                List.of(new WorkflowDTO(Collections.emptyList(), workflow)));
 
             this.webTestClient
                 .get()
@@ -239,10 +242,10 @@ public class IntegrationControllerIntTest {
                 .description("workflowDescription");
         Workflow workflow = new Workflow(
             "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
-            Workflow.Format.JSON);
+            Workflow.Format.JSON.getId());
 
         when(integrationFacade.addWorkflow(anyLong(), any(), any(), any()))
-            .thenReturn(workflow);
+            .thenReturn(new WorkflowDTO(Collections.emptyList(), workflow));
 
         try {
             this.webTestClient

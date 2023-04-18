@@ -21,13 +21,12 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.domain.Workflow.Format;
 import com.bytechef.atlas.domain.Workflow.SourceType;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.connection.WorkflowConnection;
-import com.bytechef.hermes.workflow.dto.WorkflowDTO;
+import com.bytechef.hermes.workflow.WorkflowDTO;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +37,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
 
     private final WorkflowService workflowService;
 
+    @SuppressFBWarnings("EI")
     public WorkflowFacadeImpl(WorkflowService workflowService) {
         this.workflowService = workflowService;
     }
@@ -46,46 +46,34 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     public WorkflowDTO create(String definition, Format format, SourceType sourceType) {
         Workflow workflow = workflowService.create(definition, format, sourceType);
 
-        return new WorkflowDTO(getConnections(workflow), workflow);
+        return new WorkflowDTO(WorkflowConnection.of(workflow), workflow);
     }
 
     @Override
     public WorkflowDTO getWorkflow(String id) {
         Workflow workflow = workflowService.getWorkflow(id);
 
-        return new WorkflowDTO(getConnections(workflow), workflow);
+        return new WorkflowDTO(WorkflowConnection.of(workflow), workflow);
     }
 
     @Override
     public List<WorkflowDTO> getWorkflows() {
         return CollectionUtils.map(
             workflowService.getWorkflows(),
-            workflow -> new WorkflowDTO(getConnections(workflow), workflow));
+            workflow -> new WorkflowDTO(WorkflowConnection.of(workflow), workflow));
     }
 
     @Override
     public WorkflowDTO update(String id, String definition) {
         Workflow workflow = workflowService.update(id, definition);
 
-        return new WorkflowDTO(getConnections(workflow), workflow);
+        return new WorkflowDTO(WorkflowConnection.of(workflow), workflow);
     }
 
     @Override
     public List<WorkflowDTO> getWorkflows(List<String> workflowIds) {
         return CollectionUtils.map(
             workflowService.getWorkflows(),
-            workflow -> new WorkflowDTO(getConnections(workflow), workflow));
-    }
-
-    private List<WorkflowConnection> getConnections(Workflow workflow) {
-        List<WorkflowConnection> connections = new ArrayList<>();
-
-        for (WorkflowTask workflowTask : workflow.getTasks()) {
-            workflowTask
-                .fetchExtension(WorkflowConnection.class)
-                .ifPresent(connections::add);
-        }
-
-        return connections;
+            workflow -> new WorkflowDTO(WorkflowConnection.of(workflow), workflow));
     }
 }
