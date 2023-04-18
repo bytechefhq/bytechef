@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.test.config;
+package com.bytechef.hermes.workflow.config;
 
 import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
@@ -45,7 +45,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
-import com.bytechef.hermes.workflow.test.executor.WorkflowExecutor;
+import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.workflow.test.executor.TestWorkflowExecutor;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
@@ -105,6 +105,7 @@ public class TestWorkflowExecutorConfiguration {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         return new TestWorkflowExecutor(
+            contextService,
             JobSyncExecutor.builder()
                 .contextService(contextService)
                 .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))

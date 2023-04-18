@@ -15,24 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.web.rest.mapper;
+package com.bytechef.hermes.workflow.facade;
 
-import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.domain.Workflow.Format;
+import com.bytechef.atlas.domain.Workflow.SourceType;
 import com.bytechef.hermes.workflow.dto.WorkflowDTO;
-import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
-import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
-import com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowMapperSpringConfig.class)
-public interface WorkflowMapper extends Converter<WorkflowDTO, WorkflowModel> {
+public interface WorkflowFacade {
 
-    @Override
-    WorkflowModel convert(WorkflowDTO workflowDTO);
+    WorkflowDTO create(String definition, Format format, SourceType sourceType);
 
-    WorkflowTaskModel map(WorkflowTask workflowTask);
+    WorkflowDTO getWorkflow(String id);
+
+    List<WorkflowDTO> getWorkflows();
+
+    WorkflowDTO update(String id, String definition);
+
+    List<WorkflowDTO> getWorkflows(List<String> workflowIds);
 }

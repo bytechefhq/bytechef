@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.test.executor;
+package com.bytechef.hermes.workflow.executor;
 
-import com.bytechef.hermes.workflow.test.dto.WorkflowResponse;
+import com.bytechef.hermes.workflow.dto.WorkflowResponse;
 
 import java.util.Map;
 
