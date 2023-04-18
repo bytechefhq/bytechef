@@ -114,12 +114,12 @@ public final class CollectionUtils {
             .toList();
     }
 
-    public static <T, U> List<? extends U> filter(
+    public static <T, U> List<U> filter(
         List<T> list, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
 
         return list.stream()
             .filter(filter)
-            .map(mapper)
+            .map(item -> (U) mapper.apply(item))
             .toList();
     }
 

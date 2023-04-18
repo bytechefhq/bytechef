@@ -18,7 +18,6 @@
 package com.bytechef.helios.project.dto;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
@@ -31,6 +30,6 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectExecutionDTO(
-    long id, ProjectInstance instance, Job job, Project project, List<TaskExecution> taskExecutions,
+    long id, ProjectInstance instance, Job job, Project project, List<TaskExecutionDTO> taskExecutions,
     Workflow workflow) {
 }

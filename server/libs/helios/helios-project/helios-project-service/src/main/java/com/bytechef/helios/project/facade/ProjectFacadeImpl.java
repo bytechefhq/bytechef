@@ -17,9 +17,11 @@
 
 package com.bytechef.helios.project.facade;
 
+import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
@@ -30,6 +32,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.dto.ProjectExecutionDTO;
+import com.bytechef.helios.project.dto.TaskExecutionDTO;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
@@ -52,6 +55,7 @@ import java.util.Objects;
 public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
+    private final ContextService contextService;
     private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
@@ -61,11 +65,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
-        ProjectService projectService, TaskExecutionService taskExecutionService, TagService tagService,
-        WorkflowService workflowService) {
+        CategoryService categoryService, ContextService contextService, JobService jobService,
+        ProjectInstanceService projectInstanceService, ProjectService projectService,
+        TaskExecutionService taskExecutionService, TagService tagService, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
+        this.contextService = contextService;
         this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
@@ -195,20 +200,26 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     @Transactional(readOnly = true)
+    @SuppressFBWarnings("NP")
     public ProjectExecutionDTO getProjectExecution(long id) {
         Job job = jobService.getJob(id);
 
-        Project project = OptionalUtils.orElse(projectService.fetchJobProject(id), null);
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(job.getId());
-        Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        return new ProjectExecutionDTO(job.getId(), null, job, project, taskExecutions, workflow);
+        return new ProjectExecutionDTO(
+            job.getId(),
+            OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null),
+            job,
+            OptionalUtils.orElse(projectService.fetchJobProject(id), null),
+            CollectionUtils.map(taskExecutions, taskExecution -> new TaskExecutionDTO(
+                contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION), taskExecution)),
+            workflowService.getWorkflow(job.getWorkflowId()));
     }
 
     @Override
     @Transactional(readOnly = true)
+    @SuppressFBWarnings("NP")
     public Page<ProjectExecutionDTO> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
@@ -245,7 +256,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
             CollectionUtils.getFirst(
                 projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
             CollectionUtils.filter(
-                taskExecutions, taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId())),
+                taskExecutions,
+                taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId()),
+                taskExecution -> new TaskExecutionDTO(
+                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION), taskExecution)),
             CollectionUtils.getFirst(
                 workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()))));
     }
