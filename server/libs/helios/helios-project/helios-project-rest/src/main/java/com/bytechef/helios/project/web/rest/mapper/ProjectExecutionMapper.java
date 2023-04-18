@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.project.web.rest.mapper;
 
+import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.helios.project.dto.ProjectExecutionDTO;
 import com.bytechef.helios.project.web.rest.mapper.config.ProjectMapperSpringConfig;
 import com.bytechef.helios.project.domain.Project;
@@ -24,6 +25,7 @@ import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.helios.project.web.rest.model.ProjectExecutionModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -46,4 +48,7 @@ public interface ProjectExecutionMapper extends Converter<ProjectExecutionDTO, P
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "tags", ignore = true)
     ProjectModel map(Project project);
+
+    @Mapping(target = "connections", ignore = true)
+    WorkflowModel map(Workflow workflow);
 }

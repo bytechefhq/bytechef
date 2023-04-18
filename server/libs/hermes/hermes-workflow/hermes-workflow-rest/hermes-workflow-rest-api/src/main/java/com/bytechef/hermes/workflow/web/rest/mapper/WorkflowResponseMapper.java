@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
-import com.bytechef.hermes.workflow.test.dto.WorkflowResponse;
+import com.bytechef.hermes.workflow.dto.WorkflowResponse;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowResponseModel;
 import org.mapstruct.Mapper;

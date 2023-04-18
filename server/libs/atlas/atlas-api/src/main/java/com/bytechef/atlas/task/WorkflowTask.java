@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
@@ -144,7 +145,7 @@ public class WorkflowTask implements Serializable {
         return Collections.unmodifiableList(finalize);
     }
 
-    public <T> T getExtension(Class<T> extensionClass) {
+    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
         // TODO
 
         return null;

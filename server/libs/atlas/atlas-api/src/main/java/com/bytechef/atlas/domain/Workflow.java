@@ -100,9 +100,6 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         CLASSPATH, FILESYSTEM, GIT, JDBC
     }
 
-    @Column
-    private String definition;
-
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -110,6 +107,9 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     @Column("created_date")
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @Column
+    private String definition;
 
     @Transient
     private String description;
@@ -240,20 +240,20 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return getClass().hashCode();
     }
 
-    public String getDefinition() {
-        return definition;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
     public String getCreatedBy() {
         return createdBy;
     }
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override
