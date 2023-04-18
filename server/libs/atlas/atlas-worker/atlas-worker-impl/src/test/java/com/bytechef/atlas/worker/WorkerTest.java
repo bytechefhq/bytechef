@@ -44,9 +44,9 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            TaskQueues.COMPLETIONS,
+            TaskQueues.TASKS_COMPLETIONS,
             t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(TaskQueues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(jt -> t -> "done")
@@ -68,10 +68,10 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            TaskQueues.ERRORS,
+            TaskQueues.TASKS_ERRORS,
             t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
                 .getMessage()));
-        messageBroker.receive(TaskQueues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(jt -> t -> {
@@ -94,13 +94,13 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            TaskQueues.COMPLETIONS, t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(TaskQueues.ERRORS, t -> {
+            TaskQueues.TASKS_COMPLETIONS, t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
+        messageBroker.receive(TaskQueues.TASKS_ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
-        messageBroker.receive(TaskQueues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(t1 -> {
@@ -136,10 +136,10 @@ public class WorkerTest {
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(TaskQueues.COMPLETIONS, t -> {
+        messageBroker.receive(TaskQueues.TASKS_COMPLETIONS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(TaskQueues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(t1 -> {
@@ -182,10 +182,10 @@ public class WorkerTest {
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(TaskQueues.ERRORS, t -> {
+        messageBroker.receive(TaskQueues.TASKS_ERRORS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(TaskQueues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
         Worker worker = Worker.builder()
             .taskHandlerResolver(t1 -> {
                 String type = t1.getType();

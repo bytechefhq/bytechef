@@ -45,7 +45,7 @@ public class ListenerTriggerUtilsConfiguration implements InitializingBean {
             TriggerExecution triggerExecution = new TriggerExecution(
                 WorkflowExecutionId.parse(workflowExecutionId), output);
 
-            messageBroker.send(TaskQueues.COMPLETIONS, triggerExecution);
+            messageBroker.send(TaskQueues.TASKS_COMPLETIONS, triggerExecution);
         };
     }
 }

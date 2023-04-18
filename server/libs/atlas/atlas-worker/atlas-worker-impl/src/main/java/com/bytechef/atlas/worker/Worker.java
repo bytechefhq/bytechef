@@ -107,7 +107,7 @@ public class Worker {
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                messageBroker.send(TaskQueues.COMPLETIONS, completedTaskExecution);
+                messageBroker.send(TaskQueues.TASKS_COMPLETIONS, completedTaskExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -240,7 +240,7 @@ public class Worker {
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         taskExecution.setStatus(TaskStatus.FAILED);
 
-        messageBroker.send(TaskQueues.ERRORS, taskExecution);
+        messageBroker.send(TaskQueues.TASKS_ERRORS, taskExecution);
     }
 
     private long calculateTimeout(TaskExecution taskExecution) {

@@ -117,14 +117,14 @@ public class JobController implements JobsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> restartJob(Long id, ServerWebExchange exchange) {
-        messageBroker.send(TaskQueues.RESTARTS, id);
+        messageBroker.send(TaskQueues.TASKS_RESTARTS, id);
 
         return Mono.empty();
     }
 
     @Override
     public Mono<ResponseEntity<Void>> stopJob(Long id, ServerWebExchange exchange) {
-        messageBroker.send(TaskQueues.STOPS, id);
+        messageBroker.send(TaskQueues.TASKS_STOPS, id);
 
         return Mono.empty();
     }
