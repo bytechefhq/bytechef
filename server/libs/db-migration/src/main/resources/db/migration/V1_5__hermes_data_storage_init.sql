@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS data_storage (
     instance_id              BIGINT       NULL,
     job_id                   BIGINT       NULL,
     key                      VARCHAR(256) NOT NULL,
-    scope                    VARCHAR(256) NOT NULL,
+    scope                    INT          NOT NULL,
     value                    TEXT         NOT NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               VARCHAR(256) NOT NULL,
