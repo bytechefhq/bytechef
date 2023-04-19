@@ -61,16 +61,15 @@ const NodeDetailsDialog = () => {
     const firstAction =
         currentComponent?.actions && currentComponent?.actions[0];
 
-    const {data: currentAction, refetch: refetchCurrentAction} =
-        useGetActionDefinitionQuery(
-            {
-                componentName: currentComponent?.name as string,
-                componentVersion: currentComponent?.version as number,
-                actionName: currentActionName || (firstAction?.name as string),
-            },
-            currentActionName,
-            !!currentComponent
-        );
+    const {data: currentAction} = useGetActionDefinitionQuery(
+        {
+            componentName: currentComponent?.name as string,
+            componentVersion: currentComponent?.version as number,
+            actionName: currentActionName || (firstAction?.name as string),
+        },
+        currentActionName,
+        !!currentComponent
+    );
 
     return (
         <Dialog.Root
@@ -127,8 +126,6 @@ const NodeDetailsDialog = () => {
                                                     Action
                                                 </span>
 
-
-                                                refetchCurrentAction();
                                                 <div className="overflow-hidden rounded-md bg-gray-100 py-2">
                                                     <span className="inline-flex px-4 text-sm font-medium">
                                                         {
