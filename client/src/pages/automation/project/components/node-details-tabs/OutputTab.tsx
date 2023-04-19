@@ -57,8 +57,8 @@ const SchemaProperties = ({properties}: {properties: any}) => {
 
 const OutputTab = ({action}: {action: ActionDefinitionModel}) => {
     return (
-        <div className="max-h-full flex-[1_1_1px] overflow-scroll">
             {action.outputSchema?.map((schema: any) =>
+        <div className="max-h-full flex-[1_1_1px] overflow-auto">
                 schema.properties ? (
                     <SchemaProperties
                         key={schema.name}
