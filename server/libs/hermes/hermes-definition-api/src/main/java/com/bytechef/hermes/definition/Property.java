@@ -57,10 +57,11 @@ import java.util.Map;
     @JsonSubTypes.Type(value = Property.DateTimeProperty.class, name = "DYNAMIC_PROPERTIES"),
     @JsonSubTypes.Type(value = Property.IntegerProperty.class, name = "INTEGER"),
     @JsonSubTypes.Type(value = Property.NumberProperty.class, name = "NUMBER"),
-    @JsonSubTypes.Type(value = Property.NumberProperty.class, name = "NULL"),
+    @JsonSubTypes.Type(value = Property.NullProperty.class, name = "NULL"),
     @JsonSubTypes.Type(value = Property.ObjectProperty.class, name = "OBJECT"),
     @JsonSubTypes.Type(value = Property.OneOfProperty.class, name = "ONE_OF"),
-    @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
+    @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING"),
+    @JsonSubTypes.Type(value = Property.TimeProperty.class, name = "TIME"),
 })
 // CHECKSTYLE:OFF
 public sealed interface Property<P extends Property<P>>
