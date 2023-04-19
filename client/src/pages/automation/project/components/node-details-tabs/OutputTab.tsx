@@ -61,7 +61,7 @@ const OutputTab = ({action}: {action: ActionDefinitionModel}) => {
         <div className="max-h-full flex-[1_1_1px] overflow-auto">
                 schema.properties ? (
                     <SchemaProperties
-                        key={schema.name}
+                        key={schema.name + '_' + index}
                         properties={schema.properties}
                     />
                 ) : (
