@@ -7,6 +7,7 @@ interface Node {
     version: number;
     type: 'component' | 'flowControl';
     icon?: ReactNode;
+    originNodeName?: string;
     label?: string;
 }
 
