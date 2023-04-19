@@ -17,14 +17,10 @@
 
 package com.bytechef.rest.error.vm;
 
-import java.io.Serializable;
-
 /**
  * @author Ivica Cardic
  */
-public class FieldErrorVM implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class FieldErrorVM {
 
     private final String objectName;
 

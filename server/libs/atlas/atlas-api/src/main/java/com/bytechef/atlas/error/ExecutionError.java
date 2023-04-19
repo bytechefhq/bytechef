@@ -19,7 +19,6 @@
 
 package com.bytechef.atlas.error;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ import java.util.List;
  * @author Ivica Cardic
  * @since Apr 10, 2017
  */
-public class ExecutionError implements Serializable {
+public class ExecutionError {
 
     private String message;
     private List<String> stackTrace;
