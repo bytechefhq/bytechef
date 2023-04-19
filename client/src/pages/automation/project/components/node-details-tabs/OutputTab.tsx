@@ -82,7 +82,7 @@ const SchemaProperties = ({properties}: {properties: Property[]}) => {
                             !!property.properties.length && (
                                 <div
                                     key={property.name}
-                                    className="mb-4 ml-4 flex flex-col border-l-2 border-gray-300"
+                                    className="ml-4 flex flex-col border-l border-gray-200 pl-1"
                                 >
                                     <SchemaProperties
                                         properties={property.properties}
