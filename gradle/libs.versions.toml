@@ -1,11 +1,11 @@
 [versions]
 ch-qos-logback = "1.4.6"
 checkstyle = "10.6.0"
-com-fasterxml-jackson-core = "2.14.2"
-com-fasterxml-jackson-dataformat = "2.14.2"
-com-github-kagkarlsson = "11.7"
+com-fasterxml-jackson-core = "2.15.0-rc3"
+com-fasterxml-jackson-dataformat = "2.15.0-rc3"
+com-github-kagkarlsson = "12.0.0"
 com-google-auto-service = "1.0.1"
-info-picocli = "4.7.2"
+info-picocli = "4.7.3"
 org-mapstruct = "1.5.4.Final"
 org-mapstruct-extensions-spring = "1.0.0"
 org-springframework-boot = "3.0.5"
@@ -23,7 +23,7 @@ com-fasterxml-jackson-core-jackson-databind = { module = "com.fasterxml.jackson.
 com-fasterxml-jackson-dataformat-jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "com-fasterxml-jackson-dataformat" }
 com-fasterxml-jackson-dataformat-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "com-fasterxml-jackson-dataformat" }
 com-fasterxml-jackson-dataformat-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "com-fasterxml-jackson-dataformat" }
-com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
+com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0-rc3"
 com-github-kagkarlsson-db-scheduler = { module = "com.github.kagkarlsson:db-scheduler", version.ref = "com-github-kagkarlsson" }
 com-github-kagkarlsson-db-scheduler-spring-boot-starter = { module = "com.github.kagkarlsson:db-scheduler-spring-boot-starter", version.ref = "com-github-kagkarlsson" }
 com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.4"
@@ -44,14 +44,14 @@ io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.1
 jakarta-annotation-jakarta-annotation-api = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 jakarta-jms-jakarta-jms-api = "jakarta.jms:jakarta.jms-api:3.1.0"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
-mysql-mysql-connector-java = "mysql:mysql-connector-java:8.0.32"
+mysql-mysql-connector-java = "mysql:mysql-connector-java:8.0.33"
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.28.0"
 org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.17.1"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
 org-apache-tika-tika-core = "org.apache.tika:tika-core:2.7.0"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.5.0.202303070854-r"
 org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.16.3"
-org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:22.3.1"
+org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:22.3.2"
 org-json = "org.json:json:20230227"
 org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.2"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
@@ -82,7 +82,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.47"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.48"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.18.0"
