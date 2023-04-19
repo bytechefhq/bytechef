@@ -48,10 +48,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     componentVersion == componentDefinition.getVersion())
                 .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
                 .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
-                .map(actionDefinition -> (ActionDefinition) actionDefinition)
                 .findFirst()
                 .map(this::toActionDefinitionDTO)
-                .orElseThrow(IllegalArgumentException::new));
+                .orElseThrow(
+                    () -> new IllegalArgumentException(
+                        "The component '%s' does not contain the '%s' action.".formatted(componentName, actionName))));
     }
 
     @Override
@@ -62,7 +63,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
                 .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
-                .map(actionDefinition -> (ActionDefinition) actionDefinition)
                 .map(this::toActionDefinitionDTO)
                 .toList());
     }
