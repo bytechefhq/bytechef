@@ -1,8 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference types="vite-plugin-svgr/client" />
 
 import {
-import {ActionDefinitionModel} from 'middleware/definition-registry';
+    ActionDefinitionModel,
+    ArrayPropertyModel,
+    BooleanPropertyModel,
+    DatePropertyModel,
+    DateTimePropertyModel,
+    DynamicPropertiesPropertyModel,
+    IntegerPropertyModel,
+    NullPropertyModel,
+    NumberPropertyModel,
+    ObjectPropertyModel,
+    OneOfPropertyModel,
+    StringPropertyModel,
+    TimePropertyModel,
+} from 'middleware/definition-registry';
 
 import {ReactComponent as ArrayIcon} from '../../../../../assets/array.svg';
 import {ReactComponent as BooleanIcon} from '../../../../../assets/boolean.svg';
@@ -32,10 +44,23 @@ const TYPE_ICONS = {
     TIME: <TimeIcon className="h-5 w-5 text-gray-600" />,
 };
 
-const SchemaProperties = ({properties}: {properties: any}) => {
+type Property = ArrayPropertyModel &
+    BooleanPropertyModel &
+    DatePropertyModel &
+    DateTimePropertyModel &
+    DynamicPropertiesPropertyModel &
+    IntegerPropertyModel &
+    NumberPropertyModel &
+    NullPropertyModel &
+    ObjectPropertyModel &
+    OneOfPropertyModel &
+    StringPropertyModel &
+    TimePropertyModel;
+
+const SchemaProperties = ({properties}: {properties: Property[]}) => {
     return (
         <ul className="h-full">
-            {properties.map((property: any, index: number) => {
+            {properties.map((property: Property, index: number) => {
                 return (
                     <li
                         className="flex flex-col"
@@ -78,7 +103,7 @@ const OutputTab = ({
 }) => {
     return (
         <div className="max-h-full flex-[1_1_1px] overflow-auto">
-            {actionDefinition.outputSchema?.map((schema: any, index) =>
+            {actionDefinition.outputSchema?.map((schema: Property, index) =>
                 schema.properties ? (
                     <SchemaProperties
                         key={schema.name + '_' + index}
