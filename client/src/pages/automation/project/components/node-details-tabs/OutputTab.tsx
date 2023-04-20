@@ -67,7 +67,7 @@ const PropertyField = ({data, label}: {data: Property; label: string}) => (
 );
 
 const SchemaProperties = ({properties}: {properties: Property[]}) => (
-    <ul className="h-full">
+    <ul className="ml-2 h-full">
         {properties.map((property: Property, index: number) => {
             return (
                 <li className="flex flex-col" key={`${property.name}_${index}`}>
