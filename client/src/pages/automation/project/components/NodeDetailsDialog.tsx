@@ -6,7 +6,7 @@ import {
     useGetComponentDefinitionQuery,
     useGetComponentDefinitionsQuery,
 } from 'queries/componentDefinitions.queries';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
@@ -70,6 +70,19 @@ const NodeDetailsDialog = () => {
         currentActionName,
         !!currentComponent
     );
+
+    useEffect(() => {
+        if (activeTab === 'output' && !currentAction) {
+            setActiveTab('description');
+        } else if (
+            currentComponent?.name &&
+            activeTab === 'connection' &&
+            !componentDefinitionNames?.includes(currentComponent.name)
+        ) {
+            setActiveTab('description');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentComponent?.name]);
 
     return (
         <Dialog.Root
@@ -186,16 +199,16 @@ const NodeDetailsDialog = () => {
 
                                 <div className="mb-4 flex justify-center pt-4">
                                     {tabs.map((tab) => {
-                                        if (
-                                            tab.name === 'connection' &&
-                                            !componentDefinitionNames?.includes(
+                                        const componentHasConnection =
+                                            componentDefinitionNames?.includes(
                                                 currentComponent?.name
-                                            )
-                                        ) {
-                                            return;
-                                        } else if (
-                                            tab.name === 'output' &&
-                                            !currentAction
+                                            );
+
+                                        if (
+                                            (tab.name === 'connection' &&
+                                                !componentHasConnection) ||
+                                            (tab.name === 'output' &&
+                                                !currentAction)
                                         ) {
                                             return;
                                         } else {
