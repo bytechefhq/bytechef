@@ -1,8 +1,8 @@
 import {
     FolderPlusIcon,
-    LightBulbIcon,
     LinkIcon,
     QueueListIcon,
+    RectangleStackIcon,
 } from '@heroicons/react/24/outline';
 import {useState} from 'react';
 import {Outlet} from 'react-router-dom';
@@ -32,7 +32,7 @@ const navigation: {
     {
         name: 'Project Instances',
         href: '/automation/project-instances',
-        icon: LightBulbIcon,
+        icon: RectangleStackIcon,
     },
     {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
     {
