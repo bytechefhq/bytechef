@@ -2,13 +2,36 @@ import {FieldValues, Path} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 
 import {
-    PropertyModel,
-    ValuePropertyModel,
+    ArrayPropertyModel,
+    BooleanPropertyModel,
+    DatePropertyModel,
+    DateTimePropertyModel,
+    DynamicPropertiesPropertyModel,
+    IntegerPropertyModel,
+    NullPropertyModel,
+    NumberPropertyModel,
+    ObjectPropertyModel,
+    OneOfPropertyModel,
+    StringPropertyModel,
+    TimePropertyModel,
 } from '../../middleware/definition-registry';
 import Input from '../Input/Input';
 
+type Property = ArrayPropertyModel &
+    BooleanPropertyModel &
+    DatePropertyModel &
+    DateTimePropertyModel &
+    DynamicPropertiesPropertyModel &
+    IntegerPropertyModel &
+    NumberPropertyModel &
+    NullPropertyModel &
+    ObjectPropertyModel &
+    OneOfPropertyModel &
+    StringPropertyModel &
+    TimePropertyModel;
+
 interface PropertiesProps<
-    TProperty extends PropertyModel,
+    TProperty extends Property,
     TFieldValues extends FieldValues = FieldValues
 > {
     formState: FormState<TFieldValues>;
@@ -18,7 +41,7 @@ interface PropertiesProps<
 }
 
 const Properties = <
-    TProperty extends PropertyModel,
+    TProperty extends Property,
     TFieldValues extends FieldValues = FieldValues
 >({
     formState: {errors, touchedFields},
@@ -39,6 +62,10 @@ const Properties = <
         return false;
     }
 
+    function getFieldPath(propertyName: string) {
+        return (path + '.' + propertyName) as Path<TFieldValues>;
+    }
+
     return (
         <>
             {properties &&
@@ -48,24 +75,17 @@ const Properties = <
                             <Input
                                 description={property?.description}
                                 defaultValue={
-                                    (property as ValuePropertyModel)
-                                        ?.defaultValue
-                                        ? (property as ValuePropertyModel)
-                                              ?.defaultValue + ''
+                                    property?.defaultValue
+                                        ? property.defaultValue + ''
                                         : ''
                                 }
                                 error={isError(property.name!)}
                                 type={property.hidden ? 'hidden' : 'text'}
                                 key={property.name}
                                 label={property.label}
-                                {...register(
-                                    (path +
-                                        '.' +
-                                        property.name!) as Path<TFieldValues>,
-                                    {
-                                        required: property.required!,
-                                    }
-                                )}
+                                {...register(getFieldPath(property.name!), {
+                                    required: property.required!,
+                                })}
                             />
                         );
                     }
