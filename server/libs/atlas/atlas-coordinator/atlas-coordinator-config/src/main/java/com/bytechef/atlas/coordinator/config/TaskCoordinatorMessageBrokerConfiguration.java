@@ -19,7 +19,7 @@ package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.config.TaskCoordinatorProperties.TaskCoordinatorSubscriptions;
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -54,31 +54,31 @@ public class TaskCoordinatorMessageBrokerConfiguration {
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.TASKS_COMPLETIONS,
+                TaskMessageRoute.TASKS_COMPLETIONS,
                 subscriptions.getCompletions(),
                 coordinator,
                 "complete");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.TASKS_JOBS,
+                TaskMessageRoute.TASKS_JOBS,
                 subscriptions.getJobs(),
                 coordinator,
                 "start");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.TASKS_RESTARTS,
+                TaskMessageRoute.TASKS_RESTARTS,
                 subscriptions.getJobs(),
                 coordinator,
                 "resume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.TASKS_SUBFLOWS,
+                TaskMessageRoute.TASKS_SUBFLOWS,
                 subscriptions.getJobs(),
                 coordinator,
                 "create");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.TASKS_STOPS,
+                TaskMessageRoute.TASKS_STOPS,
                 subscriptions.getJobs(),
                 coordinator,
                 "stop");

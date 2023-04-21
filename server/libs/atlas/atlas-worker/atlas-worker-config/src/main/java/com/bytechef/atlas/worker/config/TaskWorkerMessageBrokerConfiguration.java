@@ -17,8 +17,9 @@
 
 package com.bytechef.atlas.worker.config;
 
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,11 +53,12 @@ public class TaskWorkerMessageBrokerConfiguration {
 
             Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
 
-            subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
+            subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
+                listenerEndpointRegistrar, TaskMessageRoute.ofRoute(routeName), Integer.parseInt((String) concurrency),
+                worker, "handle"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, Queues.TASKS_CONTROL, 1, worker, "handle");
+                listenerEndpointRegistrar, SystemMessageRoute.CONTROL, 1, worker, "handle");
         };
     }
 }

@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,39 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.message.broker;
 
-import java.util.UUID;
-
 /**
- * @author Arik Cohen
  * @author Ivica Cardic
  */
-public final class Queues {
+public interface MessageRoute {
 
-    public static final String DLQ = "dlq";
-    public static final String ERRORS = "errors";
-    public static final String EVENTS = "events";
+    default boolean isControlExchange() {
+        return Exchange.CONTROL == getExchange();
+    }
 
-    // TODO Remove to Queues
-    public static final String TASKS_CONTROL = "tasks.x.control." + UUID.randomUUID();
+    default boolean isMessageExchange() {
+        return Exchange.MESSAGE == getExchange();
+    }
+
+    Exchange getExchange();
+
+    enum Exchange {
+
+        CONTROL("exchange.control"),
+        MESSAGE("exchange.message");
+
+        private final String name;
+
+        Exchange(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 }

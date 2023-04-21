@@ -19,10 +19,11 @@ package com.bytechef.hermes.worker;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.event.TriggerStartedWorkflowEvent;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.message.broker.TriggerQueues;
+import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.trigger.ControlTrigger;
 import com.bytechef.hermes.trigger.TriggerExecution;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -75,7 +76,7 @@ public class TriggerWorker {
 
                 TriggerExecution completedTriggerExecution = doExecuteTask(triggerExecution);
 
-                messageBroker.send(TriggerQueues.TRIGGERS_COMPLETIONS, completedTriggerExecution);
+                messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, completedTriggerExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -140,7 +141,7 @@ public class TriggerWorker {
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         triggerExecution.setStatus(TriggerExecution.Status.FAILED);
 
-        messageBroker.send(com.bytechef.message.broker.Queues.ERRORS, triggerExecution);
+        messageBroker.send(SystemMessageRoute.ERRORS, triggerExecution);
     }
 
     private static class TriggerExecutionFuture<T> implements Future<T> {

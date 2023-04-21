@@ -17,8 +17,8 @@
 
 package com.bytechef.message.broker.redis.config;
 
-import com.bytechef.message.broker.ExchangeType;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.MessageRoute;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.redis.listener.RedisListenerEndpointRegistrar;
@@ -44,7 +44,6 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -104,7 +103,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
 
         messageListenerAdapter.afterPropertiesSet();
 
-        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, channelTopic());
+        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, controlChannelTopic());
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
 
         redisMessageListenerContainer.afterPropertiesSet();
@@ -122,8 +121,8 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
     }
 
     @Bean
-    ChannelTopic channelTopic() {
-        return new ChannelTopic(ExchangeType.CONTROL + "/" + ExchangeType.CONTROL);
+    ChannelTopic controlChannelTopic() {
+        return new ChannelTopic(SystemMessageRoute.CONTROL.toString());
     }
 
     @Bean
@@ -138,17 +137,17 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
 
     @Override
     public void registerListenerEndpoint(
-        RedisListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
-        String methodName) {
+        RedisListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
+        Object delegate, String methodName) {
 
-        ExchangeType exchangeType = ExchangeType.NORMAL;
+        MessageRoute.Exchange exchange = MessageRoute.Exchange.MESSAGE;
 
-        if (Objects.equals(queueName, Queues.TASKS_CONTROL)) {
-            exchangeType = ExchangeType.CONTROL;
-            queueName = ExchangeType.CONTROL + "/" + ExchangeType.CONTROL;
+        if (messageRoute.isControlExchange()) {
+            exchange = MessageRoute.Exchange.CONTROL;
+            messageRoute = SystemMessageRoute.CONTROL;
         }
 
-        listenerEndpointRegistrar.registerListenerEndpoint(queueName, delegate, methodName, exchangeType);
+        listenerEndpointRegistrar.registerListenerEndpoint(messageRoute.toString(), delegate, methodName, exchange);
     }
 
     private static int getTimeout(Duration timeout) {

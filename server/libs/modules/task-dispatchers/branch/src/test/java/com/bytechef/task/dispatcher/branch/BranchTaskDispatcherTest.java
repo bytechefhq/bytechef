@@ -39,6 +39,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import com.bytechef.message.broker.MessageRoute;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -171,12 +173,13 @@ public class BranchTaskDispatcherTest {
 
         branchTaskDispatcher.dispatch(taskExecution);
 
-        ArgumentCaptor<String> arg1 = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<MessageRoute> arg1 = ArgumentCaptor.forClass(MessageRoute.class);
         ArgumentCaptor<TaskExecution> arg2 = ArgumentCaptor.forClass(TaskExecution.class);
 
         verify(messageBroker, times(1)).send(arg1.capture(), arg2.capture());
 
-        Assertions.assertEquals("1234", arg2.getValue()
-            .getOutput());
+        TaskExecution value = arg2.getValue();
+
+        Assertions.assertEquals("1234", value.getOutput());
     }
 }
