@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bytechef.message.broker.MessageRoute;
 import org.springframework.util.Assert;
 
 /**
@@ -35,29 +36,23 @@ import org.springframework.util.Assert;
  */
 public class SyncMessageBroker implements MessageBroker {
 
-    private final Map<String, List<Receiver>> listeners = new HashMap<>();
+    private final Map<MessageRoute, List<Receiver>> receiverMap = new HashMap<>();
 
     @Override
-    public void send(String queueName, Object message) {
-        Assert.notNull(queueName, "'queueName' must not be null");
+    public void send(MessageRoute messageRoute, Object message) {
+        Assert.notNull(messageRoute, "'messageRoute' must not be null");
 
-        List<Receiver> receivers = listeners.get(queueName);
+        List<Receiver> receivers = receiverMap.get(messageRoute);
 
-        Assert.isTrue(receivers != null && receivers.size() > 0, "no listeners subscribed for: " + queueName);
+        Assert.isTrue(receivers != null && receivers.size() > 0, "no listeners subscribed for: " + messageRoute);
 
         for (Receiver receiver : receivers) {
             receiver.receive(message);
         }
     }
 
-    public void receive(String queueName, Receiver receiver) {
-        List<Receiver> receivers = listeners.get(queueName);
-
-        if (receivers == null) {
-            receivers = new ArrayList<>();
-
-            listeners.put(queueName, receivers);
-        }
+    public void receive(MessageRoute messageRoute, Receiver receiver) {
+        List<Receiver> receivers = receiverMap.computeIfAbsent(messageRoute, k -> new ArrayList<>());
 
         receivers.add(receiver);
     }

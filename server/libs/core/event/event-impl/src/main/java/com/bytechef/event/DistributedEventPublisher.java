@@ -20,7 +20,7 @@
 package com.bytechef.event;
 
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 
 import java.util.Objects;
 
@@ -38,6 +38,6 @@ public class DistributedEventPublisher implements EventPublisher {
 
     @Override
     public void publishEvent(WorkflowEvent workflowEvent) {
-        messageBroker.send(Queues.EVENTS, workflowEvent);
+        messageBroker.send(SystemMessageRoute.EVENTS, workflowEvent);
     }
 }

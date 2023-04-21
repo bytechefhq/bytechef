@@ -20,7 +20,7 @@ package com.bytechef.hermes.coordinator.config;
 import com.bytechef.hermes.coordinator.TriggerCoordinator;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
-import com.bytechef.hermes.message.broker.TriggerQueues;
+import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +47,7 @@ public class TriggerCoordinatorMessageBrokerConfiguration {
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TriggerQueues.TRIGGERS_COMPLETIONS,
+                TriggerMessageRoute.TRIGGERS_COMPLETIONS,
                 1,
                 triggerCoordinator,
                 "complete");

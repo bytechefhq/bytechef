@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,35 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.message.broker;
 
 /**
- * @author Arik Cohen
+ * @author Ivica Cardic
  */
-public enum ExchangeType {
+public enum SystemMessageRoute implements MessageRoute {
 
-    CONTROL("exchange.control"),
-    NORMAL("exchange.normal");
+    CONTROL(Exchange.CONTROL, "system.control"),
+    DLQ(Exchange.MESSAGE, "system.dlq"),
+    ERRORS(Exchange.MESSAGE, "system.errors"),
+    EVENTS(Exchange.MESSAGE, "system.events");
 
-    ExchangeType(String name) {
-        this.name = name;
+    private final Exchange exchange;
+    private final String routeName;
+
+    SystemMessageRoute(Exchange exchange, String routeName) {
+        this.exchange = exchange;
+        this.routeName = routeName;
     }
 
-    private final String name;
+    @Override
+    public Exchange getExchange() {
+        return exchange;
+    }
 
     @Override
     public String toString() {
-        return name;
+        return routeName;
     }
 }

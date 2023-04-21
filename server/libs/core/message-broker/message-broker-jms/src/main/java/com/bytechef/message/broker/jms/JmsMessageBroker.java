@@ -23,6 +23,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.Retryable;
 import java.util.concurrent.TimeUnit;
 
+import com.bytechef.message.broker.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
@@ -40,8 +41,8 @@ public class JmsMessageBroker implements MessageBroker {
     }
 
     @Override
-    public void send(String queueName, Object message) {
-        Assert.notNull(queueName, "'queueName' must not be null");
+    public void send(MessageRoute messageRoute, Object message) {
+        Assert.notNull(messageRoute, "'queueName' must not be null");
 
         if (message instanceof Retryable) {
             Retryable retryable = (Retryable) message;
@@ -49,7 +50,7 @@ public class JmsMessageBroker implements MessageBroker {
             delay(retryable.getRetryDelayMillis());
         }
 
-        jmsTemplate.convertAndSend(queueName, message);
+        jmsTemplate.convertAndSend(messageRoute.toString(), message);
     }
 
     private void delay(long value) {

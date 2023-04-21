@@ -19,6 +19,7 @@ package com.bytechef.message.broker.redis;
 
 import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.MessageRoute;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import com.bytechef.message.Retryable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,17 +48,17 @@ public class RedisMessageBroker implements MessageBroker {
     }
 
     @Override
-    public void send(String queueName, Object message) {
-        Assert.notNull(queueName, "'queueName' must not be null");
+    public void send(MessageRoute messageRoute, Object message) {
+        Assert.notNull(messageRoute, "'messageRoute' must not be null");
 
         if (message instanceof Retryable retryable) {
             delay(retryable.getRetryDelayMillis());
         }
 
         if (message instanceof Controllable) {
-            sendMessageToTopic(queueName, message);
+            sendMessageToTopic(messageRoute.toString(), message);
         } else {
-            sendMessageToQueue(queueName, message);
+            sendMessageToQueue(messageRoute.toString(), message);
         }
     }
 

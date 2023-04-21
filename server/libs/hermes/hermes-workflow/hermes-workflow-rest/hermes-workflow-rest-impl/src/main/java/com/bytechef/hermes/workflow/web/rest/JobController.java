@@ -22,7 +22,7 @@ package com.bytechef.hermes.workflow.web.rest;
 import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.job.JobFactory;
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.hermes.workflow.web.rest.model.CreateJob200ResponseModel;
@@ -117,14 +117,14 @@ public class JobController implements JobsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> restartJob(Long id, ServerWebExchange exchange) {
-        messageBroker.send(TaskQueues.TASKS_RESTARTS, id);
+        messageBroker.send(TaskMessageRoute.TASKS_RESTARTS, id);
 
         return Mono.empty();
     }
 
     @Override
     public Mono<ResponseEntity<Void>> stopJob(Long id, ServerWebExchange exchange) {
-        messageBroker.send(TaskQueues.TASKS_STOPS, id);
+        messageBroker.send(TaskMessageRoute.TASKS_STOPS, id);
 
         return Mono.empty();
     }

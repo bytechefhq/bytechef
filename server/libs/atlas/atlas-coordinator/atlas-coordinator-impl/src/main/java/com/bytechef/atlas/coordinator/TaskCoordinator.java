@@ -25,7 +25,7 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
@@ -168,7 +168,7 @@ public class TaskCoordinator {
         } catch (Exception e) {
             taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            messageBroker.send(Queues.ERRORS, taskExecution);
+            messageBroker.send(SystemMessageRoute.ERRORS, taskExecution);
         }
     }
 

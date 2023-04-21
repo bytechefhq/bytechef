@@ -18,7 +18,7 @@
 package com.bytechef.error.config;
 
 import com.bytechef.error.ErrorHandler;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -53,7 +53,7 @@ public class ErrorHandlerMessageBrokerConfiguration {
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.ERRORS,
+                SystemMessageRoute.ERRORS,
                 subscriptions.getErrors(),
                 errorHandler,
                 "handle");

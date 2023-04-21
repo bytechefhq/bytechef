@@ -22,7 +22,7 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.coordinator.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.trigger.TriggerExecution;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 
 import java.util.Arrays;
 
@@ -51,7 +51,7 @@ public class TriggerCoordinator {
             triggerExecution.setError(
                 new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            messageBroker.send(Queues.ERRORS, triggerExecution);
+            messageBroker.send(SystemMessageRoute.ERRORS, triggerExecution);
         }
     }
 }

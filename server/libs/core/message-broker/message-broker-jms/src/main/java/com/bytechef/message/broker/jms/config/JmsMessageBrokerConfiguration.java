@@ -19,15 +19,14 @@
 
 package com.bytechef.message.broker.jms.config;
 
-import com.bytechef.message.broker.ExchangeType;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.MessageRoute;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.jms.JmsMessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Message;
 import jakarta.jms.Session;
@@ -78,14 +77,15 @@ public class JmsMessageBrokerConfiguration
 
     @Override
     public void registerListenerEndpoint(
-        JmsListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
+        JmsListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
+        Object delegate,
         String methodName) {
 
-        if (Objects.equals(queueName, Queues.TASKS_CONTROL)) {
-            queueName = ExchangeType.CONTROL + "/" + ExchangeType.CONTROL;
+        if (messageRoute.isControlExchange()) {
+            messageRoute = SystemMessageRoute.CONTROL;
         }
 
-        logger.info("Registering JMS Listener: {} -> {}:{}", queueName, delegate.getClass(), methodName);
+        logger.info("Registering JMS Listener: {} -> {}:{}", messageRoute, delegate.getClass(), methodName);
 
         MessageListenerAdapter messageListenerAdapter = new NoReplyMessageListenerAdapter(delegate);
 
@@ -94,8 +94,8 @@ public class JmsMessageBrokerConfiguration
 
         SimpleJmsListenerEndpoint simpleJmsListenerEndpoint = new SimpleJmsListenerEndpoint();
 
-        simpleJmsListenerEndpoint.setId(queueName + "Endpoint");
-        simpleJmsListenerEndpoint.setDestination(queueName);
+        simpleJmsListenerEndpoint.setId(messageRoute + "Endpoint");
+        simpleJmsListenerEndpoint.setDestination(messageRoute.toString());
         simpleJmsListenerEndpoint.setMessageListener(messageListenerAdapter);
 
         listenerEndpointRegistrar.registerEndpoint(simpleJmsListenerEndpoint, createContainerFactory(concurrency));

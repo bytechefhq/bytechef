@@ -20,13 +20,14 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.task.Task;
 
 import java.util.List;
 import java.util.Objects;
 
+import com.bytechef.message.broker.MessageRoute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     private final MessageBroker messageBroker;
     private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
 
-    private static final String DEFAULT_QUEUE = TaskQueues.TASKS;
+    private static final MessageRoute DEFAULT_MESSAGE_ROUTE = TaskMessageRoute.TASKS;
 
     public DefaultTaskDispatcher(
         MessageBroker messageBroker, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
@@ -57,20 +58,23 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
         }
 
-        String queueName = calculateQueueName(taskExecution);
+        MessageRoute messageRoute = calculateQueueName(taskExecution);
 
         if (log.isDebugEnabled()) {
             log.debug(
-                "Task id={}, type='{}' sent to queue='{}'", taskExecution.getId(), taskExecution.getType(), queueName);
+                "Task id={}, type='{}' sent to route='{}'", taskExecution.getId(), taskExecution.getType(),
+                messageRoute);
         }
 
-        messageBroker.send(queueName, taskExecution);
+        messageBroker.send(messageRoute, taskExecution);
     }
 
-    private String calculateQueueName(Task task) {
+    private MessageRoute calculateQueueName(Task task) {
         TaskExecution taskExecution = (TaskExecution) task;
 
-        return taskExecution.getNode() != null ? taskExecution.getNode() : DEFAULT_QUEUE;
+        return taskExecution.getNode() != null
+            ? TaskMessageRoute.ofRoute(taskExecution.getNode())
+            : DEFAULT_MESSAGE_ROUTE;
     }
 
     @Override

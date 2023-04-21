@@ -17,7 +17,7 @@
 
 package com.bytechef.message.broker.redis.listener;
 
-import com.bytechef.message.broker.ExchangeType;
+import com.bytechef.message.broker.MessageRoute;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import com.oblac.jrsmq.QueueMessage;
 import com.oblac.jrsmq.RedisSMQ;
@@ -66,12 +66,12 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
     }
 
     public void registerListenerEndpoint(
-        String queueName, Object delegate, String methodName, ExchangeType exchangeType) {
+        String queueName, Object delegate, String methodName, MessageRoute.Exchange exchange) {
         invokerMap.put(queueName, (String message) -> invoke(delegate, methodName, message));
 
         checkQueueExists(queueName);
 
-        if (exchangeType == ExchangeType.NORMAL) {
+        if (exchange == MessageRoute.Exchange.MESSAGE) {
             executorService.submit(() -> periodicallyCheckQueueForMessage(queueName));
         }
     }
