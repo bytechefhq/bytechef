@@ -1,10 +1,6 @@
 <FindBugsFilter>
     <Match>
         <!-- TODO Review this issues -->
-        <Class name="com.bytechef.atlas.coordinator.config.CoordinatorProperties" />
-    </Match>
-    <Match>
-        <!-- TODO Review this issues -->
         <Class name="com.bytechef.atlas.config.WorkflowRepositoryProperties" />
     </Match>
     <Match>
@@ -24,13 +20,10 @@
             <Class name="com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain" />
             <Class name="com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcWorkflowRepository" />
-            <Class name="com.bytechef.atlas.coordinator.event.EventListenerChain" />
             <Class name="com.bytechef.atlas.coordinator.job.executor.DefaultJobExecutor" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcJobRepository" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcContextRepository" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
-            <Class name="com.bytechef.atlas.coordinator.Coordinator" />
-            <Class name="com.bytechef.atlas.coordinator.error.ErrorHandlerChain" />
             <Class name="com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler" />
             <Class name="com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain" />
             <Class name="com.bytechef.atlas.message.broker.jms.JmsMessageBroker" />
@@ -75,11 +68,9 @@
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDefinition" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ConnectionDefinition" />
             <Class name="com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory" />
-            <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
             <Class name="com.bytechef.atlas.domain.Counter" />
             <Class name="com.bytechef.atlas.domain.Context"/>
             <Class name="com.bytechef.atlas.task.WorkflowTask" />
-            <Class name="com.bytechef.atlas.error.ExecutionError" />
             <Class name="com.bytechef.atlas.domain.Workflow" />
             <Class name="com.bytechef.atlas.domain.TaskExecution"/>
             <Class name="com.bytechef.atlas.domain.Job"/>
@@ -111,7 +102,6 @@
             <Class name="com.bytechef.hermes.description.model.ConnectionDescription1" />
             <Class name="com.bytechef.hermes.component.definition.ActionDefinition" />
             <Class name="com.bytechef.hermes.component.util.HttpClientUtils" />
-            <Class name="com.bytechef.atlas.event.WorkflowEvent" />
             <Class name="com.bytechef.hermes.connection.domain.Connection" />
             <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDisplay" />
@@ -120,14 +110,6 @@
             <Class name="com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL$Operation" />
             <Class name="com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL$TaskDispatcherDefinition" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentOperation" />
-            <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
-        </Or>
-    </Match>
-    <Match>
-        <!-- TODO Review this issues -->
-        <Bug code="Eq" />
-        <Or>
-            <Class name="com.bytechef.atlas.event.WorkflowEvent" />
         </Or>
     </Match>
     <Match>
@@ -144,7 +126,6 @@
             <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
             <Class name="com.bytechef.atlas.repository.resource.AbstractResourceWorkflowRepository" />
             <Class name="com.bytechef.atlas.workflow.mapper.AbstractWorkflowMapper" />
-            <Class name="com.bytechef.atlas.worker.Worker" />
             <Class name="com.bytechef.cli.command.componentDefinitionDTO.subcomand.InitSubcommand" />
             <Class name="com.bytechef.componentDefinitionDTO.task.handler.aws.s3.action.AmazonS3URI" />
             <Class name="com.bytechef.hermes.component.util.HttpClientUtils" />
