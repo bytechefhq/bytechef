@@ -82,7 +82,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.49"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.50"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.18.0"
