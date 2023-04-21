@@ -21,13 +21,16 @@ package com.bytechef.atlas.worker.config;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Arik Cohen
  */
-@ConfigurationProperties(prefix = "bytechef.worker")
-public class WorkerProperties {
+@ConfigurationProperties(prefix = "bytechef.worker.task")
+@SuppressFBWarnings("EI")
+public class TaskWorkerProperties {
 
     private Map<String, Object> subscriptions = new HashMap<>();
 

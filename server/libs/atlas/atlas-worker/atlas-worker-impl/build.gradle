@@ -4,7 +4,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation project(":server:libs:atlas:atlas-api")
-    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":server:libs:core:message-broker:message-broker-sync")
     implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation "org.springframework:spring-jdbc"

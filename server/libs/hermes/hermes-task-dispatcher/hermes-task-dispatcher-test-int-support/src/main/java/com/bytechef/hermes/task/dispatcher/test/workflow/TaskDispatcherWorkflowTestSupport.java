@@ -21,9 +21,9 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobParameters;
-import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.event.EventPublisher;
+import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.JobService;

@@ -3,6 +3,7 @@ dependencies {
 
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:core:event:event-api")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")

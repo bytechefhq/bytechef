@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.hermes.trigger.TriggerExecution;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,7 +43,7 @@ public class ListenerTriggerUtilsConfiguration implements InitializingBean {
         ListenerTriggerUtils.listenerEmitter = (workflowExecutionId, output) -> {
 
             TriggerExecution triggerExecution = new TriggerExecution(
-                WorkflowExecutionId.parse(workflowExecutionId), output);
+                output, WorkflowExecutionId.parse(workflowExecutionId));
 
             messageBroker.send(TaskQueues.TASKS_COMPLETIONS, triggerExecution);
         };

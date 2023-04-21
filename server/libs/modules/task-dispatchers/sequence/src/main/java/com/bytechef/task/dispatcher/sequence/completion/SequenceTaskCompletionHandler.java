@@ -30,7 +30,6 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -83,7 +82,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        taskExecution.setStatus(TaskStatus.COMPLETED);
+        taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 

@@ -17,9 +17,8 @@
 
 package com.bytechef.hermes.task.dispatcher.test.config;
 
-import com.bytechef.atlas.coordinator.event.EventListener;
-import com.bytechef.atlas.coordinator.event.EventListenerChain;
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.listener.EventListener;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
@@ -36,6 +35,7 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.WorkflowServiceImpl;
+import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

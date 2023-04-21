@@ -11,9 +11,8 @@ subprojects {
         implementation "org.springframework:spring-core"
         implementation "org.springframework:spring-expression"
         implementation project(":server:libs:atlas:atlas-api")
-        implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
-        implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
         implementation project(":server:libs:core:commons:commons-util")
+        implementation project(":server:libs:core:message-broker:message-broker-api")
 
         testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
         testImplementation project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-test-int-support")

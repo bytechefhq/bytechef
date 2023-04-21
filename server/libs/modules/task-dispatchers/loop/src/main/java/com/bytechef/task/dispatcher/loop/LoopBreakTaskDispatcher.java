@@ -22,8 +22,8 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_BREAK;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
