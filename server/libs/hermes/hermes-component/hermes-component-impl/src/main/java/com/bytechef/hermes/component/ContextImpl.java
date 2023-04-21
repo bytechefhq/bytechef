@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;

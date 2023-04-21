@@ -17,25 +17,117 @@
 
 package com.bytechef.hermes.trigger;
 
+import com.bytechef.error.Errorable;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public record TriggerExecution(WorkflowExecutionId workflowExecutionId, WorkflowTrigger workflowTrigger,
-    Object output) {
+public class TriggerExecution implements Errorable, Trigger {
 
-    public TriggerExecution(WorkflowExecutionId workflowExecutionId, Object output) {
-        this(workflowExecutionId, null, output);
+    private TriggerExecution() {
     }
 
-    public TriggerExecution(WorkflowExecutionId workflowExecutionId, WorkflowTrigger workflowTrigger) {
-        this(workflowExecutionId, workflowTrigger, null);
+    public TriggerExecution(Object output, WorkflowExecutionId workflowExecutionId) {
+        this.output = output;
+        this.workflowExecutionId = workflowExecutionId;
+    }
+
+    public enum Status {
+        CREATED, STARTED, FAILED, CANCELLED, COMPLETED
+    }
+
+    private WorkflowExecutionId workflowExecutionId;
+    private WorkflowTrigger workflowTrigger;
+    private Object output;
+    private ExecutionError error;
+    private Status status = Status.CREATED;
+    private String timeout;
+    private String type;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TriggerExecution that = (TriggerExecution) o;
+
+        return Objects.equals(workflowExecutionId, that.workflowExecutionId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(workflowExecutionId);
     }
 
     public Map<String, Object> getParameters() {
         return workflowTrigger.parameters();
+    }
+
+    public WorkflowExecutionId getWorkflowExecutionId() {
+        return workflowExecutionId;
+    }
+
+    public WorkflowTrigger getWorkflowTrigger() {
+        return workflowTrigger;
+    }
+
+    @Override
+    public ExecutionError getError() {
+        return error;
+    }
+
+    public Object getOutput() {
+        return output;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setError(ExecutionError error) {
+        this.error = error;
+    }
+
+    public String getTimeout() {
+        return timeout;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    public void setWorkflowExecutionId(WorkflowExecutionId workflowExecutionId) {
+        this.workflowExecutionId = workflowExecutionId;
+    }
+
+    public void setWorkflowTrigger(WorkflowTrigger workflowTrigger) {
+        this.workflowTrigger = workflowTrigger;
+    }
+
+    public void setOutput(Object output) {
+        this.output = output;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void setTimeout(String timeout) {
+        this.timeout = timeout;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

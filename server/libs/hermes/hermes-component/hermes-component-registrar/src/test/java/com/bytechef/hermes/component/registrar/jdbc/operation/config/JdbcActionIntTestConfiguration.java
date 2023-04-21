@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.operation.config;
 
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import org.springframework.boot.SpringBootConfiguration;

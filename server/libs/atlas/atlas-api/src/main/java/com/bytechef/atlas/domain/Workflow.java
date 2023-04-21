@@ -20,8 +20,8 @@
 package com.bytechef.atlas.domain;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.error.Errorable;
-import com.bytechef.atlas.error.ExecutionError;
+import com.bytechef.error.Errorable;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.workflow.mapper.WorkflowResource;

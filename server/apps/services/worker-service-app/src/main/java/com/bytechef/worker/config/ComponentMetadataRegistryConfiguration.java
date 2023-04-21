@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
-@DependsOn("workerConfiguration")
+@DependsOn("taskWorkerConfiguration")
 @Configuration
 public class ComponentMetadataRegistryConfiguration implements InitializingBean {
 

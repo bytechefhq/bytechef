@@ -19,7 +19,7 @@ package com.bytechef.hermes.workflow.web.rest.config;
 
 import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.atlas.job.JobFactory;
-import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;

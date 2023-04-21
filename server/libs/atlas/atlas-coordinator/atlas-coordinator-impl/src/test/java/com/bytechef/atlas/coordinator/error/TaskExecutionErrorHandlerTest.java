@@ -27,8 +27,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;

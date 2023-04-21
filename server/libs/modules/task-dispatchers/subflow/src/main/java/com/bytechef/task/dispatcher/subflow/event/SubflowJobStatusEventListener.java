@@ -19,14 +19,15 @@
 
 package com.bytechef.task.dispatcher.subflow.event;
 
-import com.bytechef.atlas.coordinator.event.EventListener;
+import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.error.ExecutionError;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.event.WorkflowEvent;
-import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.event.WorkflowEvent;
+import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.Queues;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -91,7 +92,7 @@ public class SubflowJobStatusEventListener implements EventListener {
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
-                    messageBroker.send(TaskQueues.TASKS_ERRORS, erroredTaskExecution);
+                    messageBroker.send(Queues.ERRORS, erroredTaskExecution);
 
                     break;
                 }

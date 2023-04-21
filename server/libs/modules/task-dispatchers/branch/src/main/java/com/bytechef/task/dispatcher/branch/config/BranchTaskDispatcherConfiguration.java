@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.branch.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;

@@ -19,7 +19,6 @@ package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
-import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -81,14 +80,14 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         TaskExecution currentTaskExecution = OptionalUtils.get(
             taskExecutionRepository.findByIdForUpdate(taskExecution.getId()));
 
-        TaskStatus currentTaskStatus = currentTaskExecution.getStatus();
-        TaskStatus taskStatus = taskExecution.getStatus();
+        TaskExecution.Status currentStatus = currentTaskExecution.getStatus();
+        TaskExecution.Status status = taskExecution.getStatus();
 
-        if (currentTaskStatus.isTerminated() && taskStatus == TaskStatus.STARTED) {
+        if (currentStatus.isTerminated() && status == TaskExecution.Status.STARTED) {
             currentTaskExecution.setStartDate(taskExecution.getStartDate());
 
             taskExecution = currentTaskExecution;
-        } else if (taskStatus.isTerminated() && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
+        } else if (status.isTerminated() && currentTaskExecution.getStatus() == TaskExecution.Status.STARTED) {
             taskExecution.setStartDate(currentTaskExecution.getStartDate());
         }
 

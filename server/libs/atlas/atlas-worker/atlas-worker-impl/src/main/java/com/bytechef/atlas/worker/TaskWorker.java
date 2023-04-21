@@ -20,16 +20,16 @@
 package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
-import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.TaskQueues;
-import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.ControlTask;
+import com.bytechef.error.ExecutionError;
+import com.bytechef.event.EventPublisher;
+import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
+import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.Queues;
+import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.ExceptionUtils;
@@ -55,11 +55,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The class responsible for executing tasks spawned by the {@link com.bytechef.atlas.coordinator.Coordinator}.
+ * The class responsible for executing tasks spawned by the {@link com.bytechef.atlas.coordinator.TaskCoordinator}.
  *
  * <p>
- * Worker threads typically execute on a different process than the {@link com.bytechef.atlas.coordinator.Coordinator}
- * process and most likely on a seperate node altogether.
+ * Worker threads typically execute on a different process than the
+ * {@link com.bytechef.atlas.coordinator.TaskCoordinator} process and most likely on a seperate node altogether.
  *
  * <p>
  * Communication between the two is decoupled through the {@link MessageBroker} interface.
@@ -67,21 +67,20 @@ import org.slf4j.LoggerFactory;
  * @author Arik Cohen
  * @since Jun 12, 2016
  */
-public class Worker {
+public class TaskWorker {
 
-    private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
-    private final TaskEvaluator taskEvaluator;
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final TaskHandlerResolver taskHandlerResolver;
-    private final MessageBroker messageBroker;
-    private final EventPublisher eventPublisher;
-    private final ExecutorService executorService;
+    private static final Logger logger = LoggerFactory.getLogger(TaskWorker.class);
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
-    private Worker(Builder builder) {
+    private final EventPublisher eventPublisher;
+    private final ExecutorService executorService;
+    private final MessageBroker messageBroker;
+    private final TaskHandlerResolver taskHandlerResolver;
+    private final TaskEvaluator taskEvaluator;
+    private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
+
+    private TaskWorker(Builder builder) {
         taskHandlerResolver = Objects.requireNonNull(builder.taskHandlerResolver);
         messageBroker = Objects.requireNonNull(builder.messageBroker);
         eventPublisher = Objects.requireNonNull(builder.eventPublisher);
@@ -201,7 +200,7 @@ public class Worker {
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
             taskExecution.setProgress(100);
-            taskExecution.setStatus(TaskStatus.COMPLETED);
+            taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
             // post tasks
             executeSubTasks(taskExecution, taskExecution.getPost(), context);
@@ -238,9 +237,9 @@ public class Worker {
 
         taskExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
-        taskExecution.setStatus(TaskStatus.FAILED);
+        taskExecution.setStatus(TaskExecution.Status.FAILED);
 
-        messageBroker.send(TaskQueues.TASKS_ERRORS, taskExecution);
+        messageBroker.send(Queues.ERRORS, taskExecution);
     }
 
     private long calculateTimeout(TaskExecution taskExecution) {
@@ -295,8 +294,8 @@ public class Worker {
             return this;
         }
 
-        public Worker build() {
-            return new Worker(this);
+        public TaskWorker build() {
+            return new TaskWorker(this);
         }
     }
 

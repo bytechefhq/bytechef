@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.condition;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
