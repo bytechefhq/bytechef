@@ -61,13 +61,22 @@ const NodeDetailsDialog = () => {
     const firstAction =
         currentComponent?.actions && currentComponent?.actions[0];
 
+    const getActionName = (): string => {
+        const currentComponentActionNames = currentComponent?.actions?.map(
+            (action) => action.name
+        );
+
+        return currentComponentActionNames?.includes(currentActionName)
+            ? currentActionName
+            : (firstAction?.name as string);
+    };
+
     const {data: currentAction} = useGetActionDefinitionQuery(
         {
             componentName: currentComponent?.name as string,
             componentVersion: currentComponent?.version as number,
-            actionName: currentActionName || (firstAction?.name as string),
+            actionName: getActionName(),
         },
-        currentActionName,
         !!currentComponent
     );
 
