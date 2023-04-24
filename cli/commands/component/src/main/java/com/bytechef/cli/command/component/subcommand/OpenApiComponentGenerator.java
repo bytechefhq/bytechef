@@ -18,11 +18,11 @@
 package com.bytechef.cli.command.component.subcommand;
 
 import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -97,7 +97,7 @@ public class OpenApiComponentGenerator {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             enable(SerializationFeature.INDENT_OUTPUT);
-            setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            registerModule(new Jdk8Module());
         }
     };
     private static final String[] COMPONENT_DIR_NAMES = {
@@ -183,13 +183,11 @@ public class OpenApiComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
@@ -386,10 +384,8 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 action($S)
-                    .display(
-                        display($S)
-                            .description($S)
-                    )
+                    .title($S)
+                    .description($S)
                     .metadata(
                         $T.of(
                             $L
@@ -430,7 +426,9 @@ public class OpenApiComponentGenerator {
                 CodeBlock actionCodeBlock = getActionCodeBlock(operationItem, openAPI);
 
                 ClassName className = ClassName.get(
-                    getPackageName() + ".action", StringUtils.capitalize(operationItem.getOperationId()) + "Action");
+                    getPackageName() + ".action",
+                    StringUtils.capitalize(componentName) + StringUtils.capitalize(operationItem.getOperationId()) +
+                        "Action");
 
                 writeComponentActionSource(className, actionCodeBlock, componentHandlerDirPath);
 
@@ -494,9 +492,7 @@ public class OpenApiComponentGenerator {
             """
                 authorization(
                     AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                    .display(
-                        display($S)
-                    )
+                    .title($S)
                     .properties(
                         $L
                         string(VALUE)
@@ -521,9 +517,7 @@ public class OpenApiComponentGenerator {
             """
                 authorization(
                     AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                    .display(
-                        display($S)
-                    )
+                    .title($S)
                     .properties(
                         string(USERNAME)
                             .label($S)
@@ -549,9 +543,7 @@ public class OpenApiComponentGenerator {
             """
                 authorization(
                     AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
-                    .display(
-                        display($S)
-                    )
+                    .title($S)
                     .properties(
                         string(TOKEN)
                             .label($S)
@@ -573,9 +565,7 @@ public class OpenApiComponentGenerator {
             """
                 authorization(
                     AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                    .display(
-                        display($S)
-                    )
+                    .title($S)
                     .properties(
                         string(CLIENT_ID)
                             .label($S)
@@ -613,9 +603,7 @@ public class OpenApiComponentGenerator {
             """
                 authorization(
                     AuthorizationType.OAUTH2_CLIENT_CREDENTIALS.toLowerCase(), AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
-                    .display(
-                        display($S)
-                    )
+                    .title($S)
                     .properties(
                         string(CLIENT_ID)
                             .label($S)
@@ -650,9 +638,7 @@ public class OpenApiComponentGenerator {
             """
                 authorization(
                     AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
-                    .display(
-                        display($S)
-                    )
+                    .title($S)
                     .properties(
                         string(CLIENT_ID)
                             .label($S)
@@ -687,9 +673,7 @@ public class OpenApiComponentGenerator {
             """
                 authorization(
                     AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD.toLowerCase(), AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD)
-                    .display(
-                        display($S)
-                    )
+                    .title($S)
                     .properties(
                         string(CLIENT_ID)
                             .label($S)
@@ -844,12 +828,10 @@ public class OpenApiComponentGenerator {
 
         builder.add(
             """
-                component($S)
-                    .display(
-                        modifyDisplay(
-                            display($S)
-                                .description($S)
-                        )
+                modifyComponent(
+                    component($S)
+                        .title($S)
+                        .description($S)
                     )
                     .actions(modifyActions($L))
                 """,
@@ -1301,7 +1283,8 @@ public class OpenApiComponentGenerator {
     }
 
     private ClassName getPropertiesClassName(String schemaName) {
-        return ClassName.get(getPackageName() + ".property", schemaName + "Properties");
+        return ClassName.get(
+            getPackageName() + ".property", StringUtils.capitalize(componentName) + schemaName + "Properties");
     }
 
     @SuppressWarnings({
