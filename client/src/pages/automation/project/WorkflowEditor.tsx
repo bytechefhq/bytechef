@@ -25,6 +25,7 @@ import WorkflowNode from './nodes/WorkflowNode';
 import 'reactflow/dist/base.css';
 
 import './WorkflowEditor.css';
+import {useNodeDetailsDialogStore} from './stores/useNodeDetailsDialogStore';
 
 type WorkflowProps = {
     components: ComponentDefinitionBasicModel[];
@@ -33,6 +34,8 @@ type WorkflowProps = {
 
 const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
     const [viewportWidth, setViewportWidth] = useState(0);
+
+    const {nodeDetailsOpen} = useNodeDetailsDialogStore();
 
     const defaultEdges: Edge[] = [
         {
@@ -132,12 +135,16 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
     useEffect(() => {
         setViewportWidth(width);
 
+        const adaptedViewportWidth = nodeDetailsOpen
+            ? width / 2 - window.innerWidth / 4
+            : width / 2;
+
         setViewport({
-            x: width / 2,
+            x: adaptedViewportWidth,
             y: 50,
             zoom: 1,
         });
-    }, [setViewport, width]);
+    }, [nodeDetailsOpen, setViewport, width]);
 
     useLayout();
 
