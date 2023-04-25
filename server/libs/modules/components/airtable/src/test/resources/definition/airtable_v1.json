@@ -1,242 +1,589 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "description": "Adds a record into an Airtable table.",
-      "title": "Creates a record."
-    },
-    "metadata": {
-      "path": "/{baseId}/{tableId}",
-      "mimeType": "application/json",
-      "requestMethod": "POST",
-      "bodyContentType": "JSON"
-    },
+    "batch": null,
+    "description": "Adds a record into an Airtable table.",
+    "exampleOutput": null,
+    "help": null,
     "name": "createRecord",
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
       "metadata": {
         "responseFormat": "JSON"
       },
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "CreatedTime",
+        "metadata": null,
+        "placeholder": null,
         "required": false,
         "name": "createdTime",
         "type": "DATE_TIME",
-        "controlType": "DATE_TIME"
+        "defaultValue": null,
+        "exampleValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Fields",
+        "metadata": null,
         "placeholder": "Add",
         "required": false,
         "name": "fields",
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
         "additionalProperties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
           "type": "ONE_OF",
           "types": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "ARRAY",
+            "defaultValue": null,
+            "exampleValue": null,
+            "items": null,
             "multipleValues": true,
-            "controlType": "JSON_BUILDER"
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "JSON_BUILDER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "BOOLEAN",
-            "controlType": "CHECKBOX"
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "CHECKBOX",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "DATE",
-            "controlType": "DATE"
+            "defaultValue": null,
+            "exampleValue": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "DATE",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "DATE_TIME",
-            "controlType": "DATE_TIME"
+            "defaultValue": null,
+            "exampleValue": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "DATE_TIME",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "INTEGER",
-            "controlType": "INPUT_INTEGER"
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "INPUT_INTEGER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "NUMBER",
-            "controlType": "INPUT_NUMBER"
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "numberPrecision": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "INPUT_NUMBER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "OBJECT",
+            "defaultValue": null,
+            "exampleValue": null,
+            "additionalProperties": null,
             "multipleValues": true,
-            "controlType": "JSON_BUILDER"
+            "objectType": null,
+            "options": null,
+            "optionsDataSource": null,
+            "properties": null,
+            "controlType": "JSON_BUILDER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "STRING",
-            "controlType": "INPUT_TEXT"
-          } ]
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "INPUT_TEXT",
+            "options": null,
+            "optionsDataSource": null,
+            "expressionDisabled": null
+          } ],
+          "expressionDisabled": null
         } ],
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
     "properties": [ {
+      "advancedOption": null,
       "description": "The base id.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "BaseId",
       "metadata": {
         "type": "PATH"
       },
+      "placeholder": null,
       "required": true,
       "name": "baseId",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The table id.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "TableId",
       "metadata": {
         "type": "PATH"
       },
+      "placeholder": null,
       "required": true,
       "name": "tableId",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
       "metadata": {
         "type": "BODY"
       },
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Fields",
+        "metadata": null,
         "placeholder": "Add",
         "required": false,
         "name": "fields",
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
         "additionalProperties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
           "type": "ONE_OF",
           "types": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "ARRAY",
+            "defaultValue": null,
+            "exampleValue": null,
+            "items": null,
             "multipleValues": true,
-            "controlType": "JSON_BUILDER"
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "JSON_BUILDER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "BOOLEAN",
-            "controlType": "CHECKBOX"
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "CHECKBOX",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "DATE",
-            "controlType": "DATE"
+            "defaultValue": null,
+            "exampleValue": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "DATE",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "DATE_TIME",
-            "controlType": "DATE_TIME"
+            "defaultValue": null,
+            "exampleValue": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "DATE_TIME",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "INTEGER",
-            "controlType": "INPUT_INTEGER"
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "INPUT_INTEGER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "NUMBER",
-            "controlType": "INPUT_NUMBER"
+            "defaultValue": null,
+            "exampleValue": null,
+            "maxValue": null,
+            "minValue": null,
+            "numberPrecision": null,
+            "options": null,
+            "optionsDataSource": null,
+            "controlType": "INPUT_NUMBER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "OBJECT",
+            "defaultValue": null,
+            "exampleValue": null,
+            "additionalProperties": null,
             "multipleValues": true,
-            "controlType": "JSON_BUILDER"
+            "objectType": null,
+            "options": null,
+            "optionsDataSource": null,
+            "properties": null,
+            "controlType": "JSON_BUILDER",
+            "expressionDisabled": null
           }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "hidden": null,
+            "label": null,
+            "metadata": null,
+            "placeholder": null,
+            "required": null,
+            "name": null,
             "type": "STRING",
-            "controlType": "INPUT_TEXT"
-          } ]
+            "defaultValue": null,
+            "exampleValue": null,
+            "controlType": "INPUT_TEXT",
+            "options": null,
+            "optionsDataSource": null,
+            "expressionDisabled": null
+          } ],
+          "expressionDisabled": null
         } ],
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
-    } ]
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Creates a record."
   } ],
+  "category": null,
   "connection": {
-    "authorizationRequired": false,
+    "authorizationRequired": true,
     "authorizations": [ {
-      "display": {
-        "title": "Bearer Token"
-      },
+      "description": null,
+      "name": "bearer_token",
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Token",
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "token",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       } ],
-      "name": "bearer_token",
+      "title": "Bearer Token",
       "type": "BEARER_TOKEN"
     } ],
-    "display": {
-      "description": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
-      "title": "Airtable"
-    },
+    "description": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
     "name": "airtable",
+    "properties": null,
+    "title": "Airtable",
     "version": 1
   },
-  "display": {
-    "description": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
-    "title": "Airtable"
-  },
+  "description": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
+  "icon": null,
+  "tags": null,
   "name": "airtable",
+  "resources": null,
   "version": 1,
+  "title": "Airtable",
   "triggers": [ {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "This trigger is activated when a new entry is added to the table that you have selected.",
-      "title": "New Record"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": true,
-      "present": false
-    },
-    "listenerDisable": {
-      "empty": true,
-      "present": false
-    },
+    "batch": null,
+    "deduplicate": null,
+    "description": "Trigger off when a new entry is added to the table that you have selected.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
     "name": "newRecord",
-    "poll": {
-      "empty": false,
-      "present": true
-    },
+    "nodeDescription": null,
+    "outputSchema": null,
+    "outputSchemaDataSource": null,
+    "poll": { },
     "properties": [ {
+      "advancedOption": null,
       "description": "The base id.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "BaseId",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "baseId",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The table id.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "TableId",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "tableId",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "TriggerField",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "triggerField",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
-    "staticWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
+    "staticWebhookRequest": null,
+    "title": "New Record",
     "type": "POLLING",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": true,
-      "present": false
-    }
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null
   } ]
 }

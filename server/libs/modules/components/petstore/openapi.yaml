@@ -467,57 +467,6 @@ paths:
                   $ref: "#/components/schemas/User"
         default:
           description: "successful operation"
-  /user/login:
-    get:
-      tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: false
-        schema:
-          type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: false
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "Successful operation"
-          headers:
-            X-Rate-Limit:
-              description: "calls per hour allowed by the user"
-              schema:
-                type: "integer"
-                format: "int32"
-            X-Expires-After:
-              description: "date in UTC when token expires"
-              schema:
-                type: "string"
-                format: "date-time"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-        "400":
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      parameters: []
-      responses:
-        default:
-          description: "successful operation"
   /user/{username}:
     get:
       tags:

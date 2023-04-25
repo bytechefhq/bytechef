@@ -24,7 +24,6 @@ import static com.bytechef.hermes.component.definition.Authorization.KEY;
 import static com.bytechef.hermes.component.definition.Authorization.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -40,8 +39,7 @@ public class PetstoreConnection {
         .baseUri(connection -> "https://petstore3.swagger.io/api/v3")
         .authorizations(authorization(
             AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
-                .display(
-                    display("OAuth2 Implicit"))
+                .title("OAuth2 Implicit")
                 .properties(
                     string(CLIENT_ID)
                         .label("Client Id")
@@ -53,8 +51,7 @@ public class PetstoreConnection {
                 .scopes(connection -> List.of("write:pets", "read:pets")),
             authorization(
                 AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                    .display(
-                        display("API Key"))
+                    .title("API Key")
                     .properties(
                         string(KEY)
                             .label("Key")

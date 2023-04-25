@@ -25,7 +25,6 @@ import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECR
 import static com.bytechef.hermes.component.definition.Authorization.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -41,8 +40,7 @@ public class PipedriveConnection {
         .baseUri(connection -> "https://api.pipedrive.com/v1")
         .authorizations(authorization(
             AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
-                .display(
-                    display("API Key"))
+                .title("API Key")
                 .properties(
 
                     string(VALUE)
@@ -57,8 +55,7 @@ public class PipedriveConnection {
                 ), authorization(
                     AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(),
                     AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                        .display(
-                            display("OAuth2 Authorization Code"))
+                        .title("OAuth2 Authorization Code")
                         .properties(
                             string(CLIENT_ID)
                                 .label("Client Id")

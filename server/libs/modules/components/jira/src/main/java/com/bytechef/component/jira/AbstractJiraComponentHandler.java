@@ -18,11 +18,10 @@
 package com.bytechef.component.jira;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
-import com.bytechef.component.jira.action.CreateIssueAction;
-import com.bytechef.component.jira.action.GetIssueAction;
-import com.bytechef.component.jira.action.SearchForIssuesUsingJqlAction;
+import com.bytechef.component.jira.action.JiraCreateIssueAction;
+import com.bytechef.component.jira.action.JiraGetIssueAction;
+import com.bytechef.component.jira.action.JiraSearchForIssuesUsingJqlAction;
 import com.bytechef.component.jira.connection.JiraConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -33,15 +32,14 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  * @generated
  */
 public abstract class AbstractJiraComponentHandler implements OpenApiComponentHandler {
-    private final ComponentDefinition componentDefinition = component("jira")
-        .display(
-            modifyDisplay(
-                display("Jira")
-                    .description("Jira Cloud platform REST API documentation")))
-        .actions(modifyActions(CreateIssueAction.ACTION_DEFINITION, GetIssueAction.ACTION_DEFINITION,
-            SearchForIssuesUsingJqlAction.ACTION_DEFINITION))
-        .connection(modifyConnection(JiraConnection.CONNECTION_DEFINITION))
-        .triggers(getTriggers());
+    private final ComponentDefinition componentDefinition = modifyComponent(
+        component("jira")
+            .title("Jira")
+            .description("Jira Cloud platform REST API documentation"))
+                .actions(modifyActions(JiraCreateIssueAction.ACTION_DEFINITION, JiraGetIssueAction.ACTION_DEFINITION,
+                    JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION))
+                .connection(modifyConnection(JiraConnection.CONNECTION_DEFINITION))
+                .triggers(getTriggers());
 
     @Override
     public ComponentDefinition getDefinition() {
