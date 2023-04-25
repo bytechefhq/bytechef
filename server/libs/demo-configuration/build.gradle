@@ -1,6 +1,7 @@
 dependencies {
+    api project(":server:libs:atlas:atlas-api")
+    api project(":server:libs:helios:helios-project:helios-project-api")
+
     implementation "org.springframework:spring-context"
-    implementation project(":server:libs:atlas:atlas-api")
-    implementation project(":server:libs:helios:helios-project:helios-project-api")
     implementation project(":server:libs:core:commons:commons-util")
 }

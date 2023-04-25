@@ -38,13 +38,13 @@ tasks.register("generateOpenAPI") {
 }
 
 dependencies {
+    api project(":server:libs:core:message-broker:message-broker-api")
     api project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest:hermes-workflow-rest-api")
 
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-webflux"
     implementation project(":server:libs:core:autoconfigure-annotations")
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:core:message-broker:message-broker-api")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
 }
