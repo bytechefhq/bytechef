@@ -72,12 +72,6 @@ public class TaskCoordinatorMessageBrokerConfiguration {
                 "resume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskMessageRoute.TASKS_SUBFLOWS,
-                subscriptions.getJobs(),
-                coordinator,
-                "create");
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
                 TaskMessageRoute.TASKS_STOPS,
                 subscriptions.getJobs(),
                 coordinator,

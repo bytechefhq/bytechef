@@ -28,8 +28,7 @@ public enum TaskMessageRoute implements MessageRoute {
     TASKS_COMPLETIONS(Exchange.MESSAGE, "tasks.completions"),
     TASKS_JOBS(Exchange.MESSAGE, "tasks.jobs"),
     TASKS_RESTARTS(Exchange.MESSAGE, "tasks.restarts"),
-    TASKS_STOPS(Exchange.MESSAGE, "tasks.stops"),
-    TASKS_SUBFLOWS(Exchange.MESSAGE, "tasks.subflows");
+    TASKS_STOPS(Exchange.MESSAGE, "tasks.stops");
 
     private final Exchange exchange;
     private final String routeName;
@@ -46,7 +45,6 @@ public enum TaskMessageRoute implements MessageRoute {
             case "tasks.jobs" -> TASKS_JOBS;
             case "tasks.restarts" -> TASKS_RESTARTS;
             case "tasks.stops" -> TASKS_STOPS;
-            case "tasks.subflows" -> TASKS_SUBFLOWS;
             default -> new CustomMessageRoute(routName);
         };
     }
