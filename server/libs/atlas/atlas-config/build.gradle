@@ -1,5 +1,6 @@
 dependencies {
-    implementation project(":server:libs:core:message-broker:message-broker-api")
-    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-api")
+    api project(":server:libs:core:message-broker:message-broker-api")
+    api project(":server:libs:atlas:atlas-repository:atlas-repository-api")
+
     implementation project(":server:libs:atlas:atlas-service")
 }
