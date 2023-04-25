@@ -8,7 +8,7 @@ const DescriptionTab = ({component}: {component: ComponentDefinitionModel}) => (
             label="Name"
             labelClassName="px-2"
             name="componentDescriptionName"
-            defaultValue={component.display.title}
+            defaultValue={component.title}
         />
 
         <TextArea
