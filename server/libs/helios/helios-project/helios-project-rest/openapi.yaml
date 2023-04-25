@@ -914,7 +914,7 @@ components:
       required:
       - "name"
       properties:
-        inputParameters:
+        inputs:
           description: "The input parameters of an project instance used as workflow\
             \ input values."
           type: "object"
