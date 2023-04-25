@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.hermes.worker.trigger.handler;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 
 /**
  * A strategy interface used for executing a {@link TriggerExecution}.
  *
- * @author Arik Cohen
- * @since Jun 12, 2016
+ * @author Ivica Cardic
  */
 public interface TriggerHandler {
 
-    TriggerDefinition.TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException;
+    TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException;
 }

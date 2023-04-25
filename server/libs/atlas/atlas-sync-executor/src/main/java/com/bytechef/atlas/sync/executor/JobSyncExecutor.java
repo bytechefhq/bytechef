@@ -125,9 +125,6 @@ public class JobSyncExecutor {
 
         jobFacade = new JobFacadeImpl(builder.contextService, builder.eventPublisher, jobService, syncMessageBroker);
 
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
         TaskCoordinator coordinator = TaskCoordinator.builder()
             .eventPublisher(builder.eventPublisher)
             .jobExecutor(jobExecutor)
