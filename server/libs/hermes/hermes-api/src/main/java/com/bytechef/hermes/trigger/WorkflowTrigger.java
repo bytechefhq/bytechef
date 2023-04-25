@@ -17,19 +17,147 @@
 
 package com.bytechef.hermes.trigger;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.atlas.constant.WorkflowConstants;
+import com.bytechef.commons.util.MapValueUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record WorkflowTrigger(String name, String label, Map<String, Object> parameters, String type) {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class WorkflowTrigger {
 
-    public WorkflowTrigger {
-        Assert.notNull(name, "'name' must not be null");
-        Assert.notNull(type, "'type' must not be null");
+    static {
+        MapValueUtils.addConverter(new WorkflowTriggerConverter());
+    }
+
+    private String name;
+    private String label;
+    private Map<String, Object> parameters;
+    private String timeout;
+    private String type;
+
+    private WorkflowTrigger() {
+    }
+
+    public WorkflowTrigger(Map<String, Object> source) {
+        Assert.notNull(source, "'source' must not be null");
+
+        if (source.containsKey(WorkflowConstants.LABEL)) {
+            this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+        }
+
+        if (source.containsKey(WorkflowConstants.NAME)) {
+            this.name = MapValueUtils.getString(source, WorkflowConstants.NAME);
+        }
+
+        if (source.containsKey(WorkflowConstants.PARAMETERS)) {
+            this.parameters = MapValueUtils.getMap(source, WorkflowConstants.PARAMETERS, Collections.emptyMap());
+        }
+
+        if (source.containsKey(WorkflowConstants.TIMEOUT)) {
+            this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
+        }
+
+        this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        WorkflowTrigger that = (WorkflowTrigger) o;
+
+        return Objects.equals(label, that.label)
+            && Objects.equals(name, that.name)
+            && parameters.equals(that.parameters)
+            && Objects.equals(timeout, that.timeout)
+            && Objects.equals(type, that.type);
+    }
+
+    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
+        // TODO
+
+        return Optional.empty();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(label, name, parameters, timeout, type);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public Map<String, Object> getParameters() {
+        return Collections.unmodifiableMap(parameters);
+    }
+
+    public String getTimeout() {
+        return timeout;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+
+        if (label != null) {
+            map.put(WorkflowConstants.LABEL, label);
+        }
+
+        if (name != null) {
+            map.put(WorkflowConstants.NAME, name);
+        }
+
+        map.put(WorkflowConstants.PARAMETERS, parameters);
+
+        if (timeout != null) {
+            map.put(WorkflowConstants.TIMEOUT, timeout);
+        }
+
+        map.put(WorkflowConstants.TYPE, type);
+
+        return Collections.unmodifiableMap(map);
+    }
+
+    @Override
+    public String toString() {
+        return "WorkflowTask{" + ", label='"
+            + label + '\'' + ", name='"
+            + name + '\'' + ", timeout='"
+            + timeout + '\'' + ", type='"
+            + type + '\'' + ", parameters='"
+            + parameters + '\'' + '}';
+    }
+
+    private static class WorkflowTriggerConverter implements Converter<Map, WorkflowTrigger> {
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public WorkflowTrigger convert(Map source) {
+            return new WorkflowTrigger(source);
+        }
     }
 }

@@ -21,46 +21,29 @@ import com.bytechef.commons.util.Base64Utils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
 public class WorkflowExecutionId {
 
-    public static final String WORKFLOW_INSTANCE_ID = "workflowExecutionId";
-
-    private final Long instanceId;
-    private final long jobId;
+    private final long instanceId;
+    private final String instanceType;
     private final String triggerName;
     private final String workflowId;
 
-    private WorkflowExecutionId(Long instanceId, long jobId, String triggerName, String workflowId) {
+    private WorkflowExecutionId(long instanceId, String instanceType, String triggerName, String workflowId) {
         this.instanceId = instanceId;
-        this.jobId = jobId;
+        this.instanceType = instanceType;
         this.triggerName = triggerName;
         this.workflowId = workflowId;
     }
 
-    public static WorkflowExecutionId of(String workflowId, long jobId) {
+    public static WorkflowExecutionId of(String workflowId, long instanceId, String instanceType, String triggerName) {
         Assert.hasText(workflowId, "'workflowId' must not be null");
-
-        return new WorkflowExecutionId(null, jobId, null, workflowId);
-    }
-
-    public static WorkflowExecutionId of(String workflowId, Long instanceId, long jobId) {
-        Assert.hasText(workflowId, "'workflowId' must not be null");
-        Assert.notNull(instanceId, "'instanceId' must not be null");
-
-        return new WorkflowExecutionId(instanceId, jobId, null, workflowId);
-    }
-
-    public static WorkflowExecutionId of(String workflowId, Long instanceId, long jobId, String triggerName) {
-        Assert.hasText(workflowId, "'workflowId' must not be null");
-        Assert.notNull(instanceId, "'instanceId' must not be null");
+        Assert.notNull(instanceType, "'instanceType' must not be null");
         Assert.hasText(triggerName, "'triggerName' must not be null");
 
-        return new WorkflowExecutionId(instanceId, jobId, triggerName, workflowId);
+        return new WorkflowExecutionId(instanceId, instanceType, triggerName, workflowId);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -69,34 +52,38 @@ public class WorkflowExecutionId {
         String[] items = id.split(":");
 
         return WorkflowExecutionId.of(
-            items[0], StringUtils.hasText(items[1]) ? Long.parseLong(items[1]) : null, Long.parseLong(items[2]),
-            items[3]);
+            items[0], Long.parseLong(items[1]), StringUtils.hasText(items[2]) ? items[2] : null, items[3]);
     }
 
     public String getWorkflowId() {
         return workflowId;
     }
 
-    public Optional<Long> getInstanceId() {
-        return Optional.ofNullable(instanceId);
+    public long getInstanceId() {
+        return instanceId;
     }
 
-    public Optional<String> getTriggerName() {
-        return Optional.ofNullable(triggerName);
+    public String getInstanceType() {
+        return instanceType;
+    }
+
+    public String getTriggerName() {
+        return triggerName;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        String id = workflowId +
+            ':' +
+            instanceId +
+            ':' +
+            (instanceType == null ? "" : instanceType) +
+            ':' +
+            (StringUtils.hasText(triggerName) ? triggerName : "");
 
-        sb.append(workflowId);
-        sb.append(':');
-        sb.append(instanceId == null ? "" : instanceId);
-        sb.append(':');
-        sb.append(jobId);
-        sb.append(':');
-        sb.append(StringUtils.hasText(triggerName) ? triggerName : "");
+        return Base64Utils.encodeToString(id);
+    }
 
-        return Base64Utils.encodeToString(sb.toString());
+    public record Instance(long id, String type) {
     }
 }

@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS task_execution (
     job_id                   BIGSERIAL    NOT NULL,
     parent_id                BIGINT           NULL,
     status                   VARCHAR(256) NOT NULL,
-    progress                 INT not          NULL,
+    progress                 INT          NOT NULL,
     priority                 INT          NOT NULL,
     max_retries              INT          NOT NULL,
     retry_attempts           INT          NOT NULL,
