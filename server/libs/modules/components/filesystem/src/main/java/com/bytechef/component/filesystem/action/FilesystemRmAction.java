@@ -31,7 +31,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RM;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -39,7 +38,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class FilesystemRmAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(RM)
-        .display(display("Remove").description("Removes the content of a directory."))
+        .title("Remove")
+        .description("Removes the content of a directory.")
         .execute(FilesystemRmAction::executeRm);
 
     /**

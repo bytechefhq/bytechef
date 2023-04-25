@@ -18,7 +18,6 @@
 package com.bytechef.component.xmlfile;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.xmlfile.action.XmlFileReadAction;
 import com.bytechef.component.xmlfile.action.XmlFileWriteAction;
@@ -34,7 +33,8 @@ import com.google.auto.service.AutoService;
 public class XmlFileComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XmlFileConstants.XML_FILE)
-        .display(display("XML File").description("Reads and writes data from a XML file."))
+        .title("XML File")
+        .description("Reads and writes data from a XML file.")
         .actions(
             XmlFileReadAction.ACTION_DEFINITION,
             XmlFileWriteAction.ACTION_DEFINITION);

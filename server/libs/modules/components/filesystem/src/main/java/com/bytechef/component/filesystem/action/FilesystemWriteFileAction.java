@@ -34,7 +34,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.WRITE_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -45,7 +45,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class FilesystemWriteFileAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(WRITE_FILE)
-        .display(display("Write to file"))
+        .title("Write to file")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")

@@ -1,275 +1,489 @@
 {
-  "display": {
-    "description": "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.",
-    "title": "Webhook"
-  },
+  "actions": null,
+  "category": null,
+  "connection": null,
+  "description": "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.",
+  "icon": null,
+  "tags": null,
   "name": "webhook",
+  "resources": null,
   "version": 1,
+  "title": "Webhook",
   "triggers": [ {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.",
-      "title": "Auto Respond with HTTP 200 status"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": true,
-      "present": false
-    },
-    "listenerDisable": {
-      "empty": true,
-      "present": false
-    },
-    "outputSchema": [ {
-      "type": "OBJECT",
-      "multipleValues": true,
-      "properties": [ {
-        "name": "headers",
-        "type": "OBJECT",
-        "multipleValues": true,
-        "controlType": "JSON_BUILDER"
-      }, {
-        "name": "query",
-        "type": "OBJECT",
-        "multipleValues": true,
-        "controlType": "JSON_BUILDER"
-      }, {
-        "name": "body",
-        "type": "ONE_OF",
-        "types": [ {
-          "type": "ARRAY",
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        }, {
-          "type": "OBJECT",
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        } ]
-      } ],
-      "controlType": "JSON_BUILDER"
-    } ],
+    "batch": null,
+    "deduplicate": null,
+    "description": "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
     "name": "autoRespondWithHTTP200",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
-    "staticWebhookRequest": {
-      "empty": false,
-      "present": true
-    },
-    "type": "STATIC_WEBHOOK",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": true,
-      "present": false
-    }
-  }, {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.",
-      "title": "Validate and respond"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": true,
-      "present": false
-    },
-    "listenerDisable": {
-      "empty": true,
-      "present": false
-    },
+    "nodeDescription": null,
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "headers",
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "query",
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "body",
         "type": "ONE_OF",
         "types": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
           "type": "ARRAY",
+          "defaultValue": null,
+          "exampleValue": null,
+          "items": null,
           "multipleValues": true,
-          "controlType": "JSON_BUILDER"
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "JSON_BUILDER",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
           "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "additionalProperties": null,
           "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        } ]
+          "objectType": null,
+          "options": null,
+          "optionsDataSource": null,
+          "properties": null,
+          "controlType": "JSON_BUILDER",
+          "expressionDisabled": null
+        } ],
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
+    "outputSchemaDataSource": null,
+    "poll": null,
+    "properties": null,
+    "staticWebhookRequest": { },
+    "title": "Auto Respond with HTTP 200 status",
+    "type": "STATIC_WEBHOOK",
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null
+  }, {
+    "batch": null,
+    "deduplicate": null,
+    "description": "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
     "name": "validateAndRespond",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
-    "properties": [ {
-      "description": "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.",
-      "label": "CSRF Token",
-      "name": "csrfToken",
-      "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ],
-    "staticWebhookRequest": {
-      "empty": false,
-      "present": true
-    },
-    "type": "STATIC_WEBHOOK",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": false,
-      "present": true
-    }
-  }, {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.",
-      "title": "Await workflow and respond"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": true,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": true,
-      "present": false
-    },
-    "listenerDisable": {
-      "empty": true,
-      "present": false
-    },
+    "nodeDescription": null,
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "headers",
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "query",
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "body",
         "type": "ONE_OF",
         "types": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
           "type": "ARRAY",
+          "defaultValue": null,
+          "exampleValue": null,
+          "items": null,
           "multipleValues": true,
-          "controlType": "JSON_BUILDER"
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "JSON_BUILDER",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
           "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "additionalProperties": null,
           "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        } ]
+          "objectType": null,
+          "options": null,
+          "optionsDataSource": null,
+          "properties": null,
+          "controlType": "JSON_BUILDER",
+          "expressionDisabled": null
+        } ],
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
-    "name": "awaitWorkflowAndRespond",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
+    "outputSchemaDataSource": null,
+    "poll": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "CSRF Token",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "csrfToken",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "staticWebhookRequest": { },
+    "title": "Validate and respond",
+    "type": "STATIC_WEBHOOK",
+    "webhookBodyRaw": null,
+    "webhookValidate": { },
+    "workflowSyncExecution": null
+  }, {
+    "batch": null,
+    "deduplicate": null,
+    "description": "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": null,
+    "listenerDisable": null,
+    "name": "awaitWorkflowAndRespond",
+    "nodeDescription": null,
+    "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": "headers",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": "query",
+        "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": "body",
+        "type": "ONE_OF",
+        "types": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "ARRAY",
+          "defaultValue": null,
+          "exampleValue": null,
+          "items": null,
+          "multipleValues": true,
+          "options": null,
+          "optionsDataSource": null,
+          "controlType": "JSON_BUILDER",
+          "expressionDisabled": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
+          "name": null,
+          "type": "OBJECT",
+          "defaultValue": null,
+          "exampleValue": null,
+          "additionalProperties": null,
+          "multipleValues": true,
+          "objectType": null,
+          "options": null,
+          "optionsDataSource": null,
+          "properties": null,
+          "controlType": "JSON_BUILDER",
+          "expressionDisabled": null
+        } ],
+        "expressionDisabled": null
+      } ],
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "poll": null,
+    "properties": [ {
+      "advancedOption": null,
+      "description": "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.",
+      "displayCondition": null,
+      "hidden": null,
+      "label": "CSRF Token",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": "csrfToken",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Timeout (ms)",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "timeout",
       "type": "INTEGER",
-      "controlType": "INPUT_INTEGER"
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     } ],
-    "staticWebhookRequest": {
-      "empty": false,
-      "present": true
-    },
+    "staticWebhookRequest": { },
+    "title": "Await workflow and respond",
     "type": "STATIC_WEBHOOK",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": false,
-      "present": true
-    }
+    "webhookBodyRaw": null,
+    "webhookValidate": { },
+    "workflowSyncExecution": true
   } ]
 }

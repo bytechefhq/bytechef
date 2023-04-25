@@ -34,7 +34,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.ContextServiceImpl;
 import com.bytechef.atlas.service.CounterServiceImpl;
 import com.bytechef.atlas.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
@@ -52,12 +51,10 @@ import java.util.Objects;
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
-    private final TaskEvaluator taskEvaluator;
     private final TaskHandlerResolver taskHandlerResolver;
 
-    public MapTaskDispatcherAdapterTaskHandler(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator) {
+    public MapTaskDispatcherAdapterTaskHandler(TaskHandlerResolver taskHandlerResolver) {
         this.taskHandlerResolver = Objects.requireNonNull(taskHandlerResolver);
-        this.taskEvaluator = Objects.requireNonNull(taskEvaluator);
     }
 
     @Override
@@ -88,7 +85,6 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})
             .executorService(new CurrentThreadExecutorService())
-            .taskEvaluator(taskEvaluator)
             .build();
 
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
@@ -105,7 +101,6 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             .messageBroker(messageBroker)
             .taskDispatcher(worker::handle)
             .taskExecutionService(taskExecutionService)
-            .taskEvaluator(taskEvaluator)
             .build();
 
         mapTaskDispatcher.dispatch(taskExecution);

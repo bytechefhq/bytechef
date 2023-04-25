@@ -53,7 +53,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -63,7 +63,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class XlsxFileReadAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(XlsxFileConstants.READ)
-        .display(display("Read from file").description("Reads data from a XLS/XLSX file."))
+        .title("Read from file")
+        .description("Reads data from a XLS/XLSX file.")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")

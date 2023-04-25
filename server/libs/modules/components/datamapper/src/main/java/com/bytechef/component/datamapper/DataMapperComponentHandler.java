@@ -17,19 +17,18 @@
 
 package com.bytechef.component.datamapper;
 
-import com.bytechef.component.datamapper.action.MapKeysAction;
-import com.bytechef.component.datamapper.action.MapListToObjectAction;
-import com.bytechef.component.datamapper.action.MapMultipleValuesBetweenObjectsAction;
-import com.bytechef.component.datamapper.action.MapObjectsAction;
-import com.bytechef.component.datamapper.action.MapObjectsToListAction;
-import com.bytechef.component.datamapper.action.MapOneValueAction;
-import com.bytechef.component.datamapper.action.MapValuesAction;
+import com.bytechef.component.datamapper.action.DataMapperMapKeysAction;
+import com.bytechef.component.datamapper.action.DataMapperMapListToObjectAction;
+import com.bytechef.component.datamapper.action.DataMapperMapMultipleValuesBetweenObjectsAction;
+import com.bytechef.component.datamapper.action.DataMapperMapObjectsAction;
+import com.bytechef.component.datamapper.action.DataMapperMapObjectsToListAction;
+import com.bytechef.component.datamapper.action.DataMapperMapOneValueAction;
+import com.bytechef.component.datamapper.action.DataMapperMapValuesAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -38,15 +37,16 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class DataMapperComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("dataMapper")
-        .display(display("Data Mapper").description("The Data Mapper enables you to configure data mappings."))
+        .title("Data Mapper")
+        .description("The Data Mapper enables you to configure data mappings.")
         .actions(
-            MapKeysAction.ACTION_DEFINITION,
-            MapListToObjectAction.ACTION_DEFINITION,
-            MapMultipleValuesBetweenObjectsAction.ACTION_DEFINITION,
-            MapObjectsAction.ACTION_DEFINITION,
-            MapObjectsToListAction.ACTION_DEFINITION,
-            MapOneValueAction.ACTION_DEFINITION,
-            MapValuesAction.ACTION_DEFINITION);
+            DataMapperMapKeysAction.ACTION_DEFINITION,
+            DataMapperMapListToObjectAction.ACTION_DEFINITION,
+            DataMapperMapMultipleValuesBetweenObjectsAction.ACTION_DEFINITION,
+            DataMapperMapObjectsAction.ACTION_DEFINITION,
+            DataMapperMapObjectsToListAction.ACTION_DEFINITION,
+            DataMapperMapOneValueAction.ACTION_DEFINITION,
+            DataMapperMapValuesAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -18,7 +18,6 @@
 package com.bytechef.component.xlsxfile;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.xlsxfile.action.XlsxFileReadAction;
 import com.bytechef.component.xlsxfile.action.XlsxFileWriteAction;
@@ -34,7 +33,8 @@ import com.google.auto.service.AutoService;
 public class XlsxFileComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XlsxFileConstants.XLSX_FILE)
-        .display(display("XLSX File").description("Reads and writes data from a XLS/XLSX file."))
+        .title("XLSX File")
+        .description("Reads and writes data from a XLS/XLSX file.")
         .actions(
             XlsxFileReadAction.ACTION_DEFINITION,
             XlsxFileWriteAction.ACTION_DEFINITION);

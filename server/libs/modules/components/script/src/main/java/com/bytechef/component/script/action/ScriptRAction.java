@@ -27,7 +27,7 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.R;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -39,7 +39,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class ScriptRAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(R)
-        .display(display("R").description("Executes custom R code."))
+        .title("R")
+        .description("Executes custom R code.")
         .properties(
             object(INPUT)
                 .label("Input")

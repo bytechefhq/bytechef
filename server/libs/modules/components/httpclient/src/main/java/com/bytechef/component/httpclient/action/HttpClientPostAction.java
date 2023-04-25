@@ -30,7 +30,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -41,7 +41,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class HttpClientPostAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(POST)
-        .display(display("POST").description("The request method to use."))
+        .title("POST")
+        .description("The request method to use.")
         .properties(
             HttpClientActionUtils.toArray(
                 //

@@ -26,7 +26,7 @@ import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.SOURC
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.STRINGIFY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -37,8 +37,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class XmlHelperStringifyAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(STRINGIFY)
-        .display(display("Convert to XML string")
-            .description("Writes the object/array to a XML string."))
+        .title("Convert to XML string")
+        .description("Writes the object/array to a XML string.")
         .properties(oneOf(SOURCE)
             .label("Source")
             .description("The data to convert to XML string.")

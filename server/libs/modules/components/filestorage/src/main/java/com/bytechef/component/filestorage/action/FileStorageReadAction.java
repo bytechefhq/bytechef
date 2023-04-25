@@ -25,7 +25,7 @@ import static com.bytechef.component.filestorage.constant.FileStorageConstants.F
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.READ;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -34,7 +34,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class FileStorageReadAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(READ)
-        .display(display("Read from file").description("Reads data from the file."))
+        .title("Read from file")
+        .description("Reads data from the file.")
         .properties(fileEntry(FILE_ENTRY)
             .label("File")
             .description(

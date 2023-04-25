@@ -27,7 +27,7 @@ import java.util.Map;
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.PARSE;
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -37,8 +37,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class XmlHelperParseAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(PARSE)
-        .display(display("Convert from XML string")
-            .description("Converts the XML string to object/array."))
+        .title("Convert from XML string")
+        .description("Converts the XML string to object/array.")
         .properties(string(SOURCE)
             .label("Source")
             .description("The XML string to convert to the data.")

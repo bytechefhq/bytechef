@@ -39,7 +39,7 @@ import static com.bytechef.component.filestorage.constant.FileStorageConstants.D
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILENAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -48,7 +48,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class FileStorageDownloadAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(DOWNLOAD)
-        .display(display("Download file").description("Download a file from the URL."))
+        .title("Download file")
+        .description("Download a file from the URL.")
         .properties(
             string(FileStorageConstants.URL)
                 .label("URL")
