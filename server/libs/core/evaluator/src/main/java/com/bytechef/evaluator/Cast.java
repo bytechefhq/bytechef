@@ -17,8 +17,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -26,12 +28,21 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Mar, 03 2020
+ * @since Feb, 19 2020
  */
-class Timestamp implements MethodExecutor {
+class Cast<T> implements MethodExecutor {
+
+    private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
+
+    private final transient Class<T> type;
+
+    Cast(Class<T> type) {
+        this.type = type;
+    }
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        return new TypedValue(System.currentTimeMillis());
+        T value = type.cast(conversionService.convert(aArguments[0], type));
+        return new TypedValue(value);
     }
 }

@@ -17,10 +17,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -30,17 +30,17 @@ import org.springframework.expression.TypedValue;
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-class Concat implements MethodExecutor {
+class Join implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        List<?> l1 = (List<?>) aArguments[0];
-        List<?> l2 = (List<?>) aArguments[1];
-        List<Object> joined = new ArrayList<>(l1.size() + l2.size());
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        String separator = (String) arguments[0];
+        List<?> values = (List<?>) arguments[1];
 
-        joined.addAll(l1);
-        joined.addAll(l2);
+        String str = values.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(separator));
 
-        return new TypedValue(joined);
+        return new TypedValue(str);
     }
 }
