@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.DefinitionDSL;
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -115,22 +114,26 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
-        private boolean batch;
+        private Boolean batch;
         private String componentName;
-        private Display display;
+        private String description;
         private Object exampleOutput;
 
         @JsonIgnore
         private ExecuteFunction execute;
-        private ExampleOutputDataSource exampleOutputDataSource;
 
         @JsonIgnore
-        private HelpFunction help;
+        private ExampleOutputDataSource exampleOutputDataSource;
+
+        private Help help;
+
+        @JsonIgnore
         private Map<String, Object> metadata;
         private String name;
         private List<? extends Property<?>> outputSchema;
         private List<? extends Property<?>> properties;
         private OutputSchemaDataSource outputSchemaDataSource;
+        private String title;
 
         private ModifiableActionDefinition() {
         }
@@ -145,8 +148,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition display(Display display) {
-            this.display = display;
+        public ModifiableActionDefinition description(String description) {
+            this.description = description;
 
             return this;
         }
@@ -157,19 +160,19 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition execute(ExecuteFunction execute) {
-            this.execute = execute;
-
-            return this;
-        }
-
         public ModifiableActionDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
             this.exampleOutputDataSource = exampleOutputDataSource;
 
             return this;
         }
 
-        public ModifiableActionDefinition help(HelpFunction help) {
+        public ModifiableActionDefinition execute(ExecuteFunction execute) {
+            this.execute = execute;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition help(Help help) {
             this.help = help;
 
             return this;
@@ -212,6 +215,12 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableActionDefinition title(String title) {
+            this.title = title;
+
+            return this;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -233,24 +242,20 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        @SuppressFBWarnings("NP")
-        public boolean getBatch() {
-            return batch;
-        }
-
-        @Override
         @JsonIgnore
         public String getComponentName() {
             return componentName;
         }
 
-        public Display getDisplay() {
-            return display;
+        @Override
+        public String getDescription() {
+            return Objects.requireNonNullElseGet(description, () -> componentName + ": " + name);
+
         }
 
         @Override
-        public Object getExampleOutput() {
-            return exampleOutput;
+        public Optional<Object> getExampleOutput() {
+            return Optional.ofNullable(exampleOutput);
         }
 
         @Override
@@ -259,12 +264,12 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public ExampleOutputDataSource getExampleOutputDataSource() {
-            return exampleOutputDataSource;
+        public Optional<ExampleOutputDataSource> getExampleOutputDataSource() {
+            return Optional.ofNullable(exampleOutputDataSource);
         }
 
         @Override
-        public Optional<HelpFunction> getHelp() {
+        public Optional<Help> getHelp() {
             return Optional.ofNullable(help);
         }
 
@@ -279,23 +284,28 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<? extends Property<?>> getOutputSchema() {
-            return outputSchema;
+        public Optional<List<? extends Property<?>>> getOutputSchema() {
+            return Optional.ofNullable(outputSchema);
         }
 
         @Override
-        public OutputSchemaDataSource getOutputSchemaDataSource() {
-            return outputSchemaDataSource;
+        public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
+            return Optional.ofNullable(outputSchemaDataSource);
         }
 
         @Override
-        public List<? extends Property<?>> getProperties() {
-            return properties;
+        public Optional<List<? extends Property<?>>> getProperties() {
+            return Optional.ofNullable(properties);
         }
 
         @Override
-        public Resources getResources() {
-            return null;
+        public String getTitle() {
+            return Objects.requireNonNullElseGet(title, () -> name);
+        }
+
+        @Override
+        public Optional<Boolean> getBatch() {
+            return Optional.ofNullable(batch);
         }
 
         private ModifiableActionDefinition componentName(String componentName) {
@@ -371,15 +381,17 @@ public final class ComponentDSL extends DefinitionDSL {
         @JsonIgnore
         private List<Object> detectOn;
 
-        private Display display;
+        private String description;
 
-        @JsonIgnore
-        private List<Object> refreshOn;
+        private String name;
 
         private List<? extends Property<?>> properties;
 
         @JsonIgnore
         private RefreshFunction refresh;
+
+        @JsonIgnore
+        private List<Object> refreshOn;
 
         @JsonIgnore
         private RefreshUrlFunction refreshUrl = connectionParameters -> {
@@ -413,13 +425,13 @@ public final class ComponentDSL extends DefinitionDSL {
         };
 
         @JsonIgnore
-        private TokenUrlFunction tokenUrl = connectionParameters -> connectionParameters
-            .getString(Authorization.TOKEN_URL);
-
-        private String name;
+        private PkceFunction pkce = (verifier, challenge) -> new Pkce(verifier, challenge, "SHA256");
+        private String title;
 
         @JsonIgnore
-        private PkceFunction pkce = (verifier, challenge) -> new Pkce(verifier, challenge, "SHA256");
+        private TokenUrlFunction tokenUrl =
+            connectionParameters -> connectionParameters.getString(Authorization.TOKEN_URL);
+
         private AuthorizationType type;
 
         private ModifiableAuthorization() {
@@ -485,8 +497,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableAuthorization display(Display display) {
-            this.display = display;
+        public ModifiableAuthorization description(String description) {
+            this.description = description;
 
             return this;
         }
@@ -537,6 +549,12 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableAuthorization title(String title) {
+            this.title = title;
+
+            return this;
+        }
+
         public ModifiableAuthorization tokenUrl(TokenUrlFunction tokenUrl) {
             if (tokenUrl != null) {
                 this.tokenUrl = tokenUrl;
@@ -576,13 +594,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Object> getDetectOn() {
-            return detectOn;
+        public Optional<List<Object>> getDetectOn() {
+            return Optional.ofNullable(detectOn);
         }
 
         @Override
-        public Display getDisplay() {
-            return display;
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
         }
 
         @Override
@@ -591,8 +609,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Object> getRefreshOn() {
-            return refreshOn;
+        public Optional<List<Object>> getRefreshOn() {
+            return Optional.ofNullable(refreshOn);
         }
 
         @Override
@@ -621,6 +639,11 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public String getTitle() {
+            return Objects.requireNonNullElseGet(title, () -> name);
+        }
+
+        @Override
         public TokenUrlFunction getTokenUrl() {
             return tokenUrl;
         }
@@ -634,17 +657,26 @@ public final class ComponentDSL extends DefinitionDSL {
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
         private List<? extends ActionDefinition> actions;
+        private String category;
         private ModifiableConnectionDefinition connection;
-        private Display display;
+        private String description;
+        private String icon;
+        private String[] tags;
 
         @JsonIgnore
         private FilterCompatibleConnectionDefinitionsFunction filterCompatibleConnectionDefinitions;
 
+        @JsonIgnore
         private Map<String, Object> metadata;
         private String name;
         private Resources resources;
         private int version = VERSION_1;
+        private String title;
         private List<? extends TriggerDefinition> triggers;
+
+        // TODO
+        @JsonIgnore
+        private NodeDescriptionFunction nodeDescription;
 
         private ModifiableComponentDefinition() {
         }
@@ -673,11 +705,18 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition category(String category) {
+            this.category = category;
+
+            return this;
+        }
+
         public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
             this.connection = ((ModifiableConnectionDefinition) connectionDefinition)
                 .componentName(this.name)
-                .display(this.display)
-                .name(this.name);
+                .description(this.description)
+                .name(this.name)
+                .title(this.getTitle());
 
             return this;
         }
@@ -685,14 +724,15 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connection = connectionDefinition
                 .componentName(this.name)
-                .display(this.display)
-                .name(this.name);
+                .description(this.description)
+                .name(this.name)
+                .title(this.getTitle());
 
             return this;
         }
 
-        public ModifiableComponentDefinition display(ModifiableDisplay display) {
-            this.display = display;
+        public ModifiableComponentDefinition description(String description) {
+            this.description = description;
 
             return this;
         }
@@ -701,6 +741,12 @@ public final class ComponentDSL extends DefinitionDSL {
             FilterCompatibleConnectionDefinitionsFunction filterCompatibleConnectionDefinitions) {
 
             this.filterCompatibleConnectionDefinitions = filterCompatibleConnectionDefinitions;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition icon(String icon) {
+            this.icon = icon;
 
             return this;
         }
@@ -722,8 +768,26 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition nodeDescription(NodeDescriptionFunction nodeDescription) {
+            this.nodeDescription = nodeDescription;
+
+            return this;
+        }
+
         public ModifiableComponentDefinition resources(ModifiableResources resources) {
             this.resources = resources;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition tags(String... tags) {
+            this.tags = tags;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition title(String title) {
+            this.title = title;
 
             return this;
         }
@@ -768,20 +832,6 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitions(
-            ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
-
-            List<ConnectionDefinition> filteredConnectionDefinitions = Collections.emptyList();
-
-            if (filterCompatibleConnectionDefinitions != null) {
-                filteredConnectionDefinitions = filterCompatibleConnectionDefinitions.apply(
-                    componentDefinition, connectionDefinitions);
-            }
-
-            return filteredConnectionDefinitions;
-        }
-
-        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -802,25 +852,33 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public FilterCompatibleConnectionDefinitionsFunction getFilterCompatibleConnectionDefinitions() {
-            return filterCompatibleConnectionDefinitions;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public List<? extends ActionDefinition> getActions() {
-            return actions == null ? null : new ArrayList<>(actions);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public ModifiableConnectionDefinition getConnection() {
-            return connection;
+        public Optional<FilterCompatibleConnectionDefinitionsFunction> getFilterCompatibleConnectionDefinitions() {
+            return Optional.ofNullable(filterCompatibleConnectionDefinitions);
         }
 
         @Override
-        public Display getDisplay() {
-            return display;
+        public Optional<List<? extends ActionDefinition>> getActions() {
+            return Optional.ofNullable(actions == null ? null : new ArrayList<>(actions));
+        }
+
+        @Override
+        public Optional<String> getCategory() {
+            return Optional.ofNullable(category);
+        }
+
+        @Override
+        public Optional<ConnectionDefinition> getConnection() {
+            return Optional.ofNullable(connection);
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public String getIcon() {
+            return icon;
         }
 
         @Override
@@ -834,14 +892,29 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        @SuppressFBWarnings("EI")
-        public Resources getResources() {
-            return resources;
+        public NodeDescriptionFunction getNodeDescription() {
+            return nodeDescription;
         }
 
         @Override
-        public List<? extends TriggerDefinition> getTriggers() {
-            return triggers == null ? null : new ArrayList<>(triggers);
+        @SuppressFBWarnings("EI")
+        public Optional<Resources> getResources() {
+            return Optional.ofNullable(resources);
+        }
+
+        @Override
+        public Optional<String[]> getTags() {
+            return Optional.ofNullable(tags == null ? null : tags.clone());
+        }
+
+        @Override
+        public String getTitle() {
+            return Objects.requireNonNull(title, () -> name);
+        }
+
+        @Override
+        public Optional<List<? extends TriggerDefinition>> getTriggers() {
+            return Optional.ofNullable(triggers == null ? null : new ArrayList<>(triggers));
         }
 
         @Override
@@ -854,7 +927,7 @@ public final class ComponentDSL extends DefinitionDSL {
         implements ComponentOptionsDataSource {
 
         @JsonIgnore
-        private OptionsFunction options;
+        private final OptionsFunction options;
 
         private ModifiableComponentOptionsDataSource(
             OptionsFunction options, List<String> loadOptionsDependOnPropertyNames) {
@@ -892,7 +965,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
-        private boolean authorizationRequired;
+        private boolean authorizationRequired = true;
         private List<? extends ModifiableAuthorization> authorizations;
 
         @JsonIgnore
@@ -900,13 +973,13 @@ public final class ComponentDSL extends DefinitionDSL {
             ? connectionParameters.getString(BASE_URI)
             : null;
         private String componentName;
-        private Display display;
+        private String description;
         private String name;
         private List<? extends Property<?>> properties;
-        private Resources resources;
 
         @JsonIgnore
         private TestConsumer test;
+        private String title;
         private int version = 1;
 
         private ModifiableConnectionDefinition() {
@@ -955,12 +1028,6 @@ public final class ComponentDSL extends DefinitionDSL {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
-
-            return this;
-        }
-
-        public ModifiableConnectionDefinition resources(ModifiableResources resources) {
-            this.resources = resources;
 
             return this;
         }
@@ -1015,8 +1082,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<? extends ModifiableAuthorization> getAuthorizations() {
-            return authorizations == null ? null : new ArrayList<>(authorizations);
+        public Optional<List<? extends Authorization>> getAuthorizations() {
+            return Optional.ofNullable(authorizations == null ? null : new ArrayList<>(authorizations));
         }
 
         @Override
@@ -1031,8 +1098,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Display getDisplay() {
-            return display;
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
         }
 
         @Override
@@ -1046,19 +1113,18 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<? extends Property<?>> getProperties() {
-            return properties == null ? null : new ArrayList<>(properties);
-        }
-
-        @Override
-        @SuppressFBWarnings("EI")
-        public Resources getResources() {
-            return resources;
+        public Optional<List<? extends Property<?>>> getProperties() {
+            return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
         }
 
         @Override
         public Optional<TestConsumer> getTest() {
             return Optional.ofNullable(test);
+        }
+
+        @Override
+        public String getTitle() {
+            return title;
         }
 
         private ModifiableConnectionDefinition componentName(String componentName) {
@@ -1068,8 +1134,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @SuppressWarnings("PMD")
-        private ModifiableConnectionDefinition display(Display display) {
-            this.display = display;
+        private ModifiableConnectionDefinition description(String description) {
+            this.description = description;
 
             return this;
         }
@@ -1078,6 +1144,14 @@ public final class ComponentDSL extends DefinitionDSL {
             this.name = name;
 
             return this;
+        }
+
+        @SuppressWarnings("PMD")
+        private ModifiableConnectionDefinition title(String title) {
+            this.title = title;
+
+            return this;
+
         }
     }
 
@@ -1098,11 +1172,13 @@ public final class ComponentDSL extends DefinitionDSL {
     public static final class ModifiableJdbcComponentDefinition implements JdbcComponentDefinition {
 
         private String databaseJdbcName;
+        private String icon;
         private String jdbcDriverClassName;
-        private Display display;
+        private String description;
         private final String name;
         private Resources resources;
-        private double version = VERSION_1;
+        private String title;
+        private int version = VERSION_1;
 
         private ModifiableJdbcComponentDefinition(String name) {
             this.name = Objects.requireNonNull(name);
@@ -1120,8 +1196,14 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableJdbcComponentDefinition display(Display display) {
-            this.display = display;
+        public ModifiableJdbcComponentDefinition description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        public ModifiableJdbcComponentDefinition icon(String icon) {
+            this.icon = icon;
 
             return this;
         }
@@ -1132,7 +1214,13 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableJdbcComponentDefinition version(double version) {
+        public ModifiableJdbcComponentDefinition title(String title) {
+            this.title = title;
+
+            return this;
+        }
+
+        public ModifiableJdbcComponentDefinition version(int version) {
             this.version = version;
 
             return this;
@@ -1149,14 +1237,19 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Display getDisplay() {
-            return display;
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public String getIcon() {
+            return icon;
         }
 
         @Override
         @SuppressFBWarnings("EI")
-        public Resources getResources() {
-            return resources;
+        public Optional<Resources> getResources() {
+            return Optional.ofNullable(resources);
         }
 
         @Override
@@ -1165,7 +1258,12 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public double getVersion() {
+        public String getTitle() {
+            return title;
+        }
+
+        @Override
+        public int getVersion() {
             return version;
         }
     }
@@ -1186,30 +1284,32 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static class ModifiableTriggerDefinition implements TriggerDefinition {
 
-        private boolean batch;
+        private Boolean batch;
         private String componentName;
         private DeduplicateFunction deduplicate;
-        private Display display;
+        private String description;
         private DynamicWebhookDisableConsumer dynamicWebhookDisable;
         private DynamicWebhookEnableFunction dynamicWebhookEnable;
         private DynamicWebhookRefreshFunction dynamicWebhookRefresh;
         private DynamicWebhookRequestFunction dynamicWebhookRequest;
         private Object exampleOutput;
         private ExampleOutputDataSource exampleOutputDataSource;
-        private HelpFunction help;
+        private Help help;
         private ListenerEnableConsumer listenerEnable;
         private ListenerDisableConsumer listenerDisable;
-        private List<? extends Property<?>> outputSchema;
         private String name;
+        // TODO
+        private NodeDescriptionFunction nodeDescription;
+        private List<? extends Property<?>> outputSchema;
         private OutputSchemaDataSource outputSchemaDataSource;
         private PollFunction poll;
         private List<? extends Property<?>> properties;
-        private Resources resources;
         private StaticWebhookRequestFunction staticWebhookRequest;
+        private String title;
         private TriggerType type;
-        private boolean webhookBodyRaw;
+        private Boolean webhookBodyRaw;
         private WebhookValidateFunction webhookValidate;
-        private boolean workflowSyncExecution;
+        private Boolean workflowSyncExecution;
 
         private ModifiableTriggerDefinition() {
         }
@@ -1230,8 +1330,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition display(Display display) {
-            this.display = display;
+        public ModifiableTriggerDefinition description(String description) {
+            this.description = description;
 
             return this;
         }
@@ -1272,7 +1372,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition help(HelpFunction help) {
+        public ModifiableTriggerDefinition help(Help help) {
             this.help = help;
 
             return this;
@@ -1292,6 +1392,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableTriggerDefinition name(String name) {
             this.name = name;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition nodeDescription(NodeDescriptionFunction nodeDescription) {
+            this.nodeDescription = nodeDescription;
 
             return this;
         }
@@ -1322,14 +1428,14 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition resources(Resources resources) {
-            this.resources = resources;
+        public ModifiableTriggerDefinition staticWebhookRequest(StaticWebhookRequestFunction staticWebhookRequest) {
+            this.staticWebhookRequest = staticWebhookRequest;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition staticWebhookRequest(StaticWebhookRequestFunction staticWebhookRequest) {
-            this.staticWebhookRequest = staticWebhookRequest;
+        public ModifiableTriggerDefinition title(String title) {
+            this.title = title;
 
             return this;
         }
@@ -1379,13 +1485,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public boolean isBatch() {
-            return batch;
-        }
-
-        @Override
-        public boolean isWorkflowSyncExecution() {
-            return workflowSyncExecution;
+        public Optional<Boolean> getBatch() {
+            return Optional.ofNullable(batch);
         }
 
         @Override
@@ -1395,8 +1496,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Display getDisplay() {
-            return display;
+        public String getDescription() {
+            return Objects.requireNonNullElseGet(description, () -> componentName + ": " + name);
         }
 
         @Override
@@ -1430,12 +1531,12 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public ExampleOutputDataSource getExampleOutputDataSource() {
-            return exampleOutputDataSource;
+        public Optional<ExampleOutputDataSource> getExampleOutputDataSource() {
+            return Optional.ofNullable(exampleOutputDataSource);
         }
 
         @Override
-        public Optional<HelpFunction> getHelp() {
+        public Optional<Help> getHelp() {
             return Optional.ofNullable(help);
         }
 
@@ -1455,13 +1556,18 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<? extends Property<?>> getOutputSchema() {
-            return outputSchema;
+        public NodeDescriptionFunction getNodeDescription() {
+            return nodeDescription;
         }
 
         @Override
-        public OutputSchemaDataSource getOutputSchemaDataSource() {
-            return outputSchemaDataSource;
+        public Optional<List<? extends Property<?>>> getOutputSchema() {
+            return Optional.ofNullable(outputSchema);
+        }
+
+        @Override
+        public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
+            return Optional.ofNullable(outputSchemaDataSource);
         }
 
         @Override
@@ -1470,13 +1576,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<? extends Property<?>> getProperties() {
-            return properties;
-        }
-
-        @Override
-        public Resources getResources() {
-            return resources;
+        public Optional<List<? extends Property<?>>> getProperties() {
+            return Optional.ofNullable(properties);
         }
 
         @Override
@@ -1485,18 +1586,28 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public String getTitle() {
+            return title;
+        }
+
+        @Override
         public TriggerType getType() {
             return type;
         }
 
         @Override
-        public boolean getWebhookBodyRaw() {
-            return webhookBodyRaw;
+        public Optional<WebhookValidateFunction> getWebhookValidate() {
+            return Optional.ofNullable(webhookValidate);
         }
 
         @Override
-        public Optional<WebhookValidateFunction> getWebhookValidate() {
-            return Optional.ofNullable(webhookValidate);
+        public Optional<Boolean> getWorkflowSyncExecution() {
+            return Optional.ofNullable(workflowSyncExecution);
+        }
+
+        @Override
+        public Optional<Boolean> getWebhookBodyRaw() {
+            return Optional.ofNullable(webhookBodyRaw);
         }
 
         private ModifiableTriggerDefinition componentName(String componentName) {

@@ -17,19 +17,20 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-interface HelpFunction {
+interface NodeDescriptionFunction {
 
-    HelpOutput apply(Context.Connection connection, InputParameters inputParameters);
+    /**
+     *
+     * @param connection
+     * @param inputParameters
+     * @return
+     */
+    String apply(Connection connection, InputParameters inputParameters);
 
-    @SuppressFBWarnings("EI")
-    record HelpOutput(String body, String learnMoreUrl) {
-
-    }
 }

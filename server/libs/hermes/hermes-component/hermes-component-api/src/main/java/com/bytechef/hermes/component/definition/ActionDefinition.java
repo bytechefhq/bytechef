@@ -19,9 +19,7 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
@@ -34,27 +32,15 @@ import java.util.Optional;
 @JsonDeserialize(as = ComponentDSL.ModifiableActionDefinition.class)
 public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
 
-    boolean getBatch();
+    Optional<Boolean> getBatch();
 
     String getComponentName();
 
-    Display getDisplay();
+    String getDescription();
 
-    Object getExampleOutput();
+    Optional<Object> getExampleOutput();
 
-    ExampleOutputDataSource getExampleOutputDataSource();
-
-    Optional<HelpFunction> getHelp();
-
-    Map<String, Object> getMetadata();
-
-    String getName();
-
-    List<? extends Property<?>> getOutputSchema();
-
-    OutputSchemaDataSource getOutputSchemaDataSource();
-
-    List<? extends Property<?>> getProperties();
+    Optional<ExampleOutputDataSource> getExampleOutputDataSource();
 
     /**
      * The code that should be executed when an action runs as a task inside the workflow engine.
@@ -63,7 +49,19 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      */
     Optional<ExecuteFunction> getExecute();
 
-    Resources getResources();
+    Optional<Help> getHelp();
+
+    Map<String, Object> getMetadata();
+
+    String getName();
+
+    Optional<List<? extends Property<?>>> getOutputSchema();
+
+    Optional<OutputSchemaDataSource> getOutputSchemaDataSource();
+
+    Optional<List<? extends Property<?>>> getProperties();
+
+    String getTitle();
 
     /**
      *

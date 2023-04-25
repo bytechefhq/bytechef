@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.net.ssl.SSLSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -582,6 +583,11 @@ public class HttpClientUtilsTest {
         }
 
         @Override
+        public Set<String> getKeys() {
+            return null;
+        }
+
+        @Override
         public <T> List<T> getList(String key, Class<T> elementType) {
             return null;
         }
@@ -624,11 +630,6 @@ public class HttpClientUtilsTest {
         @Override
         public long getLong(String key, long defaultValue) {
             return 0;
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            return null;
         }
 
         @Override
@@ -809,6 +810,11 @@ public class HttpClientUtilsTest {
         }
 
         @Override
+        public Set<String> getKeys() {
+            return null;
+        }
+
+        @Override
         public <T> List<T> getList(String key, Class<T> elementType) {
             return null;
         }
@@ -866,11 +872,6 @@ public class HttpClientUtilsTest {
         @Override
         public Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
             return null;
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            return parameters;
         }
 
         @Override

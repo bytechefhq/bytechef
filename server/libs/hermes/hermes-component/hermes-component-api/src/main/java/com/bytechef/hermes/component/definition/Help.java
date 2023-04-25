@@ -17,28 +17,12 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.definition.Resources;
-
-import java.util.Optional;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * @author Ivica Cardic
+ * @param body
+ * @param learnMoreUrl
  */
-public sealed interface JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcComponentDefinition {
-
-    String getDatabaseJdbcName();
-
-    String getJdbcDriverClassName();
-
-    Optional<String> getDescription();
-
-    String getIcon();
-
-    Optional<Resources> getResources();
-
-    String getName();
-
-    String getTitle();
-
-    int getVersion();
+@SuppressFBWarnings("EI")
+public record Help(String body, String learnMoreUrl) {
 }
