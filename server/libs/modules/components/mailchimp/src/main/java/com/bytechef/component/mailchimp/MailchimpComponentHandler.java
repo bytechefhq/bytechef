@@ -17,7 +17,7 @@
 
 package com.bytechef.component.mailchimp;
 
-import com.bytechef.component.mailchimp.trigger.SubscribeTrigger;
+import com.bytechef.component.mailchimp.trigger.MailchimpSubscribeTrigger;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.google.auto.service.AutoService;
@@ -32,6 +32,6 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
 
     @Override
     public List<TriggerDefinition> getTriggers() {
-        return List.of(SubscribeTrigger.TRIGGER_DEFINITION);
+        return List.of(MailchimpSubscribeTrigger.TRIGGER_DEFINITION);
     }
 }

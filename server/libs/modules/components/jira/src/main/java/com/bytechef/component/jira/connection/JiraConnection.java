@@ -24,7 +24,6 @@ import static com.bytechef.hermes.component.definition.Authorization.PASSWORD;
 import static com.bytechef.hermes.component.definition.Authorization.USERNAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -40,8 +39,7 @@ public class JiraConnection {
         .baseUri(connection -> "https://your-domain.atlassian.net")
         .authorizations(authorization(
             AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
-                .display(
-                    display("Basic Auth"))
+                .title("Basic Auth")
                 .properties(
                     string(USERNAME)
                         .label("Username")
@@ -51,8 +49,7 @@ public class JiraConnection {
                         .required(true)),
             authorization(
                 AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                    .display(
-                        display("OAuth2 Authorization Code"))
+                    .title("OAuth2 Authorization Code")
                     .properties(
                         string(CLIENT_ID)
                             .label("Client Id")

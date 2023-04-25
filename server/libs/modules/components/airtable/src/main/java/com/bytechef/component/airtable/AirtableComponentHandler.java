@@ -32,7 +32,6 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
 
     @Override
     public List<TriggerDefinition> getTriggers() {
-        return List.of(
-            NewRecordTrigger.TRIGGER_DEFINITION);
+        return List.of(NewRecordTrigger.TRIGGER_DEFINITION);
     }
 }
