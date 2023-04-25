@@ -63,7 +63,7 @@ export interface PropertyModel {
      * @type {boolean}
      * @memberof PropertyModel
      */
-    expressionEnabled?: boolean;
+    expressionDisabled?: boolean;
     /**
      * If the property should be visible or not.
      * @type {boolean}
@@ -165,7 +165,7 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'advancedOption': !exists(json, 'advancedOption') ? undefined : json['advancedOption'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
-        'expressionEnabled': !exists(json, 'expressionEnabled') ? undefined : json['expressionEnabled'],
+        'expressionDisabled': !exists(json, 'expressionDisabled') ? undefined : json['expressionDisabled'],
         'hidden': !exists(json, 'hidden') ? undefined : json['hidden'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
@@ -188,7 +188,7 @@ export function PropertyModelToJSON(value?: PropertyModel | null): any {
         'advancedOption': value.advancedOption,
         'description': value.description,
         'displayCondition': value.displayCondition,
-        'expressionEnabled': value.expressionEnabled,
+        'expressionDisabled': value.expressionDisabled,
         'hidden': value.hidden,
         'label': value.label,
         'metadata': value.metadata,

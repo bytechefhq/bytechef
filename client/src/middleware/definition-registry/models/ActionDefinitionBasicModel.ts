@@ -13,18 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayModel } from './DisplayModel';
+import type { HelpModel } from './HelpModel';
 import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
-import type { ResourcesModel } from './ResourcesModel';
-import {
-    ResourcesModelFromJSON,
-    ResourcesModelFromJSONTyped,
-    ResourcesModelToJSON,
-} from './ResourcesModel';
+    HelpModelFromJSON,
+    HelpModelFromJSONTyped,
+    HelpModelToJSON,
+} from './HelpModel';
 
 /**
  * An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
@@ -33,23 +27,29 @@ import {
  */
 export interface ActionDefinitionBasicModel {
     /**
+     * The description.
+     * @type {string}
+     * @memberof ActionDefinitionBasicModel
+     */
+    description?: string;
+    /**
+     * 
+     * @type {HelpModel}
+     * @memberof ActionDefinitionBasicModel
+     */
+    help?: HelpModel;
+    /**
      * The action name.
      * @type {string}
      * @memberof ActionDefinitionBasicModel
      */
     name: string;
     /**
-     * 
-     * @type {DisplayModel}
+     * The title
+     * @type {string}
      * @memberof ActionDefinitionBasicModel
      */
-    display: DisplayModel;
-    /**
-     * 
-     * @type {ResourcesModel}
-     * @memberof ActionDefinitionBasicModel
-     */
-    resources?: ResourcesModel;
+    title?: string;
 }
 
 /**
@@ -58,7 +58,6 @@ export interface ActionDefinitionBasicModel {
 export function instanceOfActionDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "display" in value;
 
     return isInstance;
 }
@@ -73,9 +72,10 @@ export function ActionDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscrim
     }
     return {
         
+        'description': !exists(json, 'description') ? undefined : json['description'],
+        'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'display': DisplayModelFromJSON(json['display']),
-        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'title': !exists(json, 'title') ? undefined : json['title'],
     };
 }
 
@@ -88,9 +88,10 @@ export function ActionDefinitionBasicModelToJSON(value?: ActionDefinitionBasicMo
     }
     return {
         
+        'description': value.description,
+        'help': HelpModelToJSON(value.help),
         'name': value.name,
-        'display': DisplayModelToJSON(value.display),
-        'resources': ResourcesModelToJSON(value.resources),
+        'title': value.title,
     };
 }
 

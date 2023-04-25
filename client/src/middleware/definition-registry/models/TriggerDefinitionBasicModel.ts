@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayModel } from './DisplayModel';
+import type { HelpModel } from './HelpModel';
 import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
+    HelpModelFromJSON,
+    HelpModelFromJSONTyped,
+    HelpModelToJSON,
+} from './HelpModel';
 import type { TriggerTypeModel } from './TriggerTypeModel';
 import {
     TriggerTypeModelFromJSON,
@@ -33,17 +33,29 @@ import {
  */
 export interface TriggerDefinitionBasicModel {
     /**
-     * 
-     * @type {DisplayModel}
+     * The description.
+     * @type {string}
      * @memberof TriggerDefinitionBasicModel
      */
-    display: DisplayModel;
+    description?: string;
+    /**
+     * 
+     * @type {HelpModel}
+     * @memberof TriggerDefinitionBasicModel
+     */
+    help?: HelpModel;
     /**
      * The action name.
      * @type {string}
      * @memberof TriggerDefinitionBasicModel
      */
     name: string;
+    /**
+     * The title
+     * @type {string}
+     * @memberof TriggerDefinitionBasicModel
+     */
+    title?: string;
     /**
      * 
      * @type {TriggerTypeModel}
@@ -57,7 +69,6 @@ export interface TriggerDefinitionBasicModel {
  */
 export function instanceOfTriggerDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "type" in value;
 
@@ -74,8 +85,10 @@ export function TriggerDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscri
     }
     return {
         
-        'display': DisplayModelFromJSON(json['display']),
+        'description': !exists(json, 'description') ? undefined : json['description'],
+        'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
+        'title': !exists(json, 'title') ? undefined : json['title'],
         'type': TriggerTypeModelFromJSON(json['type']),
     };
 }
@@ -89,8 +102,10 @@ export function TriggerDefinitionBasicModelToJSON(value?: TriggerDefinitionBasic
     }
     return {
         
-        'display': DisplayModelToJSON(value.display),
+        'description': value.description,
+        'help': HelpModelToJSON(value.help),
         'name': value.name,
+        'title': value.title,
         'type': TriggerTypeModelToJSON(value.type),
     };
 }
