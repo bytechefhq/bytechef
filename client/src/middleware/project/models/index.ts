@@ -24,6 +24,7 @@ export * from './UpdateTagsRequestModel';
 export * from './WebhookModel';
 export * from './WebhookRetryModel';
 export * from './WorkflowBasicModel';
+export * from './WorkflowConnectionModel';
 export * from './WorkflowFormatModel';
 export * from './WorkflowModel';
 export * from './WorkflowTaskModel';

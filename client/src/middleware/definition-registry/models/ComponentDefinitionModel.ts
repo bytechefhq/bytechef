@@ -25,12 +25,6 @@ import {
     ConnectionDefinitionBasicModelFromJSONTyped,
     ConnectionDefinitionBasicModelToJSON,
 } from './ConnectionDefinitionBasicModel';
-import type { DisplayModel } from './DisplayModel';
-import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
 import type { ResourcesModel } from './ResourcesModel';
 import {
     ResourcesModelFromJSON,
@@ -57,17 +51,29 @@ export interface ComponentDefinitionModel {
      */
     actions?: Array<ActionDefinitionBasicModel>;
     /**
+     * The category.
+     * @type {string}
+     * @memberof ComponentDefinitionModel
+     */
+    category?: string;
+    /**
      * 
      * @type {ConnectionDefinitionBasicModel}
      * @memberof ComponentDefinitionModel
      */
     connection?: ConnectionDefinitionBasicModel;
     /**
-     * 
-     * @type {DisplayModel}
+     * The description.
+     * @type {string}
      * @memberof ComponentDefinitionModel
      */
-    display: DisplayModel;
+    description?: string;
+    /**
+     * The icon.
+     * @type {string}
+     * @memberof ComponentDefinitionModel
+     */
+    icon?: string;
     /**
      * The name.
      * @type {string}
@@ -80,6 +86,18 @@ export interface ComponentDefinitionModel {
      * @memberof ComponentDefinitionModel
      */
     resources?: ResourcesModel;
+    /**
+     * Tags for categorization.
+     * @type {Array<string>}
+     * @memberof ComponentDefinitionModel
+     */
+    tags?: Array<string>;
+    /**
+     * The title
+     * @type {string}
+     * @memberof ComponentDefinitionModel
+     */
+    title?: string;
     /**
      * The list of all available triggers the component can perform.
      * @type {Array<TriggerDefinitionBasicModel>}
@@ -99,7 +117,6 @@ export interface ComponentDefinitionModel {
  */
 export function instanceOfComponentDefinitionModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "version" in value;
 
@@ -117,10 +134,14 @@ export function ComponentDefinitionModelFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicModelFromJSON)),
+        'category': !exists(json, 'category') ? undefined : json['category'],
         'connection': !exists(json, 'connection') ? undefined : ConnectionDefinitionBasicModelFromJSON(json['connection']),
-        'display': DisplayModelFromJSON(json['display']),
+        'description': !exists(json, 'description') ? undefined : json['description'],
+        'icon': !exists(json, 'icon') ? undefined : json['icon'],
         'name': json['name'],
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'tags': !exists(json, 'tags') ? undefined : json['tags'],
+        'title': !exists(json, 'title') ? undefined : json['title'],
         'triggers': !exists(json, 'triggers') ? undefined : ((json['triggers'] as Array<any>).map(TriggerDefinitionBasicModelFromJSON)),
         'version': json['version'],
     };
@@ -136,10 +157,14 @@ export function ComponentDefinitionModelToJSON(value?: ComponentDefinitionModel 
     return {
         
         'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionDefinitionBasicModelToJSON)),
+        'category': value.category,
         'connection': ConnectionDefinitionBasicModelToJSON(value.connection),
-        'display': DisplayModelToJSON(value.display),
+        'description': value.description,
+        'icon': value.icon,
         'name': value.name,
         'resources': ResourcesModelToJSON(value.resources),
+        'tags': value.tags,
+        'title': value.title,
         'triggers': value.triggers === undefined ? undefined : ((value.triggers as Array<any>).map(TriggerDefinitionBasicModelToJSON)),
         'version': value.version,
     };

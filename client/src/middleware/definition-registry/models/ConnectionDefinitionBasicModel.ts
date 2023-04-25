@@ -13,19 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayModel } from './DisplayModel';
-import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
-import type { ResourcesModel } from './ResourcesModel';
-import {
-    ResourcesModelFromJSON,
-    ResourcesModelFromJSONTyped,
-    ResourcesModelToJSON,
-} from './ResourcesModel';
-
 /**
  * Definition of a connection to an outside service.
  * @export
@@ -33,11 +20,11 @@ import {
  */
 export interface ConnectionDefinitionBasicModel {
     /**
-     * 
-     * @type {DisplayModel}
+     * The description.
+     * @type {string}
      * @memberof ConnectionDefinitionBasicModel
      */
-    display: DisplayModel;
+    description?: string;
     /**
      * The connection name.
      * @type {string}
@@ -45,11 +32,11 @@ export interface ConnectionDefinitionBasicModel {
      */
     name: string;
     /**
-     * 
-     * @type {ResourcesModel}
+     * The title
+     * @type {string}
      * @memberof ConnectionDefinitionBasicModel
      */
-    resources?: ResourcesModel;
+    title?: string;
     /**
      * The version of a connection.
      * @type {number}
@@ -63,7 +50,6 @@ export interface ConnectionDefinitionBasicModel {
  */
 export function instanceOfConnectionDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "version" in value;
 
@@ -80,9 +66,9 @@ export function ConnectionDefinitionBasicModelFromJSONTyped(json: any, ignoreDis
     }
     return {
         
-        'display': DisplayModelFromJSON(json['display']),
+        'description': !exists(json, 'description') ? undefined : json['description'],
         'name': json['name'],
-        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'title': !exists(json, 'title') ? undefined : json['title'],
         'version': json['version'],
     };
 }
@@ -96,9 +82,9 @@ export function ConnectionDefinitionBasicModelToJSON(value?: ConnectionDefinitio
     }
     return {
         
-        'display': DisplayModelToJSON(value.display),
+        'description': value.description,
         'name': value.name,
-        'resources': ResourcesModelToJSON(value.resources),
+        'title': value.title,
         'version': value.version,
     };
 }
