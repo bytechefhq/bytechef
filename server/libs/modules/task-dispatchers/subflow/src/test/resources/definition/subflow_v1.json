@@ -1,15 +1,28 @@
 {
-  "display": {
-    "description": "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task.",
-    "title": "Subflow"
-  },
+  "description": "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task.",
+  "icon": null,
   "name": "subflow",
+  "outputSchema": null,
   "properties": [ {
+    "advancedOption": null,
     "description": "The id of sub-workflow to execute.",
+    "displayCondition": null,
+    "hidden": null,
     "label": "Workflow Id",
+    "metadata": null,
+    "placeholder": null,
+    "required": null,
     "name": "workflowId",
     "type": "STRING",
-    "controlType": "INPUT_TEXT"
+    "defaultValue": null,
+    "exampleValue": null,
+    "controlType": "INPUT_TEXT",
+    "options": null,
+    "optionsDataSource": null,
+    "expressionDisabled": null
   } ],
+  "resources": null,
+  "taskProperties": null,
+  "title": "Subflow",
   "version": 1
 }

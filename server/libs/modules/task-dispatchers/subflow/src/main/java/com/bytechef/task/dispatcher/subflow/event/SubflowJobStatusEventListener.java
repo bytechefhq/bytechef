@@ -30,7 +30,6 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -49,17 +48,14 @@ public class SubflowJobStatusEventListener implements EventListener {
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
-    private final TaskEvaluator taskEvaluator;
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
-        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
-        TaskEvaluator taskEvaluator) {
+        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.messageBroker = messageBroker;
-        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
@@ -106,8 +102,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                         completionTaskExecution.setOutput(output);
                     } else {
                         // TODO check, it seems wrong
-                        completionTaskExecution = taskEvaluator.evaluate(
-                            completionTaskExecution, Map.of("execution", Map.of("output", output)));
+                        completionTaskExecution.evaluate(Map.of("execution", Map.of("output", output)));
                     }
 
                     messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, completionTaskExecution);

@@ -1,22 +1,51 @@
 {
-  "display": {
-    "description": "Run collection of tasks in parallel, without waiting until the previous function has completed.",
-    "title": "Parallel"
-  },
+  "description": "Run collection of tasks in parallel, without waiting until the previous function has completed.",
+  "icon": null,
   "name": "parallel",
-  "version": 1,
+  "outputSchema": null,
+  "properties": null,
+  "resources": null,
   "taskProperties": [ {
+    "advancedOption": null,
     "description": "The task to use in each iteration.",
+    "displayCondition": null,
+    "hidden": null,
+    "label": null,
+    "metadata": null,
+    "placeholder": null,
+    "required": null,
     "name": "tasks",
     "type": "ARRAY",
+    "defaultValue": null,
+    "exampleValue": null,
     "items": [ {
+      "advancedOption": null,
       "description": "The task or task dispatcher to use.",
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
       "objectType": "TASK",
-      "controlType": "INPUT_TEXT"
+      "options": null,
+      "optionsDataSource": null,
+      "properties": null,
+      "controlType": "INPUT_TEXT",
+      "expressionDisabled": null
     } ],
     "multipleValues": true,
-    "controlType": "JSON_BUILDER"
-  } ]
+    "options": null,
+    "optionsDataSource": null,
+    "controlType": "JSON_BUILDER",
+    "expressionDisabled": null
+  } ],
+  "title": "Parallel",
+  "version": 1
 }

@@ -19,6 +19,7 @@
 
 package com.bytechef.task.dispatcher.forkjoin.completion;
 
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -28,7 +29,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,19 +61,16 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     private final CounterService counterService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final ContextService contextService;
-    private final TaskEvaluator taskEvaluator;
 
     public ForkJoinTaskCompletionHandler(
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService, TaskDispatcher<? super Task> taskDispatcher, ContextService contextService,
-        TaskEvaluator taskEvaluator) {
+        CounterService counterService, TaskDispatcher<? super Task> taskDispatcher, ContextService contextService) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
         this.taskDispatcher = taskDispatcher;
         this.contextService = contextService;
-        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
@@ -108,7 +105,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))
+            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
             .toList();
 
         List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
@@ -126,13 +123,16 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)
-                .workflowTask(WorkflowTask.of(branchWorkflowTask, BRANCH, branch))
+                .workflowTask(
+                    new WorkflowTask(
+                        MapValueUtils.append(
+                            branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, branch))))
                 .build();
 
             Map<String, Object> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);
 
-            branchTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
+            branchTaskExecution.evaluate(context);
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 

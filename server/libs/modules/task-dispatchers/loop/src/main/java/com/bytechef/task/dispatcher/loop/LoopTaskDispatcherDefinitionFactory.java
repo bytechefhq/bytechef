@@ -20,7 +20,7 @@ package com.bytechef.task.dispatcher.loop;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
@@ -44,7 +44,8 @@ import org.springframework.stereotype.Component;
 public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP)
-        .display(display("Loop").description("Loops sequentially over list of items."))
+        .title("Loop")
+        .description("Loops sequentially over list of items.")
         .properties(
             array(LIST).label("List of items")
                 .description("List of items to iterate over."),

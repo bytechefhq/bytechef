@@ -22,7 +22,6 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +41,17 @@ public class SequenceTaskDispatcherConfiguration {
     private MessageBroker messageBroker;
 
     @Autowired
-    private TaskEvaluator taskEvaluator;
-
-    @Autowired
     private TaskExecutionService taskExecutionService;
 
     @Bean("sequenceTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory sequenceTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService);
     }
 
     @Bean("sequenceTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory sequenceTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SequenceTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskExecutionService);
     }
 }

@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.each;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
@@ -42,10 +42,9 @@ import org.springframework.stereotype.Component;
 public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(EACH)
-        .display(
-            display("Each")
-                .description(
-                    "Iterates over each item in `list`, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order."))
+        .title("Each")
+        .description(
+            "Iterates over each item in `list`, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order.")
         .properties(
             array(LIST)
                 .label("List of items")

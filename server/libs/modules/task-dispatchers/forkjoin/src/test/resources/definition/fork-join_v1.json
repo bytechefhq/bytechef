@@ -1,28 +1,70 @@
 {
-  "display": {
-    "description": "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence.",
-    "title": "Fork/Join"
-  },
+  "description": "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence.",
+  "icon": null,
   "name": "fork-join",
-  "version": 1,
+  "outputSchema": null,
+  "properties": null,
+  "resources": null,
   "taskProperties": [ {
+    "advancedOption": null,
     "description": "The list of sequences of tasks to execute in parallel.",
+    "displayCondition": null,
+    "hidden": null,
+    "label": null,
+    "metadata": null,
+    "placeholder": null,
+    "required": null,
     "name": "branches",
     "type": "ARRAY",
+    "defaultValue": null,
+    "exampleValue": null,
     "items": [ {
+      "advancedOption": null,
       "description": "The list of tasks that executes sequentially.",
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
       "items": [ {
+        "advancedOption": null,
         "description": "The task or task dispatcher to use.",
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
         "objectType": "TASK",
-        "controlType": "INPUT_TEXT"
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "INPUT_TEXT",
+        "expressionDisabled": null
       } ],
       "multipleValues": true,
-      "controlType": "JSON_BUILDER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
     "multipleValues": true,
-    "controlType": "JSON_BUILDER"
-  } ]
+    "options": null,
+    "optionsDataSource": null,
+    "controlType": "JSON_BUILDER",
+    "expressionDisabled": null
+  } ],
+  "title": "Fork/Join",
+  "version": 1
 }

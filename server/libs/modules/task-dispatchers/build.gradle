@@ -9,7 +9,6 @@ subprojects {
 
         implementation "org.springframework:spring-context"
         implementation "org.springframework:spring-core"
-        implementation "org.springframework:spring-expression"
         implementation project(":server:libs:atlas:atlas-api")
         implementation project(":server:libs:core:commons:commons-util")
         implementation project(":server:libs:core:message-broker:message-broker-api")

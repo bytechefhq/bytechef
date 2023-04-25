@@ -1,8 +1,11 @@
 {
-  "display": {
-    "description": "Breaks the loop execution.",
-    "title": "Loop Break"
-  },
+  "description": "Breaks the loop execution.",
+  "icon": null,
   "name": "loop-break",
+  "outputSchema": null,
+  "properties": null,
+  "resources": null,
+  "taskProperties": null,
+  "title": "Loop Break",
   "version": 1
 }

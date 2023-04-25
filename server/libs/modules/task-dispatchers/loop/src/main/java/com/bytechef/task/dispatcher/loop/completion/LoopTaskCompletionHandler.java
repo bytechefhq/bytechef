@@ -34,7 +34,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -51,20 +50,16 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     private final ContextService contextService;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
 
     public LoopTaskCompletionHandler(
-        ContextService contextService,
-        TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskEvaluator taskEvaluator,
-        TaskExecutionService taskExecutionService) {
+        ContextService contextService, TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
-        this.taskEvaluator = taskEvaluator;
         this.taskExecutionService = taskExecutionService;
     }
 
@@ -103,7 +98,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 .parentId(loopTaskExecution.getId())
                 .priority(loopTaskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)
-                .workflowTask(WorkflowTask.of(iteratee))
+                .workflowTask(new WorkflowTask(iteratee))
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
@@ -119,7 +114,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 MapValueUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
                 taskExecution.getTaskNumber());
 
-            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, newContext);
+            subTaskExecution.evaluate(newContext);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
