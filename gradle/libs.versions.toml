@@ -1,13 +1,11 @@
 [versions]
 ch-qos-logback = "1.4.7"
 checkstyle = "10.6.0"
-com-fasterxml-jackson-core = "2.15.0-rc3"
-com-fasterxml-jackson-dataformat = "2.15.0-rc3"
 com-github-kagkarlsson = "12.0.0"
 com-google-auto-service = "1.0.1"
 info-picocli = "4.7.3"
-org-mapstruct = "1.5.4.Final"
-org-mapstruct-extensions-spring = "1.0.0"
+org-mapstruct = "1.5.5.Final"
+org-mapstruct-extensions-spring = "1.0.1"
 org-springframework-boot = "3.0.6"
 org-springframework-cloud = "4.0.2"
 org-springframework-cloud-dependencies = "2022.0.2"
@@ -18,18 +16,12 @@ spotbugs = "4.7.3"
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback" }
-com-fasterxml-jackson-core-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "com-fasterxml-jackson-core" }
-com-fasterxml-jackson-core-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "com-fasterxml-jackson-core" }
-com-fasterxml-jackson-dataformat-jackson-dataformat-csv = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-csv", version.ref = "com-fasterxml-jackson-dataformat" }
-com-fasterxml-jackson-dataformat-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "com-fasterxml-jackson-dataformat" }
-com-fasterxml-jackson-dataformat-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "com-fasterxml-jackson-dataformat" }
-com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0-rc3"
 com-github-kagkarlsson-db-scheduler = { module = "com.github.kagkarlsson:db-scheduler", version.ref = "com-github-kagkarlsson" }
 com-github-kagkarlsson-db-scheduler-spring-boot-starter = { module = "com.github.kagkarlsson:db-scheduler-spring-boot-starter", version.ref = "com-github-kagkarlsson" }
 com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.4"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
-com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-7"
+com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-8"
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-jayway-jsonpath-json-path = "com.jayway.jsonpath:json-path:2.8.0"
@@ -82,7 +74,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.50"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.52"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.18.0"
