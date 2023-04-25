@@ -22,9 +22,10 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.helios.project.service.ProjectInstanceService;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -42,17 +43,17 @@ public class ProjectTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public TaskExecution process(TaskExecution taskExecution) {
-        Job job = jobService.getJob(taskExecution.getJobId());
+        projectInstanceService.fetchJobProjectInstance(Objects.requireNonNull(taskExecution.getJobId()))
+            .ifPresent(
+                projectInstance -> taskExecution
+                    .putMetadata("instanceId", projectInstance.getId())
+                    .putMetadata("instanceType", "PROJECT"));
 
-        projectInstanceService.fetchJobProjectInstance(taskExecution.getJobId())
-            .ifPresentOrElse(
-                projectInstance -> taskExecution.putMetadata(
-                    WorkflowExecutionId.WORKFLOW_INSTANCE_ID,
-                    WorkflowExecutionId.of(job.getWorkflowId(), taskExecution.getJobId(), projectInstance.getId())),
-                () -> taskExecution.putMetadata(
-                    WorkflowExecutionId.WORKFLOW_INSTANCE_ID,
-                    WorkflowExecutionId.of(job.getWorkflowId(), taskExecution.getJobId())));
+        Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
+
+        taskExecution.putMetadata("workflowId", job.getWorkflowId());
 
         return taskExecution;
     }

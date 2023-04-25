@@ -18,7 +18,7 @@
 package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.job.JobParameters;
+import com.bytechef.atlas.dto.JobParameters;
 
 import java.time.LocalDateTime;
 import java.util.List;

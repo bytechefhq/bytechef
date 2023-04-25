@@ -17,9 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.definition.Display;
-import com.bytechef.hermes.definition.Resources;
+import com.bytechef.hermes.component.definition.Help;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -27,5 +26,5 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressFBWarnings("EI")
 public record TriggerDefinitionBasicDTO(
-    Boolean batch, Display display, String name, Resources resources, TriggerDefinition.TriggerType type) {
+    Boolean batch, String description, Help help, String name, String title, TriggerType type) {
 }

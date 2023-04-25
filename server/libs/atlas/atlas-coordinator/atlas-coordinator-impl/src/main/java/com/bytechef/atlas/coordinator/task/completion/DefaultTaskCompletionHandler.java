@@ -19,11 +19,11 @@
 
 package com.bytechef.atlas.coordinator.task.completion;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.domain.TaskExecution.Status;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
@@ -32,12 +32,13 @@ import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
+import com.bytechef.evaluator.Evaluator;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -58,19 +59,17 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
     private final JobService jobService;
-    private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
     private final WorkflowService workflowService;
 
     public DefaultTaskCompletionHandler(
         ContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
-        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
         this.jobService = jobService;
-        this.taskEvaluator = taskEvaluator;
         this.taskExecutionService = taskExecutionService;
         this.workflowService = workflowService;
     }
@@ -83,6 +82,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
+        Assert.notNull(taskExecution, "'taskExecution' must not be null");
         Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
         if (log.isDebugEnabled()) {
@@ -100,14 +100,13 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         if (job == null) {
             log.error("Unknown job id={}", taskExecution.getJobId());
         } else {
-            taskExecution.setStatus(TaskExecution.Status.COMPLETED);
+            taskExecution.setStatus(Status.COMPLETED);
 
             taskExecution = taskExecutionService.update(taskExecution);
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-                Assert.notNull(job.getId(), "'job.id' must not be null");
-
-                Map<String, Object> newContext = new HashMap<>(contextService.peek(job.getId(), Context.Classname.JOB));
+                Map<String, Object> newContext = new HashMap<>(
+                    contextService.peek(Objects.requireNonNull(job.getId()), Context.Classname.JOB));
 
                 newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -139,14 +138,10 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             source.put(output.name(), output.value());
         }
 
-        job.setStatus(Job.Status.COMPLETED);
-        job.setEndDate(LocalDateTime.now());
         job.setCurrentTask(-1);
-
-        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
-            new TaskExecution(WorkflowTask.of("type", WorkflowConstants.PARAMETERS, source)), context);
-
-        job.setOutputs(evaluatedTaskExecution.getParameters());
+        job.setEndDate(LocalDateTime.now());
+        job.setStatus(Job.Status.COMPLETED);
+        job.setOutputs(Evaluator.evaluate(source, context));
 
         job = jobService.update(job);
 

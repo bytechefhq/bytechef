@@ -19,10 +19,13 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.task.WorkflowTask;
 import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,12 +40,18 @@ public class DefaultTaskDispatcherTest {
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
             (k, m) -> Assertions.assertEquals(TaskMessageRoute.TASKS, k), List.of());
 
-        defaultTaskDispatcher.dispatch(new TaskExecution(WorkflowTask.of("type", "test", "value")));
+        defaultTaskDispatcher.dispatch(
+            TaskExecution.builder()
+                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type", "test", "value")))
+                .build());
     }
 
     @Test
     public void test2() {
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("test", "node", "encoder"));
+        TaskExecution taskExecution =
+            TaskExecution.builder()
+                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "test", "node", "encoder")))
+                .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
             (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofRoute("encoder"), k), List.of());
@@ -52,7 +61,10 @@ public class DefaultTaskDispatcherTest {
 
     @Test
     public void test3() {
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("test", "node", "encoder.xlarge"));
+        TaskExecution taskExecution =
+            TaskExecution.builder()
+                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "test", "node", "encoder.xlarge")))
+                .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
             (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofRoute("encoder.xlarge"), k), List.of());

@@ -22,5 +22,5 @@ package com.bytechef.hermes.worker.trigger.handler;
  */
 public interface TriggerHandlerAccessor {
 
-    TriggerHandler getTaskHandler(String type);
+    TriggerHandler getTriggerHandler(String type);
 }

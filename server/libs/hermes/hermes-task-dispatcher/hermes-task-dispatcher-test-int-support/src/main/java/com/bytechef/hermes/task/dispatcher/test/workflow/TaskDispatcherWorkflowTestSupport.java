@@ -20,7 +20,7 @@ package com.bytechef.hermes.task.dispatcher.test.workflow;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.job.JobParameters;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
@@ -30,7 +30,6 @@ import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -76,7 +75,6 @@ public class TaskDispatcherWorkflowTestSupport {
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
-        TaskEvaluator taskEvaluator = TaskEvaluator.create();
 
         JobSyncExecutor jobSyncExecutor = JobSyncExecutor.builder()
             .contextService(contextService)
@@ -84,13 +82,10 @@ public class TaskDispatcherWorkflowTestSupport {
             .jobService(jobService)
             .syncMessageBroker(syncMessageBroker)
             .taskCompletionHandlerFactories(
-                taskCompletionHandlerFactoriesFunction.apply(
-                    counterService, taskEvaluator, taskExecutionService))
+                taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService))
             .taskDispatcherResolverFactories(
                 taskDispatcherResolverFactoriesFunction
-                    .apply(
-                        contextService, counterService, syncMessageBroker, taskEvaluator,
-                        taskExecutionService))
+                    .apply(contextService, counterService, syncMessageBroker, taskExecutionService))
             .taskExecutionService(taskExecutionService)
             .taskHandlerAccessor(taskHandlerMapSupplier.get()::get)
             .workflowService(workflowService)
@@ -102,14 +97,14 @@ public class TaskDispatcherWorkflowTestSupport {
     @FunctionalInterface
     public interface TaskCompletionHandlerFactoriesFunction {
         List<TaskCompletionHandlerFactory> apply(
-            CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService);
+            CounterService counterService, TaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface
     public interface TaskDispatcherResolverFactoriesFunction {
         List<TaskDispatcherResolverFactory> apply(
             ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-            TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService);
+            TaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface

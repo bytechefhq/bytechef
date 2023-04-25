@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.task.handler;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
 import com.bytechef.hermes.component.registrar.task.handler.ComponentTaskHandlerBeanDefinitionLoader;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -24,6 +26,7 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -54,12 +57,11 @@ public class JdbcComponentTaskHandlerBeanDefinitionLoader implements ComponentTa
             componentTaskHandlerFactories.add(
                 new ComponentTaskHandlerBeanDefinition(
                     componentDefinition,
-                    componentDefinition.getActions()
-                        .stream()
-                        .map(actionDefinition -> new TaskHandlerBeanDefinitionEntry(
+                    CollectionUtils.map(
+                        OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList()),
+                        actionDefinition -> new TaskHandlerBeanDefinitionEntry(
                             actionDefinition.getName(),
-                            getBeanDefinition(actionDefinition, jdbcComponentHandler)))
-                        .toList()));
+                            getBeanDefinition(actionDefinition, jdbcComponentHandler)))));
         }
 
         return componentTaskHandlerFactories;

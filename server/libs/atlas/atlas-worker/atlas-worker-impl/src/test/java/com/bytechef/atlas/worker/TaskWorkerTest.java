@@ -24,7 +24,6 @@ import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.commons.util.MapValueUtils;
 import java.io.File;
@@ -34,6 +33,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
@@ -53,10 +54,11 @@ public class TaskWorkerTest {
             .taskHandlerResolver(jt -> t -> "done")
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .build();
 
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
@@ -80,9 +82,10 @@ public class TaskWorkerTest {
             })
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .build();
 
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
@@ -113,15 +116,16 @@ public class TaskWorkerTest {
                 }
             })
             .messageBroker(messageBroker)
-            .taskEvaluator(TaskEvaluator.create())
             .eventPublisher(e -> {})
             .build();
 
-        TaskExecution task = new TaskExecution(WorkflowTask.of(Map.of(
-            "pre",
-            List.of(Map.of("name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
-            "type", "var",
-            WorkflowConstants.PARAMETERS, Map.of("value", "${myVar}"))));
+        TaskExecution task = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(
+                "pre",
+                List.of(Map.of("name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
+                "type", "var",
+                WorkflowConstants.PARAMETERS, Map.of("value", "${myVar}"))))
+            .build();
 
         task.setId(1234L);
         task.setJobId(4567L);
@@ -160,13 +164,14 @@ public class TaskWorkerTest {
             })
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
-            "post", List.of(Map.of("type", "rm", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
-            "pre", List.of(Map.of("type", "mkdir", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
-            "type", "pass")));
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(
+                "post", List.of(Map.of("type", "rm", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
+                "pre", List.of(Map.of("type", "mkdir", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
+                "type", "pass")))
+            .build();
 
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
@@ -207,13 +212,14 @@ public class TaskWorkerTest {
             })
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
-            "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
-            "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
-            "type", "rogue")));
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(
+                "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
+                "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
+                "type", "rogue")))
+            .build();
 
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
@@ -222,6 +228,7 @@ public class TaskWorkerTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         SyncMessageBroker messageBroker = new SyncMessageBroker();
@@ -237,10 +244,11 @@ public class TaskWorkerTest {
             })
             .messageBroker(messageBroker)
             .eventPublisher(event -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("type"));
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .build();
 
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
@@ -264,6 +272,7 @@ public class TaskWorkerTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void test7() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
@@ -279,10 +288,11 @@ public class TaskWorkerTest {
             })
             .messageBroker(messageBroker)
             .eventPublisher(event -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution1 = new TaskExecution(WorkflowTask.of("type"));
+        TaskExecution taskExecution1 = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .build();
 
         taskExecution1.setId(1111L);
         taskExecution1.setJobId(2222L);
@@ -290,7 +300,9 @@ public class TaskWorkerTest {
         // execute the task
         executorService.submit(() -> worker.handle(taskExecution1));
 
-        TaskExecution taskExecution2 = new TaskExecution(WorkflowTask.of("type"));
+        TaskExecution taskExecution2 = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .build();
 
         taskExecution2.setId(3333L);
         taskExecution2.setJobId(4444L);
@@ -314,6 +326,7 @@ public class TaskWorkerTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void test8() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
@@ -329,16 +342,19 @@ public class TaskWorkerTest {
             })
             .messageBroker(messageBroker)
             .eventPublisher(event -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
 
-        TaskExecution taskExecution1 = new TaskExecution(WorkflowTask.of("type"));
+        TaskExecution taskExecution1 = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .build();
         taskExecution1.setId(1111L);
         taskExecution1.setJobId(2222L);
         // execute the task
         executorService.submit(() -> worker.handle(taskExecution1));
 
-        TaskExecution taskExecution2 = new TaskExecution(WorkflowTask.of("type"));
+        TaskExecution taskExecution2 = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .build();
         taskExecution2.setId(3333L);
         taskExecution2.setJobId(2222L);
         taskExecution2.setParentId(taskExecution1.getId());

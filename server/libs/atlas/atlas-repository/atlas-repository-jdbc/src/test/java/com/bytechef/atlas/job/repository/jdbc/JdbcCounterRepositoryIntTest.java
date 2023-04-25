@@ -17,6 +17,7 @@
 
 package com.bytechef.atlas.job.repository.jdbc;
 
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Counter;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -32,6 +33,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -110,7 +113,7 @@ public class JdbcCounterRepositoryIntTest {
     private static TaskExecution getTaskExecution(long jobId) {
         return TaskExecution.builder()
             .jobId(jobId)
-            .workflowTask(WorkflowTask.of("type"))
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
     }
 }

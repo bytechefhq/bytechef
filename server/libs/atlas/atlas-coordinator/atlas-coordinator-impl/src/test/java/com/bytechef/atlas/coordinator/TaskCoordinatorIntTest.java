@@ -20,9 +20,9 @@
 package com.bytechef.atlas.coordinator;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.job.JobParameters;
-import com.bytechef.atlas.job.JobFactory;
-import com.bytechef.atlas.job.JobFactoryImpl;
+import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.facade.JobFacadeImpl;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
@@ -89,7 +89,7 @@ public class TaskCoordinatorIntTest {
     private ContextService contextService;
 
     @Autowired
-    private JobFactory jobFactory;
+    private JobFacade jobFacade;
 
     @Autowired
     private JobService jobService;
@@ -112,19 +112,6 @@ public class TaskCoordinatorIntTest {
         Job completedJob = executeWorkflow("aGVsbG8y");
 
         Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
-    }
-
-    @Test
-    public void testRequiredParameters() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            TaskCoordinator coordinator = TaskCoordinator.builder()
-                .jobFactory(jobFactory)
-                .jobService(jobService)
-                .taskExecutionService(taskExecutionService)
-                .build();
-
-            coordinator.create(new JobParameters(Collections.emptyMap(), "aGVsbG8x"));
-        });
     }
 
     private Job executeWorkflow(String workflowId) {
@@ -160,8 +147,8 @@ public class TaskCoordinatorIntTest {
         }
 
         @Bean
-        JobFactory jobFactory(ContextService contextService, JobService jobService) {
-            return new JobFactoryImpl(contextService, e -> {}, jobService, new SyncMessageBroker());
+        JobFacade jobFactory(ContextService contextService, JobService jobService) {
+            return new JobFacadeImpl(contextService, e -> {}, jobService, new SyncMessageBroker());
         }
 
         @Bean

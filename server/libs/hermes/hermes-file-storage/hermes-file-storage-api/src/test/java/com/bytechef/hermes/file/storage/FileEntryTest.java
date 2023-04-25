@@ -19,12 +19,13 @@ package com.bytechef.hermes.file.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
+import com.bytechef.atlas.constant.WorkflowConstants;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import java.util.Collections;
+import java.util.Map;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -53,15 +54,11 @@ public class FileEntryTest {
 
     @Test
     public void testSpelEvaluation() {
-        TaskEvaluator taskEvaluator = TaskEvaluator.create();
-        TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of("type", "result", "${fileEntry.name} ${fileEntry.url}"));
-
-        taskEvaluator.evaluate(
-            taskExecution,
+        Map<String, Object> map = Evaluator.evaluate(
+            Map.of(WorkflowConstants.TYPE, "type", "result", "${fileEntry.name} ${fileEntry.url}"),
             Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt")));
 
         assertEquals(
-            "sample.txt /tmp/fileName.txt", MapValueUtils.getString(taskExecution.getParameters(), "result"));
+            "sample.txt /tmp/fileName.txt", MapValueUtils.getString(map, "result"));
     }
 }

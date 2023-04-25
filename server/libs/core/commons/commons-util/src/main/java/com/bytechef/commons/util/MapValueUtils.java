@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,6 +47,22 @@ public final class MapValueUtils {
     private static final DefaultConversionService conversionService = new DefaultConversionService();
 
     private MapValueUtils() {
+    }
+
+    @SuppressWarnings(("unchecked"))
+    public static <V> Map<String, Object> append(Map<String, Object> map, String key, Map<String, V> values) {
+        Assert.notNull(key, "'key' must not be null");
+        Assert.notNull(values, "'values' must not be null");
+
+        Map<String, V> submap = new HashMap<>(getMap(map, key));
+
+        submap.putAll(values);
+
+        map = new HashMap<>(map);
+
+        map.put(key, submap);
+
+        return Collections.unmodifiableMap(map);
     }
 
     public static boolean containsKey(Map<String, Object> map, String key) {

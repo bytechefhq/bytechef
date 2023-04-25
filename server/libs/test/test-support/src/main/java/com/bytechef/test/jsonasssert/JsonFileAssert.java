@@ -17,12 +17,14 @@
 
 package com.bytechef.test.jsonasssert;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -33,7 +35,8 @@ public class JsonFileAssert {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
-            setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            registerModule(new JavaTimeModule());
+            registerModule(new Jdk8Module());
         }
     };
 

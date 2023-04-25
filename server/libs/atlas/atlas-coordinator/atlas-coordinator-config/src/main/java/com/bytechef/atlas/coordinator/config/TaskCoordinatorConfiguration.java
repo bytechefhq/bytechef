@@ -35,7 +35,6 @@ import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -45,7 +44,6 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import java.util.Collections;
 import java.util.List;
@@ -72,9 +70,6 @@ public class TaskCoordinatorConfiguration {
     private EventPublisher eventPublisher;
 
     @Autowired
-    private JobFactory jobFactory;
-
-    @Autowired
     private JobService jobService;
 
     @Autowired
@@ -90,9 +85,6 @@ public class TaskCoordinatorConfiguration {
     private List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors = Collections.emptyList();
 
     @Autowired
-    private TaskEvaluator taskEvaluator;
-
-    @Autowired
     private TaskExecutionService taskExecutionService;
 
     @Autowired
@@ -106,7 +98,7 @@ public class TaskCoordinatorConfiguration {
     @Bean
     DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
         return new DefaultTaskCompletionHandler(
-            contextService, eventPublisher, jobExecutor(), jobService, taskEvaluator, taskExecutionService,
+            contextService, eventPublisher, jobExecutor(), jobService, taskExecutionService,
             workflowService);
     }
 
@@ -117,7 +109,7 @@ public class TaskCoordinatorConfiguration {
 
     @Bean
     JobExecutor jobExecutor() {
-        return new JobExecutor(contextService, taskDispatcher(), taskExecutionService, taskEvaluator, workflowService);
+        return new JobExecutor(contextService, taskDispatcher(), taskExecutionService, workflowService);
     }
 
     @Bean
@@ -152,7 +144,6 @@ public class TaskCoordinatorConfiguration {
         return TaskCoordinator.builder()
             .eventPublisher(eventPublisher)
             .jobExecutor(jobExecutor())
-            .jobFactory(jobFactory)
             .jobService(jobService)
             .messageBroker(messageBroker)
             .taskCompletionHandler(taskCompletionHandler())
