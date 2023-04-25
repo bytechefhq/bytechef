@@ -40,6 +40,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -103,15 +104,15 @@ public sealed interface Property<P extends Property<P>>
 
     Object accept(PropertyVisitor propertyVisitor);
 
-    Boolean getAdvancedOption();
+    Optional<Boolean> getAdvancedOption();
 
     String getDescription();
 
     String getDisplayCondition();
 
-    Boolean getExpressionEnabled();
+    Optional<Boolean> getExpressionDisabled();
 
-    Boolean getHidden();
+    Optional<Boolean> getHidden();
 
     String getLabel();
 
@@ -119,9 +120,9 @@ public sealed interface Property<P extends Property<P>>
 
     String getName();
 
-    String getPlaceholder();
+    Optional<String> getPlaceholder();
 
-    Boolean getRequired();
+    Optional<Boolean> getRequired();
 
     Type getType();
 
