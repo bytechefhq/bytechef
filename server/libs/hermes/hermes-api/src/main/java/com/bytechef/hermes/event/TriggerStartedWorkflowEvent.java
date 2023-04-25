@@ -18,7 +18,6 @@
 package com.bytechef.hermes.event;
 
 import com.bytechef.event.AbstractWorkflowEvent;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
 
 /**
  * @author Ivica Cardic
@@ -27,22 +26,22 @@ public class TriggerStartedWorkflowEvent extends AbstractWorkflowEvent {
 
     public static final String TRIGGER_STARTED = "trigger.started";
 
-    private final WorkflowExecutionId workflowExecutionId;
+    private final long triggerExecutionId;
 
-    public TriggerStartedWorkflowEvent(WorkflowExecutionId workflowExecutionId) {
-        super(TRIGGER_STARTED);
+    public TriggerStartedWorkflowEvent(long triggerExecutionId) {
+        super();
 
-        this.workflowExecutionId = workflowExecutionId;
+        this.triggerExecutionId = triggerExecutionId;
     }
 
-    public WorkflowExecutionId getWorkflowExecutionId() {
-        return workflowExecutionId;
+    public long getTriggerExecutionId() {
+        return triggerExecutionId;
     }
 
     @Override
     public String toString() {
         return "TriggerStartedWorkflowEvent{" +
-            "workflowExecutionId=" + workflowExecutionId +
+            "triggerExecutionId=" + triggerExecutionId +
             ", createdDate=" + createdDate +
             ", type='" + type + '\'' +
             "} " + super.toString();

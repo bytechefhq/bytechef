@@ -15,12 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.trigger;
+package com.bytechef.hermes.service;
 
-import com.bytechef.message.Controllable;
+import com.bytechef.hermes.domain.TriggerExecution;
 
 /**
  * @author Ivica Cardic
  */
-public interface ControlTrigger extends Trigger, Controllable {
+public interface TriggerExecutionService {
+
+    TriggerExecution create(TriggerExecution triggerExecution);
+
+    TriggerExecution getTriggerExecution(long id);
+
+    TriggerExecution update(TriggerExecution triggerExecution);
 }
