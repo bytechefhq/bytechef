@@ -17,11 +17,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -31,13 +29,10 @@ import org.springframework.expression.TypedValue;
  * @author Arik Cohen
  * @since Mar, 03 2020
  */
-class DateFormat implements MethodExecutor {
+class Now implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        Date date = (Date) aArguments[0];
-        SimpleDateFormat sdf = new SimpleDateFormat((String) aArguments[1], Locale.getDefault());
-
-        return new TypedValue(sdf.format(date));
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        return new TypedValue(new Date());
     }
 }

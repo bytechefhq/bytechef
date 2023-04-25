@@ -17,10 +17,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import java.io.File;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -30,16 +30,18 @@ import org.springframework.expression.TypedValue;
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-public class TempDir implements MethodExecutor {
+class Concat implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        String tmpDir = System.getProperty("java.io.tmpdir");
+    public TypedValue execute(EvaluationContext context, Object aTarget, Object... arguments) throws AccessException {
+        List<?> l1 = (List<?>) arguments[0];
+        List<?> l2 = (List<?>) arguments[1];
 
-        if (tmpDir.endsWith(File.separator)) {
-            tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
-        }
+        List<Object> joined = new ArrayList<>(l1.size() + l2.size());
 
-        return new TypedValue(tmpDir);
+        joined.addAll(l1);
+        joined.addAll(l2);
+
+        return new TypedValue(joined);
     }
 }

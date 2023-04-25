@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
@@ -26,15 +26,12 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Feb, 24 2020
+ * @since Mar, 03 2020
  */
-class StringFormat implements MethodExecutor {
+class Timestamp implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        Object[] args = new Object[aArguments.length - 1];
-        System.arraycopy(aArguments, 1, args, 0, aArguments.length - 1);
-
-        return new TypedValue(String.format((String) aArguments[0], args));
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        return new TypedValue(System.currentTimeMillis());
     }
 }

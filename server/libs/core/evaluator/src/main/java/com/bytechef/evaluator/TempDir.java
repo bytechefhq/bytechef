@@ -17,11 +17,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.File;
+
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -29,17 +28,18 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Feb, 25 2020
+ * @since Feb, 19 2020
  */
-class Sort implements MethodExecutor {
+public class TempDir implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        Collection<?> list = (Collection<?>) aArguments[0];
-        List<?> sorted = list.stream()
-            .sorted()
-            .collect(Collectors.toList());
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        String tmpDir = System.getProperty("java.io.tmpdir");
 
-        return new TypedValue(sorted);
+        if (tmpDir.endsWith(File.separator)) {
+            tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
+        }
+
+        return new TypedValue(tmpDir);
     }
 }
