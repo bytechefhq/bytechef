@@ -23,7 +23,6 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +47,6 @@ public class MapTaskDispatcherConfiguration {
     private MessageBroker messageBroker;
 
     @Autowired
-    private TaskEvaluator taskEvaluator;
-
-    @Autowired
     private TaskExecutionService taskExecutionService;
 
     @Bean("mapTaskCompletionHandlerFactory_v1")
@@ -67,7 +63,6 @@ public class MapTaskDispatcherConfiguration {
             .messageBroker(messageBroker)
             .contextService(contextService)
             .counterService(counterService)
-            .taskEvaluator(taskEvaluator)
             .build();
     }
 }

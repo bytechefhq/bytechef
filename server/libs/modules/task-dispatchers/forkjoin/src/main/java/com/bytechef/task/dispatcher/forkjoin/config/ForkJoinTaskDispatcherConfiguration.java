@@ -23,7 +23,6 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,20 +45,17 @@ public class ForkJoinTaskDispatcherConfiguration {
     private MessageBroker messageBroker;
 
     @Autowired
-    private TaskEvaluator taskEvaluator;
-
-    @Autowired
     private TaskExecutionService taskExecutionService;
 
     @Bean("forkJoinTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-            taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService, taskEvaluator);
+            taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService);
     }
 
     @Bean("forkJoinTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory forkTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ForkJoinTaskDispatcher(
-            contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, counterService, messageBroker, taskDispatcher, taskExecutionService);
     }
 }

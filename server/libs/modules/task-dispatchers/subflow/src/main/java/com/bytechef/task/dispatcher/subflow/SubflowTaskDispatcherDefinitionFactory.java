@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 
@@ -35,10 +34,9 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(
         SubflowTaskDispatcherConstants.SUBFLOW)
-            .display(
-                display("Subflow")
-                    .description(
-                        "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task."))
+            .title("Subflow")
+            .description(
+                "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task.")
             .properties(string(WorkflowConstants.WORKFLOW_ID)
                 .label("Workflow Id")
                 .description("The id of sub-workflow to execute."));

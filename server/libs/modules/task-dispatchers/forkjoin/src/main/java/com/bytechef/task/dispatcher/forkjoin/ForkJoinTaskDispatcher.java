@@ -24,6 +24,7 @@ import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatc
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
@@ -35,7 +36,6 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import java.time.LocalDateTime;
@@ -91,19 +91,16 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final CounterService counterService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public ForkJoinTaskDispatcher(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskDispatcher<? super Task> taskDispatcher, TaskEvaluator taskEvaluator,
-        TaskExecutionService taskExecutionService) {
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
-        this.taskEvaluator = taskEvaluator;
         this.taskExecutionService = taskExecutionService;
     }
 
@@ -114,7 +111,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))
+            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
             .toList();
 
         taskExecution.setStartDate(LocalDateTime.now());
@@ -147,13 +144,16 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(1)
-                    .workflowTask(WorkflowTask.of(branchWorkflowTask, BRANCH, i))
+                    .workflowTask(
+                        new WorkflowTask(
+                            MapValueUtils.append(
+                                branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS, Map.of(BRANCH, i))))
                     .build();
 
                 Map<String, Object> context = contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-                branchTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
+                branchTaskExecution.evaluate(context);
 
                 branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 

@@ -20,7 +20,7 @@ package com.bytechef.task.dispatcher.condition;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.number;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.option;
@@ -55,8 +55,8 @@ import org.springframework.stereotype.Component;
 public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(CONDITION)
-        .display(
-            display("Condition").description("Directs a stream based on true/false results of comparisons."))
+        .title("Condition")
+        .description("Directs a stream based on true/false results of comparisons.")
         .properties(
             bool(RAW_EXPRESSION)
                 .label("Raw expression")

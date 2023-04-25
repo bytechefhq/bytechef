@@ -37,7 +37,6 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -58,25 +57,20 @@ import java.util.Objects;
 public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
     private final MessageBroker messageBroker;
     private final ContextService contextService;
     private final CounterService counterService;
 
     public EachTaskDispatcher(
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService,
-        MessageBroker messageBroker,
-        ContextService contextService,
-        CounterService counterService,
-        TaskEvaluator taskEvaluator) {
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
+        MessageBroker messageBroker, ContextService contextService, CounterService counterService) {
+
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.messageBroker = messageBroker;
         this.contextService = contextService;
         this.counterService = counterService;
-        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
@@ -106,7 +100,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(i + 1)
-                    .workflowTask(WorkflowTask.of(iteratee))
+                    .workflowTask(new WorkflowTask(iteratee))
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(
@@ -115,7 +109,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
                 newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
-                iterateeTaskExecution = taskEvaluator.evaluate(iterateeTaskExecution, newContext);
+                iterateeTaskExecution.evaluate(newContext);
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution);
 

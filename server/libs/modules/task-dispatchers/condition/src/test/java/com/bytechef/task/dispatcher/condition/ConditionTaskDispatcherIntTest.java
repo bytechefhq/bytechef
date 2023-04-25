@@ -23,7 +23,6 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
@@ -46,7 +45,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @TaskDispatcherIntTest
 public class ConditionTaskDispatcherIntTest {
 
-    public static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
@@ -94,8 +94,7 @@ public class ConditionTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("condition_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
-            this::getTaskCompletionHandlerFactories,
-            this::getTaskDispatcherResolverFactories,
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
@@ -106,8 +105,7 @@ public class ConditionTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("condition_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
-            this::getTaskCompletionHandlerFactories,
-            this::getTaskDispatcherResolverFactories,
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
@@ -123,8 +121,7 @@ public class ConditionTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("condition_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
-            this::getTaskCompletionHandlerFactories,
-            this::getTaskDispatcherResolverFactories,
+            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
@@ -139,21 +136,21 @@ public class ConditionTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+        CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService));
     }
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+        TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
+                contextService, messageBroker, taskDispatcher, taskExecutionService));
     }
 
     private Map<String, TaskHandler<?>> getTaskHandlerMap() {
