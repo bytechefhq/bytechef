@@ -51,7 +51,7 @@ const ContextualMenu = ({
 
             const newWorkflowNode = {
                 data: {
-                    label: clickedItem.display?.title,
+                    label: clickedItem?.title,
                     name: getFormattedName(clickedItem.name!, nodes),
                     icon: <Component1Icon className="h-8 w-8 text-gray-700" />,
                     originNodeName: clickedItem.name,
@@ -132,7 +132,7 @@ const ContextualMenu = ({
                                 icon: (
                                     <Component1Icon className="h-8 w-8 text-gray-700" />
                                 ),
-                                label: clickedItem.display?.title,
+                                label: clickedItem?.title,
                                 name: getFormattedName(
                                     clickedItem.name!,
                                     nodes
@@ -175,7 +175,7 @@ const ContextualMenu = ({
                         component.name
                             ?.toLowerCase()
                             .includes(filter.toLowerCase()) ||
-                        component.display?.title
+                        component?.title
                             ?.toLowerCase()
                             .includes(filter.toLowerCase())
                 )
@@ -187,7 +187,7 @@ const ContextualMenu = ({
                         flowControl.name
                             ?.toLowerCase()
                             .includes(filter.toLowerCase()) ||
-                        flowControl.display?.title
+                        flowControl?.title
                             ?.toLowerCase()
                             .includes(filter.toLowerCase())
                 )

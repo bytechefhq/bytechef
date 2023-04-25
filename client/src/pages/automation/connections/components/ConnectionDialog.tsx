@@ -190,7 +190,7 @@ const ConnectionDialog = ({
                           : []),
                       ...connectionDefinition.authorizations.map(
                           (authorization) => ({
-                              label: authorization?.display?.title as string,
+                              label: authorization?.title as string,
                               value: authorization.name as string,
                           })
                       ),
@@ -468,7 +468,7 @@ const ConnectionDialog = ({
                             {component && (
                                 <Input
                                     label="Component"
-                                    defaultValue={component.display.title}
+                                    defaultValue={component.title}
                                     disabled
                                     name="defaultComponentName"
                                 />
@@ -618,10 +618,7 @@ const ConnectionDialog = ({
                                         <>
                                             {`Excellent! You can connect and create the `}
                                             <span className="font-semibold">
-                                                {
-                                                    componentDefinition?.display
-                                                        ?.title
-                                                }
+                                                {componentDefinition?.title}
                                             </span>
                                             {` connection under name `}
                                             <span className="font-semibold">
