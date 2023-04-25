@@ -22,3 +22,4 @@ src/main/java/com/bytechef/helios/project/web/rest/model/UpdateTagsRequestModel.
 src/main/java/com/bytechef/helios/project/web/rest/model/WebhookModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/WebhookRetryModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowBasicModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowConnectionModel.java
