@@ -159,11 +159,7 @@ public final class Workflow implements Errorable, Persistable<String> {
 
     @PersistenceCreator
     public Workflow(String definition, String id, int format) throws Exception {
-        this(
-            definition, Format.valueOf(format), id,
-            WorkflowReader.readWorkflowMap(
-                new WorkflowResource(
-                    id, new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)), Format.valueOf(format))));
+        this(definition, Format.valueOf(format), id, readWorkflowMap(definition, id, format));
     }
 
     public Workflow(String definition, Format format, String id, Map<String, Object> source) {
@@ -372,5 +368,11 @@ public final class Workflow implements Errorable, Persistable<String> {
     }
 
     public record Output(String name, Object value) {
+    }
+
+    private static Map<String, Object> readWorkflowMap(String definition, String id, int format) throws Exception {
+        return WorkflowReader.readWorkflowMap(
+            new WorkflowResource(
+                id, new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)), Format.valueOf(format)));
     }
 }
