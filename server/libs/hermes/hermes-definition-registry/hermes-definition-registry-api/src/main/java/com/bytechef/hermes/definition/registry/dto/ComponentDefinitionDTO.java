@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -28,10 +27,11 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ComponentDefinitionDTO(
-    List<ActionDefinitionBasicDTO> actions, ConnectionDefinitionBasicDTO connection, Display display, String name,
-    Resources resources, List<TriggerDefinitionBasicDTO> triggers, int version) {
+    List<ActionDefinitionBasicDTO> actions, String category, ConnectionDefinitionBasicDTO connection,
+    String description, String icon, String name, Resources resources, String[] tags,
+    List<TriggerDefinitionBasicDTO> triggers, String title, int version) {
 
     public ComponentDefinitionDTO(String name) {
-        this(null, null, null, name, null, null, 0);
+        this(null, null, null, null, null, name, null, null, null, null, 0);
     }
 }

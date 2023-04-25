@@ -20,16 +20,16 @@
 package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.domain.TaskExecution.Status;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
-import com.bytechef.atlas.task.ControlTask;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
+import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.ExceptionUtils;
@@ -77,7 +77,6 @@ public class TaskWorker {
     private final ExecutorService executorService;
     private final MessageBroker messageBroker;
     private final TaskHandlerResolver taskHandlerResolver;
-    private final TaskEvaluator taskEvaluator;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
 
     private TaskWorker(Builder builder) {
@@ -85,7 +84,6 @@ public class TaskWorker {
         messageBroker = Objects.requireNonNull(builder.messageBroker);
         eventPublisher = Objects.requireNonNull(builder.eventPublisher);
         executorService = Objects.requireNonNull(builder.executorService);
-        taskEvaluator = Objects.requireNonNull(builder.taskEvaluator);
     }
 
     /**
@@ -143,15 +141,17 @@ public class TaskWorker {
      * Handle control tasks. Control tasks are used by the Coordinator to control Worker instances. For example, to stop
      * an ongoing task or to adjust something on a worker outside the context of a job.
      */
-    public void handle(ControlTask controlTask) {
-        logger.debug("Received control task: {}", controlTask);
+    public void handle(Controllable controllable) {
+        if (controllable instanceof CancelControlTask controlTask) {
+            logger.debug("Received control task: {}", controlTask);
 
-        if (CancelControlTask.TYPE_CANCEL.equals(controlTask.getType())) {
-            Long jobId = ((CancelControlTask) controlTask).getJobId();
+            Long jobId = controlTask.getJobId();
 
             for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutions.values()) {
                 if (Objects.equals(taskExecutionFuture.taskExecution.getJobId(), jobId)) {
-                    logger.info("Cancelling task {}->{}", jobId, taskExecutionFuture.taskExecution.getId());
+                    logger.info(
+                        "Cancelling task jobId={}->taskExecutionId={}", jobId,
+                        taskExecutionFuture.taskExecution.getId());
 
                     taskExecutionFuture.cancel(true);
                 }
@@ -172,26 +172,11 @@ public class TaskWorker {
             // pre tasks
             executeSubTasks(taskExecution, taskExecution.getPre(), context);
 
-            taskExecution = taskEvaluator.evaluate(taskExecution, context);
+            taskExecution.evaluate(context);
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
-            Object output = taskHandler.handle(
-                TaskExecution.builder()
-                    .id(taskExecution.getId())
-                    .jobId(taskExecution.getJobId())
-                    .maxRetries(taskExecution.getMaxRetries())
-                    .parentId(taskExecution.getParentId())
-                    .priority(taskExecution.getPriority())
-                    .progress(taskExecution.getProgress())
-                    .retryAttempts(taskExecution.getRetryAttempts())
-                    .retryDelay(taskExecution.getRetryDelay())
-                    .retryDelayFactor(taskExecution.getRetryDelayFactor())
-                    .status(taskExecution.getStatus())
-                    .startDate(taskExecution.getStartDate())
-                    .taskNumber(taskExecution.getTaskNumber())
-                    .workflowTask(taskExecution.getWorkflowTask())
-                    .build());
+            Object output = taskHandler.handle(taskExecution.clone());
 
             if (output != null) {
                 taskExecution.setOutput(output);
@@ -200,7 +185,7 @@ public class TaskWorker {
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
             taskExecution.setProgress(100);
-            taskExecution.setStatus(TaskExecution.Status.COMPLETED);
+            taskExecution.setStatus(Status.COMPLETED);
 
             // post tasks
             executeSubTasks(taskExecution, taskExecution.getPost(), context);
@@ -222,7 +207,7 @@ public class TaskWorker {
                 .workflowTask(subWorkflowTask)
                 .build();
 
-            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(context);
 
             TaskExecution completionTaskExecution = doExecuteTask(subTaskExecution);
 
@@ -237,7 +222,7 @@ public class TaskWorker {
 
         taskExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
-        taskExecution.setStatus(TaskExecution.Status.FAILED);
+        taskExecution.setStatus(Status.FAILED);
 
         messageBroker.send(SystemMessageRoute.ERRORS, taskExecution);
     }
@@ -262,16 +247,9 @@ public class TaskWorker {
         private MessageBroker messageBroker;
         private EventPublisher eventPublisher;
         private ExecutorService executorService = Executors.newCachedThreadPool();
-        private TaskEvaluator taskEvaluator;
 
         public Builder taskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
             this.taskHandlerResolver = taskHandlerResolver;
-
-            return this;
-        }
-
-        public Builder taskEvaluator(TaskEvaluator taskEvaluator) {
-            this.taskEvaluator = taskEvaluator;
 
             return this;
         }

@@ -17,7 +17,6 @@
 
 package com.bytechef.platform.config;
 
-import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -27,6 +26,7 @@ import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.helios.project.facade.ProjectFacadeImpl;
 import com.bytechef.helios.project.facade.ProjectInstanceFacade;
 import com.bytechef.helios.project.facade.ProjectInstanceFacadeImpl;
+import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
@@ -42,12 +42,13 @@ public class ProjectConfiguration {
 
     @Bean
     ProjectInstanceFacade projectInstanceFacade(
-        JobFactory jobFactory, ProjectInstanceService projectInstanceService,
+        ProjectInstanceJobFactory projectInstanceJobFactory, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
         TagService tagService) {
 
         return new ProjectInstanceFacadeImpl(
-            jobFactory, projectInstanceService, projectInstanceWorkflowService, projectService, tagService);
+            projectInstanceJobFactory, projectInstanceService, projectInstanceWorkflowService, projectService,
+            tagService);
     }
 
     @Bean

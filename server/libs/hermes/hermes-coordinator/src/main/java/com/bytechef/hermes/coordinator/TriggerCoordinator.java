@@ -20,15 +20,17 @@ package com.bytechef.hermes.coordinator;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.coordinator.completion.TriggerCompletionHandler;
-import com.bytechef.hermes.trigger.TriggerExecution;
+import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
 /**
  * @author Ivica Cardic
  */
+@Component
 public class TriggerCoordinator {
 
     private final MessageBroker messageBroker;

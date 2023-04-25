@@ -17,9 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.definition.Display;
+import com.bytechef.hermes.component.definition.Help;
 import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -29,6 +28,6 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ActionDefinitionDTO(
-    Boolean batch, Display display, Object exampleOutput, String name, List<? extends Property<?>> outputSchema,
-    List<? extends Property<?>> properties, Resources resources) {
+    Boolean batch, String description, Object exampleOutput, Help help, String name,
+    List<? extends Property<?>> outputSchema, List<? extends Property<?>> properties, String title) {
 }

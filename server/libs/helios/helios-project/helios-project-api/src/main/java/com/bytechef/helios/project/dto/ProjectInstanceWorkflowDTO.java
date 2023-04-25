@@ -44,7 +44,7 @@ public record ProjectInstanceWorkflowDTO(
         this(
             projectInstanceWorkflow.getConnectionIds(), connections, projectInstanceWorkflow.getCreatedBy(),
             projectInstanceWorkflow.getCreatedDate(), projectInstanceWorkflow.isEnabled(),
-            projectInstanceWorkflow.getId(), projectInstanceWorkflow.getInputParameters(),
+            projectInstanceWorkflow.getId(), projectInstanceWorkflow.getInputs(),
             projectInstanceWorkflow.getLastExecutionDate(), projectInstanceWorkflow.getLastModifiedBy(),
             projectInstanceWorkflow.getLastModifiedDate(), projectInstance,
             projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getVersion(),
@@ -61,7 +61,7 @@ public record ProjectInstanceWorkflowDTO(
         projectInstanceWorkflow.setConnectionIds(connectionIds);
         projectInstanceWorkflow.setEnabled(enabled);
         projectInstanceWorkflow.setId(id);
-        projectInstanceWorkflow.setInputParameters(inputParameters);
+        projectInstanceWorkflow.setInputs(inputParameters);
         projectInstanceWorkflow.setLastExecutionDate(lastExecutionDate);
         projectInstanceWorkflow.setProjectInstanceId(projectInstanceId);
         projectInstanceWorkflow.setVersion(version);

@@ -18,12 +18,14 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,9 +46,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return Mono.just(
             componentDefinitions.stream()
-                .filter(componentDefinition -> triggerName.equalsIgnoreCase(componentDefinition.getName()) &&
-                    componentVersion == componentDefinition.getVersion())
-                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getTriggers()))
+                .filter(componentDefinition -> triggerName.equalsIgnoreCase(
+                    componentDefinition.getName()) && componentVersion == componentDefinition.getVersion())
+                .flatMap(componentDefinition -> CollectionUtils.stream(
+                    OptionalUtils.orElse(componentDefinition.getTriggers(), Collections.emptyList())))
                 .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))
                 .findFirst()
                 .map(this::toTriggerDefinitionDTO)
@@ -58,18 +61,22 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         String componentName, int componentVersion) {
         return Mono.just(
             componentDefinitions.stream()
-                .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                    componentVersion == componentDefinition.getVersion())
-                .filter(componentDefinition -> componentDefinition.getTriggers() != null)
-                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getTriggers()))
+                .filter(componentDefinition -> componentName.equalsIgnoreCase(
+                    componentDefinition.getName()) && componentVersion == componentDefinition.getVersion())
+                .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getTriggers()))
+                .flatMap(componentDefinition -> CollectionUtils.stream(
+                    OptionalUtils.orElse(componentDefinition.getTriggers(), Collections.emptyList())))
                 .map(this::toTriggerDefinitionDTO)
                 .toList());
     }
 
     private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
         return new TriggerDefinitionDTO(
-            triggerDefinition.isBatch(), triggerDefinition.getDisplay(), triggerDefinition.getExampleOutput(),
-            triggerDefinition.getName(), triggerDefinition.getOutputSchema(), triggerDefinition.getProperties(),
-            triggerDefinition.getResources(), triggerDefinition.getType());
+            OptionalUtils.orElse(triggerDefinition.getBatch(), false), triggerDefinition.getDescription(),
+            triggerDefinition.getExampleOutput(), OptionalUtils.orElse(triggerDefinition.getHelp(), null),
+            triggerDefinition.getName(),
+            OptionalUtils.orElse(triggerDefinition.getOutputSchema(), Collections.emptyList()),
+            OptionalUtils.orElse(triggerDefinition.getProperties(), Collections.emptyList()),
+            triggerDefinition.getTitle(), triggerDefinition.getType());
     }
 }

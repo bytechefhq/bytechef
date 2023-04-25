@@ -23,13 +23,13 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
@@ -43,7 +43,6 @@ import com.bytechef.hermes.component.registrar.jdbc.operation.InsertJdbcOperatio
 import com.bytechef.hermes.component.registrar.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.hermes.component.registrar.jdbc.operation.UpdateJdbcOperation;
 import com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants;
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,8 @@ public class JdbcComponentHandler implements ComponentHandler {
 
     public JdbcComponentHandler(JdbcComponentDefinition jdbcComponentDefinition) {
         this.componentDefinition = getComponentDefinition(
-            jdbcComponentDefinition.getName(), jdbcComponentDefinition.getDisplay());
+            OptionalUtils.orElse(jdbcComponentDefinition.getDescription(), null), jdbcComponentDefinition.getName(),
+            jdbcComponentDefinition.getIcon(), jdbcComponentDefinition.getTitle());
         this.databaseJdbcName = jdbcComponentDefinition.getDatabaseJdbcName();
         this.jdbcDriverClassName = jdbcComponentDefinition.getJdbcDriverClassName();
     }
@@ -104,12 +104,11 @@ public class JdbcComponentHandler implements ComponentHandler {
         return updateJdbcOperation.execute(context, inputParameters);
     }
 
-    private ComponentDefinition getComponentDefinition(String name, Display display) {
+    private ComponentDefinition getComponentDefinition(String description, String name, String icon, String title) {
         return component(name)
-            .display(
-                display(display.getTitle())
-                    .description(display.getDescription())
-                    .icon(display.getIcon()))
+            .description(description)
+            .icon(icon)
+            .title(title)
             .connection(
                 connection()
                     .properties(
@@ -127,7 +126,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .required(true)))
             .actions(
                 action(JdbcConstants.QUERY)
-                    .display(display("Query").description("Execute an SQL query."))
+                    .title("Query")
+                    .description("Execute an SQL query.")
                     .properties(
                         string(JdbcConstants.QUERY)
                             .label("Query")
@@ -144,7 +144,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .outputSchema(array().items(object().properties(integer())))
                     .execute(this::executeQuery),
                 action(JdbcConstants.INSERT)
-                    .display(display("Insert").description("Insert rows in database."))
+                    .title("Insert")
+                    .description("Insert rows in database.")
                     .properties(
                         string(JdbcConstants.SCHEMA)
                             .label("Schema")
@@ -167,7 +168,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .outputSchema(object().properties(integer()))
                     .execute(this::executeInsert),
                 action(JdbcConstants.UPDATE)
-                    .display(display("Update").description("Update rows in database."))
+                    .title("Update")
+                    .description("Update rows in database.")
                     .properties(
                         string(JdbcConstants.SCHEMA)
                             .label("Schema")
@@ -195,7 +197,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .outputSchema(object().properties(integer()))
                     .execute(this::executeUpdate),
                 action(JdbcConstants.DELETE)
-                    .display(display("Delete").description("Delete rows from database."))
+                    .title("Delete")
+                    .description("Delete rows from database.")
                     .properties(
                         string(JdbcConstants.SCHEMA)
                             .label("Schema")
@@ -218,7 +221,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .outputSchema(object().properties(integer()))
                     .execute(this::executeDelete),
                 action(JdbcConstants.EXECUTE)
-                    .display(display("Execute").description("Execute an SQL DML or DML statement."))
+                    .title("Execute")
+                    .description("Execute an SQL DML or DML statement.")
                     .properties(
                         string(JdbcConstants.EXECUTE)
                             .label("Execute")

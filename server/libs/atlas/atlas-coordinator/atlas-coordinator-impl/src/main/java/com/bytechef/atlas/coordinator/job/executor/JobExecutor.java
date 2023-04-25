@@ -28,7 +28,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -50,18 +50,16 @@ public class JobExecutor {
     private final ContextService contextService;
     private final TaskDispatcher<? super TaskExecution> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final TaskEvaluator taskEvaluator;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobExecutor(
         ContextService contextService, TaskDispatcher<? super TaskExecution> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskEvaluator taskEvaluator, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskEvaluator = taskEvaluator;
         this.workflowService = workflowService;
     }
 
@@ -86,11 +84,10 @@ public class JobExecutor {
 
         nextTaskExecution = taskExecutionService.create(nextTaskExecution);
 
-        nextTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
+        nextTaskExecution.evaluate(context);
 
-        Assert.notNull(nextTaskExecution.getId(), "'nextTaskExecution.id' must not be null");
-
-        contextService.push(nextTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+        contextService.push(
+            Objects.requireNonNull(nextTaskExecution.getId()), Context.Classname.TASK_EXECUTION, context);
 
         taskDispatcher.dispatch(nextTaskExecution);
 

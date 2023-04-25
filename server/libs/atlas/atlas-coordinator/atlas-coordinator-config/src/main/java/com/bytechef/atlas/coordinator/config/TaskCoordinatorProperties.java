@@ -43,26 +43,44 @@ public class TaskCoordinatorProperties {
 
         private int completions = 1;
         private int jobs = 1;
+        private int restarts = 1;
+        private int stops = 1;
         private int subflows = 1;
 
         public int getCompletions() {
             return completions;
         }
 
-        public void setCompletions(int completions) {
-            this.completions = completions;
-        }
-
         public int getJobs() {
             return jobs;
+        }
+
+        public int getRestarts() {
+            return restarts;
+        }
+
+        public int getStops() {
+            return stops;
+        }
+
+        public int getSubflows() {
+            return subflows;
+        }
+
+        public void setCompletions(int completions) {
+            this.completions = completions;
         }
 
         public void setJobs(int jobs) {
             this.jobs = jobs;
         }
 
-        public int getSubflows() {
-            return subflows;
+        public void setRestarts(int restarts) {
+            this.restarts = restarts;
+        }
+
+        public void setStops(int stops) {
+            this.stops = stops;
         }
 
         public void setSubflows(int subflows) {

@@ -23,4 +23,6 @@ import com.bytechef.message.Controllable;
  * @author Ivica Cardic
  */
 public interface ControlTask extends Task, Controllable {
+
+    String getType();
 }

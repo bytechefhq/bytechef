@@ -54,8 +54,8 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @Column("input_parameters")
-    private MapWrapper inputParameters = new MapWrapper();
+    @Column("inputs")
+    private MapWrapper inputs = new MapWrapper();
 
     @Column
     private boolean enabled;
@@ -90,8 +90,8 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     }
 
     @SuppressFBWarnings("NP")
-    public ProjectInstanceWorkflow(Map<String, Object> inputParameters, String workflowId) {
-        this.inputParameters = new MapWrapper(inputParameters);
+    public ProjectInstanceWorkflow(Map<String, Object> inputs, String workflowId) {
+        this.inputs = new MapWrapper(inputs);
         this.workflowId = workflowId;
     }
 
@@ -128,8 +128,8 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         return createdDate;
     }
 
-    public Map<String, Object> getInputParameters() {
-        return Collections.unmodifiableMap(inputParameters.getMap());
+    public Map<String, Object> getInputs() {
+        return Collections.unmodifiableMap(inputs.getMap());
     }
 
     @Override
@@ -188,9 +188,9 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setInputParameters(Map<String, Object> inputParameters) {
-        if (!CollectionUtils.isEmpty(inputParameters)) {
-            this.inputParameters = new MapWrapper(inputParameters);
+    public void setInputs(Map<String, Object> inputs) {
+        if (!CollectionUtils.isEmpty(inputs)) {
+            this.inputs = new MapWrapper(inputs);
         }
     }
 
@@ -215,7 +215,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         return "ProjectTag{" + ", id='"
             + id + '\'' + ", workflowId='"
             + workflowId + '\'' + ", inputParameters="
-            + inputParameters + ", projectInstanceWorkflowConnections="
+            + inputs + ", projectInstanceWorkflowConnections="
             + projectInstanceWorkflowConnections + ", lastExecutionDate="
             + lastExecutionDate + ", enabled="
             + enabled + '}';

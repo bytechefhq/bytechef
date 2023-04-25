@@ -37,6 +37,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -125,6 +126,14 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
     StringPropertyModel map(Property.StringProperty stringProperty);
 
     TimePropertyModel map(Property.TimeProperty timeProperty);
+
+    default Boolean mapOptionalBoolean(Optional<Boolean> optional) {
+        return optional.orElse(null);
+    }
+
+    default String mapOptionalString(Optional<String> optional) {
+        return optional.orElse(null);
+    }
 
     default List<PropertyModel> map(List<? extends Property<?>> properties) {
         if (CollectionUtils.isEmpty(properties)) {

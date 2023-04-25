@@ -19,38 +19,40 @@
 
 package com.bytechef.atlas.task;
 
+import com.bytechef.message.AbstractControllable;
+
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  * @since Apr 19, 2017
  */
-public class CancelControlTask extends AbstractControlTask {
+public class CancelControlTask extends AbstractControllable implements ControlTask {
 
-    public static final String TYPE_CANCEL = "cancel";
+    public static final String TYPE_CANCEL = "task.cancel";
 
-    private Long jobId;
-    private Long taskExecutionId;
+    private long jobId;
+    private long taskExecutionId;
 
-    public CancelControlTask() {
+    private CancelControlTask() {
     }
 
-    public CancelControlTask(Long jobId, Long taskExecutionId) {
+    public CancelControlTask(long jobId, long taskExecutionId) {
         super(TYPE_CANCEL);
 
         this.jobId = jobId;
         this.taskExecutionId = taskExecutionId;
     }
 
-    public Long getJobId() {
+    public long getJobId() {
         return jobId;
     }
 
-    public Long getTaskExecutionId() {
+    public long getTaskExecutionId() {
         return taskExecutionId;
     }
 
     @Override
     public String toString() {
-        return "CancelControlTask{" + "jobId='" + jobId + '\'' + ", taskExecutionId='" + taskExecutionId + '\'' + '}';
+        return "CancelControlTask{" + "jobId=" + jobId + ", taskExecutionId=" + taskExecutionId + '}';
     }
 }

@@ -6,4 +6,5 @@ dependencies {
     testImplementation project(":server:libs:atlas:atlas-api")
     testImplementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
     testImplementation project(":server:libs:core:commons:commons-util")
+    testImplementation project(":server:libs:core:evaluator")
 }

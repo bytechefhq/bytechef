@@ -27,20 +27,19 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.job.JobParameters;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.job.JobFactory;
-import com.bytechef.atlas.job.JobFactoryImpl;
+import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.facade.JobFacadeImpl;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -62,7 +61,7 @@ import org.slf4j.LoggerFactory;
 public class JobSyncExecutor {
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private final JobFactory jobFactory;
+    private final JobFacade jobFacade;
     private final JobService jobService;
 
     @SuppressFBWarnings("EI")
@@ -88,14 +87,13 @@ public class JobSyncExecutor {
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
                 new TaskDispatcherAdapterTaskHandlerResolver(
-                    builder.taskDispatcherAdapterFactories, taskHandlerResolverChain, builder.taskEvaluator),
+                    builder.taskDispatcherAdapterFactories, taskHandlerResolverChain),
                 new DefaultTaskHandlerResolver(builder.taskHandlerAccessor)));
 
         TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(taskHandlerResolverChain)
             .messageBroker(syncMessageBroker)
             .eventPublisher(builder.eventPublisher)
-            .taskEvaluator(builder.taskEvaluator)
             .build();
 
         syncMessageBroker.receive(TaskMessageRoute.TASKS, o -> worker.handle((TaskExecution) o));
@@ -110,11 +108,10 @@ public class JobSyncExecutor {
                 Stream.of(new DefaultTaskDispatcher(syncMessageBroker, List.of()))));
 
         JobExecutor jobExecutor = new JobExecutor(
-            builder.contextService, taskDispatcherChain, builder.taskExecutionService, builder.taskEvaluator,
-            builder.workflowService);
+            builder.contextService, taskDispatcherChain, builder.taskExecutionService, builder.workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            builder.contextService, builder.eventPublisher, jobExecutor, jobService, builder.taskEvaluator,
+            builder.contextService, builder.eventPublisher, jobExecutor, jobService,
             builder.taskExecutionService, builder.workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
@@ -126,7 +123,7 @@ public class JobSyncExecutor {
                         taskCompletionHandlerChain, taskDispatcherChain)),
                 Stream.of(defaultTaskCompletionHandler)));
 
-        jobFactory = new JobFactoryImpl(builder.contextService, builder.eventPublisher, jobService, syncMessageBroker);
+        jobFacade = new JobFacadeImpl(builder.contextService, builder.eventPublisher, jobService, syncMessageBroker);
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
@@ -134,7 +131,6 @@ public class JobSyncExecutor {
         TaskCoordinator coordinator = TaskCoordinator.builder()
             .eventPublisher(builder.eventPublisher)
             .jobExecutor(jobExecutor)
-            .jobFactory(jobFactory)
             .jobService(jobService)
             .taskCompletionHandler(taskCompletionHandlerChain)
             .taskDispatcher(taskDispatcherChain)
@@ -150,7 +146,7 @@ public class JobSyncExecutor {
     }
 
     public Job execute(JobParameters jobParameters) {
-        long jobId = jobFactory.create(jobParameters);
+        long jobId = jobFacade.create(jobParameters);
 
         return jobService.getJob(jobId);
     }
@@ -165,7 +161,6 @@ public class JobSyncExecutor {
         private List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories = Collections.emptyList();
         private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories = Collections.emptyList();
         private List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories = Collections.emptyList();
-        private TaskEvaluator taskEvaluator = TaskEvaluator.create();
         private TaskExecutionService taskExecutionService;
         private TaskHandlerAccessor taskHandlerAccessor;
         private WorkflowService workflowService;
@@ -202,11 +197,6 @@ public class JobSyncExecutor {
         public Builder taskCompletionHandlerFactories(
             List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories) {
             this.taskCompletionHandlerFactories = taskCompletionHandlerFactories;
-            return this;
-        }
-
-        public Builder taskEvaluator(TaskEvaluator taskEvaluator) {
-            this.taskEvaluator = taskEvaluator;
             return this;
         }
 

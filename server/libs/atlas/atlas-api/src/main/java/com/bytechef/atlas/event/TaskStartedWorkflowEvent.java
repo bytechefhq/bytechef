@@ -18,7 +18,6 @@
 package com.bytechef.atlas.event;
 
 import com.bytechef.event.AbstractWorkflowEvent;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -28,16 +27,14 @@ public class TaskStartedWorkflowEvent extends AbstractWorkflowEvent {
     public static final String TASK_STARTED = "task.started";
 
     private Long jobId;
-    private Long taskExecutionId;
+    private long taskExecutionId;
 
     private TaskStartedWorkflowEvent() {
-        super(TASK_STARTED);
+        super();
     }
 
-    public TaskStartedWorkflowEvent(Long taskExecutionId) {
+    public TaskStartedWorkflowEvent(long taskExecutionId) {
         super(TASK_STARTED);
-
-        Assert.notNull(taskExecutionId, "'taskId' must not be null");
 
         this.taskExecutionId = taskExecutionId;
     }
@@ -53,7 +50,7 @@ public class TaskStartedWorkflowEvent extends AbstractWorkflowEvent {
         return jobId;
     }
 
-    public Long getTaskExecutionId() {
+    public long getTaskExecutionId() {
         return taskExecutionId;
     }
 

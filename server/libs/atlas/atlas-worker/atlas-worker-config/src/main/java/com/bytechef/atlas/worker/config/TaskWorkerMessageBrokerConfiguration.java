@@ -49,16 +49,16 @@ public class TaskWorkerMessageBrokerConfiguration {
     @Bean
     MessageBrokerConfigurer<?> taskWorkerMessageBrokerConfigurer() {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TaskWorker worker = applicationContext.getBean(TaskWorker.class);
+            TaskWorker taskWorker = applicationContext.getBean(TaskWorker.class);
 
             Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskMessageRoute.ofRoute(routeName), Integer.parseInt((String) concurrency),
-                worker, "handle"));
+                taskWorker, "handle"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, SystemMessageRoute.CONTROL, 1, worker, "handle");
+                listenerEndpointRegistrar, SystemMessageRoute.CONTROL, 1, taskWorker, "handle");
         };
     }
 }

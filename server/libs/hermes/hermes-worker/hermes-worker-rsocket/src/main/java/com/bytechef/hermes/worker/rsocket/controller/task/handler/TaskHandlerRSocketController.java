@@ -42,12 +42,12 @@ public class TaskHandlerRSocketController {
         TaskHandler<?> taskHandler = taskHandlerAccessor.getTaskHandler(taskHandlerHandleRequest.type());
 
         try {
-            Object value = taskHandler.handle(taskHandlerHandleRequest.taskExecution());
+            Object output = taskHandler.handle(taskHandlerHandleRequest.taskExecution());
 
-            if (value == null) {
+            if (output == null) {
                 return Mono.empty();
             } else {
-                return Mono.just(value);
+                return Mono.just(output);
             }
         } catch (TaskExecutionException e) {
             throw new RuntimeException(e);

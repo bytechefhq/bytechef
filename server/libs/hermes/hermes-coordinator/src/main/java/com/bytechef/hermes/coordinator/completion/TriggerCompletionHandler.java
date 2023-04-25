@@ -17,34 +17,40 @@
 
 package com.bytechef.hermes.coordinator.completion;
 
-import com.bytechef.commons.util.ExceptionUtils;
-import com.bytechef.error.ErrorHandler;
-import com.bytechef.error.Errorable;
-import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.trigger.TriggerExecution;
-
-import java.util.Arrays;
+import com.bytechef.hermes.coordinator.instance.InstanceJobFactoryAccessor;
+import com.bytechef.hermes.domain.TriggerExecution.Status;
+import com.bytechef.hermes.job.InstanceJobFactory;
+import com.bytechef.hermes.domain.TriggerExecution;
+import com.bytechef.hermes.service.TriggerExecutionService;
+import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
+@Component
 public class TriggerCompletionHandler {
 
-    private final ErrorHandler<? super Errorable> errorHandler;
+    private final InstanceJobFactoryAccessor instanceJobFactoryAccessor;
+    private final TriggerExecutionService triggerExecutionService;
 
-    public TriggerCompletionHandler(ErrorHandler<? super Errorable> errorHandler) {
-        this.errorHandler = errorHandler;
+    public TriggerCompletionHandler(
+        InstanceJobFactoryAccessor instanceJobFactoryAccessor, TriggerExecutionService triggerExecutionService) {
+
+        this.instanceJobFactoryAccessor = instanceJobFactoryAccessor;
+        this.triggerExecutionService = triggerExecutionService;
     }
 
     public void handle(TriggerExecution triggerExecution) {
-        try {
-            // TODO
-            System.out.println(triggerExecution);
-        } catch (Exception e) {
-            triggerExecution.setError(
-                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+        WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-            errorHandler.handle(triggerExecution);
-        }
+        InstanceJobFactory instanceJobFactory = instanceJobFactoryAccessor.getInstanceJobFactory(
+            workflowExecutionId.getInstanceType());
+
+        instanceJobFactory.createJob(workflowExecutionId.getWorkflowId(), workflowExecutionId.getInstanceId());
+
+        triggerExecution.setStatus(Status.COMPLETED);
+
+        triggerExecutionService.update(triggerExecution);
     }
 }

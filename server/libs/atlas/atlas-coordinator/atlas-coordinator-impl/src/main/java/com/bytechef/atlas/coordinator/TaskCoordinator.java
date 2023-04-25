@@ -23,13 +23,11 @@ import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.CancelControlTask;
@@ -58,7 +56,6 @@ public class TaskCoordinator {
 
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
-    private final JobFactory jobFactory;
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskCompletionHandler taskCompletionHandler;
@@ -68,7 +65,6 @@ public class TaskCoordinator {
     private TaskCoordinator(Builder builder) {
         this.eventPublisher = builder.eventPublisher;
         this.jobExecutor = builder.jobExecutor;
-        this.jobFactory = builder.jobFactory;
         this.jobService = builder.jobService;
         this.messageBroker = builder.messageBroker;
         this.taskCompletionHandler = builder.taskCompletionHandler;
@@ -80,21 +76,7 @@ public class TaskCoordinator {
         return new Builder();
     }
 
-    /**
-     * Starts a job instance.
-     *
-     * @param jobParameters The Key-Value map representing the workflow parameters
-     */
-    public void create(JobParameters jobParameters) {
-        long jobId = jobFactory.create(jobParameters);
-
-        if (log.isDebugEnabled()) {
-            Job job = jobService.getJob(jobId);
-
-            log.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
-        }
-    }
-
+    @SuppressFBWarnings("NP")
     public void start(Long jobId) {
         Job job = jobService.setStatusToStarted(jobId);
 
@@ -111,9 +93,9 @@ public class TaskCoordinator {
      * Stop a running job.
      *
      * @param jobId The id of the job to stop
-     * @return The stopped {@link Job}
      */
-    public Job stop(Long jobId) {
+    @SuppressFBWarnings("NP")
+    public void stop(Long jobId) {
         Job job = jobService.setStatusToStopped(jobId);
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
@@ -135,17 +117,14 @@ public class TaskCoordinator {
         if (log.isDebugEnabled()) {
             log.debug("Job id={}, label='{}' stopped", job.getId(), job.getLabel());
         }
-
-        return job;
     }
 
     /**
      * Resume a stopped or failed job.
      *
      * @param jobId The id of the job to resume.
-     * @return The resumed job
      */
-    public Job resume(Long jobId) {
+    public void resume(Long jobId) {
         Job job = jobService.resumeToStatusStarted(jobId);
 
         jobExecutor.execute(job);
@@ -153,8 +132,6 @@ public class TaskCoordinator {
         if (log.isDebugEnabled()) {
             log.debug("Job id={}, label='{}' resumed", job.getId(), job.getLabel());
         }
-
-        return job;
     }
 
     /**
@@ -176,7 +153,6 @@ public class TaskCoordinator {
     public static final class Builder {
         private EventPublisher eventPublisher;
         private JobExecutor jobExecutor;
-        private JobFactory jobFactory;
         private JobService jobService;
         private MessageBroker messageBroker;
         private TaskCompletionHandler taskCompletionHandler;
@@ -193,11 +169,6 @@ public class TaskCoordinator {
 
         public Builder jobExecutor(JobExecutor jobExecutor) {
             this.jobExecutor = jobExecutor;
-            return this;
-        }
-
-        public Builder jobFactory(JobFactory jobFactory) {
-            this.jobFactory = jobFactory;
             return this;
         }
 

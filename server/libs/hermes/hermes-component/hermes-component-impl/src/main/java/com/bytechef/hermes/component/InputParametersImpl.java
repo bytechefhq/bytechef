@@ -23,9 +23,9 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -115,6 +115,11 @@ public class InputParametersImpl implements InputParameters {
     }
 
     @Override
+    public Set<String> getKeys() {
+        return parameters.keySet();
+    }
+
+    @Override
     public <T> List<T> getList(String key, Class<T> elementType) {
         return MapValueUtils.getList(parameters, key, elementType);
     }
@@ -182,11 +187,6 @@ public class InputParametersImpl implements InputParameters {
     @Override
     public Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
         return MapValueUtils.getMap(parameters, key, valueTypes, defaultValue);
-    }
-
-    @Override
-    public Map<String, Object> getMap() {
-        return new HashMap<>(parameters);
     }
 
     @Override

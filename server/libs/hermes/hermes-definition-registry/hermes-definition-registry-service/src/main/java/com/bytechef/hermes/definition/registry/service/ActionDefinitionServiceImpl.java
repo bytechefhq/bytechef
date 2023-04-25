@@ -18,12 +18,14 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +48,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitions.stream()
                 .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
-                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
+                .flatMap(componentDefinition -> CollectionUtils.stream(
+                    OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList())))
                 .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
                 .findFirst()
                 .map(this::toActionDefinitionDTO)
@@ -62,15 +65,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitions.stream()
                 .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
-                .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getActions()))
+                .flatMap(componentDefinition -> CollectionUtils.stream(
+                    OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList())))
                 .map(this::toActionDefinitionDTO)
                 .toList());
     }
 
     private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
         return new ActionDefinitionDTO(
-            actionDefinition.getBatch(), actionDefinition.getDisplay(), actionDefinition.getExampleOutput(),
-            actionDefinition.getName(), actionDefinition.getOutputSchema(), actionDefinition.getProperties(),
-            actionDefinition.getResources());
+            OptionalUtils.orElse(actionDefinition.getBatch(), false), actionDefinition.getDescription(),
+            actionDefinition.getExampleOutput(), OptionalUtils.orElse(actionDefinition.getHelp(), null),
+            actionDefinition.getName(),
+            OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList()),
+            OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
+            actionDefinition.getTitle());
     }
 }

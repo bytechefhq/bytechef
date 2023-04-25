@@ -18,12 +18,13 @@
 package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 
@@ -46,13 +47,15 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
 
     public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {
 
-        private Display display;
+        private String description;
+        private String icon;
         private String name;
         private List<Property<? extends Property<?>>> outputSchema;
         private List<Property<?>> properties;
         private Resources resources;
-        private int version = VERSION_1;
         private List<Property<?>> taskProperties;
+        private String title;
+        private int version = VERSION_1;
 
         private ModifiableTaskDispatcherDefinition() {
         }
@@ -61,14 +64,20 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             this.name = name;
         }
 
-        public ModifiableTaskDispatcherDefinition display(ModifiableDisplay display) {
-            this.display = display;
+        public ModifiableTaskDispatcherDefinition description(String description) {
+            this.description = description;
 
             return this;
         }
 
         public ModifiableTaskDispatcherDefinition display(ModifiableResources resources) {
             this.resources = resources;
+
+            return this;
+        }
+
+        public ModifiableTaskDispatcherDefinition icon(String icon) {
+            this.icon = icon;
 
             return this;
         }
@@ -89,6 +98,12 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableTaskDispatcherDefinition title(String title) {
+            this.title = title;
+
+            return this;
+        }
+
         public ModifiableTaskDispatcherDefinition version(int version) {
             this.version = version;
 
@@ -102,8 +117,13 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public Display getDisplay() {
-            return display;
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public String getIcon() {
+            return icon;
         }
 
         @Override
@@ -125,6 +145,11 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         @SuppressFBWarnings("EI")
         public Resources getResources() {
             return resources;
+        }
+
+        @Override
+        public String getTitle() {
+            return Objects.requireNonNullElseGet(title, () -> name);
         }
 
         @Override
