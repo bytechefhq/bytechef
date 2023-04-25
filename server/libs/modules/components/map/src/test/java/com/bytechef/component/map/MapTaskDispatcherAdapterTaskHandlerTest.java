@@ -26,7 +26,6 @@ import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.MapValueUtils;
 import java.util.Arrays;
@@ -45,15 +44,16 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     @Test
     public void test1() {
         TaskHandlerResolver resolver = task -> t -> MapValueUtils.get(t.getParameters(), "value");
-        MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver,
-            TaskEvaluator.create());
+        MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver);
 
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(
-            Map.of(
-                WorkflowConstants.TYPE, "type",
-                WorkflowConstants.PARAMETERS, Map.of(
-                    "list", List.of(1, 2, 3), "iteratee", Map.of(
-                        "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))));
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(
+                Map.of(
+                    WorkflowConstants.TYPE, "type",
+                    WorkflowConstants.PARAMETERS, Map.of(
+                        "list", List.of(1, 2, 3), "iteratee", Map.of(
+                            "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))))
+            .build();
 
         taskExecution.setJobId(4567L);
 
@@ -69,13 +69,15 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                 throw new ComponentExecutionException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-                taskHandlerResolver, TaskEvaluator.create());
+                taskHandlerResolver);
 
-            TaskExecution taskExecution = new TaskExecution(
-                WorkflowTask.of(
-                    Map.of(
-                        WorkflowConstants.PARAMETERS,
-                        Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue")))));
+            TaskExecution taskExecution = TaskExecution.builder()
+                .workflowTask(
+                    new WorkflowTask(
+                        Map.of(
+                            WorkflowConstants.PARAMETERS,
+                            Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue")))))
+                .build();
 
             taskExecution.setJobId(4567L);
 
@@ -123,45 +125,45 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             .taskHandlerResolver(taskHandlerResolver)
             .messageBroker(messageBroker)
             .eventPublisher(e -> {})
-            .taskEvaluator(TaskEvaluator.create())
             .build();
 
-        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver,
-            TaskEvaluator.create());
+        mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
 
-        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of(Map.of(
-            "finalize",
-            List.of(Map.of(
-                "name",
-                "output",
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(
+                "finalize",
+                List.of(Map.of(
+                    "name",
+                    "output",
+                    "type",
+                    "map",
+                    WorkflowConstants.PARAMETERS,
+                    Map.of(
+                        "list", Arrays.asList(1, 2, 3),
+                        "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
+                "post",
+                List.of(Map.of(
+                    "name",
+                    "output",
+                    "type",
+                    "map",
+                    WorkflowConstants.PARAMETERS,
+                    Map.of(
+                        "list", Arrays.asList(1, 2, 3),
+                        "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
+                "pre",
+                List.of(Map.of(
+                    "name",
+                    "output",
+                    "type",
+                    "map",
+                    WorkflowConstants.PARAMETERS,
+                    Map.of(
+                        "list", Arrays.asList(1, 2, 3),
+                        "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
                 "type",
-                "map",
-                WorkflowConstants.PARAMETERS,
-                Map.of(
-                    "list", Arrays.asList(1, 2, 3),
-                    "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
-            "post",
-            List.of(Map.of(
-                "name",
-                "output",
-                "type",
-                "map",
-                WorkflowConstants.PARAMETERS,
-                Map.of(
-                    "list", Arrays.asList(1, 2, 3),
-                    "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
-            "pre",
-            List.of(Map.of(
-                "name",
-                "output",
-                "type",
-                "map",
-                WorkflowConstants.PARAMETERS,
-                Map.of(
-                    "list", Arrays.asList(1, 2, 3),
-                    "iteratee", Map.of("type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "${item}"))))),
-            "type",
-            "pass")));
+                "pass")))
+            .build();
 
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);

@@ -36,7 +36,7 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.WRITE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -47,7 +47,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class XmlFileWriteAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(WRITE)
-        .display(display("Write to file").description("Writes the data to a XML file."))
+        .title("Write to file")
+        .description("Writes the data to a XML file.")
         .properties(
             oneOf(SOURCE)
                 .label("Source")

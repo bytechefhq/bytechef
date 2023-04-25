@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 /**
@@ -31,7 +31,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
  */
 public class VarSetAction {
     public static final ActionDefinition ACTION_DEFINITION = action(VarConstants.SET)
-        .display(display("Set value"))
+        .title("Set value")
+        .description("Assign value to a variable that can be used in the following steps.")
         .properties(oneOf(VarConstants.VALUE)
             .label("Value")
             .description("Value of any type to set.")

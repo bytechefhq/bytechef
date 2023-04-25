@@ -1,53 +1,121 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "title": "Debug"
-    },
+    "batch": null,
+    "description": "logger: debug",
+    "exampleOutput": null,
+    "help": null,
     "name": "debug",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "text",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Debug"
   }, {
-    "batch": false,
-    "display": {
-      "title": "Error"
-    },
+    "batch": null,
+    "description": "logger: error",
+    "exampleOutput": null,
+    "help": null,
     "name": "error",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "text",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Error"
   }, {
-    "batch": false,
-    "display": {
-      "title": "Info"
-    },
+    "batch": null,
+    "description": "logger: info",
+    "exampleOutput": null,
+    "help": null,
     "name": "info",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "text",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Info"
   }, {
-    "batch": false,
-    "display": {
-      "title": "Warn"
-    },
+    "batch": null,
+    "description": "logger: warn",
+    "exampleOutput": null,
+    "help": null,
     "name": "warn",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "text",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Warn"
   } ],
-  "display": {
-    "description": "Logs a value to the system log.",
-    "title": "Logger"
-  },
+  "category": null,
+  "connection": null,
+  "description": "Logs a value to the system log.",
+  "icon": null,
+  "tags": null,
   "name": "logger",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "Logger",
+  "triggers": null
 }

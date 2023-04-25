@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.util.JsonUtils;
 import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.PARSE;
 import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -35,8 +35,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class JsonHelperParseAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(PARSE)
-        .display(display("Convert from JSON string")
-            .description("Converts the JSON string to object/array."))
+        .title("Convert from JSON string")
+        .description("Converts the JSON string to object/array.")
         .properties(string(SOURCE)
             .label("Source")
             .description("The JSON string to convert to the data.")

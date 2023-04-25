@@ -19,7 +19,6 @@ package com.bytechef.component.aws.s3;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constant.AWS_S3;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.aws.s3.action.AwsS3GetObjectAction;
 import com.bytechef.component.aws.s3.action.AwsS3GetUrlAction;
@@ -37,8 +36,8 @@ import com.google.auto.service.AutoService;
 public class AwsS3ComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(AWS_S3)
-        .display(display("AWS S3")
-            .description("AWS S3 is a simple object storage service provided by Amazon Web Services."))
+        .title("AWS S3")
+        .description("AWS S3 is a simple object storage service provided by Amazon Web Services.")
         .actions(
             AwsS3GetObjectAction.ACTION_DEFINITION, AwsS3GetUrlAction.ACTION_DEFINITION,
             AwsS3ListObjectsAction.ACTION_DEFINITION,

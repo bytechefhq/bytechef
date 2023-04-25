@@ -19,7 +19,6 @@ package com.bytechef.component.jsonfile;
 
 import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.JSON_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.jsonfile.action.JsonFileReadAction;
 import com.bytechef.component.jsonfile.action.JsonFileWriteAction;
@@ -34,7 +33,8 @@ import com.google.auto.service.AutoService;
 public class JsonFileComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(JSON_FILE)
-        .display(display("JSON File").description("Reads and writes data from a JSON file."))
+        .title("JSON File")
+        .description("Reads and writes data from a JSON file.")
         .actions(
             JsonFileReadAction.ACTION_DEFINITION,
             JsonFileWriteAction.ACTION_DEFINITION);

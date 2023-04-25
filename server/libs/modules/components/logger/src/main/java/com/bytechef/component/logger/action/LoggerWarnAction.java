@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import static com.bytechef.component.logger.constant.LoggerConstants.TEXT;
 import static com.bytechef.component.logger.constant.LoggerConstants.WARN;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -37,7 +37,7 @@ public class LoggerWarnAction {
     private static final Logger logger = LoggerFactory.getLogger(LoggerWarnAction.class);
 
     public static final ActionDefinition ACTION_DEFINITION = action(WARN)
-        .display(display("Warn"))
+        .title("Warn")
         .properties(string(TEXT))
         .execute(LoggerWarnAction::executeWarn);
 

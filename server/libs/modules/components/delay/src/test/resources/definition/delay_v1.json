@@ -1,24 +1,42 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "title": "Delay"
-    },
+    "batch": null,
+    "description": "Delay action execution.",
+    "exampleOutput": null,
+    "help": null,
     "name": "delay",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "Time in milliseconds.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Millis",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "millis",
       "type": "INTEGER",
+      "defaultValue": 1,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "defaultValue": 1
-    } ]
-  } ],
-  "display": {
-    "description": "Sets a value which can then be referenced in other tasks.",
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
     "title": "Delay"
-  },
+  } ],
+  "category": null,
+  "connection": null,
+  "description": "Sets a value which can then be referenced in other tasks.",
+  "icon": null,
+  "tags": null,
   "name": "delay",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "Delay",
+  "triggers": null
 }

@@ -19,7 +19,6 @@ package com.bytechef.component.filestorage;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_STORAGE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.filestorage.action.FileStorageDownloadAction;
 import com.bytechef.component.filestorage.action.FileStorageReadAction;
@@ -35,7 +34,8 @@ import com.google.auto.service.AutoService;
 public class FileStorageComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(FILE_STORAGE)
-        .display(display("File Storage").description("Reads and writes data from a file"))
+        .title("File Storage")
+        .description("Reads and writes data from a file")
         .actions(
             FileStorageReadAction.ACTION_DEFINITION,
             FileStorageWriteAction.ACTION_DEFINITION,

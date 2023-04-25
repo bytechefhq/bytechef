@@ -29,7 +29,7 @@ import java.util.Map;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 public class NewRecordTrigger {
@@ -40,8 +40,9 @@ public class NewRecordTrigger {
     private static final String TRIGGER_FIELD = "triggerField";
 
     public static final TriggerDefinition TRIGGER_DEFINITION = trigger("newRecord")
-        .display(display("New Record").description(
-            "This trigger is activated when a new entry is added to the table that you have selected."))
+        .title("New Record")
+        .description(
+            "Trigger off when a new entry is added to the table that you have selected.")
         .type(TriggerDefinition.TriggerType.POLLING)
         .properties(
             string(BASE_ID)
@@ -59,7 +60,7 @@ public class NewRecordTrigger {
                 .required(true))
         .poll(NewRecordTrigger::poll);
 
-    protected static TriggerDefinition.PollOutput poll(TriggerDefinition.PollContext context) {
+    protected static TriggerDefinition.PollFunction.Output poll(TriggerDefinition.PollFunction.Context context) {
         InputParameters inputParameters = context.inputParameters();
         Map<String, Object> closureParameters = context.closureParameters();
 
@@ -84,6 +85,6 @@ public class NewRecordTrigger {
             .execute()
             .getBody();
 
-        return new TriggerDefinition.PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
+        return new TriggerDefinition.PollFunction.Output(records, Map.of(LAST_TIME_CHECKED, endDate), false);
     }
 }

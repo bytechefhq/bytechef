@@ -36,7 +36,7 @@ import static com.bytechef.hermes.component.definition.Authorization.USERNAME;
 import static com.bytechef.hermes.component.definition.Authorization.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -48,7 +48,7 @@ public class HttpClientConnection {
         .authorizations(
             authorization(Authorization.AuthorizationType.API_KEY.name()
                 .toLowerCase(), Authorization.AuthorizationType.API_KEY)
-                    .display(display("API Key"))
+                    .title("API Key")
                     .properties(
                         string(KEY)
                             .label("Key")
@@ -70,14 +70,14 @@ public class HttpClientConnection {
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.BEARER_TOKEN)
-                    .display(display("Bearer Token"))
+                    .title("Bearer Token")
                     .properties(string(TOKEN).label("Token")
                         .required(true)),
             authorization(
                 Authorization.AuthorizationType.BASIC_AUTH.name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.BASIC_AUTH)
-                    .display(display("Basic Auth"))
+                    .title("Basic Auth")
                     .properties(
                         string(USERNAME).label("Username")
                             .required(true),
@@ -87,7 +87,7 @@ public class HttpClientConnection {
                 Authorization.AuthorizationType.DIGEST_AUTH.name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.DIGEST_AUTH)
-                    .display(display("Digest Auth"))
+                    .title("Digest Auth")
                     .properties(
                         string(USERNAME).label("Username")
                             .required(true),
@@ -98,7 +98,7 @@ public class HttpClientConnection {
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                    .display(display("OAuth2 Authorization Code"))
+                    .title("OAuth2 Authorization Code")
                     .properties(
                         string(AUTHORIZATION_URL)
                             .label("Authorization URL")
@@ -122,7 +122,7 @@ public class HttpClientConnection {
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE)
-                    .display(display("OAuth2 Implicit Code"))
+                    .title("OAuth2 Implicit Code")
                     .properties(
                         string(AUTHORIZATION_URL)
                             .label("Authorization URL")
@@ -144,7 +144,7 @@ public class HttpClientConnection {
                     .name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
-                    .display(display("OAuth2 Client Credentials"))
+                    .title("OAuth2 Client Credentials")
                     .properties(
                         string(TOKEN_URL).label("Token URL")
                             .required(true),

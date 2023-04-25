@@ -1,34 +1,76 @@
 {
   "actions": [ {
-    "batch": false,
+    "batch": null,
+    "description": "map: map",
+    "exampleOutput": null,
+    "help": null,
     "name": "map",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "List of items to iterate over.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "List of items",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "list",
       "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "items": null,
       "multipleValues": true,
-      "controlType": "JSON_BUILDER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The name of the item variable.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Item Var",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "itemVar",
       "type": "STRING",
       "defaultValue": "item",
-      "controlType": "INPUT_TEXT"
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The name of the index variable.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Item Index",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "itemIndex",
       "type": "STRING",
       "defaultValue": "itemIndex",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "map"
   } ],
-  "display": {
-    "description": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
-    "title": "Map"
-  },
+  "category": null,
+  "connection": null,
+  "description": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
+  "icon": null,
+  "tags": null,
   "name": "map",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "Map",
+  "triggers": null
 }

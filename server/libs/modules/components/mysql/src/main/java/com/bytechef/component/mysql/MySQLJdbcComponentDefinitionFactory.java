@@ -18,7 +18,7 @@
 package com.bytechef.component.mysql;
 
 import static com.bytechef.component.mysql.constant.MySQLConstants.MYSQL;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+
 import static com.bytechef.hermes.component.definition.ComponentDSL.jdbcComponent;
 
 import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
@@ -32,7 +32,8 @@ import com.google.auto.service.AutoService;
 public class MySQLJdbcComponentDefinitionFactory implements JdbcComponentDefinitionFactory {
 
     private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(MYSQL)
-        .display(display("MySQL").description("Query, insert nd update data from MySQL."))
+        .title("MySQL")
+        .description("Query, insert nd update data from MySQL.")
         .databaseJdbcName("mysql")
         .jdbcDriverClassName("com.mysql.jdbc.Driver");
 

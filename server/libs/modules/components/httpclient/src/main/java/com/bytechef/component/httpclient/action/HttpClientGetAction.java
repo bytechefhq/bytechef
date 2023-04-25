@@ -30,7 +30,7 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -41,7 +41,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class HttpClientGetAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(GET)
-        .display(display("GET").description("The request method to use."))
+        .title("GET")
+        .description("The request method to use.")
         .properties(
             HttpClientActionUtils.toArray(
                 //

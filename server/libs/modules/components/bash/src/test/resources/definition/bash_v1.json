@@ -1,28 +1,57 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "description": "Executes the script.",
-      "title": "Execute"
-    },
+    "batch": null,
+    "description": "Executes the script.",
+    "exampleOutput": null,
+    "help": null,
     "name": "execute",
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
     "properties": [ {
+      "advancedOption": null,
       "description": "Script written in bash.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Script",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "script",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Execute"
   } ],
-  "display": {
-    "description": "Allows you to run arbitrary Bash scripts.",
-    "title": "Bash"
-  },
+  "category": null,
+  "connection": null,
+  "description": "Allows you to run arbitrary Bash scripts.",
+  "icon": null,
+  "tags": null,
   "name": "bash",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "Bash",
+  "triggers": null
 }

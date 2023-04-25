@@ -29,7 +29,6 @@ import java.nio.file.Path;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -37,8 +36,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class FilesystemCreateTempDirAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
-        .display(display("Create Temp Directory")
-            .description("Creates a temporary directory oon the filesystem."))
+        .title("Create Temp Directory")
+        .description("Creates a temporary directory oon the filesystem.")
         .execute(FilesystemCreateTempDirAction::executeCreateTempDir);
 
     public static String executeCreateTempDir(Context context, InputParameters inputParameters) {

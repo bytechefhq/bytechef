@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.MKDIR;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +35,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class FilesystemMkdirAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(MKDIR)
-        .display(display("Create").description("Creates a directory."))
+        .title("Create")
+        .description("Creates a directory.")
         .execute(FilesystemMkdirAction::executeMkdir);
 
     /**

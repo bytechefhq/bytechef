@@ -26,7 +26,7 @@ import static com.bytechef.component.filestorage.constant.FileStorageConstants.F
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.WRITE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -35,7 +35,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class FileStorageWriteAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(WRITE)
-        .display(display("Write to file").description("Writes the data to the file."))
+        .title("Write to file")
+        .description("Writes the data to the file.")
         .properties(
             string(CONTENT)
                 .label("Content")

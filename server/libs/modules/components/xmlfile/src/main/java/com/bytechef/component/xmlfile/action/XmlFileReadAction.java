@@ -38,7 +38,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -49,7 +49,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class XmlFileReadAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(READ)
-        .display(display("Read from file").description("Reads data from a XML file."))
+        .title("Read from file")
+        .description("Reads data from a XML file.")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")

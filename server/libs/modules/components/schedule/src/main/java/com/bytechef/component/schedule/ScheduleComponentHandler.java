@@ -17,18 +17,17 @@
 
 package com.bytechef.component.schedule;
 
-import com.bytechef.component.schedule.trigger.CronTrigger;
-import com.bytechef.component.schedule.trigger.EveryDayTrigger;
-import com.bytechef.component.schedule.trigger.EveryMonthTrigger;
-import com.bytechef.component.schedule.trigger.EveryWeekTrigger;
-import com.bytechef.component.schedule.trigger.IntervalTrigger;
+import com.bytechef.component.schedule.trigger.ScheduleCronTrigger;
+import com.bytechef.component.schedule.trigger.ScheduleEveryDayTrigger;
+import com.bytechef.component.schedule.trigger.ScheduleEveryMonthTrigger;
+import com.bytechef.component.schedule.trigger.ScheduleEveryWeekTrigger;
+import com.bytechef.component.schedule.trigger.ScheduleIntervalTrigger;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import org.springframework.stereotype.Component;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -40,14 +39,15 @@ public class ScheduleComponentHandler implements ComponentDefinitionFactory {
 
     public ScheduleComponentHandler(SchedulerClient schedulerClient) {
         this.componentDefinition = component("schedule")
-            .display(display("Schedule").description(
-                "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals."))
+            .title("Schedule")
+            .description(
+                "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.")
             .triggers(
-                new EveryDayTrigger(schedulerClient).triggerDefinition,
-                new EveryWeekTrigger(schedulerClient).triggerDefinition,
-                new EveryMonthTrigger(schedulerClient).triggerDefinition,
-                new IntervalTrigger(schedulerClient).triggerDefinition,
-                new CronTrigger(schedulerClient).triggerDefinition);
+                new ScheduleEveryDayTrigger(schedulerClient).triggerDefinition,
+                new ScheduleEveryWeekTrigger(schedulerClient).triggerDefinition,
+                new ScheduleEveryMonthTrigger(schedulerClient).triggerDefinition,
+                new ScheduleIntervalTrigger(schedulerClient).triggerDefinition,
+                new ScheduleCronTrigger(schedulerClient).triggerDefinition);
     }
 
     @Override

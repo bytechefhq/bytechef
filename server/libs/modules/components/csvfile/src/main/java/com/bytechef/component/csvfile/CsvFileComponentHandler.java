@@ -19,7 +19,6 @@ package com.bytechef.component.csvfile;
 
 import static com.bytechef.component.csvfile.constant.CsvFileConstants.CSV_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.csvfile.action.CsvFileReadAction;
 import com.bytechef.component.csvfile.action.CsvFileWriteAction;
@@ -34,7 +33,8 @@ import com.google.auto.service.AutoService;
 public class CsvFileComponentHandler implements ComponentHandler {
 
     public static final ComponentDefinition COMPONENT_DEFINITION = component(CSV_FILE)
-        .display(display("CSV File").description("Reads and writes data from a csv file."))
+        .title("CSV File")
+        .description("Reads and writes data from a csv file.")
         .actions(
             CsvFileReadAction.ACTION_DEFINITION,
             CsvFileWriteAction.ACTION_DEFINITION);

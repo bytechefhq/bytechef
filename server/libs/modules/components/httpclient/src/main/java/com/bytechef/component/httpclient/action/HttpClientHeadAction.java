@@ -26,7 +26,6 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.HEAD;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -34,7 +33,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class HttpClientHeadAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(HEAD)
-        .display(display("HEAD").description("The request method to use."))
+        .title("HEAD")
+        .description("The request method to use.")
         .properties(HttpClientActionUtils.toArray(
             //
             // Common properties
