@@ -1,4 +1,4 @@
-package com.bytechef.hermes.workflow.web.rest.model;
+package com.bytechef.dione.integration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:35.670148+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:34.232731+02:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;

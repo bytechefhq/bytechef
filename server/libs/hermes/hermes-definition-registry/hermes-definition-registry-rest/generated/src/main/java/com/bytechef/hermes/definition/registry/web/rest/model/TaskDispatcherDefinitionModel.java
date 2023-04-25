@@ -2,7 +2,6 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,10 +25,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
-  private DisplayModel display;
+  private String description;
+
+  private String icon;
 
   private String name;
 
@@ -46,9 +47,11 @@ public class TaskDispatcherDefinitionModel {
   @Valid
   private List<@Valid PropertyModel> taskProperties;
 
+  private String title;
+
   /**
    * Default constructor
-   * @deprecated Use {@link TaskDispatcherDefinitionModel#TaskDispatcherDefinitionModel(DisplayModel, String, Integer)}
+   * @deprecated Use {@link TaskDispatcherDefinitionModel#TaskDispatcherDefinitionModel(String, Integer)}
    */
   @Deprecated
   public TaskDispatcherDefinitionModel() {
@@ -58,30 +61,49 @@ public class TaskDispatcherDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskDispatcherDefinitionModel(DisplayModel display, String name, Integer version) {
-    this.display = display;
+  public TaskDispatcherDefinitionModel(String name, Integer version) {
     this.name = name;
     this.version = version;
   }
 
-  public TaskDispatcherDefinitionModel display(DisplayModel display) {
-    this.display = display;
+  public TaskDispatcherDefinitionModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * The description.
+   * @return description
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("display")
-  public DisplayModel getDisplay() {
-    return display;
+  
+  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public TaskDispatcherDefinitionModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The icon.
+   * @return icon
+  */
+  
+  @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public TaskDispatcherDefinitionModel name(String name) {
@@ -228,6 +250,26 @@ public class TaskDispatcherDefinitionModel {
     this.taskProperties = taskProperties;
   }
 
+  public TaskDispatcherDefinitionModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The title
+   * @return title
+  */
+  
+  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -237,31 +279,35 @@ public class TaskDispatcherDefinitionModel {
       return false;
     }
     TaskDispatcherDefinitionModel taskDispatcherDefinition = (TaskDispatcherDefinitionModel) o;
-    return Objects.equals(this.display, taskDispatcherDefinition.display) &&
+    return Objects.equals(this.description, taskDispatcherDefinition.description) &&
+        Objects.equals(this.icon, taskDispatcherDefinition.icon) &&
         Objects.equals(this.name, taskDispatcherDefinition.name) &&
         Objects.equals(this.outputSchema, taskDispatcherDefinition.outputSchema) &&
         Objects.equals(this.properties, taskDispatcherDefinition.properties) &&
         Objects.equals(this.resources, taskDispatcherDefinition.resources) &&
         Objects.equals(this.version, taskDispatcherDefinition.version) &&
-        Objects.equals(this.taskProperties, taskDispatcherDefinition.taskProperties);
+        Objects.equals(this.taskProperties, taskDispatcherDefinition.taskProperties) &&
+        Objects.equals(this.title, taskDispatcherDefinition.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, outputSchema, properties, resources, version, taskProperties);
+    return Objects.hash(description, icon, name, outputSchema, properties, resources, version, taskProperties, title);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TaskDispatcherDefinitionModel {\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    taskProperties: ").append(toIndentedString(taskProperties)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();
   }
