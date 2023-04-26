@@ -13,9 +13,8 @@ import PageHeader from 'components/PageHeader/PageHeader';
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import {
     JobBasicModel,
-    ProjectExecutionBasicModel,
-    ProjectExecutionBasicModelFromJSON,
     ProjectExecutionModel,
+    ProjectExecutionModelFromJSON,
 } from 'middleware/project';
 import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
 import {
@@ -34,8 +33,10 @@ import EmptyList from '../../../components/EmptyList/EmptyList';
 import PageFooter from '../../../components/PageFooter/PageFooter';
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import Pagination from '../../../components/Pagination/Pagination';
+import useExecutionDetailsDialogStore from '../project/stores/useExecutionDetailsDialogStore';
+import ExecutionDetailsDialog from './ExecutionDetailsDialog';
 
-const columnHelper = createColumnHelper<ProjectExecutionBasicModel>();
+const columnHelper = createColumnHelper<ProjectExecutionModel>();
 
 const columns = [
     columnHelper.accessor((row) => row.job, {
@@ -110,7 +111,7 @@ const jobStatusOptions = [
 ];
 
 function getDuration(
-    info: CellContext<ProjectExecutionBasicModel, JobBasicModel | undefined>
+    info: CellContext<ProjectExecutionModel, JobBasicModel | undefined>
 ): string | undefined {
     const startDate = info.getValue()?.startDate?.getTime();
     const endDate = info.getValue()?.endDate?.getTime();
@@ -359,7 +360,7 @@ export const Executions = () => {
                                         (
                                             projectExecution: ProjectExecutionModel
                                         ) =>
-                                            ProjectExecutionBasicModelFromJSON(
+                                            ProjectExecutionModelFromJSON(
                                                 projectExecution
                                             )
                                     )}
@@ -372,53 +373,73 @@ export const Executions = () => {
     );
 };
 
-const Table = ({data}: {data: ProjectExecutionBasicModel[]}): JSX.Element => {
-    const table = useReactTable<ProjectExecutionBasicModel>({
+const Table = ({data}: {data: ProjectExecutionModel[]}): JSX.Element => {
+    const table = useReactTable<ProjectExecutionModel>({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
 
-    return (
-        <table className="w-full divide-y divide-gray-300 bg-white text-sm">
-            <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                            <th
-                                key={header.id}
-                                className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                            >
-                                {header.isPlaceholder
-                                    ? null
-                                    : flexRender(
-                                          header.column.columnDef.header,
-                                          header.getContext()
-                                      )}
-                            </th>
-                        ))}
-                    </tr>
-                ))}
-            </thead>
+    const [selectedItemId, setSelectedItemId] = useState<number | undefined>();
 
-            <tbody className="divide-y divide-gray-200 bg-white">
-                {table.getRowModel().rows.map((row) => (
-                    <tr key={row.id}>
-                        {row.getVisibleCells().map((cell) => (
-                            <td
-                                key={cell.id}
-                                className="whitespace-nowrap px-3 py-4 text-sm text-gray-900"
-                            >
-                                {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext()
-                                )}
-                            </td>
-                        ))}
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+    const {setExecutionDetailsOpen} = useExecutionDetailsDialogStore();
+
+    const handleRowClick = (index: number) => {
+        if (data[index]?.id) {
+            setSelectedItemId(data[index]?.id);
+            setExecutionDetailsOpen(true);
+        }
+    };
+
+    return (
+        <>
+            <table className="w-full divide-y divide-gray-300 bg-white text-sm">
+                <thead>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <tr key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => (
+                                <th
+                                    key={header.id}
+                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                                >
+                                    {header.isPlaceholder
+                                        ? null
+                                        : flexRender(
+                                              header.column.columnDef.header,
+                                              header.getContext()
+                                          )}
+                                </th>
+                            ))}
+                        </tr>
+                    ))}
+                </thead>
+
+                <tbody className="divide-y divide-gray-200 bg-white">
+                    {table.getRowModel().rows.map((row) => (
+                        <tr
+                            key={row.id}
+                            onClick={() => handleRowClick(row.index)}
+                        >
+                            {row.getVisibleCells().map((cell) => (
+                                <td
+                                    key={cell.id}
+                                    className="whitespace-nowrap px-3 py-4 text-sm text-gray-900"
+                                >
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext()
+                                    )}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            {selectedItemId && (
+                <ExecutionDetailsDialog selectedItemId={selectedItemId} />
+            )}
+        </>
     );
 };
 
