@@ -5,6 +5,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.Arrays;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-26T12:56:34.547448+02:00[Europe/Zagreb]")
 public class OptionModel {
 
   private String description;
@@ -30,7 +33,7 @@ public class OptionModel {
 
   private String name;
 
-  private Object value;
+  private JsonNullable<Object> value = JsonNullable.undefined();
 
   public OptionModel description(String description) {
     this.description = description;
@@ -93,22 +96,22 @@ public class OptionModel {
   }
 
   public OptionModel value(Object value) {
-    this.value = value;
+    this.value = JsonNullable.of(value);
     return this;
   }
 
   /**
-   * The value of an option.
+   * Can be anything: string, number, array, object, etc. (except `null`)
    * @return value
   */
   
-  @Schema(name = "value", description = "The value of an option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "value", description = "Can be anything: string, number, array, object, etc. (except `null`)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("value")
-  public Object getValue() {
+  public JsonNullable<Object> getValue() {
     return value;
   }
 
-  public void setValue(Object value) {
+  public void setValue(JsonNullable<Object> value) {
     this.value = value;
   }
 
@@ -124,12 +127,23 @@ public class OptionModel {
     return Objects.equals(this.description, option.description) &&
         Objects.equals(this.displayCondition, option.displayCondition) &&
         Objects.equals(this.name, option.name) &&
-        Objects.equals(this.value, option.value);
+        equalsNullable(this.value, option.value);
+  }
+
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, displayCondition, name, value);
+    return Objects.hash(description, displayCondition, name, hashCodeNullable(value));
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override
