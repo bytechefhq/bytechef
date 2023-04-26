@@ -99,6 +99,7 @@ public abstract class AbstractComponentTaskHandlerBeanDefinitionLoader<T extends
                 .addConstructorArgValue(componentDefinitionFactory)
                 .addConstructorArgReference("connectionDefinitionService")
                 .addConstructorArgReference("connectionService")
+                .addConstructorArgReference("dataStorageService")
                 .addConstructorArgReference("eventPublisher")
                 .addConstructorArgReference("fileStorageService")
                 .addConstructorArgValue(triggerDefinition)
