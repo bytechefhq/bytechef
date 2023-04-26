@@ -78,14 +78,8 @@ public class DataStorage implements Persistable<Long> {
     @Id
     private Long id;
 
-    @Column("reference_id")
+    @Column("key")
     private String key;
-
-    @Column("instance_id")
-    private Long instanceId;
-
-    @Column("job_id")
-    private Long jobId;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -98,14 +92,14 @@ public class DataStorage implements Persistable<Long> {
     @Column
     private int scope;
 
+    @Column("scope_id")
+    private Long scopeId;
+
     @Version
-    private String value;
+    private Object value;
 
     @Version
     private int version;
-
-    @Column("workflow_id")
-    private String workflowId;
 
     public DataStorage() {
     }
@@ -121,14 +115,6 @@ public class DataStorage implements Persistable<Long> {
     @Override
     public Long getId() {
         return id;
-    }
-
-    public Long getInstanceId() {
-        return instanceId;
-    }
-
-    public Long getJobId() {
-        return jobId;
     }
 
     public String getKey() {
@@ -147,16 +133,16 @@ public class DataStorage implements Persistable<Long> {
         return Scope.valueOf(scope);
     }
 
-    public String getValue() {
+    public Long getScopeId() {
+        return scopeId;
+    }
+
+    public Object getValue() {
         return value;
     }
 
     public int getVersion() {
         return version;
-    }
-
-    public String getWorkflowId() {
-        return workflowId;
     }
 
     @Override
@@ -188,23 +174,19 @@ public class DataStorage implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
-    }
-
-    public void setJobId(Long jobId) {
-        this.jobId = jobId;
-    }
-
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public void setScopeId(Long scopeId) {
+        this.scopeId = scopeId;
     }
 
     public void setScope(Scope scope) {
         this.scope = scope.getId();
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -212,19 +194,13 @@ public class DataStorage implements Persistable<Long> {
         this.version = version;
     }
 
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
-    }
-
     @Override
     public String toString() {
         return "DataStorage{" +
             "id=" + id +
-            ", workflowId='" + workflowId + '\'' +
-            ", instanceId='" + instanceId + '\'' +
-            ", jobId='" + jobId + '\'' +
-            ", key='" + key + '\'' +
             ", scope='" + scope + '\'' +
+            ", scopeId='" + scopeId + '\'' +
+            ", key='" + key + '\'' +
             ", value='" + value + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
