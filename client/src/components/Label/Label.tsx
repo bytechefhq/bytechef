@@ -1,5 +1,4 @@
 import {Label as LabelPrimitive} from '@radix-ui/react-label';
-import React from 'react';
 
 interface LabelProps {
     htmlFor: string;
