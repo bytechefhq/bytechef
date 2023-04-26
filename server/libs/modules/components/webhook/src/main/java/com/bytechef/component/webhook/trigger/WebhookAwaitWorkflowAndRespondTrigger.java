@@ -19,7 +19,7 @@ package com.bytechef.component.webhook.trigger;
 
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction.Context;
+import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
@@ -71,7 +71,7 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
         .staticWebhookRequest(WebhookAwaitWorkflowAndRespondTrigger::staticWebhookRequest)
         .webhookValidate(WebhookAwaitWorkflowAndRespondTrigger::webhookValidate);
 
-    protected static TriggerDefinition.WebhookOutput staticWebhookRequest(Context context) {
+    protected static TriggerDefinition.WebhookOutput staticWebhookRequest(StaticWebhookRequestContext context) {
         TriggerDefinition.WebhookBody webhookBody = context.body();
 
         return TriggerDefinition.WebhookOutput.map(

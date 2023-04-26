@@ -221,18 +221,30 @@ public interface TriggerDefinition {
          *
          * @param context
          */
-        void accept(Context context);
+        void accept(DynamicWebhookDisableContext context);
 
-        /**
-         *
-         * @param connection
-         * @param inputParameters
-         * @param dynamicWebhookEnableOutput
-         */
-        record Context(
-            Connection connection, InputParameters inputParameters,
-            DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
-        }
+    }
+
+    /**
+     *
+     * @param connection
+     * @param inputParameters
+     * @param dynamicWebhookEnableOutput
+     */
+    record DynamicWebhookDisableContext(
+        Connection connection, InputParameters inputParameters,
+        DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
+    }
+
+    /**
+     *
+     * @param connection
+     * @param inputParameters
+     * @param webhookUrl
+     * @param workflowExecutionId
+     */
+    record DynamicWebhookEnableContext(
+        Connection connection, InputParameters inputParameters, String webhookUrl, String workflowExecutionId) {
     }
 
     /**
@@ -244,18 +256,8 @@ public interface TriggerDefinition {
         /**
          * @param context
          */
-        DynamicWebhookEnableOutput apply(Context context);
+        DynamicWebhookEnableOutput apply(DynamicWebhookEnableContext context);
 
-        /**
-         *
-         * @param connection
-         * @param inputParameters
-         * @param webhookUrl
-         * @param workflowExecutionId
-         */
-        record Context(
-            Connection connection, InputParameters inputParameters, String webhookUrl, String workflowExecutionId) {
-        }
     }
 
     /**
@@ -282,6 +284,23 @@ public interface TriggerDefinition {
 
     /**
      *
+     * @param triggerContext
+     * @param inputParameters
+     * @param headers
+     * @param parameters
+     * @param body
+     * @param path
+     * @param method
+     * @param dynamicWebhookEnableOutput
+     */
+    record DynamicWebhookRequestContext(
+        TriggerContext triggerContext, InputParameters inputParameters, WebhookHeaders headers,
+        WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method,
+        DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
+    }
+
+    /**
+     *
      */
     @FunctionalInterface
     interface DynamicWebhookRequestFunction {
@@ -291,24 +310,8 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        WebhookOutput apply(Context context);
+        WebhookOutput apply(DynamicWebhookRequestContext context);
 
-        /**
-         *
-         * @param triggerContext
-         * @param inputParameters
-         * @param headers
-         * @param parameters
-         * @param body
-         * @param path
-         * @param method
-         * @param dynamicWebhookEnableOutput
-         */
-        record Context(
-            TriggerContext triggerContext, InputParameters inputParameters, WebhookHeaders headers,
-            WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method,
-            DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
-        }
     }
 
     /**
@@ -341,6 +344,17 @@ public interface TriggerDefinition {
 
     /**
      *
+     * @param triggerContext
+     * @param inputParameters
+     * @param closureParameters
+     */
+    @SuppressFBWarnings("EI")
+    record PollContext(
+        TriggerContext triggerContext, InputParameters inputParameters, Map<String, Object> closureParameters) {
+    }
+
+    /**
+     *
      */
     @FunctionalInterface
     interface PollFunction {
@@ -350,35 +364,40 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        Output apply(Context context);
+        PollOutput apply(PollContext context);
 
-        /**
-         *
-         * @param triggerContext
-         * @param inputParameters
-         * @param closureParameters
-         */
-        @SuppressFBWarnings("EI")
-        record Context(
-            TriggerContext triggerContext, InputParameters inputParameters, Map<String, Object> closureParameters) {
+    }
+
+    /**
+     *
+     * @param records
+     * @param closureParameters
+     * @param pollImmediately
+     */
+    @SuppressFBWarnings("EI")
+    record PollOutput(
+        List<Map<?, ?>> records, Map<String, Object> closureParameters, boolean pollImmediately)
+        implements TriggerOutput {
+
+        @Override
+        public Object getValue() {
+            return records;
         }
+    }
 
-        /**
-         *
-         * @param records
-         * @param closureParameters
-         * @param pollImmediately
-         */
-        @SuppressFBWarnings("EI")
-        record Output(
-            List<Map<?, ?>> records, Map<String, Object> closureParameters, boolean pollImmediately)
-            implements TriggerOutput {
-
-            @Override
-            public Object getValue() {
-                return records;
-            }
-        }
+    /**
+     *
+     * @param triggerContext
+     * @param inputParameters
+     * @param headers
+     * @param parameters
+     * @param body
+     * @param path
+     * @param method
+     */
+    record StaticWebhookRequestContext(
+        TriggerContext triggerContext, InputParameters inputParameters, WebhookHeaders headers,
+        WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {
     }
 
     /**
@@ -392,28 +411,14 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        WebhookOutput apply(Context context);
+        WebhookOutput apply(StaticWebhookRequestContext context);
 
-        /**
-         *
-         * @param triggerContext
-         * @param inputParameters
-         * @param headers
-         * @param parameters
-         * @param body
-         * @param path
-         * @param method
-         */
-        record Context(
-            TriggerContext triggerContext, InputParameters inputParameters, WebhookHeaders headers,
-            WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {
-        }
     }
 
     /**
      *
      */
-    sealed interface TriggerOutput permits WebhookOutput, PollFunction.Output {
+    sealed interface TriggerOutput permits WebhookOutput, PollOutput {
 
         /**
          *
