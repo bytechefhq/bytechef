@@ -29,11 +29,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:30.301914+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-26T12:53:46.029630+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   @Valid
-  private Map<String, Object> inputParameters = new HashMap<>();
+  private Map<String, Object> inputs = new HashMap<>();
 
   @Valid
   private List<Long> connectionIds;
@@ -66,32 +66,32 @@ public class ProjectInstanceWorkflowModel {
 
   private Integer version;
 
-  public ProjectInstanceWorkflowModel inputParameters(Map<String, Object> inputParameters) {
-    this.inputParameters = inputParameters;
+  public ProjectInstanceWorkflowModel inputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
     return this;
   }
 
-  public ProjectInstanceWorkflowModel putInputParametersItem(String key, Object inputParametersItem) {
-    if (this.inputParameters == null) {
-      this.inputParameters = new HashMap<>();
+  public ProjectInstanceWorkflowModel putInputsItem(String key, Object inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new HashMap<>();
     }
-    this.inputParameters.put(key, inputParametersItem);
+    this.inputs.put(key, inputsItem);
     return this;
   }
 
   /**
    * The input parameters of an project instance used as workflow input values.
-   * @return inputParameters
+   * @return inputs
   */
   
-  @Schema(name = "inputParameters", description = "The input parameters of an project instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("inputParameters")
-  public Map<String, Object> getInputParameters() {
-    return inputParameters;
+  @Schema(name = "inputs", description = "The input parameters of an project instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public Map<String, Object> getInputs() {
+    return inputs;
   }
 
-  public void setInputParameters(Map<String, Object> inputParameters) {
-    this.inputParameters = inputParameters;
+  public void setInputs(Map<String, Object> inputs) {
+    this.inputs = inputs;
   }
 
   public ProjectInstanceWorkflowModel connectionIds(List<Long> connectionIds) {
@@ -379,7 +379,7 @@ public class ProjectInstanceWorkflowModel {
       return false;
     }
     ProjectInstanceWorkflowModel projectInstanceWorkflow = (ProjectInstanceWorkflowModel) o;
-    return Objects.equals(this.inputParameters, projectInstanceWorkflow.inputParameters) &&
+    return Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
         Objects.equals(this.connectionIds, projectInstanceWorkflow.connectionIds) &&
         Objects.equals(this.connections, projectInstanceWorkflow.connections) &&
         Objects.equals(this.createdBy, projectInstanceWorkflow.createdBy) &&
@@ -397,14 +397,14 @@ public class ProjectInstanceWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputParameters, connectionIds, connections, createdBy, createdDate, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstance, projectInstanceId, workflowId, version);
+    return Objects.hash(inputs, connectionIds, connections, createdBy, createdDate, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstance, projectInstanceId, workflowId, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectInstanceWorkflowModel {\n");
-    sb.append("    inputParameters: ").append(toIndentedString(inputParameters)).append("\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    connectionIds: ").append(toIndentedString(connectionIds)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
