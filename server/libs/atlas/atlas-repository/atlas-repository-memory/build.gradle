@@ -1,7 +1,7 @@
 dependencies {
+    api "com.fasterxml.jackson.core:jackson-databind"
     api project(":server:libs:atlas:atlas-repository:atlas-repository-api")
 
-    implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.springframework:spring-core"
     implementation project(":server:libs:core:commons:commons-util")
 }
