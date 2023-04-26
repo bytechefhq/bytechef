@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.worker.trigger.handler;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 
@@ -26,7 +25,7 @@ import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
  *
  * @author Ivica Cardic
  */
-public interface TriggerHandler {
+public interface TriggerHandler<O> {
 
-    TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException;
+    O handle(TriggerExecution triggerExecution) throws TriggerExecutionException;
 }

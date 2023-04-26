@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.worker.rsocket.controller.task.handler;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
@@ -39,11 +38,11 @@ public class TriggerHandlerRSocketController {
     }
 
     @MessageMapping("TriggerHandler.handle")
-    public Mono<TriggerOutput> handle(TriggerHandlerHandleRequest triggerHandlerHandleRequest) {
-        TriggerHandler triggerHandler = triggerHandlerAccessor.getTriggerHandler(triggerHandlerHandleRequest.type());
+    public Mono<Object> handle(TriggerHandlerHandleRequest triggerHandlerHandleRequest) {
+        TriggerHandler<?> triggerHandler = triggerHandlerAccessor.getTriggerHandler(triggerHandlerHandleRequest.type());
 
         try {
-            TriggerOutput output = triggerHandler.handle(triggerHandlerHandleRequest.triggerExecution());
+            Object output = triggerHandler.handle(triggerHandlerHandleRequest.triggerExecution());
 
             if (output == null) {
                 return Mono.empty();
