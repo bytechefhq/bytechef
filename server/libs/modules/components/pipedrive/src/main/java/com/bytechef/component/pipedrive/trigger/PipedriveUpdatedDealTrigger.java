@@ -21,7 +21,7 @@ import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer.Context;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 
@@ -254,7 +254,7 @@ public class PipedriveUpdatedDealTrigger {
 
     @SuppressWarnings("unchecked")
     private static WebhookOutput
-        dynamicWebhookRequest(TriggerDefinition.DynamicWebhookRequestFunction.Context context) {
+        dynamicWebhookRequest(TriggerDefinition.DynamicWebhookRequestContext context) {
         TriggerDefinition.WebhookBody body = context.body();
 
         Map<String, Object> content = (Map<String, Object>) body.getContent();
@@ -262,7 +262,7 @@ public class PipedriveUpdatedDealTrigger {
         return WebhookOutput.map((Map<String, Object>) content.get("current"));
     }
 
-    private static void dynamicWebhookDisable(Context context) {
+    private static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
         Connection connection = context.connection();
         DynamicWebhookEnableOutput enableOutput = context.dynamicWebhookEnableOutput();
 
@@ -270,7 +270,7 @@ public class PipedriveUpdatedDealTrigger {
     }
 
     private static DynamicWebhookEnableOutput
-        dynamicWebhookEnable(TriggerDefinition.DynamicWebhookEnableFunction.Context context) {
+        dynamicWebhookEnable(TriggerDefinition.DynamicWebhookEnableContext context) {
         Connection connection = context.connection();
 
         return new DynamicWebhookEnableOutput(
