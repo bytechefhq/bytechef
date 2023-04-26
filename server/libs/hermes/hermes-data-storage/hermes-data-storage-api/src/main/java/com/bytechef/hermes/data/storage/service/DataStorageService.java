@@ -17,8 +17,19 @@
 
 package com.bytechef.hermes.data.storage.service;
 
+import com.bytechef.hermes.data.storage.domain.DataStorage;
+import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
+
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
 public interface DataStorageService {
+
+    <T> Optional<T> fetchValue(Scope scope, long scopeId, String referenceId);
+
+    DataStorage getDataStorage(long id);
+
+    void save(Scope scope, Long scopeId, String key, Object value);
 }
