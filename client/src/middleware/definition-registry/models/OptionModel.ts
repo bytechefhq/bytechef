@@ -38,11 +38,11 @@ export interface OptionModel {
      */
     name?: string;
     /**
-     * The value of an option.
-     * @type {object}
+     * Can be anything: string, number, array, object, etc. (except `null`)
+     * @type {any}
      * @memberof OptionModel
      */
-    value?: object;
+    value?: any | null;
 }
 
 /**
