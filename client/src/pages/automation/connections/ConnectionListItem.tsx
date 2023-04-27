@@ -2,6 +2,7 @@ import {CalendarIcon} from '@heroicons/react/24/outline';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {useState} from 'react';
+import InlineSVG from 'react-inlinesvg';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import Badge from '../../../components/Badge/Badge';
@@ -14,10 +15,12 @@ import {
     useDeleteConnectionMutation,
     useUpdateConnectionTagsMutation,
 } from '../../../mutations/connections.mutations';
-import { ComponentDefinitionKeys, useGetComponentDefinitionQuery } from "../../../queries/componentDefinitions.queries";
+import {
+    ComponentDefinitionKeys,
+    useGetComponentDefinitionQuery,
+} from '../../../queries/componentDefinitions.queries';
 import {ConnectionKeys} from '../../../queries/connections.queries';
 import ConnectionDialog from './components/ConnectionDialog';
-import InlineSVG from "react-inlinesvg";
 
 interface ConnectionListItemProps {
     connection: ConnectionModel;
@@ -77,9 +80,16 @@ const ConnectionListItem = ({
                 <div className="flex-1 pr-8">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
-                            {componentDefinition?.icon && <InlineSVG className="mr-1 h-6 w-6 flex-none" src={componentDefinition.icon} />}
+                            {componentDefinition?.icon && (
+                                <InlineSVG
+                                    className="mr-1 h-6 w-6 flex-none"
+                                    src={componentDefinition.icon}
+                                />
+                            )}
 
-                            {!componentDefinition?.icon && <Component1Icon className="mr-1 h-6 w-6 flex-none" />}
+                            {!componentDefinition?.icon && (
+                                <Component1Icon className="mr-1 h-6 w-6 flex-none" />
+                            )}
 
                             <span className="mr-2 text-base font-semibold text-gray-900">
                                 {connection.name}
