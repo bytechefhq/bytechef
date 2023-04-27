@@ -71,7 +71,7 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
             <div className="mb-2 flex items-center">
                 <span>{TYPE_ICONS.OBJECT}</span>
 
-                <span className="ml-2 text-sm font-bold uppercase text-gray-800">
+                <span className="ml-2 text-sm text-gray-800">
                     {currentNode.name}
                 </span>
             </div>
