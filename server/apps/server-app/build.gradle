@@ -63,6 +63,7 @@ dependencies {
     implementation project(":server:libs:modules:components:aws:aws-s3")
     implementation project(":server:libs:modules:components:bash")
     implementation project(":server:libs:modules:components:csvfile")
+    implementation project(":server:libs:modules:components:datamapper")
     implementation project(":server:libs:modules:components:datastorage")
     implementation project(":server:libs:modules:components:delay")
     implementation project(":server:libs:modules:components:filestorage")
