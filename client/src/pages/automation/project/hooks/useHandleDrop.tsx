@@ -41,7 +41,7 @@ export default function useHandleDrop(): [
             name: droppedNode.name,
             data: {
                 icon: droppedNode?.icon || (
-                    <PlayIcon className="h-8 w-8 text-gray-700" />
+                    <PlayIcon className="h-9 w-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
@@ -121,7 +121,7 @@ export default function useHandleDrop(): [
         const draggedNode = {
             data: {
                 icon: droppedNode?.icon || (
-                    <PlayIcon className="h-8 w-8 text-gray-700" />
+                    <PlayIcon className="h-9 w-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),

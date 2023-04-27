@@ -50,7 +50,7 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
         {
             id: '1',
             data: {
-                icon: <PlayIcon className="h-8 w-8 text-gray-700" />,
+                icon: <PlayIcon className="h-9 w-9 text-gray-700" />,
                 label: 'Manual Trigger',
                 name: 'manual',
                 type: 'trigger',
