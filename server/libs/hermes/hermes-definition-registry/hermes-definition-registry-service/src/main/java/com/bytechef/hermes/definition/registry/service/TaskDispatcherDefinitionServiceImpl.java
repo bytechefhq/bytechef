@@ -20,6 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
@@ -69,9 +70,10 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
 
         return new TaskDispatcherDefinitionDTO(
             OptionalUtils.orElse(taskDispatcherDefinition.getDescription(), null),
-            taskDispatcherDefinition.getIcon(), taskDispatcherDefinition.getName(),
+            DefinitionUtils.readIcon(taskDispatcherDefinition.getIcon()), taskDispatcherDefinition.getName(),
             taskDispatcherDefinition.getOutputSchema(), taskDispatcherDefinition.getProperties(),
             taskDispatcherDefinition.getResources(), taskDispatcherDefinition.getTaskProperties(),
             taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getVersion());
     }
+
 }

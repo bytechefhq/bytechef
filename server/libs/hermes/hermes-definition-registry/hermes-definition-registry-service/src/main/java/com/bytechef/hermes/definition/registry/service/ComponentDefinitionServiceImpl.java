@@ -27,6 +27,7 @@ import com.bytechef.hermes.definition.registry.dto.ActionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionBasicDTO;
+import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
@@ -97,7 +98,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 Collections.emptyList()),
             OptionalUtils.orElse(componentDefinition.getCategory(), null),
             OptionalUtils.mapOrElse(componentDefinition.getConnection(), this::toConnectionDefinitionDTO, null),
-            OptionalUtils.orElse(componentDefinition.getDescription(), null), componentDefinition.getIcon(),
+            OptionalUtils.orElse(componentDefinition.getDescription(), null),
+            DefinitionUtils.readIcon(componentDefinition.getIcon()),
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getResources(), null),
             OptionalUtils.orElse(componentDefinition.getTags(), null),
             OptionalUtils.mapOrElse(
