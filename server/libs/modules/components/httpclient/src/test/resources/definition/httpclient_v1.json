@@ -6440,7 +6440,7 @@
     "version": 1
   },
   "description": "Makes an HTTP request and returns the response data.",
-  "icon": null,
+  "icon": "path:assets/httpclient.svg",
   "tags": null,
   "name": "httpClient",
   "resources": null,

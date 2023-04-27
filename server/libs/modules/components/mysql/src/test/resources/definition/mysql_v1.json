@@ -1581,7 +1581,7 @@
     "version": 1
   },
   "description": "Query, insert nd update data from MySQL.",
-  "icon": null,
+  "icon": "path:assets/mysql.svg",
   "tags": null,
   "name": "mysql",
   "resources": null,

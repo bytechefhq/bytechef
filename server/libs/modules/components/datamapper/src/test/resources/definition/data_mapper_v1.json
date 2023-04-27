@@ -950,7 +950,7 @@
   "category": null,
   "connection": null,
   "description": "The Data Mapper enables you to configure data mappings.",
-  "icon": null,
+  "icon": "path:assets/datamapper.svg",
   "tags": null,
   "name": "dataMapper",
   "resources": null,

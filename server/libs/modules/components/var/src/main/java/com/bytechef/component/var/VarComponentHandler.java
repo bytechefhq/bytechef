@@ -34,6 +34,7 @@ public class VarComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(VarConstants.VAR)
         .title("Var")
         .description("Sets a value which can then be referenced in other tasks.")
+        .icon("path:assets/var.svg")
         .actions(VarSetAction.ACTION_DEFINITION);
 
     @Override

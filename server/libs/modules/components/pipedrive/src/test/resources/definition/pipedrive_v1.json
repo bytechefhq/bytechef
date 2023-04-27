@@ -24311,7 +24311,7 @@
     "version": 1
   },
   "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
-  "icon": null,
+  "icon": "path:assets/pipedrive.svg",
   "tags": null,
   "name": "pipedrive",
   "resources": null,

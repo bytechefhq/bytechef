@@ -35,6 +35,7 @@ public class XmlHelperComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XML_HELPER)
         .title("XML Helper")
         .description("Converts between XML string and object/array.")
+        .icon("path:assets/xmlhelper.svg")
         .actions(
             XmlHelperParseAction.ACTION_DEFINITION,
             XmlHelperStringifyAction.ACTION_DEFINITION);

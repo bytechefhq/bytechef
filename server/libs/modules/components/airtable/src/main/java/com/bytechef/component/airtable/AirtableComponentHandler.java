@@ -19,6 +19,7 @@ package com.bytechef.component.airtable;
 
 import com.bytechef.component.airtable.trigger.NewRecordTrigger;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.google.auto.service.AutoService;
 
@@ -29,6 +30,11 @@ import java.util.List;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition.icon("path:assets/airtable.svg");
+    }
 
     @Override
     public List<TriggerDefinition> getTriggers() {

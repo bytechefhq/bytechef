@@ -171,7 +171,7 @@
   "category": null,
   "connection": null,
   "description": "Sets a value which can then be referenced in other tasks.",
-  "icon": null,
+  "icon": "path:assets/var.svg",
   "tags": null,
   "name": "var",
   "resources": null,

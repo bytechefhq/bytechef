@@ -552,7 +552,7 @@
   "category": null,
   "connection": null,
   "description": "Reads and writes data from a ODS file.",
-  "icon": null,
+  "icon": "path:assets/odsfile.svg",
   "tags": null,
   "name": "odsFile",
   "resources": null,

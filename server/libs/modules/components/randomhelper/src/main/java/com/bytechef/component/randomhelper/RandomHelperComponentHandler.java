@@ -35,6 +35,7 @@ public class RandomHelperComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(RANDOM_HELPER)
         .title("Random Helper")
         .description("The Random Helper allows you to generate random values.")
+        .icon("path:assets/randomhelper.svg")
         .actions(
             RandomHelperRandomIntAction.ACTION_DEFINITION,
             RandomHelperRandomFloatAction.ACTION_DEFINITION);

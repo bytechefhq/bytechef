@@ -111,7 +111,7 @@
   "category": null,
   "connection": null,
   "description": "Logs a value to the system log.",
-  "icon": null,
+  "icon": "path:assets/logger.svg",
   "tags": null,
   "name": "logger",
   "resources": null,

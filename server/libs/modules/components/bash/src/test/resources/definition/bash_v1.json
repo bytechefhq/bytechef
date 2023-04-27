@@ -47,7 +47,7 @@
   "category": null,
   "connection": null,
   "description": "Allows you to run arbitrary Bash scripts.",
-  "icon": null,
+  "icon": "path:assets/bash.svg",
   "tags": null,
   "name": "bash",
   "resources": null,

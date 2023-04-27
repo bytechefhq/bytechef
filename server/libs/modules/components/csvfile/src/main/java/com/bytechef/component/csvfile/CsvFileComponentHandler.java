@@ -35,6 +35,7 @@ public class CsvFileComponentHandler implements ComponentHandler {
     public static final ComponentDefinition COMPONENT_DEFINITION = component(CSV_FILE)
         .title("CSV File")
         .description("Reads and writes data from a csv file.")
+        .icon("path:assets/csvfile.svg")
         .actions(
             CsvFileReadAction.ACTION_DEFINITION,
             CsvFileWriteAction.ACTION_DEFINITION);

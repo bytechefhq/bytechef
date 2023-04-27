@@ -37,6 +37,7 @@ public class WebhookComponentHandler implements ComponentHandler {
         .title("Webhook")
         .description(
             "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.")
+        .icon("path:assets/webhook.svg")
         .triggers(
             WebhookAutoRespondWithHTTP200Trigger.TRIGGER_DEFINITION,
             WebhookValidateAndRespondTrigger.TRIGGER_DEFINITION,
