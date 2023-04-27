@@ -1,6 +1,6 @@
 {
   "description": "Executes list of tasks in a sequence.",
-  "icon": null,
+  "icon": "path:assets/sequence.svg",
   "name": "sequence",
   "outputSchema": null,
   "properties": null,

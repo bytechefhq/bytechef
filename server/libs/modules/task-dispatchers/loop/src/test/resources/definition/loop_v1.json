@@ -1,6 +1,6 @@
 {
   "description": "Loops sequentially over list of items.",
-  "icon": null,
+  "icon": "path:assets/loop.svg",
   "name": "loop",
   "outputSchema": [ {
     "advancedOption": null,

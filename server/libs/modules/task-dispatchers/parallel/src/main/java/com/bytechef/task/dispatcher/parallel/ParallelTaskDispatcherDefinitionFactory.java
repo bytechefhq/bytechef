@@ -38,6 +38,7 @@ public class ParallelTaskDispatcherDefinitionFactory implements TaskDispatcherDe
         .title("Parallel")
         .description(
             "Run collection of tasks in parallel, without waiting until the previous function has completed.")
+        .icon("path:assets/parallel.svg")
         .taskProperties(array(TASKS)
             .description("The task to use in each iteration.")
             .items(task()));

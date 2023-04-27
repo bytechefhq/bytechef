@@ -1,6 +1,6 @@
 {
   "description": "Directs a stream based on true/false results of comparisons.",
-  "icon": null,
+  "icon": "path:assets/condition.svg",
   "name": "condition",
   "outputSchema": null,
   "properties": [ {

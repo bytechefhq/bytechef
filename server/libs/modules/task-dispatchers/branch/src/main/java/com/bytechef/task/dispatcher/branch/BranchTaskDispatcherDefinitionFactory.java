@@ -42,6 +42,7 @@ public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(BRANCH)
         .title("Branch")
         .description("Executes one and only one branch of execution based on the `expression` value.")
+        .icon("path:assets/branch.svg")
         .properties(string(EXPRESSION)
             .label("Expression")
             .description("Defines expression upon which evaluation the proper branch continues execution."))
