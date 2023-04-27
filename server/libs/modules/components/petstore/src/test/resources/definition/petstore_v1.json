@@ -4270,7 +4270,7 @@
     "version": 1
   },
   "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
-  "icon": null,
+  "icon": "path:assets/petstore.svg",
   "tags": null,
   "name": "petstore",
   "resources": null,

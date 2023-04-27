@@ -42,6 +42,7 @@ public class ScheduleComponentHandler implements ComponentDefinitionFactory {
             .title("Schedule")
             .description(
                 "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.")
+            .icon("path:assets/schedule.svg")
             .triggers(
                 new ScheduleEveryDayTrigger(schedulerClient).triggerDefinition,
                 new ScheduleEveryWeekTrigger(schedulerClient).triggerDefinition,

@@ -19,6 +19,7 @@ package com.bytechef.component.mailchimp;
 
 import com.bytechef.component.mailchimp.trigger.MailchimpSubscribeTrigger;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.google.auto.service.AutoService;
 
@@ -29,6 +30,11 @@ import java.util.List;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition.icon("path:assets/mailchimp.svg");
+    }
 
     @Override
     public List<TriggerDefinition> getTriggers() {

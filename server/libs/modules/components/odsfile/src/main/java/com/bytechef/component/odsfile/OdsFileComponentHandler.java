@@ -36,6 +36,7 @@ public class OdsFileComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(ODS_FILE)
         .title("ODS File")
         .description("Reads and writes data from a ODS file.")
+        .icon("path:assets/odsfile.svg")
         .actions(
             OdsFileReadAction.ACTION_DEFINITION,
             OdsFileWriteAction.ACTION_DEFINITION);

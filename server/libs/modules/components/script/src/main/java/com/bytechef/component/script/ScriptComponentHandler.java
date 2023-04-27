@@ -40,6 +40,7 @@ public class ScriptComponentHandler implements ComponentHandler {
         .title("Script")
         .description(
             "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.")
+        .icon("path:assets/script.svg")
         .actions(
             ScriptJavaAction.ACTION_DEFINITION,
             ScriptJavaScriptAction.ACTION_DEFINITION,

@@ -34,6 +34,7 @@ public class MySQLJdbcComponentDefinitionFactory implements JdbcComponentDefinit
     private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(MYSQL)
         .title("MySQL")
         .description("Query, insert nd update data from MySQL.")
+        .icon("path:assets/mysql.svg")
         .databaseJdbcName("mysql")
         .jdbcDriverClassName("com.mysql.jdbc.Driver");
 

@@ -459,7 +459,7 @@
   "category": null,
   "connection": null,
   "description": "Reads and writes data from a csv file.",
-  "icon": null,
+  "icon": "path:assets/csvfile.svg",
   "tags": null,
   "name": "csvFile",
   "resources": null,

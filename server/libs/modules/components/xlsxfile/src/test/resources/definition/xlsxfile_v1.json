@@ -552,7 +552,7 @@
   "category": null,
   "connection": null,
   "description": "Reads and writes data from a XLS/XLSX file.",
-  "icon": null,
+  "icon": "path:assets/xlsxfile.svg",
   "tags": null,
   "name": "xlsxFile",
   "resources": null,

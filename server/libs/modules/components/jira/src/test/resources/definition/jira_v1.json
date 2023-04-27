@@ -9354,7 +9354,7 @@
     "version": 1
   },
   "description": "Jira Cloud platform REST API documentation",
-  "icon": null,
+  "icon": "path:assets/jira.svg",
   "tags": null,
   "name": "jira",
   "resources": null,

@@ -37,6 +37,7 @@ public class LoggerComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(LOGGER)
         .title("Logger")
         .description("Logs a value to the system log.")
+        .icon("path:assets/logger.svg")
         .actions(LoggerDebugAction.ACTION_DEFINITION, LoggerErrorAction.ACTION_DEFINITION,
             LoggerInfoAction.ACTION_DEFINITION,
             LoggerWarnAction.ACTION_DEFINITION);
