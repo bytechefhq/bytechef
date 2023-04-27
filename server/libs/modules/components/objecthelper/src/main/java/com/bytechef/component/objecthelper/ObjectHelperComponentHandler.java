@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jsonhelper;
+package com.bytechef.component.objecthelper;
 
-import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.JSON_HELPER;
+import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.OBJECT_HELPER;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.jsonhelper.action.JsonHelperParseAction;
-import com.bytechef.component.jsonhelper.action.JsonHelperStringifyAction;
+import com.bytechef.component.objecthelper.action.ObjectHelperParseAction;
+import com.bytechef.component.objecthelper.action.ObjectHelperStringifyAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -30,14 +30,15 @@ import com.google.auto.service.AutoService;
  * @author Ivica Cardic
  */
 @AutoService(ComponentHandler.class)
-public class JsonHelperComponentHandler implements ComponentHandler {
+public class ObjectHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(JSON_HELPER)
-        .title("JSON Helper")
-        .description("JSON Helper allows you to do various operations on objects.")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(OBJECT_HELPER)
+        .title("Object Helper")
+        .description("Object Helper allows you to do various operations on objects.")
+        .icon("path:assets/objecthelper.svg")
         .actions(
-            JsonHelperParseAction.ACTION_DEFINITION,
-            JsonHelperStringifyAction.ACTION_DEFINITION);
+            ObjectHelperParseAction.ACTION_DEFINITION,
+            ObjectHelperStringifyAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
