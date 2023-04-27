@@ -49,8 +49,7 @@ public abstract class AbstractComponentTaskHandlerBeanDefinitionLoader<T extends
 
             List<TaskHandlerBeanDefinitionEntry> taskHandlerBeanDefinitionEntries = new ArrayList<>();
 
-            componentDefinition
-                .getActions()
+            componentDefinition.getActions()
                 .ifPresent(
                     actionDefinitions -> taskHandlerBeanDefinitionEntries.addAll(
                         com.bytechef.commons.util.CollectionUtils.map(
@@ -60,8 +59,7 @@ public abstract class AbstractComponentTaskHandlerBeanDefinitionLoader<T extends
                                 getComponentActionTaskHandlerBeanDefinition(
                                     actionDefinition, componentDefinitionFactory)))));
 
-            componentDefinition
-                .getTriggers()
+            componentDefinition.getTriggers()
                 .ifPresent(triggerDefinitions -> {
                     for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                         BeanDefinition triggeBeanDefinition = getComponentTriggerTaskHandlerBeanDefinition(
