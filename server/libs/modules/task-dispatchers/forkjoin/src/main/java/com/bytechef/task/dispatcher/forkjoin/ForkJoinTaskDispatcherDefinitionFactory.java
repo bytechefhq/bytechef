@@ -38,6 +38,7 @@ public class ForkJoinTaskDispatcherDefinitionFactory implements TaskDispatcherDe
         .title("Fork/Join")
         .description(
             "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence.")
+        .icon("path:assets/forkjoin.svg")
         .taskProperties(array(BRANCHES)
             .description("The list of sequences of tasks to execute in parallel.")
             .items(array().description("The list of tasks that executes sequentially.")

@@ -1,6 +1,6 @@
 {
   "description": "Breaks the loop execution.",
-  "icon": null,
+  "icon": "path:assets/loopbreak.svg",
   "name": "loop-break",
   "outputSchema": null,
   "properties": null,

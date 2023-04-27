@@ -46,6 +46,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP)
         .title("Loop")
         .description("Loops sequentially over list of items.")
+        .icon("path:assets/loop.svg")
         .properties(
             array(LIST).label("List of items")
                 .description("List of items to iterate over."),
