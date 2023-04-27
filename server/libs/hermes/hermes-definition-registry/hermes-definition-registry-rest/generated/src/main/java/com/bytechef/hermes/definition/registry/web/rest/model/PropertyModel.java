@@ -10,8 +10,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.HashMap;
-import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -48,7 +46,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-26T12:56:34.547448+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-27T08:00:36.899199+02:00[Europe/Zagreb]")
 public class PropertyModel {
 
   private Boolean advancedOption;
@@ -62,9 +60,6 @@ public class PropertyModel {
   private Boolean hidden;
 
   private String label;
-
-  @Valid
-  private Map<String, Object> metadata = new HashMap<>();
 
   private String name;
 
@@ -194,34 +189,6 @@ public class PropertyModel {
     this.label = label;
   }
 
-  public PropertyModel metadata(Map<String, Object> metadata) {
-    this.metadata = metadata;
-    return this;
-  }
-
-  public PropertyModel putMetadataItem(String key, Object metadataItem) {
-    if (this.metadata == null) {
-      this.metadata = new HashMap<>();
-    }
-    this.metadata.put(key, metadataItem);
-    return this;
-  }
-
-  /**
-   * The additional data that can be used during processing.
-   * @return metadata
-  */
-  
-  @Schema(name = "metadata", description = "The additional data that can be used during processing.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("metadata")
-  public Map<String, Object> getMetadata() {
-    return metadata;
-  }
-
-  public void setMetadata(Map<String, Object> metadata) {
-    this.metadata = metadata;
-  }
-
   public PropertyModel name(String name) {
     this.name = name;
     return this;
@@ -317,7 +284,6 @@ public class PropertyModel {
         Objects.equals(this.expressionDisabled, property.expressionDisabled) &&
         Objects.equals(this.hidden, property.hidden) &&
         Objects.equals(this.label, property.label) &&
-        Objects.equals(this.metadata, property.metadata) &&
         Objects.equals(this.name, property.name) &&
         Objects.equals(this.placeholder, property.placeholder) &&
         Objects.equals(this.required, property.required) &&
@@ -326,7 +292,7 @@ public class PropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(advancedOption, description, displayCondition, expressionDisabled, hidden, label, metadata, name, placeholder, required, type);
+    return Objects.hash(advancedOption, description, displayCondition, expressionDisabled, hidden, label, name, placeholder, required, type);
   }
 
   @Override
@@ -339,7 +305,6 @@ public class PropertyModel {
     sb.append("    expressionDisabled: ").append(toIndentedString(expressionDisabled)).append("\n");
     sb.append("    hidden: ").append(toIndentedString(hidden)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
-    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    placeholder: ").append(toIndentedString(placeholder)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
