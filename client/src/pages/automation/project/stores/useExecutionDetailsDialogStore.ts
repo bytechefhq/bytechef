@@ -3,7 +3,7 @@ import {create} from 'zustand';
 
 interface ProjectExecutionDetailsState {
     executionDetailsOpen: boolean;
-    setExecutionDetailsOpen: (rightSlideOverOpen: boolean) => void;
+    setExecutionDetailsOpen: (executionDetailsOpen: boolean) => void;
 
     currentExecution: ProjectExecutionModel;
     setCurrentExecution: (currentExecution: ProjectExecutionModel) => void;
