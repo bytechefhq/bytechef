@@ -1,6 +1,6 @@
 import {Component1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
-import {memo, useEffect, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
 import {
@@ -10,6 +10,7 @@ import {
 import WorkflowNodesList from '../components/WorkflowNodesList';
 import getFormattedName from '../utils/getFormattedName';
 import getRandomId from '../utils/getRandomId';
+import InlineSVG from "react-inlinesvg";
 
 interface ContextualMenuProps {
     components: ComponentDefinitionBasicModel[] | undefined;
@@ -53,7 +54,11 @@ const ContextualMenu = ({
                 data: {
                     label: clickedItem?.title,
                     name: getFormattedName(clickedItem.name!, nodes),
-                    icon: <Component1Icon className="h-8 w-8 text-gray-700" />,
+                    icon: <>
+                            {clickedItem.icon && <InlineSVG className="h-9 w-9 text-gray-700" src={clickedItem.icon} />}
+
+                            {!clickedItem.icon && <Component1Icon className="h-9 w-9 text-gray-700" />}
+                        </>,
                     originNodeName: clickedItem.name,
                 },
                 position: {
@@ -130,7 +135,11 @@ const ContextualMenu = ({
                             ...node,
                             data: {
                                 icon: (
-                                    <Component1Icon className="h-8 w-8 text-gray-700" />
+                                    <>
+                                        {clickedItem.icon && <InlineSVG className="h-9 w-9 text-gray-700" src={clickedItem.icon} />}
+
+                                        {!clickedItem.icon && <Component1Icon className="h-9 w-9 text-gray-700" />}
+                                     </>
                                 ),
                                 label: clickedItem?.title,
                                 name: getFormattedName(
