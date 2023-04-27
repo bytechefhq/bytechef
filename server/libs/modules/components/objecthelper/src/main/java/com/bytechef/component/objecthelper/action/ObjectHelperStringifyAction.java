@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jsonhelper.action;
+package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.JsonUtils;
 
-import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.SOURCE;
-import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.STRINGIFY;
+import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
+import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.STRINGIFY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
@@ -32,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 /**
  * @author Ivica Cardic
  */
-public class JsonHelperStringifyAction {
+public class ObjectHelperStringifyAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(STRINGIFY)
         .title("Convert to JSON string")
@@ -42,7 +42,7 @@ public class JsonHelperStringifyAction {
             .description("The data to convert to JSON string.")
             .required(true))
         .outputSchema(string())
-        .execute(JsonHelperStringifyAction::executeStringify);
+        .execute(ObjectHelperStringifyAction::executeStringify);
 
     public static String executeStringify(Context context, InputParameters inputParameters) {
         Object input = inputParameters.getRequired(SOURCE);

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jsonhelper.action;
+package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.JsonUtils;
 
-import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.PARSE;
-import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.SOURCE;
+import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.PARSE;
+import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
@@ -32,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 /**
  * @author Ivica Cardic
  */
-public class JsonHelperParseAction {
+public class ObjectHelperParseAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(PARSE)
         .title("Convert from JSON string")
@@ -42,7 +42,7 @@ public class JsonHelperParseAction {
             .description("The JSON string to convert to the data.")
             .required(true))
         .outputSchema(oneOf())
-        .execute(JsonHelperParseAction::executeParse);
+        .execute(ObjectHelperParseAction::executeParse);
 
     public static Object executeParse(Context context, InputParameters inputParameters) {
         Object input = inputParameters.getRequired(SOURCE);

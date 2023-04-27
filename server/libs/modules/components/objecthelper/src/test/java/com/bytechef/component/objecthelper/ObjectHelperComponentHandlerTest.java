@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jsonhelper;
+package com.bytechef.component.objecthelper;
 
-import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.SOURCE;
+import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.component.jsonhelper.action.JsonHelperParseAction;
-import com.bytechef.component.jsonhelper.action.JsonHelperStringifyAction;
+import com.bytechef.component.objecthelper.action.ObjectHelperParseAction;
+import com.bytechef.component.objecthelper.action.ObjectHelperStringifyAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.util.JsonUtils;
@@ -34,13 +34,13 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-public class JsonHelperComponentHandlerTest {
+public class ObjectHelperComponentHandlerTest {
 
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/jsonhelper_v1.json", new JsonHelperComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/objecthelper_v1.json", new ObjectHelperComponentHandler().getDefinition());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class JsonHelperComponentHandlerTest {
                 }
                 """);
 
-        assertThat(JsonHelperParseAction.executeParse(context, inputParameters))
+        assertThat(ObjectHelperParseAction.executeParse(context, inputParameters))
             .isEqualTo(Map.of("key", 3));
 
         inputParameters = Mockito.mock(InputParameters.class);
@@ -69,7 +69,7 @@ public class JsonHelperComponentHandlerTest {
                     ]
                     """);
 
-        assertThat(JsonHelperParseAction.executeParse(context, inputParameters))
+        assertThat(ObjectHelperParseAction.executeParse(context, inputParameters))
             .isEqualTo(List.of(Map.of("key", 3)));
     }
 
@@ -82,7 +82,7 @@ public class JsonHelperComponentHandlerTest {
         Mockito.when(inputParameters.getRequired(SOURCE))
             .thenReturn(Map.of("key", 3));
 
-        assertThat(JsonHelperStringifyAction.executeStringify(context, inputParameters))
+        assertThat(ObjectHelperStringifyAction.executeStringify(context, inputParameters))
             .isEqualTo(JsonUtils.write(input));
     }
 }
