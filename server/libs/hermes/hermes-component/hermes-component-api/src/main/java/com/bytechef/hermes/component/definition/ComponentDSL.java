@@ -713,7 +713,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
             this.connection = ((ModifiableConnectionDefinition) connectionDefinition)
-                .componentName(this.name)
                 .description(this.description)
                 .name(this.name)
                 .title(this.getTitle());
@@ -723,7 +722,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connection = connectionDefinition
-                .componentName(this.name)
                 .description(this.description)
                 .name(this.name)
                 .title(this.getTitle());
@@ -972,7 +970,6 @@ public final class ComponentDSL extends DefinitionDSL {
         private BaseUriFunction baseUri = (connectionParameters) -> connectionParameters.containsKey(BASE_URI)
             ? connectionParameters.getString(BASE_URI)
             : null;
-        private String componentName;
         private String description;
         private String name;
         private List<? extends Property<?>> properties;
@@ -1055,7 +1052,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
             ModifiableConnectionDefinition that = (ModifiableConnectionDefinition) o;
 
-            return componentName.equals(that.componentName) && version == that.version;
+            return name.equals(that.name) && version == that.version;
         }
 
         @Override
@@ -1065,7 +1062,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public int hashCode() {
-            return Objects.hash(componentName, version);
+            return Objects.hash(name, version);
         }
 
         @Override
@@ -1089,12 +1086,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public BaseUriFunction getBaseUri() {
             return baseUri;
-        }
-
-        @Override
-        @JsonIgnore
-        public String getComponentName() {
-            return componentName;
         }
 
         @Override
@@ -1125,12 +1116,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public String getTitle() {
             return title;
-        }
-
-        private ModifiableConnectionDefinition componentName(String componentName) {
-            this.componentName = componentName;
-
-            return this;
         }
 
         @SuppressWarnings("PMD")

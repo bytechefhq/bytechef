@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -221,7 +222,9 @@ public class DefinitionDSL {
         private Boolean expressionEnabled;
         private Boolean hidden;
         private String label;
-        private Map<String, Object> metadata;
+
+        @JsonIgnore
+        private Map<String, Object> metadata = new HashMap<>();
         private String placeholder;
         private Boolean required;
         private String name;
@@ -316,13 +319,13 @@ public class DefinitionDSL {
         }
 
         @Override
-        public String getDescription() {
-            return description;
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
         }
 
         @Override
-        public String getDisplayCondition() {
-            return displayCondition;
+        public Optional<String> getDisplayCondition() {
+            return Optional.ofNullable(displayCondition);
         }
 
         @Override
@@ -341,13 +344,13 @@ public class DefinitionDSL {
         }
 
         @Override
-        public String getLabel() {
-            return label;
+        public Optional<String> getLabel() {
+            return Optional.ofNullable(label);
         }
 
         @Override
         public Map<String, Object> getMetadata() {
-            return metadata == null ? null : new HashMap<>(metadata);
+            return new HashMap<>(metadata);
         }
 
         @Override
@@ -508,18 +511,18 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Boolean getMultipleValues() {
-                return multipleValues;
+            public Optional<Boolean> getMultipleValues() {
+                return Optional.ofNullable(multipleValues);
             }
 
             @Override
-            public List<Option<?>> getOptions() {
-                return options;
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.ofNullable(options);
             }
 
             @Override
-            public OptionsDataSource getOptionsDataSource() {
-                return optionsDataSource;
+            public Optional<OptionsDataSource> getOptionsDataSource() {
+                return Optional.ofNullable(optionsDataSource);
             }
 
             @Override
@@ -613,8 +616,8 @@ public class DefinitionDSL {
             }
 
             @Override
-            public List<Option<?>> getOptions() {
-                return options;
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.ofNullable(options);
             }
 
             @Override
@@ -678,8 +681,8 @@ public class DefinitionDSL {
             }
 
             @Override
-            public List<Option<?>> getOptions() {
-                return options;
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.ofNullable(options);
             }
 
             @Override
@@ -757,23 +760,23 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Integer getMaxValue() {
-                return maxValue;
+            public Optional<Integer> getMaxValue() {
+                return Optional.ofNullable(maxValue);
             }
 
             @Override
-            public Integer getMinValue() {
-                return minValue;
+            public Optional<Integer> getMinValue() {
+                return Optional.ofNullable(minValue);
             }
 
             @Override
-            public List<Option<?>> getOptions() {
-                return options;
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.ofNullable(options);
             }
 
             @Override
-            public OptionsDataSource getOptionsDataSource() {
-                return optionsDataSource;
+            public Optional<OptionsDataSource> getOptionsDataSource() {
+                return Optional.ofNullable(optionsDataSource);
             }
 
             @Override
@@ -908,28 +911,28 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Integer getMaxValue() {
-                return maxValue;
+            public Optional<Integer> getMaxValue() {
+                return Optional.ofNullable(maxValue);
             }
 
             @Override
-            public Integer getMinValue() {
-                return minValue;
+            public Optional<Integer> getMinValue() {
+                return Optional.ofNullable(minValue);
             }
 
             @Override
-            public Integer getNumberPrecision() {
-                return numberPrecision;
+            public Optional<Integer> getNumberPrecision() {
+                return Optional.ofNullable(numberPrecision);
             }
 
             @Override
-            public List<Option<?>> getOptions() {
-                return options;
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.ofNullable(options);
             }
 
             @Override
-            public OptionsDataSource getOptionsDataSource() {
-                return optionsDataSource;
+            public Optional<OptionsDataSource> getOptionsDataSource() {
+                return Optional.ofNullable(optionsDataSource);
             }
 
             @Override
@@ -1033,8 +1036,9 @@ public class DefinitionDSL {
             }
 
             @Override
-            public List<? extends Property<?>> getAdditionalProperties() {
-                return additionalProperties == null ? null : new ArrayList<>(additionalProperties);
+            public Optional<List<? extends Property<?>>> getAdditionalProperties() {
+                return Optional.ofNullable(
+                    additionalProperties == null ? null : new ArrayList<>(additionalProperties));
             }
 
             @Override
@@ -1049,28 +1053,28 @@ public class DefinitionDSL {
                 }
             }
 
-            public Boolean getMultipleValues() {
-                return multipleValues;
+            public Optional<Boolean> getMultipleValues() {
+                return Optional.ofNullable(multipleValues);
             }
 
             @Override
-            public String getObjectType() {
-                return objectType;
+            public Optional<String> getObjectType() {
+                return Optional.ofNullable(objectType);
             }
 
             @Override
-            public List<Option<?>> getOptions() {
-                return options;
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.ofNullable(options);
             }
 
             @Override
-            public OptionsDataSource getOptionsDataSource() {
-                return optionsDataSource;
+            public Optional<OptionsDataSource> getOptionsDataSource() {
+                return Optional.ofNullable(optionsDataSource);
             }
 
             @Override
-            public List<? extends Property<?>> getProperties() {
-                return properties == null ? null : new ArrayList<>(properties);
+            public Optional<List<? extends Property<?>>> getProperties() {
+                return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
             }
 
             @Override
@@ -1215,13 +1219,13 @@ public class DefinitionDSL {
             }
 
             @Override
-            public List<Option<?>> getOptions() {
-                return options == null ? null : new ArrayList<>(options);
+            public Optional<List<Option<?>>> getOptions() {
+                return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
             }
 
             @Override
-            public OptionsDataSource getOptionsDataSource() {
-                return optionsDataSource;
+            public Optional<OptionsDataSource> getOptionsDataSource() {
+                return Optional.ofNullable(optionsDataSource);
             }
         }
 
@@ -1305,13 +1309,13 @@ public class DefinitionDSL {
             }
 
             @Override
-            public V getDefaultValue() {
-                return defaultValue;
+            public Optional<V> getDefaultValue() {
+                return Optional.ofNullable(defaultValue);
             }
 
             @Override
-            public V getExampleValue() {
-                return exampleValue;
+            public Optional<V> getExampleValue() {
+                return Optional.ofNullable(exampleValue);
             }
         }
     }
