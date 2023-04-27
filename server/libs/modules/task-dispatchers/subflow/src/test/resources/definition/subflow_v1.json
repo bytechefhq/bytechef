@@ -9,7 +9,6 @@
     "displayCondition": null,
     "hidden": null,
     "label": "Workflow Id",
-    "metadata": null,
     "placeholder": null,
     "required": null,
     "name": "workflowId",

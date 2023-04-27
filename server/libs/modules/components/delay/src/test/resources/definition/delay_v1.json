@@ -12,7 +12,6 @@
       "displayCondition": null,
       "hidden": null,
       "label": "Millis",
-      "metadata": null,
       "placeholder": null,
       "required": true,
       "name": "millis",
