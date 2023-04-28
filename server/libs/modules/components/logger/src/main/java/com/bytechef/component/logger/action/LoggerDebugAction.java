@@ -41,7 +41,7 @@ public class LoggerDebugAction {
         .properties(string(TEXT))
         .execute(LoggerDebugAction::executeDebug);
 
-    public static Object executeDebug(Context context, InputParameters inputParameters) {
+    protected static Object executeDebug(Context context, InputParameters inputParameters) {
         logger.debug(inputParameters.getString(TEXT));
 
         return null;

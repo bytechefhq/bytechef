@@ -53,7 +53,7 @@ public class ScriptRAction {
         .outputSchema(oneOf())
         .execute(ScriptRAction::executeR);
 
-    public static Object executeR(Context context, InputParameters inputParameters) {
+    protected static Object executeR(Context context, InputParameters inputParameters) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("R", inputParameters);
     }
 }

@@ -52,7 +52,7 @@ public class ScriptRubyAction {
         .outputSchema(oneOf())
         .execute(ScriptRubyAction::executeRuby);
 
-    public static Object executeRuby(Context context, InputParameters inputParameters) {
+    protected static Object executeRuby(Context context, InputParameters inputParameters) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", inputParameters);
     }
 }

@@ -41,7 +41,7 @@ public class LoggerInfoAction {
         .properties(string(TEXT))
         .execute(LoggerInfoAction::executeInfo);
 
-    public static Object executeInfo(Context context, InputParameters inputParameters) {
+    protected static Object executeInfo(Context context, InputParameters inputParameters) {
         logger.info(inputParameters.getString(TEXT));
 
         return null;

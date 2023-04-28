@@ -128,7 +128,7 @@ public class HttpClientActionUtils {
         return properties;
     }
 
-    public static Object execute(
+    protected static Object execute(
         Context context, InputParameters inputParameters, RequestMethod requestMethod) {
 
         HttpClientUtils.Response response = exchange(

@@ -62,7 +62,7 @@ public class HttpClientGetAction {
             fileEntry().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
         .execute(HttpClientGetAction::executeGet);
 
-    public static Object executeGet(Context context, InputParameters inputParameters) {
+    protected static Object executeGet(Context context, InputParameters inputParameters) {
         return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.GET);
     }
 }

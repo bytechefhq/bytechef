@@ -55,7 +55,7 @@ public class HttpClientPatchAction {
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .execute(HttpClientPatchAction::executePatch);
 
-    public static Object executePatch(Context context, InputParameters inputParameters) {
+    protected static Object executePatch(Context context, InputParameters inputParameters) {
         return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.PATCH);
     }
 }
