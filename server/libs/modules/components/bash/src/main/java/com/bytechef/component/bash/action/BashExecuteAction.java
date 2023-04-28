@@ -55,7 +55,7 @@ public class BashExecuteAction {
         .outputSchema(string())
         .execute(BashExecuteAction::execute);
 
-    public static String execute(Context context, InputParameters inputParameters) {
+    protected static String execute(Context context, InputParameters inputParameters) {
         try {
             File scriptFile = File.createTempFile("_script", ".sh");
 

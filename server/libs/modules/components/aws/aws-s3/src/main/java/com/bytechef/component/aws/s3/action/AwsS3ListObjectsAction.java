@@ -62,7 +62,7 @@ public class AwsS3ListObjectsAction {
         .outputSchema(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
         .execute(AwsS3ListObjectsAction::executeListObjects);
 
-    public static List<S3ObjectDescription> executeListObjects(
+    protected static List<S3ObjectDescription> executeListObjects(
         Context context, InputParameters inputParameters) {
         S3ClientBuilder builder = S3Client.builder();
 

@@ -105,7 +105,7 @@ public class XlsxFileReadAction {
         .outputSchema(array())
         .execute(XlsxFileReadAction::executeRead);
 
-    public static List<Map<String, ?>> executeRead(Context context, InputParameters inputParameters) {
+    protected static List<Map<String, ?>> executeRead(Context context, InputParameters inputParameters) {
         Context.FileEntry fileEntry = inputParameters.get(FILE_ENTRY, Context.FileEntry.class);
         boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
         boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
@@ -188,7 +188,7 @@ public class XlsxFileReadAction {
         return value;
     }
 
-    public static List<Map<String, ?>> read(
+    protected static List<Map<String, ?>> read(
         XlsxFileConstants.FileFormat fileFormat, InputStream inputStream, ReadConfiguration configuration)
         throws IOException {
         List<Map<String, ?>> rows = new ArrayList<>();

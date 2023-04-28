@@ -46,9 +46,9 @@ public class AwsS3PresignGetObjectAction {
             .description("The AWS S3 uri.")
             .required(true))
         .outputSchema(string())
-        .execute(AwsS3PresignGetObjectAction::performGetPresignedObject);
+        .execute(AwsS3PresignGetObjectAction::executeGetPresignedObject);
 
-    public static String performGetPresignedObject(Context context, InputParameters inputParameters) {
+    protected static String executeGetPresignedObject(Context context, InputParameters inputParameters) {
         AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
 
         try (S3Presigner s3Presigner = S3Presigner.create()) {

@@ -19,6 +19,7 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.component.filestorage.constant.FileStorageConstants;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -66,7 +67,7 @@ public class FileStorageDownloadAction {
     /**
      * executes the download of a file (given its URL).
      */
-    public static Context.FileEntry executeDownload(Context context, InputParameters inputParameters) {
+    protected static FileEntry executeDownload(Context context, InputParameters inputParameters) {
         try {
             URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
