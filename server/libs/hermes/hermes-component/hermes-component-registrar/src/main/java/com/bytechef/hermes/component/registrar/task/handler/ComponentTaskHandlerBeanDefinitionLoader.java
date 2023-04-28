@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.task.handler;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.config.BeanDefinition;
 
@@ -32,7 +32,7 @@ public interface ComponentTaskHandlerBeanDefinitionLoader {
 
     @SuppressFBWarnings("EI")
     record ComponentTaskHandlerBeanDefinition(
-        ComponentDefinition componentDefinition,
+        ComponentDefinitionFactory componentDefinitionFactory,
         List<TaskHandlerBeanDefinitionEntry> taskHandlerBeanDefinitionEntries) {
     }
 
