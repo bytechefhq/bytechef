@@ -20,6 +20,7 @@
 package com.bytechef.component.rabbitmq;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,5 +33,17 @@ public class RabbitMqComponentHandlerTest {
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/rabbit_mq_v1.json", new RabbitMqComponentHandler().getDefinition());
+    }
+
+    @Test
+    @Disabled
+    public void testNewMessageTrigger() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testSendMessageAction() {
+        // TODO
     }
 }
