@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.registrar.factory.config;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.registrar.oas.task.handler.OpenApiComponentTaskHandlerBeanDefinitionLoader;
 import com.bytechef.hermes.component.registrar.task.handler.ComponentTaskHandlerBeanDefinitionLoader;
@@ -40,24 +41,29 @@ import java.util.List;
 @Component
 public class ComponentTaskHandlerBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    private final List<ComponentTaskHandlerBeanDefinitionLoader> componentTaskHandlerBeanDefinitionLoaders = List.of(
-        new DefaultComponentTaskHandlerBeanDefinitionLoader(),
-        new JdbcComponentTaskHandlerBeanDefinitionLoader(),
-        new OpenApiComponentTaskHandlerBeanDefinitionLoader());
+    private static final List<ComponentTaskHandlerBeanDefinitionLoader> COMPONENT_TASK_HANDLER_BEAN_DEFINITION_LOADERS =
+        List.of(
+            new DefaultComponentTaskHandlerBeanDefinitionLoader(),
+            new JdbcComponentTaskHandlerBeanDefinitionLoader(),
+            new OpenApiComponentTaskHandlerBeanDefinitionLoader());
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         List<ComponentTaskHandlerBeanDefinition> componentTaskHandlerFactories = CollectionUtils.flatMap(
-            componentTaskHandlerBeanDefinitionLoaders,
+            COMPONENT_TASK_HANDLER_BEAN_DEFINITION_LOADERS,
             componentTaskHandlerBeanDefinitionLoader -> CollectionUtils.stream(
                 componentTaskHandlerBeanDefinitionLoader.loadComponentTaskHandlerBeanDefinitions()));
 
         for (ComponentTaskHandlerBeanDefinition componentTaskHandlerBeanDefinition : componentTaskHandlerFactories) {
-            ComponentDefinition componentDefinition = componentTaskHandlerBeanDefinition.componentDefinition();
+            ComponentDefinitionFactory componentDefinitionFactory =
+                componentTaskHandlerBeanDefinition.componentDefinitionFactory();
+
+            ComponentDefinition componentDefinition = componentDefinitionFactory.getDefinition();
 
             beanFactory.registerSingleton(
-                getBeanName(componentDefinition.getName(), componentDefinition.getVersion(), "ComponentDefinition"),
-                componentDefinition);
+                getBeanName(
+                    componentDefinition.getName(), componentDefinition.getVersion(), "ComponentDefinitionFactory", '_'),
+                componentDefinitionFactory);
 
             for (TaskHandlerBeanDefinitionEntry taskHandlerBeanDefinitionEntry : componentTaskHandlerBeanDefinition
                 .taskHandlerBeanDefinitionEntries()) {
@@ -67,13 +73,13 @@ public class ComponentTaskHandlerBeanFactoryPostProcessor implements BeanFactory
                 ((BeanDefinitionRegistry) beanFactory).registerBeanDefinition(
                     getBeanName(
                         componentDefinition.getName(), componentDefinition.getVersion(),
-                        taskHandlerBeanDefinitionEntry.taskHandlerName()),
+                        taskHandlerBeanDefinitionEntry.taskHandlerName(), '/'),
                     taskHandlerBeanDefinition);
             }
         }
     }
 
-    private String getBeanName(String componentName, int version, String typeName) {
-        return componentName + "/v" + version + "/" + typeName;
+    private String getBeanName(String componentName, int version, String typeName, char delimiter) {
+        return componentName + delimiter + "v" + version + delimiter + typeName;
     }
 }

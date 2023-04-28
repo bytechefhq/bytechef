@@ -17,6 +17,8 @@
 
 package com.bytechef.server.config;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
@@ -53,6 +55,11 @@ public class DefinitionRegistryConfiguration {
         ComponentDefinitionService componentDefinitionService, ConnectionService connectionService) {
 
         return new ComponentDefinitionFacadeImpl(componentDefinitionService, connectionService);
+    }
+
+    @Bean
+    List<ComponentDefinition> componentDefinitions(List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        return CollectionUtils.map(componentDefinitionFactories, ComponentDefinitionFactory::getDefinition);
     }
 
     @Bean

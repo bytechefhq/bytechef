@@ -56,7 +56,7 @@ public class JdbcComponentTaskHandlerBeanDefinitionLoader implements ComponentTa
 
             componentTaskHandlerFactories.add(
                 new ComponentTaskHandlerBeanDefinition(
-                    componentDefinition,
+                    jdbcComponentHandler,
                     CollectionUtils.map(
                         OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList()),
                         actionDefinition -> new TaskHandlerBeanDefinitionEntry(
