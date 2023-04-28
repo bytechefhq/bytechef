@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.sequence.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
 import static com.bytechef.task.dispatcher.sequence.constant.SequenceTaskDispatcherConstants.SEQUENCE;
 
@@ -69,7 +68,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
             String type = parentTaskExecution.getType();
 
-            return type.equals(SEQUENCE + "/v" + VERSION_1);
+            return type.equals(SEQUENCE + "/v1");
         }
 
         return false;

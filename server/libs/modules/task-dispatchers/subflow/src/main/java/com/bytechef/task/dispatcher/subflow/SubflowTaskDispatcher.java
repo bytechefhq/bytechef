@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants.SUBFLOW;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
@@ -60,7 +59,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), SUBFLOW + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), SUBFLOW + "/v1")) {
             return this;
         }
 

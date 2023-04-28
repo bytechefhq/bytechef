@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.condition.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITION;
@@ -70,7 +69,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
 
             String type = parentTaskExecution.getType();
 
-            return type.equals(CONDITION + "/v" + VERSION_1);
+            return type.equals(CONDITION + "/v1");
         }
 
         return false;

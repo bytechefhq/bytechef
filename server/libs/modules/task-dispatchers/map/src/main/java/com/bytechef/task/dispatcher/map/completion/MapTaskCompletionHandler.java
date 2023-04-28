@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.map.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -60,7 +59,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
             String type = parentExecution.getType();
 
-            return type.equals(MAP + "/v" + VERSION_1);
+            return type.equals(MAP + "/v1");
         }
         return false;
     }

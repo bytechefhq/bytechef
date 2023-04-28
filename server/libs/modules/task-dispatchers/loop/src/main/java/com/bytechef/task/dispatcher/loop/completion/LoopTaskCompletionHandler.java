@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.loop.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_VAR;
@@ -72,7 +71,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             String type = parentExecution.getType();
 
-            return type.equals(LOOP + "/v" + VERSION_1);
+            return type.equals(LOOP + "/v1");
         }
 
         return false;
