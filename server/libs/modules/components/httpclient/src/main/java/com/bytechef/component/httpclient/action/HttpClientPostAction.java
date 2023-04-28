@@ -70,7 +70,7 @@ public class HttpClientPostAction {
             fileEntry().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
         .execute(HttpClientPostAction::executePost);
 
-    public static Object executePost(Context context, InputParameters inputParameters) {
+    protected static Object executePost(Context context, InputParameters inputParameters) {
         return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.POST);
     }
 }

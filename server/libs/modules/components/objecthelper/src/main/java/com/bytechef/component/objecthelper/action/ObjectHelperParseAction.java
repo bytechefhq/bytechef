@@ -44,7 +44,7 @@ public class ObjectHelperParseAction {
         .outputSchema(oneOf())
         .execute(ObjectHelperParseAction::executeParse);
 
-    public static Object executeParse(Context context, InputParameters inputParameters) {
+    protected static Object executeParse(Context context, InputParameters inputParameters) {
         Object input = inputParameters.getRequired(SOURCE);
 
         return JsonUtils.read((String) input);

@@ -41,7 +41,7 @@ public class LoggerWarnAction {
         .properties(string(TEXT))
         .execute(LoggerWarnAction::executeWarn);
 
-    public static Object executeWarn(Context context, InputParameters inputParameters) {
+    protected static Object executeWarn(Context context, InputParameters inputParameters) {
         logger.warn(inputParameters.getString(TEXT));
 
         return null;

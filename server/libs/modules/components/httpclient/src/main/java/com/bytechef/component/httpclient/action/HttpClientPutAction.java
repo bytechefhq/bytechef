@@ -55,7 +55,7 @@ public class HttpClientPutAction {
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .execute(HttpClientPutAction::executePut);
 
-    public static Object executePut(Context context, InputParameters inputParameters) {
+    protected static Object executePut(Context context, InputParameters inputParameters) {
         return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.PUT);
     }
 }
