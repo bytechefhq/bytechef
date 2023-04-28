@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.sequence.constant.SequenceTaskDispatcherConstants.SEQUENCE;
 
 import com.bytechef.atlas.domain.Context;
@@ -103,7 +102,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), SEQUENCE + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), SEQUENCE + "/v1")) {
             return this;
         }
 

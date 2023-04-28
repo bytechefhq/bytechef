@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.branch.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.CASES;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.DEFAULT;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.EXPRESSION;
@@ -77,7 +76,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
             String type = parentExecution.getType();
 
-            return type.equals(BRANCH + "/v" + VERSION_1);
+            return type.equals(BRANCH + "/v1");
         }
 
         return false;

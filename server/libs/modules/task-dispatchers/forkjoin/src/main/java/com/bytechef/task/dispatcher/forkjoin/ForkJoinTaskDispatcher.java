@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.forkjoin;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCH;
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.FORK_JOIN;
@@ -169,7 +168,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), FORK_JOIN + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), FORK_JOIN + "/v1")) {
             return this;
         }
 

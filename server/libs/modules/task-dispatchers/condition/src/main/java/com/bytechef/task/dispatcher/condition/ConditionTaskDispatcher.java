@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.condition;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITION;
@@ -115,7 +114,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), CONDITION + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), CONDITION + "/v1")) {
             return this;
         }
 
