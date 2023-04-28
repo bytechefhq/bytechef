@@ -27,18 +27,19 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import org.springframework.stereotype.Component;
 
+import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
+@Component(SCHEDULE + "_v1_ComponentDefinitionFactory")
 public class ScheduleComponentHandler implements ComponentDefinitionFactory {
 
     private final ComponentDefinition componentDefinition;
 
     public ScheduleComponentHandler(SchedulerClient schedulerClient) {
-        this.componentDefinition = component("schedule")
+        this.componentDefinition = component(SCHEDULE)
             .title("Schedule")
             .description(
                 "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.")
