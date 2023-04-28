@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
@@ -33,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageGetAllKeysAction {
 
-    public final ActionDefinition actionDefinition = action("getAllKeys")
+    public static final ActionDefinition ACTION_DEFINITION = action("getAllKeys")
         .title("Get All Keys")
         .description(
             "Retrieve all the currently existing keys from storage, along with their values within the provided scope.")
@@ -43,16 +42,10 @@ public class DataStorageGetAllKeysAction {
                 .description("The namespace to get keys from.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
-        .execute(this::execute);
+        .execute(DataStorageGetAllKeysAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageGetAllKeysAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }

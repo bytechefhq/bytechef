@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.INDEX;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
@@ -36,7 +35,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageDeleteValueFromListAction {
 
-    public final ActionDefinition actionDefinition = action("deleteValueFromlist")
+    public static final ActionDefinition ACTION_DEFINITION = action("deleteValueFromlist")
         .title("Delete Value from List")
         .description("Delete a value from the given index in a list.")
         .properties(
@@ -55,16 +54,10 @@ public class DataStorageDeleteValueFromListAction {
                 .description(
                     "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.")
                 .required(true))
-        .execute(this::execute);
+        .execute(DataStorageDeleteValueFromListAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageDeleteValueFromListAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }

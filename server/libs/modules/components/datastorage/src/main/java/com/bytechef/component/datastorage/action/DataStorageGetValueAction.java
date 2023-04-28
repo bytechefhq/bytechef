@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.DEFAULT_VALUE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
@@ -42,7 +41,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageGetValueAction {
 
-    public final ActionDefinition actionDefinition = action("getValue")
+    public static final ActionDefinition ACTION_DEFINITION = action("getValue")
         .title("Get Value")
         .description("Retrieve a previously assigned value within the specified scope using its corresponding key.")
         .properties(
@@ -60,16 +59,10 @@ public class DataStorageGetValueAction {
                 .label("Default value")
                 .description("The default value to return if no value exists under the given key.")
                 .required(true))
-        .execute(this::execute);
+        .execute(DataStorageGetValueAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageGetValueAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }
