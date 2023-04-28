@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
@@ -36,7 +35,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageAwaitGetValueAction {
 
-    public final ActionDefinition actionDefinition = action("awaitGetValue")
+    public static final ActionDefinition ACTION_DEFINITION = action("awaitGetValue")
         .title("Await Get Value")
         .description("")
         .properties(
@@ -56,16 +55,10 @@ public class DataStorageAwaitGetValueAction {
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
-        .execute(this::execute);
+        .execute(DataStorageAwaitGetValueAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageAwaitGetValueAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }

@@ -20,6 +20,7 @@
 package com.bytechef.component.datastorage;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,6 +32,60 @@ public class DataStorageComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/data_storage_v1.json", new DataStorageComponentHandler(null).getDefinition());
+            "definition/data_storage_v1.json", new DataStorageComponentHandler().getDefinition());
+    }
+
+    @Test
+    @Disabled
+    public void testSetValueInListAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testSetValueAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testGetValueAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testGetAllKeysAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testDeleteValueFromListAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testDeleteValueAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testAwaitGetValueAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testAtomicIncrementAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testAppendValueToListAction() {
+        // TODO
     }
 }

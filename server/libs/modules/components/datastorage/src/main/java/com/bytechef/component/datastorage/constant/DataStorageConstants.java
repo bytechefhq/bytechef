@@ -17,7 +17,6 @@
 
 package com.bytechef.component.datastorage.constant;
 
-import com.bytechef.hermes.data.storage.domain.DataStorage;
 import com.bytechef.hermes.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -40,9 +39,9 @@ public class DataStorageConstants {
 
     @SuppressFBWarnings("MS")
     public static final Option[] SCOPE_OPTIONS = {
-        option(DataStorage.Scope.CURRENT_EXECUTION.getLabel(), DataStorage.Scope.CURRENT_EXECUTION),
-        option(DataStorage.Scope.WORKFLOW_INSTANCE.getLabel(), DataStorage.Scope.WORKFLOW),
-        option(DataStorage.Scope.WORKFLOW.getLabel(), DataStorage.Scope.WORKFLOW),
-        option(DataStorage.Scope.ACCOUNT.getLabel(), DataStorage.Scope.ACCOUNT)
+        option("Current Execution", 1),
+        option("Workflow Instance", 2),
+        option("Workflow", 3),
+        option("Account", 4)
     };
 }
