@@ -18,6 +18,7 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -65,7 +66,7 @@ public class XmlFileWriteAction {
         .outputSchema(fileEntry())
         .execute(XmlFileWriteAction::executeWrite);
 
-    public static Context.FileEntry executeWrite(Context context, InputParameters inputParameters) {
+    protected static FileEntry executeWrite(Context context, InputParameters inputParameters) {
         Object source = inputParameters.getRequired(SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

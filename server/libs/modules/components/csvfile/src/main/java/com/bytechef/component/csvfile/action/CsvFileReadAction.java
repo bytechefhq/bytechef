@@ -105,7 +105,7 @@ public class CsvFileReadAction {
         .outputSchema(array())
         .execute(CsvFileReadAction::executeRead);
 
-    public static List<Map<String, Object>> executeRead(Context context, InputParameters inputParameters) {
+    protected static List<Map<String, Object>> executeRead(Context context, InputParameters inputParameters) {
         String delimiter = inputParameters.getString(DELIMITER, ",");
         boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
         boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
@@ -139,7 +139,7 @@ public class CsvFileReadAction {
         }
     }
 
-    public static List<Map<String, Object>> read(InputStream inputStream, ReadConfiguration configuration)
+    protected static List<Map<String, Object>> read(InputStream inputStream, ReadConfiguration configuration)
         throws IOException {
         List<Map<String, Object>> rows = new ArrayList<>();
         int count = 0;

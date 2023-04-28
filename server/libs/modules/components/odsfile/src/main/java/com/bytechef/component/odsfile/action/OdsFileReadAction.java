@@ -99,7 +99,7 @@ public class OdsFileReadAction {
         .outputSchema(array())
         .execute(OdsFileReadAction::executeRead);
 
-    public static List<Map<String, ?>> executeRead(Context context, InputParameters inputParameters) {
+    protected static List<Map<String, ?>> executeRead(Context context, InputParameters inputParameters) {
         boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
         boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
         Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
@@ -137,7 +137,7 @@ public class OdsFileReadAction {
         }
     }
 
-    public static List<Map<String, ?>> read(InputStream inputStream, ReadConfiguration configuration)
+    protected static List<Map<String, ?>> read(InputStream inputStream, ReadConfiguration configuration)
         throws IOException {
         List<Map<String, ?>> rows = new ArrayList<>();
 

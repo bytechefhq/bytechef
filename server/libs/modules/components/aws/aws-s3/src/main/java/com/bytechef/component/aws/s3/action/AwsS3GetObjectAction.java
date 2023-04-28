@@ -55,7 +55,7 @@ public class AwsS3GetObjectAction {
         .outputSchema(fileEntry())
         .execute(AwsS3GetObjectAction::executeGetObject);
 
-    public static Context.FileEntry executeGetObject(Context context, InputParameters inputParameters) {
+    protected static Context.FileEntry executeGetObject(Context context, InputParameters inputParameters) {
         AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
 
         String bucketName = amazonS3Uri.getBucket();

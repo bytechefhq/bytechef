@@ -60,7 +60,7 @@ public class FilesystemWriteFileAction {
         .outputSchema(object().properties(integer("bytes")))
         .execute(FilesystemWriteFileAction::executeWriteFile);
 
-    public static Map<String, Long> executeWriteFile(Context context, InputParameters inputParameters) {
+    protected static Map<String, Long> executeWriteFile(Context context, InputParameters inputParameters) {
         String fileName = inputParameters.getRequiredString(FILENAME);
 
         try (

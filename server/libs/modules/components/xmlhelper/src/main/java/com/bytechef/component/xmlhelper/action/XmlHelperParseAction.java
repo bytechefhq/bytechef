@@ -46,7 +46,7 @@ public class XmlHelperParseAction {
         .outputSchema(object())
         .execute(XmlHelperParseAction::executeParse);
 
-    public static Map<String, ?> executeParse(Context context, InputParameters inputParameters) {
+    protected static Map<String, ?> executeParse(Context context, InputParameters inputParameters) {
         String source = inputParameters.getRequiredString(SOURCE);
 
         return XmlUtils.read(source);

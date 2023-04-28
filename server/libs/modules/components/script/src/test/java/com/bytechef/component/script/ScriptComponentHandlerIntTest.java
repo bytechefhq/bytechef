@@ -38,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ComponentIntTest
 public class ScriptComponentHandlerIntTest {
 
-    public static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
     private TaskHandler<Object> taskHandler = taskExecution -> {
         Map<String, Object> parameters = taskExecution.getParameters();
 

@@ -45,7 +45,7 @@ public class FilesystemLsAction {
         .description("Lists a content of directory for the given path.")
         .execute(FilesystemLsAction::executeLs);
 
-    public static List<FileInfo> executeLs(Context context, InputParameters inputParameters) {
+    protected static List<FileInfo> executeLs(Context context, InputParameters inputParameters) {
         Path root = Paths.get(inputParameters.getRequiredString("path"));
 
         boolean recursive = inputParameters.getBoolean("recursive", false);

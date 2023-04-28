@@ -39,22 +39,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -257,22 +257,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -337,22 +337,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -417,22 +417,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -479,22 +479,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -543,22 +543,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -605,22 +605,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -795,22 +795,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
@@ -985,22 +985,22 @@
         "description": null,
         "displayCondition": null,
         "name": "Current Execution",
-        "value": "CURRENT_EXECUTION"
+        "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Workflow instance",
-        "value": "WORKFLOW"
+        "name": "Workflow Instance",
+        "value": 2
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Workflow",
-        "value": "WORKFLOW"
+        "value": 3
       }, {
         "description": null,
         "displayCondition": null,
         "name": "Account",
-        "value": "ACCOUNT"
+        "value": 4
       } ],
       "optionsDataSource": null,
       "expressionDisabled": null
