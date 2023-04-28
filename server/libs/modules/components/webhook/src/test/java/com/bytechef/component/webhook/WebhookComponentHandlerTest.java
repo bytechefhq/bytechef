@@ -18,6 +18,7 @@
 package com.bytechef.component.webhook;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -27,5 +28,23 @@ public class WebhookComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() throws IOException {
         JsonFileAssert.assertEquals("definition/webhook_v1.json", new WebhookComponentHandler().getDefinition());
+    }
+
+    @Test
+    @Disabled
+    public void testAutoRespondWithHTTP200Trigger() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testAwaitWorkflowAndRespondTrigger() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testValidateAndRespondTrigger() {
+        // TODO
     }
 }
