@@ -353,6 +353,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
     record AuthorizationCallbackResponse(
         String accessToken, String refreshToken, Map<String, Object> additionalParameters) {
 
+        AuthorizationCallbackResponse(String accessToken, String refreshToken) {
+            this(accessToken, refreshToken, Map.of());
+        }
+
         public Map<String, Object> toMap() {
             Map<String, Object> map = new HashMap<>();
 
