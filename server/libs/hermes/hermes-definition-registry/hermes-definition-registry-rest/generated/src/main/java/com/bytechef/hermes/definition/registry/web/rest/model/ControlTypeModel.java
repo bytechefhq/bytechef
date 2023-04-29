@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * A type of the control to show in UI.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-27T08:00:36.899199+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-28T19:34:07.283252+02:00[Europe/Zagreb]")
 public enum ControlTypeModel {
   
   CHECKBOX("CHECKBOX"),
