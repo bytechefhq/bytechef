@@ -21,6 +21,7 @@ import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.commons.discovery.util.DiscoveryUtils;
 import com.bytechef.commons.rsocket.util.RSocketUtils;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -60,7 +61,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     @Override
     public void executeAuthorizationApply(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
-        Authorization.AuthorizationContext authorizationContext) {
+        AuthorizationContext authorizationContext) {
 
         Map<String, Map<String, List<String>>> authorizationContextMap = MonoUtils.get(
             getRSocketRequester(componentName)
@@ -114,7 +115,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinitionMono(
+    public Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(
         String componentName, int componentVersion) {
 
         return getRSocketRequester(componentName)
@@ -125,7 +126,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitionsMono(
+    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(
         String componentName, int componentVersion) {
 
         return Mono.zip(

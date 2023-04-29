@@ -19,7 +19,7 @@ package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
-import com.bytechef.helios.project.facade.ProjectInstanceFacade;
+import com.bytechef.helios.project.ProjectInstanceFacade;
 import com.bytechef.helios.project.web.rest.model.CreateProjectInstanceJob200ResponseModel;
 import com.bytechef.helios.project.web.rest.model.CreateProjectInstanceJobRequestModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;

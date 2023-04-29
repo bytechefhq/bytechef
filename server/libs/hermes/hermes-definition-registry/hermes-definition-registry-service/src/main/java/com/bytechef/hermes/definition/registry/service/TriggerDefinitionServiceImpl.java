@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Ivica Cardic
@@ -41,7 +42,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Mono<TriggerDefinitionDTO> getComponentTriggerDefinitionMono(
+    public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
+        try {
+            return getTriggerDefinitionMono(componentName, componentVersion, triggerName)
+                .toFuture()
+                .get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(
         String componentName, int componentVersion, String triggerName) {
 
         return Mono.just(
@@ -57,7 +69,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Mono<List<TriggerDefinitionDTO>> getComponentTriggerDefinitions(
+    public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitions(
         String componentName, int componentVersion) {
         return Mono.just(
             componentDefinitions.stream()

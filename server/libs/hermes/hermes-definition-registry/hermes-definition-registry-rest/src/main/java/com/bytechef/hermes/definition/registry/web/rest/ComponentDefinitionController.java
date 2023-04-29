@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -110,7 +110,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     public Mono<ResponseEntity<ConnectionDefinitionModel>> getComponentConnectionDefinition(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
-        return connectionDefinitionService.getComponentConnectionDefinitionMono(componentName, componentVersion)
+        return connectionDefinitionService.getConnectionDefinitionMono(componentName, componentVersion)
             .mapNotNull(
                 connectionDefinition -> conversionService.convert(
                     connectionDefinition, ConnectionDefinitionModel.class))
@@ -122,7 +122,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return Mono.just(
-            connectionDefinitionService.getComponentConnectionDefinitionsMono(componentName, componentVersion)
+            connectionDefinitionService.getConnectionDefinitionsMono(componentName, componentVersion)
                 .mapNotNull(
                     connectionDefinitions -> connectionDefinitions.stream()
                         .map(
@@ -172,7 +172,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     public Mono<ResponseEntity<TriggerDefinitionModel>> getComponentTriggerDefinition(
         String componentName, Integer componentVersion, String triggerName, ServerWebExchange exchange) {
 
-        return triggerDefinitionService.getComponentTriggerDefinitionMono(componentName, componentVersion, triggerName)
+        return triggerDefinitionService.getTriggerDefinitionMono(componentName, componentVersion, triggerName)
             .mapNotNull(triggerDefinition -> conversionService.convert(triggerDefinition, TriggerDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
@@ -182,7 +182,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return Mono.just(
-            triggerDefinitionService.getComponentTriggerDefinitions(componentName, componentVersion)
+            triggerDefinitionService.getTriggerDefinitions(componentName, componentVersion)
                 .mapNotNull(
                     connectionDefinitions -> connectionDefinitions.stream()
                         .map(

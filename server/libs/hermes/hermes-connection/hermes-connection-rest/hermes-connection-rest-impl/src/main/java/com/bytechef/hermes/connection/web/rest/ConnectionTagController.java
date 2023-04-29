@@ -18,7 +18,7 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.hermes.connection.ConnectionFacade;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;

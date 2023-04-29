@@ -20,7 +20,7 @@ package com.bytechef.hermes.connection.web.rest;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
-import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.hermes.connection.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.hermes.connection.web.rest.model.UpdateTagsRequestModel;

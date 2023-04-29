@@ -24,9 +24,9 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
-import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.rsocket.client.ComponentDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ConnectionDefinitionServiceRSocketClient;
@@ -202,18 +202,18 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinitionMono(
+        public Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(
             String componentName, int componentVersion) {
 
-            return connectionDefinitionService.getComponentConnectionDefinitionMono(
+            return connectionDefinitionService.getConnectionDefinitionMono(
                 componentName, componentVersion);
         }
 
         @Override
-        public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitionsMono(
+        public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(
             String componentName, int version) {
 
-            return connectionDefinitionService.getComponentConnectionDefinitionsMono(componentName, version);
+            return connectionDefinitionService.getConnectionDefinitionsMono(componentName, version);
         }
 
         @Override
