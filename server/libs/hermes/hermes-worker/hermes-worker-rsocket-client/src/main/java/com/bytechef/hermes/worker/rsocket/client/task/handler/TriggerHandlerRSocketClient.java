@@ -18,7 +18,6 @@
 package com.bytechef.hermes.worker.rsocket.client.task.handler;
 
 import com.bytechef.commons.rsocket.util.RSocketUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
 import com.bytechef.hermes.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,12 +49,12 @@ public class TriggerHandlerRSocketClient {
     }
 
     @SuppressFBWarnings("NP")
-    public TriggerOutput handle(String type, TriggerExecution triggerExecution) {
+    public Object handle(String type, TriggerExecution triggerExecution) {
         try {
             return getRSocketRequester(StringUtils.split(type, "/")[0])
                 .route("TriggerHandler.handle")
                 .data(Map.of("type", type, "triggerExecution", triggerExecution))
-                .retrieveMono(TriggerOutput.class)
+                .retrieveMono(Object.class)
                 .toFuture()
                 .get();
         } catch (ExecutionException | InterruptedException e) {
