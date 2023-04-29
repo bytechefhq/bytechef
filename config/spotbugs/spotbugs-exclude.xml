@@ -11,26 +11,9 @@
         <!-- TODO Review this issues -->
         <Bug code="EI2" />
         <Or>
-            <Class name="com.bytechef.atlas.service.ContextServiceIntTest" />
-            <Class name="com.bytechef.atlas.service.CounterService" />
-            <Class name="com.bytechef.atlas.service.JobService" />
             <Class name="com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport" />
             <Class name="com.bytechef.hermes.registry.InMemoryDefinitionRegistry" />
             <Class name="com.bytechef.hermes.registry.DefinitionRegistryChain" />
-            <Class name="com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain" />
-            <Class name="com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain" />
-            <Class name="com.bytechef.atlas.repository.jdbc.JdbcWorkflowRepository" />
-            <Class name="com.bytechef.atlas.coordinator.job.executor.DefaultJobExecutor" />
-            <Class name="com.bytechef.atlas.repository.jdbc.JdbcJobRepository" />
-            <Class name="com.bytechef.atlas.repository.jdbc.JdbcContextRepository" />
-            <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
-            <Class name="com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler" />
-            <Class name="com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain" />
-            <Class name="com.bytechef.atlas.message.broker.jms.JmsMessageBroker" />
-            <Class name="com.bytechef.atlas.message.broker.kafka.KafkaMessageBroker" />
-            <Class name="com.bytechef.atlas.repository.jdbc.JdbcCounterRepository" />
-            <Class name="com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver" />
-            <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
             <Class name="com.bytechef.hermes.component.domain.Connection" />
             <Class name="com.bytechef.hermes.description.accessor.InMemoryConnectionDescriptorResolver" />
             <Class name="com.bytechef.hermes.description.accessor.ComponentDescriptorDescriptorResolverChain" />
@@ -67,16 +50,6 @@
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDisplay" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDefinition" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ConnectionDefinition" />
-            <Class name="com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory" />
-            <Class name="com.bytechef.atlas.domain.Counter" />
-            <Class name="com.bytechef.atlas.domain.Context"/>
-            <Class name="com.bytechef.atlas.task.WorkflowTask" />
-            <Class name="com.bytechef.atlas.domain.Workflow" />
-            <Class name="com.bytechef.atlas.domain.TaskExecution"/>
-            <Class name="com.bytechef.atlas.domain.Job"/>
-            <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties"/>
-            <Class name="com.bytechef.atlas.service.ContextService"/>
-            <Class name="com.bytechef.atlas.service.WorkflowService"/>
         </Or>
     </Match>
     <Match>

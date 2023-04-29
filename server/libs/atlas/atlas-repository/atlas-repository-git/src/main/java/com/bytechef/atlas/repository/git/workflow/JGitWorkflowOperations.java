@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
@@ -67,6 +68,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     private final String username;
     private final String password;
 
+    @SuppressFBWarnings("EI")
     public JGitWorkflowOperations(String url, String branch, String[] searchPaths, String username, String password) {
         this.url = url;
         this.branch = branch;

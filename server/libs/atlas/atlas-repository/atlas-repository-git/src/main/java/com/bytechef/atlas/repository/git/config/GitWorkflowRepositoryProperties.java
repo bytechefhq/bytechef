@@ -19,6 +19,7 @@
 
 package com.bytechef.atlas.repository.git.config;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -38,47 +39,48 @@ public class GitWorkflowRepositoryProperties {
         return url;
     }
 
-    public void setUrl(String aUrl) {
-        url = aUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String[] getSearchPaths() {
         return searchPaths;
     }
 
-    public void setSearchPaths(String[] aSearchPaths) {
-        searchPaths = aSearchPaths;
+    @SuppressFBWarnings("EI")
+    public void setSearchPaths(String[] searchPaths) {
+        this.searchPaths = searchPaths;
     }
 
     public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean aEnabled) {
-        enabled = aEnabled;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getBranch() {
         return branch;
     }
 
-    public void setBranch(String aBranch) {
-        branch = aBranch;
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String aUsername) {
-        username = aUsername;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String aPassword) {
-        password = aPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
