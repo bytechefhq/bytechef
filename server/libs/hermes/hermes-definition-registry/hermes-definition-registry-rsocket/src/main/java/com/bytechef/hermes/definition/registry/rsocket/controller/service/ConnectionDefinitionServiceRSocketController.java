@@ -85,13 +85,13 @@ public class ConnectionDefinitionServiceRSocketController {
 
     @MessageMapping("ConnectionDefinitionService.getComponentConnectionDefinition")
     public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinition(Map<String, Object> map) {
-        return connectionDefinitionService.getComponentConnectionDefinitionMono(
+        return connectionDefinitionService.getConnectionDefinitionMono(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"));
     }
 
     @MessageMapping("ConnectionDefinitionService.getComponentConnectionDefinitions")
     public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitions(Map<String, Object> map) {
-        return connectionDefinitionService.getComponentConnectionDefinitionsMono(
+        return connectionDefinitionService.getConnectionDefinitionsMono(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"));
     }
 

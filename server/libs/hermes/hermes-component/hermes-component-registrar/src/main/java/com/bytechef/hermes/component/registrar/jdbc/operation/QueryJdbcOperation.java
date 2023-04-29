@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.registrar.jdbc.operation;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
+import com.bytechef.hermes.component.registrar.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants;
 
 import java.sql.ResultSet;

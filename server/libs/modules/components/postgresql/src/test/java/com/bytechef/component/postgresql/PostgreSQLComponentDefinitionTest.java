@@ -17,7 +17,7 @@
 
 package com.bytechef.component.postgresql;
 
-import com.bytechef.hermes.component.registrar.jdbc.task.handler.JdbcComponentHandler;
+import com.bytechef.hermes.component.registrar.jdbc.handler.JdbcComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 

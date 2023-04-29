@@ -19,9 +19,9 @@
 
 package com.bytechef.hermes.workflow.web.rest;
 
-import com.bytechef.atlas.facade.TaskExecutionFacade;
+import com.bytechef.atlas.task.execution.TaskExecutionFacade;
 import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
@@ -51,18 +51,18 @@ import reactor.core.publisher.Mono;
 public class JobController implements JobsApi {
 
     private final ConversionService conversionService;
-    private final JobFacade jobFacade;
+    private final JobFactory jobFactory;
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskExecutionFacade taskExecutionFacade;
 
     @SuppressFBWarnings("EI2")
     public JobController(
-        ConversionService conversionService, JobFacade jobFacade, JobService jobService,
+        ConversionService conversionService, JobFactory jobFactory, JobService jobService,
         MessageBroker messageBroker, TaskExecutionFacade taskExecutionFacade) {
 
         this.conversionService = conversionService;
-        this.jobFacade = jobFacade;
+        this.jobFactory = jobFactory;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
         this.taskExecutionFacade = taskExecutionFacade;
@@ -75,7 +75,7 @@ public class JobController implements JobsApi {
         return jobParametersModelMono
             .map(jobParametersModel -> new CreateJob200ResponseModel()
                 .jobId(
-                    jobFacade.create(
+                    jobFactory.create(
                         conversionService.convert(jobParametersModel, JobParameters.class))))
             .map(ResponseEntity::ok);
     }

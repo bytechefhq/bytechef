@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Ivica Cardic
@@ -46,22 +47,41 @@ public class TriggerDefinitionServiceRSocketClient implements TriggerDefinitionS
     }
 
     @Override
-    public Mono<TriggerDefinitionDTO> getComponentTriggerDefinitionMono(
+    public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
+        try {
+            return getRSocketRequester(componentName)
+                .route("TriggerDefinitionService.getTriggerDefinition")
+                .data(
+                    Map.of(
+                        "componentName", componentName, "componentVersion", componentVersion,
+                        "triggerName", triggerName))
+                .retrieveMono(TriggerDefinitionDTO.class)
+                .toFuture()
+                .get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(
         String componentName, int componentVersion, String triggerName) {
 
         return getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.getComponentTriggerDefinition")
+            .route("TriggerDefinitionService.getTriggerDefinition")
             .data(
-                Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", triggerName))
+                Map.of(
+                    "componentName", componentName, "componentVersion", componentVersion,
+                    "triggerName", triggerName))
             .retrieveMono(TriggerDefinitionDTO.class);
     }
 
     @Override
-    public Mono<List<TriggerDefinitionDTO>> getComponentTriggerDefinitions(
+    public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitions(
         String componentName, int componentVersion) {
 
         return getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.getComponentTriggerDefinitions")
+            .route("TriggerDefinitionService.getTriggerDefinitions")
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(new ParameterizedTypeReference<>() {});

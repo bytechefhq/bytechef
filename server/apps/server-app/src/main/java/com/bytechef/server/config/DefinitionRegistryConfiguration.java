@@ -21,14 +21,17 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.LocalComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
@@ -81,6 +84,14 @@ public class DefinitionRegistryConfiguration {
                 .stream()
                 .map(TaskDispatcherDefinitionFactory::getDefinition)
                 .toList());
+    }
+
+    @Bean
+    TriggerDefinitionFacade triggerDefinitionFacade(
+        LocalComponentDefinitionService componentDefinitionService,
+        ConnectionDefinitionService connectionDefinitionService) {
+
+        return new TriggerDefinitionFacadeImpl(componentDefinitionService, connectionDefinitionService);
     }
 
     @Bean
