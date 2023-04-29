@@ -20,18 +20,20 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets TriggerType
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-27T08:00:36.899199+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-28T19:34:07.283252+02:00[Europe/Zagreb]")
 public enum TriggerTypeModel {
   
-  DYNAMIC_WEBHOOK("DYNAMIC_WEBHOOK"),
+  HYBRID_DYNAMIC("HYBRID_DYNAMIC"),
   
-  HYBRID("HYBRID"),
+  HYBRID_STATIC("HYBRID_STATIC"),
   
   LISTENER("LISTENER"),
   
   POLLING("POLLING"),
   
-  STATIC_WEBHOOK("STATIC_WEBHOOK");
+  WEBHOOK_DYNAMIC("WEBHOOK_DYNAMIC"),
+  
+  WEBHOOK_STATIC("WEBHOOK_STATIC");
 
   private String value;
 
