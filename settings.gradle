@@ -106,6 +106,8 @@ include("server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem-s
 include("server:libs:hermes:hermes-service")
 include("server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-api")
 include("server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-test-int-support")
+include("server:libs:hermes:hermes-trigger-executor:hermes-trigger-executor-api")
+include("server:libs:hermes:hermes-trigger-executor:hermes-trigger-executor-impl")
 include("server:libs:hermes:hermes-webhook-rest")
 include("server:libs:hermes:hermes-worker:hermes-worker-api")
 include("server:libs:hermes:hermes-worker:hermes-worker-impl")

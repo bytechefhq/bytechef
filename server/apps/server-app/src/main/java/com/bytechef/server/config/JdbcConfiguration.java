@@ -34,6 +34,8 @@ import com.bytechef.hermes.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.hermes.converter.StringToWorkflowTriggerConverter;
 import com.bytechef.hermes.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.hermes.converter.WorkflowTriggerToStringConverter;
+import com.bytechef.hermes.data.storage.converter.DataStorageValueToStringConverter;
+import com.bytechef.hermes.data.storage.converter.StringToDataStorageValueConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -79,11 +81,13 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
+            new DataStorageValueToStringConverter(objectMapper),
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
             new MapListWrapperToStringConverter(objectMapper),
+            new StringToDataStorageValueConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
             new StringToMapListWrapperConverter(objectMapper),
