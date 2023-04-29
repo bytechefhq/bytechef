@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,17 +34,20 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class WorkflowTrigger {
+public class WorkflowTrigger implements Serializable, Trigger {
 
     static {
         MapValueUtils.addConverter(new WorkflowTriggerConverter());
     }
 
+    private String componentName;
+    private int componentVersion;
     private String name;
     private String label;
     private Map<String, Object> parameters;
     private String timeout;
     private String type;
+    private String triggerName;
 
     private WorkflowTrigger() {
     }
@@ -68,6 +72,12 @@ public class WorkflowTrigger {
         }
 
         this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
+
+        String[] typeItems = type.split("/");
+
+        this.componentName = typeItems[0];
+        this.componentVersion = Integer.parseInt(typeItems[1].replace("v", ""));
+        this.triggerName = typeItems[2];
     }
 
     @Override
@@ -100,6 +110,14 @@ public class WorkflowTrigger {
         return Objects.hash(label, name, parameters, timeout, type);
     }
 
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getComponentVersion() {
+        return componentVersion;
+    }
+
     public String getName() {
         return name;
     }
@@ -114,6 +132,10 @@ public class WorkflowTrigger {
 
     public String getTimeout() {
         return timeout;
+    }
+
+    public String getTriggerName() {
+        return triggerName;
     }
 
     public String getType() {

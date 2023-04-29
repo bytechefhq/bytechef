@@ -24,6 +24,8 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.hermes.data.storage.converter.DataStorageValueToStringConverter;
+import com.bytechef.hermes.data.storage.converter.StringToDataStorageValueConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
@@ -69,10 +71,12 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
+            new DataStorageValueToStringConverter(objectMapper),
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new MapWrapperToStringConverter(objectMapper),
             new MapListWrapperToStringConverter(objectMapper),
+            new StringToDataStorageValueConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
             new StringToMapListWrapperConverter(objectMapper));
     }
