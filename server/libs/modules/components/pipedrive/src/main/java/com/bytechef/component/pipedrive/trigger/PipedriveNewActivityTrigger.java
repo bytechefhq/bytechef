@@ -44,7 +44,7 @@ public class PipedriveNewActivityTrigger {
     public static final TriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("newActivity")
         .title("New Activity")
         .description("Trigger off whenever a new activity is added.")
-        .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerDefinition.TriggerType.WEBHOOK_DYNAMIC)
         .outputSchema(
             object()
                 .properties(

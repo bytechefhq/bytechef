@@ -44,7 +44,7 @@ public class PipedriveUpdatedOrganizationTrigger {
     public static final TriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("updatedOrganization")
         .title("Updated Organization")
         .description("Trigger off whenever an existing organization is updated.")
-        .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerDefinition.TriggerType.WEBHOOK_DYNAMIC)
         .outputSchema(
             object()
                 .properties(

@@ -140,7 +140,7 @@
     "properties": null,
     "staticWebhookRequest": { },
     "title": "Auto Respond with HTTP 200 status",
-    "type": "STATIC_WEBHOOK",
+    "type": "WEBHOOK_STATIC",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null
@@ -291,7 +291,7 @@
     } ],
     "staticWebhookRequest": { },
     "title": "Validate and respond",
-    "type": "STATIC_WEBHOOK",
+    "type": "WEBHOOK_STATIC",
     "webhookBodyRaw": null,
     "webhookValidate": { },
     "workflowSyncExecution": null
@@ -460,7 +460,7 @@
     } ],
     "staticWebhookRequest": { },
     "title": "Await workflow and respond",
-    "type": "STATIC_WEBHOOK",
+    "type": "WEBHOOK_STATIC",
     "webhookBodyRaw": null,
     "webhookValidate": { },
     "workflowSyncExecution": true
