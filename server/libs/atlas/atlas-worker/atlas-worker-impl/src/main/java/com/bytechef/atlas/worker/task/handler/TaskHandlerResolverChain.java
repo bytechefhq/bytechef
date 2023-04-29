@@ -20,8 +20,9 @@
 package com.bytechef.atlas.worker.task.handler;
 
 import com.bytechef.atlas.task.Task;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -44,6 +45,6 @@ public class TaskHandlerResolverChain implements TaskHandlerResolver {
     }
 
     public void setTaskHandlerResolvers(List<TaskHandlerResolver> taskHandlerResolvers) {
-        this.taskHandlerResolvers = Objects.requireNonNull(taskHandlerResolvers);
+        this.taskHandlerResolvers = new ArrayList<>(taskHandlerResolvers);
     }
 }

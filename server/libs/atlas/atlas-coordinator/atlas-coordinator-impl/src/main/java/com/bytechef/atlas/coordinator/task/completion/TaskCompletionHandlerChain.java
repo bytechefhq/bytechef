@@ -20,6 +20,8 @@
 package com.bytechef.atlas.coordinator.task.completion;
 
 import com.bytechef.atlas.domain.TaskExecution;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,6 +46,6 @@ public class TaskCompletionHandlerChain implements TaskCompletionHandler {
     }
 
     public void setTaskCompletionHandlers(List<TaskCompletionHandler> taskCompletionHandlers) {
-        this.taskCompletionHandlers = taskCompletionHandlers;
+        this.taskCompletionHandlers = new ArrayList<>(taskCompletionHandlers);
     }
 }
