@@ -17,7 +17,7 @@
 
 package com.bytechef.component.schedule.trigger;
 
-import com.bytechef.component.schedule.config.ScheduleConfiguration;
+import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -31,7 +31,7 @@ import java.time.ZoneId;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bytechef.component.schedule.config.ScheduleConfiguration.SCHEDULE_RECURRING_TASK;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE_RECURRING_TASK;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DAY_OF_WEEK;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.HOUR;
@@ -124,7 +124,7 @@ public class ScheduleEveryDayTrigger {
     protected void listenerEnable(
         Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
-        CronSchedule cron = new CronSchedule(
+        CronSchedule cronSchedule = new CronSchedule(
             "0 %s %s ? * %s".formatted(
                 inputParameters.getInteger(MINUTE), inputParameters.getInteger(HOUR),
                 inputParameters.getMap(DAY_OF_WEEK)
@@ -138,15 +138,15 @@ public class ScheduleEveryDayTrigger {
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
                 workflowExecutionId,
-                new ScheduleConfiguration.WorkflowScheduleAndData(
-                    cron,
+                new WorkflowScheduleAndData(
+                    cronSchedule,
                     Map.of(
                         HOUR, inputParameters.getInteger(HOUR),
                         MINUTE, inputParameters.getInteger(MINUTE),
                         DAY_OF_WEEK, inputParameters.getMap(DAY_OF_WEEK),
                         TIMEZONE, inputParameters.getString(TIMEZONE)),
                     workflowExecutionId)),
-            cron.getInitialExecutionTime(Instant.now()));
+            cronSchedule.getInitialExecutionTime(Instant.now()));
     }
 
     protected void listenerDisable(

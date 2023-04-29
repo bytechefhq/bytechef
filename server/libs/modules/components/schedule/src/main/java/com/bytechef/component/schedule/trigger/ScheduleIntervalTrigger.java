@@ -17,7 +17,7 @@
 
 package com.bytechef.component.schedule.trigger;
 
-import com.bytechef.component.schedule.config.ScheduleConfiguration;
+import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -30,7 +30,7 @@ import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
 import java.time.Instant;
 import java.util.Map;
 
-import static com.bytechef.component.schedule.config.ScheduleConfiguration.SCHEDULE_RECURRING_TASK;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE_RECURRING_TASK;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.INTERVAL;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIME_UNIT;
@@ -98,7 +98,7 @@ public class ScheduleIntervalTrigger {
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
                 workflowExecutionId,
-                new ScheduleConfiguration.WorkflowScheduleAndData(
+                new WorkflowScheduleAndData(
                     cron,
                     Map.of(
                         INTERVAL, inputParameters.getInteger(INTERVAL),
