@@ -22,7 +22,6 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -46,9 +45,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 })
 @SpringBootConfiguration
 public class ProjectIntTestConfiguration {
-
-    @MockBean
-    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private ConnectionService connectionService;
