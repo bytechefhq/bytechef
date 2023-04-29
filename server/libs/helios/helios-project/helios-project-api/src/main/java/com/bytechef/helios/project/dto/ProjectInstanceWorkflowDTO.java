@@ -33,7 +33,7 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ProjectInstanceWorkflowDTO(
     List<Long> connectionIds, List<Connection> connections, String createdBy, LocalDateTime createdDate,
-    boolean enabled, Long id, Map<String, Object> inputParameters, LocalDateTime lastExecutionDate,
+    boolean enabled, Long id, Map<String, Object> inputs, LocalDateTime lastExecutionDate,
     String lastModifiedBy, LocalDateTime lastModifiedDate, ProjectInstance projectInstance, Long projectInstanceId,
     int version, String workflowId) {
 
@@ -61,7 +61,7 @@ public record ProjectInstanceWorkflowDTO(
         projectInstanceWorkflow.setConnectionIds(connectionIds);
         projectInstanceWorkflow.setEnabled(enabled);
         projectInstanceWorkflow.setId(id);
-        projectInstanceWorkflow.setInputs(inputParameters);
+        projectInstanceWorkflow.setInputs(inputs);
         projectInstanceWorkflow.setLastExecutionDate(lastExecutionDate);
         projectInstanceWorkflow.setProjectInstanceId(projectInstanceId);
         projectInstanceWorkflow.setVersion(version);
@@ -77,7 +77,7 @@ public record ProjectInstanceWorkflowDTO(
         private LocalDateTime createdDate;
         private boolean enabled;
         private Long id;
-        private Map<String, Object> inputParameters;
+        private Map<String, Object> inputs;
         private LocalDateTime lastExecutionDate;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
@@ -119,8 +119,8 @@ public record ProjectInstanceWorkflowDTO(
             return this;
         }
 
-        public Builder inputParameters(Map<String, Object> inputParameters) {
-            this.inputParameters = inputParameters;
+        public Builder inputs(Map<String, Object> inputs) {
+            this.inputs = inputs;
             return this;
         }
 
@@ -161,7 +161,7 @@ public record ProjectInstanceWorkflowDTO(
 
         public ProjectInstanceWorkflowDTO build() {
             return new ProjectInstanceWorkflowDTO(
-                connectionIds, connections, createdBy, createdDate, enabled, id, inputParameters, lastExecutionDate,
+                connectionIds, connections, createdBy, createdDate, enabled, id, inputs, lastExecutionDate,
                 lastModifiedBy, lastModifiedDate, projectInstance, projectInstanceId, version, workflowId);
         }
     }
