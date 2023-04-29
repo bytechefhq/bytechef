@@ -81,7 +81,8 @@ public class TriggerWorker {
 
         Future<?> future = executorService.submit(() -> {
             try {
-                eventPublisher.publishEvent(new TriggerStartedWorkflowEvent(triggerExecution.getId()));
+                eventPublisher.publishEvent(new TriggerStartedWorkflowEvent(
+                    Objects.requireNonNull(triggerExecution.getId())));
 
                 TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
 
@@ -140,7 +141,7 @@ public class TriggerWorker {
     private TriggerExecution doExecuteTrigger(TriggerExecution triggerExecution) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        TriggerHandler triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
+        TriggerHandler<?> triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
 
         Object output = triggerHandler.handle(triggerExecution.clone());
 

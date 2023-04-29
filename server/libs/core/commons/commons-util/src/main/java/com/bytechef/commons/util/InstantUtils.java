@@ -15,21 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.service;
+package com.bytechef.commons.util;
 
-import com.bytechef.hermes.data.storage.domain.DataStorage;
-import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
-
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStorageService {
+public class InstantUtils {
 
-    <T> Optional<T> fetchValue(Scope scope, long scopeId, String key);
-
-    DataStorage getDataStorage(long id);
-
-    void save(Scope scope, Long scopeId, String key, Object value);
+    public static Instant getInstant(LocalDateTime localDateTime) {
+        return Instant.ofEpochMilli(LocalDateTimeUtils.getTime(localDateTime));
+    }
 }
