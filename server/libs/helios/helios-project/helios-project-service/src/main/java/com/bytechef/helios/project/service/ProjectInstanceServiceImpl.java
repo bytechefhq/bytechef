@@ -52,7 +52,7 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
         Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be empty");
         Assert.notNull(projectInstance.getName(), "'projectId' must not be empty");
 
-        projectInstance.setStatus(Status.DISABLED);
+        projectInstance.setStatus(Status.ENABLED);
 
         return projectInstanceRepository.save(projectInstance);
     }
