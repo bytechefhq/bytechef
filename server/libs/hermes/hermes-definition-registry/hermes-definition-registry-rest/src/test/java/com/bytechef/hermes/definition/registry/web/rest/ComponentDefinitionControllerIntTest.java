@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.web.rest;
 
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import com.bytechef.hermes.definition.registry.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;

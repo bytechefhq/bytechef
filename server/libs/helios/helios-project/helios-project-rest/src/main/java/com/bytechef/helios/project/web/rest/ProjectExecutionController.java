@@ -18,7 +18,7 @@
 package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.helios.project.ProjectFacade;
+import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.helios.project.web.rest.model.ProjectExecutionBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -17,7 +17,7 @@
 
 package com.bytechef.dione.integration.web.rest;
 
-import com.bytechef.dione.integration.IntegrationFacade;
+import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.dione.integration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.tag.domain.Tag;
 import org.junit.jupiter.api.Assertions;

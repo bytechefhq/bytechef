@@ -24,7 +24,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.data.storage.domain.DataStorage;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
-import com.bytechef.hermes.definition.registry.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.trigger.executor.data.TriggerScheduleAndData;
