@@ -41,7 +41,6 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class IntegrationController implements IntegrationsApi {
 

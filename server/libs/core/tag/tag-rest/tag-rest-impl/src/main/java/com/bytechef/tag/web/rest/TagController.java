@@ -17,7 +17,6 @@
 
 package com.bytechef.tag.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.tag.web.rest.model.TagModel;
@@ -34,7 +33,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class TagController implements TagsApi {
 

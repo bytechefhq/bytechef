@@ -21,7 +21,6 @@ import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.context.ApplicationContext;
@@ -32,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnWorker
+
 public class TaskWorkerMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;

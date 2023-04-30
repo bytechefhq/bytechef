@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
@@ -34,7 +33,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionsApi {
 

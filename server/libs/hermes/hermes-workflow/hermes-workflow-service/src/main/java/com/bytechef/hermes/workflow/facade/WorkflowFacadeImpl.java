@@ -23,7 +23,6 @@ import com.bytechef.atlas.domain.Workflow.SourceType;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.workflow.WorkflowDTO;
-import com.bytechef.hermes.workflow.facade.WorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 
