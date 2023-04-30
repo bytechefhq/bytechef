@@ -25,11 +25,11 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
-import com.bytechef.helios.project.ProjectInstanceFacade;
+import com.bytechef.helios.project.facade.ProjectInstanceFacade;
 import com.bytechef.helios.project.web.rest.config.ProjectRestTestConfiguration;
 import com.bytechef.helios.project.web.rest.mapper.ProjectMapper;
 import com.bytechef.helios.project.dto.ProjectDTO;
-import com.bytechef.helios.project.ProjectFacade;
+import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.helios.project.web.rest.model.CreateProjectWorkflowRequestModel;
