@@ -27,23 +27,23 @@ import java.util.Map;
 public interface TriggerDefinitionFacade {
 
     void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId,
         DynamicWebhookEnableOutput output);
 
     DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String webhookUrl,
         String workflowExecutionId);
 
     DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output);
+        String triggerName, String componentName, int componentVersion, DynamicWebhookEnableOutput output);
 
     void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId);
 
     void executeListenerEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId);
 }

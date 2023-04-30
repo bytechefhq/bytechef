@@ -44,6 +44,7 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest:hermes-connection-rest-impl")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-service")
+    implementation project(":server:libs:hermes:hermes-trigger-executor:hermes-trigger-executor-impl")
     implementation project(":server:libs:hermes:hermes-worker:hermes-worker-rsocket-client")
     implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest:hermes-workflow-rest-impl")
     implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-service")

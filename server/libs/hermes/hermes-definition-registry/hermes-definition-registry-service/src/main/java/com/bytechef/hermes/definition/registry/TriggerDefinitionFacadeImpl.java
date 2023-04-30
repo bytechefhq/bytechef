@@ -24,8 +24,8 @@ import com.bytechef.hermes.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.definition.registry.service.LocalComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -38,12 +38,12 @@ import static com.bytechef.hermes.component.definition.TriggerDefinition.*;
  */
 public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
-    private final LocalComponentDefinitionService componentDefinitionService;
+    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectionDefinitionService connectionDefinitionService;
 
     @SuppressFBWarnings("EI2")
     public TriggerDefinitionFacadeImpl(
-        LocalComponentDefinitionService componentDefinitionService,
+        ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService) {
 
         this.componentDefinitionService = componentDefinitionService;
@@ -52,7 +52,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId,
         DynamicWebhookEnableOutput output) {
 
@@ -71,7 +71,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String webhookUrl,
         String workflowExecutionId) {
 
@@ -90,7 +90,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
+        String triggerName, String componentName, int componentVersion, DynamicWebhookEnableOutput output) {
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             componentName, componentVersion);
@@ -105,7 +105,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId) {
 
         Definitions definitions = getDefinitions(componentName, componentVersion, triggerName);
@@ -121,7 +121,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public void executeListenerEnable(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> connectionParameters,
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId) {
 
         Definitions definitions = getDefinitions(componentName, componentVersion, triggerName);

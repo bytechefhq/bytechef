@@ -31,7 +31,6 @@ import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServic
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.service.LocalComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
@@ -88,7 +87,7 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TriggerDefinitionFacade triggerDefinitionFacade(
-        LocalComponentDefinitionService componentDefinitionService,
+        ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService) {
 
         return new TriggerDefinitionFacadeImpl(componentDefinitionService, connectionDefinitionService);

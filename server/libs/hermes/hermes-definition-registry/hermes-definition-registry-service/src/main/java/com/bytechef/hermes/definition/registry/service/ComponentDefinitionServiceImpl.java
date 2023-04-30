@@ -41,7 +41,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 /**
  * @author Ivica Cardic
  */
-public class ComponentDefinitionServiceImpl implements ComponentDefinitionService, LocalComponentDefinitionService {
+public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
         .title("Manual")

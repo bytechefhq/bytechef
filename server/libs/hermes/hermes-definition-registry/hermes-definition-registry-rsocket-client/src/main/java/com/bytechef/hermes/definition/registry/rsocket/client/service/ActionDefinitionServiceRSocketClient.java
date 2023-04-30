@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
-import com.bytechef.commons.rsocket.util.RSocketUtils;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.rsocket.AbstractRSocketClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,18 +31,13 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ActionDefinitionServiceRSocketClient implements ActionDefinitionService {
-
-    private static final String WORKER_SERVICE_APP = "worker-service-app";
-
-    private final DiscoveryClient discoveryClient;
-    private final RSocketRequester.Builder rSocketRequesterBuilder;
+public class ActionDefinitionServiceRSocketClient extends AbstractRSocketClient
+    implements ActionDefinitionService {
 
     public ActionDefinitionServiceRSocketClient(
         DiscoveryClient discoveryClient, RSocketRequester.Builder rSocketRequesterBuilder) {
 
-        this.discoveryClient = discoveryClient;
-        this.rSocketRequesterBuilder = rSocketRequesterBuilder;
+        super(discoveryClient, rSocketRequesterBuilder);
     }
 
     @Override
@@ -65,10 +60,5 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(new ParameterizedTypeReference<>() {});
-    }
-
-    private RSocketRequester getRSocketRequester(String componentName) {
-        return RSocketUtils.getRSocketRequester(
-            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, rSocketRequesterBuilder);
     }
 }
