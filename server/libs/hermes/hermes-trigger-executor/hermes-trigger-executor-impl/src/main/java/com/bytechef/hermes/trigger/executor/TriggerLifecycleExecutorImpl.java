@@ -83,8 +83,9 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
         switch (triggerDefinition.type()) {
             case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {
                 triggerDefinitionFacade.executeDynamicWebhookDisable(
-                    workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
-                    workflowTrigger.getTriggerName(), connection == null ? Map.of() : connection.getParameters(),
+                    workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
+                    workflowTrigger.getComponentVersion(),
+                    connection == null ? Map.of() : connection.getParameters(),
                     connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                     workflowExecutionId.toString(), output);
 
@@ -93,8 +94,9 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                         TRIGGER_DYNAMIC_WEBHOOK_REFRESH_ONE_TIME_TASK.getTaskName(), workflowExecutionId.toString()));
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
-                workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
-                workflowTrigger.getTriggerName(), connection == null ? Map.of() : connection.getParameters(),
+                workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
+                workflowTrigger.getComponentVersion(),
+                connection == null ? Map.of() : connection.getParameters(),
                 connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                 workflowExecutionId.toString());
             case POLLING -> schedulerClient.cancel(
@@ -116,8 +118,9 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
         switch (triggerDefinition.type()) {
             case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {
                 DynamicWebhookEnableOutput output = triggerDefinitionFacade.executeDynamicWebhookEnable(
-                    workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
-                    workflowTrigger.getTriggerName(), connection == null ? Map.of() : connection.getParameters(),
+                    workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
+                    workflowTrigger.getComponentVersion(),
+                    connection == null ? Map.of() : connection.getParameters(),
                     connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                     createWebhookUrl(workflowExecutionId), workflowExecutionId.toString());
 
@@ -136,8 +139,9 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                 }
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerEnable(
-                workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
-                workflowTrigger.getTriggerName(), connection == null ? Map.of() : connection.getParameters(),
+                workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
+                workflowTrigger.getComponentVersion(),
+                connection == null ? Map.of() : connection.getParameters(),
                 connection == null ? null : connection.getAuthorizationName(), workflowTrigger.getParameters(),
                 workflowExecutionId.toString());
             case POLLING -> {

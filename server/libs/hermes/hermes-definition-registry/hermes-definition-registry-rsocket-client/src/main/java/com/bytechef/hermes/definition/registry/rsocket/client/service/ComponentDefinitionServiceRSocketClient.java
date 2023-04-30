@@ -19,7 +19,9 @@ package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.discovery.util.DiscoveryUtils;
 import com.bytechef.commons.rsocket.util.RSocketUtils;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.rsocket.AbstractRSocketClient;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -34,18 +36,18 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ComponentDefinitionServiceRSocketClient implements ComponentDefinitionService {
-
-    private static final String WORKER_SERVICE_APP = "worker-service-app";
-
-    private final DiscoveryClient discoveryClient;
-    private final RSocketRequester.Builder rSocketRequesterBuilder;
+public class ComponentDefinitionServiceRSocketClient extends AbstractRSocketClient
+    implements ComponentDefinitionService {
 
     public ComponentDefinitionServiceRSocketClient(
         DiscoveryClient discoveryClient, RSocketRequester.Builder rSocketRequesterBuilder) {
 
-        this.discoveryClient = discoveryClient;
-        this.rSocketRequesterBuilder = rSocketRequesterBuilder;
+        super(discoveryClient, rSocketRequesterBuilder);
+    }
+
+    @Override
+    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -87,10 +89,5 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
             .map(object -> (List<ComponentDefinitionDTO>) object)
             .flatMap(Collection::stream)
             .toList();
-    }
-
-    private RSocketRequester getRSocketRequester(String componentName) {
-        return RSocketUtils.getRSocketRequester(
-            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, rSocketRequesterBuilder);
     }
 }

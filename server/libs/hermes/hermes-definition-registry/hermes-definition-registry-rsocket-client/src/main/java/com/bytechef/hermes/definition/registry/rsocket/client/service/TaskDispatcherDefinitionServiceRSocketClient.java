@@ -35,7 +35,6 @@ public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatc
     private final RSocketRequester rSocketRequester;
 
     public TaskDispatcherDefinitionServiceRSocketClient(RSocketRequester rSocketRequester) {
-
         this.rSocketRequester = rSocketRequester;
     }
 
