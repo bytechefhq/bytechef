@@ -194,23 +194,26 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return false;
     }
 
-    private Boolean containsConnection(WorkflowTask workflowTask, String componentName, int connectionVersion) {
-        return workflowTask
-            .fetchExtension(WorkflowConnection.class)
+    private boolean containsConnection(WorkflowTask workflowTask, String componentName, int connectionVersion) {
+        return WorkflowConnection.of(workflowTask)
+            .values()
+            .stream()
             .map(workflowConnection -> Objects.equals(
-                workflowConnection.componentName(), componentName) &&
-                workflowConnection.connectionVersion() == connectionVersion)
+                workflowConnection.getComponentName(), componentName) &&
+                workflowConnection.getConnectionVersion() == connectionVersion)
+            .findFirst()
             .orElse(false);
+    }
+
+    private static boolean containsTag(Connection connection, Tag tag) {
+        List<Long> curTagIds = connection.getTagIds();
+
+        return curTagIds.contains(tag.getId());
     }
 
     private List<Tag> filterTags(List<Tag> tags, Connection connection) {
         return tags.stream()
-            .filter(
-                tag -> {
-                    List<Long> curTagIds = connection.getTagIds();
-
-                    return curTagIds.contains(tag.getId());
-                })
+            .filter(tag -> containsTag(connection, tag))
             .toList();
     }
 }
