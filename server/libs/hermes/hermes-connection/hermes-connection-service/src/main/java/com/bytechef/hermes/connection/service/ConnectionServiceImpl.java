@@ -115,4 +115,10 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         return connectionRepository.save(connection);
     }
+
+    @Override
+    public Connection getConnection(String componentName, int connectionVersion) {
+        return OptionalUtils.get(
+            connectionRepository.findByComponentNameAndConnectionVersion(componentName, connectionVersion));
+    }
 }
