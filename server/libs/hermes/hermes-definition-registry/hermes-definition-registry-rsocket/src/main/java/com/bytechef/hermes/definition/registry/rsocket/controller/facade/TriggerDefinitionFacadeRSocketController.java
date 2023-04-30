@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.controller.facade;
 
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,8 +26,6 @@ import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-
-import static com.bytechef.hermes.component.definition.TriggerDefinition.*;
 
 /**
  * @author Ivica Cardic
