@@ -19,7 +19,6 @@ package com.bytechef.hermes.coordinator.config;
 
 import com.bytechef.hermes.coordinator.TriggerCoordinator;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
@@ -30,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnCoordinator
+
 public class TriggerCoordinatorMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;

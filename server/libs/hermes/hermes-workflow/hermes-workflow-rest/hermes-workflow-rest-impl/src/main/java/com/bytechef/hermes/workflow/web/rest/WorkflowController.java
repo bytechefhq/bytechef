@@ -26,7 +26,6 @@ import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
 import com.bytechef.hermes.workflow.facade.WorkflowFacade;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowResponseModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -46,7 +45,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class WorkflowController implements WorkflowsApi {
 

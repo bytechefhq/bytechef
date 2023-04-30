@@ -21,7 +21,6 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class TaskExecutionController implements TaskExecutionsApi {
 
