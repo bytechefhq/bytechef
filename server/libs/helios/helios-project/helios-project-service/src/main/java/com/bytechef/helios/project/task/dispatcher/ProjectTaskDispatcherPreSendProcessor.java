@@ -21,7 +21,9 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.JobService;
+import com.bytechef.helios.project.constant.ProjectConstants;
 import com.bytechef.helios.project.service.ProjectInstanceService;
+import com.bytechef.hermes.constant.MetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -46,14 +48,13 @@ public class ProjectTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
     @SuppressFBWarnings("NP")
     public TaskExecution process(TaskExecution taskExecution) {
         projectInstanceService.fetchJobProjectInstance(Objects.requireNonNull(taskExecution.getJobId()))
-            .ifPresent(
-                projectInstance -> taskExecution
-                    .putMetadata("instanceId", projectInstance.getId())
-                    .putMetadata("instanceType", "PROJECT"));
+            .ifPresent(projectInstance -> taskExecution
+                .putMetadata(MetadataConstants.INSTANCE_ID, projectInstance.getId())
+                .putMetadata(MetadataConstants.INSTANCE_TYPE, ProjectConstants.PROJECT));
 
         Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
 
-        taskExecution.putMetadata("workflowId", job.getWorkflowId());
+        taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;
     }
