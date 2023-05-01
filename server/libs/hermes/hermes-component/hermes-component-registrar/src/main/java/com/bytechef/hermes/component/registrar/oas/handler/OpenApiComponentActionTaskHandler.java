@@ -27,6 +27,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.registrar.oas.OpenApiClient;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
+import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -64,7 +65,7 @@ public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         ActionContext context = new ContextImpl(
             connectionDefinitionService, connectionService, eventPublisher, fileStorageService,
-            taskExecution.getParameters(), taskExecution.getId());
+            taskExecution.getId(), WorkflowConnection.of(taskExecution.getWorkflowTask()));
 
         return ComponentContextSupplier.get(
             context, openApiComponentHandler.getDefinition(),
