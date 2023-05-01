@@ -87,7 +87,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(1)
-                .workflowTask(new WorkflowTask(iteratee))
+                .workflowTask(WorkflowTask.of(iteratee))
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(

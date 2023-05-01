@@ -64,7 +64,7 @@ public class BranchTaskDispatcherTest {
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskExecutionService);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            new WorkflowTask(
+            WorkflowTask.of(
                 Map.of(
                     WorkflowConstants.TYPE, "type",
                     WorkflowConstants.PARAMETERS,
@@ -79,7 +79,7 @@ public class BranchTaskDispatcherTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(2L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "print")))
+                    .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "print")))
                     .build());
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
@@ -101,7 +101,7 @@ public class BranchTaskDispatcherTest {
             contextService, messageBroker, taskDispatcher, taskExecutionService);
         TaskExecution taskExecution = TaskExecution.builder().id(
             1L).workflowTask(
-            new WorkflowTask(
+            WorkflowTask.of(
                 Map.of(
                     WorkflowConstants.TYPE, "type",
                     WorkflowConstants.PARAMETERS,
@@ -124,7 +124,7 @@ public class BranchTaskDispatcherTest {
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             contextService, messageBroker, taskDispatcher, taskExecutionService);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            new WorkflowTask(
+            WorkflowTask.of(
                 Map.of(
                     WorkflowConstants.TYPE, "type",
                     WorkflowConstants.PARAMETERS,
@@ -140,7 +140,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder().id(2L).workflowTask(new WorkflowTask(Map.of("type", "sleep"))).build());
+            .thenReturn(TaskExecution.builder().id(2L).workflowTask(WorkflowTask.of(Map.of("type", "sleep"))).build());
 
         branchTaskDispatcher.dispatch(taskExecution);
 
@@ -162,7 +162,7 @@ public class BranchTaskDispatcherTest {
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
-                new WorkflowTask(
+                WorkflowTask.of(
                     Map.of(
                         WorkflowConstants.TYPE, "type",
                         WorkflowConstants.PARAMETERS,
