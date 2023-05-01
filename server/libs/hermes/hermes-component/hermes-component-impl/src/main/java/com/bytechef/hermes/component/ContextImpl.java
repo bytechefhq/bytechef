@@ -21,6 +21,7 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -30,8 +31,6 @@ import org.springframework.core.convert.converter.Converter;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.bytechef.hermes.component.definition.ConnectionDefinition.CONNECTION_ID;
 
 /**
  * @author Ivica Cardic
@@ -46,34 +45,57 @@ public class ContextImpl implements ActionContext, TriggerContext {
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
-    private final Map<String, Object> parameters;
     private final Long taskExecutionId;
+    private final Map<String, WorkflowConnection> workflowConnectionMap;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        EventPublisher eventPublisher, FileStorageService fileStorageService, Map<String, Object> parameters,
-        Long taskExecutionId) {
+        EventPublisher eventPublisher, FileStorageService fileStorageService, Long taskExecutionId,
+        Map<String, WorkflowConnection> workflowConnectionMap) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
-        this.parameters = parameters;
         this.taskExecutionId = taskExecutionId;
+        this.workflowConnectionMap = workflowConnectionMap;
     }
 
     @Override
     public Optional<Connection> fetchConnection() {
-        return Optional.ofNullable(MapValueUtils.getLong(parameters, CONNECTION_ID))
-            .map(connectionService::getConnection)
+        return Optional.ofNullable(workflowConnectionMap.entrySet()
+            .iterator()
+            .next()
+            .getValue())
+            .map(this::getConnection)
+            .map(this::toContextConnection);
+    }
+
+    @Override
+    public Optional<Connection> fetchConnection(String name) {
+        return Optional.ofNullable(workflowConnectionMap.get(name))
+            .map(this::getConnection)
             .map(this::toContextConnection);
     }
 
     @Override
     public Connection getConnection() {
-        return toContextConnection(
-            connectionService.getConnection(MapValueUtils.getLong(parameters, CONNECTION_ID)));
+        WorkflowConnection workflowConnection = workflowConnectionMap.entrySet()
+            .iterator()
+            .next()
+            .getValue();
+
+        if (workflowConnection == null) {
+            throw new IllegalStateException("Connection is not defined");
+        }
+
+        return toContextConnection(getConnection(workflowConnection));
+    }
+
+    @Override
+    public Connection getConnection(String name) {
+        return toContextConnection(getConnection(workflowConnectionMap.get(name)));
     }
 
     @Override
@@ -107,11 +129,16 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    private static FileEntry toContextFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
+    private com.bytechef.hermes.connection.domain.Connection getConnection(WorkflowConnection workflowConnection) {
+        return connectionService.getConnection(
+            workflowConnection.getComponentName(), workflowConnection.getConnectionVersion());
+    }
+
+    private FileEntry toContextFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
         return new ContextFileEntry(fileEntry);
     }
 
-    private Context.Connection toContextConnection(com.bytechef.hermes.connection.domain.Connection connection) {
+    private Connection toContextConnection(com.bytechef.hermes.connection.domain.Connection connection) {
         return new ContextConnectionImpl(
             connection.getAuthorizationName(), connection.getComponentName(), connectionDefinitionService,
             connection.getConnectionVersion(), connection.getParameters());
