@@ -60,7 +60,7 @@ public class EachTaskDispatcherTest {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
                 taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
             dispatcher.dispatch(TaskExecution.builder()
-                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+                .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
                 .build());
         });
     }
@@ -73,7 +73,7 @@ public class EachTaskDispatcherTest {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            new WorkflowTask(
+            WorkflowTask.of(
                 Map.of(
                     WorkflowConstants.TYPE, "type",
                     WorkflowConstants.PARAMETERS,
@@ -99,7 +99,7 @@ public class EachTaskDispatcherTest {
             .id(
                 1L)
             .workflowTask(
-                new WorkflowTask(
+                WorkflowTask.of(
                     Map.of(
                         WorkflowConstants.TYPE, "type",
                         WorkflowConstants.PARAMETERS,

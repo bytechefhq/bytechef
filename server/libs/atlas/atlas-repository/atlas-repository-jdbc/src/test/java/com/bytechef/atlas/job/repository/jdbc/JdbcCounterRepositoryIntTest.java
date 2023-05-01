@@ -113,7 +113,7 @@ public class JdbcCounterRepositoryIntTest {
     private static TaskExecution getTaskExecution(long jobId) {
         return TaskExecution.builder()
             .jobId(jobId)
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
     }
 }
