@@ -1,99 +1,128 @@
-import {FieldValues, Path} from 'react-hook-form/dist/types';
+import {TagModel} from 'middleware/tag/models/TagModel';
+import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
+import {PropertyType} from 'types/projectTypes';
 
-import {
-    ArrayPropertyModel,
-    BooleanPropertyModel,
-    DatePropertyModel,
-    DateTimePropertyModel,
-    DynamicPropertiesPropertyModel,
-    IntegerPropertyModel,
-    NullPropertyModel,
-    NumberPropertyModel,
-    ObjectPropertyModel,
-    OneOfPropertyModel,
-    StringPropertyModel,
-    TimePropertyModel,
-} from '../../middleware/definition-registry';
 import Input from '../Input/Input';
 
-type Property = ArrayPropertyModel &
-    BooleanPropertyModel &
-    DatePropertyModel &
-    DateTimePropertyModel &
-    DynamicPropertiesPropertyModel &
-    IntegerPropertyModel &
-    NumberPropertyModel &
-    NullPropertyModel &
-    ObjectPropertyModel &
-    OneOfPropertyModel &
-    StringPropertyModel &
-    TimePropertyModel;
-
-interface PropertiesProps<
-    TProperty extends Property,
-    TFieldValues extends FieldValues = FieldValues
-> {
-    formState: FormState<TFieldValues>;
-    path?: string;
-    properties?: TProperty[];
-    register: UseFormRegister<TFieldValues>;
+export interface PropertyFormProps {
+    authorizationName: string;
+    componentName: {
+        value: string;
+        label: string;
+    };
+    name: string;
+    parameters: {[key: string]: object};
+    tags: Array<TagModel | {label: string; value: string}>;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    [key: string]: any;
 }
 
-const Properties = <
-    TProperty extends Property,
-    TFieldValues extends FieldValues = FieldValues
->({
-    formState: {errors, touchedFields},
+interface PropertyProps {
+    path?: string;
+    formState?: FormState<FieldValues>;
+    register?: UseFormRegister<PropertyFormProps>;
+    property: PropertyType;
+}
+
+const Property = ({
     path = 'parameters',
-    properties,
+    formState,
+    property,
     register,
-}: PropertiesProps<TProperty, TFieldValues>): JSX.Element => {
-    function isError(propertyName: string) {
-        if (
-            touchedFields[path] &&
-            touchedFields[path]![propertyName] &&
-            errors[path] &&
-            (errors[path] as never)[propertyName]
-        ) {
-            return true;
-        }
+}: PropertyProps) => {
+    const {
+        controlType,
+        defaultValue = '',
+        description,
+        hidden,
+        label,
+        name,
+        required,
+    } = property;
 
-        return false;
-    }
-
-    function getFieldPath(propertyName: string) {
-        return (path + '.' + propertyName) as Path<TFieldValues>;
-    }
+    const hasError = (propertyName: string) =>
+        formState?.touchedFields[path] &&
+        formState?.touchedFields[path]![propertyName] &&
+        formState?.errors[path] &&
+        (formState?.errors[path] as never)[propertyName];
 
     return (
-        <>
-            {properties &&
-                properties.map((property) => {
-                    if (property.type === 'STRING') {
-                        return (
-                            <Input
-                                description={property?.description}
-                                defaultValue={
-                                    property?.defaultValue
-                                        ? property.defaultValue + ''
-                                        : ''
-                                }
-                                error={isError(property.name!)}
-                                type={property.hidden ? 'hidden' : 'text'}
-                                key={property.name}
-                                label={property.label}
-                                {...register(getFieldPath(property.name!), {
-                                    required: property.required!,
-                                })}
-                            />
-                        );
-                    }
-                })}
-        </>
+        <li>
+            {register && controlType === 'INPUT_TEXT' && (
+                <Input
+                    description={description}
+                    defaultValue={defaultValue as string}
+                    error={hasError(name!)}
+                    type={hidden ? 'hidden' : 'text'}
+                    key={name}
+                    label={label}
+                    {...register(`${path}.${name}`, {
+                        required: required!,
+                    })}
+                />
+            )}
+
+            {!register && controlType === 'INPUT_TEXT' && (
+                <Input
+                    description={description}
+                    defaultValue={defaultValue as string}
+                    error={hasError(name!)}
+                    key={name}
+                    label={label || name}
+                    name={name!}
+                    type={hidden ? 'hidden' : 'text'}
+                />
+            )}
+
+            {controlType === 'INPUT_INTEGER' && (
+                <Input
+                    description={description}
+                    defaultValue={defaultValue as string}
+                    error={hasError(name!)}
+                    key={name}
+                    label={label || name}
+                    name={name!}
+                    type={hidden ? 'hidden' : 'number'}
+                />
+            )}
+
+            {controlType === 'INPUT_PASSWORD' && (
+                <Input
+                    description={description}
+                    defaultValue={defaultValue as string}
+                    error={hasError(name!)}
+                    key={name}
+                    label={label || name}
+                    name={name!}
+                    type={hidden ? 'hidden' : 'password'}
+                />
+            )}
+        </li>
     );
 };
 
-Properties.displayName = 'Properties';
+interface PropertiesProps {
+    properties: Array<PropertyType>;
+    formState?: FormState<FieldValues>;
+    register?: UseFormRegister<PropertyFormProps>;
+}
+
+const Properties = ({
+    formState,
+    properties,
+    register,
+}: PropertiesProps): JSX.Element => (
+    <ul className="mb-4 space-y-2">
+        {properties.map((property, index) => (
+            <Property
+                formState={formState}
+                key={`${property.name}_${index}`}
+                property={property}
+                register={register}
+            />
+        ))}
+    </ul>
+);
 
 export default Properties;
