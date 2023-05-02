@@ -839,7 +839,7 @@ components:
           description: "Th id of a project."
           type: "integer"
           format: "int64"
-          writeOnly: false
+          writeOnly: true
         projectInstanceWorkflows:
           type: "array"
           items:
@@ -900,7 +900,7 @@ components:
           description: "Th id of a project."
           type: "integer"
           format: "int64"
-          writeOnly: false
+          writeOnly: true
         status:
           description: "The status of a project instance."
           type: "string"
@@ -920,19 +920,11 @@ components:
           type: "object"
           additionalProperties:
             type: "object"
-        connectionIds:
-          description: "The ids of connections used by a project instance."
-          type: "array"
-          items:
-            type: "integer"
-            format: "int64"
-          writeOnly: true
         connections:
           description: "The connections used by a project instance."
           type: "array"
           items:
-            $ref: "../../../hermes/hermes-connection/hermes-connection-rest/hermes-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
-          readOnly: true
+            $ref: "#/components/schemas/ProjectInstanceWorkflowConnection"
         createdBy:
           description: "The created by."
           type: "string"
@@ -969,12 +961,27 @@ components:
           description: "Th id of a project instance."
           type: "integer"
           format: "int64"
-          writeOnly: false
+          writeOnly: true
         workflowId:
           description: "The id of a workflow."
           type: "integer"
         __version:
           type: "integer"
+    ProjectInstanceWorkflowConnection:
+      description: "The connection used in particular task."
+      type: "object"
+      properties:
+        connectionId:
+          description: "The connection id"
+          type: "integer"
+          format: "int64"
+        key:
+          description: "The connection key under which a connection is defined in\
+            \ a workflow definition."
+          type: "string"
+        taskName:
+          description: "The task name to which a connection belongs."
+          type: "string"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"
