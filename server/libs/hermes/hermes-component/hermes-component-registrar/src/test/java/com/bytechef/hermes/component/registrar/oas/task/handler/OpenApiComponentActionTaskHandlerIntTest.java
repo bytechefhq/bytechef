@@ -33,10 +33,10 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.registrar.oas.handler.OpenApiComponentActionTaskHandler;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
-import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
@@ -111,9 +111,6 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     @Autowired
     private ConnectionService connectionService;
-
-    @MockBean
-    private InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
 
     @MockBean
     private TagService tagService;
@@ -803,7 +800,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
     private OpenApiComponentActionTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentActionTaskHandler(
             getActionDefinition(actionName), connectionDefinitionService, connectionService,
-            null, FILE_STORAGE_SERVICE, instanceConnectionFetcherAccessor, PETSTORE_COMPONENT_HANDLER);
+            null, FILE_STORAGE_SERVICE, PETSTORE_COMPONENT_HANDLER);
     }
 
     private ActionDefinition getActionDefinition(String actionName) {
@@ -820,14 +817,12 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {
         return TaskExecution.builder()
-            .workflowTask(
+            .metadata(
                 connection.getId() == null
-                    ? WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type", WorkflowConstants.PARAMETERS, parameters))
-                    : WorkflowTask.of(
-                        Map.of(
-                            WorkflowConstants.TYPE, "type",
-                            WorkflowConstants.PARAMETERS, parameters,
-                            "connections", Map.of("petstore", Map.of("id", connection.getId())))))
+                    ? Map.of()
+                    : Map.of(MetadataConstants.CONNECTION_IDS, Map.of("petstore", connection.getId())))
+            .workflowTask(
+                WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type", WorkflowConstants.PARAMETERS, parameters)))
             .build();
     }
 

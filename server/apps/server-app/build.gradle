@@ -46,7 +46,7 @@ dependencies {
     implementation project(":server:libs:helios:helios-project:helios-project-rest")
     implementation project(":server:libs:helios:helios-project:helios-project-service")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
-    implementation project(":server:libs:hermes:hermes-coordinator")
+    implementation project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl")
     implementation project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-service")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
