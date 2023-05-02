@@ -21,11 +21,10 @@ import com.bytechef.commons.util.InstantUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.data.storage.domain.DataStorage;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.service.TriggerLifecycleService;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.trigger.executor.data.TriggerScheduleAndData;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -48,21 +47,21 @@ import static com.bytechef.hermes.trigger.executor.constants.TriggerScheduleCons
 @Service
 public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
 
-    private final DataStorageService dataStorageService;
     private final SchedulerClient schedulerClient;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final TriggerLifecycleService triggerLifecycleService;
     private final String webhookUrl;
 
     public TriggerLifecycleExecutorImpl(
-        DataStorageService dataStorageService, SchedulerClient schedulerClient,
-        TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
+        SchedulerClient schedulerClient, TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerDefinitionService triggerDefinitionService, TriggerLifecycleService triggerLifecycleService,
         @Value("bytechef.webhookUrl") String webhookUrl) {
 
-        this.dataStorageService = dataStorageService;
         this.schedulerClient = schedulerClient;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.triggerLifecycleService = triggerLifecycleService;
         this.webhookUrl = webhookUrl;
     }
 
@@ -71,9 +70,8 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
         WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection) {
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
-            dataStorageService.fetchValue(
-                DataStorage.Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
-                workflowExecutionId.toString()),
+            triggerLifecycleService.fetchValue(
+                workflowExecutionId.getInstanceId(), workflowExecutionId.toString()),
             null);
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
@@ -124,9 +122,8 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                     createWebhookUrl(workflowExecutionId), workflowExecutionId.toString());
 
                 if (output != null) {
-                    dataStorageService.save(
-                        DataStorage.Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
-                        workflowExecutionId.toString(), output);
+                    triggerLifecycleService.save(
+                        workflowExecutionId.getInstanceId(), workflowExecutionId.toString(), output);
 
                     if (output.webhookExpirationDate() != null) {
                         schedulerClient.schedule(

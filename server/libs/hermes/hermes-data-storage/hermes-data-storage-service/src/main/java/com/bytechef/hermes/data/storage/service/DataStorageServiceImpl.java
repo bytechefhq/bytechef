@@ -45,8 +45,7 @@ public class DataStorageServiceImpl implements DataStorageService {
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public <T> Optional<T> fetchValue(Scope scope, long scopeId, String key) {
-        return dataStorageRepository.findByScopeAndScopeIdAndKey(
-            scope.getId(), scopeId, key)
+        return dataStorageRepository.findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
             .map(dataStorage -> (T) dataStorage.getValue());
     }
 
@@ -57,13 +56,15 @@ public class DataStorageServiceImpl implements DataStorageService {
     }
 
     @Override
-    public void save(Scope scope, Long scopeId, String key, Object value) {
+    public void save(Scope scope, long scopeId, String key, Object value) {
         dataStorageRepository
             .findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
-            .ifPresentOrElse(dataStorage -> {
-                dataStorage.setValue(value);
+            .ifPresentOrElse(
+                dataStorage -> {
+                    dataStorage.setValue(value);
 
-                dataStorageRepository.save(dataStorage);
-            }, () -> dataStorageRepository.save(new DataStorage(key, scope.getId(), scopeId, value)));
+                    dataStorageRepository.save(dataStorage);
+                },
+                () -> dataStorageRepository.save(new DataStorage(key, scope.getId(), scopeId, value)));
     }
 }

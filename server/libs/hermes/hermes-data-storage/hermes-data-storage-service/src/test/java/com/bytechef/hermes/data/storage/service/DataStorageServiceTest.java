@@ -27,7 +27,19 @@ public class DataStorageServiceTest {
 
     @Disabled
     @Test
-    public void test() {
+    public void testFetchValue() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void testGetDataStorage() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void testSave() {
         // TODO
     }
 }
