@@ -44,7 +44,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     <label
                         htmlFor={name}
                         className={twMerge(
-                            'block text-sm font-medium text-gray-700 dark:text-gray-400',
+                            'block text-sm font-medium capitalize text-gray-700 dark:text-gray-400',
                             description && 'mr-1',
                             labelClassName
                         )}
