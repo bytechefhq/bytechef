@@ -25,7 +25,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -53,6 +52,4 @@ public interface ConnectionRepository
         """)
     List<Connection> findAllByComponentNamesAndTagIds(
         @Param("componentNames") List<String> componentNames, @Param("tagIds") List<Long> tagIds);
-
-    Optional<Connection> findByComponentNameAndConnectionVersion(String componentName, int connectionVersion);
 }

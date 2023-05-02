@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.coordinator.instance;
+package com.bytechef.hermes.coordinator.job;
 
 import com.bytechef.hermes.job.InstanceJobFactory;
 import org.springframework.stereotype.Component;

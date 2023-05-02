@@ -41,6 +41,7 @@ public class TaskHandlerResolverChain implements TaskHandlerResolver {
                 return handler;
             }
         }
+
         throw new IllegalArgumentException("Unknown task handler: " + task.getType());
     }
 

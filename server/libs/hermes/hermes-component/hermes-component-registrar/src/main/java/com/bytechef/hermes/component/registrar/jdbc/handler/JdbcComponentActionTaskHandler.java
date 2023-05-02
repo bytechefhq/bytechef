@@ -21,6 +21,7 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.registrar.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.handler.DefaultComponentActionTaskHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -38,11 +39,12 @@ public class JdbcComponentActionTaskHandler extends DefaultComponentActionTaskHa
     public JdbcComponentActionTaskHandler(
         ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, DataSourceFactory dataSourceFactory, EventPublisher eventPublisher,
-        FileStorageService fileStorageService, JdbcComponentHandler jdbcComponentHandler) {
+        FileStorageService fileStorageService, InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor,
+        JdbcComponentHandler jdbcComponentHandler) {
 
         super(
-            actionDefinition, connectionDefinitionService, jdbcComponentHandler, connectionService, eventPublisher,
-            fileStorageService);
+            actionDefinition, jdbcComponentHandler, connectionDefinitionService, connectionService, eventPublisher,
+            fileStorageService, instanceConnectionFetcherAccessor);
 
         this.dataSourceFactory = dataSourceFactory;
     }

@@ -20,13 +20,17 @@ package com.bytechef.hermes.connection.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.InstanceConnectionFetcher;
+import com.bytechef.hermes.util.InstanceTypeThreadLocal;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,6 +51,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
+    private final InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
     private final OAuth2Properties oAuth2Properties;
     private final TagService tagService;
     private final WorkflowService workflowService;
@@ -54,10 +59,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        OAuth2Properties oAuth2Properties, TagService tagService, WorkflowService workflowService) {
+        InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor, OAuth2Properties oAuth2Properties,
+        TagService tagService, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
+        this.instanceConnectionFetcherAccessor = instanceConnectionFetcherAccessor;
         this.oAuth2Properties = oAuth2Properties;
         this.tagService = tagService;
         this.workflowService = workflowService;
@@ -96,9 +103,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             connection.setTags(tags);
         }
 
-        return new ConnectionDTO(
-            isConnectionUsed(connection.getComponentName(), connection.getConnectionVersion()),
-            connectionService.create(connection), tags);
+        connection = connectionService.create(connection);
+
+        return new ConnectionDTO(isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, tags);
     }
 
     @Override
@@ -114,11 +121,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @SuppressFBWarnings("NP")
     public ConnectionDTO getConnection(Long id) {
         Connection connection = connectionService.getConnection(id);
 
         return new ConnectionDTO(
-            isConnectionUsed(connection.getComponentName(), connection.getConnectionVersion()), connection,
+            isConnectionUsed(Objects.requireNonNull(connection.getId())), connection,
             tagService.getTags(connection.getTagIds()));
     }
 
@@ -135,8 +143,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         return connections.stream()
             .map(connection -> new ConnectionDTO(
-                isConnectionUsed(connection.getComponentName(), connection.getConnectionVersion()), connection,
-                filterTags(tags, connection)))
+                isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, filterTags(tags, connection)))
             .toList();
     }
 
@@ -152,14 +159,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ConnectionDTO update(Long id, List<Tag> tags) {
         tags = checkTags(tags);
 
         Connection connection = connectionService.update(
             id, com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
 
-        return new ConnectionDTO(
-            isConnectionUsed(connection.getComponentName(), connection.getConnectionVersion()), connection, tags);
+        return new ConnectionDTO(isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, tags);
     }
 
     @Override
@@ -167,7 +174,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         List<Tag> tags = checkTags(connectionDTO.tags());
 
         return new ConnectionDTO(
-            isConnectionUsed(connectionDTO.componentName(), connectionDTO.connectionVersion()),
+            isConnectionUsed(connectionDTO.id()),
             connectionService.update(
                 connectionDTO.id(), connectionDTO.name(),
                 com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId), connectionDTO.version()),
@@ -180,12 +187,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             : tagService.save(tags);
     }
 
-    private boolean isConnectionUsed(String componentName, int connectionVersion) {
+    private boolean isConnectionUsed(long id) {
         List<Workflow> workflows = workflowService.getWorkflows();
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {
-                if (containsConnection(workflowTask, componentName, connectionVersion)) {
+                if (containsConnection(workflowTask, id)) {
                     return true;
                 }
             }
@@ -194,13 +201,23 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return false;
     }
 
-    private boolean containsConnection(WorkflowTask workflowTask, String componentName, int connectionVersion) {
+    private boolean containsConnection(WorkflowConnection workflowConnection, long id, String instanceType) {
+        return workflowConnection.getConnectionId()
+            .map(connectionId -> id == connectionId)
+            .orElseGet(() -> {
+                InstanceConnectionFetcher instanceConnectionFetcher =
+                    instanceConnectionFetcherAccessor.getInstanceConnectionFetcher(instanceType);
+
+                return instanceConnectionFetcher.getConnection(
+                    workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName())) != null;
+            });
+    }
+
+    private boolean containsConnection(WorkflowTask workflowTask, long id) {
         return WorkflowConnection.of(workflowTask)
             .values()
             .stream()
-            .map(workflowConnection -> Objects.equals(
-                workflowConnection.getComponentName(), componentName) &&
-                workflowConnection.getConnectionVersion() == connectionVersion)
+            .map(workflowConnection -> containsConnection(workflowConnection, id, InstanceTypeThreadLocal.get()))
             .findFirst()
             .orElse(false);
     }

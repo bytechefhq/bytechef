@@ -19,7 +19,7 @@
 
 package com.bytechef.hermes.workflow.web.rest;
 
-import com.bytechef.atlas.facade.TaskExecutionFacade;
+import com.bytechef.hermes.workflow.facade.TaskExecutionFacade;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;

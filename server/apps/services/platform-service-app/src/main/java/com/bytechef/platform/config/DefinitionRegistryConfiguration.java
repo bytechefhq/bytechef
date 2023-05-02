@@ -82,6 +82,7 @@ public class DefinitionRegistryConfiguration {
 
         return new TriggerDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
     }
+
     @Bean
     TriggerDefinitionServiceRSocketClient triggerDefinitionServiceRSocketClient(
         DiscoveryClient discoveryClient,

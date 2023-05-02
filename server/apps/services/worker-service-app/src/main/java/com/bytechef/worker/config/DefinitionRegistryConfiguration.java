@@ -26,6 +26,8 @@ import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
@@ -120,6 +122,14 @@ public class DefinitionRegistryConfiguration {
         @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
 
         return new ConnectionDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    }
+
+    @Bean
+    TriggerDefinitionFacade triggerDefinitionFacade(
+        ComponentDefinitionService componentDefinitionService,
+        ConnectionDefinitionService connectionDefinitionService) {
+
+        return new TriggerDefinitionFacadeImpl(componentDefinitionService, connectionDefinitionService);
     }
 
     @Bean

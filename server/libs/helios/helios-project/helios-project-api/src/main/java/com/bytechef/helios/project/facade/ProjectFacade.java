@@ -20,7 +20,7 @@ package com.bytechef.helios.project.facade;
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.project.dto.ProjectExecutionDTO;
 import com.bytechef.helios.project.dto.ProjectDTO;
-import com.bytechef.hermes.workflow.WorkflowDTO;
+import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 

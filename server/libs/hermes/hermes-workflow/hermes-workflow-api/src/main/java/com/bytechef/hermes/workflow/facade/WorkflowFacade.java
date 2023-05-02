@@ -19,7 +19,7 @@ package com.bytechef.hermes.workflow.facade;
 
 import com.bytechef.atlas.domain.Workflow.Format;
 import com.bytechef.atlas.domain.Workflow.SourceType;
-import com.bytechef.hermes.workflow.WorkflowDTO;
+import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 
 import java.util.List;
 

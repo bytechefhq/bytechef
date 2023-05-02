@@ -49,7 +49,9 @@ CREATE TABLE IF NOT EXISTS project_instance_workflow (
 CREATE TABLE IF NOT EXISTS project_instance_workflow_connection (
     id                                BIGSERIAL    NOT NULL PRIMARY KEY,
     project_instance_workflow_id      BIGSERIAL    NOT NULL,
-    connection_id                     BIGSERIAL    NOT NULL
+    connection_id                     BIGSERIAL    NOT NULL,
+    key                               VARCHAR(256) NOT NULL,
+    task_name                         VARCHAR(256) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS project_instance_workflow_job (

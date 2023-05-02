@@ -34,7 +34,7 @@ import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.helios.project.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.project.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.hermes.workflow.WorkflowDTO;
+import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
