@@ -19,7 +19,7 @@ package com.bytechef.dione.integration.facade;
 
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.integration.dto.IntegrationDTO;
-import com.bytechef.hermes.workflow.WorkflowDTO;
+import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.transaction.annotation.Transactional;
 

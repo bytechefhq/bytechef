@@ -18,7 +18,6 @@
 package com.bytechef.hermes.workflow.dto;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;

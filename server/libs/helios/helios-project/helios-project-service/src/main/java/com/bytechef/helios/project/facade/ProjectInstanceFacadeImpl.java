@@ -20,6 +20,7 @@ package com.bytechef.helios.project.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.constant.ProjectConstants;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
@@ -29,8 +30,11 @@ import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.InstanceConnectionFetcher;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -53,6 +57,7 @@ import java.util.Objects;
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private final ConnectionService connectionService;
+    private final InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
     private final ProjectInstanceJobFactory projectInstanceJobFactory;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
@@ -63,12 +68,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        ConnectionService connectionService, ProjectInstanceJobFactory projectInstanceJobFactory,
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectService projectService, TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor,
-        WorkflowService workflowService) {
+        ConnectionService connectionService, InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor,
+        ProjectInstanceJobFactory projectInstanceJobFactory, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
+        TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
+        this.instanceConnectionFetcherAccessor = instanceConnectionFetcherAccessor;
         this.projectInstanceJobFactory = projectInstanceJobFactory;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
@@ -107,8 +113,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                         workflow.getId(), projectInstanceDTO.id(), ProjectConstants.PROJECT,
                         workflowTrigger.getTriggerName()),
                     WorkflowConnection.of(workflowTrigger)
-                        .map(workflowConnection -> connectionService.getConnection(
-                            workflowConnection.getComponentName(), workflowConnection.getConnectionVersion()))
+                        .map(this::getConnection)
                         .orElse(null),
                     projectInstanceWorkflow.getInputs());
             }
@@ -125,8 +130,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     // the job id is missing.
     @Transactional(propagation = Propagation.NEVER)
     @SuppressFBWarnings("NP")
-    public long createProjectInstanceJob(String workflowId, long projectInstanceId) {
-        return projectInstanceJobFactory.createJob(workflowId, projectInstanceId);
+    public long createJob(String workflowId, long instanceId) {
+        return projectInstanceJobFactory.createJob(workflowId, instanceId);
     }
 
     @Override
@@ -148,8 +153,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                         workflow.getId(), projectInstanceId, ProjectConstants.PROJECT,
                         workflowTrigger.getTriggerName()),
                     WorkflowConnection.of(workflowTrigger)
-                        .map(workflowConnection -> connectionService.getConnection(
-                            workflowConnection.getComponentName(), workflowConnection.getConnectionVersion()))
+                        .map(this::getConnection)
                         .orElse(null));
             }
         }
@@ -265,6 +269,18 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return tags.stream()
             .filter(tag -> containsTag(projectInstance, tag))
             .toList();
+    }
+
+    private Connection getConnection(WorkflowConnection workflowConnection) {
+        return workflowConnection.getConnectionId()
+            .map(connectionService::getConnection)
+            .orElseGet(() -> {
+                InstanceConnectionFetcher instanceConnectionFetcher =
+                    instanceConnectionFetcherAccessor.getInstanceConnectionFetcher(ProjectConstants.PROJECT);
+
+                return instanceConnectionFetcher.getConnection(
+                    workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName()));
+            });
     }
 
     private List<Project> getProjects(List<ProjectInstance> projectInstances) {

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow;
+package com.bytechef.hermes.workflow.dto;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.domain.Workflow.Format;

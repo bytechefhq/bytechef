@@ -39,12 +39,20 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
 
+    @Column
+    private String key;
+
+    @Column("task_name")
+    private String taskName;
+
     public ProjectInstanceWorkflowConnection() {
     }
 
     @SuppressFBWarnings("NP")
-    public ProjectInstanceWorkflowConnection(Long connectionId) {
+    public ProjectInstanceWorkflowConnection(Long connectionId, String key, String taskName) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
+        this.key = key;
+        this.taskName = taskName;
     }
 
     @Override
@@ -58,7 +66,8 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
 
         ProjectInstanceWorkflowConnection that = (ProjectInstanceWorkflowConnection) o;
 
-        return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId);
+        return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId)
+            && Objects.equals(key, that.key) && Objects.equals(taskName, that.taskName);
     }
 
     @Override
@@ -75,6 +84,14 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
         return connectionId.getId();
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
     @Override
     public boolean isNew() {
         return id == null;
@@ -82,8 +99,11 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
 
     @Override
     public String toString() {
-        return "ProjectTag{" + ", id='"
-            + id + '\'' + ", connectionId='"
-            + getConnectionId() + '\'' + '}';
+        return "ProjectInstanceWorkflowConnection{" +
+            "id=" + id +
+            ", connectionId=" + connectionId +
+            ", key='" + key + '\'' +
+            ", taskName='" + taskName + '\'' +
+            '}';
     }
 }

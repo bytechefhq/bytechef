@@ -24,12 +24,12 @@ import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.helios.project.facade.ProjectFacadeImpl;
-import com.bytechef.helios.project.facade.ProjectInstanceFacade;
 import com.bytechef.helios.project.facade.ProjectInstanceFacadeImpl;
 import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
 import com.bytechef.tag.service.TagService;
@@ -43,15 +43,15 @@ import org.springframework.context.annotation.Configuration;
 public class ProjectConfiguration {
 
     @Bean
-    ProjectInstanceFacade projectInstanceFacade(
-        ConnectionService connectionService, ProjectInstanceJobFactory projectInstanceJobFactory,
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectService projectService, TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor,
-        WorkflowService workflowService) {
+    com.bytechef.helios.project.facade.ProjectInstanceFacade projectInstanceFacade(
+        ConnectionService connectionService, InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor,
+        ProjectInstanceJobFactory projectInstanceJobFactory, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
+        TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor, WorkflowService workflowService) {
 
         return new ProjectInstanceFacadeImpl(
-            connectionService, projectInstanceJobFactory, projectInstanceService, projectInstanceWorkflowService,
-            projectService, tagService, triggerLifecycleExecutor, workflowService);
+            connectionService, instanceConnectionFetcherAccessor, projectInstanceJobFactory, projectInstanceService,
+            projectInstanceWorkflowService, projectService, tagService, triggerLifecycleExecutor, workflowService);
     }
 
     @Bean

@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.test.config;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
+import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
@@ -81,6 +82,9 @@ public class ComponentTestIntConfiguration {
 
     @MockBean(name = "connectionDefinitionService")
     private ConnectionDefinitionService connectionDefinitionService;
+
+    @MockBean(name = "instanceConnectionFetcherAccessor")
+    private InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
 
     @MockBean
     private MessageBroker messageBroker;

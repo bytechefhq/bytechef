@@ -19,7 +19,7 @@ package com.bytechef.helios.project.dto;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.dto.TaskExecutionDTO;
+import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
