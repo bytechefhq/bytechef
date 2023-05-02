@@ -1,5 +1,4 @@
 dependencies {
-    api project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     api project(":server:libs:hermes:hermes-trigger-executor:hermes-trigger-executor-api")
 

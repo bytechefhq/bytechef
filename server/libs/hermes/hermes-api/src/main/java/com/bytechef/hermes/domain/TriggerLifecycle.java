@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.domain;
+package com.bytechef.hermes.domain;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,41 +33,8 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@Table("data_storage")
-public class DataStorage implements Persistable<Long> {
-
-    public enum Scope {
-        ACCOUNT(4, "Account"),
-        CURRENT_EXECUTION(1, "Current Execution"),
-        WORKFLOW(3, "Workflow"),
-        WORKFLOW_INSTANCE(2, "Workflow instance");
-
-        private final int id;
-        private final String label;
-
-        Scope(int id, String label) {
-            this.id = id;
-            this.label = label;
-        }
-
-        public static Scope valueOf(int id) {
-            return switch (id) {
-                case 1 -> Scope.CURRENT_EXECUTION;
-                case 2 -> Scope.WORKFLOW_INSTANCE;
-                case 3 -> Scope.WORKFLOW;
-                case 4 -> Scope.ACCOUNT;
-                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
-            };
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-    }
+@Table("trigger_lifecycle")
+public class TriggerLifecycle implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")
@@ -80,9 +47,6 @@ public class DataStorage implements Persistable<Long> {
     @Id
     private Long id;
 
-    @Column("key")
-    private String key;
-
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -91,26 +55,25 @@ public class DataStorage implements Persistable<Long> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @Column
-    private int scope;
-
-    @Column("scope_id")
-    private Long scopeId;
+    @Column("instance_id")
+    private Long instanceId;
 
     @Column
-    private DataStorageValue value;
+    private TriggerLifecycleValue value;
 
     @Version
     private int version;
 
-    public DataStorage() {
+    @Column("workflow_execution_id")
+    private String workflowExecutionId;
+
+    public TriggerLifecycle() {
     }
 
-    public DataStorage(String key, int scope, long scopeId, Object value) {
-        this.key = key;
-        this.scope = scope;
-        this.scopeId = scopeId;
-        this.value = new DataStorageValue(value, value.getClass());
+    public TriggerLifecycle(long instanceId, Object value, String workflowExecutionId) {
+        this.instanceId = instanceId;
+        this.value = new TriggerLifecycleValue(value, value.getClass());
+        this.workflowExecutionId = workflowExecutionId;
     }
 
     public String getCreatedBy() {
@@ -126,10 +89,6 @@ public class DataStorage implements Persistable<Long> {
         return id;
     }
 
-    public String getKey() {
-        return key;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -138,12 +97,8 @@ public class DataStorage implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public Scope getScope() {
-        return Scope.valueOf(scope);
-    }
-
-    public Long getScopeId() {
-        return scopeId;
+    public Long getInstanceId() {
+        return instanceId;
     }
 
     public Object getValue() {
@@ -158,6 +113,10 @@ public class DataStorage implements Persistable<Long> {
         return version;
     }
 
+    public String getWorkflowExecutionId() {
+        return workflowExecutionId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -168,9 +127,9 @@ public class DataStorage implements Persistable<Long> {
             return false;
         }
 
-        DataStorage dataStorage = (DataStorage) o;
+        TriggerLifecycle triggerLifecycle = (TriggerLifecycle) o;
 
-        return Objects.equals(id, dataStorage.id);
+        return Objects.equals(id, triggerLifecycle.id);
     }
 
     @Override
@@ -187,33 +146,28 @@ public class DataStorage implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setScopeId(Long scopeId) {
-        this.scopeId = scopeId;
-    }
-
-    public void setScope(Scope scope) {
-        this.scope = scope.getId();
+    public void setInstanceId(Long instanceId) {
+        this.instanceId = instanceId;
     }
 
     public void setValue(Object value) {
-        this.value = new DataStorageValue(value, value.getClass());
+        this.value = new TriggerLifecycleValue(value, value.getClass());
     }
 
     public void setVersion(int version) {
         this.version = version;
     }
 
+    public void setWorkflowExecutionId(String workflowExecutionId) {
+        this.workflowExecutionId = workflowExecutionId;
+    }
+
     @Override
     public String toString() {
         return "DataStorage{" +
             "id=" + id +
-            ", scope='" + scope + '\'' +
-            ", scopeId='" + scopeId + '\'' +
-            ", key='" + key + '\'' +
+            ", instanceId='" + instanceId + '\'' +
+            ", workflowExecutionId='" + workflowExecutionId + '\'' +
             ", value='" + value + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
@@ -223,8 +177,8 @@ public class DataStorage implements Persistable<Long> {
             '}';
     }
 
-    public record DataStorageValue(Object value, String classname) {
-        public DataStorageValue(Object value, Class<?> classValue) {
+    public record TriggerLifecycleValue(Object value, String classname) {
+        public TriggerLifecycleValue(Object value, Class<?> classValue) {
             this(value, classValue.getName());
         }
     }
