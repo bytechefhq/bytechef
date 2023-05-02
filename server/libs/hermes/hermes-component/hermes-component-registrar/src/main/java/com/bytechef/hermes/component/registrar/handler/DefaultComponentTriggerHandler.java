@@ -42,9 +42,8 @@ import com.bytechef.hermes.component.definition.WebhookBodyImpl;
 import com.bytechef.hermes.component.definition.WebhookHeadersImpl;
 import com.bytechef.hermes.component.definition.WebhookParametersImpl;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
-import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.constant.MetadataConstants;
 import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -85,15 +84,13 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     private final DataStorageService datStorageService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
-    private final InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
     private final TriggerDefinition triggerDefinition;
 
     @SuppressFBWarnings("EI")
     public DefaultComponentTriggerHandler(
         ComponentDefinitionFactory componentDefinitionFactory, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, DataStorageService datStorageService, EventPublisher eventPublisher,
-        FileStorageService fileStorageService, InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor,
-        TriggerDefinition triggerDefinition) {
+        FileStorageService fileStorageService, TriggerDefinition triggerDefinition) {
 
         this.componentDefinitionFactory = componentDefinitionFactory;
         this.connectionDefinitionService = connectionDefinitionService;
@@ -101,20 +98,15 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
         this.datStorageService = datStorageService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
-        this.instanceConnectionFetcherAccessor = instanceConnectionFetcherAccessor;
         this.triggerDefinition = triggerDefinition;
     }
 
     @Override
     public Object handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
-        WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
-
         TriggerContext context = new ContextImpl(
-            connectionDefinitionService, connectionService, eventPublisher, fileStorageService,
-            instanceConnectionFetcherAccessor, workflowExecutionId.getInstanceType(), null,
-            WorkflowConnection.of(triggerExecution.getWorkflowTrigger())
-                .map(workflowConnection -> Map.of(workflowConnection.getKey(), workflowConnection))
-                .orElse(Map.of()));
+            connectionDefinitionService,
+            MapValueUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS),
+            connectionService, eventPublisher, fileStorageService, null);
 
         return ComponentContextSupplier.get(
             context, componentDefinitionFactory.getDefinition(), () -> doHandle(triggerExecution, context));

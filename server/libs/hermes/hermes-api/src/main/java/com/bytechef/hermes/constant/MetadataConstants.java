@@ -22,6 +22,7 @@ package com.bytechef.hermes.constant;
  */
 public class MetadataConstants {
 
+    public static final String CONNECTION_IDS = "connectionIds";
     public static final String INSTANCE_ID = "instanceId";
     public static final String INSTANCE_TYPE = "instanceType";
     public static final String WORKFLOW_ID = "workflowId";
