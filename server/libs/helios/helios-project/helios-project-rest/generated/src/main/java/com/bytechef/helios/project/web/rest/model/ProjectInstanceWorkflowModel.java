@@ -3,7 +3,7 @@ package com.bytechef.helios.project.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceBasicModel;
-import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,17 +29,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-30T20:58:23.415641+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T07:30:32.347559+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
   @Valid
-  private List<Long> connectionIds;
-
-  @Valid
-  private List<@Valid ConnectionModel> connections;
+  private List<@Valid ProjectInstanceWorkflowConnectionModel> connections;
 
   private String createdBy;
 
@@ -94,40 +91,12 @@ public class ProjectInstanceWorkflowModel {
     this.inputs = inputs;
   }
 
-  public ProjectInstanceWorkflowModel connectionIds(List<Long> connectionIds) {
-    this.connectionIds = connectionIds;
-    return this;
-  }
-
-  public ProjectInstanceWorkflowModel addConnectionIdsItem(Long connectionIdsItem) {
-    if (this.connectionIds == null) {
-      this.connectionIds = new ArrayList<>();
-    }
-    this.connectionIds.add(connectionIdsItem);
-    return this;
-  }
-
-  /**
-   * The ids of connections used by a project instance.
-   * @return connectionIds
-  */
-  
-  @Schema(name = "connectionIds", description = "The ids of connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connectionIds")
-  public List<Long> getConnectionIds() {
-    return connectionIds;
-  }
-
-  public void setConnectionIds(List<Long> connectionIds) {
-    this.connectionIds = connectionIds;
-  }
-
-  public ProjectInstanceWorkflowModel connections(List<@Valid ConnectionModel> connections) {
+  public ProjectInstanceWorkflowModel connections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public ProjectInstanceWorkflowModel addConnectionsItem(ConnectionModel connectionsItem) {
+  public ProjectInstanceWorkflowModel addConnectionsItem(ProjectInstanceWorkflowConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -140,13 +109,13 @@ public class ProjectInstanceWorkflowModel {
    * @return connections
   */
   @Valid 
-  @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, description = "The connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "connections", description = "The connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
-  public List<@Valid ConnectionModel> getConnections() {
+  public List<@Valid ProjectInstanceWorkflowConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<@Valid ConnectionModel> connections) {
+  public void setConnections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
     this.connections = connections;
   }
 
@@ -380,7 +349,6 @@ public class ProjectInstanceWorkflowModel {
     }
     ProjectInstanceWorkflowModel projectInstanceWorkflow = (ProjectInstanceWorkflowModel) o;
     return Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
-        Objects.equals(this.connectionIds, projectInstanceWorkflow.connectionIds) &&
         Objects.equals(this.connections, projectInstanceWorkflow.connections) &&
         Objects.equals(this.createdBy, projectInstanceWorkflow.createdBy) &&
         Objects.equals(this.createdDate, projectInstanceWorkflow.createdDate) &&
@@ -397,7 +365,7 @@ public class ProjectInstanceWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs, connectionIds, connections, createdBy, createdDate, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstance, projectInstanceId, workflowId, version);
+    return Objects.hash(inputs, connections, createdBy, createdDate, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstance, projectInstanceId, workflowId, version);
   }
 
   @Override
@@ -405,7 +373,6 @@ public class ProjectInstanceWorkflowModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectInstanceWorkflowModel {\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
-    sb.append("    connectionIds: ").append(toIndentedString(connectionIds)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
