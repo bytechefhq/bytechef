@@ -5,7 +5,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
-import {TaskExecutionModel} from 'middleware/project';
+import {TaskExecutionModel} from 'middleware/automation/project';
 import {twMerge} from 'tailwind-merge';
 
 const dummyOutputData = {

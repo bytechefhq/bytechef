@@ -13,7 +13,7 @@ import {
     ProjectInstanceModel,
     ProjectModel,
     TagModel,
-} from '../../../middleware/project';
+} from '../../../middleware/automation/project';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,

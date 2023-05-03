@@ -6,7 +6,10 @@ import {
     useReactTable,
 } from '@tanstack/react-table';
 import Badge from 'components/Badge/Badge';
-import {JobBasicModel, ProjectExecutionModel} from 'middleware/project';
+import {
+    JobBasicModel,
+    ProjectExecutionModel,
+} from 'middleware/automation/project';
 import useExecutionDetailsDialogStore from 'pages/automation/project/stores/useExecutionDetailsDialogStore';
 
 const getDuration = (

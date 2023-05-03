@@ -3,7 +3,7 @@ import {
     ActionDefinitionModel,
     ActionDefinitionsApi,
     GetComponentActionDefinitionRequest,
-} from 'middleware/definition-registry';
+} from 'middleware/core/definition-registry';
 
 export const ActionDefinitionKeys = {
     actionDefinition: (request: GetComponentActionDefinitionRequest) => [
