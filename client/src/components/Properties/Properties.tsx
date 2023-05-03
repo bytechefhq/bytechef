@@ -1,4 +1,4 @@
-import {TagModel} from 'middleware/tag/models/TagModel';
+import {TagModel} from 'middleware/core/tag/models/TagModel';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import {PropertyType} from 'types/projectTypes';
