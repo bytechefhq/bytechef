@@ -54,7 +54,7 @@ public class IntegrationCategoryControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/integration-categories")
+                .uri("/embedded/integration-categories")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()

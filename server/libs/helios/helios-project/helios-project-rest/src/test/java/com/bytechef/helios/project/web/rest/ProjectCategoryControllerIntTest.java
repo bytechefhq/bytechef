@@ -58,7 +58,7 @@ public class ProjectCategoryControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/project-categories")
+                .uri("/automation/project-categories")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()

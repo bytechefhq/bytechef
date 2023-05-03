@@ -5,6 +5,13 @@ info:
   version: "1"
 servers:
 - url: "http://localhost:5173/api/core"
+tags:
+- name: "jobs"
+  description: "The Core Jobs API"
+- name: "task-executions"
+  description: "The Core Task Executions API"
+- name: "workflows"
+  description: "The Core Workflows API"
 paths:
   /jobs:
     get:

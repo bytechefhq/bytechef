@@ -56,7 +56,7 @@ public class ProjectTagControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/project-tags")
+                .uri("/automation/project-tags")
                 .exchange()
                 .expectStatus()
                 .isOk()
