@@ -34,7 +34,5 @@ public interface WorkflowFacade {
 
     List<WorkflowDTO> getWorkflows();
 
-    List<WorkflowDTO> getWorkflows(List<String> workflowIds);
-
     WorkflowDTO update(String id, String definition);
 }
