@@ -1,0 +1,9 @@
+apis/ConnectionTagsApi.ts
+apis/ConnectionsApi.ts
+apis/index.ts
+index.ts
+models/ConnectionModel.ts
+models/TagModel.ts
+models/UpdateTagsRequestModel.ts
+models/index.ts
+runtime.ts
