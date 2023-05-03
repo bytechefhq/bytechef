@@ -25,6 +25,9 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFunction;
+import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
+import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
@@ -144,9 +147,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         Authorization authorization = getAuthorization(componentName, connectionVersion, authorizationName);
 
-        Authorization.AuthorizationUrlFunction authorizationUrlFunction = authorization.getAuthorizationUrl();
-        Authorization.ClientIdFunction clientIdFunction = authorization.getClientId();
-        Authorization.ScopesFunction scopesFunction = authorization.getScopes();
+        AuthorizationUrlFunction authorizationUrlFunction = authorization.getAuthorizationUrl();
+        ClientIdFunction clientIdFunction = authorization.getClientId();
+        ScopesFunction scopesFunction = authorization.getScopes();
 
         return new OAuth2AuthorizationParametersDTO(
             authorizationUrlFunction.apply(new InputParametersImpl(connectionParameters)),
