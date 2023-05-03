@@ -35,7 +35,7 @@ public interface ProjectInstanceWorkflowService {
 
     ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String taskName);
 
-    ProjectInstanceWorkflow getProjectInstanceWorkflow(String workflowId, long projectInstanceId);
+    ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId);
 

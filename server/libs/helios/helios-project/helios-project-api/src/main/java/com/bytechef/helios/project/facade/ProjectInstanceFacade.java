@@ -33,6 +33,10 @@ public interface ProjectInstanceFacade {
 
     void deleteProjectInstance(long projectInstanceId);
 
+    void enableProjectInstance(long id, boolean enable);
+
+    void enableProjectInstanceWorkflow(long id, String workflowId, boolean enable);
+
     ProjectInstanceDTO getProjectInstance(long projectInstanceId);
 
     List<Tag> getProjectInstanceTags();

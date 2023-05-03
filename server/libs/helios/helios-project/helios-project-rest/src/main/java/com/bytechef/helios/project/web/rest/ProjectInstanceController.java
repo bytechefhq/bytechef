@@ -91,6 +91,26 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     }
 
     @Override
+    public Mono<ResponseEntity<Void>> enableProjectInstance(Long id, Boolean enable, ServerWebExchange exchange) {
+        projectInstanceFacade.enableProjectInstance(id, enable);
+
+        return Mono.just(
+            ResponseEntity.ok()
+                .build());
+    }
+
+    @Override
+    public Mono<ResponseEntity<Void>> enableProjectInstanceWorkflow(
+        Long id, String workflowId, Boolean enable, ServerWebExchange exchange) {
+
+        projectInstanceFacade.enableProjectInstanceWorkflow(id, workflowId, enable);
+
+        return Mono.just(
+            ResponseEntity.ok()
+                .build());
+    }
+
+    @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectInstanceModel>> getProjectInstance(Long id, ServerWebExchange exchange) {
         return Mono
