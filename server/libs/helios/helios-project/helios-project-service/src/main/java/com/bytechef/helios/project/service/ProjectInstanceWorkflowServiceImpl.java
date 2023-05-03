@@ -78,7 +78,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
-    public ProjectInstanceWorkflow getProjectInstanceWorkflow(String workflowId, long projectInstanceId) {
+    public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
         return projectInstanceWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId);
     }
 
