@@ -15,12 +15,13 @@ import NativeSelect from 'components/NativeSelect/NativeSelect';
 import Properties, {PropertyFormProps} from 'components/Properties/Properties';
 import Tooltip from 'components/Tooltip/Tooltip';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
-import {ConnectionModel, TagModel} from 'middleware/connection';
+import {ConnectionModel, TagModel} from 'middleware/automation/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
-} from 'middleware/definition-registry';
+    GetOAuth2AuthorizationParametersRequestModel,
+} from 'middleware/core/definition-registry';
 import {
     useCreateConnectionMutation,
     useUpdateConnectionMutation,
@@ -32,8 +33,8 @@ import {
 import {useGetConnectionDefinitionQuery} from 'queries/connectionDefinitions.queries';
 import {
     ConnectionKeys,
-    useGetConnectionOAuth2AuthorizationParametersQuery,
     useGetConnectionTagsQuery,
+    useGetOAuth2AuthorizationParametersQuery,
 } from 'queries/connections.queries';
 import {useGetOAuth2PropertiesQuery} from 'queries/oauth2Properties.queries';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -115,8 +116,8 @@ const ConnectionDialog = ({
         isLoading: oAuth2AuthorizationParametersLoading,
         error: oAuth2AuthorizationParametersError,
         data: oAuth2AuthorizationParameters,
-    } = useGetConnectionOAuth2AuthorizationParametersQuery(
-        getNewConnection(),
+    } = useGetOAuth2AuthorizationParametersQuery(
+        getNewOAuth2AuthorizationParameters(),
         wizardStep === 'oauth_step'
     );
 
@@ -298,6 +299,19 @@ const ConnectionDialog = ({
             },
             tags: tags,
         } as ConnectionModel;
+    }
+
+    function getNewOAuth2AuthorizationParameters(): GetOAuth2AuthorizationParametersRequestModel {
+        const {componentName, parameters} = getValues();
+
+        return {
+            authorizationName: authorizationName,
+            componentName: componentName?.value,
+            connectionVersion: 1,
+            parameters: {
+                ...parameters,
+            },
+        } as GetOAuth2AuthorizationParametersRequestModel;
     }
 
     function getErrors(): string[] {

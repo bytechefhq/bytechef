@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '../../../../middleware/definition-registry';
+} from '../../../../middleware/core/definition-registry';
 import WorkflowNodesList from './WorkflowNodesList';
 
 interface SidebarProps {

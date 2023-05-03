@@ -2,7 +2,7 @@ import {LinkIcon, PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
 import EmptyList from 'components/EmptyList/EmptyList';
 import Select from 'components/Select/Select';
-import {ComponentDefinitionModel} from 'middleware/definition-registry';
+import {ComponentDefinitionModel} from 'middleware/core/definition-registry';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
 import {useGetConnectionsQuery} from 'queries/connections.queries';
 import {useState} from 'react';

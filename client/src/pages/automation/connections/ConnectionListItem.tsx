@@ -10,7 +10,10 @@ import DropdownMenu, {
     IDropdownMenuItem,
 } from '../../../components/DropdownMenu/DropdownMenu';
 import TagList from '../../../components/TagList/TagList';
-import {ConnectionModel, TagModel} from '../../../middleware/connection';
+import {
+    ConnectionModel,
+    TagModel,
+} from '../../../middleware/automation/connection';
 import {
     useDeleteConnectionMutation,
     useUpdateConnectionTagsMutation,

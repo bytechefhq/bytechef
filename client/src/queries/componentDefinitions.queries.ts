@@ -6,7 +6,7 @@ import {
     ComponentDefinitionsApi,
     GetComponentDefinitionRequest,
     GetComponentDefinitionsRequest,
-} from '../middleware/definition-registry';
+} from '../middleware/core/definition-registry';
 
 export const ComponentDefinitionKeys = {
     componentDefinition: (request: GetComponentDefinitionRequest) => [

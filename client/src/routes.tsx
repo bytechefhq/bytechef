@@ -3,7 +3,7 @@ import {createBrowserRouter} from 'react-router-dom';
 
 import App from './App';
 import ErrorPage from './ErrorPage';
-import {ProjectsApi} from './middleware/project';
+import {ProjectsApi} from './middleware/automation/project';
 import Connections from './pages/automation/connections/Connections';
 import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
 import Executions from './pages/automation/executions/Executions';

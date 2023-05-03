@@ -4,9 +4,13 @@ import {
     ConnectionModel,
     ConnectionTagsApi,
     ConnectionsApi,
-    OAuth2AuthorizationParametersModel,
     TagModel,
-} from '../middleware/connection';
+} from '../middleware/automation/connection';
+import {
+    ConnectionDefinitionsApi,
+    GetOAuth2AuthorizationParametersRequestModel,
+    OAuth2AuthorizationParametersModel,
+} from '../middleware/core/definition-registry';
 
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
@@ -14,10 +18,9 @@ export const ConnectionKeys = {
         componentNames?: string[];
         tagIds?: number[];
     }) => [...ConnectionKeys.connections, filters],
-    connectionOAuth2AuthorizationParameters: (connection: ConnectionModel) => [
-        ...ConnectionKeys.connections,
-        connection,
-    ],
+    connectionOAuth2AuthorizationParameters: (
+        request: GetOAuth2AuthorizationParametersRequestModel
+    ) => [...ConnectionKeys.connections, request],
     connectionTags: ['connectionTags'] as const,
     connections: ['connections'] as const,
 };
@@ -27,15 +30,15 @@ export const useGetConnectionQuery = (id: number) =>
         new ConnectionsApi().getConnection({id})
     );
 
-export const useGetConnectionOAuth2AuthorizationParametersQuery = (
-    connection: ConnectionModel,
+export const useGetOAuth2AuthorizationParametersQuery = (
+    request: GetOAuth2AuthorizationParametersRequestModel,
     enabled: boolean
 ) =>
     useQuery<OAuth2AuthorizationParametersModel, Error>(
-        ConnectionKeys.connectionOAuth2AuthorizationParameters(connection),
+        ConnectionKeys.connectionOAuth2AuthorizationParameters(request),
         () =>
-            new ConnectionsApi().getConnectionOAuth2AuthorizationParameters({
-                connectionModel: connection,
+            new ConnectionDefinitionsApi().getOAuth2AuthorizationParameters({
+                getOAuth2AuthorizationParametersRequestModel: request,
             }),
         {
             enabled,

@@ -12,8 +12,8 @@ import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import {
     ProjectExecutionModel,
     ProjectExecutionModelFromJSON,
-} from 'middleware/project';
-import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
+} from 'middleware/automation/project';
+import {GetProjectExecutionsJobStatusEnum} from 'middleware/automation/project/apis/ProjectExecutionsApi';
 import {
     useGetProjectExecutionsQuery,
     useGetProjectInstancesQuery,
