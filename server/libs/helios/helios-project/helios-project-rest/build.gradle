@@ -13,7 +13,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     generatorName = "spring"
     importMappings = [
         CategoryModel: "com.bytechef.category.web.rest.model.CategoryModel",
-        ConnectionModel: "com.bytechef.hermes.connection.web.rest.model.ConnectionModel",
         ExecutionErrorModel: "com.bytechef.hermes.workflow.web.rest.model.ExecutionErrorModel",
         JobModel: "com.bytechef.hermes.workflow.web.rest.model.JobModel",
         PageModel: "org.springframework.data.domain.Page",
@@ -29,7 +28,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         Category: "CategoryModel",
-        Connection: "ConnectionModel",
         ExecutionError: "ExecutionErrorModel",
         Job: "JobModel",
         Page: "org.springframework.data.domain.Page",
