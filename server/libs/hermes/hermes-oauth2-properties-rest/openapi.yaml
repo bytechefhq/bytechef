@@ -23,79 +23,6 @@ paths:
                 $ref: "#/components/schemas/OAuth2Properties"
 components:
   schemas:
-    Connection:
-      description: "Contains all required information to open a connection to a service\
-        \ defined by componentName parameter."
-      type: "object"
-      required:
-      - "name"
-      - "componentName"
-      - "componentVersion"
-      - "parameters"
-      properties:
-        active:
-          description: "If a connection is used in any of active workflows."
-          type: "boolean"
-          readOnly: true
-        authorizationName:
-          description: "The name of an authorization used by this connection. Used\
-            \ for HTTP based services."
-          type: "string"
-        componentName:
-          description: "The name of a component that uses this connection."
-          type: "string"
-        connectionVersion:
-          description: "The version of a component that uses this connection."
-          type: "integer"
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of a connection."
-          type: "string"
-        id:
-          description: "The id of a connection."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        parameters:
-          description: "The parameters of a connection."
-          type: "object"
-          additionalProperties:
-            type: "object"
-          writeOnly: true
-        tags:
-          type: "array"
-          items:
-            $ref: "../../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
-        __version:
-          type: "integer"
-          format: "int32"
-    OAuth2AuthorizationParameters:
-      properties:
-        authorizationUrl:
-          type: "string"
-        clientId:
-          type: "string"
-        scopes:
-          type: "array"
-          items:
-            type: "string"
     OAuth2Properties:
       properties:
         redirectUri:
@@ -108,11 +35,3 @@ components:
           readOnly: true
           items:
             type: "string"
-    UpdateTagsRequest:
-      description: "The request object that contains the array of tags."
-      type: "object"
-      properties:
-        tags:
-          type: "array"
-          items:
-            $ref: "../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
