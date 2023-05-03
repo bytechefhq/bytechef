@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class OAuth2PropertiesController implements Oauth2PropertiesApi {
 
     private final ConversionService conversionService;

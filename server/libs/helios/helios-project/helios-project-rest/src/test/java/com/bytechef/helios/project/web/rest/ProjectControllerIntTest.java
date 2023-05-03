@@ -81,7 +81,7 @@ public class ProjectControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/projects/1")
+                .uri("/automation/projects/1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -106,7 +106,7 @@ public class ProjectControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/projects/1")
+                .uri("/automation/projects/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -128,7 +128,7 @@ public class ProjectControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/projects/1/workflows")
+                .uri("/automation/projects/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -149,7 +149,7 @@ public class ProjectControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/projects")
+            .uri("/automation/projects")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -162,7 +162,7 @@ public class ProjectControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/projects?categoryIds=1")
+            .uri("/automation/projects?categoryIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -174,7 +174,7 @@ public class ProjectControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/projects?tagIds=1")
+            .uri("/automation/projects?tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -186,7 +186,7 @@ public class ProjectControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/projects?categoryIds=1&tagIds=1")
+            .uri("/automation/projects?categoryIds=1&tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -207,7 +207,7 @@ public class ProjectControllerIntTest {
             assert projectDTO.id() != null;
             this.webTestClient
                 .post()
-                .uri("/projects")
+                .uri("/automation/projects")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(projectModel)
@@ -255,7 +255,7 @@ public class ProjectControllerIntTest {
         try {
             this.webTestClient
                 .post()
-                .uri("/projects/1/workflows")
+                .uri("/automation/projects/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(createProjectWorkflowRequestModel)
@@ -303,7 +303,7 @@ public class ProjectControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/projects/1")
+                .uri("/automation/projects/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(projectModel)
@@ -331,7 +331,7 @@ public class ProjectControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/projects/1/tags")
+                .uri("/automation/projects/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))

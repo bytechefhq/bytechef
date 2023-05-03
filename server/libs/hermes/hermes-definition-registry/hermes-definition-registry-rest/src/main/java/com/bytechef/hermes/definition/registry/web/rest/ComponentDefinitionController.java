@@ -45,7 +45,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     private final ActionDefinitionService actionDefinitionService;

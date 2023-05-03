@@ -46,7 +46,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class JobController implements JobsApi {
 
     private final ConversionService conversionService;

@@ -83,7 +83,7 @@ public class WorkflowControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/workflows/1")
+                .uri("/core/workflows/1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -105,7 +105,7 @@ public class WorkflowControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/workflows/1")
+                .uri("/core/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -124,7 +124,7 @@ public class WorkflowControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/workflows")
+                .uri("/core/workflows")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -153,7 +153,7 @@ public class WorkflowControllerIntTest {
 
             this.webTestClient
                 .post()
-                .uri("/workflows")
+                .uri("/core/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(workflowModel)
@@ -193,7 +193,7 @@ public class WorkflowControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/workflows/1")
+                .uri("/core/workflows/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(workflowModel)

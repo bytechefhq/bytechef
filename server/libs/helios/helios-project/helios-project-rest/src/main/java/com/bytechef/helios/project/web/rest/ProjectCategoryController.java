@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class ProjectCategoryController implements ProjectCategoriesApi {
 
     private final ConversionService conversionService;

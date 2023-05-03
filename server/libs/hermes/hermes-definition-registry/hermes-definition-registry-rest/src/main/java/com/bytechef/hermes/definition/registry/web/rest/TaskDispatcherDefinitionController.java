@@ -34,7 +34,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionsApi {
 
     private final ConversionService conversionService;

@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.web.rest.mapper.config;
+package com.bytechef.hermes.connection.web.rest;
 
-import com.bytechef.hermes.oauth2.web.rest.adapter.OAuth2ConversionServiceAdapter;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = {OAuth2ConversionServiceAdapter.class
-})
-@SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.hermes.oauth2.web.rest.adapter",
-    conversionServiceAdapterClassName = "OAuth2ConversionServiceAdapter")
-public interface OAuth2MapperSpringConfig {
+public class OAuth2PropertiesControllerTest {
+
+    @Disabled
+    @Test
+    public void testGetOAuth2Properties() {
+        // TODO
+    }
 }

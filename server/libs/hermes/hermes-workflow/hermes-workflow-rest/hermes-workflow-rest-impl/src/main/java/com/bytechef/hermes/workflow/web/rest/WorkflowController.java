@@ -46,7 +46,7 @@ import java.util.Map;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class WorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;

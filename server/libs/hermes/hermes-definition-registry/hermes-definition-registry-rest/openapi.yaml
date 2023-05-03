@@ -5,6 +5,17 @@ info:
   version: "1"
 servers:
 - url: "http://localhost:5173/api/core"
+tags:
+- name: "action-definitions"
+  description: "The Core Action Definitions API"
+- name: "component-definitions"
+  description: "The Core Component Definitions API"
+- name: "connection-definitions"
+  description: "The Core Connection Definitions API"
+- name: "task-dispatcher-definitions"
+  description: "The Core Task Dispatcher Definitions API"
+- name: "trigger-definitions"
+  description: "The Core Trigger Definitions API"
 paths:
   /component-definitions:
     get:
@@ -279,6 +290,50 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDefinition"
+  /connection-definitions/oauth2:
+    post:
+      description: "Retrieves oauth2 authorization parameters."
+      summary: "Retrieves oauth2 authorization parameters."
+      tags:
+      - "connection-definitions"
+      operationId: "getOAuth2AuthorizationParameters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: "Contains all required information to open a connection\
+                \ to a service defined by componentName parameter."
+              type: "object"
+              required:
+              - "name"
+              - "componentName"
+              - "componentVersion"
+              - "parameters"
+              properties:
+                authorizationName:
+                  description: "The name of an authorization used by this connection.\
+                    \ Used for HTTP based services."
+                  type: "string"
+                componentName:
+                  description: "The name of a component that uses this connection."
+                  type: "string"
+                connectionVersion:
+                  description: "The version of a component that uses this connection."
+                  type: "integer"
+                parameters:
+                  description: "The parameters of a connection."
+                  type: "object"
+                  additionalProperties:
+                    type: "object"
+                  writeOnly: true
+        required: true
+      responses:
+        "200":
+          description: "The object with oauth2 authorization parameters."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2AuthorizationParameters"
   /task-dispatcher-definitions:
     get:
       description: "Get all task dispatcher definitions."
@@ -720,6 +775,16 @@ components:
               $ref: "#/components/schemas/Option"
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
+    OAuth2AuthorizationParameters:
+      properties:
+        authorizationUrl:
+          type: "string"
+        clientId:
+          type: "string"
+        scopes:
+          type: "array"
+          items:
+            type: "string"
     ObjectProperty:
       description: "An object property type."
       type: "object"

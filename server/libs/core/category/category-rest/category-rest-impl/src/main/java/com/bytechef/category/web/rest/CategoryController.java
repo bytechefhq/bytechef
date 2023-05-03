@@ -34,7 +34,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class CategoryController implements CategoriesApi {
 
     private final CategoryService categoryService;
