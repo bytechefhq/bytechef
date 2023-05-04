@@ -1,0 +1,60 @@
+plugins {
+    alias(libs.plugins.org.openapi.generator)
+}
+
+task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    apiPackage = "com.bytechef.helios.connection.web.rest"
+    configOptions = [
+        "dateLibrary": "java8-localdatetime",
+        "interfaceOnly": "true",
+        "reactive": "true",
+        "useSpringBoot3": "true"
+    ]
+    generatorName = "spring"
+    importMappings = [
+        TagModel: "com.bytechef.tag.web.rest.model.TagModel"
+    ]
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    modelPackage = "com.bytechef.helios.connection.web.rest.model"
+    outputDir = "$projectDir/generated".toString()
+    schemaMappings = [
+        Tag: "TagModel"
+    ]
+}
+
+sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
+
+task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "typescript-fetch"
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    outputDir = "$rootDir/client/src/middleware/automation/connection".toString()
+    typeMappings = [
+        DateTime: "Date"
+    ]
+}
+
+tasks.register("generateOpenAPI") {
+    dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
+}
+
+dependencies {
+    annotationProcessor libs.org.mapstruct.mapstruct.processor
+    annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
+
+    api project(":server:libs:core:tag:tag-rest:tag-rest-api")
+    api project(":server:libs:helios:helios-connection:helios-connection-api")
+
+    implementation libs.io.swagger.core.v3.swagger.annotations
+    implementation libs.org.openapitools.jackson.databind.nullable
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "jakarta.validation:jakarta.validation-api"
+    implementation libs.org.mapstruct
+    implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-webflux"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+}

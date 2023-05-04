@@ -28,6 +28,7 @@ import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitio
 
 import java.util.List;
 
+import com.bytechef.oauth2.config.OAuth2Properties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -57,6 +58,9 @@ public class ComponentDefinitionControllerIntTest {
 
     @MockBean
     private ConnectionDefinitionService connectionDefinitionService;
+
+    @MockBean
+    private OAuth2Properties oAuth2Properties;
 
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;

@@ -26,13 +26,12 @@ import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.helios.project.domain.ProjectInstance.Status;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
 import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
-import com.bytechef.hermes.connection.InstanceConnectionFetcher;
-import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -58,7 +57,6 @@ import java.util.Objects;
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private final ConnectionService connectionService;
-    private final InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
     private final ProjectInstanceJobFactory projectInstanceJobFactory;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
@@ -69,13 +67,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        ConnectionService connectionService, InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor,
-        ProjectInstanceJobFactory projectInstanceJobFactory, ProjectInstanceService projectInstanceService,
-        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor, WorkflowService workflowService) {
+        ConnectionService connectionService, ProjectInstanceJobFactory projectInstanceJobFactory,
+        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectService projectService, TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor,
+        WorkflowService workflowService) {
 
         this.connectionService = connectionService;
-        this.instanceConnectionFetcherAccessor = instanceConnectionFetcherAccessor;
         this.projectInstanceJobFactory = projectInstanceJobFactory;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
@@ -302,13 +299,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private Connection getConnection(WorkflowConnection workflowConnection) {
         return workflowConnection.getConnectionId()
             .map(connectionService::getConnection)
-            .orElseGet(() -> {
-                InstanceConnectionFetcher instanceConnectionFetcher =
-                    instanceConnectionFetcherAccessor.getInstanceConnectionFetcher(ProjectConstants.PROJECT);
-
-                return instanceConnectionFetcher.getConnection(
-                    workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName()));
-            });
+            .orElseGet(() -> getConnection(
+                workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName())));
     }
 
     private Connection getConnection(WorkflowTrigger workflowTrigger) {
@@ -318,6 +310,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             .findFirst()
             .map(this::getConnection)
             .orElse(null);
+    }
+
+    private Connection getConnection(String key, String taskName) {
+        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
+            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(key, taskName);
+
+        return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
     }
 
     private List<Project> getProjects(List<ProjectInstance> projectInstances) {
