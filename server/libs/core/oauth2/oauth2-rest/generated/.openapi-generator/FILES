@@ -1,0 +1,5 @@
+README.md
+pom.xml
+src/main/java/com/bytechef/oauth2/web/rest/ApiUtil.java
+src/main/java/com/bytechef/oauth2/web/rest/Oauth2PropertiesApi.java
+src/main/java/com/bytechef/oauth2/web/rest/model/OAuth2PropertiesModel.java

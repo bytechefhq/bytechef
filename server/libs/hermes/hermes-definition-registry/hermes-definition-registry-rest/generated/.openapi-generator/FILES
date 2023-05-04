@@ -2,6 +2,7 @@ README.md
 pom.xml
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/ApiUtil.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/ComponentDefinitionsApi.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/ConnectionDefinitionsApi.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/TaskDispatcherDefinitionsApi.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ActionDefinitionModel.java
@@ -20,12 +21,14 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropert
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/HelpModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NullPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPropertyModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OAuth2AuthorizationParametersModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyAllOfModel.java
