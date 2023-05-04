@@ -26,7 +26,7 @@ import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
+import static com.bytechef.component.delay.constant.DelayConstants.SLEEP;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
@@ -34,17 +34,17 @@ import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 /**
  * @author Ivica Cardic
  */
-public class DelayDelayAction {
+public class DelaySleepAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(DELAY)
-        .title("Delay")
+    public static final ActionDefinition ACTION_DEFINITION = action(SLEEP)
+        .title("Sleep")
         .description("Delay action execution.")
         .properties(integer(DelayConstants.MILLIS)
             .label("Millis")
             .description("Time in milliseconds.")
             .required(true)
             .defaultValue(1))
-        .execute(DelayDelayAction::executeDelay);
+        .execute(DelaySleepAction::executeDelay);
 
     protected static Object executeDelay(Context context, InputParameters inputParameters) {
         try {

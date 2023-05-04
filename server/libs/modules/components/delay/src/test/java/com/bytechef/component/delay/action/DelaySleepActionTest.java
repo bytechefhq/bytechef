@@ -29,7 +29,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * @author Ivica Cardic
  */
-public class DelayDelayActionTest {
+public class DelaySleepActionTest {
 
     @Test
     public void test1() {
@@ -44,7 +44,7 @@ public class DelayDelayActionTest {
         Mockito.when(inputParameters.getDuration("duration"))
             .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
 
-        DelayDelayAction.executeDelay(Mockito.mock(Context.class), inputParameters);
+        DelaySleepAction.executeDelay(Mockito.mock(Context.class), inputParameters);
 
         long delta = System.currentTimeMillis() - now;
 
@@ -63,7 +63,7 @@ public class DelayDelayActionTest {
         Mockito.when(inputParameters.getLong("millis"))
             .thenReturn(500L);
 
-        DelayDelayAction.executeDelay(Mockito.mock(Context.class), inputParameters);
+        DelaySleepAction.executeDelay(Mockito.mock(Context.class), inputParameters);
 
         long delta = System.currentTimeMillis() - now;
 
@@ -75,7 +75,7 @@ public class DelayDelayActionTest {
     public void test3() {
         long now = System.currentTimeMillis();
 
-        DelayDelayAction.executeDelay(Mockito.mock(Context.class), Mockito.mock(InputParameters.class));
+        DelaySleepAction.executeDelay(Mockito.mock(Context.class), Mockito.mock(InputParameters.class));
 
         long delta = System.currentTimeMillis() - now;
 

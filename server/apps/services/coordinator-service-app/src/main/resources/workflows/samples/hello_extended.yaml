@@ -60,7 +60,7 @@ tasks:
     parameters:
       text: "Hello ${yourName}"
   - label: "Sleep a little"
-    type: "delay/v1/delay"
+    type: "delay/v1/sleep"
     parameters:
       millis: "${randomNumber}"
   - label: "Print a farewell"
