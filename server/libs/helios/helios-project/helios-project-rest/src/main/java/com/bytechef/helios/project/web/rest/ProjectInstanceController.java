@@ -62,8 +62,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
             .map(
                 projectInstanceModel -> conversionService.convert(
                     projectInstanceFacade.createProjectInstance(
-                        conversionService.convert(
-                            projectInstanceModel, ProjectInstanceDTO.class)),
+                        conversionService.convert(projectInstanceModel, ProjectInstanceDTO.class)),
                     ProjectInstanceModel.class))
             .map(ResponseEntity::ok);
     }

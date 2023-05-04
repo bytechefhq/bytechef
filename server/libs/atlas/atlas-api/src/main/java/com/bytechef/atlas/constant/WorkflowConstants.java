@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class WorkflowConstants {
 
+    public static final String DEFAULT = "default";
     public static final String DESCRIPTION = "description";
     public static final String EVENT = "event";
     public static final String FINALIZE = "finalize";
@@ -51,6 +52,7 @@ public class WorkflowConstants {
     public static final String WORKFLOW_ID = "workflowId";
 
     public static final List<String> WORKFLOW_DEFINITION_CONSTANTS = List.of(
+        DEFAULT,
         DESCRIPTION,
         FINALIZE,
         INPUTS,

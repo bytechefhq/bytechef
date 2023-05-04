@@ -319,21 +319,24 @@ public final class HttpClientUtils {
         Body body, Configuration configuration, RequestMethod requestMethod) throws Exception {
 
         HttpClient httpClient = createHttpClient(
-            componentContext.context(), componentContext.componentDefinition(), headers, queryParameters,
+            componentContext == null ? null : componentContext.context(),
+            componentContext == null ? null : componentContext.componentDefinition(), headers, queryParameters,
             configuration);
 
         HttpRequest httpRequest = createHTTPRequest(
-            componentContext.context(), urlString, requestMethod, headers, queryParameters, body);
+            componentContext == null ? null : componentContext.context(), urlString, requestMethod, headers,
+            queryParameters, body);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
-        return handleResponse(componentContext.context(), httpResponse, configuration);
+        return handleResponse(
+            componentContext == null ? null : componentContext.context(), httpResponse, configuration);
     }
 
     private static void addFileEntry(
         Context context, MultipartBodyPublisher.Builder builder, String name, Context.FileEntry fileEntry) {
 
-        Objects.requireNonNull(context, "'triggerContext' must not be null");
+        Objects.requireNonNull(context, "'context' must not be null");
 
         builder.formPart(
             name, fileEntry.getName(),
@@ -409,7 +412,7 @@ public final class HttpClientUtils {
     private static HttpRequest.BodyPublisher getBinaryBodyPublisher(
         Context context, Body body, Context.FileEntry fileEntry) {
 
-        Objects.requireNonNull(context, "'triggerContext' must not be null");
+        Objects.requireNonNull(context, "'context' must not be null");
 
         return MoreBodyPublishers.ofMediaType(
             HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
@@ -468,7 +471,7 @@ public final class HttpClientUtils {
         Context context, Configuration configuration, Map<String, List<String>> headers,
         InputStream httpResponseBody) throws MimeTypeException {
 
-        Objects.requireNonNull(context, "'triggerContext' must not be null");
+        Objects.requireNonNull(context, "'context' must not be null");
 
         String filename = configuration.getFilename();
 

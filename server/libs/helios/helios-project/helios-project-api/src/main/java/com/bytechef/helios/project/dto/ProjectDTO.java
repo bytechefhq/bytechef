@@ -54,7 +54,7 @@ public record ProjectDTO(
         project.setName(name);
         project.setProjectVersion(projectVersion);
         project.setPublishedDate(publishedDate);
-        project.setStatus(status);
+        project.setStatus(status == null ? Project.Status.UNPUBLISHED : status);
         project.setTags(tags);
         project.setVersion(version);
         project.setWorkflowIds(workflowIds);
@@ -74,7 +74,7 @@ public record ProjectDTO(
         private LocalDateTime lastModifiedDate;
         private int projectVersion;
         private LocalDateTime publishedDate;
-        private Project.Status status;
+        private Project.Status status = Project.Status.UNPUBLISHED;
         private List<Tag> tags;
         private int version;
         private List<String> workflowIds;
