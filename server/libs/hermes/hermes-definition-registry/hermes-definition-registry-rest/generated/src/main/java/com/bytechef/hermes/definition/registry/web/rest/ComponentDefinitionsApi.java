@@ -42,9 +42,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-28T19:34:07.283252+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "action-definitions", description = "the action-definitions API")
+@Tag(name = "action-definitions", description = "The Core Action Definitions API")
 public interface ComponentDefinitionsApi {
 
     /**
