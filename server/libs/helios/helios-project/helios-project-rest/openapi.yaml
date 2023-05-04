@@ -1068,15 +1068,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ProjectInstanceWorkflowConnection"
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
         enabled:
           description: "If a workflow is enabled or not in the project instance."
           type: "boolean"
@@ -1089,29 +1080,8 @@ components:
           description: "The last execution date of a project instance."
           type: "string"
           format: "date-time"
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        projectInstance:
-          type: "object"
-          allOf:
-          - $ref: "#/components/schemas/ProjectInstanceBasic"
-          readOnly: true
-        projectInstanceId:
-          description: "Th id of a project instance."
-          type: "integer"
-          format: "int64"
-          writeOnly: true
         workflowId:
           description: "The id of a workflow."
-          type: "integer"
-        __version:
           type: "integer"
     ProjectInstanceWorkflowConnection:
       description: "The connection used in particular task."
