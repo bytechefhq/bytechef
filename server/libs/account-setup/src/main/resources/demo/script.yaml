@@ -1,5 +1,5 @@
 ---
-label: "Function Demo"
+label: "Hello Script Demo"
 inputs:
 - name: "yourName"
   label: "Your Name"
