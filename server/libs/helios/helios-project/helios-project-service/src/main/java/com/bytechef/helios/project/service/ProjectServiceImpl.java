@@ -56,11 +56,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public long countProjects() {
+        return projectRepository.count();
+    }
+
+    @Override
     public Project create(Project project) {
         Assert.notNull(project, "'project' must not be null");
 
         Assert.isNull(project.getId(), "'id' must be null");
-        Assert.notEmpty(project.getWorkflowIds(), "'workflowIds' must not be empty");
         Assert.notNull(project.getName(), "'name' must not be null");
 
         project.setProjectVersion(1);
