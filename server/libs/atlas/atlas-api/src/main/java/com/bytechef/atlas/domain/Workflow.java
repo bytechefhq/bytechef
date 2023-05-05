@@ -145,6 +145,9 @@ public final class Workflow implements Errorable, Persistable<String> {
     private LocalDateTime lastModifiedDate;
 
     @Transient
+    private Map<String, Object> metadata = new HashMap<>();
+
+    @Transient
     private List<Output> outputs = Collections.emptyList();
 
     @Transient
@@ -164,18 +167,22 @@ public final class Workflow implements Errorable, Persistable<String> {
 
     @PersistenceCreator
     public Workflow(String definition, String id, int format) throws Exception {
-        this(definition, Format.valueOf(format), id, readWorkflowMap(definition, id, format));
+        this(definition, Format.valueOf(format), id, readWorkflowMap(definition, id, format), Map.of());
     }
 
-    public Workflow(String definition, Format format, String id, Map<String, Object> source) {
+    public Workflow(
+        String definition, Format format, String id, Map<String, Object> source, Map<String, Object> metadata) {
+
         Assert.notNull(definition, "'definition' must not be null");
         Assert.notNull(format, "'format' must not be null");
         Assert.notNull(id, "'id' must not be null");
         Assert.notNull(source, "'source' must not be null");
+        Assert.notNull(metadata, "'metadata' must not be null");
 
         this.definition = definition;
         this.format = format.getId();
         this.id = id;
+        this.metadata = new HashMap<>(metadata);
 
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
@@ -309,6 +316,10 @@ public final class Workflow implements Errorable, Persistable<String> {
         return lastModifiedDate;
     }
 
+    public Object getMetadata(String key) {
+        return metadata.get(key);
+    }
+
     /** Returns the workflow's expected outputs */
     public List<Output> getOutputs() {
         return Collections.unmodifiableList(outputs);
@@ -368,7 +379,7 @@ public final class Workflow implements Errorable, Persistable<String> {
     @Override
     public String toString() {
         return "Workflow{" +
-            ", id=" + id +
+            "id=" + id +
             ", label='" + label + '\'' +
             ", definition='" + definition + '\'' +
             ", format=" + format +
@@ -395,6 +406,7 @@ public final class Workflow implements Errorable, Persistable<String> {
     private static Map<String, Object> readWorkflowMap(String definition, String id, int format) throws Exception {
         return WorkflowReader.readWorkflowMap(
             new WorkflowResource(
-                id, new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)), Format.valueOf(format)));
+                id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
+                Format.valueOf(format)));
     }
 }

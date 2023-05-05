@@ -39,6 +39,7 @@ public class WorkflowConstants {
     public static final String NODE = "node";
     public static final String OUTPUTS = "outputs";
     public static final String PARAMETERS = "parameters";
+    public static final String PATH = "path";
     public static final String POST = "post";
     public static final String PRE = "pre";
     public static final String MAX_RETRIES = "maxRetries";

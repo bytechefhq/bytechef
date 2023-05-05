@@ -117,7 +117,7 @@ public class IntegrationControllerIntTest {
     @Test
     public void testGetIntegrationWorkflows() {
         try {
-            Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of());
+            Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of(), Map.of());
 
             when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(
                 List.of(new WorkflowDTO(Collections.emptyList(), workflow)));
