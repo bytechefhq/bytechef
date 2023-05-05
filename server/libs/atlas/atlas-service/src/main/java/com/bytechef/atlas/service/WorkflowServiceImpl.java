@@ -98,8 +98,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         Assert.notNull(id, "'id' must not be null");
 
         workflowCrudRepositories.stream()
-            .filter(workflowCrudRepository -> workflowCrudRepository.findById(id)
-                .isPresent())
+            .filter(workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)))
             .findFirst()
             .ifPresent(workflowCrudRepository -> workflowCrudRepository.deleteById(id));
     }
