@@ -96,7 +96,6 @@
         <!-- TODO Review this issues -->
         <Bug code="THROWS" />
         <Or>
-            <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
             <Class name="com.bytechef.atlas.repository.resource.AbstractResourceWorkflowRepository" />
             <Class name="com.bytechef.atlas.workflow.mapper.AbstractWorkflowMapper" />
             <Class name="com.bytechef.cli.command.componentDefinitionDTO.subcomand.InitSubcommand" />
