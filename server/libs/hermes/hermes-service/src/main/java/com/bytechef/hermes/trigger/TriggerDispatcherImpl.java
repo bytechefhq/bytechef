@@ -33,7 +33,7 @@ import java.util.Objects;
 @Component
 public class TriggerDispatcherImpl implements TriggerDispatcher {
 
-    private static final Logger log = LoggerFactory.getLogger(TriggerDispatcherImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TriggerDispatcherImpl.class);
 
     private final MessageBroker messageBroker;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
@@ -52,8 +52,8 @@ public class TriggerDispatcherImpl implements TriggerDispatcher {
             triggerExecution = triggerDispatcherPreSendProcessor.process(triggerExecution);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                 "Trigger id={}, type='{}' sent to route='{}'", triggerExecution.getId(), triggerExecution.getType(),
                 TriggerMessageRoute.TRIGGERS);
         }

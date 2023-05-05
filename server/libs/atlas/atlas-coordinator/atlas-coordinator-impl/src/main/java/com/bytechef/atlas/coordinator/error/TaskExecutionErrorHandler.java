@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  */
 public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskExecutionErrorHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecutionErrorHandler.class);
 
     private final EventPublisher eventPublisher;
     private final JobService jobService;
@@ -68,7 +68,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
         Assert.notNull(error, "'error' must not be null");
 
-        log.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
+        logger.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
 
         // set task status to FAILED and persist
 

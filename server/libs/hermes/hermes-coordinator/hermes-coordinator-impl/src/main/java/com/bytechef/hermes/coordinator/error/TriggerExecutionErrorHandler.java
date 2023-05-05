@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
 @Component
 public class TriggerExecutionErrorHandler implements ErrorHandler<TriggerExecution> {
 
-    private static final Logger log = LoggerFactory.getLogger(TriggerExecutionErrorHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(TriggerExecutionErrorHandler.class);
 
     private final TriggerExecutionService triggerExecutionService;
 
@@ -50,8 +50,7 @@ public class TriggerExecutionErrorHandler implements ErrorHandler<TriggerExecuti
 
         Assert.notNull(error, "'error' must not be null");
 
-        log.error(
-            "Trigger {}: {}\n{}", triggerExecution.getId(), error.getMessage(), error.getStackTrace());
+        logger.error("Trigger {}: {}\n{}", triggerExecution.getId(), error.getMessage(), error.getStackTrace());
 
         // set task status to FAILED and persist
 
