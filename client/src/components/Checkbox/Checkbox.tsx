@@ -5,10 +5,10 @@ import Tooltip from 'components/Tooltip/Tooltip';
 import {twMerge} from 'tailwind-merge';
 
 export interface CheckboxProps {
+    id: string;
     defaultChecked?: boolean;
     description?: string;
     disabled?: boolean;
-    id: string;
     label?: string;
 }
 
