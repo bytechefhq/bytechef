@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.core.io.Resource;
 
 /**
@@ -35,11 +38,15 @@ import org.springframework.core.io.Resource;
 public class WorkflowResource implements Resource {
 
     private final String id;
+    private final Map<String, Object> metadata;
     private final transient Resource resource;
     private final Workflow.Format workflowFormat;
 
-    public WorkflowResource(String id, Resource resource, Workflow.Format workflowFormat) {
+    public WorkflowResource(
+        String id, Map<String, Object> metadata, Resource resource, Workflow.Format workflowFormat) {
+
         this.id = id;
+        this.metadata = new HashMap<>(metadata);
         this.resource = resource;
         this.workflowFormat = workflowFormat;
     }
@@ -110,5 +117,9 @@ public class WorkflowResource implements Resource {
     @Override
     public String getDescription() {
         return resource.getDescription();
+    }
+
+    public Map<String, Object> getMetadata() {
+        return new HashMap<>(metadata);
     }
 }

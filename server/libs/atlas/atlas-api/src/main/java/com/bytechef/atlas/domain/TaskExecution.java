@@ -291,6 +291,10 @@ public final class TaskExecution
         return new HashMap<>(metadata);
     }
 
+    public Object getMetadata(String key) {
+        return metadata.get(key);
+    }
+
     @JsonIgnore
     public String getName() {
         return workflowTask.getName();
@@ -467,7 +471,9 @@ public final class TaskExecution
     }
 
     public void setMetadata(Map<String, Object> metadata) {
-        if (metadata != null) {
+        if (metadata == null) {
+            this.metadata = new HashMap<>();
+        } else {
             this.metadata = new HashMap<>(metadata);
         }
     }

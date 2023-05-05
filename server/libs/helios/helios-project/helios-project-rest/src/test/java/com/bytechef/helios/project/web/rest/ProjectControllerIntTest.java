@@ -121,7 +121,7 @@ public class ProjectControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
-            Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of());
+            Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of(), Map.of());
 
             when(projectFacade.getProjectWorkflows(1L)).thenReturn(
                 List.of(new WorkflowDTO(Collections.emptyList(), workflow)));

@@ -35,6 +35,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -220,6 +221,7 @@ public class WorkflowControllerIntTest {
 
     private static Workflow getWorkflow() throws JsonProcessingException {
         return new Workflow(
-            DEFINITION, Workflow.Format.JSON, "1", OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}));
+            DEFINITION, Workflow.Format.JSON, "1",
+            OBJECT_MAPPER.readValue(DEFINITION, new TypeReference<>() {}), Map.of());
     }
 }
