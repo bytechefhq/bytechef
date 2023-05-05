@@ -20,6 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import reactor.core.publisher.Mono;
@@ -48,8 +49,7 @@ public interface ConnectionDefinitionService {
     Optional<String> fetchBaseUri(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters);
 
-    Authorization.AuthorizationType getAuthorizationType(
-        String authorizationName, String componentName, int connectionVersion);
+    AuthorizationType getAuthorizationType(String authorizationName, String componentName, int connectionVersion);
 
     Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(String componentName, int componentVersion);
 
