@@ -17,8 +17,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.git.workflow;
+package com.bytechef.atlas.repository.git.operations;
 
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.workflow.mapper.WorkflowResource;
 
@@ -27,8 +28,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.eclipse.jgit.api.CloneCommand;
@@ -47,7 +49,6 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
 
@@ -61,31 +62,37 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
     private static final String LATEST = "latest";
 
-    private File repositoryDir;
-    private final String url;
     private final String branch;
-    private final String[] searchPaths;
+    private final List<String> extensions;
+    private File repositoryDir;
+    private final List<String> searchPaths;
+    private final String url;
     private final String username;
     private final String password;
 
     @SuppressFBWarnings("EI")
-    public JGitWorkflowOperations(String url, String branch, String[] searchPaths, String username, String password) {
-        this.url = url;
+    public JGitWorkflowOperations(
+        String url, String branch, List<String> extensions, List<String> searchPaths, String username,
+        String password) {
+
         this.branch = branch;
-        this.searchPaths = searchPaths;
-        this.username = username;
         this.password = password;
+        this.extensions = extensions;
+        this.searchPaths = searchPaths;
+        this.url = url;
+        this.username = username;
     }
 
     @Override
     public List<WorkflowResource> getHeadFiles() {
         Repository repository = getRepository();
 
-        return getHeadFiles(repository, searchPaths);
+        return getHeadFiles(repository, extensions, searchPaths);
     }
 
-    private List<WorkflowResource> getHeadFiles(Repository repository, String... searchPaths) {
-        List<String> searchPathsList = Arrays.asList(searchPaths);
+    private List<WorkflowResource> getHeadFiles(
+        Repository repository, List<String> extensions, List<String> searchPaths) {
+
         List<WorkflowResource> workflowResources = new ArrayList<>();
 
         try (ObjectReader objectReader = repository.newObjectReader();
@@ -107,13 +114,19 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
             while (treeWalk.next()) {
                 String path = treeWalk.getPathString();
 
-                if (!path.startsWith(".") &&
-                    (CollectionUtils.isEmpty(searchPathsList) ||
-                        CollectionUtils.contains(searchPathsList.iterator(), path))) {
+                String extension = Optional.of(path)
+                    .filter(f -> f.contains("."))
+                    .map(f -> f.substring(path.lastIndexOf(".") + 1))
+                    .orElse("");
+
+                if ((CollectionUtils.isEmpty(extensions) || extensions.contains(extension)) &&
+                    (CollectionUtils.isEmpty(searchPaths) || searchPaths.contains(path))) {
 
                     ObjectId objectId = treeWalk.getObjectId(0);
 
-                    logger.debug("Loading {} [{}]", path, objectId.name());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Loading {} [{}]", path, objectId.name());
+                    }
 
                     workflowResources.add(readBlob(repository, path.substring(0, path.indexOf('.')), objectId.name()));
                 }
@@ -166,26 +179,38 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     }
 
     private WorkflowResource readBlob(Repository repository, String path, String blobId) throws Exception {
+        WorkflowResource workflowResource = null;
+
         try (ObjectReader reader = repository.newObjectReader()) {
             if (blobId.equals(LATEST)) {
-                List<WorkflowResource> headFiles = getHeadFiles(repository, path);
+                List<WorkflowResource> headFiles = getHeadFiles(repository, extensions, List.of(path));
 
-                Assert.notEmpty(headFiles, "could not find: " + path + ":" + blobId);
+                if (headFiles.isEmpty()) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Could not find: " + path + ":" + blobId);
+                    }
+                } else {
+                    workflowResource = headFiles.get(0);
+                }
+            } else {
+                ObjectId objectId = repository.resolve(blobId);
 
-                return headFiles.get(0);
+                if (objectId == null) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Could not find: " + path + ":" + blobId);
+                    }
+                } else {
+                    ObjectLoader objectLoader = reader.open(objectId);
+
+                    AbbreviatedObjectId abbreviatedObjectId = reader.abbreviate(objectId);
+
+                    workflowResource = new WorkflowResource(
+                        path + ":" + abbreviatedObjectId.name(), Map.of(WorkflowConstants.PATH, path),
+                        new ByteArrayResource(objectLoader.getBytes()), Workflow.Format.parse(path));
+                }
             }
 
-            ObjectId objectId = repository.resolve(blobId);
-
-            Assert.notNull(objectId, "could not find: " + path + ":" + blobId);
-
-            ObjectLoader objectLoader = reader.open(objectId);
-
-            AbbreviatedObjectId abbreviatedObjectId = reader.abbreviate(objectId);
-
-            return new WorkflowResource(
-                path + ":" + abbreviatedObjectId.name(),
-                new ByteArrayResource(objectLoader.getBytes()), Workflow.Format.parse(path));
+            return workflowResource;
         }
     }
 
