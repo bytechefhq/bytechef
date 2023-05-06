@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component;
+package com.bytechef.hermes.definition.registry.component;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
 import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -151,7 +153,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
     private static class ContextFileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
 
         @Override
-        public Context.FileEntry convert(Map<?, ?> source) {
+        public FileEntry convert(Map<?, ?> source) {
             return new ContextFileEntry(
                 (String) source.get("extension"),
                 (String) source.get("mimeType"),
