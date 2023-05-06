@@ -22,7 +22,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.service.TriggerLifecycleService;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
@@ -33,7 +32,7 @@ import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Map;
@@ -44,22 +43,19 @@ import static com.bytechef.hermes.trigger.executor.constants.TriggerScheduleCons
 /**
  * @author Ivica Cardic
  */
-@Service
+@Component
 public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
 
     private final SchedulerClient schedulerClient;
-    private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerLifecycleService triggerLifecycleService;
     private final String webhookUrl;
 
     public TriggerLifecycleExecutorImpl(
-        SchedulerClient schedulerClient, TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerDefinitionService triggerDefinitionService, TriggerLifecycleService triggerLifecycleService,
-        @Value("bytechef.webhookUrl") String webhookUrl) {
+        SchedulerClient schedulerClient, TriggerDefinitionService triggerDefinitionService,
+        TriggerLifecycleService triggerLifecycleService, @Value("bytechef.webhookUrl") String webhookUrl) {
 
         this.schedulerClient = schedulerClient;
-        this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerLifecycleService = triggerLifecycleService;
         this.webhookUrl = webhookUrl;
@@ -79,7 +75,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
 
         switch (triggerDefinition.type()) {
             case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {
-                triggerDefinitionFacade.executeDynamicWebhookDisable(
+                triggerDefinitionService.executeDynamicWebhookDisable(
                     workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
                     workflowTrigger.getComponentVersion(),
                     connection == null ? Map.of() : connection.getParameters(),
@@ -90,7 +86,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                     TaskInstanceId.of(
                         TRIGGER_DYNAMIC_WEBHOOK_REFRESH_ONE_TIME_TASK.getTaskName(), workflowExecutionId.toString()));
             }
-            case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
+            case LISTENER -> triggerDefinitionService.executeListenerDisable(
                 workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
                 workflowTrigger.getComponentVersion(),
                 connection == null ? Map.of() : connection.getParameters(),
@@ -114,7 +110,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
 
         switch (triggerDefinition.type()) {
             case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {
-                DynamicWebhookEnableOutput output = triggerDefinitionFacade.executeDynamicWebhookEnable(
+                DynamicWebhookEnableOutput output = triggerDefinitionService.executeDynamicWebhookEnable(
                     workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
                     workflowTrigger.getComponentVersion(),
                     connection == null ? Map.of() : connection.getParameters(),
@@ -134,7 +130,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                     }
                 }
             }
-            case LISTENER -> triggerDefinitionFacade.executeListenerEnable(
+            case LISTENER -> triggerDefinitionService.executeListenerEnable(
                 workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
                 workflowTrigger.getComponentVersion(),
                 connection == null ? Map.of() : connection.getParameters(),

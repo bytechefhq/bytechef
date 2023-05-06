@@ -18,7 +18,6 @@
 package com.bytechef.platform.config;
 
 import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.facade.TriggerDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ConnectionDefinitionServiceRSocketClient;
@@ -73,14 +72,6 @@ public class DefinitionRegistryConfiguration {
         @Qualifier("coordinatorRSocketRequester") RSocketRequester rSocketRequester) {
 
         return new TaskDispatcherDefinitionServiceRSocketClient(rSocketRequester);
-    }
-
-    @Bean
-    TriggerDefinitionFacadeRSocketClient triggerDefinitionFacadeRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
-
-        return new TriggerDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
     }
 
     @Bean

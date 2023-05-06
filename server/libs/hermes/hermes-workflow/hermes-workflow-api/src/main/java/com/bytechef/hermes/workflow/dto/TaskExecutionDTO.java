@@ -20,6 +20,7 @@ package com.bytechef.hermes.workflow.dto;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -30,21 +31,23 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record TaskExecutionDTO(
-    String createdBy, LocalDateTime createdDate, LocalDateTime endDate, ExecutionError error, long executionTime,
-    Long id, Map<String, Object> input, Long jobId, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    int maxRetries, Object output, Long parentId, int priority, int progress, int retryAttempts, String retryDelay,
-    int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate, TaskExecution.Status status, int taskNumber,
-    String type, WorkflowTask workflowTask) {
+    ComponentDefinitionDTO component, String createdBy, LocalDateTime createdDate, LocalDateTime endDate,
+    ExecutionError error, long executionTime, Long id, Map<String, Object> input, Long jobId, String lastModifiedBy,
+    LocalDateTime lastModifiedDate, int maxRetries, Object output, Long parentId, int priority, int progress,
+    int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate,
+    TaskExecution.Status status, int taskNumber, String type, WorkflowTask workflowTask) {
 
-    public TaskExecutionDTO(Map<String, Object> input, TaskExecution taskExecution) {
+    public TaskExecutionDTO(
+        ComponentDefinitionDTO component, Map<String, Object> input, TaskExecution taskExecution) {
+
         this(
-            taskExecution.getCreatedBy(), taskExecution.getCreatedDate(), taskExecution.getEndDate(),
-            taskExecution.getError(), taskExecution.getExecutionTime(), taskExecution.getId(), input,
-            taskExecution.getJobId(), taskExecution.getLastModifiedBy(), taskExecution.getLastModifiedDate(),
-            taskExecution.getMaxRetries(), taskExecution.getOutput(), taskExecution.getParentId(),
-            taskExecution.getPriority(), taskExecution.getProgress(), taskExecution.getRetryAttempts(),
-            taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(), taskExecution.getRetryDelayMillis(),
-            taskExecution.getStartDate(), taskExecution.getStatus(), taskExecution.getTaskNumber(),
-            taskExecution.getType(), taskExecution.getWorkflowTask());
+            component, taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),
+            taskExecution.getEndDate(), taskExecution.getError(), taskExecution.getExecutionTime(),
+            taskExecution.getId(), input, taskExecution.getJobId(), taskExecution.getLastModifiedBy(),
+            taskExecution.getLastModifiedDate(), taskExecution.getMaxRetries(), taskExecution.getOutput(),
+            taskExecution.getParentId(), taskExecution.getPriority(), taskExecution.getProgress(),
+            taskExecution.getRetryAttempts(), taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(),
+            taskExecution.getRetryDelayMillis(), taskExecution.getStartDate(), taskExecution.getStatus(),
+            taskExecution.getTaskNumber(), taskExecution.getType(), taskExecution.getWorkflowTask());
     }
 }
