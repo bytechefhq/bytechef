@@ -39,10 +39,8 @@ public class DefaultComponentHandlerBeanDefinitionLoader
         return BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentActionTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
             .addConstructorArgValue(componentHandler)
-            .addConstructorArgReference("connectionDefinitionService")
-            .addConstructorArgReference("connectionService")
-            .addConstructorArgReference("eventPublisher")
-            .addConstructorArgReference("fileStorageService")
+            .addConstructorArgReference("contextFactory")
+            .addConstructorArgReference("inputParametersFactory")
             .getBeanDefinition();
     }
 }

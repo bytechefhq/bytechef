@@ -19,19 +19,15 @@ package com.bytechef.hermes.component.registrar.oas.handler;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.registrar.oas.OpenApiClient;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -42,32 +38,23 @@ public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
     private static final OpenApiClient OPEN_API_CLIENT = new OpenApiClient();
 
     private final ActionDefinition actionDefinition;
-    private final ConnectionDefinitionService connectionDefinitionService;
-    private final ConnectionService connectionService;
-    private final EventPublisher eventPublisher;
-    private final FileStorageService fileStorageService;
+    private final ContextFactory contextFactory;
     private final OpenApiComponentHandler openApiComponentHandler;
 
     @SuppressFBWarnings("EI2")
     public OpenApiComponentActionTaskHandler(
-        ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService,
-        OpenApiComponentHandler openApiComponentHandler) {
+        ActionDefinition actionDefinition,
+        ContextFactory contextFactory, OpenApiComponentHandler openApiComponentHandler) {
 
         this.actionDefinition = actionDefinition;
-        this.connectionDefinitionService = connectionDefinitionService;
-        this.connectionService = connectionService;
-        this.eventPublisher = eventPublisher;
-        this.fileStorageService = fileStorageService;
+        this.contextFactory = contextFactory;
         this.openApiComponentHandler = openApiComponentHandler;
     }
 
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        ActionContext context = new ContextImpl(
-            connectionDefinitionService,
-            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS),
-            connectionService, eventPublisher, fileStorageService, taskExecution.getId());
+        ActionContext context = contextFactory.createActionContext(
+            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS), taskExecution.getId());
 
         return ComponentContextSupplier.get(
             context, openApiComponentHandler.getDefinition(),

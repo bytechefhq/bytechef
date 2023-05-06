@@ -69,11 +69,9 @@ public class JdbcComponentHandlerBeanDefinitionLoader implements ComponentHandle
 
         return BeanDefinitionBuilder.genericBeanDefinition(JdbcComponentActionTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
-            .addConstructorArgReference("connectionDefinitionService")
-            .addConstructorArgReference("connectionService")
+            .addConstructorArgReference("contextFactory")
             .addConstructorArgReference("dataSourceFactory")
-            .addConstructorArgReference("eventPublisher")
-            .addConstructorArgReference("fileStorageService")
+            .addConstructorArgReference("inputParametersFactory")
             .addConstructorArgValue(jdbcComponentHandler)
             .getBeanDefinition();
     }

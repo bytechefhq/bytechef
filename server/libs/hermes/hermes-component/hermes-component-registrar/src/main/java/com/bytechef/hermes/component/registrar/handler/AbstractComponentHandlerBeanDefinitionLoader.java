@@ -97,11 +97,9 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
         if (triggerType != TriggerType.LISTENER) {
             beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentTriggerHandler.class)
                 .addConstructorArgValue(componentDefinitionFactory)
-                .addConstructorArgReference("connectionDefinitionService")
-                .addConstructorArgReference("connectionService")
+                .addConstructorArgReference("contextFactory")
                 .addConstructorArgReference("dataStorageService")
-                .addConstructorArgReference("eventPublisher")
-                .addConstructorArgReference("fileStorageService")
+                .addConstructorArgReference("inputParametersFactory")
                 .addConstructorArgValue(triggerDefinition)
                 .getBeanDefinition();
         }

@@ -19,19 +19,15 @@ package com.bytechef.hermes.component.registrar.handler;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -42,31 +38,24 @@ public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
     protected final ComponentHandler componentHandler;
 
     private final ActionDefinition actionDefinition;
-    private final ConnectionDefinitionService connectionDefinitionService;
-    private final ConnectionService connectionService;
-    private final EventPublisher eventPublisher;
-    private final FileStorageService fileStorageService;
+    private final ContextFactory contextFactory;
+    private final InputParametersFactory inputParametersFactory;
 
     @SuppressFBWarnings("EI2")
     public DefaultComponentActionTaskHandler(
-        ActionDefinition actionDefinition, ComponentHandler componentHandler,
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        ActionDefinition actionDefinition, ComponentHandler componentHandler, ContextFactory contextFactory,
+        InputParametersFactory inputParametersFactory) {
 
         this.actionDefinition = actionDefinition;
         this.componentHandler = componentHandler;
-        this.connectionDefinitionService = connectionDefinitionService;
-        this.connectionService = connectionService;
-        this.eventPublisher = eventPublisher;
-        this.fileStorageService = fileStorageService;
+        this.contextFactory = contextFactory;
+        this.inputParametersFactory = inputParametersFactory;
     }
 
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        ActionContext context = new ContextImpl(
-            connectionDefinitionService,
-            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS),
-            connectionService, eventPublisher, fileStorageService, taskExecution.getId());
+        ActionContext context = contextFactory.createActionContext(
+            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS), taskExecution.getId());
 
         return ComponentContextSupplier.get(
             context, componentHandler.getDefinition(),
@@ -74,9 +63,10 @@ public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
                 try {
                     return actionDefinition.getExecute()
                         .map(executeFunction -> executeFunction.apply(
-                            context, new InputParametersImpl(taskExecution.getParameters())))
+                            context, inputParametersFactory.createInputParameters(taskExecution.getParameters())))
                         .orElseGet(() -> componentHandler.handleAction(
-                            actionDefinition, context, new InputParametersImpl(taskExecution.getParameters())));
+                            actionDefinition, context,
+                            inputParametersFactory.createInputParameters(taskExecution.getParameters())));
                 } catch (Exception e) {
                     throw new TaskExecutionException(e.getMessage(), e);
                 }

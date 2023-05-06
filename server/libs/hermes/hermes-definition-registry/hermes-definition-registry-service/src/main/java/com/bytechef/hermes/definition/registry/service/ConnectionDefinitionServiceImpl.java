@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.component.InputParametersImpl;
+import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;

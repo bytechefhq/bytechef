@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.util;
+package com.bytechef.hermes.definition.registry.component.factory;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ContextConnectionImpl;
+import com.bytechef.hermes.definition.registry.component.ContextConnectionImpl;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
