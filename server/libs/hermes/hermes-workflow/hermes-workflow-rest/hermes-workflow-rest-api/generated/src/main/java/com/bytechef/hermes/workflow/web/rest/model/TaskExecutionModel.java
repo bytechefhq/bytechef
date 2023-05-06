@@ -2,6 +2,7 @@ package com.bytechef.hermes.workflow.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.hermes.workflow.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.hermes.workflow.web.rest.model.ExecutionErrorModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,8 +29,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:37:27.694957+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-06T08:20:36.906696+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
+
+  private ComponentDefinitionModel component;
 
   private String createdBy;
 
@@ -142,6 +145,26 @@ public class TaskExecutionModel {
     this.priority = priority;
     this.startDate = startDate;
     this.status = status;
+  }
+
+  public TaskExecutionModel component(ComponentDefinitionModel component) {
+    this.component = component;
+    return this;
+  }
+
+  /**
+   * Get component
+   * @return component
+  */
+  @Valid 
+  @Schema(name = "component", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("component")
+  public ComponentDefinitionModel getComponent() {
+    return component;
+  }
+
+  public void setComponent(ComponentDefinitionModel component) {
+    this.component = component;
   }
 
   public TaskExecutionModel createdBy(String createdBy) {
@@ -641,7 +664,8 @@ public class TaskExecutionModel {
       return false;
     }
     TaskExecutionModel taskExecution = (TaskExecutionModel) o;
-    return Objects.equals(this.createdBy, taskExecution.createdBy) &&
+    return Objects.equals(this.component, taskExecution.component) &&
+        Objects.equals(this.createdBy, taskExecution.createdBy) &&
         Objects.equals(this.createdDate, taskExecution.createdDate) &&
         Objects.equals(this.endDate, taskExecution.endDate) &&
         Objects.equals(this.error, taskExecution.error) &&
@@ -669,13 +693,14 @@ public class TaskExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, maxRetries, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
+    return Objects.hash(component, createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, maxRetries, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TaskExecutionModel {\n");
+    sb.append("    component: ").append(toIndentedString(component)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");

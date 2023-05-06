@@ -27,12 +27,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-08T21:31:51.028205+02:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String description;
 
-  private Object exampleOutput;
+  private Object sampleOutput;
 
   private HelpModel help;
 
@@ -85,24 +85,24 @@ public class TriggerDefinitionModel {
     this.description = description;
   }
 
-  public TriggerDefinitionModel exampleOutput(Object exampleOutput) {
-    this.exampleOutput = exampleOutput;
+  public TriggerDefinitionModel sampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
     return this;
   }
 
   /**
-   * The example value of the action's output.
-   * @return exampleOutput
+   * The sample value of the action's output.
+   * @return sampleOutput
   */
   
-  @Schema(name = "exampleOutput", description = "The example value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("exampleOutput")
-  public Object getExampleOutput() {
-    return exampleOutput;
+  @Schema(name = "sampleOutput", description = "The sample value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutput")
+  public Object getSampleOutput() {
+    return sampleOutput;
   }
 
-  public void setExampleOutput(Object exampleOutput) {
-    this.exampleOutput = exampleOutput;
+  public void setSampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
   }
 
   public TriggerDefinitionModel help(HelpModel help) {
@@ -251,7 +251,7 @@ public class TriggerDefinitionModel {
     }
     TriggerDefinitionModel triggerDefinition = (TriggerDefinitionModel) o;
     return Objects.equals(this.description, triggerDefinition.description) &&
-        Objects.equals(this.exampleOutput, triggerDefinition.exampleOutput) &&
+        Objects.equals(this.sampleOutput, triggerDefinition.sampleOutput) &&
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputSchema, triggerDefinition.outputSchema) &&
@@ -262,7 +262,7 @@ public class TriggerDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, exampleOutput, help, name, outputSchema, properties, title, type);
+    return Objects.hash(description, sampleOutput, help, name, outputSchema, properties, title, type);
   }
 
   @Override
@@ -270,7 +270,7 @@ public class TriggerDefinitionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class TriggerDefinitionModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    exampleOutput: ").append(toIndentedString(exampleOutput)).append("\n");
+    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");

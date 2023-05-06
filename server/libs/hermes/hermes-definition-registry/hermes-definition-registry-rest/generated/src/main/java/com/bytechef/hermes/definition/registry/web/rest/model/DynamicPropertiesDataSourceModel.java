@@ -21,20 +21,20 @@ import jakarta.annotation.Generated;
  * Defines function that should load properties.
  */
 
-@Schema(name = "PropertiesDataSource", description = "Defines function that should load properties.")
-@JsonTypeName("PropertiesDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
-public class PropertiesDataSourceModel {
+@Schema(name = "DynamicPropertiesDataSource", description = "Defines function that should load properties.")
+@JsonTypeName("DynamicPropertiesDataSource")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-08T21:31:51.028205+02:00[Europe/Zagreb]")
+public class DynamicPropertiesDataSourceModel {
 
   @Valid
   private List<String> loadPropertiesDependsOn;
 
-  public PropertiesDataSourceModel loadPropertiesDependsOn(List<String> loadPropertiesDependsOn) {
+  public DynamicPropertiesDataSourceModel loadPropertiesDependsOn(List<String> loadPropertiesDependsOn) {
     this.loadPropertiesDependsOn = loadPropertiesDependsOn;
     return this;
   }
 
-  public PropertiesDataSourceModel addLoadPropertiesDependsOnItem(String loadPropertiesDependsOnItem) {
+  public DynamicPropertiesDataSourceModel addLoadPropertiesDependsOnItem(String loadPropertiesDependsOnItem) {
     if (this.loadPropertiesDependsOn == null) {
       this.loadPropertiesDependsOn = new ArrayList<>();
     }
@@ -65,8 +65,8 @@ public class PropertiesDataSourceModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PropertiesDataSourceModel propertiesDataSource = (PropertiesDataSourceModel) o;
-    return Objects.equals(this.loadPropertiesDependsOn, propertiesDataSource.loadPropertiesDependsOn);
+    DynamicPropertiesDataSourceModel dynamicPropertiesDataSource = (DynamicPropertiesDataSourceModel) o;
+    return Objects.equals(this.loadPropertiesDependsOn, dynamicPropertiesDataSource.loadPropertiesDependsOn);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class PropertiesDataSourceModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PropertiesDataSourceModel {\n");
+    sb.append("class DynamicPropertiesDataSourceModel {\n");
     sb.append("    loadPropertiesDependsOn: ").append(toIndentedString(loadPropertiesDependsOn)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -1,13 +1,22 @@
 package com.bytechef.helios.project.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.helios.project.web.rest.model.JobBasicModel;
+import com.bytechef.helios.project.web.rest.model.ProjectBasicModel;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceBasicModel;
+import com.bytechef.helios.project.web.rest.model.WorkflowBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -16,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecutionBasic", description = "Contains information about execution of one of project workflows.")
 @JsonTypeName("WorkflowExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:27:26.489882+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-07T13:31:36.723257+02:00[Europe/Zagreb]")
 public class WorkflowExecutionBasicModel {
 
   private Long id;
@@ -38,7 +47,7 @@ public class WorkflowExecutionBasicModel {
    * The id of a workflow execution.
    * @return id
   */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -58,7 +67,7 @@ public class WorkflowExecutionBasicModel {
    * Get instance
    * @return instance
   */
-  @Valid
+  @Valid 
   @Schema(name = "instance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("instance")
   public ProjectInstanceBasicModel getInstance() {
@@ -78,7 +87,7 @@ public class WorkflowExecutionBasicModel {
    * Get job
    * @return job
   */
-  @Valid
+  @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
   public JobBasicModel getJob() {
@@ -98,7 +107,7 @@ public class WorkflowExecutionBasicModel {
    * Get project
    * @return project
   */
-  @Valid
+  @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
   public ProjectBasicModel getProject() {
@@ -118,7 +127,7 @@ public class WorkflowExecutionBasicModel {
    * Get workflow
    * @return workflow
   */
-  @Valid
+  @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
   public WorkflowBasicModel getWorkflow() {
@@ -137,12 +146,12 @@ public class WorkflowExecutionBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowExecutionBasicModel WorkflowExecutionBasic = (WorkflowExecutionBasicModel) o;
-    return Objects.equals(this.id, WorkflowExecutionBasic.id) &&
-        Objects.equals(this.instance, WorkflowExecutionBasic.instance) &&
-        Objects.equals(this.job, WorkflowExecutionBasic.job) &&
-        Objects.equals(this.project, WorkflowExecutionBasic.project) &&
-        Objects.equals(this.workflow, WorkflowExecutionBasic.workflow);
+    WorkflowExecutionBasicModel workflowExecutionBasic = (WorkflowExecutionBasicModel) o;
+    return Objects.equals(this.id, workflowExecutionBasic.id) &&
+        Objects.equals(this.instance, workflowExecutionBasic.instance) &&
+        Objects.equals(this.job, workflowExecutionBasic.job) &&
+        Objects.equals(this.project, workflowExecutionBasic.project) &&
+        Objects.equals(this.workflow, workflowExecutionBasic.workflow);
   }
 
   @Override
