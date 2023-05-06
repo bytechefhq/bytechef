@@ -314,6 +314,23 @@ paths:
                 $ref: "#/components/schemas/WorkflowResponse"
 components:
   schemas:
+    ComponentDefinition:
+      description: "A component contains a set of reusable code(actions) that accomplish\
+        \ specific tasks, triggers and connections if there is a need for a connection\
+        \ to an outside service."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        icon:
+          description: "The icon."
+          type: "string"
+        name:
+          description: "The name of a component."
+          type: "string"
+        title:
+          description: "The title"
+          type: "string"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"
@@ -516,6 +533,8 @@ components:
       - "startDate"
       - "status"
       properties:
+        component:
+          $ref: "#/components/schemas/ComponentDefinition"
         createdBy:
           description: "The created by."
           type: "string"
