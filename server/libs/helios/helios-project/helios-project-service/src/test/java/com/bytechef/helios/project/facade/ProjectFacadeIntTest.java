@@ -34,6 +34,7 @@ import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.repository.ProjectRepository;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -327,13 +328,14 @@ public class ProjectFacadeIntTest {
 
         @Bean
         ProjectFacade projectFacade(
-            CategoryService categoryService, ContextService contextService, JobService jobService,
-            ProjectInstanceService projectInstanceService, ProjectService projectService,
-            TaskExecutionService taskExecutionService, TagService tagService, WorkflowService workflowService) {
+            CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
+            ContextService contextService, JobService jobService, ProjectInstanceService projectInstanceService,
+            ProjectService projectService, TaskExecutionService taskExecutionService, TagService tagService,
+            WorkflowService workflowService) {
 
             return new ProjectFacadeImpl(
-                categoryService, contextService, jobService, projectInstanceService, projectService,
-                taskExecutionService, tagService, workflowService);
+                categoryService, contextService, componentDefinitionService, jobService, projectInstanceService,
+                projectService, taskExecutionService, tagService, workflowService);
         }
     }
 }

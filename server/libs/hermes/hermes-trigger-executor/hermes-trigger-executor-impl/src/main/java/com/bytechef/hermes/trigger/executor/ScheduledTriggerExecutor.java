@@ -19,8 +19,8 @@ package com.bytechef.hermes.trigger.executor;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.trigger.TriggerDispatcher;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.service.TriggerExecutionService;
 import com.bytechef.hermes.service.TriggerLifecycleService;
@@ -38,16 +38,16 @@ import java.util.Map;
 public class ScheduledTriggerExecutor {
 
     private final TriggerExecutionService triggerExecutionService;
-    private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerLifecycleService triggerLifecycleService;
 
     public ScheduledTriggerExecutor(
-        TriggerExecutionService triggerExecutionService, TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerExecutionService triggerExecutionService, TriggerDefinitionService triggerDefinitionService,
         TriggerDispatcher triggerDispatcher, TriggerLifecycleService triggerLifecycleService) {
 
         this.triggerExecutionService = triggerExecutionService;
-        this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.triggerDefinitionService = triggerDefinitionService;
         this.triggerDispatcher = triggerDispatcher;
         this.triggerLifecycleService = triggerLifecycleService;
     }
@@ -60,8 +60,8 @@ public class ScheduledTriggerExecutor {
         TriggerDefinition.DynamicWebhookEnableOutput output = OptionalUtils.get(
             triggerLifecycleService.fetchValue(workflowExecutionId.getInstanceId(), workflowExecutionId.toString()));
 
-        output = triggerDefinitionFacade.executeDynamicWebhookRefresh(
-            workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
+        output = triggerDefinitionService.executeDynamicWebhookRefresh(
+            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(), workflowTrigger.getTriggerName(),
             output);
 
         if (output != null) {

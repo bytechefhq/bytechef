@@ -18,6 +18,10 @@
 package com.bytechef.hermes.workflow.facade;
 
 import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.util.ComponentUtils;
 import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -32,20 +36,27 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class TaskExecutionFacadeImpl implements TaskExecutionFacade {
 
+    private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public TaskExecutionFacadeImpl(ContextService contextService, TaskExecutionService taskExecutionService) {
+    public TaskExecutionFacadeImpl(
+        ComponentDefinitionService componentDefinitionService, ContextService contextService,
+        TaskExecutionService taskExecutionService) {
+
+        this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.taskExecutionService = taskExecutionService;
     }
 
     @Override
     public TaskExecutionDTO getTaskExecution(long id) {
+        TaskExecution taskExecution = taskExecutionService.getTaskExecution(id);
+
         return new TaskExecutionDTO(
-            contextService.peek(id, Context.Classname.TASK_EXECUTION),
-            taskExecutionService.getTaskExecution(id));
+            getComponentDefinition(taskExecution), contextService.peek(id, Context.Classname.TASK_EXECUTION),
+            taskExecution);
     }
 
     @Override
@@ -54,8 +65,16 @@ public class TaskExecutionFacadeImpl implements TaskExecutionFacade {
         return taskExecutionService.getJobTaskExecutions(jobId)
             .stream()
             .map(taskExecution -> new TaskExecutionDTO(
+                getComponentDefinition(taskExecution),
                 contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
                 taskExecutionService.getTaskExecution(taskExecution.getId())))
             .toList();
+    }
+
+    private ComponentDefinitionDTO getComponentDefinition(TaskExecution taskExecution) {
+        ComponentUtils.ComponentType componentType = ComponentUtils.getComponentType(taskExecution.getType());
+
+        return componentDefinitionService.getComponentDefinition(
+            componentType.componentName(), componentType.componentVersion());
     }
 }
