@@ -219,33 +219,34 @@ export const Executions = () => {
                                 />
                             )}
 
-                            {projectInstances?.length && (
-                                <FilterableSelect
-                                    isClearable
-                                    label="Instances"
-                                    name="instances"
-                                    options={projectInstances?.map(
-                                        (instance) => ({
-                                            label: instance.name,
-                                            value: (
-                                                instance.id || 0
-                                            ).toString(),
-                                        })
-                                    )}
-                                    onChange={(
-                                        value: OnChangeValue<
-                                            ISelectOption,
-                                            false
-                                        >
-                                    ) =>
-                                        value
-                                            ? setFilterInstanceId(
-                                                  Number(value.value)
-                                              )
-                                            : setFilterInstanceId(undefined)
-                                    }
-                                />
-                            )}
+                            {projectInstances &&
+                                projectInstances?.length > 0 && (
+                                    <FilterableSelect
+                                        isClearable
+                                        label="Instances"
+                                        name="instances"
+                                        options={projectInstances?.map(
+                                            (instance) => ({
+                                                label: instance.name,
+                                                value: (
+                                                    instance.id || 0
+                                                ).toString(),
+                                            })
+                                        )}
+                                        onChange={(
+                                            value: OnChangeValue<
+                                                ISelectOption,
+                                                false
+                                            >
+                                        ) =>
+                                            value
+                                                ? setFilterInstanceId(
+                                                      Number(value.value)
+                                                  )
+                                                : setFilterInstanceId(undefined)
+                                        }
+                                    />
+                                )}
                         </div>
                     </>
                 }
