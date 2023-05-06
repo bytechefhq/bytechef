@@ -25,12 +25,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-08T21:31:51.028205+02:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
   private String description;
 
-  private Object exampleOutput;
+  private Object sampleOutput;
 
   private HelpModel help;
 
@@ -80,24 +80,24 @@ public class ActionDefinitionModel {
     this.description = description;
   }
 
-  public ActionDefinitionModel exampleOutput(Object exampleOutput) {
-    this.exampleOutput = exampleOutput;
+  public ActionDefinitionModel sampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
     return this;
   }
 
   /**
-   * The example value of the action's output.
-   * @return exampleOutput
+   * The sample value of the action's output.
+   * @return sampleOutput
   */
   
-  @Schema(name = "exampleOutput", description = "The example value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("exampleOutput")
-  public Object getExampleOutput() {
-    return exampleOutput;
+  @Schema(name = "sampleOutput", description = "The sample value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutput")
+  public Object getSampleOutput() {
+    return sampleOutput;
   }
 
-  public void setExampleOutput(Object exampleOutput) {
-    this.exampleOutput = exampleOutput;
+  public void setSampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
   }
 
   public ActionDefinitionModel help(HelpModel help) {
@@ -226,7 +226,7 @@ public class ActionDefinitionModel {
     }
     ActionDefinitionModel actionDefinition = (ActionDefinitionModel) o;
     return Objects.equals(this.description, actionDefinition.description) &&
-        Objects.equals(this.exampleOutput, actionDefinition.exampleOutput) &&
+        Objects.equals(this.sampleOutput, actionDefinition.sampleOutput) &&
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputSchema, actionDefinition.outputSchema) &&
@@ -236,7 +236,7 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, exampleOutput, help, name, outputSchema, properties, title);
+    return Objects.hash(description, sampleOutput, help, name, outputSchema, properties, title);
   }
 
   @Override
@@ -244,7 +244,7 @@ public class ActionDefinitionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ActionDefinitionModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    exampleOutput: ").append(toIndentedString(exampleOutput)).append("\n");
+    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
