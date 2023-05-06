@@ -90,6 +90,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Project getWorkflowProject(String workflowId) {
+        return OptionalUtils.get(projectRepository.findByWorkflowId(workflowId));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));

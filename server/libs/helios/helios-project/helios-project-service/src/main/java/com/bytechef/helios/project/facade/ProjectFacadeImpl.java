@@ -208,7 +208,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return new ProjectExecutionDTO(
             Objects.requireNonNull(job.getId()),
             OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null), job,
-            OptionalUtils.orElse(projectService.fetchJobProject(id), null),
+            projectService.getWorkflowProject(job.getWorkflowId()),
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(
                     Objects.requireNonNull(job.getId())),
