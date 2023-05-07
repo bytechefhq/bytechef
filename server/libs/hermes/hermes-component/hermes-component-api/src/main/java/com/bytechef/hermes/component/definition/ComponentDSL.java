@@ -85,6 +85,14 @@ public final class ComponentDSL extends DefinitionDSL {
             string("url").required(true));
     }
 
+    public static Help help(String body) {
+        return new Help(body, null);
+    }
+
+    public static Help help(String body, String learnMoreUrl) {
+        return new Help(body, learnMoreUrl);
+    }
+
     public static ModifiableJdbcComponentDefinition jdbcComponent(String name) {
         return new ModifiableJdbcComponentDefinition(name);
     }
@@ -118,7 +126,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Boolean batch;
         private String componentName;
         private String description;
-        private Object exampleOutput;
+        private String exampleOutput;
 
         @JsonIgnore
         private ExecuteFunction execute;
@@ -132,6 +140,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Map<String, Object> metadata;
         private String name;
         private List<? extends Property<?>> outputSchema;
+        private String outputSchemaProperty;
         private List<? extends Property<?>> properties;
         private OutputSchemaDataSource outputSchemaDataSource;
         private String title;
@@ -155,7 +164,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition exampleOutput(Object exampleOutput) {
+        public ModifiableActionDefinition exampleOutput(String exampleOutput) {
             this.exampleOutput = exampleOutput;
 
             return this;
@@ -210,6 +219,12 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableActionDefinition outputSchemaProperty(String outputSchemaProperty) {
+            this.outputSchemaProperty = outputSchemaProperty;
+
+            return this;
+        }
+
         public <P extends Property<?>> ModifiableActionDefinition properties(P... properties) {
             this.properties = List.of(properties);
 
@@ -249,7 +264,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<Object> getExampleOutput() {
+        public Optional<String> getExampleOutput() {
             return Optional.ofNullable(exampleOutput);
         }
 
@@ -286,6 +301,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
             return Optional.ofNullable(outputSchemaDataSource);
+        }
+
+        @Override
+        public Optional<String> getOutputSchemaProperty() {
+            return Optional.ofNullable(outputSchemaProperty);
         }
 
         @Override
@@ -653,6 +673,8 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<? extends ActionDefinition> actions;
         private String category;
         private ModifiableConnectionDefinition connection;
+        private Boolean customAction;
+        private Help customActionHelp;
         private String description;
         private String icon;
         private String[] tags;
@@ -670,7 +692,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         // TODO
         @JsonIgnore
-        private NodeDescriptionFunction nodeDescription;
+        private NodeDescriptionFunction nodeDescription;;
 
         private ModifiableComponentDefinition() {
         }
@@ -719,6 +741,18 @@ public final class ComponentDSL extends DefinitionDSL {
                 .description(this.description)
                 .name(this.name)
                 .title(this.getTitle());
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition customAction(boolean customAction) {
+            this.customAction = customAction;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition customAction(Help customActionHelp) {
+            this.customActionHelp = customActionHelp;
 
             return this;
         }
@@ -861,6 +895,16 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<ConnectionDefinition> getConnection() {
             return Optional.ofNullable(connection);
+        }
+
+        @Override
+        public Optional<Boolean> getCustomAction() {
+            return Optional.ofNullable(customAction);
+        }
+
+        @Override
+        public Optional<Help> getCustomActionHelp() {
+            return Optional.ofNullable(customActionHelp);
         }
 
         @Override

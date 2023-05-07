@@ -40,6 +40,10 @@ public sealed interface ComponentDefinition permits ComponentDSL.ModifiableCompo
 
     Optional<ConnectionDefinition> getConnection();
 
+    Optional<Boolean> getCustomAction();
+
+    Optional<Help> getCustomActionHelp();
+
     Optional<String> getDescription();
 
     String getIcon();

@@ -1155,6 +1155,7 @@ public class DefinitionDSL {
             private ControlType controlType;
             private List<Option<?>> options;
             private OptionsDataSource optionsDataSource;
+            private SampleDataType sampleDataType;
 
             private ModifiableStringProperty() {
                 this(null);
@@ -1200,6 +1201,12 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableStringProperty sampleDataType(SampleDataType sampleDataType) {
+                this.sampleDataType = sampleDataType;
+
+                return this;
+            }
+
             @Override
             public Object accept(PropertyVisitor propertyVisitor) {
                 return propertyVisitor.visit(this);
@@ -1226,6 +1233,11 @@ public class DefinitionDSL {
             @Override
             public Optional<OptionsDataSource> getOptionsDataSource() {
                 return Optional.ofNullable(optionsDataSource);
+            }
+
+            @Override
+            public Optional<SampleDataType> getSampleDataType() {
+                return Optional.ofNullable(sampleDataType);
             }
         }
 
