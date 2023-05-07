@@ -20,6 +20,7 @@
 package com.bytechef.error;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class ExecutionError {
      * @return an array of stack trace elements representing the stack trace pertaining to this error.
      */
     public List<String> getStackTrace() {
-        return new ArrayList<>(stackTrace);
+        return Collections.unmodifiableList(stackTrace);
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -205,7 +206,7 @@ public class DefinitionDSL {
 
         @Override
         public List<String> getLoadPropertiesDependsOn() {
-            return new ArrayList<>(loadPropertiesDependsOn);
+            return Collections.unmodifiableList(loadPropertiesDependsOn);
         }
     }
 
@@ -350,7 +351,7 @@ public class DefinitionDSL {
 
         @Override
         public Map<String, Object> getMetadata() {
-            return new HashMap<>(metadata);
+            return Collections.unmodifiableMap(metadata);
         }
 
         @Override
@@ -1397,7 +1398,7 @@ public class DefinitionDSL {
 
         @Override
         public List<String> getLoadOptionsDependsOn() {
-            return new ArrayList<>(loadOptionsDependsOn);
+            return Collections.unmodifiableList(loadOptionsDependsOn);
         }
     }
 
