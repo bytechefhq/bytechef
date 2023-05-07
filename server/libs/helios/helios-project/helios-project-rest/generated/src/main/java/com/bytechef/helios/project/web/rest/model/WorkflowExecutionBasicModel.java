@@ -1,32 +1,23 @@
 package com.bytechef.helios.project.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.project.web.rest.model.JobBasicModel;
-import com.bytechef.helios.project.web.rest.model.ProjectBasicModel;
-import com.bytechef.helios.project.web.rest.model.ProjectInstanceBasicModel;
-import com.bytechef.helios.project.web.rest.model.WorkflowBasicModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
  * Contains information about execution of one of project workflows.
  */
 
-@Schema(name = "ProjectExecutionBasic", description = "Contains information about execution of one of project workflows.")
-@JsonTypeName("ProjectExecutionBasic")
+@Schema(name = "WorkflowExecutionBasic", description = "Contains information about execution of one of project workflows.")
+@JsonTypeName("WorkflowExecutionBasic")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:27:26.489882+02:00[Europe/Zagreb]")
-public class ProjectExecutionBasicModel {
+public class WorkflowExecutionBasicModel {
 
   private Long id;
 
@@ -38,17 +29,17 @@ public class ProjectExecutionBasicModel {
 
   private WorkflowBasicModel workflow;
 
-  public ProjectExecutionBasicModel id(Long id) {
+  public WorkflowExecutionBasicModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of a project execution.
+   * The id of a workflow execution.
    * @return id
   */
-  
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
     return id;
@@ -58,7 +49,7 @@ public class ProjectExecutionBasicModel {
     this.id = id;
   }
 
-  public ProjectExecutionBasicModel instance(ProjectInstanceBasicModel instance) {
+  public WorkflowExecutionBasicModel instance(ProjectInstanceBasicModel instance) {
     this.instance = instance;
     return this;
   }
@@ -67,7 +58,7 @@ public class ProjectExecutionBasicModel {
    * Get instance
    * @return instance
   */
-  @Valid 
+  @Valid
   @Schema(name = "instance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("instance")
   public ProjectInstanceBasicModel getInstance() {
@@ -78,7 +69,7 @@ public class ProjectExecutionBasicModel {
     this.instance = instance;
   }
 
-  public ProjectExecutionBasicModel job(JobBasicModel job) {
+  public WorkflowExecutionBasicModel job(JobBasicModel job) {
     this.job = job;
     return this;
   }
@@ -87,7 +78,7 @@ public class ProjectExecutionBasicModel {
    * Get job
    * @return job
   */
-  @Valid 
+  @Valid
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
   public JobBasicModel getJob() {
@@ -98,7 +89,7 @@ public class ProjectExecutionBasicModel {
     this.job = job;
   }
 
-  public ProjectExecutionBasicModel project(ProjectBasicModel project) {
+  public WorkflowExecutionBasicModel project(ProjectBasicModel project) {
     this.project = project;
     return this;
   }
@@ -107,7 +98,7 @@ public class ProjectExecutionBasicModel {
    * Get project
    * @return project
   */
-  @Valid 
+  @Valid
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
   public ProjectBasicModel getProject() {
@@ -118,7 +109,7 @@ public class ProjectExecutionBasicModel {
     this.project = project;
   }
 
-  public ProjectExecutionBasicModel workflow(WorkflowBasicModel workflow) {
+  public WorkflowExecutionBasicModel workflow(WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -127,7 +118,7 @@ public class ProjectExecutionBasicModel {
    * Get workflow
    * @return workflow
   */
-  @Valid 
+  @Valid
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
   public WorkflowBasicModel getWorkflow() {
@@ -146,12 +137,12 @@ public class ProjectExecutionBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectExecutionBasicModel projectExecutionBasic = (ProjectExecutionBasicModel) o;
-    return Objects.equals(this.id, projectExecutionBasic.id) &&
-        Objects.equals(this.instance, projectExecutionBasic.instance) &&
-        Objects.equals(this.job, projectExecutionBasic.job) &&
-        Objects.equals(this.project, projectExecutionBasic.project) &&
-        Objects.equals(this.workflow, projectExecutionBasic.workflow);
+    WorkflowExecutionBasicModel WorkflowExecutionBasic = (WorkflowExecutionBasicModel) o;
+    return Objects.equals(this.id, WorkflowExecutionBasic.id) &&
+        Objects.equals(this.instance, WorkflowExecutionBasic.instance) &&
+        Objects.equals(this.job, WorkflowExecutionBasic.job) &&
+        Objects.equals(this.project, WorkflowExecutionBasic.project) &&
+        Objects.equals(this.workflow, WorkflowExecutionBasic.workflow);
   }
 
   @Override
@@ -162,7 +153,7 @@ public class ProjectExecutionBasicModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProjectExecutionBasicModel {\n");
+    sb.append("class WorkflowExecutionBasicModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    instance: ").append(toIndentedString(instance)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");

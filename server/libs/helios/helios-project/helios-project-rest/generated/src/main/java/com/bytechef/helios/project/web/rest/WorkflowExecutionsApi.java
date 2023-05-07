@@ -5,18 +5,15 @@
  */
 package com.bytechef.helios.project.web.rest;
 
+import com.bytechef.helios.project.web.rest.model.WorkflowExecutionModel;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-import com.bytechef.helios.project.web.rest.model.ProjectExecutionModel;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -24,49 +21,42 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import org.springframework.http.codec.multipart.Part;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:27:26.489882+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "project-executions", description = "The Automation Project Executions API")
-public interface ProjectExecutionsApi {
+@Tag(name = "workflow-executions", description = "The Automation Workflow Executions API")
+public interface WorkflowExecutionsApi {
 
     /**
-     * GET /project-executions/{id} : Get project executions by id.
-     * Get project execution by id.
+     * GET /workflow-executions/{id} : Get workflow executions by id.
+     * Get workflow execution by id.
      *
-     * @param id The id of a project execution. (required)
-     * @return The of project execution object. (status code 200)
+     * @param id The id of a workflow execution. (required)
+     * @return The of workflow execution object. (status code 200)
      */
     @Operation(
-        operationId = "getProjectExecution",
-        summary = "Get project executions by id.",
-        description = "Get project execution by id.",
-        tags = { "project-executions" },
+        operationId = "getWorkflowExecution",
+        summary = "Get workflow executions by id.",
+        description = "Get workflow execution by id.",
+        tags = { "workflow-executions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The of project execution object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectExecutionModel.class))
+            @ApiResponse(responseCode = "200", description = "The of workflow execution object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowExecutionModel.class))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-executions/{id}",
+        value = "/workflow-executions/{id}",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<ProjectExecutionModel>> getProjectExecution(
-        @Parameter(name = "id", description = "The id of a project execution.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+    default Mono<ResponseEntity<WorkflowExecutionModel>> getWorkflowExecution(
+        @Parameter(name = "id", description = "The id of a workflow execution.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -84,8 +74,8 @@ public interface ProjectExecutionsApi {
 
 
     /**
-     * GET /project-executions : Get project executions.
-     * Get project executions.
+     * GET /workflow-executions : Get workflow executions.
+     * Get workflow executions.
      *
      * @param jobStatus The status of an executed job (optional)
      * @param jobStartDate The start date of a job. (optional)
@@ -94,25 +84,25 @@ public interface ProjectExecutionsApi {
      * @param projectInstanceId The id of a project instance. (optional)
      * @param workflowId The id of a workflow. (optional)
      * @param pageNumber The number of the page to return. (optional, default to 0)
-     * @return The page of project executions. (status code 200)
+     * @return The page of workflow executions. (status code 200)
      */
     @Operation(
-        operationId = "getProjectExecutions",
-        summary = "Get project executions.",
-        description = "Get project executions.",
-        tags = { "project-executions" },
+        operationId = "getWorkflowExecutions",
+        summary = "Get workflow executions.",
+        description = "Get workflow executions.",
+        tags = { "workflow-executions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The page of project executions.", content = {
+            @ApiResponse(responseCode = "200", description = "The page of workflow executions.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = org.springframework.data.domain.Page.class))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-executions",
+        value = "/workflow-executions",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<org.springframework.data.domain.Page>> getProjectExecutions(
+    default Mono<ResponseEntity<org.springframework.data.domain.Page>> getWorkflowExecutions(
         @Parameter(name = "jobStatus", description = "The status of an executed job", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStatus", required = false) String jobStatus,
         @Parameter(name = "jobStartDate", description = "The start date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStartDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobStartDate,
         @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobEndDate,

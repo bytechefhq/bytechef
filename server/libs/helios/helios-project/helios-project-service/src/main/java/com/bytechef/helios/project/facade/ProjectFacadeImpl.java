@@ -31,7 +31,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.dto.ProjectDTO;
-import com.bytechef.helios.project.dto.ProjectExecutionDTO;
+import com.bytechef.helios.project.dto.WorkflowExecutionDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.util.ComponentUtils;
@@ -209,10 +209,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
-    public ProjectExecutionDTO getProjectExecution(long id) {
+    public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
-        return new ProjectExecutionDTO(
+        return new WorkflowExecutionDTO(
             Objects.requireNonNull(job.getId()),
             OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null), job,
             projectService.getWorkflowProject(job.getWorkflowId()),
@@ -230,7 +230,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
-    public Page<ProjectExecutionDTO> searchProjectExecutions(
+    public Page<WorkflowExecutionDTO> searchWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
@@ -259,7 +259,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<Workflow> workflows = workflowService.getWorkflows(
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-        return jobsPage.map(job -> new ProjectExecutionDTO(
+        return jobsPage.map(job -> new WorkflowExecutionDTO(
             Objects.requireNonNull(job.getId()),
             OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null), job,
             CollectionUtils.getFirst(
