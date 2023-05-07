@@ -6,10 +6,10 @@ import ErrorPage from './ErrorPage';
 import {ProjectsApi} from './middleware/automation/project';
 import Connections from './pages/automation/connections/Connections';
 import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
-import Executions from './pages/automation/executions/Executions';
 import ProjectInstances from './pages/automation/project-instances/ProjectInstances';
 import Project from './pages/automation/project/Project';
 import Projects from './pages/automation/projects/Projects';
+import WorkflowExecutions from './pages/automation/workflow-executions/WorkflowExecutions';
 import Integrations from './pages/embedded/integrations/Integrations';
 import Settings from './pages/settings/Settings';
 import {ProjectKeys} from './queries/projects.queries';
@@ -60,8 +60,8 @@ export const router = createBrowserRouter([
                         element: <Connections />,
                     },
                     {
-                        path: 'executions',
-                        element: <Executions />,
+                        path: 'workflow-executions',
+                        element: <WorkflowExecutions />,
                     },
                 ],
             },
