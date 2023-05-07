@@ -17,11 +17,10 @@
 
 package com.bytechef.server.config;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
@@ -39,6 +38,7 @@ import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionS
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
+import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistryImpl;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import org.springframework.context.annotation.Bean;
@@ -53,8 +53,10 @@ import java.util.List;
 public class DefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionService actionDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ActionDefinitionServiceImpl(componentDefinitions);
+    ActionDefinitionService actionDefinitionService(
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+
+        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
     }
 
     @Bean
@@ -65,18 +67,13 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    List<ComponentDefinition> componentDefinitions(List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        return CollectionUtils.map(componentDefinitionFactories, ComponentDefinitionFactory::getDefinition);
+    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
     }
 
     @Bean
-    ComponentDefinitionService componentDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ComponentDefinitionServiceImpl(componentDefinitions);
-    }
-
-    @Bean
-    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ConnectionDefinitionServiceImpl(componentDefinitions);
+    ConnectionDefinitionService connectionDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        return new ConnectionDefinitionServiceImpl(componentDefinitionRegistry);
     }
 
     @Bean
@@ -102,20 +99,22 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    TaskDispatcherDefinitionService taskDispatcherDefinitionService(
+    public TaskDispatcherDefinitionRegistry taskDispatcherRegistry(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
 
-        return new TaskDispatcherDefinitionServiceImpl(
-            taskDispatcherDefinitionFactories
-                .stream()
-                .map(TaskDispatcherDefinitionFactory::getDefinition)
-                .toList());
+        return new TaskDispatcherDefinitionRegistryImpl(taskDispatcherDefinitionFactories);
+    }
+
+    @Bean
+    TaskDispatcherDefinitionService
+        taskDispatcherDefinitionService(TaskDispatcherDefinitionRegistry taskDispatcherDefinitionRegistry) {
+        return new TaskDispatcherDefinitionServiceImpl(taskDispatcherDefinitionRegistry);
     }
 
     @Bean
     TriggerDefinitionService triggerDefinitionService(
-        List<ComponentDefinition> componentDefinitions, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
 
-        return new TriggerDefinitionServiceImpl(componentDefinitions, contextConnectionFactory);
+        return new TriggerDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
     }
 }

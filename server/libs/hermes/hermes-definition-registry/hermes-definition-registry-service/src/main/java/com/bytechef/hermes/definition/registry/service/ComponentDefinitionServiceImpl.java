@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.definition.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
@@ -52,8 +53,9 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     private final List<ComponentDefinition> componentDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public ComponentDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
-        this.componentDefinitions = CollectionUtils.concat(componentDefinitions, MANUAL_COMPONENT_DEFINITION)
+    public ComponentDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        this.componentDefinitions = CollectionUtils.concat(
+            componentDefinitionRegistry.getComponentDefinitions(), MANUAL_COMPONENT_DEFINITION)
             .stream()
             .sorted((o1, o2) -> {
                 String o1Name = o1.getName();

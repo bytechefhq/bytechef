@@ -17,8 +17,10 @@
 
 package com.bytechef.coordinator.config;
 
+import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistryImpl;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,13 +34,16 @@ import java.util.List;
 public class DefinitionRegistryConfiguration {
 
     @Bean
-    TaskDispatcherDefinitionService taskDispatcherDefinitionService(
+    public TaskDispatcherDefinitionRegistry taskDispatcherRegistry(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
 
-        return new TaskDispatcherDefinitionServiceImpl(
-            taskDispatcherDefinitionFactories
-                .stream()
-                .map(TaskDispatcherDefinitionFactory::getDefinition)
-                .toList());
+        return new TaskDispatcherDefinitionRegistryImpl(taskDispatcherDefinitionFactories);
+    }
+
+    @Bean
+    TaskDispatcherDefinitionService taskDispatcherDefinitionService(
+        TaskDispatcherDefinitionRegistry taskDispatcherDefinitionRegistry) {
+
+        return new TaskDispatcherDefinitionServiceImpl(taskDispatcherDefinitionRegistry);
     }
 }
