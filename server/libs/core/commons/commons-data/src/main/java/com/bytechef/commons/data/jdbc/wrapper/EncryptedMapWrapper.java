@@ -17,6 +17,7 @@
 
 package com.bytechef.commons.data.jdbc.wrapper;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -42,7 +43,7 @@ public class EncryptedMapWrapper {
     }
 
     public Map<String, Object> getMap() {
-        return new HashMap<>(map);
+        return Collections.unmodifiableMap(map);
     }
 
     public Object get(String key) {

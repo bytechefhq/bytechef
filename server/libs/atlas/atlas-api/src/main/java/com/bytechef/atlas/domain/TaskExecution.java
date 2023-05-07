@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -288,7 +289,7 @@ public final class TaskExecution
     }
 
     public Map<String, Object> getMetadata() {
-        return new HashMap<>(metadata);
+        return Collections.unmodifiableMap(metadata);
     }
 
     public Object getMetadata(String key) {

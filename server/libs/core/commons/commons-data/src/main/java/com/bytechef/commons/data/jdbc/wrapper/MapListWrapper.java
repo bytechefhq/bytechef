@@ -42,7 +42,7 @@ public class MapListWrapper {
     }
 
     public List<Map<String, Object>> getList() {
-        return new ArrayList<>(list);
+        return Collections.unmodifiableList(list);
     }
 
     @Override
