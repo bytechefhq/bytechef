@@ -24,9 +24,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.Help;
 import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.ControlType;
 import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
 
@@ -35,7 +33,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.help;
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
@@ -177,7 +174,8 @@ public class CustomAction {
 
             string(OUTPUT_SCHEMA)
                 .label("Output")
-                .description("Please provide a description of the desired format for the API's output schema. This format will then be utilized to generate the data tree for the output.")
+                .description(
+                    "Please provide a description of the desired format for the API's output schema. This format will then be utilized to generate the data tree for the output.")
                 .controlType(ControlType.SCHEMA_DESIGNER)
                 .sampleDataType(SampleDataType.JSON))
         .outputSchema(oneOf())

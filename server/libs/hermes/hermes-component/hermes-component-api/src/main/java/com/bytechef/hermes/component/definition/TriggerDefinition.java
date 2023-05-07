@@ -35,6 +35,10 @@ import java.util.Optional;
 @JsonDeserialize(as = ComponentDSL.ModifiableTriggerDefinition.class)
 public interface TriggerDefinition {
 
+    /**
+     *
+     * @return
+     */
     enum TriggerType {
         HYBRID_DYNAMIC,
         HYBRID_STATIC,
@@ -44,6 +48,10 @@ public interface TriggerDefinition {
         WEBHOOK_STATIC
     }
 
+    /**
+     *
+     * @return
+     */
     enum WebhookMethod {
         DELETE,
         GET,

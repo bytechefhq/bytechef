@@ -32,6 +32,10 @@ import java.util.Optional;
 @JsonDeserialize(as = ComponentDSL.ModifiableActionDefinition.class)
 public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
 
+    /**
+     *
+     * @return
+     */
     Optional<Boolean> getBatch();
 
     /**
@@ -40,10 +44,22 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      */
     Optional<Boolean> getDeprecated();
 
+    /**
+     *
+     * @return
+     */
     String getDescription();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getExampleOutput();
 
+    /**
+     *
+     * @return
+     */
     Optional<ExampleOutputDataSource> getExampleOutputDataSource();
 
     /**
@@ -53,20 +69,52 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      */
     Optional<ExecuteFunction> getExecute();
 
+    /**
+     *
+     * @return
+     */
     Optional<Help> getHelp();
 
+    /**
+     *
+     * @return
+     */
     Map<String, Object> getMetadata();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     *
+     * @return
+     */
     Optional<List<? extends Property<?>>> getOutputSchema();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getOutputSchemaProperty();
 
+    /**
+     *
+     * @return
+     */
     Optional<OutputSchemaDataSource> getOutputSchemaDataSource();
 
+    /**
+     *
+     * @return
+     */
     Optional<List<? extends Property<?>>> getProperties();
 
+    /**
+     *
+     * @return
+     */
     String getTitle();
 
     /**
