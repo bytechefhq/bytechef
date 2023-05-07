@@ -43,13 +43,13 @@ const columns = [
             />
         ),
     }),
-    columnHelper.accessor('project', {
-        header: 'Project',
-        cell: (info) => info.getValue()?.name,
-    }),
     columnHelper.accessor('workflow', {
         header: 'Workflow',
         cell: (info) => info.getValue()?.label,
+    }),
+    columnHelper.accessor('project', {
+        header: 'Project',
+        cell: (info) => info.getValue()?.name,
     }),
     columnHelper.accessor('instance', {
         header: 'Instance',
@@ -72,7 +72,7 @@ const columns = [
     }),
 ];
 
-const ExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
+const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
     const reactTable = useReactTable<WorkflowExecutionModel>({
         data,
         columns,
@@ -139,4 +139,4 @@ const ExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
     );
 };
 
-export default ExecutionsTable;
+export default WorkflowExecutionsTable;
