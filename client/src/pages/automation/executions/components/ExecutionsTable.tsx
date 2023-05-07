@@ -60,13 +60,13 @@ const columns = [
         cell: (info) => getDuration(info),
     }),
     columnHelper.accessor((row) => row.job, {
-        header: 'Completed date',
+        header: 'Execution date',
         cell: (info) => (
             <>
                 {info.getValue()?.endDate &&
-                    `${info.getValue()?.endDate?.toLocaleDateString()} ${info
+                    `${info.getValue()?.startDate?.toLocaleDateString()} ${info
                         .getValue()
-                        ?.endDate?.toLocaleTimeString()}`}
+                        ?.startDate?.toLocaleTimeString()}`}
             </>
         ),
     }),
