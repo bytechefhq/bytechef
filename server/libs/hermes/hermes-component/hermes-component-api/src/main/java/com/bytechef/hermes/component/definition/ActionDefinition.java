@@ -34,6 +34,12 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
 
     Optional<Boolean> getBatch();
 
+    /**
+     *
+     * @return
+     */
+    Optional<Boolean> getDeprecated();
+
     String getDescription();
 
     Optional<String> getExampleOutput();
