@@ -417,7 +417,7 @@ components:
           type: "string"
         exampleOutput:
           description: "The example value of the action's output."
-          type: "object"
+          type: "string"
         help:
           $ref: "#/components/schemas/Help"
         name:
@@ -667,6 +667,7 @@ components:
       - "INPUT_URL"
       - "JSON_BUILDER"
       - "MULTI_SELECT"
+      - "SCHEMA_DESIGNER"
       - "SELECT"
       - "TEXT_AREA"
       - "TIME"

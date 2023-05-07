@@ -33,7 +33,9 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
-        return modifiableComponentDefinition.icon("path:assets/mailchimp.svg");
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/mailchimp.svg");
     }
 
     @Override

@@ -276,6 +276,8 @@ public interface InputParameters {
 
     LocalDateTime getRequiredLocalDateTime(String key);
 
+    <V> Map<String, V> getRequiredMap(String key);
+
     /**
      * Return the {@link String} value associated with the given key -- converting as necessary.
      *
