@@ -160,6 +160,7 @@ public class WorkflowTask implements Task {
 
     /**
      * Get the metadata.
+     *
      * @return
      */
     public Map<String, Object> getMetadata() {
