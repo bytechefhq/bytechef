@@ -44,6 +44,6 @@ public sealed interface SampleOutputDataSource permits ComponentDSL.ModifiableSa
          * @param inputParameters
          * @return
          */
-        String apply(Connection connection, InputParameters inputParameters);
+        Object apply(Connection connection, InputParameters inputParameters);
     }
 }
