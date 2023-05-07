@@ -645,22 +645,22 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Executor delete(String uri) {
-            this.url = Objects.requireNonNull(uri);
+        public Executor delete(String url) {
+            this.url = Objects.requireNonNull(url);
             this.requestMethod = RequestMethod.DELETE;
 
             return this;
         }
 
-        public Executor exchange(String uri, RequestMethod requestMethod) {
-            this.url = Objects.requireNonNull(uri);
+        public Executor exchange(String url, RequestMethod requestMethod) {
+            this.url = Objects.requireNonNull(url);
             this.requestMethod = Objects.requireNonNull(requestMethod);
 
             return this;
         }
 
-        public Executor head(String uri) {
-            this.url = Objects.requireNonNull(uri);
+        public Executor head(String url) {
+            this.url = Objects.requireNonNull(url);
             this.requestMethod = RequestMethod.HEAD;
 
             return this;
@@ -674,8 +674,8 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Executor get(String uri) {
-            this.url = Objects.requireNonNull(uri);
+        public Executor get(String url) {
+            this.url = Objects.requireNonNull(url);
             this.requestMethod = RequestMethod.GET;
 
             return this;
@@ -689,8 +689,8 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Executor patch(String uri) {
-            this.url = Objects.requireNonNull(uri);
+        public Executor patch(String url) {
+            this.url = Objects.requireNonNull(url);
             this.requestMethod = RequestMethod.PATCH;
 
             return this;
@@ -702,8 +702,8 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Executor post(String uri) {
-            this.url = Objects.requireNonNull(uri);
+        public Executor post(String url) {
+            this.url = Objects.requireNonNull(url);
             this.requestMethod = RequestMethod.POST;
 
             return this;

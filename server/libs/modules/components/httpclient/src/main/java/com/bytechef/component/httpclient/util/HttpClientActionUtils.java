@@ -38,7 +38,7 @@ import static com.bytechef.component.httpclient.constant.HttpClientConstants.BOD
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.FOLLOW_REDIRECT;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.FULL_RESPONSE;
-import static com.bytechef.component.httpclient.constant.HttpClientConstants.HEADER_PARAMETERS;
+import static com.bytechef.component.httpclient.constant.HttpClientConstants.HEADERS;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.IGNORE_RESPONSE_CODE;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.PROXY;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.QUERY_PARAMETERS;
@@ -72,7 +72,7 @@ public class HttpClientActionUtils {
                     option("Form-Urlencoded", BodyContentType.FORM_URL_ENCODED.name()),
                     option("Raw", BodyContentType.RAW.name()),
                     option("Binary", BodyContentType.BINARY.name()))
-                .defaultValue("NONE")
+                .defaultValue("")
                 .advancedOption(true));
         }
 
@@ -139,7 +139,7 @@ public class HttpClientActionUtils {
                         .proxy(inputParameters.getString(PROXY))
                         .responseFormat(getResponseFormat(inputParameters))
                         .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
-                .headers(inputParameters.getMap(HEADER_PARAMETERS))
+                .headers(inputParameters.getMap(HEADERS))
                 .queryParameters(inputParameters.getMap(QUERY_PARAMETERS))
                 .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
                 .execute();

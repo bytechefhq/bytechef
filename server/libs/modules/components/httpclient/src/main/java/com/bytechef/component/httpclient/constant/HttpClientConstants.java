@@ -48,7 +48,7 @@ public class HttpClientConstants {
     public static final String FOLLOW_REDIRECT = "followRedirect";
     public static final String FULL_RESPONSE = "fullResponse";
     public static final String HEAD = "head";
-    public static final String HEADER_PARAMETERS = "headerParameters";
+    public static final String HEADERS = "headers";
     public static final String HTTP_CLIENT = "httpClient";
     public static final String GET = "get";
     public static final String IGNORE_RESPONSE_CODE = "ignoreResponseCode";
@@ -65,35 +65,34 @@ public class HttpClientConstants {
     public static final List<Property<?>> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
             object(BODY_CONTENT)
-                .label("JSON")
+                .label("Body Content - JSON")
                 .description("Body Parameters to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
                 .additionalProperties(oneOf())
                 .placeholder("Add Parameter"),
             object(BODY_CONTENT)
-                .label("XML")
+                .label("Body Content - XML")
                 .description("XML content to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
-                .additionalProperties(oneOf())
                 .placeholder("Add Parameter"),
             object(BODY_CONTENT)
-                .label("Form Data")
+                .label("Body Content - Form Data")
                 .description("Body parameters to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
                 .placeholder("Add Parameter")
                 .additionalProperties(oneOf().types(string(), fileEntry())),
             object(BODY_CONTENT)
-                .label("Form URL-Encoded")
+                .label("Body Content - Form URL-Encoded")
                 .description("Body parameters to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
                 .placeholder("Add Parameter")
                 .additionalProperties(string()),
             string(BODY_CONTENT)
-                .label("Raw")
+                .label("Body Content - Raw")
                 .description("The raw text to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
             fileEntry(BODY_CONTENT)
-                .label("Binary")
+                .label("Body Content - Binary")
                 .description("The object property which contains a reference to the file to upload.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
@@ -101,27 +100,35 @@ public class HttpClientConstants {
         Arrays.asList(
             object().properties(oneOf("body").types(array(), object()), object("headers"), integer("status"))
                 .displayCondition(
-                    "['%s', '%s'].includes('%s') && %s === false".formatted(
-                        ResponseFormat.JSON.name(), ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
+                    "['%s'].includes('%s') && %s === false".formatted(
+                        ResponseFormat.JSON.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
+            object().properties(object("body"), object("headers"), integer("status"))
+                .displayCondition(
+                    "['%s'].includes('%s') && %s === false".formatted(
+                        ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
             oneOf()
                 .types(array(), object())
                 .displayCondition(
-                    "['%s', '%s'].includes('%s') && %s === true".formatted(
-                        ResponseFormat.JSON.name(), ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
+                    "['%s'].includes('%s') && %s === true".formatted(
+                        ResponseFormat.JSON.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
+            object()
+                .displayCondition(
+                    "['%s'].includes('%s') && %s === true".formatted(
+                        ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
             string().displayCondition(
                 "%s === '%s' && %s === true".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name(), FULL_RESPONSE)),
             object().properties(string("body"), object("headers"), integer("status"))
                 .displayCondition(
-                    "%s === '%s' && %s === false".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name(),
-                        FULL_RESPONSE)),
+                    "%s === '%s' && %s === false".formatted(
+                        RESPONSE_FORMAT, ResponseFormat.TEXT.name(), FULL_RESPONSE)),
             fileEntry()
                 .displayCondition(
-                    "%s === '%s' && %s === true".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name(),
-                        FULL_RESPONSE)),
+                    "%s === '%s' && %s === true".formatted(
+                        RESPONSE_FORMAT, ResponseFormat.BINARY.name(), FULL_RESPONSE)),
             object().properties(fileEntry("body"), object("headers"), integer("status"))
                 .displayCondition(
-                    "%s === '%s' && %s === false".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name(),
-                        FULL_RESPONSE))));
+                    "%s === '%s' && %s === false".formatted(
+                        RESPONSE_FORMAT, ResponseFormat.BINARY.name(), FULL_RESPONSE))));
 
     public static final List<Property<?>> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
@@ -166,10 +173,10 @@ public class HttpClientConstants {
             // Header properties
             //
 
-            object(HEADER_PARAMETERS)
-                .label("Header Parameters")
-                .description("Header parameters to send.")
-                .placeholder("Add Parameter")
+            object(HEADERS)
+                .label("Headers")
+                .description("Headers to send.")
+                .placeholder("Add header")
                 .additionalProperties(string()),
 
             //
@@ -179,6 +186,6 @@ public class HttpClientConstants {
             object(QUERY_PARAMETERS)
                 .label("Query Parameters")
                 .description("Query parameters to send.")
-                .placeholder("Add Parameter")
+                .placeholder("Add parameter")
                 .additionalProperties(string())));
 }
