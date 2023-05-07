@@ -127,7 +127,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String componentName;
         private Boolean deprecated;
         private String description;
-        private String sampleOutput;
+        private Object sampleOutput;
 
         @JsonIgnore
         private ExecuteFunction execute;
@@ -171,7 +171,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition sampleOutput(String sampleOutput) {
+        public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
             this.sampleOutput = sampleOutput;
 
             return this;
@@ -271,7 +271,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<String> getSampleOutput() {
+        public Optional<Object> getSampleOutput() {
             return Optional.ofNullable(sampleOutput);
         }
 

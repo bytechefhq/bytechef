@@ -54,7 +54,7 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      *
      * @return
      */
-    Optional<String> getSampleOutput();
+    Optional<Object> getSampleOutput();
 
     /**
      *
