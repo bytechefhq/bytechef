@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
@@ -60,8 +61,10 @@ import java.util.Optional;
 public class DefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionService actionDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ActionDefinitionServiceImpl(componentDefinitions);
+    ActionDefinitionService actionDefinitionService(
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+
+        return new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
     }
 
     @Bean
@@ -100,8 +103,8 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    ComponentDefinitionService componentDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ComponentDefinitionServiceImpl(componentDefinitions);
+    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
+        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
     }
 
     @Bean
@@ -114,11 +117,11 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ConnectionDefinitionService connectionDefinitionService(
-        List<ComponentDefinition> componentDefinitions,
+        ComponentDefinitionRegistry componentDefinitionRegistry,
         ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient) {
 
         return new WorkerConnectionDefinitionService(
-            new ConnectionDefinitionServiceImpl(componentDefinitions), connectionDefinitionServiceRSocketClient);
+            new ConnectionDefinitionServiceImpl(componentDefinitionRegistry), connectionDefinitionServiceRSocketClient);
     }
 
     @Bean
@@ -153,9 +156,9 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TriggerDefinitionService triggerDefinitionService(
-        List<ComponentDefinition> componentDefinitions, ContextConnectionFactory contextConnectionFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
 
-        return new TriggerDefinitionServiceImpl(componentDefinitions, contextConnectionFactory);
+        return new TriggerDefinitionServiceImpl(componentDefinitionRegistry, contextConnectionFactory);
     }
 
     /**
