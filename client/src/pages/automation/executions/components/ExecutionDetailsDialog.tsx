@@ -3,72 +3,104 @@ import * as Dialog from '@radix-ui/react-dialog';
 import {useGetWorkflowExecutionQuery} from 'queries/projects.queries';
 import {twMerge} from 'tailwind-merge';
 
-import useExecutionDetailsDialogStore from '../../project/stores/useExecutionDetailsDialogStore';
+import useWorkflowExecutionDetailsDialogStore from '../../project/stores/useWorkflowExecutionDetailsDialogStore';
 import ReadOnlyWorkflow from './dialog-content/ReadOnlyWorkflow';
 import WorkflowTaskListAccordion from './dialog-content/WorkflowTaskListAccordion';
 
 const ExecutionDetailsDialog = () => {
     const {
-        currentExecutionId,
-        executionDetailsDialogOpen,
-        setExecutionDetailsDialogOpen,
-    } = useExecutionDetailsDialogStore();
+        workflowExecutionId,
+        workflowExecutionDetailsDialogOpen,
+        setWorkflowExecutionDetailsDialogOpen,
+    } = useWorkflowExecutionDetailsDialogStore();
 
-    const {data: currentExecution, isLoading: currentExecutionLoading} =
+    const {data: workflowExecution, isLoading: workflowExecutionLoading} =
         useGetWorkflowExecutionQuery(
             {
-                id: currentExecutionId,
+                id: workflowExecutionId,
             },
-            executionDetailsDialogOpen
+            workflowExecutionDetailsDialogOpen
         );
 
-    const allTasksCompleted = currentExecution?.taskExecutions?.every(
+    const allTasksCompleted = workflowExecution?.taskExecutions?.every(
         (taskExecution) => taskExecution.status === 'COMPLETED'
     );
 
+    const startTime = workflowExecution?.job?.startDate?.getTime();
+    const endTime = workflowExecution?.job?.endDate?.getTime();
+
+    let duration;
+
+    if (startTime && endTime) {
+        duration = `${Math.round(endTime - startTime)}ms`;
+    }
+
+    const taskExecutionsCount = workflowExecution?.taskExecutions?.length || 0;
+
     return (
         <Dialog.Root
-            open={executionDetailsDialogOpen}
+            open={workflowExecutionDetailsDialogOpen}
             onOpenChange={() =>
-                setExecutionDetailsDialogOpen(!executionDetailsDialogOpen)
+                setWorkflowExecutionDetailsDialogOpen(
+                    !workflowExecutionDetailsDialogOpen
+                )
             }
             modal={false}
         >
             <Dialog.Portal>
-                <Dialog.Content className="fixed inset-y-0 right-0 z-10 flex w-full max-w-6xl overflow-hidden border-l border-gray-100 shadow-lg">
-                    {currentExecutionLoading && <span>Loading...</span>}
+                <Dialog.Content className="fixed inset-y-0 right-0 z-10 flex w-full max-w-7xl overflow-hidden border-l border-gray-100 shadow-lg">
+                    {workflowExecutionLoading && <span>Loading...</span>}
 
-                    <div className="flex w-6/12 flex-col border-r border-gray-200 bg-white">
-                        <Dialog.Title className="flex items-center justify-between px-2 py-4 text-gray-900">
-                            <span className="text-lg">
-                                {allTasksCompleted
-                                    ? 'Workflow executed successfully'
-                                    : 'Workflow failed'}
-                            </span>
+                    <div className="flex w-7/12 flex-col border-r border-gray-100 bg-white">
+                        <Dialog.Title className="px-3 py-4">
+                            <div className="mb-3 flex items-center justify-between text-gray-900">
+                                <span className="text-lg">
+                                    {allTasksCompleted
+                                        ? 'Workflow executed successfully'
+                                        : 'Workflow failed'}
+                                </span>
 
-                            <CheckCircleIcon
-                                className={twMerge(
-                                    'mr-3 h-5 w-5',
-                                    allTasksCompleted
-                                        ? 'text-green-500'
-                                        : 'text-red-500'
-                                )}
-                            />
+                                <CheckCircleIcon
+                                    className={twMerge(
+                                        'h-5 w-5',
+                                        allTasksCompleted
+                                            ? 'text-green-500'
+                                            : 'text-red-500'
+                                    )}
+                                />
+                            </div>
+
+                            <div className="flex justify-between text-xs">
+                                <span>
+                                    {workflowExecution?.job?.startDate &&
+                                        `${workflowExecution?.job?.startDate?.toLocaleDateString()} ${workflowExecution?.job?.startDate?.toLocaleTimeString()}`}
+                                </span>
+
+                                <span>Duration: {duration}ms</span>
+
+                                <span>
+                                    {`${taskExecutionsCount} task${
+                                        taskExecutionsCount > 1 ? 's' : ''
+                                    } executed`}
+                                </span>
+                            </div>
                         </Dialog.Title>
 
-                        {!!currentExecution?.taskExecutions?.length && (
+                        {!!workflowExecution?.taskExecutions?.length && (
                             <WorkflowTaskListAccordion
                                 allTasksCompleted={!!allTasksCompleted}
-                                taskExecutions={currentExecution.taskExecutions}
+                                taskExecutions={
+                                    workflowExecution.taskExecutions
+                                }
                             />
                         )}
                     </div>
 
-                    {currentExecution && (
+                    {workflowExecution && (
                         <ReadOnlyWorkflow
-                            execution={currentExecution}
-                            setExecutionDetailsDialogOpen={
-                                setExecutionDetailsDialogOpen
+                            workflowExecution={workflowExecution}
+                            setWorkflowExecutionDetailsDialogOpen={
+                                setWorkflowExecutionDetailsDialogOpen
                             }
                         />
                     )}
