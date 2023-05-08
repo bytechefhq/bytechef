@@ -9,6 +9,7 @@ export interface CheckboxProps {
     defaultChecked?: boolean;
     description?: string;
     disabled?: boolean;
+    fieldsetClassName?: string;
     label?: string;
 }
 
@@ -16,10 +17,16 @@ const Checkbox = ({
     defaultChecked = true,
     description,
     disabled = false,
+    fieldsetClassName,
     id,
     label,
 }: CheckboxProps) => (
-    <fieldset className="flex w-full items-center space-x-1 py-2">
+    <fieldset
+        className={twMerge(
+            'flex w-full items-center space-x-1 py-2',
+            fieldsetClassName
+        )}
+    >
         {label && (
             <Label
                 className={twMerge(
