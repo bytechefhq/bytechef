@@ -119,13 +119,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Object getSampleOutput();
-
-    /**
-     *
-     * @return
-     */
-    Optional<SampleOutputDataSource> getExampleOutputDataSource();
+    EditorDescriptionFunction getEditorDescription();
 
     /**
      *
@@ -138,12 +132,6 @@ public interface TriggerDefinition {
      * @return
      */
     String getName();
-
-    /**
-     *
-     * @return
-     */
-    NodeDescriptionFunction getNodeDescription();
 
     /**
      *
@@ -180,6 +168,18 @@ public interface TriggerDefinition {
      * @return
      */
     Optional<List<? extends Property<?>>> getProperties();
+
+    /**
+     *
+     * @return
+     */
+    Object getSampleOutput();
+
+    /**
+     *
+     * @return
+     */
+    Optional<SampleOutputDataSource> getSampleOutputDataSource();
 
     /**
      *

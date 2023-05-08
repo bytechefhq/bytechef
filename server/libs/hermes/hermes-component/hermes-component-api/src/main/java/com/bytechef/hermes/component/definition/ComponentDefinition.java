@@ -96,12 +96,6 @@ public sealed interface ComponentDefinition permits ComponentDSL.ModifiableCompo
      *
      * @return
      */
-    NodeDescriptionFunction getNodeDescription();
-
-    /**
-     *
-     * @return
-     */
     Optional<Resources> getResources();
 
     /**

@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.definition.registry.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
@@ -36,50 +36,22 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 
 /**
  * @author Ivica Cardic
  */
 public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
-    private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
-        .title("Manual")
-        .triggers(trigger("trigger"));
-
-    private final List<ComponentDefinition> componentDefinitions;
+    private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
     @SuppressFBWarnings("EI2")
     public ComponentDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
-        this.componentDefinitions = CollectionUtils.concat(
-            componentDefinitionRegistry.getComponentDefinitions(), MANUAL_COMPONENT_DEFINITION)
-            .stream()
-            .sorted((o1, o2) -> {
-                String o1Name = o1.getName();
-
-                return o1Name.compareTo(o2.getName());
-            })
-            .toList();
+        this.componentDefinitionRegistry = componentDefinitionRegistry;
     }
 
     @Override
     public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
-        ComponentDefinition componentDefinition;
-
-        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.stream()
-            .filter(curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()))
-            .toList();
-
-        if (version == null) {
-            componentDefinition = filteredComponentDefinitions.get(filteredComponentDefinitions.size() - 1);
-        } else {
-            componentDefinition = CollectionUtils.getFirst(
-                filteredComponentDefinitions,
-                curComponentDefinition -> version == curComponentDefinition.getVersion());
-        }
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(name, version);
 
         return toComponentDefinitionDTO(componentDefinition);
     }
@@ -92,7 +64,8 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono() {
         return Mono.just(
-            componentDefinitions.stream()
+            componentDefinitionRegistry.getComponentDefinitions()
+                .stream()
                 .map(this::toComponentDefinitionDTO)
                 .toList());
     }
@@ -100,11 +73,10 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(String name) {
         return Mono.just(
-            CollectionUtils.map(
-                componentDefinitions.stream()
-                    .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
-                    .toList(),
-                this::toComponentDefinitionDTO));
+            componentDefinitionRegistry.getComponentDefinitions(name)
+                .stream()
+                .map(this::toComponentDefinitionDTO)
+                .toList());
     }
 
     private ComponentDefinitionDTO toComponentDefinitionDTO(ComponentDefinition componentDefinition) {

@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.definition.registry.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
@@ -29,7 +29,6 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationConte
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFunction;
 import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
@@ -40,7 +39,6 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -48,22 +46,17 @@ import java.util.Optional;
  */
 public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
 
-    private final List<ComponentDefinition> componentDefinitions;
-    private final List<ConnectionDefinition> connectionDefinitions;
+    private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
     @SuppressFBWarnings("EI2")
     public ConnectionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
-        this.componentDefinitions = componentDefinitionRegistry.getComponentDefinitions();
-        this.connectionDefinitions = componentDefinitions.stream()
-            .map(componentDefinition -> OptionalUtils.orElse(componentDefinition.getConnection(), null))
-            .filter(Objects::nonNull)
-            .distinct()
-            .toList();
+        this.componentDefinitionRegistry = componentDefinitionRegistry;
     }
 
     @Override
     public boolean connectionExists(String componentName, int connectionVersion) {
-        return componentDefinitions.stream()
+        return componentDefinitionRegistry.getComponentDefinitions()
+            .stream()
             .anyMatch(componentDefinition -> {
                 ConnectionDefinition connectionDefinition = OptionalUtils.get(componentDefinition.getConnection());
 
@@ -77,7 +70,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName, AuthorizationContext authorizationContext) {
 
-        Authorization authorization = getAuthorization(componentName, connectionVersion, authorizationName);
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationName);
 
         Authorization.ApplyConsumer applyConsumer = authorization.getApply();
 
@@ -90,7 +84,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
         String redirectUri) {
 
-        Authorization authorization = getAuthorization(componentName, connectionVersion, authorizationName);
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationName);
 
         AuthorizationCallbackFunction authorizationCallbackFunction = authorization.getAuthorizationCallback();
 
@@ -106,7 +101,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public Optional<String> fetchBaseUri(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters) {
 
-        ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
+        ConnectionDefinition connectionDefinition = componentDefinitionRegistry.getComponentConnectionDefinition(
+            componentName, connectionVersion);
 
         ConnectionDefinition.BaseUriFunction baseUriFunction = connectionDefinition.getBaseUri();
 
@@ -117,7 +113,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public Authorization.AuthorizationType getAuthorizationType(
         String authorizationName, String componentName, int connectionVersion) {
 
-        Authorization authorization = getAuthorization(componentName, connectionVersion, authorizationName);
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationName);
 
         return authorization.getType();
     }
@@ -127,18 +124,16 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String componentName, int componentVersion) {
         return Mono.just(
             toConnectionDefinitionDTO(
-                CollectionUtils.getFirst(
-                    componentDefinitions,
-                    componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                        componentDefinition.getVersion() == componentVersion,
-                    componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()))));
+                componentDefinitionRegistry.getConnectionDefinition(componentName, componentVersion)));
     }
 
     @Override
     public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono() {
-        return Mono.just(connectionDefinitions.stream()
-            .map(this::toConnectionDefinitionDTO)
-            .toList());
+        return Mono.just(
+            componentDefinitionRegistry.getConnectionDefinitions()
+                .stream()
+                .map(this::toConnectionDefinitionDTO)
+                .toList());
     }
 
     @Override
@@ -146,7 +141,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName) {
 
-        Authorization authorization = getAuthorization(componentName, connectionVersion, authorizationName);
+        Authorization authorization = componentDefinitionRegistry.getAuthorization(
+            componentName, connectionVersion, authorizationName);
 
         AuthorizationUrlFunction authorizationUrlFunction = authorization.getAuthorizationUrl();
         ClientIdFunction clientIdFunction = authorization.getClientId();
@@ -162,42 +158,10 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(
         String componentName, int componentVersion) {
 
-        ComponentDefinition componentDefinition = CollectionUtils.getFirst(
-            componentDefinitions,
-            curComponentDefinition -> Objects.equals(curComponentDefinition.getName(), componentName) &&
-                curComponentDefinition.getVersion() == componentVersion);
-
         return Mono.just(
             CollectionUtils.map(
-                CollectionUtils.concatDistinct(
-                    applyFilterCompatibleConnectionDefinitions(componentDefinition, connectionDefinitions),
-                    List.of(OptionalUtils.get(componentDefinition.getConnection()))),
+                componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion),
                 this::toConnectionDefinitionDTO));
-    }
-
-    private Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
-        ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
-
-        return connectionDefinition.getAuthorization(authorizationName);
-    }
-
-    private ConnectionDefinition getComponentConnectionDefinition(String componentName, int connectionVersion) {
-        return CollectionUtils.getFirst(
-            componentDefinitions,
-            componentDefinition -> componentDefinition.getConnection()
-                .map(connectionDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                    connectionDefinition.getVersion() == connectionVersion)
-                .orElse(false),
-            componentDefinition -> OptionalUtils.get(componentDefinition.getConnection()));
-    }
-
-    public List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitions(
-        ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
-
-        return componentDefinition.getFilterCompatibleConnectionDefinitions()
-            .map(filterCompatibleConnectionDefinitionsFunction -> filterCompatibleConnectionDefinitionsFunction
-                .apply(componentDefinition, connectionDefinitions))
-            .orElse(Collections.emptyList());
     }
 
     private List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {

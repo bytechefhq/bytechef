@@ -181,7 +181,7 @@ public sealed interface Property<P extends Property<P>>
 
     @JsonDeserialize(as = ModifiableArrayProperty.class)
     sealed interface ArrayProperty
-        extends ValueProperty<Object[], ArrayProperty> permits ModifiableArrayProperty {
+        extends ValueProperty<Object[], ArrayProperty>, OptionsProperty permits ModifiableArrayProperty {
 
         List<Property<?>> getItems();
 
@@ -217,7 +217,7 @@ public sealed interface Property<P extends Property<P>>
 
     @JsonDeserialize(as = ModifiableIntegerProperty.class)
     sealed interface IntegerProperty extends
-        ValueProperty<Integer, IntegerProperty> permits ModifiableIntegerProperty {
+        ValueProperty<Integer, IntegerProperty>, OptionsProperty permits ModifiableIntegerProperty {
 
         Optional<Integer> getMaxValue();
 
@@ -235,7 +235,7 @@ public sealed interface Property<P extends Property<P>>
 
     @JsonDeserialize(as = ModifiableNumberProperty.class)
     sealed interface NumberProperty
-        extends ValueProperty<Double, NumberProperty> permits ModifiableNumberProperty {
+        extends ValueProperty<Double, NumberProperty>, OptionsProperty permits ModifiableNumberProperty {
 
         Optional<Integer> getMaxValue();
 
@@ -250,7 +250,7 @@ public sealed interface Property<P extends Property<P>>
 
     @JsonDeserialize(as = ModifiableObjectProperty.class)
     sealed interface ObjectProperty
-        extends ValueProperty<Object, ObjectProperty> permits ModifiableObjectProperty {
+        extends ValueProperty<Object, ObjectProperty>, OptionsProperty permits ModifiableObjectProperty {
 
         Optional<List<? extends Property<?>>> getAdditionalProperties();
 
@@ -267,7 +267,7 @@ public sealed interface Property<P extends Property<P>>
 
     @JsonDeserialize(as = ModifiableStringProperty.class)
     sealed interface StringProperty
-        extends ValueProperty<String, StringProperty> permits ModifiableStringProperty {
+        extends ValueProperty<String, StringProperty>, OptionsProperty permits ModifiableStringProperty {
 
         enum SampleDataType {
             CSV, JSON, XML
