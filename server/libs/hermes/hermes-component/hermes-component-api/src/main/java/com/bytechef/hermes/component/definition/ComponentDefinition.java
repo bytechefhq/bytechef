@@ -45,6 +45,7 @@ public sealed interface ComponentDefinition permits ComponentDSL.ModifiableCompo
     Optional<List<? extends ActionDefinition>> getActions();
 
     /**
+     * TODO
      *
      * @return
      */
@@ -93,12 +94,14 @@ public sealed interface ComponentDefinition permits ComponentDSL.ModifiableCompo
     String getName();
 
     /**
+     * TODO
      *
      * @return
      */
     Optional<Resources> getResources();
 
     /**
+     * TODO
      *
      * @return
      */
@@ -117,6 +120,7 @@ public sealed interface ComponentDefinition permits ComponentDSL.ModifiableCompo
     Optional<List<? extends TriggerDefinition>> getTriggers();
 
     /**
+     * TODO
      *
      * @return
      */

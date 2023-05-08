@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiablePropertiesDataSource.class)
-public interface PropertiesDataSource {
+@JsonDeserialize(as = DefinitionDSL.ModifiableDynamicPropertiesDataSource.class)
+public interface DynamicPropertiesDataSource {
 
     /**
      *

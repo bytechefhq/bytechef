@@ -25,11 +25,27 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonDeserialize(as = DefinitionDSL.ModifiableOption.class)
 public sealed interface Option<T> permits DefinitionDSL.ModifiableOption {
 
+    /**
+     *
+     * @return
+     */
     String getDescription();
 
+    /**
+     *
+     * @return
+     */
     String getDisplayCondition();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     *
+     * @return
+     */
     Object getValue();
 }

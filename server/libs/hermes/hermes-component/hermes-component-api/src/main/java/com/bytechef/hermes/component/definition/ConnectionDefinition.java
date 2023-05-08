@@ -34,26 +34,73 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
     String BASE_URI = "baseUri";
 
+    /**
+     *
+     * @return
+     */
     boolean containsAuthorizations();
 
+    /**
+     *
+     * @param authorizationName
+     * @return
+     */
     Authorization getAuthorization(String authorizationName);
 
+    /**
+     *
+     * @return
+     */
     Optional<List<? extends Authorization>> getAuthorizations();
 
+    /**
+     *
+     * @return
+     */
     BaseUriFunction getBaseUri();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getDescription();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     *
+     * @return
+     */
     Optional<List<? extends Property<?>>> getProperties();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     Optional<TestConsumer> getTest();
 
+    /**
+     *
+     * @return
+     */
     String getTitle();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     int getVersion();
 
+    /**
+     *
+     * @return
+     */
     boolean isAuthorizationRequired();
 
     /**

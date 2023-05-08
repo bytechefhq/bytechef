@@ -28,9 +28,21 @@ import java.util.Optional;
 @JsonDeserialize(as = DefinitionDSL.ModifiableResources.class)
 public sealed interface Resources permits DefinitionDSL.ModifiableResources {
 
+    /**
+     *
+     * @return
+     */
     Optional<String[]> getCategories();
 
+    /**
+     *
+     * @return
+     */
     String getDocumentationUrl();
 
+    /**
+     *
+     * @return
+     */
     Optional<Map<String, String>> getAdditionalUrls();
 }

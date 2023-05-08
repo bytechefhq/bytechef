@@ -33,12 +33,14 @@ import java.util.Optional;
 public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
 
     /**
+     * TODO
      *
      * @return
      */
     Optional<Boolean> getBatch();
 
     /**
+     * TODO
      *
      * @return
      */
@@ -86,12 +88,6 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      * @return
      */
     Optional<List<? extends Property<?>>> getOutputSchema();
-
-    /**
-     *
-     * @return
-     */
-    Optional<String> getOutputSchemaProperty();
 
     /**
      *
