@@ -37,6 +37,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
+import com.bytechef.hermes.component.definition.registry.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -842,7 +843,8 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
         @Bean
         ConnectionDefinitionService connectionDefinitionService() {
-            return new ConnectionDefinitionServiceImpl(List.of(PETSTORE_COMPONENT_HANDLER.getDefinition()));
+            return new ConnectionDefinitionServiceImpl(
+                new ComponentDefinitionRegistryImpl(List.of(PETSTORE_COMPONENT_HANDLER.getDefinition()), List.of()));
         }
 
         @Bean

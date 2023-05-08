@@ -70,8 +70,8 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
                 workflowExecutionId.getInstanceId(), workflowExecutionId.toString()),
             null);
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
-            workflowTrigger.getTriggerName());
+            workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
+            workflowTrigger.getComponentVersion());
 
         switch (triggerDefinition.type()) {
             case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {
@@ -105,8 +105,8 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
         Map<String, Object> context) {
 
         TriggerDefinitionDTO triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
-            workflowTrigger.getTriggerName());
+            workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
+            workflowTrigger.getComponentVersion());
 
         switch (triggerDefinition.type()) {
             case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {

@@ -54,13 +54,7 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      *
      * @return
      */
-    Optional<Object> getSampleOutput();
-
-    /**
-     *
-     * @return
-     */
-    Optional<SampleOutputDataSource> getExampleOutputDataSource();
+    EditorDescriptionFunction getEditorDescription();
 
     /**
      * The code that should be executed when an action runs as a task inside the workflow engine.
@@ -110,6 +104,18 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      * @return
      */
     Optional<List<? extends Property<?>>> getProperties();
+
+    /**
+     *
+     * @return
+     */
+    Optional<Object> getSampleOutput();
+
+    /**
+     *
+     * @return
+     */
+    Optional<SampleOutputDataSource> getSampleOutputDataSource();
 
     /**
      *

@@ -377,6 +377,8 @@ public class DefinitionDSL {
             private List<Property<?>> items;
             private Boolean multipleValues = true;
             private List<Option<?>> options;
+
+            @JsonIgnore
             private OptionsDataSource optionsDataSource;
 
             private ModifiableArrayProperty() {
@@ -573,6 +575,8 @@ public class DefinitionDSL {
             ModifiableValueProperty<LocalDate, ModifiableDateProperty, DateProperty> implements Property.DateProperty {
 
             private List<Option<?>> options;
+
+            @JsonIgnore
             private OptionsDataSource optionsDataSource;
 
             private ModifiableDateProperty() {
@@ -638,6 +642,8 @@ public class DefinitionDSL {
             implements Property.DateTimeProperty {
 
             private List<Option<?>> options;
+
+            @JsonIgnore
             private OptionsDataSource optionsDataSource;
 
             private ModifiableDateTimeProperty() {
@@ -705,6 +711,8 @@ public class DefinitionDSL {
             private Integer maxValue;
             private Integer minValue;
             private List<Option<?>> options;
+
+            @JsonIgnore
             private OptionsDataSource optionsDataSource;
 
             private ModifiableIntegerProperty() {
@@ -814,6 +822,8 @@ public class DefinitionDSL {
             private Integer minValue;
             private Integer numberPrecision;
             private List<Option<?>> options;
+
+            @JsonIgnore
             private OptionsDataSource optionsDataSource;
 
             private ModifiableNumberProperty() {
@@ -951,7 +961,10 @@ public class DefinitionDSL {
             private Boolean multipleValues = true;
             private String objectType;
             private List<Option<?>> options;
+
+            @JsonIgnore
             private OptionsDataSource optionsDataSource;
+
             private List<? extends Property<?>> properties;
 
             private ModifiableObjectProperty() {
@@ -1089,6 +1102,7 @@ public class DefinitionDSL {
             extends ModifiableProperty<ModifiableDynamicPropertiesProperty, DynamicPropertiesProperty>
             implements Property.DynamicPropertiesProperty {
 
+            @JsonIgnore
             private PropertiesDataSource propertiesDataSource;
 
             public ModifiableDynamicPropertiesProperty propertiesDataSource(
@@ -1155,7 +1169,10 @@ public class DefinitionDSL {
 
             private ControlType controlType;
             private List<Option<?>> options;
+
+            @JsonIgnore
             private OptionsDataSource optionsDataSource;
+
             private SampleDataType sampleDataType;
 
             private ModifiableStringProperty() {

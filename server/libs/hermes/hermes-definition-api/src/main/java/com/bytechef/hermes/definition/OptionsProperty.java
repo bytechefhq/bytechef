@@ -15,22 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.definition;
 
-import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.InputParameters;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-interface NodeDescriptionFunction {
+public interface OptionsProperty {
 
-    /**
-     *
-     * @param connection
-     * @param inputParameters
-     * @return
-     */
-    String apply(Connection connection, InputParameters inputParameters);
+    Optional<List<Option<?>>> getOptions();
 
+    Optional<OptionsDataSource> getOptionsDataSource();
 }

@@ -17,18 +17,41 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
+import com.bytechef.hermes.definition.Option;
+import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface ActionDefinitionService {
 
+    String executeEditorDescription(
+        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> actionParameters);
+
+    List<Option<?>> executeOptions(
+        String propertyName, String actionName, String componentName, int componentVersion,
+        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters);
+
+    List<? extends Property<?>> executeOutputSchema(
+        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> actionParameters);
+
+    Object executeSampleOutput(
+        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> actionParameters);
+
+    List<? extends Property<?>> executeProperties(
+        String propertyName, String actionName, String componentName, int componentVersion,
+        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters);
+
     Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
-        String componentName, int componentVersion, String actionName);
+        String actionName, String componentName, int componentVersion);
 
     Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(String componentName, int componentVersion);
 }
