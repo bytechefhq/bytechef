@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
+import Properties from 'components/Properties/Properties';
 import {useGetActionDefinitionQuery} from 'queries/actionDefinitions.queries';
 import {
     useGetComponentDefinitionQuery,
@@ -15,7 +16,6 @@ import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
-import PropertiesTab from './node-details-tabs/PropertiesTab';
 
 const tabs = [
     {
@@ -23,12 +23,12 @@ const tabs = [
         name: 'description',
     },
     {
-        label: 'Properties',
-        name: 'properties',
-    },
-    {
         label: 'Connection',
         name: 'connection',
+    },
+    {
+        label: 'Properties',
+        name: 'properties',
     },
     {
         label: 'Output',
@@ -85,9 +85,20 @@ const NodeDetailsDialog = () => {
             !componentDefinitionNames?.includes(currentComponent.name)
         ) {
             setActiveTab('description');
+        } else if (
+            activeTab === 'properties' &&
+            !currentAction?.properties?.length
+        ) {
+            setActiveTab('description');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentComponent?.name]);
+
+    useEffect(() => {
+        if (currentAction) {
+            setCurrentActionName(currentAction.name);
+        }
+    }, [currentAction]);
 
     const singleActionComponent = currentComponent?.actions?.length === 1;
 
@@ -101,7 +112,7 @@ const NodeDetailsDialog = () => {
         if (
             (name === 'connection' && !componentHasConnection) ||
             (name === 'output' && !currentAction) ||
-            (name === 'properties' && !currentAction)
+            (name === 'properties' && !currentAction?.properties?.length)
         ) {
             return;
         } else {
@@ -218,12 +229,12 @@ const NodeDetailsDialog = () => {
                                                     activeTab === tab.name &&
                                                         'border-blue-500 text-blue-500 hover:text-blue-500'
                                                 )}
-                                                onClick={() =>
-                                                    setActiveTab(tab.name)
-                                                }
                                                 key={tab.name}
                                                 label={tab.label}
                                                 name={tab.name}
+                                                onClick={() =>
+                                                    setActiveTab(tab.name)
+                                                }
                                             />
                                         ))}
                                     </div>
@@ -237,8 +248,9 @@ const NodeDetailsDialog = () => {
                                     )}
 
                                     {activeTab === 'properties' &&
-                                        currentAction?.properties && (
-                                            <PropertiesTab
+                                        !!currentAction?.properties?.length && (
+                                            <Properties
+                                                actionName={currentActionName}
                                                 properties={
                                                     currentAction.properties
                                                 }
