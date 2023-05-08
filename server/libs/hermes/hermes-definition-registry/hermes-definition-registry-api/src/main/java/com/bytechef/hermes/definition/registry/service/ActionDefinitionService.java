@@ -31,24 +31,24 @@ import java.util.Map;
 public interface ActionDefinitionService {
 
     String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters);
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters);
 
     List<Option<?>> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters);
+        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters);
 
     List<? extends Property<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters);
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters);
+
+    List<? extends Property<?>> executeDynamicProperties(
+        String propertyName, String actionName, String componentName, int componentVersion,
+        Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters);
 
     Object executeSampleOutput(
-        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> actionParameters);
-
-    List<? extends Property<?>> executeProperties(
-        String propertyName, String actionName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters);
+        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String authorizationName, Map<String, Object> connectionParameters);
 
     Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
         String actionName, String componentName, int componentVersion);

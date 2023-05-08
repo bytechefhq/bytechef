@@ -102,9 +102,9 @@ public class ConnectionDefinitionServiceRSocketController {
 
     @MessageMapping("ConnectionDefinitionService.getOAuth2Parameters")
     public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(Connection connection) {
-        return Mono.just(connectionDefinitionService.getOAuth2Parameters(
+        return connectionDefinitionService.getOAuth2Parameters(
             connection.componentName, connection.connectionVersion, connection.parameters,
-            connection.authorizationName));
+            connection.authorizationName);
     }
 
     private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {

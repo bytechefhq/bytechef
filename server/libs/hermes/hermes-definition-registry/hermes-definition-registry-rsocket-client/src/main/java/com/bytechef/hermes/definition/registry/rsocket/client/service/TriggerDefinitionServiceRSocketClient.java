@@ -85,15 +85,10 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
 
     @Override
     public String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.executeEditorDescription")
-            .data(new EditorDescription(
-                authorizationName, componentName, componentVersion, connectionParameters, triggerName,
-                triggerParameters))
-            .retrieveMono(String.class));
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -126,53 +121,33 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
     @Override
     public List<Option<?>> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> triggerParameters) {
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.executeOptions")
-            .data(new Options(
-                authorizationName, componentName, componentVersion, connectionParameters, propertyName, triggerName,
-                triggerParameters))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
-    }
-
-    @Override
-    public List<? extends Property<?>> executeProperties(
-        String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> triggerParameters) {
-
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.executeProperties")
-            .data(new Properties(
-                authorizationName, componentName, componentVersion, connectionParameters, propertyName, triggerName,
-                triggerParameters))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends Property<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.executeOutputSchema")
-            .data(new OutputSchema(
-                authorizationName, componentName, componentVersion, connectionParameters, triggerName,
-                triggerParameters))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<? extends Property<?>> executeDynamicProperties(
+        String propertyName, String triggerName, String componentName, int componentVersion,
+        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
+
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        String authorizationName, Map<String, Object> connectionParameters) {
 
-        return MonoUtils.get(getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.executeSampleOutput")
-            .data(new SampleOutput(
-                authorizationName, componentName, componentVersion, connectionParameters, triggerName,
-                triggerParameters))
-            .retrieveMono(new ParameterizedTypeReference<>() {}));
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -225,11 +200,6 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
         String componentName, int componentVersion, DynamicWebhookEnableOutput output, String triggerName) {
     }
 
-    private record EditorDescription(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String triggerName, Map<String, Object> triggerParameters) {
-    }
-
     private record ListenerDisable(
         String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String triggerName, Map<String, Object> triggerParameters, String workflowExecutionId) {
@@ -238,27 +208,5 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
     private record ListenerEnable(
         String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
         String triggerName, Map<String, Object> triggerParameters, String workflowExecutionId) {
-    }
-
-    private record Options(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String propertyName, String triggerName, Map<String, Object> triggerParameters) {
-    }
-
-    private record OutputSchema(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String triggerName, Map<String, Object> triggerParameters) {
-
-    }
-
-    private record Properties(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String propertyName, String triggerName, Map<String, Object> triggerParameters) {
-    }
-
-    private record SampleOutput(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String triggerName, Map<String, Object> triggerParameters) {
-
     }
 }

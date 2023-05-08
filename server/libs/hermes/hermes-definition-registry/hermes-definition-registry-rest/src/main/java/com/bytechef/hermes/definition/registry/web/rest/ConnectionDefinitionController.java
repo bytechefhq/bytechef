@@ -49,13 +49,14 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
 
     @Override
     public Mono<ResponseEntity<OAuth2AuthorizationParametersModel>> getOAuth2AuthorizationParameters(
-        Mono<GetOAuth2AuthorizationParametersRequestModel> connectionModelMono, ServerWebExchange exchange) {
+        Mono<GetOAuth2AuthorizationParametersRequestModel> parametersRequestModelMono, ServerWebExchange exchange) {
 
-        return connectionModelMono
-            .map(connection -> connectionDefinitionService.getOAuth2Parameters(
-                connection.getComponentName(), connection.getConnectionVersion(),
-                oAuth2Properties.checkPredefinedApp(connection.getComponentName(), connection.getParameters()),
-                connection.getAuthorizationName()))
+        return parametersRequestModelMono
+            .flatMap(parametersRequestModel -> connectionDefinitionService.getOAuth2Parameters(
+                parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
+                oAuth2Properties.checkPredefinedApp(
+                    parametersRequestModel.getComponentName(), parametersRequestModel.getParameters()),
+                parametersRequestModel.getAuthorizationName()))
             .map(oAuth2AuthorizationParametersDTO -> conversionService.convert(
                 oAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel.class))
             .map(ResponseEntity::ok);

@@ -18,8 +18,6 @@
 package com.bytechef.hermes.definition.registry.rsocket.controller.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -74,16 +72,6 @@ public class TriggerDefinitionServiceRSocketController {
             dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.output));
     }
 
-    @MessageMapping("TriggerDefinitionService.executeEditorDescription")
-    public Mono<String> executeEditorDescription(
-        EditorDescription editorDescription) {
-
-        return Mono.just(triggerDefinitionService.executeEditorDescription(
-            editorDescription.triggerName, editorDescription.componentName, editorDescription.componentVersion,
-            editorDescription.connectionParameters, editorDescription.authorizationName,
-            editorDescription.triggerParameters));
-    }
-
     @MessageMapping("TriggerDefinitionFacade.executeListenerDisable")
     public Mono<Void> executeListenerDisable(ListenerDisable listenerDisable) {
         triggerDefinitionService.executeListenerDisable(
@@ -102,42 +90,6 @@ public class TriggerDefinitionServiceRSocketController {
             listenerEnable.workflowExecutionId);
 
         return Mono.empty();
-    }
-
-    @MessageMapping("TriggerDefinitionService.executeOptions")
-    public Mono<List<Option<?>>> executeOptions(Options options) {
-
-        return Mono.just(triggerDefinitionService.executeOptions(
-            options.propertyName, options.triggerName, options.componentName, options.componentVersion,
-            options.connectionParameters, options.authorizationName,
-            options.triggerParameters));
-    }
-
-    @MessageMapping("TriggerDefinitionService.executeProperties")
-    public Mono<List<? extends Property<?>>> executeProperties(Properties properties) {
-
-        return Mono.just(triggerDefinitionService.executeProperties(
-            properties.propertyName, properties.triggerName, properties.componentName, properties.componentVersion,
-            properties.connectionParameters, properties.authorizationName,
-            properties.triggerParameters));
-    }
-
-    @MessageMapping("TriggerDefinitionService.executeOutputSchema")
-    public Mono<List<? extends Property<?>>> executeOutputSchema(OutputSchema outputSchema) {
-
-        return Mono.just(triggerDefinitionService.executeOutputSchema(
-            outputSchema.triggerName, outputSchema.componentName, outputSchema.componentVersion,
-            outputSchema.connectionParameters, outputSchema.authorizationName,
-            outputSchema.triggerParameters));
-    }
-
-    @MessageMapping("TriggerDefinitionService.executeSampleOutput")
-    public Mono<Object> executeSampleOutput(SampleOutput sampleOutput) {
-
-        return Mono.just(triggerDefinitionService.executeSampleOutput(
-            sampleOutput.triggerName, sampleOutput.componentName, sampleOutput.componentVersion,
-            sampleOutput.connectionParameters, sampleOutput.authorizationName,
-            sampleOutput.triggerParameters));
     }
 
     @MessageMapping("TriggerDefinitionService.getTriggerDefinition")
@@ -168,11 +120,6 @@ public class TriggerDefinitionServiceRSocketController {
         String triggerName) {
     }
 
-    private record EditorDescription(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String triggerName, Map<String, Object> triggerParameters) {
-    }
-
     private record ListenerDisable(
         String authorizationName, String componentName, int componentVersion,
         Map<String, Object> connectionParameters, String triggerName, Map<String, Object> triggerParameters,
@@ -183,25 +130,5 @@ public class TriggerDefinitionServiceRSocketController {
         String authorizationName, String componentName, int componentVersion,
         Map<String, Object> connectionParameters, String triggerName, Map<String, Object> triggerParameters,
         String workflowExecutionId) {
-    }
-
-    private record Options(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String propertyName, String triggerName, Map<String, Object> triggerParameters) {
-    }
-
-    private record OutputSchema(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String triggerName, Map<String, Object> triggerParameters) {
-    }
-
-    private record Properties(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String propertyName, String triggerName, Map<String, Object> triggerParameters) {
-    }
-
-    private record SampleOutput(
-        String authorizationName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String triggerName, Map<String, Object> triggerParameters) {
     }
 }

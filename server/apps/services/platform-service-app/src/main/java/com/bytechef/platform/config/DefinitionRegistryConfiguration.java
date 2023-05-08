@@ -17,7 +17,9 @@
 
 package com.bytechef.platform.config;
 
+import com.bytechef.hermes.definition.registry.rsocket.client.facade.ActionDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
+import com.bytechef.hermes.definition.registry.rsocket.client.facade.TriggerDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ConnectionDefinitionServiceRSocketClient;
@@ -34,6 +36,14 @@ import org.springframework.messaging.rsocket.RSocketRequester;
  */
 @Configuration
 public class DefinitionRegistryConfiguration {
+
+    @Bean
+    ActionDefinitionFacadeRSocketClient actionDefinitionFacadeRSocketClient(
+        DiscoveryClient discoveryClient,
+        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+
+        return new ActionDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    }
 
     @Bean
     ActionDefinitionServiceRSocketClient actionDefinitionServiceRSocketClient(
@@ -72,6 +82,14 @@ public class DefinitionRegistryConfiguration {
         @Qualifier("coordinatorRSocketRequester") RSocketRequester rSocketRequester) {
 
         return new TaskDispatcherDefinitionServiceRSocketClient(rSocketRequester);
+    }
+
+    @Bean
+    TriggerDefinitionFacadeRSocketClient triggerDefinitionFacadeRSocketClient(
+        DiscoveryClient discoveryClient,
+        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+
+        return new TriggerDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
     }
 
     @Bean

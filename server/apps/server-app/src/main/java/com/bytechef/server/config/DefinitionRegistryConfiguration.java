@@ -20,6 +20,10 @@ package com.bytechef.server.config;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
@@ -51,6 +55,13 @@ import java.util.List;
  */
 @Configuration
 public class DefinitionRegistryConfiguration {
+
+    @Bean
+    ActionDefinitionFacade actionDefinitionFacade(
+        ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
+
+        return new ActionDefinitionFacadeImpl(actionDefinitionService, connectionService);
+    }
 
     @Bean
     ActionDefinitionService actionDefinitionService(
@@ -103,6 +114,13 @@ public class DefinitionRegistryConfiguration {
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
 
         return new TaskDispatcherDefinitionRegistryImpl(taskDispatcherDefinitionFactories);
+    }
+
+    @Bean
+    TriggerDefinitionFacade triggerDefinitionFacade(
+        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
+
+        return new TriggerDefinitionFacadeImpl(connectionService, triggerDefinitionService);
     }
 
     @Bean
